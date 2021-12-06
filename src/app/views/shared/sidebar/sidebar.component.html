@@ -1,0 +1,28 @@
+<div class="py-4">
+
+    <div class="my-4 mb-10 flex justify-center items-center cursor-pointer" [routerLink]="['/']">
+        <img class="w-9 h-9" src="../../../../assets/branding/soundcore_logo_full.svg">
+        <h5 class="ml-4">Soundcore <span class="block text-xs leading-none opacity-20">by TSAlliance</span></h5>
+    </div>
+
+    <ul>
+        <li [routerLink]="['/']" [routerLinkActive]="'active'" [routerLinkActiveOptions]="{ exact: true }"><span><i class="fa-solid fa-house"></i>Startseite</span></li>
+        <li [routerLink]="['/library']" [routerLinkActive]="'active'"><span><i class="fa-solid fa-layer-group"></i>Bibliothek</span></li>
+        <li [routerLink]="['/activity']" [routerLinkActive]="'active'"><span><i class="fa-solid fa-compass"></i>Aktivität</span></li>
+        <li [routerLink]="['/collection']" [routerLinkActive]="'active'"><span><i class="fa-solid fa-heart"></i>Lieblingssongs</span></li>
+    </ul>
+
+    <ul>
+        <label>Entdecken</label>
+        <li [routerLink]="['/releases']" [routerLinkActive]="'active'"><span><i class="fa-solid fa-calendar-check"></i>Neuheiten</span></li>
+        <li [routerLink]="['/genres']" [routerLinkActive]="'active'"><span><i class="fa-solid fa-boxes-stacked"></i>Genres</span></li>
+        <li [routerLink]="['/artists']" [routerLinkActive]="'active'"><span><i class="fa-solid fa-masks-theater"></i>Künstler</span></li>
+    </ul>
+
+    <ul>
+        <label>Deine Sammlung</label>
+        <button>Playlist erstellen</button>
+        <li [routerLink]="['/playlist', 1]" [routerLinkActive]="'active'"><span>Playlist 1</span></li>
+        <li [routerLink]="['/playlist', 2]" [routerLinkActive]="'active'"><span>Playlist 2</span></li>
+    </ul>
+</div>

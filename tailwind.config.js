@@ -1,0 +1,76 @@
+const colors = require("tailwindcss/colors")
+
+module.exports = {
+    prefix: '',
+    mode: 'jit',
+    purge: {
+      enabled: true,
+      content: [
+        './src/**/*.{html,ts,scss}',
+      ]
+    },
+    darkMode: 'class', // or 'media' or 'class'
+    theme: {
+      extend: {
+        gridTemplateColumns: {
+          drawer: 'auto minmax(0, 1fr)',
+          drawerClosed: 'auto'
+        },
+        colors: {
+          background: {
+            light: "#1b2027",
+            DEFAULT: "#181c22",
+            dark: "#14181d"
+          },
+          primary: {
+            light: "#4d5159",
+            DEFAULT: "#393E46",
+            dark: "#222831"
+          },
+          accent: {
+            light: "#FFD97E",
+            DEFAULT: "#FFCD69",
+            dark: "#FFBF50"
+          }
+        }
+      },
+      colors: {
+        transparent: 'transparent',
+        current: 'currentColor',
+        white: {
+          light: colors.white,
+          DEFAULT: "#CCCCCC",
+          dark: "#BBBBBB"
+        }
+      },
+      screens: {
+        '2xl': {'min-width': '1550px'},
+        'xl': {'min-width': '1200px'},  // Desktop
+        'lg': {'min-width': '1000px'},
+        'md': {'min-width': '780px'},   // Tablet
+        'sm': {'min-width': '540px'}    // Mobile
+      },
+      fontSize: {
+        xs: ['0.7rem', { lineHeight: '1rem' }],
+        sm: ['0.78rem', { lineHeight: '1.1rem' }],
+        base: ['0.85rem', { lineHeight: '1.25rem' }],
+        lg: ['1.125rem', { lineHeight: '1.75rem' }],
+        xl: ['1.25rem', { lineHeight: '1.75rem' }],
+        '2xl': ['1.5rem', { lineHeight: '2rem' }],
+        '3xl': ['1.875rem', { lineHeight: '2.25rem' }],
+        '4xl': ['2.25rem', { lineHeight: '2.5rem' }],
+        '5xl': ['3rem', { lineHeight: '1' }]
+      },
+      fontWeight: {
+        light: '300',
+        normal: '500',
+        bold: '700'
+      },
+    },
+    variants: {
+      extend: {},
+    },
+    plugins: [
+        require('@tailwindcss/typography')
+    ]
+};

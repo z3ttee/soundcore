@@ -1,0 +1,16 @@
+<asc-drawer #drawer>
+    <div asc-drawer>
+        <asc-sidebar></asc-sidebar>
+    </div>
+    <div asc-drawer-content>
+        <button (click)="drawer.toggle()">Toggle Drawer</button>
+
+        <section class="p-6">
+            <router-outlet></router-outlet>
+        </section>
+        
+
+        
+    </div>
+</asc-drawer>
+
