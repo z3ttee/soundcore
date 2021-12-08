@@ -23,16 +23,20 @@ module.exports = {
             dark: "#14181d"
           },
           primary: {
-            light: "#4d5159",
-            DEFAULT: "#393E46",
-            dark: "#222831"
+            light: "#272e38",
+            DEFAULT: "#272e38",
+            dark: "#14181d"
           },
           accent: {
             light: "#FFD97E",
             DEFAULT: "#FFCD69",
             dark: "#FFBF50"
           }
-        }
+        },
+        backgroundImage: theme => ({
+          'sidebar-gradient': "linear-gradient(60deg, " + theme('colors.primary.dark') + " 0%, " + theme('colors.primary.light') + " 100%);",
+          'content-gradient': "linear-gradient(180deg, " + theme('colors.accent.dark') + " 0%, " + theme('colors.background.dark') + " 30%);"
+        })
       },
       colors: {
         transparent: 'transparent',
