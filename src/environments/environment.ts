@@ -3,7 +3,10 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-  production: false
+  production: false,
+  sso_client_id: "2VYhnrdDzaEJlEyQ",
+  sso_redirect_uri: "http://localhost:4200/authorize",
+  api_base_uri: "http://localhost:3001"
 };
 
 /*

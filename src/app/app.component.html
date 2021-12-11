@@ -1,4 +1,5 @@
-<asc-drawer #drawer>
+<asc-splash *ngIf="showSplashScreen"></asc-splash>
+<asc-drawer *ngIf="!showSplashScreen" #drawer>
     <div asc-drawer>
         <asc-sidebar></asc-sidebar>
     </div>
@@ -8,9 +9,6 @@
         <section class="p-6">
             <router-outlet></router-outlet>
         </section>
-        
-
-        
     </div>
 </asc-drawer>
 
