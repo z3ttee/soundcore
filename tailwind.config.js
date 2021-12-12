@@ -31,6 +31,26 @@ module.exports = {
             light: "#FFD97E",
             DEFAULT: "#FFCD69",
             dark: "#FFBF50"
+          },
+          error: {
+            light: "#D25D5D",
+            DEFAULT: "#c75151",
+            dark: "#B94848"
+          },
+          warn: {
+            light: "#FBC06E",
+            DEFAULT: "#f0ad4e",
+            dark: "#DE9939"
+          },
+          success: {
+            light: "#66A55B",
+            DEFAULT: "#538d4a",
+            dark: "#497E40"
+          },
+          info: {
+            light: "#378FC2",
+            DEFAULT: "#277cad",
+            dark: "#23719E"
           }
         },
         backgroundImage: theme => ({
@@ -56,8 +76,8 @@ module.exports = {
       },
       fontSize: {
         xs: ['0.7rem', { lineHeight: '1rem' }],
-        sm: ['0.78rem', { lineHeight: '1.1rem' }],
-        base: ['0.85rem', { lineHeight: '1.25rem' }],
+        sm: ['0.8rem', { lineHeight: '1.1rem' }],
+        base: ['0.92rem', { lineHeight: '1.25rem' }],
         lg: ['1.125rem', { lineHeight: '1.75rem' }],
         xl: ['1.25rem', { lineHeight: '1.75rem' }],
         '2xl': ['1.5rem', { lineHeight: '2rem' }],

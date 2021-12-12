@@ -1,5 +1,5 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { ActivatedRoute, ActivationEnd, NavigationEnd, ResolveEnd, ResolveStart, Router, RoutesRecognized } from '@angular/router';
 import { filter, first, map, skip, zip } from 'rxjs';
 import { SSOSession, SSOSessionType } from 'src/app/model/session.model';
@@ -12,6 +12,10 @@ import { environment } from 'src/environments/environment';
   styleUrls: ['./splash.component.scss']
 })
 export class SplashComponent implements OnInit {
+
+  @Input() public appTitle: string;
+  @Input() public subtitle: string;
+  @Input() public appLogoUri: string;
 
   public errorMessage: string;
 
@@ -36,11 +40,7 @@ export class SplashComponent implements OnInit {
               this.authService.redirectToAuthentication();
             } else {
               // TODO: Show error to user. These are browser javascript errors (Network, TypedError etc)
-              if(errorResponse.statusText == "Network Error") {
-                this.errorMessage = "Es ist ein Netzwerkfehler aufgetreten.";
-              } else {
-                this.errorMessage = "In der Anwendung ist ein unbekannter Fehler aufgetreten. Installiere ggf. die aktuellste Version.";
-              }
+              this.errorMessage = "Ein unerwarteter Netzwerkfehler ist aufgetreten.";
             }
 
             return null;
@@ -59,7 +59,7 @@ export class SplashComponent implements OnInit {
           })
         }
       } else {
-        // User still logged in, do nothing?
+        // TODO: User still logged in, do nothing?
       }
     })
 

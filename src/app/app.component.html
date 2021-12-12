@@ -1,14 +1,14 @@
-<asc-splash *ngIf="showSplashScreen"></asc-splash>
-<asc-drawer *ngIf="!showSplashScreen" #drawer>
-    <div asc-drawer>
-        <asc-sidebar></asc-sidebar>
-    </div>
-    <div asc-drawer-content>
-        <button (click)="drawer.toggle()">Toggle Drawer</button>
-
-        <section class="p-6">
-            <router-outlet></router-outlet>
-        </section>
-    </div>
-</asc-drawer>
-
+<asc-splash *ngIf="showSplashScreen" [appTitle]="'Soundcore'" [subtitle]="'by TSAlliance'" [appLogoUri]="'../../../assets/branding/soundcore_logo_full.svg'">
+    <asc-drawer *ngIf="!showSplashScreen" #drawer>
+        <div asc-drawer>
+            <asc-sidebar></asc-sidebar>
+        </div>
+        <div asc-drawer-content>
+            <button (click)="drawer.toggle()">Toggle Drawer</button>
+    
+            <section class="p-6">
+                <router-outlet></router-outlet>
+            </section>
+        </div>
+    </asc-drawer>
+</asc-splash>

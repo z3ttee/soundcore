@@ -116,7 +116,11 @@ export class AuthenticationService {
    * @param session Data to persist
    */
   private async persistSession(session: SSOSession) {
-    CookieApi.set(SESSION_COOKIE_NAME, session.accessToken!, { expires: session.expiresAt })
+    if(!session || session.type == SSOSessionType.SESSION_ANONYMOUS || !session.accessToken) {
+      CookieApi.remove(SESSION_COOKIE_NAME);
+    } else {
+      CookieApi.set(SESSION_COOKIE_NAME, session.accessToken!, { expires: session.expiresAt })
+    }
   }
 
   /**
