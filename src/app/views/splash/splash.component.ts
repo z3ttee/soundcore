@@ -30,22 +30,19 @@ export class SplashComponent implements OnInit {
       const session = this.authService.getSession();
       const grantCode = queryMap.get("code");
 
+      console.log(session)
+
       if(session.type == SSOSessionType.SESSION_ANONYMOUS) {
         if(!grantCode){
           this.authService.redirectToAuthentication();
         } else {
           // Login user using the grantCode
-          this.authService.authorize({ grantCode, redirectUri: environment.sso_redirect_uri}).catch((errorResponse: HttpErrorResponse) => {
-            if(errorResponse.status != 0) {
-              this.authService.redirectToAuthentication();
-            } else {
-              // TODO: Show error to user. These are browser javascript errors (Network, TypedError etc)
-              this.errorMessage = "Ein unerwarteter Netzwerkfehler ist aufgetreten.";
-            }
+          this.authService.authorize({ grantCode, redirectUri: environment.sso_redirect_uri}).then((response) => {
+            const session: SSOSession = new SSOSession(response.accessToken);
+            session.type = SSOSessionType.SESSION_USER;
+            session.expiresAt = response.expiresAt;
+            console.log(session)
 
-            return null;
-          }).then((response) => {
-            const session: SSOSession = response;
             // Persists session on success
             this.authService.updateSession(session).then(() => {
               this.authService.findCurrentUser().then((user) => {
@@ -56,6 +53,20 @@ export class SplashComponent implements OnInit {
                 });
               })
             });
+          }).catch((errorResponse: HttpErrorResponse) => {
+            
+            if(errorResponse.status != 200) {
+              if(errorResponse.status == 0) {
+                // TODO: Show error to user. These are browser javascript errors (Network, TypedError etc)
+                this.errorMessage = "Ein unerwarteter Netzwerkfehler ist aufgetreten.";
+                return
+              }
+
+              console.log(errorResponse)
+              // this.authService.redirectToAuthentication();
+            } 
+
+            return null;
           })
         }
       } else {

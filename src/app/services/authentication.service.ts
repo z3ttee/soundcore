@@ -10,13 +10,17 @@ import { SSOCreateAuthorizationDTO } from '../dto/create-authorization.dto';
 import { SSOAccessToken } from '../model/sso-access-token.entity';
 import { SSOUser } from '../model/sso-user.model';
 
+export interface SSOConfig {
+
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class AuthenticationService {
 
   private readonly _sessionSubject = new BehaviorSubject(SSOSession.anonymous());
-  private readonly _userSubject = new BehaviorSubject(null);
+  private readonly _userSubject = new BehaviorSubject(SSOUser.anonymous());
   private readonly _readySubject = new BehaviorSubject(false);
 
   /**
@@ -33,28 +37,40 @@ export class AuthenticationService {
   public readonly $ready: Observable<boolean> = this._readySubject.asObservable();
   public readonly $isLoggedIn: Observable<boolean> = combineLatest([this.$session, this.$ready]).pipe(map(([session, ready]) => (ready && !!session && session.type != SSOSessionType.SESSION_ANONYMOUS)))
 
+  /*public static forRoot(config: SSOConfig): ModuleWithProviders<GreetingModule> {
+    return {
+      ngModule: GreetingModule,
+      providers: [
+        {provide: UserServiceConfig, useValue: config }
+      ]
+    };
+  }*/
+
   constructor(private httpClient: HttpClient) {
-    this.restoreSession().then(() => {
+    this.restoreSession().then((session) => {
+      // Push restored session
+      this._sessionSubject.next(session)
+
+      // Subscribe to session changes.
+      // If session is null or anonymous, proceed with login
+      // Otherwise persist session updates.
       this._sessionSubject.pipe(skip(1)).subscribe((session) => {
-        // Subscribe to session changes.
-        // If session is null or anonymous, proceed with login
-        // Otherwise persist session updates.
         if(!session || session.type == SSOSessionType.SESSION_ANONYMOUS) this.redirectToAuthentication();
         else this.persistSession(session);
       })
 
-      this.restoreUser().then(() => {
-        this._userSubject.pipe(skip(1)).subscribe((user) => {
-          this.persistUser(user)
-        })
-      }).catch(() => {
-        // User data did not exist, but session does.
-        // So we try to fetch user's data.
-        this.findAndPersistCurrentUser()
+      this.restoreUser().then((user) => {
+        this._userSubject.next(user)
+
+        // User data was found, but it may be outdated.
+        // This is why the below function is called which fetches
+        // the user's data and persists it as well as updating the app state
+        this.findAndUpdateCurrentUser();
       })
-    }).catch(() => {
-      this._sessionSubject.next(SSOSession.anonymous())
     }).finally(() => {
+      // The restore session process is done.
+      // For this value we don't care if the session is anonymous or not.
+      // This must be handled in different places in the app.
       this._readySubject.next(true);
     })
   }
@@ -68,27 +84,42 @@ export class AuthenticationService {
   }
 
   /**
-   * Restore session from cookie.
+   * Restore session from cookie. If no cookie exists, an anonymous session is returned
+   * @returns SSOSession
    */
-  private async restoreSession() {
+  private async restoreSession(): Promise<SSOSession> {
+    console.log("[SSO] Checking local session.")
     const cookieValue: any = CookieApi.get(SESSION_COOKIE_NAME)
+
     // No need to push anonymous session, as the default value in subject is anonymous
-    if(!cookieValue) throw new Error("Session not found.");
+    if(!cookieValue) {
+      console.warn("[SSO] No active session found. Continuing in anonymous mode.")
+      await this.logoutWithoutUpdate();
+      const session = SSOSession.anonymous();
+      return session;
+    }
 
     const session = new SSOSession(cookieValue);
-    this._sessionSubject.next(session);
+    console.log("[SSO] Active session found.")
+    return session;
   }
 
   /**
    * Restore user data from localStorage.
    */
-  private async restoreUser() {
-    const data: SSOUser = JSON.parse(localStorage.getItem(USER_LOCALSTORAGE)) || null;
-    if(!data) throw new Error("User data not found.");
+  private async restoreUser(): Promise<SSOUser> {
+    console.log("[SSO] Checking local user data.")
 
-    this._userSubject.next(data);
-    // Update user data in background
-    this.findAndPersistCurrentUser();
+    const session = this.getSession();
+    const data: SSOUser = JSON.parse(localStorage.getItem(USER_LOCALSTORAGE)) || null;
+
+    if(session.type == SSOSessionType.SESSION_ANONYMOUS || !data) {
+      console.warn("[SSO] No user data found or session anonymous. Switching to anonymous user instance.")
+      return SSOUser.anonymous();
+    }
+
+    console.log("[SSO] Found user data for username: ", data.username)
+    return data;
   }
 
   /**
@@ -98,6 +129,11 @@ export class AuthenticationService {
     window.location.href = `https://account.tsalliance.eu/authorize?client_id=${environment.sso_client_id}&redirect_uri=${environment.sso_redirect_uri}`
   }
 
+  /**
+   * Request access token from AllianceSSO endpoint by providing grantCode.
+   * @param createAuthorizationDto Data to request access token with
+   * @returns SSOAccessToken
+   */
   public async authorize(createAuthorizationDto: SSOCreateAuthorizationDTO): Promise<SSOAccessToken> {
     return firstValueFrom(this.httpClient.post(`${environment.api_base_uri}/v1/authentication/authorize`, createAuthorizationDto)) as Promise<SSOAccessToken>
   }
@@ -116,10 +152,11 @@ export class AuthenticationService {
    * @param session Data to persist
    */
   private async persistSession(session: SSOSession) {
+    console.log("presist session: ", session)
     if(!session || session.type == SSOSessionType.SESSION_ANONYMOUS || !session.accessToken) {
       CookieApi.remove(SESSION_COOKIE_NAME);
     } else {
-      CookieApi.set(SESSION_COOKIE_NAME, session.accessToken!, { expires: session.expiresAt })
+      CookieApi.set(SESSION_COOKIE_NAME, session.accessToken!, { expires: session.expiresAt || 365 })
     }
   }
 
@@ -146,9 +183,11 @@ export class AuthenticationService {
    * @returns SSOUser
    */
   public async findCurrentUser(): Promise<SSOUser> {
-    return firstValueFrom(this.httpClient.get(`${environment.api_base_uri}/v1/authentication/user/@me`, {
-      headers: {
-        'Authorization': `Bearer ${this.getSession().accessToken}`
+    const session = this.getSession();
+    if(!session || session.type == SSOSessionType.SESSION_ANONYMOUS) return null;
+
+    return firstValueFrom(this.httpClient.get(`${environment.api_base_uri}/v1/authentication/user/@me`, { headers: {
+        'Authorization': `Bearer ${session.accessToken}`
       }
     })).then((response) => response as SSOUser)
   }
@@ -158,7 +197,7 @@ export class AuthenticationService {
    * If it was successful, then the fetched data is pushed and persisted to localStorage.
    * @returns SSOUser
    */
-  public async findAndPersistCurrentUser(): Promise<SSOUser> {
+  public async findAndUpdateCurrentUser(): Promise<SSOUser> {
     return this.findCurrentUser().then((user) => {
       this.updateUser(user);
       return user;
@@ -167,6 +206,25 @@ export class AuthenticationService {
       // TODO: Show error as toast?
       return null;
     })
+  }
+
+  /**
+   * Logout user by setting user to null and session to an anonymous session.
+   */
+  public async logout(): Promise<void> {
+    console.warn("[SSO] Loggin out user.")
+    await this.updateUser(null);
+    await this.updateSession(SSOSession.anonymous())
+  }
+
+  /**
+   * Logout user by setting user to null and session to an anonymous session.
+   * This method will not push updates to the application state.
+   */
+  private async logoutWithoutUpdate(): Promise<void> {
+    console.warn("[SSO] Loggin out user without active update.")
+    await this.persistSession(null);
+    await this.persistSession(SSOSession.anonymous())
   }
 
 

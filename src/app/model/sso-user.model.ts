@@ -8,4 +8,14 @@ export class SSOUser {
     public createdAt: Date;
     public avatarResourceId?: string;
 
+    public static anonymous(): SSOUser {
+        return {
+            id: "123",
+            username: "Unknown user",
+            email: "unknown@email.xyz",
+            role: null,
+            createdAt: new Date()
+        }
+    }
+
 }
