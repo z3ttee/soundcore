@@ -16,6 +16,7 @@ export class SplashComponent implements OnInit {
   @Input() public appTitle: string;
   @Input() public subtitle: string;
   @Input() public appLogoUri: string;
+  @Input() public active: boolean = true;
 
   public errorMessage: string;
 
@@ -30,8 +31,6 @@ export class SplashComponent implements OnInit {
       const session = this.authService.getSession();
       const grantCode = queryMap.get("code");
 
-      console.log(session)
-
       if(session.type == SSOSessionType.SESSION_ANONYMOUS) {
         if(!grantCode){
           this.authService.redirectToAuthentication();
@@ -41,16 +40,12 @@ export class SplashComponent implements OnInit {
             const session: SSOSession = new SSOSession(response.accessToken);
             session.type = SSOSessionType.SESSION_USER;
             session.expiresAt = response.expiresAt;
-            console.log(session)
 
             // Persists session on success
             this.authService.updateSession(session).then(() => {
-              this.authService.findCurrentUser().then((user) => {
-                console.log(user)
-                // Persist user data, if finding the data was successful
-                this.authService.updateUser(user).then(() => {
-                  this.router.navigate(["/"])
-                });
+              // Persist user data, if finding the data was successful
+              this.authService.findAndUpdateCurrentUser().then(() => {
+                this.router.navigate(["/"])
               })
             });
           }).catch((errorResponse: HttpErrorResponse) => {
@@ -62,8 +57,7 @@ export class SplashComponent implements OnInit {
                 return
               }
 
-              console.log(errorResponse)
-              // this.authService.redirectToAuthentication();
+              this.authService.redirectToAuthentication();
             } 
 
             return null;

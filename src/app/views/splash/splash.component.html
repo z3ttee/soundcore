@@ -1,4 +1,4 @@
-<div class="splash-wrapper fixed left-0 top-0 flex flex-col justify-center content-center items-center w-full h-full overflow-hidden bg-background">
+<div *ngIf="active" class="splash-wrapper fixed left-0 top-0 flex flex-col justify-center content-center items-center w-full h-full overflow-hidden bg-background">
     <div class="block">
         <img [src]="appLogoUri" class="w-14 h-14 block mx-auto animate-pulse">
     </div>
@@ -15,4 +15,4 @@
     </div>
 </div>
 
-<ng-content *ngIf=""></ng-content>
+<ng-content *ngIf="!active"></ng-content>

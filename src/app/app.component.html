@@ -1,5 +1,5 @@
-<asc-splash *ngIf="showSplashScreen" [appTitle]="'Soundcore'" [subtitle]="'by TSAlliance'" [appLogoUri]="'../../../assets/branding/soundcore_logo_full.svg'">
-    <asc-drawer *ngIf="!showSplashScreen" #drawer>
+<asc-splash [appTitle]="'Soundcore'" [subtitle]="'by TSAlliance'" [active]="showSplashScreen" [appLogoUri]="'../../../assets/branding/soundcore_logo_full.svg'">
+    <asc-drawer #drawer>
         <div asc-drawer>
             <asc-sidebar></asc-sidebar>
         </div>
