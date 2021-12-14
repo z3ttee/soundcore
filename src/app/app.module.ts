@@ -7,12 +7,12 @@ import { IndexViewComponent } from './views/index-view/index-view.component';
 import { DrawerComponent } from './components/drawer/drawer.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { SidebarComponent } from './views/shared/sidebar/sidebar.component';
-import { ToolbarComponent } from './components/toolbar/toolbar.component';
 import { SplashComponent } from './views/splash/splash.component';
 import { StoreModule } from '@ngrx/store';
 
 import { HttpClientModule } from "@angular/common/http"
-import { AuthenticationService } from './services/authentication.service';
+import { ToolbarComponent } from './views/shared/toolbar/toolbar.component';
+import { AccentradialComponent } from './views/shared/accentradial/accentradial.component';
 
 // TODO: https://angular.io/guide/i18n-common-prepare
 
@@ -23,7 +23,8 @@ import { AuthenticationService } from './services/authentication.service';
     DrawerComponent,
     SidebarComponent,
     ToolbarComponent,
-    SplashComponent
+    SplashComponent,
+    AccentradialComponent
   ],
   imports: [
     BrowserModule,

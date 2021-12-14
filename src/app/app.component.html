@@ -4,11 +4,15 @@
             <asc-sidebar></asc-sidebar>
         </div>
         <div asc-drawer-content>
-            <button (click)="drawer.toggle()">Toggle Drawer</button>
-    
-            <section class="p-6">
-                <router-outlet></router-outlet>
-            </section>
+            <asc-accentradial [color]="'#FFCD69'"></asc-accentradial>
+            <div class="relative">
+                <asc-toolbar></asc-toolbar>
+                <button (click)="drawer.toggle()">Toggle Drawer</button>
+        
+                <section class="p-6">
+                    <router-outlet></router-outlet>
+                </section>
+            </div>
         </div>
     </asc-drawer>
 </asc-splash>
