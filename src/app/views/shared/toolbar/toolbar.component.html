@@ -1,0 +1,16 @@
+<div class="p-6">
+    <div class="flex flex-1 p-4 rounded-md bg-primary">
+        <div class="inline-block">
+            <button (click)="emitMenuToggle()" *ngIf="withMenu"><i class="fa-solid fa-bars"></i></button>
+            
+            <ng-content></ng-content>
+        </div>
+        <div class="flex-grow">
+            <input type="text" name="search">
+        </div>
+    
+        <div class="inline-block">
+
+        </div>
+    </div>
+</div>
