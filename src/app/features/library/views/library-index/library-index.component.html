@@ -1,0 +1,18 @@
+<section>
+
+    <h1 class="px-6">Your library</h1>
+
+    <nav mat-tab-nav-bar color="accent" class="mt-6">
+        <a mat-tab-link
+        *ngFor="let link of navLinks"
+        [routerLink]="[link.link]"
+        routerLinkActive #rla="routerLinkActive"
+        [routerLinkActiveOptions]="{ exact: true }"
+        [active]="rla.isActive">{{ link.label }}</a>
+    </nav>
+
+    <div class="p-6">
+        <router-outlet></router-outlet>
+    </div>
+
+</section>

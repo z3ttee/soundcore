@@ -1,0 +1,53 @@
+<div class="flex flex-1">
+    <div class="flex-grow">actionbar</div>
+    <div>
+        <button class="bg-error rounded-md p-2 ">Cancel all</button>
+    </div>
+</div>
+
+<section>
+    <div class="relative border-2 border-primary-light border-dashed bg-primary-light bg-opacity-20 rounded-md">
+        <p class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none">Klicken oder Dateien hierher ziehen</p>
+        <input #fileInput class="opacity-0 w-full p-6 py-12 cursor-pointer" type="file" multiple="true" (input)="enqueueFiles($event)">
+    </div>
+    
+    <hr class="my-4">
+
+    <p *ngIf="($queue | async).length <= 0">Keine aktiven Uploads</p>
+    <section *ngIf="($queue | async).length > 0">
+        <h5>Wird hochgeladen</h5>
+        <div class="bg-primary my-1 p-6 rounded-lg border-2 border-transparent" *ngFor="let upload of ($queue | async)" [ngClass]="{'border-error-light': (upload.$info | async).error}">
+            <div class="flex flex-1 items-center">
+                <div class="flex-grow">{{ upload.file.name }}</div>
+
+                {{ (upload.$info | async).error }}
+
+                <div class="mr-2">
+                    <mat-chip-list>
+                        <mat-chip [color]="(upload.$info | async).error ? 'warn' : 'accent'" selected="">{{ (upload.$info | async).status }} </mat-chip>
+                    </mat-chip-list>
+                </div>
+                <div>
+                    <button mat-stroked-button color="warn" (click)="upload.cancel()">Cancel</button>
+                </div>
+            </div>
+
+            <mat-progress-bar
+                class="mt-6"
+                *ngIf="!upload.isDone()"
+                class="my-2"
+                [mode]="upload.isUploading() ? 'determinate' : 'indeterminate'"
+                [value]="(upload.$info | async).progress">
+            </mat-progress-bar>
+        </div>
+    </section>
+    <!--<mat-paginator color="accent" 
+               [pageSize]="selectedPageSize"
+               [pageSizeOptions]="pageSizeOptions"
+               [pageIndex]="currentPageIndex"
+               [disabled]="isLoading"
+               [length]="($uploadsPage | async).totalElements"
+               (page)="onPageEvent($event)"
+               aria-label="Select page">
+    </mat-paginator>-->
+</section>

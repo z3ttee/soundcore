@@ -1,0 +1,42 @@
+<section>
+
+    <div class="flex flex-1">
+        <div class="flex-grow">actionbar</div>
+        <div>
+            <button class="bg-accent text-primary-dark" (click)="createUpload()">Hochladen</button>
+        </div>
+    </div>
+
+    <p *ngIf="isLoading">Loading...</p>
+    <p *ngIf="($uploadsPage | async).amount <= 0 && !isLoading">Keine Uploads gefunden</p>
+
+    <div *ngIf="($uploadsPage | async).amount > 0">
+        <div class="bg-primary my-1 p-6 rounded-lg border-2 border-transparent" *ngFor="let uploadedFile of ($uploadsPage | async).elements">
+            <div class="flex flex-1 items-center">
+                <div class="flex-grow">{{ uploadedFile.metadata.title }}</div>
+
+                <div class="mr-2">
+                    <mat-chip-list>
+                        <mat-chip selected="">{{ uploadedFile.status }} </mat-chip>
+                    </mat-chip-list>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <mat-paginator color="accent" 
+               [pageSize]="selectedPageSize"
+               [pageSizeOptions]="pageSizeOptions"
+               [pageIndex]="currentPageIndex"
+               [disabled]="isLoading"
+               [length]="($uploadsPage | async).totalElements"
+               (page)="onPageEvent($event)"
+               aria-label="Select page">
+    </mat-paginator>
+
+    
+</section>
+
+
+
