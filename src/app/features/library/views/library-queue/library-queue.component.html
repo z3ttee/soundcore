@@ -13,7 +13,72 @@
     
     <hr class="my-4">
 
-    <p *ngIf="($queue | async).length <= 0">Keine aktiven Uploads</p>
+    <mat-accordion class="example-headers-align" multi>
+        <mat-expansion-panel [disabled]="($successQueue | async)?.length <= 0">
+            <mat-expansion-panel-header>
+                <mat-panel-title>
+                Erfolgreich
+                </mat-panel-title>
+                <mat-panel-description>
+                    <mat-icon>info</mat-icon>
+                    <span>{{ ($successQueue | async)?.length || 0 }}</span>
+                </mat-panel-description>
+            </mat-expansion-panel-header>
+      
+            <asc-upload-list-item *ngFor="let upload of ($successQueue | async)" [upload]="upload"></asc-upload-list-item>
+      
+        </mat-expansion-panel>
+
+        <mat-expansion-panel [disabled]="($erroredQueue | async)?.length <= 0">
+            <mat-expansion-panel-header>
+                <mat-panel-title>
+                Fehlgeschlagen
+                </mat-panel-title>
+                <mat-panel-description>
+                    <mat-icon>info</mat-icon>
+                    <span>{{ ($erroredQueue | async)?.length || 0 }}</span>
+                </mat-panel-description>
+            </mat-expansion-panel-header>
+      
+            <asc-upload-list-item *ngFor="let upload of ($erroredQueue | async)" [upload]="upload"></asc-upload-list-item>
+      
+        </mat-expansion-panel>
+
+        <mat-expansion-panel [disabled]="($duplicatesQueue | async)?.length <= 0">
+            <mat-expansion-panel-header>
+                <mat-panel-title>
+                Duplikate
+                </mat-panel-title>
+                <mat-panel-description>
+                    <mat-icon>info</mat-icon>
+                    <span>{{ ($duplicatesQueue | async)?.length || 0 }}</span>
+                </mat-panel-description>
+            </mat-expansion-panel-header>
+      
+            <asc-upload-list-item *ngFor="let upload of ($duplicatesQueue | async)" [upload]="upload"></asc-upload-list-item>
+      
+        </mat-expansion-panel>
+
+        <mat-expansion-panel expanded="true">
+            <mat-expansion-panel-header>
+                <mat-panel-title>
+                Warteschlange
+                </mat-panel-title>
+                <mat-panel-description>
+                    <mat-icon>info</mat-icon>
+                    <span>{{ ($activeQueue | async)?.length || 0 }}</span>
+                </mat-panel-description>
+            </mat-expansion-panel-header>
+      
+            <p *ngIf="($activeQueue | async).length <= 0">Keine aktiven Uploads</p>
+            <asc-upload-list-item *ngFor="let upload of ($activeQueue | async)" [upload]="upload"></asc-upload-list-item>
+      
+        </mat-expansion-panel>
+      
+        
+      </mat-accordion>
+
+    <!--<p *ngIf="($queue | async).length <= 0">Keine aktiven Uploads</p>
     <section *ngIf="($queue | async).length > 0">
         <h5>Wird hochgeladen</h5>
         <div class="bg-primary my-1 p-6 rounded-lg border-2 border-transparent" *ngFor="let upload of ($queue | async)" [ngClass]="{'border-error-light': (upload.$info | async).error}">
@@ -40,14 +105,5 @@
                 [value]="(upload.$info | async).progress">
             </mat-progress-bar>
         </div>
-    </section>
-    <!--<mat-paginator color="accent" 
-               [pageSize]="selectedPageSize"
-               [pageSizeOptions]="pageSizeOptions"
-               [pageIndex]="currentPageIndex"
-               [disabled]="isLoading"
-               [length]="($uploadsPage | async).totalElements"
-               (page)="onPageEvent($event)"
-               aria-label="Select page">
-    </mat-paginator>-->
+    </section>-->
 </section>

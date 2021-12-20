@@ -30,7 +30,9 @@ export class LibraryUploadsComponent implements OnInit {
 
   private async findMyUploads(pageable: Pageable = { page: this.currentPageIndex, size: this.selectedPageSize }) {
     this.isLoading = true;
-    this.libraryService.findMyUploads(pageable).then((page) => {
+    this.libraryService.findMyUploadedSongs(pageable).then((page) => {
+      
+
       if(!page) page = Page.of([]);
       console.log(page)
       this._uploadsPageSubject.next(page)

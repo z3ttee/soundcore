@@ -17,6 +17,9 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import {MatProgressBarModule} from '@angular/material/progress-bar';
 import { LibraryQueueComponent } from './views/library-queue/library-queue.component';
 import {MatChipsModule} from '@angular/material/chips';
+import {MatExpansionModule} from '@angular/material/expansion';
+import {MatIconModule} from '@angular/material/icon';
+import { UploadListItemComponent } from './components/upload-list-item/upload-list-item.component';
 
 
 const routes: Routes = [
@@ -32,7 +35,8 @@ const routes: Routes = [
     LibraryIndexComponent,
     LibraryUploadsComponent,
     LibraryPlaylistsComponent,
-    LibraryQueueComponent
+    LibraryQueueComponent,
+    UploadListItemComponent
   ],
   providers: [
     LibraryService
@@ -51,7 +55,9 @@ const routes: Routes = [
     MatInputModule,
     ReactiveFormsModule,
     MatProgressBarModule,
-    MatChipsModule
+    MatChipsModule,
+    MatExpansionModule,
+    MatIconModule
   ]
 })
 export class LibraryModule { }

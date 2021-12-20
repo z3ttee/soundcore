@@ -6,6 +6,7 @@ import { environment } from 'src/environments/environment';
 import { BehaviorSubject, firstValueFrom, Observable } from 'rxjs';
 import { Page, Pageable } from 'src/app/pagination/pagination';
 import { Upload } from '../entities/upload.entity';
+import { UploadedAudioFile } from '../entities/uploaded-file.entity';
 
 @Injectable({
   providedIn: 'root'
@@ -18,7 +19,7 @@ export class LibraryService {
 
   constructor(private httpClient: HttpClient, private authService: AuthenticationService) { }
 
-  public async findMyUploads(pageable: Pageable): Promise<Page<any>> {
+  public async findMyUploadedSongs(pageable: Pageable): Promise<Page<any>> {
     // TODO: Remove auth header and put into request interceptor
     return firstValueFrom(this.httpClient.get(`${environment.api_base_uri}/v1/uploads/byUploader/@me${Pageable.toQuery(pageable)}`, {
       headers: {
@@ -42,15 +43,24 @@ export class LibraryService {
       ...this._queueSubject.getValue(),
       upload
     ])
-    console.log(upload)
-    upload.start()
 
-    // upload.fileType = FileType.FILE_SONG
-    // upload.
+    upload.start()
   }
 
   public async abortUpload() {
     // TODO
+  }
+
+  public async updateStatus(uploadedFile: UploadedAudioFile) {
+    console.log("Updating status for id: ", uploadedFile.id);
+
+    const uploads: Upload[] = this._queueSubject.getValue();
+    console.log(uploads)
+    const upload = uploads.find((upload) => upload.id == uploadedFile.id);
+
+    upload.updateStatus(uploadedFile.status);
+
+    this._queueSubject.next(uploads)
   }
 
   
