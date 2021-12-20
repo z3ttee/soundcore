@@ -1,0 +1,24 @@
+<div class="bg-primary my-1 p-6 rounded-lg border-2 border-transparent" [ngClass]="{'border-error-light': (upload.$info | async).error}">
+    <div class="flex flex-1 items-center">
+        <div class="flex-grow">{{ upload.file.name }}</div>
+
+        {{ (upload.$info | async).error }}
+
+        <div class="mr-2">
+            <mat-chip-list>
+                <mat-chip [color]="(upload.$info | async).error ? 'warn' : 'accent'" selected="">{{ (upload.$info | async).status }} </mat-chip>
+            </mat-chip-list>
+        </div>
+        <div *ngIf="upload.isUploading()">
+            <button mat-stroked-button color="warn" (click)="upload.abort()">Cancel</button>
+        </div>
+    </div>
+
+    <mat-progress-bar
+        class="mt-6"
+        *ngIf="!upload.isDone()"
+        class="my-2"
+        [mode]="upload.isUploading() ? 'determinate' : 'indeterminate'"
+        [value]="(upload.$info | async).progress">
+    </mat-progress-bar>
+</div>

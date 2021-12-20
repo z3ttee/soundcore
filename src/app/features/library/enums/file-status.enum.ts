@@ -13,6 +13,7 @@ export enum FileStatus {
     // Only client-side
     STATUS_UPLOADING = "uploading",
     STATUS_AWAIT_UPLOAD = "awaiting",
-    STATUS_ERRORED = "errored"
+    STATUS_ERRORED = "errored",
+    STATUS_ABORTED = "aborted"
 
 }

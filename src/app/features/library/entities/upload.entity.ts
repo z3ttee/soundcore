@@ -5,6 +5,8 @@ import { environment } from "src/environments/environment";
 import { FileStatus } from "../enums/file-status.enum";
 import { UploadedAudioFile } from "./uploaded-file.entity";
 
+import { v4 as uuidv4 } from "uuid"
+
 export class UploadInfo {
 
     public status: FileStatus = FileStatus.STATUS_AWAIT_UPLOAD;
@@ -21,8 +23,16 @@ export class Upload {
 
     public file: File;
 
+    // TODO: Auto-generate id
+    public id: string;
+
     constructor(file: File, private httpClient: HttpClient, private authService: AuthenticationService) {
         this.file = file;
+        this.id = uuidv4();
+    }
+
+    public get status(): FileStatus {
+        return this._infoSubject.getValue().status;
     }
 
     public isUploading() {
@@ -62,15 +72,15 @@ export class Upload {
             }),
             filter((event) => event.type == HttpEventType.Response)
         ).subscribe((response: HttpResponse<UploadedAudioFile>) => {
-            console.log(response)
+            this.id = response.body.id
+            console.log("assigned id: ", this.id)
             this.updateStatus(response.body.status)
-
         })
     }
 
-    public cancel() {
-        this._$upload.unsubscribe()
-
+    public abort() {
+        this._$upload.unsubscribe();
+        this.updateStatus(FileStatus.STATUS_ABORTED)
     }
 
     private updateProgress(progress: number) {
@@ -80,7 +90,7 @@ export class Upload {
         this._infoSubject.next(info)
     }
 
-    private updateStatus(status: FileStatus) {
+    public updateStatus(status: FileStatus) {
         const info: UploadInfo = this._infoSubject.getValue();
         info.status = status;
 
