@@ -2,13 +2,9 @@ const colors = require("tailwindcss/colors")
 
 module.exports = {
     prefix: '',
-    mode: 'jit',
-    purge: {
-      enabled: true,
-      content: [
-        './src/**/*.{html,ts,scss}',
-      ]
-    },
+    content: [
+      './src/**/*.{html,ts,scss}',
+    ],
     darkMode: 'class', // or 'media' or 'class'
     theme: {
       extend: {
@@ -55,6 +51,7 @@ module.exports = {
         },
         backgroundImage: theme => ({
           'sidebar-gradient': "linear-gradient(60deg, " + theme('colors.primary.dark') + " 0%, " + theme('colors.primary.light') + " 100%);",
+          'player-gradient': "linear-gradient(-2deg, " + theme('colors.primary.dark') + " 0%, " + theme('colors.primary.light') + " 70%);",
           'content-gradient': "linear-gradient(180deg, " + theme('colors.accent.dark') + " 0%, " + theme('colors.background.dark') + " 30%);"
         })
       },
@@ -95,6 +92,5 @@ module.exports = {
       extend: {},
     },
     plugins: [
-        require('@tailwindcss/typography')
     ]
 };

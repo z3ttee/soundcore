@@ -19,6 +19,8 @@ export interface SSOConfig {
 })
 export class AuthenticationService {
 
+  // TODO: Make sure user never gets null
+
   private readonly _sessionSubject = new BehaviorSubject(SSOSession.anonymous());
   private readonly _userSubject = new BehaviorSubject(SSOUser.anonymous());
   private readonly _readySubject = new BehaviorSubject(false);
@@ -84,6 +86,14 @@ export class AuthenticationService {
   }
 
   /**
+   * Get snapshot of the current user.
+   * @returns SSOUser
+   */
+   public getUser(): SSOUser {
+    return this._userSubject.getValue();
+  }
+
+  /**
    * Restore session from cookie. If no cookie exists, an anonymous session is returned
    * @returns SSOSession
    */
@@ -111,11 +121,11 @@ export class AuthenticationService {
     console.log("[SSO] Checking local user data.")
 
     const session = this.getSession();
-    const data: SSOUser = JSON.parse(localStorage.getItem(USER_LOCALSTORAGE)) || null;
+    const data: SSOUser = JSON.parse(localStorage.getItem(USER_LOCALSTORAGE)) || SSOUser.anonymous();
 
-    if(session.type == SSOSessionType.SESSION_ANONYMOUS || !data) {
+    if(session.type == SSOSessionType.SESSION_ANONYMOUS) {
       console.warn("[SSO] No user data found or session anonymous. Switching to anonymous user instance.")
-      return SSOUser.anonymous();
+      return data;
     }
 
     console.log("[SSO] Found user data for username: ", data.username)
@@ -135,6 +145,7 @@ export class AuthenticationService {
    * @returns SSOAccessToken
    */
   public async authorize(createAuthorizationDto: SSOCreateAuthorizationDTO): Promise<SSOAccessToken> {
+    console.log("authorizing using: ", createAuthorizationDto)
     return firstValueFrom(this.httpClient.post(`${environment.api_base_uri}/v1/authentication/authorize`, createAuthorizationDto)) as Promise<SSOAccessToken>
   }
 
@@ -174,7 +185,7 @@ export class AuthenticationService {
    * @param user Data to persist
    */
    private async persistUser(user: SSOUser) {
-    if(!user) localStorage.removeItem(USER_LOCALSTORAGE);
+    if(!user || user.isAnonymous) localStorage.removeItem(USER_LOCALSTORAGE);
     else localStorage.setItem(USER_LOCALSTORAGE, JSON.stringify(user))
   }
 
@@ -184,12 +195,12 @@ export class AuthenticationService {
    */
   public async findCurrentUser(): Promise<SSOUser> {
     const session = this.getSession();
-    if(!session || session.type == SSOSessionType.SESSION_ANONYMOUS) return null;
+    if(!session || session.type == SSOSessionType.SESSION_ANONYMOUS) return SSOUser.anonymous();
 
     return firstValueFrom(this.httpClient.get(`${environment.api_base_uri}/v1/authentication/user/@me`, { headers: {
         'Authorization': `Bearer ${session.accessToken}`
       }
-    })).then((response) => response as SSOUser)
+    })).then((response) => response as SSOUser).catch(() => SSOUser.anonymous())
   }
 
   /**
@@ -213,7 +224,7 @@ export class AuthenticationService {
    */
   public async logout(): Promise<void> {
     console.warn("[SSO] Loggin out user.")
-    await this.updateUser(null);
+    await this.updateUser(SSOUser.anonymous());
     await this.updateSession(SSOSession.anonymous())
   }
 
@@ -223,7 +234,7 @@ export class AuthenticationService {
    */
   private async logoutWithoutUpdate(): Promise<void> {
     console.warn("[SSO] Loggin out user without active update.")
-    await this.persistSession(null);
+    await this.persistUser(SSOUser.anonymous());
     await this.persistSession(SSOSession.anonymous())
   }
 

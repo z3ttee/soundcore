@@ -35,11 +35,15 @@ export class SplashComponent implements OnInit {
         if(!grantCode){
           this.authService.redirectToAuthentication();
         } else {
+          console.log(grantCode)
+
           // Login user using the grantCode
           this.authService.authorize({ grantCode, redirectUri: environment.sso_redirect_uri}).then((response) => {
             const session: SSOSession = new SSOSession(response.accessToken);
             session.type = SSOSessionType.SESSION_USER;
             session.expiresAt = response.expiresAt;
+
+            console.log(session)
 
             // Persists session on success
             this.authService.updateSession(session).then(() => {
@@ -57,7 +61,7 @@ export class SplashComponent implements OnInit {
                 return
               }
 
-              this.authService.redirectToAuthentication();
+              // this.authService.redirectToAuthentication();
             } 
 
             return null;

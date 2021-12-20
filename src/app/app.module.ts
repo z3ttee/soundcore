@@ -13,6 +13,19 @@ import { StoreModule } from '@ngrx/store';
 import { HttpClientModule } from "@angular/common/http"
 import { ToolbarComponent } from './views/shared/toolbar/toolbar.component';
 import { AccentradialComponent } from './views/shared/accentradial/accentradial.component';
+import { ActivitybarComponent } from './views/shared/activitybar/activitybar.component';
+import { AudioplayerModule } from './features/audioplayer/audioplayer.module';
+
+import {MatButtonModule} from '@angular/material/button';
+import {MatIconModule} from '@angular/material/icon';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import {MatAutocompleteModule} from '@angular/material/autocomplete';
+import {MatInputModule} from '@angular/material/input';
+import {MatListModule} from '@angular/material/list';
+import {MatDividerModule} from '@angular/material/divider';
+import { SongArtistsPipe } from './pipes/song-artists.pipe';
+
+
 
 // TODO: https://angular.io/guide/i18n-common-prepare
 
@@ -24,14 +37,27 @@ import { AccentradialComponent } from './views/shared/accentradial/accentradial.
     SidebarComponent,
     ToolbarComponent,
     SplashComponent,
-    AccentradialComponent
+    AccentradialComponent,
+    ActivitybarComponent,
+    SongArtistsPipe
+
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     BrowserAnimationsModule,
     HttpClientModule,
-    StoreModule.forRoot({}, {})
+    AudioplayerModule,
+    ReactiveFormsModule,
+    StoreModule.forRoot({}, {}),
+
+    // Import global Angular Material Components
+    MatIconModule,
+    MatButtonModule,
+    MatAutocompleteModule,
+    MatInputModule,
+    MatListModule,
+    MatDividerModule
   ],
   providers: [
   ],
