@@ -1,0 +1,15 @@
+<div class="bg-background-dark rounded-md my-2 px-6 py-4 flex flex-1 items-center shadow-md border-2 border-transparent hover:border-primary-light transition-all cursor-pointer active:bg-background">
+
+    <img src="assets/img/icon_bucket.png" class="inline-block w-20 h-20">
+
+    <div class="flex-grow px-8">
+        <h6>{{ bucket.name || "Unknown name" }}</h6>
+
+        <ul class="flex gap-8 mt-2">
+            <li class="opacity-40 cursor-pointer" [matTooltip]="'Mounts: ' + (bucket.mounts?.length || 0)"><mat-icon class="align-middle mr-1">storage</mat-icon>{{ bucket.mounts?.length || 0 }}</li>
+            <li class="opacity-40 cursor-pointer" [matTooltip]="'BucketID: ' + bucket.id"><mat-icon class="align-middle mr-1">tag</mat-icon>{{ bucket.id.slice(0, 6) }}...</li>
+            <li class="opacity-40 cursor-pointer" [matTooltip]="'Maschine: ' + bucket.machineId"><mat-icon class="align-middle mr-1">computer</mat-icon>{{ bucket.machineId?.slice(0, 6) }}...</li>
+        </ul>
+    </div>
+
+</div>

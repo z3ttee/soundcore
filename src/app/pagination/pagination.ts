@@ -3,6 +3,8 @@ export class Pageable {
     public page: number = 0;
 
     public static toQuery(pageable: Pageable): string {
+        if(!pageable) pageable = new Pageable();
+
         const searchParams = new URLSearchParams();
         searchParams.append("page", `${pageable.page}`);
         searchParams.append("size", `${pageable.size}`);

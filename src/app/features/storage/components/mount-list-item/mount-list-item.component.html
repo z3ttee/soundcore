@@ -1,17 +1,22 @@
-<div class="bg-background-dark rounded-xl my-2 p-4 flex flex-1 items-center">
-    <mat-icon>folder</mat-icon>
+<div class="bg-background-dark rounded-md my-2 px-6 py-4 flex flex-1 items-center shadow-md">
 
-    <div class="flex-grow pl-8">
-        <p>{{ mount?.path || "Unknown path" }}</p>
-        <p class="text-sm opacity-40">{{ mount?.id || "Unknown id" }}</p>
+    <img src="assets/img/icon_harddrive.png" class="inline-block w-16 h-16">
+
+    <div class="flex-grow px-6">
+        <h6>{{ mount?.path || "Unknown path" }}</h6>
+
+        <ul class="flex gap-8 mt-2">
+            <li class="opacity-40 cursor-pointer" matTooltip="MountID">{{ mount?.id || "Unknown id" }}</li>
+        </ul>
     </div>
 
     <div class="inline-flex items-center">
-        <button mat-icon-button (click)="triggerEditEvent()">
+        <button mat-icon-button (click)="triggerEditEvent()" matTooltip="Bearbeiten">
             <mat-icon>edit</mat-icon>
         </button>
-        <button mat-icon-button color="warn" (click)="triggerDeleteEvent()">
+        <button mat-icon-button color="warn" (click)="triggerDeleteEvent()" matTooltip="Löschen">
             <mat-icon>delete</mat-icon>
         </button>
     </div>
+
 </div>

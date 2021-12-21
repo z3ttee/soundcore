@@ -16,7 +16,7 @@ const routes: Routes = [
   { path: "library", loadChildren: () => import("./features/library/library.module").then((m) => m.LibraryModule) },
   { path: "genres", loadChildren: () => import("./features/genre/genre.module").then((m) => m.GenreModule) },
   { path: "releases", loadChildren: () => import("./features/releases/releases.module").then((m) => m.ReleasesModule) },
-  { path: "storage", loadChildren: () => import("./features/storage/admin.module").then((m) => m.AdminModule) },
+  { path: "storage", loadChildren: () => import("./features/storage/storage.module").then((m) => m.StorageModule) },
 
 ];
 

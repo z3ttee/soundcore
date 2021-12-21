@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { AdminIndexComponent } from './views/admin-index/admin-index.component';
+import { BucketsComponent } from './views/buckets-page/buckets.component';
 import { RouterModule, Routes } from '@angular/router';
 import { MountListItemComponent } from './components/mount-list-item/mount-list-item.component';
 import { BucketService } from './services/bucket.service';
@@ -16,18 +16,23 @@ import { MountEditorDialog } from './dialogs/mount-editor.dialog';
 import {MatInputModule} from '@angular/material/input';
 import {MatCheckboxModule} from '@angular/material/checkbox';
 import {MatProgressBarModule} from '@angular/material/progress-bar';
+import { BucketInfoComponent } from './views/bucket-info/bucket-info.component';
+import { BucketListItemComponent } from './components/bucket-list-item/bucket-list-item.component';
 
 const routes: Routes = [
 
-  { path: "", component: AdminIndexComponent }
+  { path: "", component: BucketsComponent},
+  { path: ":bucketId", component: BucketInfoComponent }
 
 ]
 
 @NgModule({
   declarations: [
-    AdminIndexComponent,
+    BucketsComponent,
     MountListItemComponent,
-    MountEditorDialog
+    MountEditorDialog,
+    BucketInfoComponent,
+    BucketListItemComponent
   ],
   imports: [
     CommonModule,
@@ -50,4 +55,4 @@ const routes: Routes = [
     MountService
   ]
 })
-export class AdminModule { }
+export class StorageModule { }

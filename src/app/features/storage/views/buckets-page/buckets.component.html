@@ -1,0 +1,24 @@
+<section class="px-8">
+    <h2>Speicherzonen</h2>
+
+    <div class="my-4 p-4 bg-info rounded-md flex flex-1 items-center">
+        <mat-icon>info</mat-icon>
+        <p class="flex-grow pl-4 text-sm">Speicherzonen (Buckets) sind Server, auf denen Dateien gespeichert werden. Ein Bucket beinhaltet verschiedene Mounts (Ordner), in denen alle Dateien verwaltet werden.</p>
+    </div>
+
+    <div class="my-4">
+        <mat-progress-bar color="accent" mode="indeterminate" *ngIf="isLoadingBuckets"></mat-progress-bar>
+        <p *ngIf="($availableBuckets | async)?.elements.length <= 0 && !isLoadingBuckets">Keine Speicherzonen gefunden.</p>
+        <asc-bucket-list-item *ngFor="let bucket of ($availableBuckets | async)?.elements" [bucket]="bucket" (click)="navigateToBucket(bucket)"></asc-bucket-list-item>
+    </div>
+
+    <mat-paginator 
+        color="primary"
+        [length]="($availableBuckets | async)?.totalElements"
+        [pageSize]="selectedPageSize"
+        [pageSizeOptions]="pageSizeOptions"
+        (page)="onPageEvent($event)"
+        [disabled]="isLoadingBuckets"
+        aria-label="Select page">
+    </mat-paginator>
+</section>
