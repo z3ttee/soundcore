@@ -1,0 +1,10 @@
+<div class="p-4 rounded-xl bg-background-dark text-center flex flex-1 flex-col h-full cursor-pointer">
+
+    <img [src]="coverSrc" class="w-full aspect-square mx-auto rounded-xl shadow-lg">
+
+    <div class="max-w-full overflow-hidden text-left flex-grow pt-4 px-1">
+        <p class="font-bold text-base max-w-full overflow-hidden text-ellipsis whitespace-nowrap">{{ song.title }}</p>
+        <p class="text-sm opacity-60 line-clamp-2">{{ song.artists | songArtistsJoin }}</p>
+    </div>
+
+</div>

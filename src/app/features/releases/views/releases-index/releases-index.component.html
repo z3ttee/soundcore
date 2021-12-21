@@ -1,0 +1,17 @@
+
+<section class="px-4">
+    <h5>Kürzlich hinzugefügte Songs</h5>
+
+    <div class="grid grid-rows-1 grid-cols-6 overflow-hidden grid-rows my-4 gap-3">
+        <asc-song-item *ngFor="let song of ($latestSongs | async)?.elements" [song]="song" (click)="selectSong(song)"></asc-song-item>
+    </div>
+</section>
+
+
+
+
+<h5>Entdecke neue Alben</h5>
+
+<h5>Finde die neusten Künstler</h5>
+
+<h5>Neueste Playlisten</h5>
