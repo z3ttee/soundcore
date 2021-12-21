@@ -1,0 +1,21 @@
+<div class="block w-full p-6">
+    <div class="flex flex-1 p-4 rounded-md bg-primary bg-player-gradient relative overflow-hidden items-center">
+
+        <div class="w-12 h-12 border-2 rounded-lg overflow-hidden mr-3 shadow-lg">
+
+        </div>
+
+        <div class="inline-block w-64">
+            <p class="font-bold">{{ ($currentSong | async)?.title || "Unknown title" }}</p>
+            <p class="text-sm opacity-80">{{ ($currentSong | async)?.artists | songArtistsJoin }}</p>
+        </div>
+
+        <div>
+            <p>Playing: {{ currentSrc }}</p>
+
+            <audio controls [src]="currentSrc" autoplay></audio>
+        </div>
+
+        <input class="absolute bottom-0 left-0 w-full appearance-none bg-accent h-1 rounded-md transform-gpu origin-bottom transition-all hover:h-2 cursor-pointer" type="range" name="player_seek">
+    </div>
+</div>
