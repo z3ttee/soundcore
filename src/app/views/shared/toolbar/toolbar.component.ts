@@ -3,6 +3,7 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { catchError, debounceTime, distinctUntilChanged, filter, map, Observable, of, startWith, switchMap, tap } from 'rxjs';
 import { ComplexSearchResult } from 'src/app/model/search-result.model';
+import { AuthenticationService } from 'src/app/services/authentication.service';
 import { environment } from 'src/environments/environment';
 
 @Component({
@@ -23,7 +24,7 @@ export class ToolbarComponent implements OnInit {
 
   public isSearching: boolean = false;
 
-  constructor(private httpClient: HttpClient) { }
+  constructor(private httpClient: HttpClient, private authService: AuthenticationService) { }
 
   ngOnInit(): void {
     this.$complexSearchResult = this.myControl.valueChanges.pipe(
@@ -56,6 +57,12 @@ export class ToolbarComponent implements OnInit {
       }
     }),
     tap((value) => console.log(value))) as Observable<ComplexSearchResult>
+  }
+
+  public logout() {
+    this.authService.logout().then(() => {
+      window.location.reload()
+    })
   }
 
 }

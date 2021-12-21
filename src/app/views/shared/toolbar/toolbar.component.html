@@ -58,5 +58,11 @@
             <button mat-icon-button [routerLink]="['/library/queue']" [routerLinkActive]="'hidden'">
                 <mat-icon>file_upload</mat-icon>
             </button>
+            <button mat-icon-button [routerLink]="['/settings']">
+                <mat-icon>settings</mat-icon>
+            </button>
+            <button mat-icon-button (click)="logout()">
+                <mat-icon>power_settings_new</mat-icon>
+            </button>
         </div>
 </div>
