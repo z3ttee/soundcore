@@ -1,0 +1,39 @@
+<section class="px-8">
+    <h2>Mediatheken</h2>
+    <p>Verwalte alle Ordnerstrukturen</p>
+
+    <hr class="my-8">
+
+    <p class="pb-2">Um alle gekoppelten Ordner anzuzeigen, wähle einen Bucket aus <span class="align-middle"><mat-icon matTooltip="Buckets stellen Server dar. Somit können Dateien verteilt auf verschiedenen Servern gespeichert werden (WiP). Zu jedem Bucket gehören mehrere Mounts. Diese Mounts sind Ordner im Dateisystem.">info</mat-icon></span></p>
+    <mat-form-field appearance="fill">
+        <mat-label>Storage Bucket</mat-label>
+        <mat-select [formControl]="bucketControl">
+          <mat-option *ngFor="let bucket of availableBuckets?.elements" [value]="bucket">
+            {{ bucket.machineId }}
+          </mat-option>
+        </mat-select>
+    </mat-form-field>
+
+    <div *ngIf="bucketControl.value">
+        <hr class="my-8">
+
+        <button mat-flat-button (click)="openMountEditor()">Neuen Mount erstellen</button>
+
+        <div class="my-6">
+            <p *ngIf="isLoadingMounts">Keine Mounts vorhanden</p>
+            <p *ngIf="($availableMounts | async)?.elements.length <= 0 && !isLoadingMounts">Keine Mounts vorhanden</p>
+            <asc-mount-list-item *ngFor="let mount of ($availableMounts | async)?.elements" [mount]="mount" (delete)="deleteMount(mount)" (edit)="openMountEditor(mount)"></asc-mount-list-item>    
+        </div>
+        
+        <mat-paginator 
+            color="primary"
+            [length]="($availableMounts | async)?.totalElements"
+            [pageSize]="selectedPageSize"
+            [pageSizeOptions]="pageSizeOptions"
+            (page)="onPageEvent($event)"
+            [disabled]="isLoadingMounts"
+            aria-label="Select page">
+        </mat-paginator>
+    </div>
+
+</section>

@@ -19,6 +19,11 @@
     </ul>
 
     <ul>
+        <label>Administration</label>
+        <li [routerLink]="['/admin']" [routerLinkActive]="'active'"><span><i class="fa-solid fa-photo-film"></i>Mediatheken</span></li>
+    </ul>
+
+    <ul>
         <label>Deine Sammlung</label>
         <button>Playlist erstellen</button>
         <li [routerLink]="['/playlist', 1]" [routerLinkActive]="'active'"><span>Playlist 1</span></li>

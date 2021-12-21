@@ -1,0 +1,17 @@
+<div class="bg-background-dark rounded-xl my-2 p-4 flex flex-1 items-center">
+    <mat-icon>folder</mat-icon>
+
+    <div class="flex-grow pl-8">
+        <p>{{ mount?.path || "Unknown path" }}</p>
+        <p class="text-sm opacity-40">{{ mount?.id || "Unknown id" }}</p>
+    </div>
+
+    <div class="inline-flex items-center">
+        <button mat-icon-button (click)="triggerEditEvent()">
+            <mat-icon>edit</mat-icon>
+        </button>
+        <button mat-icon-button color="warn" (click)="triggerDeleteEvent()">
+            <mat-icon>delete</mat-icon>
+        </button>
+    </div>
+</div>
