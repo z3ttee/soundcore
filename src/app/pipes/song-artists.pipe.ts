@@ -7,6 +7,7 @@ import { Artist } from "../model/artist.model";
 export class SongArtistsPipe implements PipeTransform {
     
     public transform(value: Artist[]): string {
+        if(!value) return "Unknown artist";
         return value.map((artist) => artist.name).join(", ");
     }
 

@@ -13,7 +13,6 @@ import { StoreModule } from '@ngrx/store';
 import { HttpClientModule } from "@angular/common/http"
 import { ToolbarComponent } from './views/shared/toolbar/toolbar.component';
 import { AccentradialComponent } from './views/shared/accentradial/accentradial.component';
-import { ActivitybarComponent } from './views/shared/activitybar/activitybar.component';
 import { AudioplayerModule } from './features/audioplayer/audioplayer.module';
 
 import {MatButtonModule} from '@angular/material/button';
@@ -23,9 +22,8 @@ import {MatAutocompleteModule} from '@angular/material/autocomplete';
 import {MatInputModule} from '@angular/material/input';
 import {MatListModule} from '@angular/material/list';
 import {MatDividerModule} from '@angular/material/divider';
-import { SongArtistsPipe } from './pipes/song-artists.pipe';
-
-
+import { AppCommonModule } from './common.module';
+import { StreamService } from './services/stream.service';
 
 // TODO: https://angular.io/guide/i18n-common-prepare
 
@@ -38,8 +36,6 @@ import { SongArtistsPipe } from './pipes/song-artists.pipe';
     ToolbarComponent,
     SplashComponent,
     AccentradialComponent,
-    ActivitybarComponent,
-    SongArtistsPipe
 
   ],
   imports: [
@@ -50,6 +46,7 @@ import { SongArtistsPipe } from './pipes/song-artists.pipe';
     AudioplayerModule,
     ReactiveFormsModule,
     StoreModule.forRoot({}, {}),
+    AppCommonModule,
 
     // Import global Angular Material Components
     MatIconModule,
@@ -60,6 +57,7 @@ import { SongArtistsPipe } from './pipes/song-artists.pipe';
     MatDividerModule
   ],
   providers: [
+    StreamService
   ],
   bootstrap: [AppComponent]
 })

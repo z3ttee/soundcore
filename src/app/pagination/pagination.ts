@@ -1,6 +1,6 @@
 export class Pageable {
-    public size: number;
-    public page: number;
+    public size: number = 10;
+    public page: number = 0;
 
     public static toQuery(pageable: Pageable): string {
         const searchParams = new URLSearchParams();

@@ -86,6 +86,14 @@ export class AuthenticationService {
   }
 
   /**
+   * Get snapshot of the current session's access token.
+   * @returns string
+   */
+   public getAccessToken(): string {
+    return this._sessionSubject.getValue().accessToken;
+  }
+
+  /**
    * Get snapshot of the current user.
    * @returns SSOUser
    */
