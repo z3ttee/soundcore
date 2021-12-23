@@ -1,6 +1,7 @@
 import { HttpErrorResponse } from "@angular/common/http";
 import { Component, Inject } from "@angular/core";
 import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
+import { AllianceError } from "src/app/model/error.model";
 import { StorageMount } from "../model/storage-mount.model";
 import { MountService } from "../services/mount.service";
 
@@ -10,7 +11,7 @@ import { MountService } from "../services/mount.service";
 export class MountEditorDialog {
 
     public isLoading: boolean = false;
-    public errorMessage: string = undefined;
+    public error: HttpErrorResponse = undefined;
 
     constructor(
         private mountService: MountService,
@@ -28,20 +29,16 @@ export class MountEditorDialog {
         let promise;
 
         if(!isEditMode) {
-            promise = this.mountService.create({ bucketId: this.data.bucket.id, path: this.data.path, createIfNotExists: true })
+            promise = this.mountService.create({ bucketId: this.data.bucket.id, path: this.data.path, name: this.data.name })
         } else {
-            promise = this.mountService.update(this.data.id, { path: this.data.path })
+            promise = this.mountService.update(this.data.id, { path: this.data.path, name: this.data.name })
         }
 
         promise.then((mount) => {
             this.data = mount;
             this.dialogRef.close();
         }).catch((error: HttpErrorResponse) => {
-            if(error.error) {
-                this.errorMessage = error.error["message"]
-            } else {
-                this.errorMessage = error.message
-            }
+            this.error = error
         }).finally(() => {
             this.isLoading = false;
         })

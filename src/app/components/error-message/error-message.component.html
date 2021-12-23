@@ -1,0 +1,16 @@
+<div class="bg-error p-4 text-sm flex flex-1 rounded-md items-center" *ngIf="error">
+    <div class="pr-6" *ngIf="withIcon && !isValidationError"><i class="fa-solid fa-triangle-exclamation text-xl"></i></div>
+
+    <div class="flex-grow" *ngIf="!isValidationError">
+        <p>{{ stringMessage }}</p>
+    </div>
+
+    <div class="flex-grow" *ngIf="isValidationError">
+        <ul class="my-2" *ngFor="let entry of messages">
+            <li class="text-xs opacity-60">{{ entry.key.toUpperCase() }}</li>
+            <ul class="list-disc pl-6">
+                <li *ngFor="let message of entry.messages">{{ message }}</li>
+            </ul>
+        </ul>
+    </div>
+</div>

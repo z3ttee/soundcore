@@ -18,6 +18,7 @@ import {MatCheckboxModule} from '@angular/material/checkbox';
 import {MatProgressBarModule} from '@angular/material/progress-bar';
 import { BucketInfoComponent } from './views/bucket-info/bucket-info.component';
 import { BucketListItemComponent } from './components/bucket-list-item/bucket-list-item.component';
+import { AppCommonModule } from 'src/app/common.module';
 
 const routes: Routes = [
 
@@ -36,6 +37,7 @@ const routes: Routes = [
   ],
   imports: [
     CommonModule,
+    AppCommonModule,
     FormsModule,
     ReactiveFormsModule,
     RouterModule.forChild(routes),

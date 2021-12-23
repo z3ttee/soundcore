@@ -3,23 +3,23 @@
 <h1 mat-dialog-title>{{ data['editMode'] ? 'Mount bearbeiten' : 'Mount koppeln' }}</h1>
 
 <mat-dialog-content>
-
-    <p class="bg-error-light border border-error-dark rounded-md text-sm mb-4 p-3" *ngIf="!isLoading && errorMessage">{{ errorMessage }}</p>
+    
+    <asc-error-message [error]="error"></asc-error-message>
+    
     <div class="my-2 p-4 bg-warn rounded-md flex flex-1 items-center text-primary-dark">
         <mat-icon>info</mat-icon>
         <p class="flex-grow pl-4 text-sm text-background-dark">Es wird empfohlen, keine Mounts in anderen Mounts zu erstellen.</p>
     </div>
 
     <mat-form-field appearance="fill" class="w-full">
-        <mat-label>Pfad eingeben</mat-label>
-        <input matInput [(ngModel)]="data.path" placeholder="/mnt/HDD/media">
+        <mat-label>Name eingeben*</mat-label>
+        <input matInput [(ngModel)]="data.name" placeholder="Mount #1">
     </mat-form-field>
 
-    <mat-checkbox
-          class="w-full"
-          [(ngModel)]="data['createIfNotExists']">
-        Ordner erstellen, wenn nicht vorhanden?
-    </mat-checkbox>
+    <mat-form-field appearance="fill" class="w-full">
+        <mat-label>Pfad eingeben*</mat-label>
+        <input matInput [(ngModel)]="data.path" placeholder="/mnt/HDD/media">
+    </mat-form-field>
 </mat-dialog-content>
 
 <mat-dialog-actions>
