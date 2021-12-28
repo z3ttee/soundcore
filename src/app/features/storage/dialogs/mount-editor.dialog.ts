@@ -22,7 +22,6 @@ export class MountEditorDialog {
     }
 
     public async save() {
-
         this.isLoading = true;
         const isEditMode = this.data["isEditMode"]
 

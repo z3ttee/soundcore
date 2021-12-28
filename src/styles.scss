@@ -56,3 +56,8 @@ h6 {
 label {
     @apply inline-block text-white-dark opacity-60 px-1 text-xs my-1;
 }
+
+.mat-paginator {
+    background: none;
+    @apply text-sm;
+}

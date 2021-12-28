@@ -21,7 +21,7 @@ export class LibraryService {
 
   public async findMyUploadedSongs(pageable: Pageable): Promise<Page<any>> {
     // TODO: Remove auth header and put into request interceptor
-    return firstValueFrom(this.httpClient.get(`${environment.api_base_uri}/v1/uploads/byUploader/@me${Pageable.toQuery(pageable)}`, {
+    return firstValueFrom(this.httpClient.get(`${environment.api_base_uri}/v1/index/byUploader/@me${Pageable.toQuery(pageable)}`, {
       headers: {
         "Authorization": "Bearer " + this.authService.getSession().accessToken
       }

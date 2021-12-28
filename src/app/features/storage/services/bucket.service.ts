@@ -14,11 +14,11 @@ export class BucketService {
     constructor(private httpClient: HttpClient, private authService: AuthenticationService) {}
 
     public async findAllBuckets(pageable: Pageable): Promise<Page<StorageBucket>> {
-        return firstValueFrom(this.httpClient.get(`${environment.api_base_uri}/v1/storage-buckets${Pageable.toQuery(pageable)}`, { headers: { "Authorization": `Bearer ${this.authService.getAccessToken()}`}})) as Promise<Page<StorageBucket>>
+        return firstValueFrom(this.httpClient.get(`${environment.api_base_uri}/v1/buckets${Pageable.toQuery(pageable)}`, { headers: { "Authorization": `Bearer ${this.authService.getAccessToken()}`}})) as Promise<Page<StorageBucket>>
     }
 
     public async findById(bucketId: string): Promise<StorageBucket> {
-        return firstValueFrom(this.httpClient.get(`${environment.api_base_uri}/v1/storage-buckets/${bucketId}`, { headers: { "Authorization": `Bearer ${this.authService.getAccessToken()}`}})) as Promise<StorageBucket>
+        return firstValueFrom(this.httpClient.get(`${environment.api_base_uri}/v1/buckets/${bucketId}`, { headers: { "Authorization": `Bearer ${this.authService.getAccessToken()}`}})) as Promise<StorageBucket>
     }
 
 }

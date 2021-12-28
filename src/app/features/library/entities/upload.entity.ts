@@ -53,7 +53,7 @@ export class Upload {
         const fileData = new FormData();
         fileData.append("file", this.file)
 
-        this._$upload = this.httpClient.post(`${environment.api_base_uri}/v1/uploads/song/`, fileData, {
+        this._$upload = this.httpClient.post(`${environment.api_base_uri}/v1/upload/audio/`, fileData, {
             // TODO: Remove headers and add to interceptor
             headers: {
                 "Authorization": this.authService.getSession().accessToken
@@ -104,5 +104,6 @@ export class Upload {
         info.error = error
 
         this._infoSubject.next(info)
+        this._$upload.unsubscribe();
     }
 }

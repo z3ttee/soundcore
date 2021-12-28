@@ -24,6 +24,7 @@ import {MatListModule} from '@angular/material/list';
 import {MatDividerModule} from '@angular/material/divider';
 import { AppCommonModule } from './common.module';
 import { StreamService } from './services/stream.service';
+import { DeviceService } from './services/device.service';
 
 // TODO: https://angular.io/guide/i18n-common-prepare
 
@@ -35,8 +36,7 @@ import { StreamService } from './services/stream.service';
     SidebarComponent,
     ToolbarComponent,
     SplashComponent,
-    AccentradialComponent,
-
+    AccentradialComponent
   ],
   imports: [
     BrowserModule,
@@ -57,7 +57,8 @@ import { StreamService } from './services/stream.service';
     MatDividerModule
   ],
   providers: [
-    StreamService
+    StreamService,
+    DeviceService
   ],
   bootstrap: [AppComponent]
 })
