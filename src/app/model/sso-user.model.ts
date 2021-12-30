@@ -7,6 +7,7 @@ export class SSOUser {
     public role: SSORole;
     public createdAt: Date;
     public avatarResourceId?: string;
+    public isAnonymous: boolean = false;
 
     public static anonymous(): SSOUser {
         return {
@@ -14,7 +15,8 @@ export class SSOUser {
             username: "Unknown user",
             email: "unknown@email.xyz",
             role: null,
-            createdAt: new Date()
+            createdAt: new Date(),
+            isAnonymous: true
         }
     }
 

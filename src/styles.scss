@@ -11,6 +11,8 @@
 /* Import Font Awesome */
 @import "../node_modules/@fortawesome/fontawesome-free/css/all.min.css";
 
+@import "../node_modules/@angular/material/prebuilt-themes/pink-bluegrey.css";
+
 /* General styling */
 * {
     font-family: 'Readex Pro', sans-serif;
@@ -53,4 +55,9 @@ h6 {
 
 label {
     @apply inline-block text-white-dark opacity-60 px-1 text-xs my-1;
+}
+
+.mat-paginator {
+    background: none;
+    @apply text-sm;
 }

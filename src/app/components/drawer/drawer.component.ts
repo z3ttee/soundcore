@@ -1,6 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { NavigationStart, Router } from '@angular/router';
-import { filter } from 'rxjs';
+import { filter, Observable, tap } from 'rxjs';
+import { Breakpoint, DeviceService } from 'src/app/services/device.service';
 
 @Component({
   selector: 'asc-drawer',
@@ -10,28 +11,40 @@ import { filter } from 'rxjs';
 export class DrawerComponent implements OnInit {
 
     @Input() public opened: boolean = true;
-    @Input() public mode: "push" | "over" = "push";
+    public mode: "push" | "over" = "push";
     @Input() public hasBackdrop: boolean = true;
 
-    constructor(private router: Router) {}
+    private $breakpoint: Observable<Breakpoint>;
+
+    constructor(private router: Router, private deviceService: DeviceService) {
+        this.$breakpoint = this.deviceService.$breakpoint;
+    }
 
     public ngOnInit(): void {
         this.router.events.pipe(filter((event) => event instanceof NavigationStart)).subscribe(() => {
-            // TODO: Close drawer on tailwindcss mobile breakpoints
-            console.log("drawer should close on mobile because of navigation start")
-            /*if(breakpoint.name == "sm" || breakpoint.name == "md") {
+            const breakpoint = this.deviceService.getBreakpoint();
+
+            // Close drawer on navigation on mobile breakpoints
+            if(breakpoint.name == "sm" || breakpoint.name == "md") {
                 this.close();
             } else {
                 if(this.mode == "over") {
                     this.close();
                 }
-            }*/
+            }
         })
 
-        // TODO: Close drawer on tailwindcss mobile breakpoints
-        /*if(this.$store.state.wydget.breakpoint.name == "sm" || this.$store.state.wydget.breakpoint.name == "md") {
-            this.opened = false;
-        }*/
+        this.$breakpoint.subscribe(() => {
+            if(this.deviceService.isCurrentSmallerThan("lg")) {
+                this.close();
+            } else {
+                if(this.mode == "over") { 
+                    this.close();
+                } else {
+                    this.open();
+                }
+            }
+        })
     }
 
     public get canShowBackdrop() {

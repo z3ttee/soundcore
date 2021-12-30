@@ -37,9 +37,13 @@ export class SplashComponent implements OnInit {
         } else {
           // Login user using the grantCode
           this.authService.authorize({ grantCode, redirectUri: environment.sso_redirect_uri}).then((response) => {
+            if(!response) return;
+
             const session: SSOSession = new SSOSession(response.accessToken);
             session.type = SSOSessionType.SESSION_USER;
             session.expiresAt = response.expiresAt;
+
+            console.log(session)
 
             // Persists session on success
             this.authService.updateSession(session).then(() => {

@@ -8,14 +8,16 @@ const routes: Routes = [
   { path: "authorize", component: SplashComponent },
 
   // Make every route below to AsyncModule
-  { path: "library", component: IndexViewComponent },
   { path: "activity", component: IndexViewComponent },
-  { path: "releases", component: IndexViewComponent },
   { path: "artists", component: IndexViewComponent },
   { path: "collection", component: IndexViewComponent },
   { path: "playlist/:playlistId", component: IndexViewComponent },
 
+  { path: "library", loadChildren: () => import("./features/library/library.module").then((m) => m.LibraryModule) },
   { path: "genres", loadChildren: () => import("./features/genre/genre.module").then((m) => m.GenreModule) },
+  { path: "releases", loadChildren: () => import("./features/releases/releases.module").then((m) => m.ReleasesModule) },
+  { path: "storage", loadChildren: () => import("./features/storage/storage.module").then((m) => m.StorageModule) },
+
 ];
 
 @NgModule({

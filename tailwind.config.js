@@ -2,20 +2,18 @@ const colors = require("tailwindcss/colors")
 
 module.exports = {
     prefix: '',
-    mode: 'jit',
-    purge: {
-      enabled: true,
-      content: [
-        './src/**/*.{html,ts,scss}',
-      ]
-    },
+    content: [
+      './src/**/*.{html,ts,scss}',
+    ],
     darkMode: 'class', // or 'media' or 'class'
     theme: {
       extend: {
-        gridTemplateColumns: {
+        gridTemplateColumns: ({ theme }) => ({
           drawer: 'auto minmax(0, 1fr)',
-          drawerClosed: 'auto'
-        },
+          drawerClosed: 'auto',
+          songs: 'repeat(auto-fill, minmax(' + theme("width.44") + ', 1fr))',
+          ...theme('spacing')
+        }),
         colors: {
           background: {
             light: "#1b2027",
@@ -55,6 +53,7 @@ module.exports = {
         },
         backgroundImage: theme => ({
           'sidebar-gradient': "linear-gradient(60deg, " + theme('colors.primary.dark') + " 0%, " + theme('colors.primary.light') + " 100%);",
+          'player-gradient': "linear-gradient(-2deg, " + theme('colors.primary.dark') + " 0%, " + theme('colors.primary.light') + " 70%);",
           'content-gradient': "linear-gradient(180deg, " + theme('colors.accent.dark') + " 0%, " + theme('colors.background.dark') + " 30%);"
         })
       },
@@ -75,8 +74,8 @@ module.exports = {
         'sm': {'min-width': '540px'}    // Mobile
       },
       fontSize: {
-        xs: ['0.7rem', { lineHeight: '1rem' }],
-        sm: ['0.8rem', { lineHeight: '1.1rem' }],
+        xs: ['0.8rem', { lineHeight: '1rem' }],
+        sm: ['0.9rem', { lineHeight: '1.1rem' }],
         base: ['0.98rem', { lineHeight: '1.25rem' }],
         lg: ['1.125rem', { lineHeight: '1.75rem' }],
         xl: ['1.25rem', { lineHeight: '1.75rem' }],
@@ -95,6 +94,6 @@ module.exports = {
       extend: {},
     },
     plugins: [
-        require('@tailwindcss/typography')
+      require("@tailwindcss/line-clamp")
     ]
 };

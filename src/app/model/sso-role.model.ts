@@ -1,4 +1,3 @@
-import { SSOPermission } from "./sso-permission.model";
 
 export class SSORole {
     public id: string;
@@ -6,5 +5,5 @@ export class SSORole {
     public description?: string;
     public hierarchy: number;
 
-    public permissions: SSOPermission[]
+    public permissions: string[]
 }
