@@ -10,52 +10,28 @@ ul {
         @apply relative px-6 transition-all my-1 cursor-pointer;
 
         span {
-            @apply py-2 px-3.5 block rounded-md transition-all my-1 opacity-70;
+            @apply py-3 px-3.5 block rounded-md transition-all my-1 opacity-70 text-sm;
 
             i {
                 @apply inline-block w-16 text-center -ml-6;
             }
         }
 
-        &::after {
-            content: "";
-            position: absolute;
-            right: 0;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 4px;
-            height: 30%;
-            border-radius: 1rem;
-            pointer-events: none;
-            opacity: 0;
-            @apply bg-accent transition-all;
-        }
-
         &.active {
             span {
-                @apply text-accent opacity-100;
-            }
-
-            &::after {
-                height: 65%;
-                opacity: 1;
+                @apply text-accent-dark bg-background-dark opacity-100;
             }
         }
 
         &:hover:not(.active) {
             span {
-                @apply text-accent-light opacity-100;
-            }
-
-            &::after {
-                height: 65%;
-                opacity: 1;
+                @apply opacity-100 bg-background-light;
             }
         }
 
         &:active {
             span {
-                @apply transform-gpu scale-95;
+                @apply bg-background-dark;
             }
         }
     }

@@ -1,6 +1,6 @@
 <div *teleportTo="'toolbarSection'">
     <ul class="inline-block">
-        <li class="inline-block px-3 py-3 mx-1 rounded-md hover:bg-background text-xs cursor-pointer transition-all" *ngFor="let link of navLinks" [routerLink]="[link.link]" routerLinkActive #rla="routerLinkActive" [routerLinkActiveOptions]="{ exact: true }" [ngClass]="{ 'bg-background': rla.isActive }">{{ link.label }}</li>
+        <li class="inline-block px-3 py-3 mx-1 rounded-md hover:bg-background-light active:bg-background-dark text-xs cursor-pointer transition-all" *ngFor="let link of navLinks" [routerLink]="[link.link]" routerLinkActive #rla="routerLinkActive" [routerLinkActiveOptions]="{ exact: true }" [ngClass]="{ 'text-accent-dark': rla.isActive }">{{ link.label }}</li>
     </ul>
 </div>
 
