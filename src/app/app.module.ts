@@ -27,6 +27,8 @@ import { StreamService } from './services/stream.service';
 import { DeviceService } from './services/device.service';
 import { AccessTokenInterceptor } from './interceptors/access-token.interceptor';
 
+import { TeleportModule } from '@ngneat/overview';
+
 // TODO: https://angular.io/guide/i18n-common-prepare
 
 @NgModule({
@@ -48,6 +50,7 @@ import { AccessTokenInterceptor } from './interceptors/access-token.interceptor'
     ReactiveFormsModule,
     StoreModule.forRoot({}, {}),
     AppCommonModule,
+    TeleportModule,
 
     // Import global Angular Material Components
     MatIconModule,

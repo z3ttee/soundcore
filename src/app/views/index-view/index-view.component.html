@@ -1,3 +1,12 @@
+<div *teleportTo="'toolbarSection'">
+    <ul class="inline-block">
+        <li class="inline-block px-3 py-3 mx-1 rounded-md hover:bg-background text-xs cursor-pointer transition-all" [routerLink]="['/']" [routerLinkActiveOptions]="{ exact: true }" [routerLinkActive]="'bg-background'">Übersicht</li>
+        <li class="inline-block px-3 py-3 mx-1 rounded-md hover:bg-background text-xs cursor-pointer transition-all" [routerLink]="['/releases']" [routerLinkActive]="'bg-background'">Neuheiten</li>
+        <li class="inline-block px-3 py-3 mx-1 rounded-md hover:bg-background text-xs cursor-pointer transition-all" [routerLink]="['/genres']" [routerLinkActive]="'active'">Genres</li>
+        <li class="inline-block px-3 py-3 mx-1 rounded-md hover:bg-background text-xs cursor-pointer transition-all" [routerLink]="['/artists']" [routerLinkActive]="'active'">Künstler</li>
+    </ul>
+</div>
+
 <section>
     <h1>Willkommen, {{ (authService.$user | async).username }}</h1>
 

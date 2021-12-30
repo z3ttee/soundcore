@@ -1,55 +1,22 @@
-<div class="flex flex-1 py-4 px-6 bg-primary items-center">
-        <div class="inline-block lg:hidden">
-            <button mat-icon-button (click)="emitMenuToggle()">
-                <mat-icon>menu</mat-icon>
-            </button>
+<div class="flex flex-1 py-2 px-2 bg-primary items-center">
+        <div class="pr-2 lg:pr-6">
+            <span class="lg:hidden">
+                <button mat-icon-button (click)="navigateBack()"><i class="fa-solid fa-arrow-left"></i></button>
+                <button mat-icon-button (click)="emitMenuToggle()" class="lg:hidden"><mat-icon>menu</mat-icon></button>
+            </span>
+            <span class="hidden lg:inline-block">
+                <button mat-icon-button (click)="navigateBack()"><i class="fa-solid fa-chevron-left"></i></button>
+                <button mat-icon-button (click)="navigateNext()"><i class="fa-solid fa-chevron-right"></i></button>
+            </span>
         </div>
-        <div class="flex-grow px-4">
-                <input 
-                    class="w-full bg-primary-dark p-3 rounded-md text-sm outline-none"
-                    type="text"
-                       placeholder="Search a song"
-                       matInput
-                       [formControl]="myControl"
-                       [matAutocomplete]="auto">
-                <mat-autocomplete #auto="matAutocomplete">
-                    <mat-list class="w-full">
-                        <div mat-subheader>Songs</div>
-                        <mat-list-item class="w-full" *ngFor="let option of ($complexSearchResult | async)?.songs?.elements">
-                            
-                            <mat-option class="w-full" [value]="option.title" (click)="navigateToSong($event, option.id)">
-                                <div class="flex flex-1 items-center">
-                                    <img class="inline-block w-9 h-9 rounded-md shadow-md mr-3" [src]="artworkBaseUrl + option.artwork?.id" />
-
-                                    <div class="flex-grow">
-                                        <p>{{ option.title }}</p>
-                                        <p>{{ option.artists | songArtistsJoin }}</p>
-                                    </div>
-                                </div>
-                                
-                            </mat-option>
-                        </mat-list-item>
-
-
-                        <mat-divider></mat-divider>
-
-
-                        <div mat-subheader>Artists</div>
-                        <mat-list-item class="w-full" *ngFor="let option of ($complexSearchResult | async)?.artists?.elements">
-                            
-                            <mat-option class="w-full" [value]="option.name" (click)="navigateToSong($event, option.id)">
-                                <div class="flex flex-1 items-center">
-                                    <img class="inline-block w-9 h-9 rounded-md shadow-md mr-3" [src]="artworkBaseUrl + option.artwork?.id" />
-
-                                    <div class="flex-grow">
-                                        <p>{{ option.name }}</p>
-                                    </div>
-                                </div>
-                                
-                            </mat-option>
-                        </mat-list-item>
-                    </mat-list>
-                </mat-autocomplete>
+        <div class="">
+            
+        </div>
+        <div class="flex-grow">
+            <div class="flex justify-center">
+                <button mat-icon-button [routerLink]="['/search']"><i class="fa-solid fa-magnifying-glass"></i></button>
+                <ng-container teleportOutlet="toolbarSection"></ng-container>
+            </div>
         </div>
     
         <div class="inline-block">
@@ -59,8 +26,6 @@
             <button mat-icon-button [routerLink]="['/settings']">
                 <mat-icon>settings</mat-icon>
             </button>
-            <button mat-icon-button (click)="logout()">
-                <mat-icon>power_settings_new</mat-icon>
-            </button>
+            <button mat-icon-button (click)="logout()"><i class="fa-solid fa-power-off"></i></button>
         </div>
 </div>
