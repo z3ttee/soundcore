@@ -1,0 +1,11 @@
+<div class="transition-all p-2 rounded-xl text-center flex flex-1 flex-col h-full cursor-pointer w-full bg-background-light border-2 border-transparent hover:border-primary active:bg-background-dark">
+    
+    <div class="block">
+        <img [src]="coverSrc" class="w-full aspect-square mx-auto rounded-xl shadow-lg">
+    </div>
+
+    <div class="max-w-full overflow-hidden text-left flex-grow pt-2 px-1" *ngIf="title || subtitle">
+        <p class="font-bold text-sm max-w-full overflow-hidden text-ellipsis whitespace-nowrap" *ngIf="title">{{ title }}</p>
+        <p class="text-xs opacity-60 line-clamp-2 pt-1" *ngIf="subtitle">{{ subtitle }}</p>
+    </div>
+</div>

@@ -10,8 +10,14 @@
 <section class="px-4">
     <h5>Kürzlich hinzugefügte Songs</h5>
 
-    <div class="grid grid-cols-songs overflow-hidden grid-rows my-4 gap-4">
-        <asc-song-item *ngFor="let song of ($latestSongs | async)?.elements" [song]="song" (click)="selectSong(song)"></asc-song-item>
+    <div class="grid grid-cols-songs overflow-hidden grid-rows my-4 gap-2">
+        <asc-showcase-item *ngFor="let song of ($latestSongs | async)?.elements" 
+            [title]="song?.title"
+            [subtitle]="song?.artists | songArtistsJoin" 
+            [artworkId]="song?.artwork?.id"
+            [itemId]="song?.id"
+            (click)="selectSong(song)">
+        </asc-showcase-item>
     </div>
 </section>
 

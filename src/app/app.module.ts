@@ -12,7 +12,6 @@ import { StoreModule } from '@ngrx/store';
 
 import { HttpClientModule, HTTP_INTERCEPTORS } from "@angular/common/http"
 import { ToolbarComponent } from './views/shared/toolbar/toolbar.component';
-import { AccentradialComponent } from './views/shared/accentradial/accentradial.component';
 import { AudioplayerModule } from './features/audioplayer/audioplayer.module';
 
 import {MatButtonModule} from '@angular/material/button';
@@ -38,8 +37,7 @@ import { TeleportModule } from '@ngneat/overview';
     DrawerComponent,
     SidebarComponent,
     ToolbarComponent,
-    SplashComponent,
-    AccentradialComponent
+    SplashComponent
   ],
   imports: [
     BrowserModule,

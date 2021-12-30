@@ -1,7 +1,7 @@
 import { CommonModule } from "@angular/common";
 import { NgModule } from "@angular/core";
-import { BrowserModule } from "@angular/platform-browser";
 import { ErrorMessageComponent } from "./components/error-message/error-message.component";
+import { ShowcaseItemComponent } from "./components/items/showcase-item/showcase-item.component";
 import { SongArtistsPipe } from "./pipes/song-artists.pipe";
 
 @NgModule({
@@ -10,11 +10,13 @@ import { SongArtistsPipe } from "./pipes/song-artists.pipe";
     ],
     declarations: [
         SongArtistsPipe,
-        ErrorMessageComponent
+        ErrorMessageComponent,
+        ShowcaseItemComponent
     ],
     exports: [
         SongArtistsPipe,
-        ErrorMessageComponent
+        ErrorMessageComponent,
+        ShowcaseItemComponent
     ]
 })
 export class AppCommonModule {}
