@@ -1,8 +1,16 @@
+<div *teleportTo="'toolbarSection'">
+    <ul class="inline-block">
+        <li class="inline-block px-3 py-3 mx-1 rounded-md hover:bg-background text-xs cursor-pointer transition-all" [routerLink]="['/']" [routerLinkActiveOptions]="{ exact: true }" [routerLinkActive]="'bg-background'">Übersicht</li>
+        <li class="inline-block px-3 py-3 mx-1 rounded-md hover:bg-background text-xs cursor-pointer transition-all" [routerLink]="['/releases']" [routerLinkActive]="'bg-background'">Neuheiten</li>
+        <li class="inline-block px-3 py-3 mx-1 rounded-md hover:bg-background text-xs cursor-pointer transition-all" [routerLink]="['/genres']" [routerLinkActive]="'active'">Genres</li>
+        <li class="inline-block px-3 py-3 mx-1 rounded-md hover:bg-background text-xs cursor-pointer transition-all" [routerLink]="['/artists']" [routerLinkActive]="'active'">Künstler</li>
+    </ul>
+</div>
 
 <section class="px-4">
     <h5>Kürzlich hinzugefügte Songs</h5>
 
-    <div class="grid grid-cols-songs overflow-hidden grid-rows my-4 gap-2">
+    <div class="grid grid-cols-songs overflow-hidden grid-rows my-4 gap-4">
         <asc-song-item *ngFor="let song of ($latestSongs | async)?.elements" [song]="song" (click)="selectSong(song)"></asc-song-item>
     </div>
 </section>
