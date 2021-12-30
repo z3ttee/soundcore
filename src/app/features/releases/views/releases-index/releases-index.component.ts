@@ -15,10 +15,7 @@ export class ReleasesIndexComponent implements OnInit {
   public $latestSongs: Observable<Page<Song>>;
 
   constructor(private songService: SongService, private streamService: StreamService) {
-    this.$latestSongs = this.songService.findLatestSongs().pipe(map((page) => {
-      page.elements = page.elements.slice(0, 8);
-      return page
-    }));
+    this.$latestSongs = this.songService.findLatestSongs();
   }
 
   ngOnInit(): void {

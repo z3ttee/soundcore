@@ -10,7 +10,7 @@ import { SidebarComponent } from './views/shared/sidebar/sidebar.component';
 import { SplashComponent } from './views/splash/splash.component';
 import { StoreModule } from '@ngrx/store';
 
-import { HttpClientModule } from "@angular/common/http"
+import { HttpClientModule, HTTP_INTERCEPTORS } from "@angular/common/http"
 import { ToolbarComponent } from './views/shared/toolbar/toolbar.component';
 import { AccentradialComponent } from './views/shared/accentradial/accentradial.component';
 import { AudioplayerModule } from './features/audioplayer/audioplayer.module';
@@ -25,6 +25,7 @@ import {MatDividerModule} from '@angular/material/divider';
 import { AppCommonModule } from './common.module';
 import { StreamService } from './services/stream.service';
 import { DeviceService } from './services/device.service';
+import { AccessTokenInterceptor } from './interceptors/access-token.interceptor';
 
 // TODO: https://angular.io/guide/i18n-common-prepare
 
@@ -58,7 +59,12 @@ import { DeviceService } from './services/device.service';
   ],
   providers: [
     StreamService,
-    DeviceService
+    DeviceService,
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: AccessTokenInterceptor,
+      multi: true,
+    }
   ],
   bootstrap: [AppComponent]
 })

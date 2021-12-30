@@ -8,10 +8,12 @@ module.exports = {
     darkMode: 'class', // or 'media' or 'class'
     theme: {
       extend: {
-        gridTemplateColumns: {
+        gridTemplateColumns: ({ theme }) => ({
           drawer: 'auto minmax(0, 1fr)',
-          drawerClosed: 'auto'
-        },
+          drawerClosed: 'auto',
+          songs: 'repeat(auto-fill, minmax(' + theme("width.44") + ', 1fr))',
+          ...theme('spacing')
+        }),
         colors: {
           background: {
             light: "#1b2027",
