@@ -5,7 +5,15 @@
     </div>
 </div>
 
+<div>
+    <asc-message [mode]="'warn'" *ngIf="(uploadService.$socketConnected | async) != 'ok' && (uploadService.$socketConnected | async) != 'connecting'">
+        Es ist möglich, dass auf Grund einer Störung, keine Status-Updates empfangen werden können. Du kannst weiterhin Dateien hochladen, jedoch werden keine Neuigkeiten zum
+        Fortschritt nach dem Hochladen angezeigt.
+    </asc-message>
+</div>
+
 <section>
+
     <div class="relative border-2 border-primary-light border-dashed bg-primary-light bg-opacity-20 rounded-md">
         <p class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none">Klicken oder Dateien hierher ziehen</p>
         <input #fileInput class="opacity-0 w-full p-6 py-12 cursor-pointer" type="file" multiple="true" (input)="enqueueFiles($event)">
@@ -13,8 +21,26 @@
     
     <hr class="my-4">
 
+    {{ ($queue | async)?.length }}
+
+    <p *ngFor="let upload of ($queue | async)">{{ upload }}</p>
+
     <mat-accordion class="example-headers-align" multi>
-        <mat-expansion-panel [disabled]="($successQueue | async)?.length <= 0">
+        <mat-expansion-panel expanded="true">
+            <mat-expansion-panel-header>
+                <mat-panel-title>
+                Warteschlange
+                </mat-panel-title>
+                <mat-panel-description>
+                    <mat-icon>info</mat-icon>
+                    <span>{{ ($queue | async)?.length || 0 }}</span>
+                </mat-panel-description>
+            </mat-expansion-panel-header>
+      
+            <asc-upload-list-item *ngFor="let upload of ($queue | async)" [upload]="upload"></asc-upload-list-item>
+      
+        </mat-expansion-panel>
+        <!--<mat-expansion-panel [disabled]="($successQueue | async)?.length <= 0">
             <mat-expansion-panel-header>
                 <mat-panel-title>
                 Erfolgreich
@@ -73,7 +99,7 @@
             <p *ngIf="($activeQueue | async).length <= 0">Keine aktiven Uploads</p>
             <asc-upload-list-item *ngFor="let upload of ($activeQueue | async)" [upload]="upload"></asc-upload-list-item>
       
-        </mat-expansion-panel>
+        </mat-expansion-panel>-->
       
         
       </mat-accordion>

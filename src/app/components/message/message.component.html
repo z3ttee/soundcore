@@ -1,0 +1,9 @@
+<div class="p-4 flex flex-1 rounded-md items-center" [ngClass]="{ 'bg-error': mode == 'error', 'bg-info': mode == 'info', 'bg-warn text-background': mode == 'warn' }">
+    <div class="pr-5" *ngIf="withIcon"><i class="fa-solid fa-triangle-exclamation text-xl"></i></div>
+
+    <div class="flex-grow">
+        <p class="text-sm" [ngClass]="{'text-background': mode == 'warn' }">
+            <ng-content></ng-content>
+        </p>
+    </div>
+</div>

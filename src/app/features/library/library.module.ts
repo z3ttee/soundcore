@@ -21,6 +21,7 @@ import {MatExpansionModule} from '@angular/material/expansion';
 import {MatIconModule} from '@angular/material/icon';
 import { UploadListItemComponent } from './components/upload-list-item/upload-list-item.component';
 import { TeleportModule } from '@ngneat/overview';
+import { AppCommonModule } from 'src/app/common.module';
 
 
 const routes: Routes = [
@@ -47,6 +48,7 @@ const routes: Routes = [
     FormsModule,
     RouterModule.forChild(routes),
     TeleportModule,
+    AppCommonModule,
 
     // Import Angular Material components
     MatTabsModule,
