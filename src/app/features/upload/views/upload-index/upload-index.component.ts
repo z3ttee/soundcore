@@ -1,23 +1,16 @@
 import { Component, OnInit } from '@angular/core';
-import { filter, map, Observable } from 'rxjs';
-import { Upload } from '../../entities/upload.entity';
-import { LibraryService } from '../../services/library.service';
-import { io, Socket } from "socket.io-client"
-import { environment } from 'src/environments/environment';
+import { Observable } from 'rxjs';
+import { Socket } from 'socket.io-client';
 import { AuthenticationService } from 'src/app/services/authentication.service';
-import { UploadedAudioFile } from '../../entities/uploaded-file.entity';
-import { FileStatus } from '../../enums/file-status.enum';
 import { Index } from '../../entities/index.entity';
+import { Upload } from '../../entities/upload.entity';
 import { UploadService } from '../../services/upload.service';
 
-export const INDEX_STATUS_EVENT = "onIndexStatusUpdate"
-
 @Component({
-  selector: 'asc-library-queue',
-  templateUrl: './library-queue.component.html',
-  styleUrls: ['./library-queue.component.scss']
+  templateUrl: './upload-index.component.html',
+  styleUrls: ['./upload-index.component.scss']
 })
-export class LibraryQueueComponent implements OnInit {
+export class UploadIndexComponent implements OnInit {
 
   public $queue: Observable<Upload[]>
 
@@ -28,7 +21,7 @@ export class LibraryQueueComponent implements OnInit {
 
   public socket: Socket;
 
-  constructor(private libraryService: LibraryService, public uploadService: UploadService, private authService: AuthenticationService) {
+  constructor(public uploadService: UploadService, private authService: AuthenticationService) {
     this.$queue = this.uploadService.$queue;
 
     this.uploadService.$queue.subscribe((queue) => {

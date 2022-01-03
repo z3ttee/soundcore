@@ -15,20 +15,16 @@ import {MatStepperModule} from '@angular/material/stepper';
 import {MatInputModule} from '@angular/material/input';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import {MatProgressBarModule} from '@angular/material/progress-bar';
-import { LibraryQueueComponent } from './views/library-queue/library-queue.component';
 import {MatChipsModule} from '@angular/material/chips';
 import {MatExpansionModule} from '@angular/material/expansion';
 import {MatIconModule} from '@angular/material/icon';
-import { UploadListItemComponent } from './components/upload-list-item/upload-list-item.component';
 import { TeleportModule } from '@ngneat/overview';
 import { AppCommonModule } from 'src/app/common.module';
-import { StatsItemComponent } from './components/stats-item/stats-item.component';
 
 const routes: Routes = [
   { path: "", component: LibraryIndexComponent, children: [
     { path: "", component: LibraryPlaylistsComponent },
     { path: "uploads", component: LibraryUploadsComponent },
-    { path: "queue", component: LibraryQueueComponent }
   ]},
 ]
 
@@ -36,10 +32,7 @@ const routes: Routes = [
   declarations: [
     LibraryIndexComponent,
     LibraryUploadsComponent,
-    LibraryPlaylistsComponent,
-    LibraryQueueComponent,
-    UploadListItemComponent,
-    StatsItemComponent
+    LibraryPlaylistsComponent
   ],
   providers: [
     LibraryService

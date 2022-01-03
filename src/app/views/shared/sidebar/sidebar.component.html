@@ -1,29 +1,39 @@
-<div class="py-4">
+<div class="h-full flex flex-1 flex-col overscroll-hidden">
 
-    <div class="my-4 mb-10 flex justify-center items-center cursor-pointer" [routerLink]="['/']">
-        <img class="w-8 h-8" src="../../../../assets/branding/soundcore_logo_full.svg">
-        <h5 class="ml-4">Soundcore</h5>
+    <!-- Navigation -->
+    <div class="py-4 h-full flex-grow overflow-y-auto overflow-x-hidden">
+        <div class="my-4 mb-10 flex justify-center items-center cursor-pointer" [routerLink]="['/']">
+            <img class="w-8 h-8" src="../../../../assets/branding/soundcore_logo_full.svg">
+            <h5 class="ml-4">Soundcore</h5>
+        </div>
+    
+        <ul>
+            <li [routerLink]="['/']" [routerLinkActive]="'active'" [routerLinkActiveOptions]="{ exact: true }"><span><i class="fa-solid fa-house"></i>Startseite</span></li>
+            <li [routerLink]="['/search']" [routerLinkActive]="'active'"><span><i class="fa-solid fa-magnifying-glass"></i>Suchen</span></li>
+            <li [routerLink]="['/library']" [routerLinkActive]="'active'"><span><i class="fa-solid fa-layer-group"></i>Bibliothek</span></li>
+            <li [routerLink]="['/collection']" [routerLinkActive]="'active'"><span><i class="fa-solid fa-heart"></i>Lieblingssongs</span></li>
+        </ul>
+    
+        <ul>
+            <label>Administration</label>
+            <li [routerLink]="['/storage']" [routerLinkActive]="'active'"><span><i class="fa-solid fa-hard-drive"></i>Speicherzonen</span></li>
+        </ul>
+    
+        <ul>
+            <label class="relative">
+                Deine Sammlung
+                <span class="absolute right-0 top-1/2 transform-gpu -translate-y-1/2"><button mat-icon-button><i class="fa-solid fa-plus"></i></button></span>
+            </label>
+            
+            <li [routerLink]="['/playlist', 1]" [routerLinkActive]="'active'"><span>Playlist 1</span></li>
+            <li [routerLink]="['/playlist', 2]" [routerLinkActive]="'active'"><span>Playlist 2</span></li>
+        </ul>
     </div>
-
-    <ul>
-        <li [routerLink]="['/']" [routerLinkActive]="'active'" [routerLinkActiveOptions]="{ exact: true }"><span><i class="fa-solid fa-house"></i>Startseite</span></li>
-        <li [routerLink]="['/search']" [routerLinkActive]="'active'"><span><i class="fa-solid fa-magnifying-glass"></i>Suchen</span></li>
-        <li [routerLink]="['/library']" [routerLinkActive]="'active'"><span><i class="fa-solid fa-layer-group"></i>Bibliothek</span></li>
-        <li [routerLink]="['/collection']" [routerLinkActive]="'active'"><span><i class="fa-solid fa-heart"></i>Lieblingssongs</span></li>
-    </ul>
-
-    <ul>
-        <label>Administration</label>
-        <li [routerLink]="['/storage']" [routerLinkActive]="'active'"><span><i class="fa-solid fa-hard-drive"></i>Speicherzonen</span></li>
-    </ul>
-
-    <ul>
-        <label class="relative">
-            Deine Sammlung
-            <span class="absolute right-0 top-1/2 transform-gpu -translate-y-1/2"><button mat-icon-button><i class="fa-solid fa-plus"></i></button></span>
-        </label>
+    
+    <!-- Status bar -->
+    <div class="max-h-52 overflow-hidden px-4 py-8 transition-all">
         
-        <li [routerLink]="['/playlist', 1]" [routerLinkActive]="'active'"><span>Playlist 1</span></li>
-        <li [routerLink]="['/playlist', 2]" [routerLinkActive]="'active'"><span>Playlist 2</span></li>
-    </ul>
+    </div>
 </div>
+
+

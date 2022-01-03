@@ -1,11 +1,9 @@
-import { HttpClient, HttpErrorResponse, HttpEventType, HttpResponse } from "@angular/common/http";
-import { BehaviorSubject, catchError, filter, Observable, of, Subscription, tap } from "rxjs";
-import { AuthenticationService } from "src/app/services/authentication.service";
-import { environment } from "src/environments/environment";
+import { BehaviorSubject, Observable } from "rxjs";
 import { FileStatus } from "../enums/file-status.enum";
-import { UploadedAudioFile } from "./uploaded-file.entity";
 
 import { v4 as uuidv4 } from "uuid"
+import { Index } from "./index.entity";
+import { IndexStatus } from "../enums/index-status.enum";
 
 export class UploadInfo {
 
@@ -16,7 +14,43 @@ export class UploadInfo {
 }
 
 export class Upload {
-    private _$upload: Subscription;
+
+    private _progressSubject: BehaviorSubject<number> = new BehaviorSubject(0);
+    private _errorSubject: BehaviorSubject<Error> = new BehaviorSubject(null);
+
+    public readonly id: string = uuidv4();
+    public index?: Index = undefined;
+
+    public readonly file: File;
+    public readonly $progress: Observable<number> = this._progressSubject.asObservable();
+    public readonly $error: Observable<Error> = this._errorSubject.asObservable();
+
+    constructor(file: File) {
+        this.file = file;
+    }
+
+    public async setProgress(progress: number) {
+        this._progressSubject.next(progress);
+    }
+
+    public isUploading() {
+        return this.index?.status == IndexStatus.UPLOADING;
+    }
+
+    public isDone() {
+        return !this.isUploading();
+    }
+
+    public hasError() {
+        return this.index?.status == IndexStatus.ERRORED;
+    }
+
+    public setError(error: Error) {
+        this.index?.status == IndexStatus.ERRORED;
+        this._errorSubject.next(error)
+    }
+
+    /*private _$upload: Subscription;
 
     private _infoSubject: BehaviorSubject<UploadInfo> = new BehaviorSubject(new UploadInfo());
     public $info: Observable<UploadInfo> = this._infoSubject.asObservable();
@@ -105,5 +139,5 @@ export class Upload {
 
         this._infoSubject.next(info)
         this._$upload.unsubscribe();
-    }
+    }*/
 }

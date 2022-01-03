@@ -1,0 +1,147 @@
+<section class="px-4">
+
+    <div class="mb-4">
+        <h3>Dateien hochladen</h3>
+        <p class="text-sm">Wähle Audio-Dateien aus, die du zu TSAlliance Soundcore hinzufügen möchtest. Beachte dabei, dass jeder Nutzer auf diese zugreifen kann.</p>
+    </div>
+
+    <!-- Warning -->
+    <div class="my-4" *ngIf="(uploadService.$socketConnected | async) != 'ok' && (uploadService.$socketConnected | async) != 'connecting'">
+        <asc-message [mode]="'warn'">
+            Es ist möglich, dass auf Grund einer Störung, keine Status-Updates empfangen werden können. Du kannst weiterhin Dateien hochladen, jedoch werden keine Neuigkeiten zum
+            Fortschritt nach dem Hochladen angezeigt.
+        </asc-message>
+    </div>
+
+    <!-- Status on how uploads succeeded -->
+    <div class="my-4 flex">
+        <asc-stats-item title="Erfolgreich" [value]="0" mode="success"></asc-stats-item>
+        <asc-stats-item title="Duplikate" [value]="0" mode="warn"></asc-stats-item>
+        <asc-stats-item title="Fehlgeschlagen" [value]="0" mode="error"></asc-stats-item>
+    </div>
+
+    <div class="my-8 relative border-2 border-primary-light border-dashed bg-primary-light bg-opacity-20 rounded-md">
+        <p class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none">Klicken oder Dateien hierher ziehen</p>
+        <input #fileInput class="opacity-0 w-full p-6 py-12 cursor-pointer" type="file" multiple="true" (input)="enqueueFiles($event)">
+    </div>
+
+    <div class="my-4">
+        <h5>In Warteschlange - {{ ($queue | async)?.length }}</h5>
+        <p class="text-sm opacity-40 font-light">Hier siehst du alle Dateien, die gerade hochgeladen oder verarbeitet werden.</p>
+    </div>
+
+    <div class="my-4">
+        <asc-upload-list-item *ngFor="let upload of ($queue | async)" [upload]="upload"></asc-upload-list-item>
+    </div>
+
+    <!--<section>
+        
+
+        <mat-accordion class="example-headers-align" multi>
+            <mat-expansion-panel expanded="true">
+                <mat-expansion-panel-header>
+                    <mat-panel-title>
+                    Warteschlange
+                    </mat-panel-title>
+                    <mat-panel-description>
+                        <mat-icon>info</mat-icon>
+                        <span>{{ ($queue | async)?.length || 0 }}</span>
+                    </mat-panel-description>
+                </mat-expansion-panel-header>
+        
+                
+        
+            </mat-expansion-panel>
+            <mat-expansion-panel [disabled]="($successQueue | async)?.length <= 0">
+                <mat-expansion-panel-header>
+                    <mat-panel-title>
+                    Erfolgreich
+                    </mat-panel-title>
+                    <mat-panel-description>
+                        <mat-icon>info</mat-icon>
+                        <span>{{ ($successQueue | async)?.length || 0 }}</span>
+                    </mat-panel-description>
+                </mat-expansion-panel-header>
+        
+                <asc-upload-list-item *ngFor="let upload of ($successQueue | async)" [upload]="upload"></asc-upload-list-item>
+        
+            </mat-expansion-panel>
+
+            <mat-expansion-panel [disabled]="($erroredQueue | async)?.length <= 0">
+                <mat-expansion-panel-header>
+                    <mat-panel-title>
+                    Fehlgeschlagen
+                    </mat-panel-title>
+                    <mat-panel-description>
+                        <mat-icon>info</mat-icon>
+                        <span>{{ ($erroredQueue | async)?.length || 0 }}</span>
+                    </mat-panel-description>
+                </mat-expansion-panel-header>
+        
+                <asc-upload-list-item *ngFor="let upload of ($erroredQueue | async)" [upload]="upload"></asc-upload-list-item>
+        
+            </mat-expansion-panel>
+
+            <mat-expansion-panel [disabled]="($duplicatesQueue | async)?.length <= 0">
+                <mat-expansion-panel-header>
+                    <mat-panel-title>
+                    Duplikate
+                    </mat-panel-title>
+                    <mat-panel-description>
+                        <mat-icon>info</mat-icon>
+                        <span>{{ ($duplicatesQueue | async)?.length || 0 }}</span>
+                    </mat-panel-description>
+                </mat-expansion-panel-header>
+        
+                <asc-upload-list-item *ngFor="let upload of ($duplicatesQueue | async)" [upload]="upload"></asc-upload-list-item>
+        
+            </mat-expansion-panel>
+
+            <mat-expansion-panel expanded="true">
+                <mat-expansion-panel-header>
+                    <mat-panel-title>
+                    Warteschlange
+                    </mat-panel-title>
+                    <mat-panel-description>
+                        <mat-icon>info</mat-icon>
+                        <span>{{ ($activeQueue | async)?.length || 0 }}</span>
+                    </mat-panel-description>
+                </mat-expansion-panel-header>
+        
+                <p *ngIf="($activeQueue | async).length <= 0">Keine aktiven Uploads</p>
+                <asc-upload-list-item *ngFor="let upload of ($activeQueue | async)" [upload]="upload"></asc-upload-list-item>
+        
+            </mat-expansion-panel>
+        
+            
+        </mat-accordion>-->
+
+        <!--<p *ngIf="($queue | async).length <= 0">Keine aktiven Uploads</p>
+        <section *ngIf="($queue | async).length > 0">
+            <h5>Wird hochgeladen</h5>
+            <div class="bg-primary my-1 p-6 rounded-lg border-2 border-transparent" *ngFor="let upload of ($queue | async)" [ngClass]="{'border-error-light': (upload.$info | async).error}">
+                <div class="flex flex-1 items-center">
+                    <div class="flex-grow">{{ upload.file.name }}</div>
+
+                    {{ (upload.$info | async).error }}
+
+                    <div class="mr-2">
+                        <mat-chip-list>
+                            <mat-chip [color]="(upload.$info | async).error ? 'warn' : 'accent'" selected="">{{ (upload.$info | async).status }} </mat-chip>
+                        </mat-chip-list>
+                    </div>
+                    <div>
+                        <button mat-stroked-button color="warn" (click)="upload.cancel()">Cancel</button>
+                    </div>
+                </div>
+
+                <mat-progress-bar
+                    class="mt-6"
+                    *ngIf="!upload.isDone()"
+                    class="my-2"
+                    [mode]="upload.isUploading() ? 'determinate' : 'indeterminate'"
+                    [value]="(upload.$info | async).progress">
+                </mat-progress-bar>
+            </div>
+        </section>-->
+</section>
