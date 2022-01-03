@@ -14,3 +14,7 @@
         </div>
     </asc-drawer>
 </asc-splash>
+
+<div class="absolute top-0 left-0 w-full z-50" *ngIf="showLoadingBar">
+    <mat-progress-bar class="bg-transparent" mode="indeterminate" value="40"></mat-progress-bar>
+</div>

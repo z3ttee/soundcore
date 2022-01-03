@@ -5,10 +5,10 @@ import { SplashComponent } from './views/splash/splash.component';
 
 const routes: Routes = [
   { path: "", component: IndexViewComponent, children: [
+    { path: "", component: IndexViewComponent },
     { path: "artists", component: IndexViewComponent },
+    { path: "releases", loadChildren: () => import("./features/releases/releases.module").then((m) => m.ReleasesModule) },
   ]},
-
-  { path: "releases", loadChildren: () => import("./features/releases/releases.module").then((m) => m.ReleasesModule) },
 
   { path: "authorize", component: SplashComponent },
 

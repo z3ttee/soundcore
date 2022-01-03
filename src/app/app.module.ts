@@ -25,6 +25,8 @@ import { AppCommonModule } from './common.module';
 import { StreamService } from './services/stream.service';
 import { DeviceService } from './services/device.service';
 import { AccessTokenInterceptor } from './interceptors/access-token.interceptor';
+import {MatProgressBarModule} from '@angular/material/progress-bar';
+
 
 import { TeleportModule } from '@ngneat/overview';
 
@@ -56,7 +58,8 @@ import { TeleportModule } from '@ngneat/overview';
     MatAutocompleteModule,
     MatInputModule,
     MatListModule,
-    MatDividerModule
+    MatDividerModule,
+    MatProgressBarModule
   ],
   providers: [
     StreamService,
