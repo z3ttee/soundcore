@@ -22,7 +22,7 @@ import {MatIconModule} from '@angular/material/icon';
 import { UploadListItemComponent } from './components/upload-list-item/upload-list-item.component';
 import { TeleportModule } from '@ngneat/overview';
 import { AppCommonModule } from 'src/app/common.module';
-
+import { StatsItemComponent } from './components/stats-item/stats-item.component';
 
 const routes: Routes = [
   { path: "", component: LibraryIndexComponent, children: [
@@ -38,7 +38,8 @@ const routes: Routes = [
     LibraryUploadsComponent,
     LibraryPlaylistsComponent,
     LibraryQueueComponent,
-    UploadListItemComponent
+    UploadListItemComponent,
+    StatsItemComponent
   ],
   providers: [
     LibraryService

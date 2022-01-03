@@ -1,12 +1,18 @@
-<div class="flex flex-1">
+<!--<div class="flex flex-1">
     <div class="flex-grow">actionbar</div>
     <div>
         <button class="bg-error rounded-md p-2 ">Cancel all</button>
     </div>
+</div>-->
+
+<div class="my-2 flex">
+    <asc-stats-item title="Erfolgreich" [value]="0" mode="success"></asc-stats-item>
+    <asc-stats-item title="Duplikate" [value]="0" mode="warn"></asc-stats-item>
+    <asc-stats-item title="Fehlgeschlagen" [value]="0" mode="error"></asc-stats-item>
 </div>
 
-<div>
-    <asc-message [mode]="'warn'" *ngIf="(uploadService.$socketConnected | async) != 'ok' && (uploadService.$socketConnected | async) != 'connecting'">
+<div class="my-2" *ngIf="(uploadService.$socketConnected | async) != 'ok' && (uploadService.$socketConnected | async) != 'connecting'">
+    <asc-message [mode]="'warn'">
         Es ist möglich, dass auf Grund einer Störung, keine Status-Updates empfangen werden können. Du kannst weiterhin Dateien hochladen, jedoch werden keine Neuigkeiten zum
         Fortschritt nach dem Hochladen angezeigt.
     </asc-message>

@@ -52,9 +52,11 @@ module.exports = {
           }
         },
         backgroundImage: theme => ({
-          'sidebar-gradient': "linear-gradient(60deg, " + theme('colors.primary.dark') + " 0%, " + theme('colors.primary.light') + " 100%);",
-          'player-gradient': "linear-gradient(-2deg, " + theme('colors.primary.dark') + " 0%, " + theme('colors.primary.light') + " 70%);",
-          'content-gradient': "linear-gradient(180deg, " + theme('colors.accent.dark') + " 0%, " + theme('colors.background.dark') + " 30%);"
+          'content-gradient': "linear-gradient(180deg, " + theme('colors.accent.dark') + " 0%, " + theme('colors.background.dark') + " 30%);",
+          'gr-success': "linear-gradient(60deg, " + theme('colors.success.light') + " 0%, " + theme('colors.success.dark') + " 100%);",
+          'gr-info': "linear-gradient(60deg, " + theme('colors.info.light') + " 0%, " + theme('colors.info.dark') + " 100%);",
+          'gr-warn': "linear-gradient(60deg, " + theme('colors.warn.light') + " 0%, " + theme('colors.warn.dark') + " 100%);",
+          'gr-error': "linear-gradient(60deg, " + theme('colors.error.light') + " 0%, " + theme('colors.error.dark') + " 100%);"
         })
       },
       colors: {
