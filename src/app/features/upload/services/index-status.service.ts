@@ -32,8 +32,8 @@ export class IndexStatusService {
      * $socketAvailable Observable.
      */
     private async connectToSocket() {
-        const socketUrl = environment.api_base_uri + "/index-status/";
-        this._socket = io(`${socketUrl}`, {
+        const socketUrl = environment.api_base_uri + "/index-status";
+        this._socket = io(socketUrl, {
             extraHeaders: {
               "Authorization": "Bearer " + this.authService.getAccessToken()
             }
