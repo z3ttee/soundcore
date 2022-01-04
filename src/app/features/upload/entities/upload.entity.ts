@@ -5,11 +5,12 @@ import { v4 as uuidv4 } from "uuid"
 import { Index } from "./index.entity";
 import { IndexStatus } from "../enums/index-status.enum";
 
-export class UploadInfo {
 
-    public status: FileStatus = FileStatus.STATUS_AWAIT_UPLOAD;
-    public error: string = undefined;
-    public progress: number = 0;
+export class UploadStatus {
+
+    public isDone: boolean = false;
+    public hasError: boolean = false;
+    public isUploading: boolean = false;
 
 }
 
@@ -17,9 +18,10 @@ export class Upload {
 
     private _progressSubject: BehaviorSubject<number> = new BehaviorSubject(0);
     private _errorSubject: BehaviorSubject<Error> = new BehaviorSubject(null);
+    private _indexSubject: BehaviorSubject<Index> = new BehaviorSubject(null);
 
     public readonly id: string = uuidv4();
-    public index?: Index = undefined;
+    public readonly $index: Observable<Index> = this._indexSubject.asObservable();
 
     public readonly file: File;
     public readonly $progress: Observable<number> = this._progressSubject.asObservable();
@@ -33,8 +35,28 @@ export class Upload {
         this._progressSubject.next(progress);
     }
 
+    public async setStatus(status: IndexStatus) {
+        const index = this.index;
+        index.status = status;
+        this._indexSubject.next(index);
+    }
+
+    public set index(val: Index) {
+        const index = this._indexSubject.getValue();
+        if(!index) {
+            this._indexSubject.next(val);
+        } else {
+            val.status = index.status;
+            this._indexSubject.next(val);
+        }
+    }
+
+    public get index(): Index {
+        return this._indexSubject.getValue();
+    }
+
     public isUploading() {
-        return this.index?.status == IndexStatus.UPLOADING;
+        return this._indexSubject.getValue()?.status == IndexStatus.UPLOADING;
     }
 
     public isDone() {
@@ -46,7 +68,8 @@ export class Upload {
     }
 
     public setError(error: Error) {
-        this.index?.status == IndexStatus.ERRORED;
+        this.setStatus(IndexStatus.ERRORED)
+        // this.index?.status == IndexStatus.ERRORED;
         this._errorSubject.next(error)
     }
 

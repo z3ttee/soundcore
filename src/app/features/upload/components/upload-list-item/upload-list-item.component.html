@@ -1,24 +1,23 @@
-<div class="bg-primary my-1 p-6 rounded-lg border-2 border-transparent" [ngClass]="{'border-error-light': (upload.$error | async)}">
-    <div class="flex flex-1 items-center">
-        <div class="flex-grow">{{ upload.file.name }}</div>
-
-        {{ (upload.$error | async) }}
-
-        <div class="mr-2">
-            <mat-chip-list>
-                <mat-chip [color]="(upload.$error | async) ? 'warn' : 'accent'" selected="">{{ upload.index?.status }} </mat-chip>
-            </mat-chip-list>
-        </div>
-        <div *ngIf="upload.isUploading()">
-            <button mat-stroked-button color="warn" (click)="abortUpload()">Abbrechen</button>
-        </div>
+<div class="inline-block w-full h-full p-4 rounded-lg border-2 border-primary bg-background-dark relative overflow-hidden">
+    <div class="absolute top-0 right-0">
+        <button mat-icon-button (click)="abortUpload()" matTooltip="Abbrechen"><i class="fa-solid fa-xmark"></i></button>
     </div>
 
-    <mat-progress-bar
-        class="mt-6"
-        *ngIf="!upload.isDone()"
-        class="my-2"
-        [mode]="upload.isUploading() ? 'determinate' : 'indeterminate'"
-        [value]="(upload.$progress | async)">
-    </mat-progress-bar>
+    <div class="mb-2">
+        <label class="p-0">Dateiname</label>
+        <p class="line-clamp-1" [matTooltip]="upload.file.name" [matTooltipShowDelay]="300">{{ upload.file.name }}</p>
+    </div>
+
+    <div class="my-3">
+        <span class="rounded-full bg-info py-2 px-4 text-xs" [ngClass]="{'bg-warn text-background': index?.status == 'duplicate', 'bg-error-dark': index?.status == 'errored', 'bg-success': index?.status == 'ok', 'bg-primary': index?.status == 'aborted'}">{{ index?.status | statusPipe }}</span>
+    
+        <button mat-icon-button (click)="retryUpload()" matTooltip="Erneut versuchen" *ngIf="index?.status == 'errored'"><i class="fa-solid fa-arrow-rotate-right"></i></button>
+    </div>
+
+    <div class="absolute bottom-0 left-0 w-full" *ngIf="showProgress">
+        <mat-progress-bar
+            [mode]="(upload.isUploading() && (upload.$progress | async) > 0) ? 'determinate' : 'indeterminate'"
+            [value]="(upload.$progress | async)">
+        </mat-progress-bar>
+    </div>
 </div>

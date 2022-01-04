@@ -1,0 +1,21 @@
+<div class="inline-block w-full h-full p-4 rounded-lg border-2 border-primary bg-background-dark relative overflow-hidden">
+    <div class="absolute top-0 right-0">
+        <button mat-icon-button matTooltip="Entfernen" (click)="clearIndexFromList()"><i class="fa-solid fa-xmark"></i></button>
+        <button mat-icon-button *ngIf="isSuccess"><i class="fa-solid fa-arrow-up-right-from-square"></i></button>
+    </div>
+
+    <div class="mb-2">
+        <label class="p-0">Dateiname</label>
+        <p class="line-clamp-1" [matTooltip]="index.filename" [matTooltipShowDelay]="300">{{ index.filename }}</p>
+    </div>
+
+    <div class="my-3">
+        <span class="rounded-full bg-info py-2 px-4 text-xs" [ngClass]="{'bg-warn text-background': index?.status == 'duplicate', 'bg-error-dark': index?.status == 'errored', 'bg-success': index?.status == 'ok', 'bg-primary': index?.status == 'aborted'}">{{ index?.status | statusPipe }}</span>
+
+        <span *ngIf="index?.status == 'duplicate'" class="ml-3 text-sm cursor-pointer" matTooltip="Duplikate treten auf, wenn eine ähnliche Datei bereits von dir oder einem anderen Nutzer hochgeladen wurde."><i class="fa-solid fa-circle-info"></i></span>
+    </div>
+
+    <div class="absolute bottom-0 left-0 w-full" *ngIf="showProgress">
+        <mat-progress-bar [mode]="'indeterminate'"></mat-progress-bar>
+    </div>
+</div>

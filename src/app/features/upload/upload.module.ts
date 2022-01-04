@@ -11,6 +11,13 @@ import { MatIconModule } from '@angular/material/icon';
 import { StatsItemComponent } from './components/stats-item/stats-item.component';
 import { UploadListItemComponent } from './components/upload-list-item/upload-list-item.component';
 import { AppCommonModule } from 'src/app/common.module';
+import {MatDialogModule} from '@angular/material/dialog';
+import { ConfirmAbortDialog } from './dialogs/confirm-abort/confirm-abort.component';
+import { MatButtonModule } from '@angular/material/button';
+import { IndexListItemComponent } from './components/index-list-item/index-list-item.component';
+import { StatusPipePipe } from './pipes/status-pipe.pipe';
+import { MatTooltipModule } from '@angular/material/tooltip';
+
 
 const routes: Routes = [
   { path: "", component: UploadIndexComponent }
@@ -21,7 +28,10 @@ const routes: Routes = [
     QuickInfoComponent,
     StatsItemComponent,
     UploadListItemComponent,
-    UploadIndexComponent
+    UploadIndexComponent,
+    ConfirmAbortDialog,
+    IndexListItemComponent,
+    StatusPipePipe
   ],
   imports: [
     CommonModule,
@@ -32,7 +42,10 @@ const routes: Routes = [
     MatProgressBarModule,
     MatChipsModule,
     MatExpansionModule,
-    MatIconModule
+    MatIconModule,
+    MatDialogModule,
+    MatButtonModule,
+    MatTooltipModule
   ]
 })
 export class UploadModule { }

@@ -1,36 +1,30 @@
 import { HttpClient, HttpErrorResponse, HttpEventType, HttpResponse } from "@angular/common/http";
-import { Injectable, OnInit } from "@angular/core";
+import { Injectable } from "@angular/core";
 import { BehaviorSubject, catchError, filter, Observable, retry, Subscription, tap } from "rxjs";
-import { io, Socket } from "socket.io-client";
-import { AuthenticationService } from "src/app/services/authentication.service";
 import { environment } from "src/environments/environment";
 import { Index } from "../entities/index.entity";
 import { Upload } from "../entities/upload.entity";
 import { IndexStatus } from "../enums/index-status.enum";
-import { SocketStatus } from "../enums/socket-status.enum";
 
-const MAX_UPLOADS = 3
+const MAX_UPLOADS = 1
 
 @Injectable({
     providedIn: "root"
 })
 export class UploadService {
 
-    private _uploads: Map<string, Subscription> = new Map();
-    private _queue: Map<string, Upload> = new Map();
-    private _socket: Socket;
+    private _uploadSubs: Map<string, Subscription> = new Map();
+    private _enqueuedUploads: Upload[] = [];
 
-    private _socketConnectedSubject: BehaviorSubject<SocketStatus> = new BehaviorSubject(SocketStatus.CONNECTING);
-    private _queueSubject: BehaviorSubject<Upload[]> = new BehaviorSubject([]);
-    private _indexSubject: BehaviorSubject<Index[]> = new BehaviorSubject([]);
+    private _queueUpdateSubject: BehaviorSubject<Upload[]> = new BehaviorSubject([]);
+    private _indexUpdateSubject: BehaviorSubject<Index[]> = new BehaviorSubject([]);
 
-    public $queue: Observable<Upload[]> = this._queueSubject.asObservable();
-    public $indexQueue: Observable<Index[]> = this._indexSubject.asObservable();
-    public $socketConnected: Observable<SocketStatus> = this._socketConnectedSubject.asObservable();
+    public $queue: Observable<Upload[]> = this._queueUpdateSubject.asObservable();
+    public $indexQueue: Observable<Index[]> = this._indexUpdateSubject.asObservable();
 
-    constructor(private httpClient: HttpClient, private authService: AuthenticationService){
-        this.connectToSocket();
-    }
+    constructor(
+        private httpClient: HttpClient
+    ){}
 
     /**
      * Add new upload to queue.
@@ -45,14 +39,16 @@ export class UploadService {
             status: IndexStatus.PREPARING
         } as Index
 
-        console.log(`[QUEUE] Created new upload instance:`, upload)
 
         // Push new upload to queue
-        console.log(`[QUEUE] Pushing upload instance:`, upload)
-        this._queue[upload.id] = upload
-        this._queueSubject.next(Object.values(this._queue));
+        this._enqueuedUploads.push(upload)
+        console.log(`[QUEUE] Pushing upload instance. Queue-size: ${this._enqueuedUploads.length}`)
 
-        setTimeout(() => this.next(), 100)
+        const queue = this._queueUpdateSubject.getValue();
+        queue.push(upload);
+        this._queueUpdateSubject.next(queue);
+
+        await this.next();
         return upload
     }
 
@@ -61,14 +57,12 @@ export class UploadService {
      * @param uploadId Upload's id
      */
     public async abortUpload(uploadId: string) {
-        const upload = this._queueSubject.getValue().find((u) => u.id == uploadId);
+        await this.unsubscribe(uploadId)
+        await this.clearUpload(uploadId);
 
-        this.unsubscribe(uploadId)
-
-        if(upload) {
-            upload.index.status = IndexStatus.ABORTED
-            this.updateUpload(upload)
-        }
+        // Because there was an upload aborted by the user, we may want to
+        // continue with the next one.
+        await this.next();
     }
 
     /**
@@ -76,13 +70,41 @@ export class UploadService {
      * @param index Index
      */
     public async updateIndex(index: Index) {
-        const indices = this._indexSubject.getValue();
+        const indices = this._indexUpdateSubject.getValue();
         const existingIndexNr = indices.findIndex((i) => i.id == index.id);
 
         if(existingIndexNr == -1) return;
         indices[existingIndexNr] = index;
 
-        this._indexSubject.next(indices);
+        this._indexUpdateSubject.next(indices);
+    }
+
+    /**
+     * Remove an index by its id from the list.
+     * @param indexId Index id
+     */
+    public async clearIndex(indexId: string) {
+        const indices = this._indexUpdateSubject.getValue();
+        const existingIndexNr = indices.findIndex((i) => i.id == indexId);
+
+        if(existingIndexNr == -1) return;
+        indices.splice(existingIndexNr, 1);
+
+        this._indexUpdateSubject.next(indices);
+    }
+
+    /**
+     * Remove an upload by its id from the list.
+     * @param uploadId Upload id
+     */
+    private async clearUpload(uploadId: string) {
+        const uploads = this._queueUpdateSubject.getValue();
+        const indexNr = uploads.findIndex((u) => u.id == uploadId);
+
+        if(indexNr == -1) return;
+        uploads.splice(indexNr, 1);
+
+        this._queueUpdateSubject.next(uploads);
     }
 
     /**
@@ -90,37 +112,27 @@ export class UploadService {
      * @param upload Upload instance
      */
     private async startUpload(upload: Upload) {
-        this._uploads[upload.id] = upload;
-        console.info(`[QUEUE] Added to upload array.`, this._uploads[upload.id]);
-
         // Build form data for post request
         const fileData = new FormData();
         fileData.append("file", upload.file)
-        console.info(`[QUEUE] Appended file to post request:`, fileData);
 
         // Set status to uploading
-        upload.index.status = IndexStatus.UPLOADING;
+        upload.setStatus(IndexStatus.UPLOADING)
         this.updateUpload(upload)
 
-        console.info(`[QUEUE] Status update sent: ${upload.index.status}`);
-        console.info(`[QUEUE] Starting upload. (${this._uploads.size+1}/${MAX_UPLOADS})`)
+        console.info(`[QUEUE] Starting upload. (${this._uploadSubs.size}/${MAX_UPLOADS})`)
 
-        let uploadSubscription: Subscription = null;
-        this._uploads[upload.id] = uploadSubscription;
-
-        // Start post request and save the subscription
-        uploadSubscription = this.httpClient.post(`${environment.api_base_uri}/v1/upload/audio/`, fileData, {            
+        const uploadSubscription: Subscription = this.httpClient.post(`${environment.api_base_uri}/v1/upload/audio/`, fileData, {            
             reportProgress: true,
             observe: "events"
         }).pipe(
             retry(0),
             catchError((err: HttpErrorResponse, caught) => {
-                console.error(err)
+                console.error(err.error)
                 upload.setError(err.error);
-                this.unsubscribe(upload.id);
                 this.updateUpload(upload);
+                this.onUploadEnd(upload, false);
 
-                console.log(uploadSubscription)
                 uploadSubscription.unsubscribe();
                 return caught;
             }),
@@ -134,19 +146,26 @@ export class UploadService {
         ).subscribe((response: HttpResponse<Index>) => {
             upload.index = response.body;
             this.updateUpload(upload)
-            this.onUploadEnd(upload)
+            this.onUploadEnd(upload, true)
         })
 
-        this._uploads[upload.id] = uploadSubscription;
+        // Register subscription in an array to limit
+        // simultaneous uploads and to be able to cancel.
+        this._uploadSubs.set(upload.id, uploadSubscription)
+        console.info(`[QUEUE] Added to upload array. Currently uploading ${this._uploadSubs.size} items...`, );
     }
 
+    /**
+     * Cancel upload request by unsubscribing the subscription.
+     * This also removes the item from the uploadSubs map
+     * @param uploadId Upload id to cancel
+     */
     private async unsubscribe(uploadId: string) {
-        const subscription = this._uploads.get(uploadId);
-        if(!subscription) {
-            console.log("no subscription found")
-            return;
-        }
+        const subscription = this._uploadSubs.get(uploadId);
+        if(!subscription) return;
+
         subscription.unsubscribe();
+        this._uploadSubs.delete(uploadId);
     }
 
     /**
@@ -154,96 +173,64 @@ export class UploadService {
      * @param upload Upload
      */
     private async updateUpload(upload: Upload) {
-        console.log(`[QUEUE] Updating status of upload ${upload.id}`)
-        this._queue[upload.id] = upload;
-        this._queueSubject.next(Object.values(this._queue))
+        const uploads = this._queueUpdateSubject.getValue();
+        
+        const updateIndex = uploads.findIndex((u) => u.id == upload.id);
+        if(updateIndex == -1) return;
+        
+        uploads[updateIndex] = upload;
+        this._queueUpdateSubject.next(uploads)
     }
 
     /**
      * Start next upload in queue.
      */
     private async next() {
-        if(this._uploads.size >= MAX_UPLOADS) {
-            console.warn(`[QUEUE] Cannot start next upload: Already reached limit of simultaneous uploads. (${this._uploads.size}/${MAX_UPLOADS})`)
+        if(this._uploadSubs.size >= MAX_UPLOADS) {
+            console.warn(`[QUEUE] Cannot start next upload: Already reached limit of simultaneous uploads. (${this._uploadSubs.size}/${MAX_UPLOADS})`)
             return;
         }
 
-        const upload = this._queueSubject.getValue().splice(0, 1)[0];
-        if(!upload) {
+        const nextUploads = this._enqueuedUploads.splice(0, 1);
+        if(!nextUploads || !nextUploads[0]) {
             console.warn(`[QUEUE] Cannot start next upload: Queue empty`)
             return;
         }
 
-        this.startUpload(upload);
+        await this.startUpload(nextUploads[0]);
     }
 
     /**
      * Handle upload ended event.
      * @param upload Upload
      */
-    private async onUploadEnd(upload: Upload) {
-        const uploads = this._queueSubject.getValue();
-        const index = uploads.findIndex((u) => u.id == upload.id )
-
-        console.log(uploads)
-
-        // Queue gets not cleared up ?!
-
-        // Remove from queue
-        uploads.splice(index, 1);
-        console.log(uploads)
-        this._queueSubject.next(uploads)
+    private async onUploadEnd(upload: Upload, shouldPromote: boolean = true) {
+        console.info(`[QUEUE] Upload ${upload.id} ended. Promoting to index.`)
 
         // Remove from ongoing uploads
-        delete this._uploads[upload.id];
-        console.log("Upload " + upload.id + " ended");
+        this.unsubscribe(upload.id)
 
-        // Add to index queue for status observation
-        this._indexSubject.next([
-            ...this._indexSubject.getValue(),
-            upload.index
-        ])
+        if(shouldPromote) {
+            const uploads = this._queueUpdateSubject.getValue();
+            const index = uploads.findIndex((u) => u.id == upload.id )
+
+            // Remove from queue
+            uploads.splice(index, 1);
+            this._queueUpdateSubject.next(uploads)
+
+            // Promote upload to index
+            this.addToIndices(upload.index);
+        }
         
         // Start next if queue not empty
         setTimeout(() => this.next(), 1000)
     }
 
-    /**
-     * Establish connection with index-status socket to receive realtime indexing updates.
-     * If the connection is not possible, then a little warning should appear by checking the
-     * $socketAvailable Observable.
-     */
-    private async connectToSocket() {
-        this._socket = io(`${environment.api_base_uri}/index-status/`, {
-            extraHeaders: {
-              "Authorization": "Bearer " + this.authService.getAccessToken()
-            }
-        })
+    private async addToIndices(index: Index) {
+        const indices = this._indexUpdateSubject.getValue();
+        indices.push(index);
 
-        this._socket.on("disconnect", () => this.handleDisconnectEvent());
-        this._socket.on("connect", () => this.handleConnectEvent());
-        this._socket.on("error", () => this.handleErrorEvent());
-        this._socket.on("connect_error", () => this.handleConnectionError());
-    }
-
-    private async handleDisconnectEvent() {
-        console.warn("[INDEX_STATUS] Disconnected from socket. Service is in limited use mode.")
-        this._socketConnectedSubject.next(SocketStatus.UNAVAILABLE)
-    }
-
-    private async handleConnectEvent() {
-        console.warn("[INDEX_STATUS] Connected to socket. Listening for index status updates.")
-        this._socketConnectedSubject.next(SocketStatus.OK)
-    }
-
-    private async handleConnectionError() {
-        console.error("[INDEX_STATUS] Could not create connection to socket. This either means there is no internet connection, the service may be down or your session is expired.")
-        this._socketConnectedSubject.next(SocketStatus.UNAVAILABLE)
-    }
-
-    private async handleErrorEvent() {
-        console.error("[INDEX_STATUS] Error occured on socket connection.")
-        this._socketConnectedSubject.next(SocketStatus.UNAVAILABLE)
+        this._indexUpdateSubject.next(indices)
     }
 
 }
