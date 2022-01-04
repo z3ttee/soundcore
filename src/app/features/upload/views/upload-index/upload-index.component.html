@@ -15,9 +15,9 @@
 
     <!-- Status on how uploads succeeded -->
     <div class="my-4 flex">
-        <asc-stats-item title="Erfolgreich" [value]="0" mode="success"></asc-stats-item>
-        <asc-stats-item title="Duplikate" [value]="0" mode="warn"></asc-stats-item>
-        <asc-stats-item title="Fehlgeschlagen" [value]="0" mode="error"></asc-stats-item>
+        <asc-stats-item title="Erfolgreich" [value]="($successAmount | async)" [max]="($listCount | async)" mode="success"></asc-stats-item>
+        <asc-stats-item title="Duplikate" [value]="($duplicateAmount | async)" [max]="($listCount | async)" mode="warn"></asc-stats-item>
+        <asc-stats-item title="Fehlgeschlagen" [value]="($errorAmount | async)" [max]="($listCount | async)" mode="error"></asc-stats-item>
     </div>
 
     <div class="my-8 relative border-2 border-primary-light border-dashed bg-primary-light bg-opacity-20 rounded-md">

@@ -6,7 +6,7 @@ import { Index } from "../entities/index.entity";
 import { Upload } from "../entities/upload.entity";
 import { IndexStatus } from "../enums/index-status.enum";
 
-const MAX_UPLOADS = 1
+const MAX_UPLOADS = 5
 
 @Injectable({
     providedIn: "root"
@@ -223,7 +223,7 @@ export class UploadService {
         }
         
         // Start next if queue not empty
-        setTimeout(() => this.next(), 1000)
+        setTimeout(() => this.next(), 100)
     }
 
     private async addToIndices(index: Index) {

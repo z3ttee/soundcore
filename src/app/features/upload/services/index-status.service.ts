@@ -1,4 +1,3 @@
-import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { BehaviorSubject, Observable } from "rxjs";
 import { io, Socket } from "socket.io-client";
@@ -21,7 +20,6 @@ export class IndexStatusService {
     public $socketConnected: Observable<SocketStatus> = this._socketConnectedSubject.asObservable();
 
     constructor(
-        private httpClient: HttpClient, 
         private authService: AuthenticationService,
         private uploadService: UploadService
     ){
