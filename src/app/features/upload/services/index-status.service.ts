@@ -33,6 +33,7 @@ export class IndexStatusService {
      */
     private async connectToSocket() {
         const socketUrl = environment.api_base_uri + "/index-status";
+        console.log(socketUrl)
         this._socket = io(socketUrl, {
             extraHeaders: {
               "Authorization": "Bearer " + this.authService.getAccessToken()
