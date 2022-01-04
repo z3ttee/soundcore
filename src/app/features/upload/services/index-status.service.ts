@@ -32,9 +32,13 @@ export class IndexStatusService {
      * $socketAvailable Observable.
      */
     private async connectToSocket() {
-        const socketUrl = environment.api_base_uri + "/index-status";
-        console.log(socketUrl)
-        this._socket = io(socketUrl, {
+        const url = new URL(environment.api_base_uri + "/index-status");
+        const hostname = url.host;
+        const pathname = url.pathname;
+
+        console.log(hostname, pathname)
+        this._socket = io(hostname, {
+            path: pathname,
             extraHeaders: {
               "Authorization": "Bearer " + this.authService.getAccessToken()
             }
