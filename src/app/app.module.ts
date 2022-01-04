@@ -12,7 +12,6 @@ import { StoreModule } from '@ngrx/store';
 
 import { HttpClientModule, HTTP_INTERCEPTORS } from "@angular/common/http"
 import { ToolbarComponent } from './views/shared/toolbar/toolbar.component';
-import { AccentradialComponent } from './views/shared/accentradial/accentradial.component';
 import { AudioplayerModule } from './features/audioplayer/audioplayer.module';
 
 import {MatButtonModule} from '@angular/material/button';
@@ -26,6 +25,10 @@ import { AppCommonModule } from './common.module';
 import { StreamService } from './services/stream.service';
 import { DeviceService } from './services/device.service';
 import { AccessTokenInterceptor } from './interceptors/access-token.interceptor';
+import {MatProgressBarModule} from '@angular/material/progress-bar';
+
+
+import { TeleportModule } from '@ngneat/overview';
 
 // TODO: https://angular.io/guide/i18n-common-prepare
 
@@ -36,8 +39,7 @@ import { AccessTokenInterceptor } from './interceptors/access-token.interceptor'
     DrawerComponent,
     SidebarComponent,
     ToolbarComponent,
-    SplashComponent,
-    AccentradialComponent
+    SplashComponent
   ],
   imports: [
     BrowserModule,
@@ -48,6 +50,7 @@ import { AccessTokenInterceptor } from './interceptors/access-token.interceptor'
     ReactiveFormsModule,
     StoreModule.forRoot({}, {}),
     AppCommonModule,
+    TeleportModule,
 
     // Import global Angular Material Components
     MatIconModule,
@@ -55,7 +58,8 @@ import { AccessTokenInterceptor } from './interceptors/access-token.interceptor'
     MatAutocompleteModule,
     MatInputModule,
     MatListModule,
-    MatDividerModule
+    MatDividerModule,
+    MatProgressBarModule
   ],
   providers: [
     StreamService,

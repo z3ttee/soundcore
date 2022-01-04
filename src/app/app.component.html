@@ -1,10 +1,9 @@
 <asc-splash [appTitle]="'Soundcore'" [subtitle]="'by TSAlliance'" [active]="showSplashScreen" [appLogoUri]="'../../../assets/branding/soundcore_logo_full.svg'">
     <asc-drawer #drawer>
-        <div asc-drawer>
+        <div class="h-full" asc-drawer>
             <asc-sidebar></asc-sidebar>
         </div>
         <div class="h-full" asc-drawer-content>
-            <asc-accentradial [color]="'#FFCD69'"></asc-accentradial>
             <asc-toolbar class="absolute w-full z-10" (onMenuToggle)="drawer.toggle()"></asc-toolbar>
 
             <div class="relative pt-28 pb-28">
@@ -15,3 +14,7 @@
         </div>
     </asc-drawer>
 </asc-splash>
+
+<div class="absolute top-0 left-0 w-full z-50" *ngIf="showLoadingBar">
+    <mat-progress-bar class="bg-transparent" mode="indeterminate" value="40"></mat-progress-bar>
+</div>

@@ -1,7 +1,8 @@
+import { Location } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { catchError, debounceTime, distinctUntilChanged, filter, map, Observable, of, startWith, switchMap, tap } from 'rxjs';
+import { catchError, debounceTime, distinctUntilChanged, Observable, of, startWith, switchMap, tap } from 'rxjs';
 import { ComplexSearchResult } from 'src/app/model/search-result.model';
 import { AuthenticationService } from 'src/app/services/authentication.service';
 import { environment } from 'src/environments/environment';
@@ -24,7 +25,7 @@ export class ToolbarComponent implements OnInit {
 
   public isSearching: boolean = false;
 
-  constructor(private httpClient: HttpClient, private authService: AuthenticationService) { }
+  constructor(private httpClient: HttpClient, private authService: AuthenticationService, private _location: Location) { }
 
   ngOnInit(): void {
     this.$complexSearchResult = this.myControl.valueChanges.pipe(
@@ -63,6 +64,14 @@ export class ToolbarComponent implements OnInit {
     this.authService.logout().then(() => {
       window.location.reload()
     })
+  }
+
+  public navigateBack() {
+    this._location.back();
+  }
+
+  public navigateNext() {
+    this._location.forward();
   }
 
 }

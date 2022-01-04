@@ -22,12 +22,7 @@ export class LibraryIndexComponent implements OnInit {
             label: 'Deine Uploads',
             link: '/library/uploads',
             index: 1
-        },
-        {
-          label: 'Queue',
-          link: '/library/queue',
-          index: 2
-      }
+        }
     ];
   }
 

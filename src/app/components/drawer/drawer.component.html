@@ -1,7 +1,7 @@
 
 <div class="drawer-wrapper transition-all relative w-full h-full overflow-hidden block lg:grid lg:grid-cols-drawer lg:grid-rows-1" [ngClass]="{'drawer-wrapper-over': mode == 'over', 'lg:grid-cols-drawerClosed': !opened}">
     
-    <div class="absolute inline-block w-64 h-full overflow-hidden z-50 lg:relative bg-primary bg-sidebar-gradient transition-all transform-gpu left-0 rounded-r-2xl lg:rounded-none" [ngClass]="{'lg:rounded-r-2xl': mode == 'over', '-translate-x-full ': !opened}">
+    <div class="absolute inline-block w-64 h-full overflow-hidden z-50 lg:relative bg-background transition-all transform-gpu left-0 rounded-r-2xl lg:rounded-none" [ngClass]="{'lg:rounded-r-2xl': mode == 'over', '-translate-x-full ': !opened}">
         <div class="w-full h-full overflow-y-auto">
             <ng-content select="[asc-drawer]"></ng-content>
         </div>

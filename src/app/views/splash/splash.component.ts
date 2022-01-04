@@ -43,17 +43,14 @@ export class SplashComponent implements OnInit {
             session.type = SSOSessionType.SESSION_USER;
             session.expiresAt = response.expiresAt;
 
-            console.log(session)
-
             // Persists session on success
             this.authService.updateSession(session).then(() => {
               // Persist user data, if finding the data was successful
               this.authService.findAndUpdateCurrentUser().then(() => {
-                this.router.navigate(["/"])
+                this.router.navigate(["/"], { replaceUrl: true })
               })
             });
           }).catch((errorResponse: HttpErrorResponse) => {
-            
             if(errorResponse.status != 200) {
               if(errorResponse.status == 0) {
                 // TODO: Show error to user. These are browser javascript errors (Network, TypedError etc)
