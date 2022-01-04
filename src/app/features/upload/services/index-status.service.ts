@@ -32,7 +32,7 @@ export class IndexStatusService {
      * $socketAvailable Observable.
      */
     private async connectToSocket() {
-        const socketUrl = environment.api_base_uri + (environment.production ? "/soundcore" : "" ) + "/index-status/";
+        const socketUrl = environment.api_base_uri + "/index-status/";
         this._socket = io(`${socketUrl}`, {
             extraHeaders: {
               "Authorization": "Bearer " + this.authService.getAccessToken()
