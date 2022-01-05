@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { map, Observable, tap } from 'rxjs';
 import { Song } from 'src/app/model/song.model';
-import { StreamService } from 'src/app/services/stream.service';
 import { environment } from 'src/environments/environment';
+import { StreamService } from '../stream/services/stream.service';
 
 @Component({
   selector: 'asc-audioplayer',

@@ -22,7 +22,6 @@ import {MatInputModule} from '@angular/material/input';
 import {MatListModule} from '@angular/material/list';
 import {MatDividerModule} from '@angular/material/divider';
 import { AppCommonModule } from './common.module';
-import { StreamService } from './services/stream.service';
 import { DeviceService } from './services/device.service';
 import { AccessTokenInterceptor } from './interceptors/access-token.interceptor';
 import {MatProgressBarModule} from '@angular/material/progress-bar';
@@ -62,7 +61,6 @@ import { TeleportModule } from '@ngneat/overview';
     MatProgressBarModule
   ],
   providers: [
-    StreamService,
     DeviceService,
     {
       provide: HTTP_INTERCEPTORS,

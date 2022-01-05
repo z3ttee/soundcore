@@ -1,0 +1,15 @@
+<div class="transition-all p-2 rounded-xl text-center flex flex-1 flex-col h-full cursor-pointer w-full bg-background-light border-2 border-transparent hover:border-primary active:bg-background-dark" (click)="playSong()">
+
+    <div class="block relative">
+        <div *ngIf="($isPlaying | async)" class="absolute bottom-2 right-2 rounded-full bg-accent-dark text-background w-10 h-10 overflow-hidden flex justify-center items-center">
+            <i class="fa-solid fa-pause"></i>
+        </div>
+
+        <img [src]="coverSrc" class="w-full aspect-square mx-auto rounded-xl shadow-lg">
+    </div>
+
+    <div class="max-w-full overflow-hidden text-left flex-grow pt-2 px-1">
+        <p class="font-bold text-sm max-w-full overflow-hidden text-ellipsis whitespace-nowrap">{{ song.title }}</p>
+        <p class="text-xs opacity-60 line-clamp-2 pt-1">{{ song.artists | songArtistsJoin }}</p>
+    </div>
+</div>

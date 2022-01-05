@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { map, Observable, of, take, tap } from 'rxjs';
+import { Observable } from 'rxjs';
+import { SongService } from 'src/app/features/song/services/song.service';
+import { StreamService } from 'src/app/features/stream/services/stream.service';
 import { Song } from 'src/app/model/song.model';
 import { Page } from 'src/app/pagination/pagination';
-import { SongService } from 'src/app/services/song.service';
-import { StreamService } from 'src/app/services/stream.service';
 
 @Component({
   selector: 'asc-releases-index',

@@ -1,16 +1,20 @@
 <section>
 
-    <div class="flex flex-1">
-        <div class="flex-grow">actionbar</div>
-        <div>
-            <button class="bg-accent text-primary-dark" (click)="createUpload()">Hochladen</button>
-        </div>
-    </div>
-
-    <p *ngIf="isLoading">Loading...</p>
+    <mat-progress-bar mode="indeterminate" color="accent" *ngIf="isLoading"></mat-progress-bar>
     <p *ngIf="($uploadsPage | async).amount <= 0 && !isLoading">Keine Uploads gefunden</p>
 
-    <div *ngIf="($uploadsPage | async).amount > 0">
+    <h3 class="mb-4">Deine Uploads</h3>
+    <div class="grid grid-cols-songs gap-4">
+        <asc-song-item *ngFor="let song of ($uploadsPage | async).elements" [song]="song"></asc-song-item>
+        <!--<asc-showcase-item 
+            *ngFor="let song of ($uploadsPage | async).elements" 
+            [title]="song.title"
+            [subtitle]="song.artists | songArtistsJoin"
+            [artworkId]="song.artwork?.id">
+        </asc-showcase-item>-->
+    </div>
+
+    <!--<div *ngIf="($uploadsPage | async).amount > 0">
         <div class="bg-primary my-1 p-6 rounded-lg border-2 border-transparent" *ngFor="let uploadedFile of ($uploadsPage | async).elements">
             <div class="flex flex-1 items-center">
                 <div class="flex-grow">{{ uploadedFile.metadata.title }}</div>
@@ -22,7 +26,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div>-->
 
     <mat-paginator color="accent" 
                [pageSize]="selectedPageSize"

@@ -12,27 +12,6 @@ import { Song } from 'src/app/model/song.model';
 })
 export class LibraryService {
 
-  private _queueSubject: BehaviorSubject<Song[]> = new BehaviorSubject([]);
+  constructor(private httpClient: HttpClient) { }
 
-  public $queue: Observable<Song[]> = this._queueSubject.asObservable();
-
-  constructor(private httpClient: HttpClient, private authService: AuthenticationService) { }
-
-  public async findMyUploadedSongs(pageable: Pageable): Promise<Page<any>> {
-    return firstValueFrom(this.httpClient.get(`${environment.api_base_uri}/v1/index/byUploader/@me${Pageable.toQuery(pageable)}`)).catch((reason) => {
-      // TODO: Handle error correctly
-      console.error(reason);
-      return Page.of([]) as Page<any>;
-    }).then((page) => page as Page<any>)
-  }
-
-  public async findProcessingUploads(): Promise<Page<any>> {
-    return null;
-  }
-
-  public async abortUpload() {
-    // TODO
-  }
-
-  
 }

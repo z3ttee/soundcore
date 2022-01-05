@@ -1,9 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { SongService } from 'src/app/features/song/services/song.service';
 import { Page, Pageable } from 'src/app/pagination/pagination';
-import { LibraryService } from '../../services/library.service';
 
 @Component({
   selector: 'asc-library-uploads',
@@ -22,7 +21,9 @@ export class LibraryUploadsComponent implements OnInit {
   private _uploadsPageSubject: BehaviorSubject<any> = new BehaviorSubject(Page.of([]));
   public $uploadsPage: Observable<Page<any>> = this._uploadsPageSubject.asObservable();
 
-  constructor(private libraryService: LibraryService, public dialog: MatDialog) { }
+  constructor(
+    private songService: SongService
+  ) { }
 
   ngOnInit(): void {
     this.findMyUploads()
@@ -30,11 +31,8 @@ export class LibraryUploadsComponent implements OnInit {
 
   private async findMyUploads(pageable: Pageable = { page: this.currentPageIndex, size: this.selectedPageSize }) {
     this.isLoading = true;
-    this.libraryService.findMyUploadedSongs(pageable).then((page) => {
-      
-
+    this.songService.findMyUploadedSongs(pageable).then((page) => {
       if(!page) page = Page.of([]);
-      console.log(page)
       this._uploadsPageSubject.next(page)
     }).finally(() => {
       this.isLoading = false;
