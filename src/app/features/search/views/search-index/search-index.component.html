@@ -1,0 +1,43 @@
+<div *teleportTo="'toolbarSection'">
+
+    <div class="flex flex-1 bg-background-dark">
+        <div class="flex-grow">
+            <input [formControl]="searchInputControl" type="text" name="search_query" id="search_query" autofocus>
+        </div>
+        <div>
+
+        </div>
+    </div>
+
+    <!--<ul class="inline-block">
+        <li class="inline-block px-3 py-3 mx-1 rounded-md hover:bg-background-light active:bg-background-dark text-xs cursor-pointer transition-all" *ngFor="let link of navLinks" [routerLink]="[link.link]" routerLinkActive #rla="routerLinkActive" [routerLinkActiveOptions]="{ exact: true }" [ngClass]="{ 'text-accent-dark': rla.isActive }">{{ link.label }}</li>
+    </ul>-->
+</div>
+
+<section class="px-4">
+    <div *ngIf="!hasSearched">
+        <h5>Deine letzten Suchanfragen</h5>
+    </div>
+
+    {{ ($currentResult | async)?.songs }}
+    
+    <div *ngIf="hasSearched">
+        <div *ngIf="($currentResult | async)?.songs">
+            <h5>Songs</h5>
+            <div class="block w-full overflow-hidden border-2 border-accent">
+                <!--<div class="grid grid-cols-songs grid-flow-col auto-cols-songs-hr overflow-x-auto overflow-y-hidden gap-4">
+                    <asc-song-item *ngFor="let song of ($currentResult | async)?.songs?.elements" [song]="song"></asc-song-item>
+                </div>-->
+            </div>
+            
+        </div>
+    
+        <h5>Artists</h5>
+    
+        <h5>Playlisten</h5>
+    
+        <h5>Alben</h5>
+    
+        <h5>Herausgeber / Label</h5>
+    </div>
+</section>

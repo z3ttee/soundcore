@@ -17,6 +17,7 @@ const routes: Routes = [
   { path: "collection", component: IndexViewComponent },
   { path: "playlist/:playlistId", component: IndexViewComponent },
 
+  { path: "search", loadChildren: () => import("./features/search/search.module").then((m) => m.SearchModule) },
   { path: "library", loadChildren: () => import("./features/library/library.module").then((m) => m.LibraryModule) },
   { path: "upload", loadChildren: () => import("./features/upload/upload.module").then((m) => m.UploadModule) },
   { path: "storage", loadChildren: () => import("./features/storage/storage.module").then((m) => m.StorageModule) },
