@@ -11,9 +11,9 @@ import { Page, Pageable } from 'src/app/pagination/pagination';
 })
 export class LibraryUploadsComponent implements OnInit {
 
-  public pageSizeOptions: number[] = [5, 10, 25, 30];
+  public pageSizeOptions: number[] = [25, 50, 100];
 
-  public selectedPageSize: number = 10;
+  public selectedPageSize: number = 25;
   public currentPageIndex: number = 0;
 
   public isLoading: boolean = true;

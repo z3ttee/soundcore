@@ -15,6 +15,9 @@ module.exports = {
           uploads: 'repeat(auto-fill, minmax(' + theme("width.80") + ', 1fr))',
           ...theme('spacing')
         }),
+        gridAutoColumns: ({ theme }) => ({
+          'songs-hr': 'minmax(' + theme("width.36") + ', 1fr))'
+        }),
         colors: {
           background: {
             light: "#1b2027",
