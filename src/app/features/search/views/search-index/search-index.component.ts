@@ -37,6 +37,7 @@ export class SearchIndexComponent implements OnInit {
     this.isSearching = true;
     this.searchService.performComplexSearch(query)
         .then((result) => {
+          console.log(result)
           this._currentResultSubject.next(result)
         }).catch((reason: HttpErrorResponse) => {
           console.error(reason.error)

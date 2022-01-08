@@ -7,6 +7,8 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { SongModule } from '../song/song.module';
 import { GenreGridItemComponent } from 'src/app/components/grid-items/genre-grid-item/genre-grid-item.component';
+import { ArtistGridItemComponent } from 'src/app/components/grid-items/artist-grid-item/artist-grid-item.component';
+import { StreamModule } from '../stream/stream.module';
 
 const routes: Routes = [
   { path: "", component: SearchIndexComponent }
@@ -16,7 +18,8 @@ const routes: Routes = [
   declarations: [
     SearchIndexComponent,
 
-    GenreGridItemComponent
+    GenreGridItemComponent,
+    ArtistGridItemComponent
   ],
   imports: [
     CommonModule,
@@ -25,6 +28,7 @@ const routes: Routes = [
     ReactiveFormsModule,
 
     SongModule,
+    StreamModule,
 
     MatProgressBarModule
   ]
