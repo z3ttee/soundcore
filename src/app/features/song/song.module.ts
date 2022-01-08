@@ -2,6 +2,11 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SongItemComponent } from './components/song-item/song-item.component';
 import { SongArtistsPipe } from './pipes/song-artists.pipe';
+import { RouterModule, Routes } from '@angular/router';
+
+const routes: Routes = [
+
+]
 
 @NgModule({
   declarations: [
@@ -9,7 +14,8 @@ import { SongArtistsPipe } from './pipes/song-artists.pipe';
     SongArtistsPipe
   ],
   imports: [
-    CommonModule
+    CommonModule,
+    RouterModule.forChild(routes)
   ],
   exports: [
     SongItemComponent,
