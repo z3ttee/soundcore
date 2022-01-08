@@ -13,7 +13,7 @@
         <p class="font-bold text-sm max-w-full overflow-hidden text-ellipsis whitespace-nowrap">{{ song.title }}</p>
 
         <div class="line-clamp-2 opacity-60">
-            <ul >
+            <ul>
                 <li *ngIf="song.explicit" class="inline"><span class="inline-flex font-light mr-1 items-center justify-center rounded-sm bg-primary-light text-xs w-4 aspect-square">E</span></li>
                 <li *ngFor="let artist of song.artists; index as i" class="inline"><span class="text-xs hover:underline leading-3 pointer-events-all" [routerLink]="['/artists', artist.id]">{{ artist.name }}</span>{{ i + 1 < song.artists.length ? ", " : "" }}</li>
             </ul>

@@ -66,7 +66,7 @@
     <h5 class="px-4 mb-2">Genres</h5>
     <div class="horizontal_scroll">
         <div class="scroll-area">
-            <span *ngFor="let genre of ($currentResult | async)?.genres?.elements">{{ genre.name }}</span>
+            <asc-genre-grid-item *ngFor="let genre of ($currentResult | async)?.genres?.elements" [genre]="genre"></asc-genre-grid-item>
         </div>
     </div>
 </div>

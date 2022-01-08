@@ -6,6 +6,7 @@ import { TeleportModule } from '@ngneat/overview';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { SongModule } from '../song/song.module';
+import { GenreGridItemComponent } from 'src/app/components/grid-items/genre-grid-item/genre-grid-item.component';
 
 const routes: Routes = [
   { path: "", component: SearchIndexComponent }
@@ -13,7 +14,9 @@ const routes: Routes = [
 
 @NgModule({
   declarations: [
-    SearchIndexComponent
+    SearchIndexComponent,
+
+    GenreGridItemComponent
   ],
   imports: [
     CommonModule,
