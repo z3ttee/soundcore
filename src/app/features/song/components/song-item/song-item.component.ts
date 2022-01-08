@@ -1,8 +1,8 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { map, Observable } from 'rxjs';
 import { StreamService } from 'src/app/features/stream/services/stream.service';
-import { Song } from 'src/app/model/song.model';
 import { environment } from 'src/environments/environment';
+import { Song } from '../../entities/song.entity';
 
 @Component({
   selector: 'asc-song-item',

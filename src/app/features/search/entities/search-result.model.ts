@@ -1,6 +1,6 @@
 import { Page } from "../../../pagination/pagination";
 import { Artist } from "../../../model/artist.model";
-import { Song } from "../../../model/song.model";
+import { Song } from "../../song/entities/song.entity";
 
 export class ComplexSearchResult {
 

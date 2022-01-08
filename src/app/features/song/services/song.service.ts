@@ -1,9 +1,9 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { firstValueFrom, Observable } from 'rxjs';
-import { Song } from 'src/app/model/song.model';
 import { Page, Pageable } from 'src/app/pagination/pagination';
 import { environment } from 'src/environments/environment';
+import { Song } from '../entities/song.entity';
 
 @Injectable({
   providedIn: 'root'

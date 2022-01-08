@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { map, Observable, tap } from 'rxjs';
-import { Song } from 'src/app/model/song.model';
 import { environment } from 'src/environments/environment';
+import { Song } from '../song/entities/song.entity';
 import { StreamService } from '../stream/services/stream.service';
 
 @Component({
