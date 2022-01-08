@@ -13,6 +13,7 @@ module.exports = {
           drawerClosed: 'auto',
           songs: 'repeat(auto-fill, minmax(' + theme("width.36") + ', 1fr))',
           uploads: 'repeat(auto-fill, minmax(' + theme("width.80") + ', 1fr))',
+          auto: 'repeat(auto-fill, 1fr)',
           ...theme('spacing')
         }),
         gridAutoColumns: ({ theme }) => ({

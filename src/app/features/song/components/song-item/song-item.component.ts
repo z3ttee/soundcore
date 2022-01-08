@@ -23,13 +23,9 @@ export class SongItemComponent implements OnInit {
   }
 
   public async ngOnInit() {
-    
-
     if(this.song.artwork) {
       this.coverSrc = `${environment.api_base_uri}/v1/artworks/${this.song.artwork.id}`;
-      this.accentColor = this.song.artwork.accentColor;
-
-      console.log(this.accentColor)
+      this.accentColor = this.song.artwork.accentColor || "#000000";
     } else {
       this.coverSrc = "/assets/img/missing_cover.png"
     }

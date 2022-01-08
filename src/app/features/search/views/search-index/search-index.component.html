@@ -14,30 +14,70 @@
     </ul>-->
 </div>
 
-<section class="px-4">
-    <div *ngIf="!hasSearched">
-        <h5>Deine letzten Suchanfragen</h5>
-    </div>
 
-    {{ ($currentResult | async)?.songs }}
-    
-    <div *ngIf="hasSearched">
-        <div *ngIf="($currentResult | async)?.songs">
-            <h5>Songs</h5>
-            <div class="block w-full overflow-hidden border-2 border-accent">
-                <!--<div class="grid grid-cols-songs grid-flow-col auto-cols-songs-hr overflow-x-auto overflow-y-hidden gap-4">
-                    <asc-song-item *ngFor="let song of ($currentResult | async)?.songs?.elements" [song]="song"></asc-song-item>
-                </div>-->
-            </div>
-            
-        </div>
-    
-        <h5>Artists</h5>
-    
-        <h5>Playlisten</h5>
-    
-        <h5>Alben</h5>
-    
-        <h5>Herausgeber / Label</h5>
-    </div>
+
+<section class="px-4 h-4">
+    <mat-progress-bar *ngIf="isSearching" mode="indeterminate" color="accent"></mat-progress-bar>
 </section>
+
+<!-- Show last search queries if nothing has been searched yet -->
+
+<div *ngIf="!hasSearched && ($history | async).length > 0">
+    <h5>Deine letzten Suchanfragen</h5>
+</div>
+
+<div *ngIf="($currentResult | async)?.songs" class="my-4">
+    <h5 class="px-4 mb-2">Songs</h5>
+    <div class="horizontal_scroll">
+        <div class="scroll-area">
+            <asc-song-item *ngFor="let song of ($currentResult | async)?.songs?.elements" [song]="song"></asc-song-item>
+        </div>
+    </div>
+</div>
+
+<div *ngIf="($currentResult | async)?.artists" class="my-4">
+    <h5 class="px-4 mb-2">Künstler</h5>
+    <div class="horizontal_scroll">
+        <div class="scroll-area">
+            <span *ngFor="let artist of ($currentResult | async)?.artists?.elements">{{ artist.name }}</span>
+        </div>
+    </div>
+</div>
+
+<div *ngIf="($currentResult | async)?.albums" class="my-4">
+    <h5 class="px-4 mb-2">Alben</h5>
+    <div class="horizontal_scroll">
+        <div class="scroll-area">
+            <span *ngFor="let album of ($currentResult | async)?.albums?.elements">{{ album.title }}</span>
+        </div>
+    </div>
+</div>
+
+<div *ngIf="($currentResult | async)?.playlists" class="my-4">
+    <h5 class="px-4 mb-2">Playlisten</h5>
+    <div class="horizontal_scroll">
+        <div class="scroll-area">
+            <span *ngFor="let playlist of ($currentResult | async)?.playlists?.elements">{{ playlist.title }}</span>
+        </div>
+    </div>
+</div>
+
+<div *ngIf="($currentResult | async)?.genres" class="my-4">
+    <h5 class="px-4 mb-2">Genres</h5>
+    <div class="horizontal_scroll">
+        <div class="scroll-area">
+            <span *ngFor="let genre of ($currentResult | async)?.genres?.elements">{{ genre.name }}</span>
+        </div>
+    </div>
+</div>
+
+<div *ngIf="($currentResult | async)?.publisher || ($currentResult | async)?.distributors || ($currentResult | async)?.labels " class="my-4">
+    <h5 class="px-4 mb-2">Herausgeber & Label</h5>
+    <div class="horizontal_scroll">
+        <div class="scroll-area">
+            <span *ngFor="let publisher of ($currentResult | async)?.publisher?.elements || []">{{ publisher.name }}</span>
+            <span *ngFor="let label of ($currentResult | async)?.labels?.elements || []">{{ label.name }}</span>
+            <span *ngFor="let distributor of ($currentResult | async)?.distributors?.elements || []">{{ distributor.name }}</span>
+        </div>
+    </div>
+</div>

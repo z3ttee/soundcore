@@ -61,3 +61,23 @@ label {
     background: none;
     @apply text-sm;
 }
+
+
+/**
+[]=============================[]
+          Scrollbars
+[]=============================[]
+*/
+/* width */
+::-webkit-scrollbar {
+    @apply h-1 w-1;
+}
+  
+/* Handle */
+::-webkit-scrollbar-thumb {
+    @apply bg-primary rounded-full;
+}
+
+::-webkit-scrollbar-track {
+    @apply bg-background-light;
+}
