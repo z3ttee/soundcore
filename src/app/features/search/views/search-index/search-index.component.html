@@ -9,9 +9,6 @@
         </div>
     </div>
 
-    <!--<ul class="inline-block">
-        <li class="inline-block px-3 py-3 mx-1 rounded-md hover:bg-background-light active:bg-background-dark text-xs cursor-pointer transition-all" *ngFor="let link of navLinks" [routerLink]="[link.link]" routerLinkActive #rla="routerLinkActive" [routerLinkActiveOptions]="{ exact: true }" [ngClass]="{ 'text-accent-dark': rla.isActive }">{{ link.label }}</li>
-    </ul>-->
 </div>
 
 
@@ -21,13 +18,12 @@
 </section>
 
 <!-- Show last search queries if nothing has been searched yet -->
-
 <div *ngIf="!hasSearched && ($history | async).length > 0">
     <h5>Deine letzten Suchanfragen</h5>
 </div>
 
 <div *ngIf="($currentResult | async)?.songs" class="my-4">
-    <h5 class="px-4 mb-2">Songs</h5>
+    <h5 class="px-4">Songs</h5>
 
     <asc-horizontal-grid>
         <asc-song-item *ngFor="let song of ($currentResult | async)?.songs?.elements" [song]="song"></asc-song-item>
@@ -35,35 +31,35 @@
 </div>
 
 <div *ngIf="($currentResult | async)?.genres" class="my-4">
-    <h5 class="px-4 mb-2">Genres</h5>
+    <h5 class="px-4">Genres</h5>
     <asc-horizontal-grid>
         <asc-genre-grid-item *ngFor="let genre of ($currentResult | async)?.genres?.elements" [genre]="genre"></asc-genre-grid-item>
     </asc-horizontal-grid>
 </div>
 
 <div *ngIf="($currentResult | async)?.artists" class="my-4">
-    <h5 class="px-4 mb-2">Künstler</h5>
+    <h5 class="px-4">Künstler</h5>
     <asc-horizontal-grid>
         <asc-artist-grid-item *ngFor="let artist of ($currentResult | async)?.artists?.elements" [artist]="artist"></asc-artist-grid-item>
     </asc-horizontal-grid>
 </div>
 
 <div *ngIf="($currentResult | async)?.albums" class="my-4">
-    <h5 class="px-4 mb-2">Alben</h5>
+    <h5 class="px-4">Alben</h5>
     <asc-horizontal-grid>
         <asc-album-grid-item *ngFor="let album of ($currentResult | async)?.albums?.elements" [album]="album"></asc-album-grid-item>
     </asc-horizontal-grid>
 </div>
 
 <div *ngIf="($currentResult | async)?.playlists" class="my-4">
-    <h5 class="px-4 mb-2">Playlisten</h5>
+    <h5 class="px-4">Playlisten</h5>
     <asc-horizontal-grid>
         <span *ngFor="let playlist of ($currentResult | async)?.playlists?.elements">{{ playlist.title }}</span>
     </asc-horizontal-grid>
 </div>
 
 <div *ngIf="($currentResult | async)?.publisher || ($currentResult | async)?.distributors || ($currentResult | async)?.labels " class="my-4">
-    <h5 class="px-4 mb-2">Herausgeber & Label</h5>
+    <h5 class="px-4">Herausgeber & Label</h5>
     <asc-horizontal-grid>
         <span *ngFor="let publisher of ($currentResult | async)?.publisher?.elements || []">{{ publisher.name }}</span>
         <span *ngFor="let label of ($currentResult | async)?.labels?.elements || []">{{ label.name }}</span>
