@@ -28,6 +28,7 @@ import {MatProgressBarModule} from '@angular/material/progress-bar';
 
 
 import { TeleportModule } from '@ngneat/overview';
+import { MainLayoutComponent } from './layout/main-layout/main-layout.component';
 
 // TODO: https://angular.io/guide/i18n-common-prepare
 
@@ -35,6 +36,7 @@ import { TeleportModule } from '@ngneat/overview';
   declarations: [
     AppComponent,
     IndexViewComponent,
+    MainLayoutComponent,
     DrawerComponent,
     SidebarComponent,
     ToolbarComponent,

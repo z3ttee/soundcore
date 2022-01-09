@@ -1,0 +1,14 @@
+<asc-drawer #drawer>
+    <div class="h-full" asc-drawer>
+        <asc-sidebar></asc-sidebar>
+    </div>
+    <div class="h-full" asc-drawer-content>
+        <asc-toolbar class="absolute w-full z-10" (onMenuToggle)="drawer.toggle()"></asc-toolbar>
+
+        <div class="relative pt-28 pb-28">
+            <router-outlet></router-outlet>
+        </div>
+
+        <asc-audioplayer class="absolute bottom-0 left-0 w-full"></asc-audioplayer>
+    </div>
+</asc-drawer>

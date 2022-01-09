@@ -24,6 +24,10 @@
                 Deine Sammlung
                 <span class="absolute right-0 top-1/2 transform-gpu -translate-y-1/2"><button mat-icon-button><i class="fa-solid fa-plus"></i></button></span>
             </label>
+
+            <li class="py-4">
+                <asc-error-message [error]="error"></asc-error-message>
+            </li>
             
             <li [routerLink]="['/playlist', 1]" [routerLinkActive]="'active'"><span>Playlist 1</span></li>
             <li [routerLink]="['/playlist', 2]" [routerLinkActive]="'active'"><span>Playlist 2</span></li>

@@ -1,4 +1,9 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { Playlist } from 'src/app/features/playlist/entities/playlist.entity';
+import { PlaylistService } from 'src/app/features/playlist/services/playlist.service';
+import { Page } from 'src/app/pagination/pagination';
 
 @Component({
   selector: 'asc-sidebar',
@@ -7,9 +12,19 @@ import { Component, OnInit } from '@angular/core';
 })
 export class SidebarComponent implements OnInit {
 
-  constructor() { }
+  private _playlistsSubject: BehaviorSubject<Playlist[]> = new BehaviorSubject([]);
+  public $playlists: Observable<Playlist[]> = this._playlistsSubject.asObservable();
 
-  ngOnInit(): void {
+  public error: HttpErrorResponse = undefined;
+
+  constructor(private playlistService: PlaylistService) { }
+
+  public async ngOnInit(): Promise<void> {
+    this.playlistService.findPageByAuthor().then((page) => {
+      this._playlistsSubject.next(page.elements);
+    }).catch((error: HttpErrorResponse) => {
+      this.error = error
+    })
   }
 
 }
