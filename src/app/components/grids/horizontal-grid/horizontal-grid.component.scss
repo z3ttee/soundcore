@@ -1,0 +1,18 @@
+:host {
+    .horizontal_scroll {
+        display: block;
+        width: 100%;
+        overflow: hidden;
+        scroll-behavior: smooth;
+
+        .scroll-area {
+            -webkit-overflow-scrolling: touch;
+            grid-auto-columns: minmax(10rem, 1fr);
+            grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+
+            @apply px-4 py-2;
+
+        }
+
+    }
+}
