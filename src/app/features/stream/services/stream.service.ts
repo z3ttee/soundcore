@@ -1,5 +1,6 @@
 import { Injectable } from "@angular/core";
 import { BehaviorSubject, Observable } from "rxjs";
+import { Album } from "src/app/model/album.model";
 import { Artist } from "src/app/model/artist.model";
 import { Song } from "../../song/entities/song.entity";
 
@@ -23,6 +24,14 @@ export class StreamService {
      */
     public async playArtist(artist: Artist): Promise<void> {
         console.log("TODO: Play artist: " + artist.name)
+    }
+
+    /**
+     * Play selected album by creating a background queue containing all songs of the album.
+     * @param album Selected album
+     */
+     public async playAlbum(album: Album): Promise<void> {
+        console.log("TODO: Play album: " + album.title)
     }
 
 }

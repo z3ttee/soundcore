@@ -57,7 +57,7 @@
     <h5 class="px-4 mb-2">Alben</h5>
     <div class="horizontal_scroll">
         <div class="scroll-area">
-            <span *ngFor="let album of ($currentResult | async)?.albums?.elements">{{ album.title }}</span>
+            <asc-album-grid-item *ngFor="let album of ($currentResult | async)?.albums?.elements" [album]="album"></asc-album-grid-item>
         </div>
     </div>
 </div>

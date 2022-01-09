@@ -9,6 +9,7 @@ import { SongModule } from '../song/song.module';
 import { GenreGridItemComponent } from 'src/app/components/grid-items/genre-grid-item/genre-grid-item.component';
 import { ArtistGridItemComponent } from 'src/app/components/grid-items/artist-grid-item/artist-grid-item.component';
 import { StreamModule } from '../stream/stream.module';
+import { AlbumGridItemComponent } from 'src/app/components/grid-items/album-grid-item/album-grid-item.component';
 
 const routes: Routes = [
   { path: "", component: SearchIndexComponent }
@@ -19,7 +20,8 @@ const routes: Routes = [
     SearchIndexComponent,
 
     GenreGridItemComponent,
-    ArtistGridItemComponent
+    ArtistGridItemComponent,
+    AlbumGridItemComponent
   ],
   imports: [
     CommonModule,

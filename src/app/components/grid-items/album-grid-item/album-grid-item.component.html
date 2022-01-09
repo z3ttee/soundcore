@@ -1,0 +1,21 @@
+<div class="item-container transition-all p-3 rounded-md text-center flex flex-1 flex-col overflow-hidden h-full cursor-pointer w-full bg-background-light border-2 border-transparent hover:border-primary active:bg-background-dark">
+
+    <div class="block relative">
+        <div [ngClass]="{'active': ($isPlaying | async)}" class="play-button transition-all transform-gpu absolute bottom-2 right-2 rounded-full bg-accent-dark shadow-lg text-background w-10 h-10 overflow-hidden flex justify-center items-center hover:scale-105" (click)="playOrPause()">
+            <i class="fa-solid fa-pause" *ngIf="($isPlaying | async)"></i>
+            <i class="fa-solid fa-play" *ngIf="!($isPlaying | async)"></i>
+        </div>
+
+        <img [src]="coverSrc" class="w-full aspect-square mx-auto rounded-lg" [style]="'box-shadow: 0px 0px 32px 5px '+accentColor+'50;'">
+    </div>
+
+    <div class="max-w-full overflow-hidden text-left flex-grow pt-2.5 px-1">
+        <p class="font-bold text-sm line-clamp-2">{{ album.title }}</p>
+
+        <div class="line-clamp-1 opacity-60">
+            <ul>
+                <li *ngFor="let artist of album.artists; index as i" class="inline"><span class="text-xs hover:underline leading-3 pointer-events-all" [routerLink]="['/artists', artist.id]">{{ artist.name }}</span>{{ i + 1 < album.artists.length ? ", " : "" }}</li>
+            </ul>
+        </div>
+    </div>
+</div>
