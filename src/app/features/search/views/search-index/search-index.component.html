@@ -1,14 +1,9 @@
-<div *teleportTo="'toolbarSection'">
-
-    <div class="flex flex-1 bg-background-dark">
-        <div class="flex-grow">
-            <input [formControl]="searchInputControl" type="text" name="search_query" id="search_query" autofocus>
-        </div>
-        <div>
-
+<div *teleportTo="'toolbarSection'" class="w-2/3">
+    <div class="flex flex-1 w-full">
+        <div class="flex-grow ">
+            <input class="appearance-none block bg-primary w-full outline-none px-4 py-3 rounded-full text-sm border-2 border-transparent active:border-primary-light" [formControl]="searchInputControl" type="text" name="search_query" id="search_query" autofocus placeholder="Suchen...">
         </div>
     </div>
-
 </div>
 
 
