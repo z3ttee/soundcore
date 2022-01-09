@@ -29,6 +29,8 @@ import {MatProgressBarModule} from '@angular/material/progress-bar';
 
 import { TeleportModule } from '@ngneat/overview';
 import { MainLayoutComponent } from './layout/main-layout/main-layout.component';
+import { PlaylistListItemComponent } from './components/list-items/playlist-list-item/playlist-list-item.component';
+import { PlaylistModule } from './features/playlist/playlist.module';
 
 // TODO: https://angular.io/guide/i18n-common-prepare
 
@@ -40,7 +42,8 @@ import { MainLayoutComponent } from './layout/main-layout/main-layout.component'
     DrawerComponent,
     SidebarComponent,
     ToolbarComponent,
-    SplashComponent
+    SplashComponent,
+    PlaylistListItemComponent
   ],
   imports: [
     BrowserModule,
@@ -52,6 +55,8 @@ import { MainLayoutComponent } from './layout/main-layout/main-layout.component'
     StoreModule.forRoot({}, {}),
     AppCommonModule,
     TeleportModule,
+
+    PlaylistModule,
 
     // Import global Angular Material Components
     MatIconModule,

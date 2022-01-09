@@ -1,0 +1,57 @@
+<div class="h-2">
+    <mat-progress-bar mode="indeterminate" *ngIf="isLoading"></mat-progress-bar>
+</div>
+
+<h2 mat-dialog-title>Playlist erstellen</h2>
+
+<mat-dialog-content class="h-full min-w-[500px] max-w-[500px] min-h-[350px]">
+
+    <asc-error-message [error]="error" *ngIf="error"></asc-error-message>
+
+    <div class="block w-full min-w-[180px] max-w-[500px]" [formGroup]="playlistDto">
+
+        <!-- Name of the playlist -->
+        <mat-form-field class="inline-block w-full" appearance="fill">
+            <mat-label>Name</mat-label>
+            <input type="text" matInput formControlName="title">
+            <mat-hint>Achte darauf, dass du noch keine Playlist so benannt hast!</mat-hint>
+            <mat-error *ngIf="playlistDto.get('title').hasError('maxlength')">
+                Der Name darf maximal 120 Zeichen lang sein.
+            </mat-error>
+            <mat-error *ngIf="playlistDto.get('title').hasError('minlength')">
+                Der Name muss mindestens 3 Zeichen lang sein.
+            </mat-error>
+            <mat-error *ngIf="playlistDto.get('title').hasError('required')">
+                Es wird ein Name benötigt.
+            </mat-error>
+        </mat-form-field>
+
+        <!-- Description of the playlist -->
+        <mat-form-field class="mt-12 inline-block w-full" appearance="fill">
+            <mat-label>Beschreibung</mat-label>
+
+            <input type="text" matInput formControlName="description">
+            <mat-error *ngIf="playlistDto.get('description').hasError('maxlength')">
+                Die Beschreibung darf maximal 120 Zeichen lang sein.
+            </mat-error>
+            <mat-error *ngIf="playlistDto.get('description').hasError('minlength')">
+                Die Beschreibung muss mindestens 3 Zeichen lang sein.
+            </mat-error>
+        </mat-form-field>
+
+        <!-- Privacy settings of the playlist -->
+        <mat-form-field class="mt-12 inline-block w-full" appearance="fill">
+            <mat-label>Sichtbarkeit</mat-label>
+            <mat-select formControlName="privacy" name="food">
+              <mat-option *ngFor="let option of availablePrivacyOptions" [value]="option.value">
+                {{ option.name }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+    </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+    <button mat-button (click)="cancel()">Abbrechen</button>
+    <button mat-button (click)="save()" cdkFocusInitial>Erstellen</button>
+</mat-dialog-actions>
