@@ -25,7 +25,7 @@
 
 <div *ngIf="($currentResult | async)?.genres" class="my-4">
     <asc-horizontal-grid headline="Genres">
-        <asc-genre-grid-item *ngFor="let genre of ($currentResult | async)?.genres?.elements" [genre]="genre"></asc-genre-grid-item>
+        <asc-genre-grid-item *ngFor="let genre of ($currentResult | async)?.genres?.elements" [genre]="genre" [routerLink]="['/genres', genre.id]"></asc-genre-grid-item>
     </asc-horizontal-grid>
 </div>
 

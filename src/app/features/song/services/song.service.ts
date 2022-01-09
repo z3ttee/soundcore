@@ -25,4 +25,8 @@ export class SongService {
   public async findMyUploadedSongs(pageable?: Pageable): Promise<Page<Song>> {
       return firstValueFrom(this.httpClient.get(`${environment.api_base_uri}/v1/songs/byUploader/@me${Pageable.toQuery(pageable)}`)).then((page) => page as Page<Song>)
   }
+
+  public async findByGenre(genreId: string, pageable?: Pageable): Promise<Page<Song>> {
+    return firstValueFrom(this.httpClient.get(`${environment.api_base_uri}/v1/songs/byGenre/${genreId}${Pageable.toQuery(pageable)}`)).then((page) => page as Page<Song>)
+  }
 }

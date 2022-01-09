@@ -4,7 +4,6 @@ import { AuthenticationCanActivateGuard } from './guards/can-activate.guard';
 import { MainLayoutComponent } from './layout/main-layout/main-layout.component';
 import { AuthorizeViewComponent } from './views/authorize-view/authorize-view.component';
 import { IndexViewComponent } from './views/index-view/index-view.component';
-import { SplashComponent } from './views/splash/splash.component';
 
 const routes: Routes = [
   
@@ -17,6 +16,8 @@ const routes: Routes = [
     { path: "library", canActivate: [AuthenticationCanActivateGuard], loadChildren: () => import("./features/library/library.module").then((m) => m.LibraryModule) },
     { path: "upload", canActivate: [AuthenticationCanActivateGuard], loadChildren: () => import("./features/upload/upload.module").then((m) => m.UploadModule) },
     { path: "storage", canActivate: [AuthenticationCanActivateGuard], loadChildren: () => import("./features/storage/storage.module").then((m) => m.StorageModule) },
+    { path: "genres", canActivate: [AuthenticationCanActivateGuard], loadChildren: () => import("./features/genre/genre.module").then((m) => m.GenreModule) },
+
 
     // Make every route below to AsyncModule
     { path: "activity", canActivate: [AuthenticationCanActivateGuard], component: IndexViewComponent },
