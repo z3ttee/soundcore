@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 
 @Component({
   selector: 'asc-seeker',
@@ -7,22 +7,38 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 })
 export class SeekerComponent implements OnInit {
 
+  @ViewChild("inputElement") public range: HTMLInputElement;
+
   @Input() public duration: number;
-  @Input() public value: number;
+
+  @Input() public set current(val: number) {
+    if(this.isInputting) return;
+    this.value = val;
+  }
+
   @Input() public steps: number = 1;
 
-  @Output() public valueChange: EventEmitter<number> = new EventEmitter();
+  @Output() public seek: EventEmitter<number> = new EventEmitter();
+
+  public get current(): number { return this.value }
+
+  public value: number = 0;
+  private isInputting: boolean = false;
 
   constructor() { }
 
   ngOnInit(): void {
+    this.value = this.current;
   }
 
   public onInputChanged(event: Event) {
-    const val = event.target["value"];
-    console.log(event.target["value"]);
-
-    this.valueChange.emit(val);
+    this.isInputting = false;
+    this.seek.emit(parseInt(event.target["value"]));
   }
+
+  public onInput() {
+    this.isInputting = true;
+  }
+
 
 }

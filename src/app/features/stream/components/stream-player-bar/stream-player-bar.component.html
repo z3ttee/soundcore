@@ -1,44 +1,33 @@
-<div class="block w-full bg-background-light bg-opacity-90 filter backdrop-blur-md relative">
-    <asc-seeker class="absolute top-0 left-0 w-full" [(value)]="currentSeekValue" [duration]="($currentSong | async)?.duration"></asc-seeker>
+<div class="block w-full bg-background-dark bg-opacity-95 filter backdrop-blur-lg relative">
+    <asc-seeker *ngIf="($currentSong | async)" class="absolute top-0 left-0 w-full" [current]="currentSeekValue" [duration]="($currentSong | async)?.duration" (seek)="onSeeking($event)"></asc-seeker>
 
     <div class="flex flex-1 p-4 px-6 items-center">
-        <div class="w-12 h-12 border-2 rounded-lg overflow-hidden mr-3 shadow-lg"></div>
+        <div class="relative w-12 h-12 rounded-lg overflow-hidden mr-3 shadow-lg" *ngIf="($currentSong | async)">
+            <img [src]="coverSrc" class="w-full aspect-square mx-auto rounded-lg">
+            <span class="absolute top-1/2 left-1/2 transform-gpu -translate-x-1/2 -translate-y-1/2" *ngIf="isLoading"><i class="fa-solid fa-spinner fa-spin"></i></span>
+        </div>
 
-        <div class="inline-block w-64">
-            <p class="font-bold line-clamp-1">{{ ($currentSong | async)?.title || "Unknown title" }}</p>
-            <p class="text-sm opacity-80 line-clamp-1">{{ ($currentSong | async)?.artists | songArtistsJoin }}</p>
+        <div class="inline-block w-64 flex-grow">
+            <p class="font-bold text-sm max-w-full overflow-hidden text-ellipsis whitespace-nowrap">{{ ($currentSong | async)?.title }}</p>
+
+            <div class="line-clamp-1 opacity-60">
+                <ul>
+                    <li *ngIf="($currentSong | async)?.explicit" class="inline"><span class="inline-flex font-light mr-1 items-center justify-center rounded-sm bg-primary-light text-xs w-4 aspect-square">E</span></li>
+                    <li *ngFor="let artist of ($currentSong | async)?.artists || []; index as i" class="inline"><span class="text-xs hover:underline leading-3 pointer-events-all" [routerLink]="['/artists', artist.id]">{{ artist.name }}</span>{{ i + 1 < ($currentSong | async)?.artists.length ? ", " : "" }}</li>
+                </ul>
+            </div>
         </div>
 
         <div class="inline-flex items-center">
-            <button *ngIf="isPaused" class="rounded-full w-11 h-11 inline-flex justify-center items-center" (click)="play()"><i class="fa-solid fa-play"></i></button>
-            <button *ngIf="!isPaused" class="rounded-full w-11 h-11 inline-flex justify-center items-center" (click)="pause()"><i class="fa-solid fa-pause"></i></button>
+            <button *ngIf="isPaused || !($currentSong | async)" class="rounded-full w-11 h-11 inline-flex justify-center items-center bg-accent-dark text-background transform-gpu hover:scale-105 active:scale-95 transition-all" (click)="play()"><i class="fa-solid fa-play"></i></button>
+            <button *ngIf="!isPaused && ($currentSong | async)" class="rounded-full w-11 h-11 inline-flex justify-center items-center bg-accent-dark text-background transform-gpu hover:scale-105 active:scale-95 transition-all" (click)="pause()"><i class="fa-solid fa-pause"></i></button>
 
-            <p class="w-32 text-center text-sm text-opacity-70 font-light">{{ currentSeekValue | durationPipe }} / {{ (($currentSong | async)?.duration || 0) | durationPipe }}</p>
+            <p class="w-32 text-center text-sm text-opacity-70 font-light">{{ currentTime | durationPipe }} / {{ (($currentSong | async)?.duration || 0) | durationPipe }}</p>
         </div>
 
+        <!-- TODO: Add volume, next, prev, shuffle and loop control -->
         <div>
-            <!--<p>Playing: {{ currentSrc }}</p>-->
-
-            <audio #audio controls [src]="currentSrc" [currentTime]="currentSeekValue" (pause)="onPauseEvent()" (play)="onPlayEvent()" (ended)="onEndedEvent()" autoplay></audio>
+            <audio #audio hidden [src]="currentSrc" (pause)="onPauseEvent()" (play)="onPlayEvent()" (ended)="onEndedEvent()" (timeupdate)="onTimeUpdated()" (seeked)="onElementSeekEvent()" (canplay)="onCanPlay()" (loadstart)="onLoadStart()" (loadeddata)="onLoadedData()" (waiting)="onWaiting()" autoplay></audio>
         </div>
     </div>
-    <!--<div class="flex flex-1 p-4 rounded-md bg-primary bg-player-gradient relative overflow-hidden items-center">
-
-        <div class="w-12 h-12 border-2 rounded-lg overflow-hidden mr-3 shadow-lg">
-
-        </div>
-
-        <div class="inline-block w-64">
-            <p class="font-bold">{{ ($currentSong | async)?.title || "Unknown title" }}</p>
-            <p class="text-sm opacity-80">{{ ($currentSong | async)?.artists | songArtistsJoin }}</p>
-        </div>
-
-        <div>
-            <p>Playing: {{ currentSrc }}</p>
-
-            <audio controls [src]="currentSrc" autoplay></audio>
-        </div>
-
-        <input class="absolute bottom-0 left-0 w-full appearance-none bg-accent h-1 rounded-md transform-gpu origin-bottom transition-all hover:h-2 cursor-pointer" type="range" name="player_seek">
-    </div>-->
 </div>
