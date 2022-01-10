@@ -8,7 +8,7 @@
     </div>
 
     <div class="align-top transition-all block w-full h-full z-400 overflow-hidden drawer-col relative">
-        <div class="z-40 transition-all absolute top-0 left-0 w-full h-full bg-background-dark bg-opacity-80 lg:pointer-events-none lg:opacity-0" [ngClass]="{'opacity-0 pointer-events-none': !opened || !canShowBackdrop, 'backdrop-mode-over': opened && mode == 'over'}" (click)="close()"></div>
+        <div class="z-40 transition-all absolute top-0 left-0 w-full h-full bg-background-dark bg-opacity-80 lg:pointer-events-none lg:opacity-0" [ngClass]="{'opacity-0 pointer-events-none': !opened || !canShowBackdrop, 'backdrop-mode-over': opened && mode == 'over'}" (click)="close()"></div>        
         <div class="w-full h-full bg-background overflow-y-auto">
             <ng-content select="[asc-drawer-content]"></ng-content>
         </div>

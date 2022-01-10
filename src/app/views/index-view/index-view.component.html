@@ -6,10 +6,35 @@
     </ul>
 </div>
 
-<section>
-    <h1>Willkommen, {{ (authService.$user | async).username }}</h1>
+<asc-infinite-scroll-list class="h-96">
+    <section>
+        <h1>Willkommen, {{ (authService.$user | async).username }}</h1>
+    
+        <h5>Zuletzt gehört</h5>
+        <h5>Kürzlich hinzugefügt</h5>
+        <h5>Entdecke Musik aus "{{ "genre" }}"</h5>
+    </section>
+    <section>
+        <h1>Willkommen, {{ (authService.$user | async).username }}</h1>
+    
+        <h5>Zuletzt gehört</h5>
+        <h5>Kürzlich hinzugefügt</h5>
+        <h5>Entdecke Musik aus "{{ "genre" }}"</h5>
+    </section>
+    <section>
+        <h1>Willkommen, {{ (authService.$user | async).username }}</h1>
+    
+        <h5>Zuletzt gehört</h5>
+        <h5>Kürzlich hinzugefügt</h5>
+        <h5>Entdecke Musik aus "{{ "genre" }}"</h5>
+    </section>
+    <section>
+        <h1>Willkommen, {{ (authService.$user | async).username }}</h1>
+    
+        <h5>Zuletzt gehört</h5>
+        <h5>Kürzlich hinzugefügt</h5>
+        <h5>Entdecke Musik aus "{{ "genre" }}"</h5>
+    </section>
+</asc-infinite-scroll-list>
 
-    <h5>Zuletzt gehört</h5>
-    <h5>Kürzlich hinzugefügt</h5>
-    <h5>Entdecke Musik aus "{{ "genre" }}"</h5>
-</section>
+

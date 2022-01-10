@@ -12,11 +12,10 @@ import { StoreModule } from '@ngrx/store';
 
 import { HttpClientModule, HTTP_INTERCEPTORS } from "@angular/common/http"
 import { ToolbarComponent } from './views/shared/toolbar/toolbar.component';
-import { AudioplayerModule } from './features/audioplayer/audioplayer.module';
 
 import {MatButtonModule} from '@angular/material/button';
 import {MatIconModule} from '@angular/material/icon';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { ReactiveFormsModule } from '@angular/forms';
 import {MatAutocompleteModule} from '@angular/material/autocomplete';
 import {MatInputModule} from '@angular/material/input';
 import {MatListModule} from '@angular/material/list';
@@ -31,11 +30,15 @@ import { TeleportModule } from '@ngneat/overview';
 import { MainLayoutComponent } from './layout/main-layout/main-layout.component';
 import { PlaylistListItemComponent } from './components/list-items/playlist-list-item/playlist-list-item.component';
 import { PlaylistModule } from './features/playlist/playlist.module';
+import { InfiniteScrollListComponent } from './components/lists/infinite-scroll-list/infinite-scroll-list.component';
+import { StreamModule } from './features/stream/stream.module';
 
 // TODO: https://angular.io/guide/i18n-common-prepare
 
 @NgModule({
   declarations: [
+    InfiniteScrollListComponent,
+
     AppComponent,
     IndexViewComponent,
     MainLayoutComponent,
@@ -50,13 +53,13 @@ import { PlaylistModule } from './features/playlist/playlist.module';
     AppRoutingModule,
     BrowserAnimationsModule,
     HttpClientModule,
-    AudioplayerModule,
     ReactiveFormsModule,
     StoreModule.forRoot({}, {}),
     AppCommonModule,
     TeleportModule,
 
     PlaylistModule,
+    StreamModule,
 
     // Import global Angular Material Components
     MatIconModule,

@@ -5,10 +5,14 @@
     <div class="h-full" asc-drawer-content>
         <asc-toolbar class="absolute w-full z-10" (onMenuToggle)="drawer.toggle()"></asc-toolbar>
 
-        <div class="relative pt-28 pb-28">
-            <router-outlet></router-outlet>
-        </div>
+        <div class="flex flex-1 flex-col h-full overflow-y-auto">
+            <!--<asc-toolbar class="w-full z-10" (onMenuToggle)="drawer.toggle()"></asc-toolbar>-->
 
-        <asc-audioplayer class="absolute bottom-0 left-0 w-full"></asc-audioplayer>
+            <div class="relative pt-28 pb-28 flex-grow">
+                <router-outlet></router-outlet>
+            </div>
+        </div>
     </div>
 </asc-drawer>
+
+<asc-stream-player-bar class="z-50 fixed bottom-0 left-0 w-full"></asc-stream-player-bar>
