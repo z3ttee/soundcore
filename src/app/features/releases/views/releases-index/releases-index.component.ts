@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
+import { Song } from 'src/app/features/song/entities/song.entity';
 import { SongService } from 'src/app/features/song/services/song.service';
 import { StreamService } from 'src/app/features/stream/services/stream.service';
-import { Song } from 'src/app/model/song.model';
 import { Page } from 'src/app/pagination/pagination';
 
 @Component({

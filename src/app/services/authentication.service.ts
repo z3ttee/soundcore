@@ -73,7 +73,7 @@ export class AuthenticationService {
       // The restore session process is done.
       // For this value we don't care if the session is anonymous or not.
       // This must be handled in different places in the app.
-      this._readySubject.next(true);
+      setTimeout(() => this._readySubject.next(true), 100)
     })
   }
 
@@ -153,7 +153,6 @@ export class AuthenticationService {
    * @returns SSOAccessToken
    */
   public async authorize(createAuthorizationDto: SSOCreateAuthorizationDTO): Promise<SSOAccessToken> {
-    console.log("authorizing using: ", createAuthorizationDto)
     return firstValueFrom(this.httpClient.post(`${environment.api_base_uri}/v1/authentication/authorize`, createAuthorizationDto)) as Promise<SSOAccessToken>
   }
 
@@ -218,7 +217,7 @@ export class AuthenticationService {
    */
   public async findAndUpdateCurrentUser(): Promise<SSOUser> {
     return this.findCurrentUser().then((user) => {
-      this.updateUser(user);
+      if(user) this.updateUser(user);
       return user;
     }).catch((error) => {
       console.warn("[SSO] Could not fetch user data: ", error);

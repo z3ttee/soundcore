@@ -1,10 +1,12 @@
-import { Song } from "./song.model";
+import { Song } from "../features/song/entities/song.entity";
+import { Artwork } from "./artwork.model";
 
 export class Label {
 
     public id: string;
-    public geniusId?: string;
     public name: string;
-    public songs?: Song[]
+
+    public songs?: Song[];
+    public artwork?: Artwork;
 
 }

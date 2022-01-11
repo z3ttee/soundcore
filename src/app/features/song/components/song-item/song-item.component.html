@@ -1,15 +1,23 @@
-<div class="transition-all p-2 rounded-xl text-center flex flex-1 flex-col h-full cursor-pointer w-full bg-background-light border-2 border-transparent hover:border-primary active:bg-background-dark" (click)="playSong()">
+<div class="item-container transition-all p-3 rounded-md text-center flex flex-1 flex-col overflow-hidden h-full cursor-pointer w-full bg-background-light border-2 border-transparent hover:border-primary active:bg-background-dark">
 
     <div class="block relative">
-        <div *ngIf="($isPlaying | async)" class="absolute bottom-2 right-2 rounded-full bg-accent-dark text-background w-10 h-10 overflow-hidden flex justify-center items-center">
-            <i class="fa-solid fa-pause"></i>
+        <div [ngClass]="{'active': isActive}" class="play-button transition-all transform-gpu absolute bottom-2 right-2 rounded-full bg-accent-dark shadow-lg text-background w-10 h-10 overflow-hidden flex justify-center items-center hover:scale-105" (click)="playOrPause()">
+            <i class="fa-solid fa-pause" *ngIf="!isPlayerPaused && isActive"></i>
+            <i class="fa-solid fa-play" *ngIf="isPlayerPaused && isActive"></i>
+            <i class="fa-solid fa-play" *ngIf="!isActive"></i>
         </div>
 
-        <img [src]="coverSrc" class="w-full aspect-square mx-auto rounded-xl shadow-lg">
+        <img [src]="coverSrc" class="w-full aspect-square mx-auto rounded-lg" [style]="'box-shadow: 0px 0px 32px 5px '+accentColor+'50;'">
     </div>
 
-    <div class="max-w-full overflow-hidden text-left flex-grow pt-2 px-1">
+    <div class="max-w-full overflow-hidden text-left flex-grow pt-2.5 px-1">
         <p class="font-bold text-sm max-w-full overflow-hidden text-ellipsis whitespace-nowrap">{{ song.title }}</p>
-        <p class="text-xs opacity-60 line-clamp-2 pt-1">{{ song.artists | songArtistsJoin }}</p>
+
+        <div class="line-clamp-2 opacity-60">
+            <ul>
+                <li *ngIf="song.explicit" class="inline"><span class="inline-flex font-light mr-1 items-center justify-center rounded-sm bg-primary-light text-xs w-4 aspect-square">E</span></li>
+                <li *ngFor="let artist of song.artists; index as i" class="inline"><span class="text-xs hover:underline leading-3 pointer-events-all" [routerLink]="['/artists', artist.id]">{{ artist.name }}</span>{{ i + 1 < song.artists.length ? ", " : "" }}</li>
+            </ul>
+        </div>
     </div>
 </div>

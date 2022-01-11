@@ -1,8 +1,8 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { map, Observable } from 'rxjs';
+import { combineLatest, map, Observable } from 'rxjs';
 import { StreamService } from 'src/app/features/stream/services/stream.service';
-import { Song } from 'src/app/model/song.model';
 import { environment } from 'src/environments/environment';
+import { Song } from '../../entities/song.entity';
 
 @Component({
   selector: 'asc-song-item',
@@ -15,23 +15,45 @@ export class SongItemComponent implements OnInit {
   @Input() public playable: boolean = true;
 
   public coverSrc: string = null;
-  public $isPlaying: Observable<boolean>;
+  public accentColor: string = "";
 
+  public isPlaying: boolean = false;
+  public isActive: boolean = false;
+  public isPlayerPaused: boolean = true;
+  
   constructor(private streamService: StreamService) {
-    this.$isPlaying = this.streamService.$currentSong.pipe(map((song) => song?.id == this.song.id));
+    combineLatest([
+      this.streamService.$currentSong,
+      this.streamService.$player
+    ]).pipe(map(([song, status]) => ({ song, status }))).subscribe((state) => {
+      this.isActive = state.song && state.song?.id == this.song?.id && !state.status.paused;
+
+      this.isPlaying = state.song && state.song?.id == this.song?.id;
+      this.isPlayerPaused = state.status.paused
+    })
   }
 
   public async ngOnInit() {
     if(this.song.artwork) {
       this.coverSrc = `${environment.api_base_uri}/v1/artworks/${this.song.artwork.id}`;
+      this.accentColor = this.song.artwork.accentColor || "#000000";
     } else {
       this.coverSrc = "/assets/img/missing_cover.png"
     }
   }
 
-  public async playSong() {
+  public async playOrPause() {
     if(!this.playable) return;
-    this.streamService.playSong(this.song);
+    if(this.isPlaying) {
+      if(this.streamService.isPaused()) {
+        this.streamService.play();
+      } else {
+        this.streamService.pause();
+      }
+    } else {
+      this.streamService.playSong(this.song);
+    }
+    
   }
 
 }

@@ -1,5 +1,5 @@
-import { Song } from "src/app/model/song.model";
 import { SSOUser } from "src/app/model/sso-user.model";
+import { Song } from "../../song/entities/song.entity";
 import { StorageMount } from "../../storage/model/storage-mount.model";
 import { IndexStatus } from "../enums/index-status.enum";
 

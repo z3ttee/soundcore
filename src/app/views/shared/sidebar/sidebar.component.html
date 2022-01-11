@@ -11,7 +11,6 @@
             <li [routerLink]="['/']" [routerLinkActive]="'active'" [routerLinkActiveOptions]="{ exact: true }"><span><i class="fa-solid fa-house"></i>Startseite</span></li>
             <li [routerLink]="['/search']" [routerLinkActive]="'active'"><span><i class="fa-solid fa-magnifying-glass"></i>Suchen</span></li>
             <li [routerLink]="['/library']" [routerLinkActive]="'active'"><span><i class="fa-solid fa-layer-group"></i>Bibliothek</span></li>
-            <li [routerLink]="['/collection']" [routerLinkActive]="'active'"><span><i class="fa-solid fa-heart"></i>Lieblingssongs</span></li>
         </ul>
     
         <ul>
@@ -22,11 +21,18 @@
         <ul>
             <label class="relative">
                 Deine Sammlung
-                <span class="absolute right-0 top-1/2 transform-gpu -translate-y-1/2"><button mat-icon-button><i class="fa-solid fa-plus"></i></button></span>
+                <span class="absolute right-4 z-50 top-1/2 transform-gpu -translate-y-1/2"><button mat-icon-button (click)="openCreatePlaylist()"><i class="fa-solid fa-plus"></i></button></span>
             </label>
+
+            <li [routerLink]="['/collection']" [routerLinkActive]="'active'" class="z-10"><span><i class="fa-solid fa-heart"></i>Lieblingssongs</span></li>
+
+            <li class="py-4" *ngIf="error">
+                <asc-error-message [error]="error"></asc-error-message>
+            </li>
             
-            <li [routerLink]="['/playlist', 1]" [routerLinkActive]="'active'"><span>Playlist 1</span></li>
-            <li [routerLink]="['/playlist', 2]" [routerLinkActive]="'active'"><span>Playlist 2</span></li>
+            <li *ngFor="let playlist of ($playlists | async)">
+                <asc-playlist-list-item [playlist]="playlist" [routerLink]="['/playlist', playlist.id]" routerLinkActive #rla="routerLinkActive" [active]="rla.isActive"></asc-playlist-list-item>
+            </li>
         </ul>
     </div>
     

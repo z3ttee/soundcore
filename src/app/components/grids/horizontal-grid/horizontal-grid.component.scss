@@ -1,0 +1,35 @@
+:host {
+    .horizontal_scroll {
+
+        .scroll-area {
+            -webkit-overflow-scrolling: touch;
+            grid-auto-columns: minmax(10rem, 1fr);
+            grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+        }
+
+    }
+}
+
+/*
+:host {
+    .horizontal_scroll {
+
+        .scroll-area {
+            overflow-y: hidden;
+            grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+
+            &.not-scrollable {
+                border: 1px solid red;
+            }
+            
+            &:not(.not-scrollable) {
+                -webkit-overflow-scrolling: touch;
+                grid-auto-columns: minmax(10rem, 1fr);
+                overflow-x: auto;
+                grid-auto-flow: column;
+            }
+        }
+
+    }
+}
+*/

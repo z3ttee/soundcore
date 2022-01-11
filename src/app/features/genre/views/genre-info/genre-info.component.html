@@ -1,0 +1,34 @@
+<section class="px-4">
+    <div class="h-2">
+        <mat-progress-bar mode="indeterminate" *ngIf="isLoading"></mat-progress-bar>
+    </div>
+    
+    <div class="my-4">
+        <asc-error-message [error]="error" *ngIf="error"></asc-error-message>
+    </div>
+</section>
+
+<section class="px-4" *ngIf="genre">
+    <div class="my-4">
+        <p class="opacity-70">Songs aus dem Genre</p>
+        <h3>"{{ genre.name }}"</h3>
+    </div>
+
+    <div class="h-2">
+        <mat-progress-bar mode="indeterminate" *ngIf="isLoadingSongs"></mat-progress-bar>
+    </div>
+
+    <div class="grid grid-cols-songs gap-4">
+        <asc-song-item *ngFor="let song of ($songsPage | async)?.elements" [song]="song"></asc-song-item>
+    </div>
+
+    <mat-paginator color="accent" 
+               [pageSize]="selectedPageSize"
+               [pageSizeOptions]="pageSizeOptions"
+               [pageIndex]="currentPageIndex"
+               [disabled]="isLoading"
+               [length]="($songsPage | async)?.totalElements"
+               (page)="onPageEvent($event)"
+               aria-label="Select page">
+    </mat-paginator>
+</section>

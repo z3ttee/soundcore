@@ -8,7 +8,8 @@ import { Component, Input, OnInit } from '@angular/core';
 export class MessageComponent {
 
   @Input() public withIcon: boolean = true;
-  @Input() public mode: "info" | "warn" | "error"
+  @Input() public mode: "info" | "warn" | "error";
+  @Input() public faIcon: string = "fa-solid fa-triangle-exclamation"
 
   constructor() { }
 
