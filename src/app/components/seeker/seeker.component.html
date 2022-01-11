@@ -1,1 +1,4 @@
-<input #inputElement [max]="duration" [value]="value" (input)="onInput()" (change)="onInputChanged($event)" class="audio-seeker absolute top-0 left-0 w-full appearance-none bg-accent bg-opacity-70 h-[3px] transform-gpu origin-bottom transition-all hover:h-[6px] cursor-pointer" type="range">
+
+<div class="block w-full relative h-[3px] hover:h-[6px] bg-primary pointer-events-none transition-all">
+    <input class="pointer-events-auto" #inputElement [max]="duration || 100" [min]="0" [value]="value" (input)="onInput()" (change)="onInputChanged($event)" type="range">
+</div>

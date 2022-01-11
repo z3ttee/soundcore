@@ -78,7 +78,7 @@ export class StreamPlayerBarComponent implements OnInit {
   }
 
   public onTimeUpdated() {
-    this.currentTime = this.audio.nativeElement.currentTime;
+    this.currentTime = Math.round(this.audio.nativeElement.currentTime);
     this.currentSeekValue = this.currentTime
   }
 
