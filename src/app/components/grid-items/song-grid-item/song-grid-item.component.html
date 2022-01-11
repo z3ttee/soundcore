@@ -1,4 +1,4 @@
-<div class="item-container transition-all p-3 rounded-md text-center flex flex-1 flex-col overflow-hidden h-full cursor-pointer w-full bg-background-light border-2 border-transparent hover:border-primary active:bg-background-dark">
+<div (contextmenu)="openSongMenu($event, song)" class="item-container transition-all p-3 rounded-md text-center flex flex-1 flex-col overflow-hidden h-full cursor-pointer w-full bg-background-light border-2 border-transparent hover:border-primary active:bg-background-dark">
 
     <div class="block relative">
         <div [ngClass]="{'active': isActive}" class="play-button transition-all transform-gpu absolute bottom-2 right-2 rounded-full bg-accent-dark shadow-lg text-background w-10 h-10 overflow-hidden flex justify-center items-center hover:scale-105" (click)="playOrPause()">
@@ -21,3 +21,18 @@
         </div>
     </div>
 </div>
+
+<ng-template #songMenu let-song>
+    <div class="bg-background p-2 rounded-lg overflow-hidden shadow-xl border-2 border-primary-light border-opacity-30 bg-opacity-95 backdrop-blur-sm">
+        <ul class="mb-3">
+            <label class="px-4 text-xs">Abspielen</label>
+            <li class="py-3 px-4 text-opacity-70 bg-opacity-95 hover:bg-background-light active:bg-primary transition-all rounded-md cursor-pointer text-sm">Zur Warteschlange</li>
+            <li class="py-3 px-4 text-opacity-70 bg-opacity-95 hover:bg-background-light active:bg-primary transition-all rounded-md cursor-pointer text-sm">Jetzt abspielen</li>
+        </ul>
+    
+        <ul class="mt-3">
+            <label class="px-4 text-xs">Aktionen</label>
+            <li class="py-3 px-4 text-opacity-70 bg-opacity-95 hover:bg-background-light active:bg-primary transition-all rounded-md cursor-pointer text-sm">Zu Playlist hinzufügen</li>
+        </ul>
+    </div>
+</ng-template>

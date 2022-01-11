@@ -26,8 +26,8 @@ module.exports = {
           },
           primary: {
             light: "#272e38",
-            DEFAULT: "#272e38",
-            dark: "#14181d"
+            DEFAULT: "#232932",
+            dark: "#1b2027"
           },
           accent: {
             light: "#FFD97E",
