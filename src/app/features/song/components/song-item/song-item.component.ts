@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { map, Observable } from 'rxjs';
+import { combineLatest, map, Observable } from 'rxjs';
 import { StreamService } from 'src/app/features/stream/services/stream.service';
 import { environment } from 'src/environments/environment';
 import { Song } from '../../entities/song.entity';
@@ -16,10 +16,21 @@ export class SongItemComponent implements OnInit {
 
   public coverSrc: string = null;
   public accentColor: string = "";
-  public $isPlaying: Observable<boolean>;
 
+  public isPlaying: boolean = false;
+  public isActive: boolean = false;
+  public isPlayerPaused: boolean = true;
+  
   constructor(private streamService: StreamService) {
-    this.$isPlaying = this.streamService.$currentSong.pipe(map((song) => song?.id == this.song.id));
+    combineLatest([
+      this.streamService.$currentSong,
+      this.streamService.$player
+    ]).pipe(map(([song, status]) => ({ song, status }))).subscribe((state) => {
+      this.isActive = state.song && state.song?.id == this.song?.id && !state.status.paused;
+
+      this.isPlaying = state.song && state.song?.id == this.song?.id;
+      this.isPlayerPaused = state.status.paused
+    })
   }
 
   public async ngOnInit() {
@@ -33,7 +44,16 @@ export class SongItemComponent implements OnInit {
 
   public async playOrPause() {
     if(!this.playable) return;
-    this.streamService.playSong(this.song);
+    if(this.isPlaying) {
+      if(this.streamService.isPaused()) {
+        this.streamService.play();
+      } else {
+        this.streamService.pause();
+      }
+    } else {
+      this.streamService.playSong(this.song);
+    }
+    
   }
 
 }

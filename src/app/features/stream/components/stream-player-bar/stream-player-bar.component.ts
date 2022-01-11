@@ -11,7 +11,7 @@ import { StreamService } from '../../services/stream.service';
 })
 export class StreamPlayerBarComponent implements OnInit {
 
-  public $currentSong: Observable<Song>;
+  public currentSong: Song;
 
   @ViewChild("audio") private audio: ElementRef<HTMLAudioElement>;
 
@@ -19,34 +19,62 @@ export class StreamPlayerBarComponent implements OnInit {
   public currentSeekValue: number = 0;
   public currentTime: number = 0;
 
-  public isPaused: boolean = true;
+  private _isPaused: boolean = true;
   public isLoading: boolean = false;
   public canPlay: boolean = false;
 
   public coverSrc: string = null;
   public accentColor: string = "";
 
+  public set isPaused(val: boolean) {
+    this._isPaused = val;
+    this.streamService.setStatus({
+      paused: val
+    })
+  }
+
+  public get isPaused(): boolean {
+    return this._isPaused;
+  }
+
   constructor(private streamService: StreamService) {
-    this.$currentSong = this.streamService.$currentSong.pipe(tap((song) => {
+    this.streamService.$currentSong.subscribe((song) => {
+      // Check if same song is selected again, prevent further
+      // processing.
+      if(song && this.currentSong?.id == song.id) return;
+
+      // Reset the player's values
+      this.currentSong = song;
       this.currentTime = 0;
       this.currentSeekValue = 0;
 
-      if(song) {
-        this.currentSrc = `${environment.api_base_uri}/v1/streams/songs/${song.id}`;
-
-        if(song.artwork) {
-          this.coverSrc = `${environment.api_base_uri}/v1/artworks/${song.artwork.id}`;
-          this.accentColor = song.artwork.accentColor || "#000000";
-        } else {
-          this.coverSrc = "/assets/img/missing_cover.png"
-        }
-      } else {
+      if(!song) {
+        // Clear audio src if no song was selected or song is null in general
         this.currentSrc = ""
+        return
       }
-    }));
+      
+      // Set audio src url
+      this.currentSrc = `${environment.api_base_uri}/v1/streams/songs/${song.id}`;
+
+      if(song.artwork) {
+        // Set artwork url and accentColor if an artwork exists on song
+        this.coverSrc = `${environment.api_base_uri}/v1/artworks/${song.artwork.id}`;
+        this.accentColor = song.artwork.accentColor || "#000000";
+      } else {
+        // Set default artwork image
+        this.coverSrc = "/assets/img/missing_cover.png"
+      }
+    });
+
+    
   }
 
-  ngOnInit(): void {
+  public ngOnInit(): void {
+    this.streamService.$pauseEvent.subscribe((paused) => {
+      if(paused) this.pause();
+      else this.play();
+    })
   }
 
   public onTimeUpdated() {
@@ -98,6 +126,8 @@ export class StreamPlayerBarComponent implements OnInit {
    * Handle the seeking event, that is thrown by seek component
    */
   public onSeeking(seekVal: number) {
+    if(!this.audio?.nativeElement) return;
+
     if(!this.hasPlayableSrc()) {
       this.currentSeekValue = 0;  
       this.currentTime = 0;
@@ -115,6 +145,7 @@ export class StreamPlayerBarComponent implements OnInit {
    * slider component.
    */
   public onElementSeekEvent() {
+    if(!this.audio?.nativeElement) return;
     this.currentSeekValue = this.audio.nativeElement.currentTime
   }
 
@@ -146,6 +177,7 @@ export class StreamPlayerBarComponent implements OnInit {
    * Pause audio of the audio element
    */
   public pause() {
+    if(!this.audio?.nativeElement) return;
     this.audio.nativeElement.pause();
   }
 
@@ -154,6 +186,7 @@ export class StreamPlayerBarComponent implements OnInit {
    */
   public play() {
     if(this.hasPlayableSrc()) {
+      if(!this.audio?.nativeElement) return;
       this.audio.nativeElement.play();
     }
   }
