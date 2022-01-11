@@ -2,14 +2,14 @@ import { Component, Input, OnInit } from '@angular/core';
 import { combineLatest, map, Observable } from 'rxjs';
 import { StreamService } from 'src/app/features/stream/services/stream.service';
 import { environment } from 'src/environments/environment';
-import { Song } from '../../entities/song.entity';
+import { Song } from '../../../features/song/entities/song.entity';
 
 @Component({
   selector: 'asc-song-item',
-  templateUrl: './song-item.component.html',
-  styleUrls: ['./song-item.component.scss']
+  templateUrl: './song-grid-item.component.html',
+  styleUrls: ['./song-grid-item.component.scss']
 })
-export class SongItemComponent implements OnInit {
+export class SongGridItemComponent implements OnInit {
 
   @Input() public song: Song;
   @Input() public playable: boolean = true;

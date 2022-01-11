@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { SongItemComponent } from './components/song-item/song-item.component';
+import { SongGridItemComponent } from '../../components/grid-items/song-grid-item/song-grid-item.component';
 import { SongArtistsPipe } from './pipes/song-artists.pipe';
 import { RouterModule, Routes } from '@angular/router';
 
@@ -10,7 +10,7 @@ const routes: Routes = [
 
 @NgModule({
   declarations: [
-    SongItemComponent,
+    SongGridItemComponent,
     SongArtistsPipe
   ],
   imports: [
@@ -18,7 +18,7 @@ const routes: Routes = [
     RouterModule.forChild(routes)
   ],
   exports: [
-    SongItemComponent,
+    SongGridItemComponent,
   ]
 })
 export class SongModule { }
