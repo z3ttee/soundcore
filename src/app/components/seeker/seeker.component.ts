@@ -50,7 +50,7 @@ export class SeekerComponent implements OnInit {
     const max = parseInt(this.range.nativeElement.max);
     const val = parseInt(this.range.nativeElement.value);
     // let progress = parseFloat((val/max * 100 ).toFixed(2));
-    let progress = Math.round((val/max * 100 ))
+    let progress = (val/max * 100 )
 
     // This is done so the track doesnt lag behind the thumb
     if(progress <= 40) progress += 0.5;
