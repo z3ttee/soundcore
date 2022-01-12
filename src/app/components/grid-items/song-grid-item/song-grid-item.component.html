@@ -24,15 +24,26 @@
 
 <ng-template #songMenu let-song>
     <div class="bg-background p-2 rounded-lg overflow-hidden shadow-xl border-2 border-primary-light border-opacity-30 bg-opacity-95 backdrop-blur-sm">
-        <ul class="mb-3">
+        <!--<ul>
+            <li class="inline-flex justify-center items-center w-9 aspect-square text-opacity-70 bg-opacity-95 hover:bg-background-light active:bg-primary transition-all rounded-md cursor-pointer"><i class="fa-solid fa-play text-xs"></i></li>
+            <li class="inline-flex justify-center items-center w-9 aspect-square text-opacity-70 bg-opacity-95 hover:bg-background-light active:bg-primary transition-all rounded-md cursor-pointer"><i class="fa-solid fa-list-ul text-xs"></i></li>
+            <li class="inline-flex justify-center items-center w-9 aspect-square text-opacity-70 bg-opacity-95 hover:bg-background-light active:bg-primary transition-all rounded-md cursor-pointer"><i class="fa-solid fa-pen text-xs"></i></li>
+        </ul>-->
+
+        <ul class="mb-4">
             <label class="px-4 text-xs">Abspielen</label>
+            <li class="py-3 px-4 text-opacity-70 bg-opacity-95 hover:bg-background-light active:bg-primary transition-all rounded-md cursor-pointer text-sm" (click)="playOrPause()" *ngIf="!isPlaying">Jetzt abspielen</li>
             <li class="py-3 px-4 text-opacity-70 bg-opacity-95 hover:bg-background-light active:bg-primary transition-all rounded-md cursor-pointer text-sm">Zur Warteschlange</li>
-            <li class="py-3 px-4 text-opacity-70 bg-opacity-95 hover:bg-background-light active:bg-primary transition-all rounded-md cursor-pointer text-sm">Jetzt abspielen</li>
         </ul>
     
-        <ul class="mt-3">
+        <ul class="my-4">
             <label class="px-4 text-xs">Aktionen</label>
             <li class="py-3 px-4 text-opacity-70 bg-opacity-95 hover:bg-background-light active:bg-primary transition-all rounded-md cursor-pointer text-sm">Zu Playlist hinzufügen</li>
+        </ul>
+
+        <ul class="mt-4">
+            <label class="px-4 text-xs">Verwaltung</label>
+            <li class="py-3 px-4 text-opacity-70 bg-opacity-95 hover:bg-background-light active:bg-primary transition-all rounded-md cursor-pointer text-sm">Bearbeiten</li>
         </ul>
     </div>
 </ng-template>
