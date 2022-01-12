@@ -9,14 +9,23 @@ import { MatInputModule } from '@angular/material/input';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import {MatSelectModule} from '@angular/material/select';
 import { AppCommonModule } from 'src/app/common.module';
+import { PlaylistInfoComponent } from './views/playlist-info/playlist-info.component';
+import { TotalPlaylistDurationPipe } from './pipes/total-duration.pipe';
+import { PlaylistPrivacyPipe } from './pipes/playlist-privacy.pipe';
+import { ChoosePlaylistComponent } from './dialogs/choose-playlist/choose-playlist.component';
+import { PlaylistListItemComponent } from 'src/app/components/list-items/playlist-list-item/playlist-list-item.component';
 
 const routes: Routes = [
-
+  { path: ":playlistId", component: PlaylistInfoComponent }
 ]
 
 @NgModule({
   declarations: [
     CreatePlaylistDialog,
+    PlaylistInfoComponent,
+    TotalPlaylistDurationPipe,
+    PlaylistPrivacyPipe,
+    ChoosePlaylistComponent,
   ],
   imports: [
     CommonModule,

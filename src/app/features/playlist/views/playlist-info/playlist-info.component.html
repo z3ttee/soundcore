@@ -1,0 +1,35 @@
+<div class="h-1">
+    <mat-progress-bar mode="indeterminate" *ngIf="isLoading" color="accent"></mat-progress-bar>
+</div>
+<section class="px-4">
+
+
+    <div class="block w-full">
+        <div class="flex flex-1 w-full items-center">
+            <div class="w-32 aspect-square rounded-md overflow-hidden">
+                <img [src]="coverSrc" [style]="'box-shadow: 0px 0px 32px 5px '+accentColor+'50;'">
+            </div>
+
+            <div class="px-4">
+                <p class="text-sm opacity-60 mb-2"><span *ngIf="playlist?.privacy != 'public'" class="text-xxs bg-primary font-light p-1 rounded-md align-middle mr-1 tracking-wide">{{ playlist?.privacy | playlistPrivacyPipe }}</span>Playlist</p>
+                <h2 class="line-clamp-1">{{ playlist?.title }}</h2>
+
+                <ul class="flex items-center pt-2">
+                    <li class="inline-flex items-center p-1 transition-all hover:bg-background-light rounded-full cursor-pointer active:bg-background-dark">
+                        <img class="w-6 aspect-square rounded-full" [src]="author?.avatarUrl || '/assets/img/missing_cover.png'">
+                        <p class="text-xs px-2">{{ author?.username }}</p>
+                    </li>
+                    <li class="inline text-xs opacity-70 ml-4">{{ playlist?.songsCount }} {{ playlist?.songsCount != 1 ? "Songs" : "Song" }}</li>
+                    <li class="inline text-xs opacity-70 ml-2">{{ playlist?.totalDuration | totalPlaylistDuration }}</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div>
+        <div *ngFor="let song of ($songs | async)">
+            {{ song.title }}
+        </div>
+    </div>
+
+</section>

@@ -16,4 +16,8 @@ export class Playlist {
     public collaborators?: SSOUser[];
     public songs?: Song[];
 
+    public songsCount?: number = 0;
+    public collaboratorsCount?: number = 0;
+    public totalDuration?: number = 0;
+
 }

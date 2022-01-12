@@ -15,8 +15,7 @@ import { Page } from 'src/app/pagination/pagination';
 })
 export class SidebarComponent implements OnInit {
 
-  private _playlistsSubject: BehaviorSubject<Playlist[]> = new BehaviorSubject([]);
-  public $playlists: Observable<Playlist[]> = this._playlistsSubject.asObservable();
+  public $playlists: Observable<Playlist[]> = this.playlistService.$playlists;
 
   public error: HttpErrorResponse = undefined;
 
@@ -25,25 +24,11 @@ export class SidebarComponent implements OnInit {
     private dialog: MatDialog
   ) { }
 
-  public async ngOnInit(): Promise<void> {
-    this.playlistService.findPageByAuthor().then((page) => {
-      this._playlistsSubject.next(page.elements);
-    }).catch((error: HttpErrorResponse) => {
-      this.error = error
-    })
-  }
+  public async ngOnInit(): Promise<void> {}
 
   public async openCreatePlaylist() {
-      const dialogRef = this.dialog.open(CreatePlaylistDialog, {
+      this.dialog.open(CreatePlaylistDialog, {
         data: {},
-      });
-  
-      dialogRef.afterClosed().subscribe((result: Playlist) => {
-        if(!result) return;
-        
-        const playlists = this._playlistsSubject.getValue()
-        playlists.push(result)
-        this._playlistsSubject.next(playlists)
       });
   }
 

@@ -1,7 +1,11 @@
 import { Overlay, OverlayRef } from '@angular/cdk/overlay';
 import { TemplatePortal } from '@angular/cdk/portal';
 import { Component, Input, OnInit, TemplateRef, ViewChild, ViewContainerRef } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { combineLatest, filter, fromEvent, map, Observable, Subscription, take } from 'rxjs';
+import { ChoosePlaylistComponent } from 'src/app/features/playlist/dialogs/choose-playlist/choose-playlist.component';
+import { Playlist } from 'src/app/features/playlist/entities/playlist.entity';
+import { PlaylistService } from 'src/app/features/playlist/services/playlist.service';
 import { StreamService } from 'src/app/features/stream/services/stream.service';
 import { ContextMenuService } from 'src/app/services/context-menu.service';
 import { environment } from 'src/environments/environment';
@@ -30,7 +34,9 @@ export class SongGridItemComponent implements OnInit {
         private streamService: StreamService,
         public overlay: Overlay,
         public viewContainerRef: ViewContainerRef,
-        private contextMenuService: ContextMenuService
+        private contextMenuService: ContextMenuService,
+        private dialog: MatDialog,
+        private playlistService: PlaylistService
     ) {
         combineLatest([
             this.streamService.$currentSong,
@@ -72,6 +78,18 @@ export class SongGridItemComponent implements OnInit {
         this.contextMenuService.open(event, this.songMenu, this.viewContainerRef, {
             $implicit: song
         });
+    }
+
+    public async openChoosePlaylist() {
+        const ref = this.dialog.open(ChoosePlaylistComponent)
+
+        ref.afterClosed().subscribe((playlist: Playlist) => {
+            if(!playlist) return;
+            this.playlistService.updateSongs(playlist.id, {
+                action: "add",
+                songs: [ this.song ]
+            })
+        })
     }
 
 }

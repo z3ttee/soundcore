@@ -21,7 +21,8 @@ const routes: Routes = []
     RouterModule.forChild(routes)
   ],
   exports: [
-    StreamPlayerBarComponent
+    StreamPlayerBarComponent,
+    DurationPipePipe
   ]
 })
 export class StreamModule { }

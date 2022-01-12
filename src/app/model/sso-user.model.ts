@@ -7,6 +7,7 @@ export class SSOUser {
     public role: SSORole;
     public createdAt: Date;
     public avatarResourceId?: string;
+    public avatarUrl?: string;
     public isAnonymous: boolean = false;
 
     public static anonymous(): SSOUser {

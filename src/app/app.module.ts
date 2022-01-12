@@ -28,7 +28,6 @@ import {MatProgressBarModule} from '@angular/material/progress-bar';
 
 import { TeleportModule } from '@ngneat/overview';
 import { MainLayoutComponent } from './layout/main-layout/main-layout.component';
-import { PlaylistListItemComponent } from './components/list-items/playlist-list-item/playlist-list-item.component';
 import { PlaylistModule } from './features/playlist/playlist.module';
 import { InfiniteScrollListComponent } from './components/lists/infinite-scroll-list/infinite-scroll-list.component';
 import { StreamModule } from './features/stream/stream.module';
@@ -45,8 +44,7 @@ import { StreamModule } from './features/stream/stream.module';
     DrawerComponent,
     SidebarComponent,
     ToolbarComponent,
-    SplashComponent,
-    PlaylistListItemComponent
+    SplashComponent
   ],
   imports: [
     BrowserModule,

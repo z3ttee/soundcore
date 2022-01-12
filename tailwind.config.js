@@ -80,6 +80,7 @@ module.exports = {
         'sm': {'min-width': '540px'}    // Mobile
       },
       fontSize: {
+        xxs: ['0.65rem', { lineHeight: '1rem' }],
         xs: ['0.8rem', { lineHeight: '1rem' }],
         sm: ['0.9rem', { lineHeight: '1.1rem' }],
         base: ['0.98rem', { lineHeight: '1.25rem' }],

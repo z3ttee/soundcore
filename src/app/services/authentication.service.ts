@@ -82,7 +82,7 @@ export class AuthenticationService {
    * @returns SSOSession
    */
   public getSession(): SSOSession {
-    return this._sessionSubject.getValue();
+    return this._sessionSubject.getValue() || SSOSession.anonymous();
   }
 
   /**
@@ -191,7 +191,7 @@ export class AuthenticationService {
    * Write user data to localStorage.
    * @param user Data to persist
    */
-   private async persistUser(user: SSOUser) {
+  private async persistUser(user: SSOUser) {
     if(!user || user.isAnonymous) localStorage.removeItem(USER_LOCALSTORAGE);
     else localStorage.setItem(USER_LOCALSTORAGE, JSON.stringify(user))
   }
@@ -201,13 +201,13 @@ export class AuthenticationService {
    * @returns SSOUser
    */
   public async findCurrentUser(): Promise<SSOUser> {
-    const session = this.getSession();
-    if(!session || session.type == SSOSessionType.SESSION_ANONYMOUS) return SSOUser.anonymous();
+    return this.findUserById("@me");
+  }
 
-    return firstValueFrom(this.httpClient.get(`${environment.api_base_uri}/v1/authentication/user/@me`, { headers: {
-        'Authorization': `Bearer ${session.accessToken}`
-      }
-    })).then((response) => response as SSOUser).catch(() => SSOUser.anonymous())
+  public async findUserById(userId: string): Promise<SSOUser> {
+    return firstValueFrom(this.httpClient.get(`${environment.api_base_uri}/v1/authentication/users/${userId}`))
+      .then((response) => response as SSOUser)
+      .catch(() => null)
   }
 
   /**

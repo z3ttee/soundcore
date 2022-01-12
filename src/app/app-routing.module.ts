@@ -17,12 +17,11 @@ const routes: Routes = [
     { path: "upload", canActivate: [AuthenticationCanActivateGuard], loadChildren: () => import("./features/upload/upload.module").then((m) => m.UploadModule) },
     { path: "storage", canActivate: [AuthenticationCanActivateGuard], loadChildren: () => import("./features/storage/storage.module").then((m) => m.StorageModule) },
     { path: "genres", canActivate: [AuthenticationCanActivateGuard], loadChildren: () => import("./features/genre/genre.module").then((m) => m.GenreModule) },
-
+    { path: "playlists", canActivate: [AuthenticationCanActivateGuard], loadChildren: () => import("./features/playlist/playlist.module").then((m) => m.PlaylistModule) },
 
     // Make every route below to AsyncModule
     { path: "activity", canActivate: [AuthenticationCanActivateGuard], component: IndexViewComponent },
     { path: "collection", canActivate: [AuthenticationCanActivateGuard], component: IndexViewComponent },
-    { path: "playlist/:playlistId", canActivate: [AuthenticationCanActivateGuard], component: IndexViewComponent },
   ]},
 
   { path: "authorize", canActivate: [AuthenticationCanActivateGuard], component: AuthorizeViewComponent },
