@@ -1,0 +1,77 @@
+<div (contextmenu)="openSongMenu($event, song)" class="item-container transition-all p-1 rounded-md text-center flex flex-1 items-center overflow-hidden h-full cursor-pointer w-full border-2 border-transparent hover:bg-background-light active:bg-background-dark">
+
+    <div class="inline-block w-11 aspect-square relative">
+        <div [ngClass]="{'active': isActive}" class="play-button transition-all transform-gpu absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 will-change-auto rounded-full bg-accent-dark shadow-lg text-background w-7 h-7 overflow-hidden flex justify-center items-center hover:scale-105" (click)="playOrPause()">
+            <i class="fa-solid fa-pause text-sm" *ngIf="!isPlayerPaused && isActive"></i>
+            <i class="fa-solid fa-play text-sm" *ngIf="isPlayerPaused && isActive"></i>
+            <i class="fa-solid fa-play text-sm" *ngIf="!isActive"></i>
+        </div>
+
+    </div>
+
+    <img [src]="coverSrc" class="w-11 aspect-square rounded-lg">
+
+    <div class="max-w-full overflow-hidden text-left flex-grow px-4">
+        <p class="font-bold text-sm max-w-full overflow-hidden text-ellipsis whitespace-nowrap">{{ song.title }}</p>
+
+        <div class="line-clamp-2 opacity-60">
+            <ul>
+                <li *ngIf="song.explicit" class="inline"><span class="inline-flex font-light mr-1 items-center justify-center rounded-sm bg-primary-light text-xs w-4 aspect-square">E</span></li>
+                <li *ngFor="let artist of song.artists; index as i" class="inline"><span class="text-xs hover:underline leading-3 pointer-events-all" [routerLink]="['/artists', artist.id]">{{ artist.name }}</span>{{ i + 1 < song.artists.length ? ", " : "" }}</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="min-w-16">
+        <p class="font-light">{{ song?.duration | durationPipe }}</p>
+    </div>
+
+
+
+    <!--<div class="block relative">
+        <div [ngClass]="{'active': isActive}" class="play-button transition-all transform-gpu absolute bottom-2 right-2 rounded-full bg-accent-dark shadow-lg text-background w-10 h-10 overflow-hidden flex justify-center items-center hover:scale-105" (click)="playOrPause()">
+            <i class="fa-solid fa-pause" *ngIf="!isPlayerPaused && isActive"></i>
+            <i class="fa-solid fa-play" *ngIf="isPlayerPaused && isActive"></i>
+            <i class="fa-solid fa-play" *ngIf="!isActive"></i>
+        </div>
+
+        <img [src]="coverSrc" class="w-full aspect-square mx-auto rounded-lg" [style]="'box-shadow: 0px 0px 32px 5px '+accentColor+'50;'">
+    </div>
+
+    <div class="max-w-full overflow-hidden text-left flex-grow pt-2.5 px-1">
+        <p class="font-bold text-sm max-w-full overflow-hidden text-ellipsis whitespace-nowrap">{{ song.title }}</p>
+
+        <div class="line-clamp-2 opacity-60">
+            <ul>
+                <li *ngIf="song.explicit" class="inline"><span class="inline-flex font-light mr-1 items-center justify-center rounded-sm bg-primary-light text-xs w-4 aspect-square">E</span></li>
+                <li *ngFor="let artist of song.artists; index as i" class="inline"><span class="text-xs hover:underline leading-3 pointer-events-all" [routerLink]="['/artists', artist.id]">{{ artist.name }}</span>{{ i + 1 < song.artists.length ? ", " : "" }}</li>
+            </ul>
+        </div>
+    </div>-->
+</div>
+
+<ng-template #songMenu let-song>
+    <div class="bg-background p-2 rounded-lg overflow-hidden shadow-xl border-2 border-primary-light border-opacity-30 bg-opacity-95 backdrop-blur-sm">
+        <!--<ul>
+            <li class="inline-flex justify-center items-center w-9 aspect-square text-opacity-70 bg-opacity-95 hover:bg-background-light active:bg-primary transition-all rounded-md cursor-pointer"><i class="fa-solid fa-play text-xs"></i></li>
+            <li class="inline-flex justify-center items-center w-9 aspect-square text-opacity-70 bg-opacity-95 hover:bg-background-light active:bg-primary transition-all rounded-md cursor-pointer"><i class="fa-solid fa-list-ul text-xs"></i></li>
+            <li class="inline-flex justify-center items-center w-9 aspect-square text-opacity-70 bg-opacity-95 hover:bg-background-light active:bg-primary transition-all rounded-md cursor-pointer"><i class="fa-solid fa-pen text-xs"></i></li>
+        </ul>-->
+
+        <ul class="mb-4">
+            <label class="px-4 text-xs">Abspielen</label>
+            <li class="py-3 px-4 text-opacity-70 bg-opacity-95 hover:bg-background-light active:bg-primary transition-all rounded-md cursor-pointer text-sm" (click)="playOrPause()" *ngIf="!isPlaying">Jetzt abspielen</li>
+            <li class="py-3 px-4 text-opacity-70 bg-opacity-95 hover:bg-background-light active:bg-primary transition-all rounded-md cursor-pointer text-sm">Zur Warteschlange</li>
+        </ul>
+    
+        <ul class="my-4">
+            <label class="px-4 text-xs">Aktionen</label>
+            <li class="py-3 px-4 text-opacity-70 bg-opacity-95 hover:bg-background-light active:bg-primary transition-all rounded-md cursor-pointer text-sm" (click)="openChoosePlaylist()">Zu Playlist hinzufügen</li>
+        </ul>
+
+        <ul class="mt-4">
+            <label class="px-4 text-xs">Verwaltung</label>
+            <li class="py-3 px-4 text-opacity-70 bg-opacity-95 hover:bg-background-light active:bg-primary transition-all rounded-md cursor-pointer text-sm">Bearbeiten</li>
+        </ul>
+    </div>
+</ng-template>

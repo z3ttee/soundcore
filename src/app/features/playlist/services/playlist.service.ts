@@ -1,8 +1,9 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, firstValueFrom, Observable } from 'rxjs';
-import { Page } from 'src/app/pagination/pagination';
+import { Page, Pageable } from 'src/app/pagination/pagination';
 import { environment } from 'src/environments/environment';
+import { Song } from '../../song/entities/song.entity';
 import { CreatePlaylistDTO } from '../dtos/create-playlist.dto';
 import { UpdatePlaylistSongsDTO } from '../dtos/update-songs.dto';
 import { Playlist } from '../entities/playlist.entity';
@@ -26,6 +27,10 @@ export class PlaylistService {
 
   public async findById(playlistId: string): Promise<Playlist> {
     return firstValueFrom(this.httpClient.get(`${environment.api_base_uri}/v1/playlists/${playlistId}`)) as Promise<Playlist>
+  }
+
+  public async findSongsByPlaylist(playlistId: string, pageable?: Pageable): Promise<Page<Song>> {
+    return firstValueFrom(this.httpClient.get(`${environment.api_base_uri}/v1/playlists/songs/${playlistId}${Pageable.toQuery(pageable)}`)) as Promise<Page<Song>>
   }
 
   public async findPageByAuthor(authorId: string = "@me"): Promise<Page<Playlist>> {
@@ -56,4 +61,5 @@ export class PlaylistService {
   private async handlePlaylistsUpdateEvent(playlists: Playlist[]): Promise<void> {
     // TODO: Properly save playlists for caching to localStorage or maybe IndexedDB?
   }
+
 }

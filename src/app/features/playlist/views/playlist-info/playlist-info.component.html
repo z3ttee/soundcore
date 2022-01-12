@@ -26,10 +26,8 @@
         </div>
     </div>
 
-    <div>
-        <div *ngFor="let song of ($songs | async)">
-            {{ song.title }}
-        </div>
+    <div class="my-4 mt-14">
+        <asc-song-list-item *ngFor="let song of ($songs | async)" [song]="song"></asc-song-list-item>
     </div>
 
 </section>

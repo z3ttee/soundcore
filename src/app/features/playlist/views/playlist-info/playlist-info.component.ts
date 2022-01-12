@@ -38,7 +38,6 @@ export class PlaylistInfoComponent implements OnInit {
     this.activatedRoute.paramMap.subscribe((paramMap) => {
       const playlistId: string = paramMap.get("playlistId");
 
-      console.log(playlistId)
       this.isLoading = true;
       this.playlistService.findById(playlistId).then((playlist) => {
         this.playlist = playlist;
@@ -54,6 +53,10 @@ export class PlaylistInfoComponent implements OnInit {
               this.author = user;
             }).finally(() => this.isAuthorLoading = false)
           }
+
+          this.playlistService.findSongsByPlaylist(this.playlist.id).then((page) => {
+            this._songSubject.next(page.elements)
+          });
         }
 
         if(this.playlist?.artwork) {

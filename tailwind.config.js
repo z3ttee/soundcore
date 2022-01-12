@@ -61,6 +61,9 @@ module.exports = {
           'gr-info': "linear-gradient(60deg, " + theme('colors.info.light') + " 0%, " + theme('colors.info.dark') + " 100%);",
           'gr-warn': "linear-gradient(60deg, " + theme('colors.warn.light') + " 0%, " + theme('colors.warn.dark') + " 100%);",
           'gr-error': "linear-gradient(60deg, " + theme('colors.error.light') + " 0%, " + theme('colors.error.dark') + " 100%);"
+        }),
+        minWidth: theme => ({
+          ...theme("spacing")
         })
       },
       colors: {

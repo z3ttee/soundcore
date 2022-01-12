@@ -13,7 +13,8 @@ import { PlaylistInfoComponent } from './views/playlist-info/playlist-info.compo
 import { TotalPlaylistDurationPipe } from './pipes/total-duration.pipe';
 import { PlaylistPrivacyPipe } from './pipes/playlist-privacy.pipe';
 import { ChoosePlaylistComponent } from './dialogs/choose-playlist/choose-playlist.component';
-import { PlaylistListItemComponent } from 'src/app/components/list-items/playlist-list-item/playlist-list-item.component';
+import { SongListItemComponent } from 'src/app/components/list-items/song-list-item/song-list-item.component';
+import { StreamModule } from '../stream/stream.module';
 
 const routes: Routes = [
   { path: ":playlistId", component: PlaylistInfoComponent }
@@ -26,12 +27,15 @@ const routes: Routes = [
     TotalPlaylistDurationPipe,
     PlaylistPrivacyPipe,
     ChoosePlaylistComponent,
+    SongListItemComponent
   ],
   imports: [
     CommonModule,
     ReactiveFormsModule,
     AppCommonModule,
     RouterModule.forChild(routes),
+
+    StreamModule,
 
     MatDialogModule,
     MatButtonModule,
