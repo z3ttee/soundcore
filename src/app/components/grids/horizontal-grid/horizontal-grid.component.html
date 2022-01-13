@@ -6,9 +6,17 @@
         </div>
     </div>
 
-    <div class="horizontal_scroll block w-full overflow-hidden scroll-smooth">
-        <div class="scroll-area grid grid-flow-col gap-4 scroll-smooth overflow-x-auto overflow-y-hidden px-4 py-2" [ngClass]="{'not-scrollable': !canScroll}">
+    <div #container class="horizontal_scroll block w-full overflow-hidden scroll-smooth relative">
+        <div class="absolute left-2 top-1/2 transform-gpu -translate-y-1/2 z-30 pointer-events-none max-h-full hidden lg:block" *ngIf="canScroll">
+            <button class="w-10 max-h-full aspect-square flex justify-center items-center border border-white-dark border-opacity-20 bg-primary-light rounded-full pointer-events-auto shadow-lg" *ngIf="scrollArea.scrollLeft > 0" (click)="scrollPrev()"><i class="fa-solid fa-chevron-left"></i></button>
+        </div>
+
+        <div #scrollArea (scroll)="onScroll($event)" class="scroll-area grid grid-flow-col gap-4 scroll-smooth overflow-x-hidden overflow-y-hidden px-4 py-2" [ngClass]="{'not-scrollable': !canScroll}">
             <ng-content></ng-content>
+        </div>
+
+        <div class="absolute right-2 top-1/2 transform-gpu -translate-y-1/2 z-30 pointer-events-none max-h-full hidden lg:block" *ngIf="canScroll">
+            <button (click)="scrollNext()" class="w-10 max-h-full aspect-square flex justify-center items-center border border-white-dark border-opacity-20 bg-primary-light rounded-full pointer-events-auto shadow-lg" *ngIf="(scrollArea.scrollLeft + scrollArea.offsetWidth) <= scrollArea.scrollWidth"><i class="fa-solid fa-chevron-right"></i></button>
         </div>
     </div>
 </div>

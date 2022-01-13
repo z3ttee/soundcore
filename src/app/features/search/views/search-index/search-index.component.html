@@ -18,7 +18,7 @@
 </div>
 
 <div *ngIf="($currentResult | async)?.songs" class="my-4">
-    <asc-horizontal-grid headline="Songs" [enableMore]="true" [canScroll]="false">
+    <asc-horizontal-grid headline="Songs" [enableMore]="true" [canScroll]="true">
         <asc-song-item *ngFor="let song of ($currentResult | async)?.songs?.elements" [song]="song"></asc-song-item>
     </asc-horizontal-grid>
 </div>
