@@ -11,6 +11,7 @@ import { ArtistGridItemComponent } from 'src/app/components/grid-items/artist-gr
 import { StreamModule } from '../stream/stream.module';
 import { AlbumGridItemComponent } from 'src/app/components/grid-items/album-grid-item/album-grid-item.component';
 import { HorizontalGridComponent } from 'src/app/components/grids/horizontal-grid/horizontal-grid.component';
+import { LabelGridItemComponent } from 'src/app/components/grid-items/label-grid-item/label-grid-item.component';
 
 const routes: Routes = [
   { path: "", component: SearchIndexComponent }
@@ -23,7 +24,8 @@ const routes: Routes = [
     GenreGridItemComponent,
     ArtistGridItemComponent,
     AlbumGridItemComponent,
-    HorizontalGridComponent
+    HorizontalGridComponent,
+    LabelGridItemComponent
   ],
   imports: [
     CommonModule,

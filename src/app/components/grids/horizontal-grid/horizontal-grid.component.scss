@@ -5,6 +5,14 @@
             -webkit-overflow-scrolling: touch;
             grid-auto-columns: minmax(10rem, 1fr);
             grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+
+            /* Hide scrollbar for Chrome, Safari and Opera */
+            &::-webkit-scrollbar {
+                display: none;
+            }
         }
 
     }

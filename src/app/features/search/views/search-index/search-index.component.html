@@ -6,18 +6,16 @@
     </div>
 </div>
 
-
-
-<section class="px-4 h-4">
+<section class="absolute top-0 left-0 w-full">
     <mat-progress-bar *ngIf="isSearching" mode="indeterminate" color="accent"></mat-progress-bar>
 </section>
 
-<!-- Show last search queries if nothing has been searched yet -->
+<!-- TODO: Show last search queries if nothing has been searched yet -->
 <div *ngIf="!hasSearched && ($history | async).length > 0">
     <h5>Deine letzten Suchanfragen</h5>
 </div>
 
-<div *ngIf="($currentResult | async)?.songs" class="my-4">
+<div *ngIf="($currentResult | async)?.songs" class="mb-4">
     <asc-horizontal-grid headline="Songs" [enableMore]="true" [canScroll]="true">
         <asc-song-item *ngFor="let song of ($currentResult | async)?.songs?.elements" [song]="song"></asc-song-item>
     </asc-horizontal-grid>
@@ -49,9 +47,9 @@
 
 <div *ngIf="($currentResult | async)?.publisher || ($currentResult | async)?.distributors || ($currentResult | async)?.labels " class="my-4">
     <asc-horizontal-grid headline="Herausgeber & Label">
-        <span *ngFor="let publisher of ($currentResult | async)?.publisher?.elements || []">{{ publisher.name }}</span>
-        <span *ngFor="let label of ($currentResult | async)?.labels?.elements || []">{{ label.name }}</span>
-        <span *ngFor="let distributor of ($currentResult | async)?.distributors?.elements || []">{{ distributor.name }}</span>
+        <asc-label-grid-item *ngFor="let publisher of ($currentResult | async)?.publisher?.elements || []" [label]="publisher" type="publisher"></asc-label-grid-item>
+        <asc-label-grid-item *ngFor="let label of ($currentResult | async)?.labels?.elements || []" [label]="label" type="label"></asc-label-grid-item>
+        <asc-label-grid-item *ngFor="let distributor of ($currentResult | async)?.distributors?.elements || []" [label]="distributor" type="distributor"></asc-label-grid-item>
     </asc-horizontal-grid>
 </div>
 

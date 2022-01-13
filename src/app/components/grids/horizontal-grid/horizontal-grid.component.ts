@@ -25,7 +25,10 @@ export class HorizontalGridComponent implements OnInit {
   }
 
   public onScroll(event: Event) {
-    // const scrollLeft: number = parseInt(event.target["scrollLeft"]);
+    const scrollLeft: number = parseInt(event.target["scrollLeft"]);
+    //console.log(this.scrollArea.nativeElement.scrollLeft + this.scrollArea.nativeElement.offsetWidth, this.scrollArea.nativeElement.scrollWidth)
+    //console.log((this.scrollArea.nativeElement.scrollLeft + this.scrollArea.nativeElement.offsetWidth) < this.scrollArea.nativeElement.scrollWidth)
+    
   }
 
   public scrollNext() {

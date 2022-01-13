@@ -4,37 +4,16 @@
         <li class="inline-block px-3 py-3 mx-1 rounded-md hover:bg-background-light active:bg-background-dark text-xs cursor-pointer transition-all" [routerLink]="['/releases']" [routerLinkActive]="'text-accent-dark'">Neuheiten</li>
         <li class="inline-block px-3 py-3 mx-1 rounded-md hover:bg-background-light active:bg-background-dark text-xs cursor-pointer transition-all" [routerLink]="['/artists']" [routerLinkActive]="'text-accent-dark'">Künstler</li>
     </ul>
+
+    
 </div>
 
-<asc-infinite-scroll-list class="h-96">
     <section>
         <h1>Willkommen, {{ (authService.$user | async).username }}</h1>
     
         <h5>Zuletzt gehört</h5>
-        <h5>Kürzlich hinzugefügt</h5>
+        <h5>Entdecke neue Songs</h5>
         <h5>Entdecke Musik aus "{{ "genre" }}"</h5>
     </section>
-    <section>
-        <h1>Willkommen, {{ (authService.$user | async).username }}</h1>
-    
-        <h5>Zuletzt gehört</h5>
-        <h5>Kürzlich hinzugefügt</h5>
-        <h5>Entdecke Musik aus "{{ "genre" }}"</h5>
-    </section>
-    <section>
-        <h1>Willkommen, {{ (authService.$user | async).username }}</h1>
-    
-        <h5>Zuletzt gehört</h5>
-        <h5>Kürzlich hinzugefügt</h5>
-        <h5>Entdecke Musik aus "{{ "genre" }}"</h5>
-    </section>
-    <section>
-        <h1>Willkommen, {{ (authService.$user | async).username }}</h1>
-    
-        <h5>Zuletzt gehört</h5>
-        <h5>Kürzlich hinzugefügt</h5>
-        <h5>Entdecke Musik aus "{{ "genre" }}"</h5>
-    </section>
-</asc-infinite-scroll-list>
 
 

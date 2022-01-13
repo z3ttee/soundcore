@@ -1,4 +1,4 @@
-<div class="block w-full bg-background-dark bg-opacity-95 filter backdrop-blur-lg relative">
+<div class="block w-full bg-background bg-opacity-95 filter backdrop-blur-md relative border-t-2 border-primary-light border-opacity-30">
     <asc-seeker *ngIf="($song | async)" [current]="currentSeekValue" [duration]="($song | async)?.duration" (seek)="onSeeking($event)"></asc-seeker>
 
     <div class="flex flex-1 p-4 px-6 items-center">
