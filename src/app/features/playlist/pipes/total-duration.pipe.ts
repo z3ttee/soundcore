@@ -20,7 +20,7 @@ export class TotalPlaylistDurationPipe implements PipeTransform {
             result += `${hours} Std. `
         }
 
-        result += `${pad(minutes, (hours > 0 ? 1 : 2))} min.`
+        result += `${pad(minutes, (hours > 0 || minutes >= 10 ? 2 : 1))} min.`
         return result;
     }
   
