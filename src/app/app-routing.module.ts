@@ -18,6 +18,7 @@ const routes: Routes = [
     { path: "storage", canActivate: [AuthenticationCanActivateGuard], loadChildren: () => import("./features/storage/storage.module").then((m) => m.StorageModule) },
     { path: "genres", canActivate: [AuthenticationCanActivateGuard], loadChildren: () => import("./features/genre/genre.module").then((m) => m.GenreModule) },
     { path: "playlists", canActivate: [AuthenticationCanActivateGuard], loadChildren: () => import("./features/playlist/playlist.module").then((m) => m.PlaylistModule) },
+    { path: "artists", canActivate: [AuthenticationCanActivateGuard], loadChildren: () => import("./features/artist/artist.module").then((m) => m.ArtistModule) },
 
     // Make every route below to AsyncModule
     { path: "activity", canActivate: [AuthenticationCanActivateGuard], component: IndexViewComponent },

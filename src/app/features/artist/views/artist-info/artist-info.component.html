@@ -1,0 +1,45 @@
+<div class="absolute w-full top-0 left-0">
+    <mat-progress-bar  mode="indeterminate" color="accent" *ngIf="isLoading"></mat-progress-bar>
+</div>
+
+<section class="px-4 h-96">
+    <div class="relative inline-block w-full items-center px-6 py-0 pt-20 rounded-xl h-64">
+        <div class="absolute top-0 left-0 w-full h-full overflow-hidden rounded-xl">
+            <div class="w-full h-full bg-center bg-cover bg-no-repeat bg-transparent z-0 filter blur-sm brightness-75" [style]="bannerSrc ? 'background-image: url(' + bannerSrc + ');' : ''"></div>
+        
+            <div class="absolute bottom-4 right-4 z-10">
+                <button class="py-3 px-4 rounded-full mr-2 bg-accent-dark text-background-dark text-xs transition-all"><i class="fa-solid fa-play"></i> Abspielen</button>
+                <button class="py-3 px-4 rounded-full bg-accent-dark text-background-dark text-xs transition-all"><i class="fa-solid fa-heart"></i> Folgen</button>
+            </div>
+        </div>
+        
+        <div class="z-10 absolute bottom-0 left-8 transform-gpu translate-y-2/3 ">
+            <div class="flex items-end">
+                <img [src]="coverSrc" class="w-32 aspect-square border-[14px] border-background-dark rounded-3xl">
+
+                <div class="z-30 p-4">
+                    <p class="text-sm mb-0">Künstler</p>
+                    <h2 class="line-clamp-1">{{ artist?.name }}</h2>
+                </div>
+            </div>
+        </div>
+
+        
+    </div>
+</section>
+
+<section class="px-16">
+    <div class="flex flex-1">
+        <div class="flex-grow mr-6">
+            <h4 class="mb-4">Beliebte Songs</h4>
+            <div *ngFor="let song of topSongs">
+                {{ song?.title }}
+            </div>
+        </div>
+
+        <div class="min-w-[30%] w-[30%] bg-background border-2 border-primary-light border-opacity-20 rounded-lg p-4" *ngIf="artist?.description">
+            <h4 class="mb-4">Informationen</h4>
+            <p class="text-sm tracking-wide">{{ artist?.description }}</p>
+        </div>
+    </div>
+</section>
