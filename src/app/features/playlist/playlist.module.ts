@@ -15,6 +15,7 @@ import { PlaylistPrivacyPipe } from './pipes/playlist-privacy.pipe';
 import { ChoosePlaylistComponent } from './dialogs/choose-playlist/choose-playlist.component';
 import { SongListItemComponent } from 'src/app/components/list-items/song-list-item/song-list-item.component';
 import { StreamModule } from '../stream/stream.module';
+import { AddedToPlaylistPipe } from 'src/app/pipes/addedToPlaylist.pipe';
 
 const routes: Routes = [
   { path: ":playlistId", component: PlaylistInfoComponent }
@@ -27,7 +28,9 @@ const routes: Routes = [
     TotalPlaylistDurationPipe,
     PlaylistPrivacyPipe,
     ChoosePlaylistComponent,
-    SongListItemComponent
+    SongListItemComponent,
+    AddedToPlaylistPipe
+
   ],
   imports: [
     CommonModule,

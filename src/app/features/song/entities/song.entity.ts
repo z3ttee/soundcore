@@ -30,4 +30,6 @@ export class Song {
     public albums?: Album[];
     public genres?: Genre[];
 
+    public song2playlist?: Date;
+
 }

@@ -22,8 +22,16 @@
         </div>
     </div>
 
-    <div class="min-w-16">
-        <p class="font-light">{{ song?.duration | durationPipe }}</p>
+    <div class="max-w-60 mr-4 hidden md:block">
+        <p class="text-xs text-center opacity-80 line-clamp-1 hover:underline">{{ song?.albums[0]?.title }}</p>
+    </div>
+
+    <div class="min-w-32 mr-4 hidden lg:block">
+        <p class="text-xs opacity-80">{{ song?.song2playlist | addedToPlaylist }}</p>
+    </div>
+
+    <div class="min-w-16 hidden sm:block">
+        <p class="text-xs opacity-80">{{ song?.duration | durationPipe }}</p>
     </div>
 
 
