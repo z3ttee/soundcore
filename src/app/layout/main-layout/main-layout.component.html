@@ -3,12 +3,13 @@
         <asc-sidebar></asc-sidebar>
     </div>
     <div class="h-full" asc-drawer-content>
-        <asc-toolbar class="absolute w-full z-10" (onMenuToggle)="drawer.toggle()"></asc-toolbar>
+        <asc-toolbar class="sticky top-0 w-full z-10" (onMenuToggle)="drawer.toggle()"></asc-toolbar>
+        <!-- TODO: Make toolbar sticky -->
 
         <div class="flex flex-1 flex-col h-full overflow-y-auto">
             <!--<asc-toolbar class="w-full z-10" (onMenuToggle)="drawer.toggle()"></asc-toolbar>-->
 
-            <div class="relative pt-28 pb-28 flex-grow">
+            <div class="relative pt-6 pb-14 flex-grow">
                 <router-outlet></router-outlet>
             </div>
         </div>

@@ -1,5 +1,9 @@
+import { Injectable } from "@angular/core";
 import { Song } from "../../song/entities/song.entity";
 
+@Injectable({
+    providedIn: "root"
+})
 export class StreamQueueService {
 
     private _queue: Song[];

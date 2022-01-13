@@ -13,8 +13,6 @@ export class TotalPlaylistDurationPipe implements PipeTransform {
         const minutes = Math.floor(value / 60) % 60
         // const seconds = Math.floor(value - minutes * 60)
 
-        console.log(minutes)
-
         let result = "";
         if(hours > 0) {
             result += `${hours} Std. `

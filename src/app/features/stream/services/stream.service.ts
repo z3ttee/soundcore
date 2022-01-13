@@ -2,8 +2,11 @@ import { Injectable } from "@angular/core";
 import { BehaviorSubject, Observable } from "rxjs";
 import { Album } from "src/app/model/album.model";
 import { Artist } from "src/app/model/artist.model";
+import { environment } from "src/environments/environment";
 import { Song } from "../../song/entities/song.entity";
 import { StreamStatus } from "../entities/stream-player.entity";
+import { AudioService } from "./audio.service";
+import { StreamQueueService } from "./queue.service";
 
 @Injectable({
     providedIn: 'root'
@@ -19,6 +22,21 @@ export class StreamService {
     public $currentSong: Observable<Song> = this._currentSongSubject.asObservable();
     public $pauseEvent: Observable<boolean> = this._pauseEventSubject.asObservable();
     public $player: Observable<StreamStatus> = this._statusSubject.asObservable();
+
+    private audio = new Audio();
+
+    constructor(
+        private queueService: StreamQueueService,
+    ) {}
+
+    public async getStreamURL(song: Song) {
+        if(!song) return "";
+        return `${environment.api_base_uri}/v1/streams/songs/${song.id}`;
+    }
+
+    public async playSongNow(song: Song) {
+        
+    }
 
     /**
      * Play the audio stream.
@@ -41,7 +59,9 @@ export class StreamService {
      * @param song Selected song
      */
     public async playSong(song: Song): Promise<void> {
-        this._currentSongSubject.next(song)
+        // this.audio.src = await this.getStreamURL(song);
+        // this.audio.play()
+        // this._currentSongSubject.next(song)
     }
 
     /**

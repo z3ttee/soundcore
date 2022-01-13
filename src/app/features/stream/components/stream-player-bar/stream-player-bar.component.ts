@@ -2,6 +2,7 @@ import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { Observable, tap } from 'rxjs';
 import { Song } from 'src/app/features/song/entities/song.entity';
 import { environment } from 'src/environments/environment';
+import { AudioInfo, AudioService } from '../../services/audio.service';
 import { StreamService } from '../../services/stream.service';
 
 @Component({
@@ -26,6 +27,11 @@ export class StreamPlayerBarComponent implements OnInit {
   public coverSrc: string = null;
   public accentColor: string = "";
 
+
+  public $info: Observable<AudioInfo> = this.audioService.$info;
+  public $song: Observable<Song> = this.audioService.$song;
+
+
   public set isPaused(val: boolean) {
     this._isPaused = val;
     this.streamService.setStatus({
@@ -37,9 +43,13 @@ export class StreamPlayerBarComponent implements OnInit {
     return this._isPaused;
   }
 
-  constructor(private streamService: StreamService) {
+  constructor(
+    private streamService: StreamService,
+    private audioService: AudioService
+  ) {
     this.streamService.$currentSong.subscribe((song) => {
-      // Check if same song is selected again, prevent further
+      this.audioService.play(song)
+      /*// Check if same song is selected again, prevent further
       // processing.
       if(song && this.currentSong?.id == song.id) return;
 
@@ -64,7 +74,7 @@ export class StreamPlayerBarComponent implements OnInit {
       } else {
         // Set default artwork image
         this.coverSrc = "/assets/img/missing_cover.png"
-      }
+      }*/
     });
 
     

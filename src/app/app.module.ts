@@ -66,7 +66,8 @@ import { StreamModule } from './features/stream/stream.module';
     MatInputModule,
     MatListModule,
     MatDividerModule,
-    MatProgressBarModule
+    MatProgressBarModule,
+    MatButtonModule
   ],
   providers: [
     DeviceService,
