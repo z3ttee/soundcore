@@ -2,44 +2,57 @@
     <mat-progress-bar  mode="indeterminate" color="accent" *ngIf="isLoading"></mat-progress-bar>
 </div>
 
-<section class="px-4 h-96">
-    <div class="relative inline-block w-full items-center px-6 py-0 pt-20 rounded-xl h-64">
-        <div class="absolute top-0 left-0 w-full h-full overflow-hidden rounded-xl">
-            <div class="w-full h-full bg-center bg-cover bg-no-repeat bg-transparent z-0 filter blur-sm brightness-75" [style]="bannerSrc ? 'background-image: url(' + bannerSrc + ');' : ''"></div>
-        
-            <div class="absolute bottom-4 right-4 z-10">
-                <button class="py-3 px-4 rounded-full mr-2 bg-accent-dark text-background-dark text-xs transition-all"><i class="fa-solid fa-play"></i> Abspielen</button>
-                <button class="py-3 px-4 rounded-full bg-accent-dark text-background-dark text-xs transition-all"><i class="fa-solid fa-heart"></i> Folgen</button>
+<section class="md:px-4 md:pt-4" [ngClass]="{'md:pb-36': !!bannerSrc}" [style]="'background: linear-gradient(180deg, ' + (bannerAccentColor || accentColor) + '50 0%, ' + (bannerAccentColor || accentColor) + '00 100%);'">
+    <div class="inline-block w-full" [ngClass]="{'h-96': !!bannerSrc}">
+        <div class="relative inline-block w-full items-center px-0 md:px-6 py-0 md:py-0 rounded-xl" [ngClass]="{'md:h-64 md:pt-20 md:shadow-md': !!bannerSrc}">
+            
+            <div class="absolute top-0 left-0 w-full h-full overflow-hidden rounded-xl hidden md:block" *ngIf="bannerSrc">
+                <div class="w-full h-full bg-center bg-cover bg-no-repeat bg-transparent z-0 filter brightness-50 blur-[2px]" [style]="bannerSrc ? 'background-image: url(' + bannerSrc + ');' : ''"></div>
+            
+                <div class="absolute bottom-4 right-4 z-10">
+                    <button class="py-3 px-4 rounded-full mr-2 bg-accent-dark text-background-dark text-xs transition-all"><i class="fa-solid fa-play"></i> Abspielen</button>
+                    <button class="py-3 px-4 rounded-full bg-accent-dark text-background-dark text-xs transition-all"><i class="fa-solid fa-heart"></i> Folgen</button>
+                </div>
             </div>
-        </div>
-        
-        <div class="z-10 absolute bottom-0 left-8 transform-gpu translate-y-2/3 ">
-            <div class="flex items-end">
-                <img [src]="coverSrc" class="w-32 aspect-square border-[14px] border-background-dark rounded-3xl">
+            
+            <div class="z-10 md:bottom-0 md:left-8 md:right-8 transform-gpu pointer-events-none" [ngClass]="{'md:absolute md:translate-y-2/3': !!bannerSrc}">
+                <div class="flex flex-1" [ngClass]="{'items-end': !!bannerSrc, 'items-center': !bannerSrc}">
+                    <img [src]="coverSrc" class="w-full md:w-32 aspect-square rounded-xl shadow-md filter brightness-50 md:brightness-100">
 
-                <div class="z-30 p-4">
-                    <p class="text-sm mb-0">Künstler</p>
-                    <h2 class="line-clamp-1">{{ artist?.name }}</h2>
+                    <div class="z-30 p-4 w-full pointer-events-auto hidden md:block">
+                        <p class="text-sm mb-0">Künstler</p>
+                        <h2 class="line-clamp-1">{{ artist?.name }}</h2>
+                    </div>
                 </div>
             </div>
         </div>
-
-        
     </div>
 </section>
 
-<section class="px-16">
-    <div class="flex flex-1">
-        <div class="flex-grow mr-6">
-            <h4 class="mb-4">Beliebte Songs</h4>
-            <div *ngFor="let song of topSongs">
-                {{ song?.title }}
+<section class="-mt-80 md:mt-4 relative" [ngClass]="{'md:-mt-36': !!bannerSrc}">
+
+    <div class="px-4 pb-4 z-30 w-full pointer-events-auto block md:hidden">
+        <p class="text-xs opacity-75">Künstler</p>
+        <h4 class="line-clamp-2">{{ artist?.name }}</h4>
+    </div>
+
+    <div class="relative min-h-80 px-4 py-4 md:px-16 md:py-0 bg-background-dark md:bg-transparent rounded-3xl md:rounded-none overflow-hidden">
+        <div class="md:hidden absolute top-0 left-0 right-0 h-16 pointer-events-none z-0" [style]="'background: linear-gradient(180deg, ' + (accentColor) + '20 0%, ' + (accentColor) + '00 100%);'" [ngClass]="{'md:pb-36': !!bannerSrc}"></div>
+
+        <div class="block md:flex md:flex-1">
+            <div class="flex-grow mr-6">
+                <h5 class="mb-4">Beliebte Songs</h5>
+                <div *ngFor="let song of topSongs">
+                    {{ song?.title }}
+                </div>
+            </div>
+    
+            <div class="w-full md:min-w-[30%] md:w-[30%] bg-background bg-opacity-90 backdrop-blur-md border-2 border-primary-light border-opacity-20 rounded-lg p-8" *ngIf="artist?.description">
+                <h4 class="mb-4">Informationen</h4>
+                <p class="text-sm tracking-wide opacity-75">{{ artist?.description }}</p>
             </div>
         </div>
-
-        <div class="min-w-[30%] w-[30%] bg-background border-2 border-primary-light border-opacity-20 rounded-lg p-4" *ngIf="artist?.description">
-            <h4 class="mb-4">Informationen</h4>
-            <p class="text-sm tracking-wide">{{ artist?.description }}</p>
-        </div>
     </div>
+
+    
 </section>
