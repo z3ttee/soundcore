@@ -1,5 +1,7 @@
 import { Injectable } from "@angular/core";
 import { BehaviorSubject, Observable } from "rxjs";
+import { AuthenticationService } from "src/app/services/authentication.service";
+import { environment } from "src/environments/environment";
 import { Song } from "../../song/entities/song.entity";
 import { StreamQueueService } from "./queue.service";
 import { StreamService } from "./stream.service";
@@ -28,7 +30,7 @@ export class AudioService {
 
     constructor(
         private queueService: StreamQueueService,
-        private streamService: StreamService
+        private authService: AuthenticationService
     ){
 
         this.audio.onloadstart = () => this.onLoad();
@@ -42,9 +44,13 @@ export class AudioService {
 
     }
 
+    public async getStreamURL(song: Song) {
+        if(!song) return "";
+        return `${environment.api_base_uri}/v1/streams/songs/${song.id}?accessToken=${this.authService.getAccessToken()}`;
+    }
 
-    public async play(song: Song) {
-        const url = await this.streamService.getStreamURL(song);
+    public async forcePlay(song: Song) {
+        const url = await this.getStreamURL(song);
 
         const info = this._infoSubject.getValue();
         info.currentTime = 0;
@@ -55,6 +61,15 @@ export class AudioService {
         this.audio.currentTime = 0;
         this.audio.src = url;
         this._songSubject.next(song);
+    }
+
+    public async play(song: Song) {
+        this.queueService.enqueue(song);
+
+        if(!this._songSubject.getValue()) {
+            // Currently no song playing, meaning we can start this one
+            this.forcePlay(song);
+        }
     }
 
     public setVolume(volume: number) {

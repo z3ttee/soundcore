@@ -4,7 +4,8 @@ import { ArtistInfoComponent } from './views/artist-info/artist-info.component';
 import { RouterModule, Routes } from '@angular/router';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatButtonModule } from '@angular/material/button';
-import { SongListItemComponent } from 'src/app/components/list-items/song-list-item/song-list-item.component';
+import { TopSongItemComponent } from './components/top-song-item/top-song-item.component';
+import { PipesModule } from 'src/app/pipes/pipes.module';
 
 const routes: Routes = [
   { path: ":artistId", component: ArtistInfoComponent }
@@ -13,10 +14,12 @@ const routes: Routes = [
 @NgModule({
   declarations: [
     ArtistInfoComponent,
+    TopSongItemComponent,
   ],
   imports: [
     CommonModule,
     RouterModule.forChild(routes),
+    PipesModule,
 
     MatProgressBarModule,
     MatButtonModule

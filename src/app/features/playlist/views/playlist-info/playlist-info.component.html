@@ -18,7 +18,7 @@
                     <p class="text-xs px-2">{{ author?.username }}</p>
                 </li>
                 <li class="inline text-xs opacity-70 ml-4">{{ playlist?.songsCount }} {{ playlist?.songsCount != 1 ? "Songs" : "Song" }}</li>
-                <li class="inline text-xs opacity-70 ml-2">{{ playlist?.totalDuration | totalPlaylistDuration }}</li>
+                <li class="inline text-xs opacity-70 ml-2">{{ playlist?.totalDuration | totalDurationPipe }}</li>
             </ul>
         </div>
     </div>

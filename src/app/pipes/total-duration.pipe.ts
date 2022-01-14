@@ -1,9 +1,9 @@
 import { Pipe, PipeTransform } from "@angular/core";
 
 @Pipe({
-    name: "totalPlaylistDuration"
+    name: "totalDurationPipe"
 })
-export class TotalPlaylistDurationPipe implements PipeTransform {
+export class TotalDurationPipe implements PipeTransform {
 
     transform(value: number): string {
         if(!value) return "0 min."

@@ -1,9 +1,9 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
-  name: 'durationPipe'
+  name: 'songDurationPipe'
 })
-export class DurationPipePipe implements PipeTransform {
+export class SongDurationPipe implements PipeTransform {
 
   transform(value: number): string {
     const pad = function(num, size) { return ('000' + num).slice(size * -1); }

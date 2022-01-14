@@ -22,7 +22,7 @@
             <button *ngIf="isPaused || !($song | async)" class="rounded-full w-11 h-11 inline-flex justify-center items-center bg-accent-dark text-background transform-gpu hover:scale-105 active:scale-95 transition-all" (click)="play()"><i class="fa-solid fa-play"></i></button>
             <button *ngIf="!isPaused && ($song | async)" class="rounded-full w-11 h-11 inline-flex justify-center items-center bg-accent-dark text-background transform-gpu hover:scale-105 active:scale-95 transition-all" (click)="pause()"><i class="fa-solid fa-pause"></i></button>
 
-            <p class="w-32 text-center text-sm text-opacity-70 font-light">{{ currentTime | durationPipe }} / {{ (($song | async)?.duration || 0) | durationPipe }}</p>
+            <p class="w-32 text-center text-sm text-opacity-70 font-light">{{ currentTime | songDurationPipe }} / {{ (($song | async)?.duration || 0) | songDurationPipe }}</p>
         </div>
 
         <!-- TODO: Add volume, next, prev, shuffle and loop control -->

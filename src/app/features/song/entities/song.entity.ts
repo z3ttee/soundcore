@@ -31,5 +31,6 @@ export class Song {
     public genres?: Genre[];
 
     public song2playlist?: Date;
+    public streamCount?: number;
 
 }

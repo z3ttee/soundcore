@@ -2,6 +2,7 @@ import { Injectable } from "@angular/core";
 import { BehaviorSubject, Observable } from "rxjs";
 import { Album } from "src/app/model/album.model";
 import { Artist } from "src/app/model/artist.model";
+import { AuthenticationService } from "src/app/services/authentication.service";
 import { environment } from "src/environments/environment";
 import { Song } from "../../song/entities/song.entity";
 import { StreamStatus } from "../entities/stream-player.entity";
@@ -27,15 +28,18 @@ export class StreamService {
 
     constructor(
         private queueService: StreamQueueService,
+        private audioService: AudioService,
+        private authService: AuthenticationService
     ) {}
 
     public async getStreamURL(song: Song) {
         if(!song) return "";
-        return `${environment.api_base_uri}/v1/streams/songs/${song.id}`;
+        return `${environment.api_base_uri}/v1/streams/songs/${song.id}?accessToken=${this.authService.getAccessToken()}`;
     }
 
-    public async playSongNow(song: Song) {
-        
+    public async forcePlay(song: Song) {
+        console.log("[STREAM] Force play: " + song.title)
+        this.audioService.forcePlay(song)
     }
 
     /**

@@ -4,25 +4,24 @@ import { StreamPlayerBarComponent } from './components/stream-player-bar/stream-
 
 import { AppCommonModule } from "../../common.module"
 import { SeekerComponent } from 'src/app/components/seeker/seeker.component';
-import { DurationPipePipe } from './pipes/duration-pipe.pipe';
 import { RouterModule, Routes } from '@angular/router';
+import { PipesModule } from 'src/app/pipes/pipes.module';
 
 const routes: Routes = []
 
 @NgModule({
   declarations: [
     StreamPlayerBarComponent,
-    SeekerComponent,
-    DurationPipePipe
+    SeekerComponent
   ],
   imports: [
     CommonModule,
     AppCommonModule,
+    PipesModule,
     RouterModule.forChild(routes)
   ],
   exports: [
-    StreamPlayerBarComponent,
-    DurationPipePipe
+    StreamPlayerBarComponent
   ]
 })
 export class StreamModule { }

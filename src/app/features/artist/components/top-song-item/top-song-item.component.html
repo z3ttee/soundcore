@@ -1,0 +1,36 @@
+<div class="item-container transition-all p-1.5 rounded-md text-center flex items-center overflow-hidden cursor-pointer w-full border-2 border-transparent hover:bg-background-light active:bg-background hover:bg-opacity-50 active:bg-opacity-50">
+
+    <div class="w-14 aspect-square relative">
+        <div [ngClass]="{'active': isActive}" class="play-button transition-all transform-gpu absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 will-change-auto rounded-full bg-accent-dark shadow-lg text-background w-7 h-7 overflow-hidden flex justify-center items-center hover:scale-105" (click)="playOrPause()">
+            <i class="fa-solid fa-pause text-sm" *ngIf="!isPlayerPaused && isActive"></i>
+            <i class="fa-solid fa-play text-sm" *ngIf="isPlayerPaused && isActive"></i>
+            <i class="fa-solid fa-play text-sm" *ngIf="!isActive"></i>
+        </div>
+    </div>
+
+    <img [src]="coverSrc" class="w-11 aspect-square rounded-lg">
+
+    <div class="max-w-full w-full overflow-hidden text-left px-4">
+        <p class="font-bold text-sm max-w-full overflow-hidden text-ellipsis whitespace-nowrap">{{ song.title }}</p>
+
+        <div class="line-clamp-2 opacity-60">
+            <ul>
+                <li *ngIf="song.explicit" class="inline"><span class="inline-flex font-light mr-1 items-center justify-center rounded-sm bg-primary-light text-xs w-4 aspect-square">E</span></li>
+                <li class="inline text-xs" *ngIf="song.artists.length > 1">feat. </li>
+                <li *ngFor="let artist of artists; index as i" class="inline"><span class="text-xs hover:underline leading-3 pointer-events-all" [routerLink]="['/artists', artist.id]">{{ artist.name }}</span>{{ i + 1 < song.artists.length-1 ? ", " : "" }}</li>
+            </ul>
+        </div>
+    </div>
+
+    <!--<div class="max-w-60 mr-4 hidden md:block">
+        <p class="text-xs text-center opacity-80 line-clamp-1 hover:underline">{{ song?.albums[0]?.title }}</p>
+    </div>-->
+
+    <div class="w-[30%] mx-4 hidden lg:block text-left">
+        <p class="text-sm opacity-80">{{ song?.streamCount || 0 }}</p>
+    </div>
+
+    <div class="w-36 hidden sm:block">
+        <p class="text-sm opacity-80">{{ song?.duration | songDurationPipe }}</p>
+    </div>
+</div>

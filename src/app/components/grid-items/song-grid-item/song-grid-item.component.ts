@@ -69,7 +69,7 @@ export class SongGridItemComponent implements OnInit {
                 this.streamService.pause();
             }
         } else {
-            this.streamService.playSong(this.song);
+            this.streamService.forcePlay(this.song);
         }
         
     }
