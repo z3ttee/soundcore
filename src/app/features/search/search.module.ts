@@ -12,6 +12,8 @@ import { StreamModule } from '../stream/stream.module';
 import { AlbumGridItemComponent } from 'src/app/components/grid-items/album-grid-item/album-grid-item.component';
 import { HorizontalGridComponent } from 'src/app/components/grids/horizontal-grid/horizontal-grid.component';
 import { LabelGridItemComponent } from 'src/app/components/grid-items/label-grid-item/label-grid-item.component';
+import { BestMatchComponent } from './components/best-match/best-match.component';
+import { PipesModule } from 'src/app/pipes/pipes.module';
 
 const routes: Routes = [
   { path: "", component: SearchIndexComponent }
@@ -20,12 +22,14 @@ const routes: Routes = [
 @NgModule({
   declarations: [
     SearchIndexComponent,
+    BestMatchComponent,
 
     GenreGridItemComponent,
     ArtistGridItemComponent,
     AlbumGridItemComponent,
     HorizontalGridComponent,
-    LabelGridItemComponent
+    LabelGridItemComponent,
+    BestMatchComponent
   ],
   imports: [
     CommonModule,
@@ -35,6 +39,7 @@ const routes: Routes = [
 
     SongModule,
     StreamModule,
+    PipesModule,
 
     MatProgressBarModule
   ]
