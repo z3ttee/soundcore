@@ -1,0 +1,64 @@
+<section class="p-4">
+    <div class="mb-4">
+        <h3>Importieren</h3>
+        <p class="opacity-70">Importiere Lieder oder Playlisten über YouTube-Links.</p>
+    </div>
+
+    <div class="my-4">
+        <asc-message mode="info">Beachte, dass nur öffentliche oder nicht gelistete Links importiert werden können.</asc-message>
+    </div>
+
+    <div class="my-8">
+        <h6>Speicherort wählen:</h6>
+
+        <mat-progress-bar color="accent" mode="indeterminate" *ngIf="isLoadingBuckets"></mat-progress-bar>
+        <asc-message mode="warn" *ngIf="!isLoadingBuckets && ($buckets | async).length <= 0">Es konnten keine Buckets gefunden werden.</asc-message>
+
+        <div class="my-4" *ngIf="!isLoadingBuckets && ($buckets | async)?.length > 0">
+            <mat-form-field appearance="fill">
+                <mat-label>Speicherzone wählen</mat-label>
+                <mat-select [formControl]="selectedBucketControl">
+                    <mat-option *ngFor="let bucket of ($buckets | async)" [value]="bucket.id">
+                        {{ bucket.name }}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+        </div>
+
+        <div class="my-4" *ngIf="selectedBucketControl.value">
+            <asc-message mode="warn" *ngIf="!isLoadingMounts && ($mounts | async).length <= 0">Es konnten keine Mounts gefunden werden.</asc-message>
+            <mat-progress-bar color="accent" mode="indeterminate" *ngIf="isLoadingMounts"></mat-progress-bar>
+        </div>
+
+        <div *ngIf="!isLoadingMounts && ($mounts | async).length > 0 && selectedBucketControl.value">
+            <mat-form-field appearance="fill">
+                <mat-label>Mount wählen</mat-label>
+                <mat-select [formControl]="selectedMountControl">
+                    <mat-option *ngFor="let mount of ($mounts | async)" [value]="mount.id">
+                        {{ mount.name }}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+        </div>
+    </div>
+
+    <div class="my-8">
+        <h6 class="mb-4">Link angeben:</h6>
+
+        <mat-form-field class="" appearance="fill">
+            <mat-label>YouTube-Link</mat-label>
+            <input [formControl]="selectedUrlControl" matInput>
+        </mat-form-field>
+
+        <mat-form-field class="ml-4" appearance="fill">
+            <mat-label>Start-Offset in Sekunden</mat-label>
+            <input [formControl]="selectedStartTime" matInput type="number">
+        </mat-form-field>
+
+        <p class="text-xs" *ngIf="selectedUrlControl">Finaler Link: {{ selectedUrlControl.value + "&t=" + (selectedStartTime.value || 0) }}</p>
+
+        <div class="mt-4">
+            <button mat-stroked-button (click)="submit()" [disabled]="!selectedUrlControl.value">Importieren</button>
+        </div> 
+    </div>
+</section>
