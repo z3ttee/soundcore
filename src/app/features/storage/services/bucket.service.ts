@@ -6,9 +6,7 @@ import { AuthenticationService } from "src/app/services/authentication.service";
 import { environment } from "src/environments/environment";
 import { StorageBucket } from "../model/storage-bucket.model";
 
-@Injectable({
-    providedIn: "root"
-})
+@Injectable()
 export class BucketService {
 
     constructor(private httpClient: HttpClient, private authService: AuthenticationService) {}

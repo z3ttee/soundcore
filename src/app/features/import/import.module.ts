@@ -9,6 +9,13 @@ import { AppCommonModule } from 'src/app/common.module';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { ImportService } from './services/import.service';
+import { BucketService } from '../storage/services/bucket.service';
+import { MountService } from '../storage/services/mount.service';
+import { IndexStatusService } from '../upload/services/index-status.service';
+import { PipesModule } from 'src/app/pipes/pipes.module';
+import { ImportListItemComponent } from './components/import-list-item/import-list-item.component';
+import { CreateImportComponent } from './dialogs/create-import/create-import.component';
+import { MatDialogModule } from '@angular/material/dialog';
 
 const routes: Routes = [
   { path: "", component: ImportIndexComponent }
@@ -16,7 +23,9 @@ const routes: Routes = [
 
 @NgModule({
   declarations: [
-    ImportIndexComponent
+    ImportIndexComponent,
+    ImportListItemComponent,
+    CreateImportComponent
   ],
   imports: [
     CommonModule,
@@ -27,11 +36,16 @@ const routes: Routes = [
     MatProgressBarModule,
     MatInputModule,
     MatButtonModule,
+    MatDialogModule,
     
-    AppCommonModule
+    AppCommonModule,
+    PipesModule
   ],
   providers: [
-    ImportService
+    ImportService,
+    BucketService,
+    IndexStatusService,
+    MountService
   ]
 })
 export class ImportModule { }

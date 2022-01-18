@@ -8,9 +8,7 @@ import { CreateMountDTO } from "../dto/create-mount.dto";
 import { UpdateMountDTO } from "../dto/update-mount.dto";
 import { StorageMount } from "../model/storage-mount.model";
 
-@Injectable({
-    providedIn: "root"
-})
+@Injectable()
 export class MountService {
 
     constructor(private httpClient: HttpClient, private authService: AuthenticationService) {}

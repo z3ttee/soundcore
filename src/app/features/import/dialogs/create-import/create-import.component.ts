@@ -1,20 +1,20 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
-import { FormControl, Validators } from '@angular/forms';
-import { MatDialog } from '@angular/material/dialog';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { MatDialogRef } from '@angular/material/dialog';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { StorageBucket } from 'src/app/features/storage/model/storage-bucket.model';
 import { StorageMount } from 'src/app/features/storage/model/storage-mount.model';
 import { BucketService } from 'src/app/features/storage/services/bucket.service';
 import { MountService } from 'src/app/features/storage/services/mount.service';
-import { CreateImportComponent } from '../../dialogs/create-import/create-import.component';
-import { ImportEntity } from '../../entities/import.entity';
 import { ImportService } from '../../services/import.service';
 
 @Component({
-  templateUrl: './import-index.component.html',
-  styleUrls: ['./import-index.component.scss']
+  selector: 'asc-create-import',
+  templateUrl: './create-import.component.html',
+  styleUrls: ['./create-import.component.scss']
 })
-export class ImportIndexComponent implements OnInit {
+export class CreateImportComponent implements OnInit {
 
   private _bucketsSubject: BehaviorSubject<StorageBucket[]> = new BehaviorSubject([]);
   private _mountsSubject: BehaviorSubject<StorageMount[]> = new BehaviorSubject([]);
@@ -22,26 +22,34 @@ export class ImportIndexComponent implements OnInit {
   // Data providers
   public $buckets: Observable<StorageBucket[]> = this._bucketsSubject.asObservable();
   public $mounts: Observable<StorageMount[]> = this._mountsSubject.asObservable();
-  public $imports: Observable<ImportEntity[]> = this.importService.$imports;
-
-  // Forms
-  public selectedBucketControl: FormControl = new FormControl();
-  public selectedMountControl: FormControl = new FormControl();
-  public selectedUrlControl: FormControl = new FormControl(null, [ Validators.required ]);
 
   // Loading states
   public isLoadingBuckets: boolean = false;
   public isLoadingMounts: boolean = false;
+  public isSaving: boolean = false;
+
+  // Forms
+  public selectedBucketControl: FormControl = new FormControl();
+
+  public createImportDto: FormGroup = new FormGroup({
+    url: new FormControl(null, [ Validators.required ]),
+    title: new FormControl(null),
+    artists: new FormControl(null),
+    albums: new FormControl(null),
+    mountId: new FormControl(null)
+  })
+
+  // Error handling
+  public error: any;
 
   constructor(
     private bucketService: BucketService,
     private mountService: MountService,
     private importService: ImportService,
-    private dialog: MatDialog
+    private dialogRef: MatDialogRef<CreateImportComponent>
   ) { }
 
-  public ngOnInit(): void {
-
+  ngOnInit(): void {
     this.isLoadingBuckets = true
     this.bucketService.findAllBuckets().then((page) => {
       this._bucketsSubject.next(page.elements);
@@ -54,18 +62,32 @@ export class ImportIndexComponent implements OnInit {
         this._mountsSubject.next(page.elements);
       }).finally(() => this.isLoadingMounts = false)
     })
-
   }
 
-  public async submit() {
+  public onSave() {
+    this.error = null;
+    console.log(this.createImportDto.value)
+
+    if(!this.createImportDto.valid) {
+      this.error = "Bitte fülle alle Felder aus."
+      return;
+    }
+
+    this.isSaving = true;
     this.importService.createImport({
-      url: this.selectedUrlControl.value,
-      mountId: this.selectedMountControl.value
+      url: this.createImportDto.get("url").value,
+      title: this.createImportDto.get("title").value,
+      mountId: this.createImportDto.get("mountId").value,
+      artists: this.createImportDto.get("artists").value?.split(","),
+      albums: this.createImportDto.get("albums").value?.split(",")
+    }).then(() => {
+      this.dialogRef.close();
+    }).catch((error) => {
+      this.error = error;
+    }).finally(() => {
+      this.isSaving = false;
     })
-  }
 
-  public async openCreateDialog() {
-    this.dialog.open(CreateImportComponent)
   }
 
 }
