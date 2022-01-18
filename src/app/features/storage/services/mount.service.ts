@@ -1,6 +1,6 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import { firstValueFrom } from "rxjs";
+import { firstValueFrom, Observable } from "rxjs";
 import { Page, Pageable } from "src/app/pagination/pagination";
 import { AuthenticationService } from "src/app/services/authentication.service";
 import { environment } from "src/environments/environment";
@@ -8,9 +8,7 @@ import { CreateMountDTO } from "../dto/create-mount.dto";
 import { UpdateMountDTO } from "../dto/update-mount.dto";
 import { StorageMount } from "../model/storage-mount.model";
 
-@Injectable({
-    providedIn: "root"
-})
+@Injectable()
 export class MountService {
 
     constructor(private httpClient: HttpClient, private authService: AuthenticationService) {}

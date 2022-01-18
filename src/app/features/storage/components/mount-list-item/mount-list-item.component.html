@@ -1,13 +1,19 @@
-<div class="bg-background-dark rounded-md my-2 px-6 py-4 flex flex-1 items-center shadow-md">
+<div class="transition-all rounded-md my-2 px-4 py-4 flex flex-1 items-center bg-background-light border-2 border-transparent hover:border-primary">
 
     <img src="assets/img/icon_harddrive.png" class="inline-block w-16 h-16">
 
-    <div class="flex-grow px-6">
-        <h6>{{ mount?.name || "Unknown name" }}</h6>
+    <div class="w-full px-6">
+        <div class="">
+            <p class="font-bold text-sm max-w-full overflow-hidden text-ellipsis whitespace-nowrap">{{ mount?.name || "Unknown name" }}</p>
+        </div>
 
-        <ul class="flex gap-8">
-            <li class="opacity-40 cursor-pointer">{{ mount?.path || "Unknown path" }}</li>
-        </ul>
+        <div>
+            <span class="text-xs leading-3 pointer-events-all opacity-60">{{ mount?.path || "Unknown path" }}</span>
+        </div>
+
+        <div class="mt-2">
+            <span class="align-middle py-1.5 px-4 bg-background rounded-full border border-primary-light border-opacity-50 text-xxs tracking-wide uppercase">{{ (status || "ok") == "ok" ? "OK" : "Indexierung läuft" }}</span>
+        </div>
     </div>
 
     <div class="inline-flex items-center">

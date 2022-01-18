@@ -19,6 +19,7 @@ import {MatProgressBarModule} from '@angular/material/progress-bar';
 import { BucketInfoComponent } from './views/bucket-info/bucket-info.component';
 import { BucketListItemComponent } from './components/bucket-list-item/bucket-list-item.component';
 import { AppCommonModule } from 'src/app/common.module';
+import { MountStatusService } from './services/mount-status.service';
 
 const routes: Routes = [
 
@@ -54,7 +55,8 @@ const routes: Routes = [
   ],
   providers: [
     BucketService,
-    MountService
+    MountService,
+    MountStatusService
   ]
 })
 export class StorageModule { }

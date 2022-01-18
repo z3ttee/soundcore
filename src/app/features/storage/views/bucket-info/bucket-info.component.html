@@ -1,10 +1,6 @@
-<section class="px-8">
-    <div class="block w-full mb-4">
-        <button mat-stroked-button (click)="navigateToOverview()"><mat-icon class="align-middle mr-2">arrow_back</mat-icon>Zurück</button>
-    </div>
-
-    <div class="my-4 flex flex-1 items-center">
-        <div class="p-4 bg-background-dark rounded-xl">
+<section class="p-4">
+    <div class="mb-4 flex flex-1 items-center">
+        <div class="p-4 bg-background-light rounded-xl">
             <img src="assets/img/icon_bucket.png" class="w-24 h-24">
         </div>
 
@@ -12,6 +8,13 @@
             <h5 class="opacity-40">Speicherzone</h5>
             <h2>{{ ($bucket | async)?.name || "Unknown name/abcd" }}</h2>
         </div>
+    </div>
+
+    <!-- Warning -->
+    <div class="my-4" *ngIf="(mountStatusService.$socketConnected | async) != 'ok' && (mountStatusService.$socketConnected | async) != 'connecting'">
+        <asc-message [mode]="'warn'">
+            Es ist möglich, dass auf Grund einer Störung, keine Status-Updates empfangen werden können. Du kannst weiterhin alle Mounts verwalten, jedoch werden keine Neuigkeiten zu Hintergrundaktivitäten angezeigt.
+        </asc-message>
     </div>
 
     <div class="my-8">
