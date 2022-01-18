@@ -1,6 +1,10 @@
 import { Index } from "../../upload/entities/index.entity";
 
 export type ImportStatus = "preparing" | "downloading" | "upgradeIndex" | "errored"
+export class ImportProgressUpdate {
+    public progress: number;
+    public importId: string;
+}
 export class ImportEntity {
 
     public id: string;

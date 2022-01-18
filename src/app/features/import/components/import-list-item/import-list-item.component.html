@@ -11,19 +11,20 @@
         </div>
     </div>
 
-    <div class="max-w-60 mr-4 hidden md:block">
-        <p class="text-xs text-center opacity-80 line-clamp-1">{{ import.metadata?.albums.join(', ') }}</p>
+    <div class="max-w-60 mr-4 hidden md:block" *ngIf="import?.metadata?.albums">
+        <p class="text-xs text-center opacity-80 line-clamp-1">{{ import.metadata.albums.join(', ') }}</p>
     </div>
 
-    <div class="min-w-16 hidden sm:block">
-        <p class="text-xs opacity-80">{{ import.metadata?.duration | songDurationPipe }}</p>
+    <div class="min-w-16 hidden sm:block" *ngIf="import.metadata?.duration">
+        <p class="text-xs opacity-80">{{ import.metadata.duration | songDurationPipe }}</p>
     </div>
 
     <div class="min-w-16 sm:block">
-        <asc-label>{{ import.status }}</asc-label>
+        <asc-label *ngIf="!import.upgradeIndex">{{ import.status | indexStatusPipe }}</asc-label>
+        <asc-label *ngIf="import.upgradeIndex">{{ import.upgradeIndex.status | indexStatusPipe }}</asc-label>
     </div>
 
-    <div class="absolute -bottom-0.5 left-0 w-full" *ngIf="import.status != 'upgradeIndex'">
+    <div class="absolute -bottom-0.5 left-0 w-full" *ngIf="import.status == 'downloading' || import.status == 'preparing' || import.upgradeIndex?.status == 'preparing' || import.upgradeIndex?.status == 'processing'">
         <mat-progress-bar [value]="import.downloadProgress" [mode]="import.status == 'downloading' ? 'determinate' : 'indeterminate'"></mat-progress-bar>
     </div>
 </div>

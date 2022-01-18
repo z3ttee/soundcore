@@ -5,6 +5,7 @@ import { SongArtistsPipe } from './song-artists.pipe';
 import { AddedToPlaylistPipe } from './added-to-playlist.pipe';
 import { TotalDurationPipe } from './total-duration.pipe';
 import { BestMatchTypePipe } from './best-match-type.pipe';
+import { IndexStatusPipe } from './index-status.pipe';
 
 @NgModule({
   declarations: [
@@ -12,7 +13,8 @@ import { BestMatchTypePipe } from './best-match-type.pipe';
     SongArtistsPipe,
     AddedToPlaylistPipe,
     TotalDurationPipe,
-    BestMatchTypePipe
+    BestMatchTypePipe,
+    IndexStatusPipe
   ],
   imports: [
     CommonModule
@@ -22,7 +24,8 @@ import { BestMatchTypePipe } from './best-match-type.pipe';
     SongArtistsPipe,
     AddedToPlaylistPipe,
     TotalDurationPipe,
-    BestMatchTypePipe
+    BestMatchTypePipe,
+    IndexStatusPipe
   ]
 })
 export class PipesModule { }

@@ -66,7 +66,6 @@ export class CreateImportComponent implements OnInit {
 
   public onSave() {
     this.error = null;
-    console.log(this.createImportDto.value)
 
     if(!this.createImportDto.valid) {
       this.error = "Bitte fülle alle Felder aus."

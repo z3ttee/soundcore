@@ -16,6 +16,7 @@ import { PipesModule } from 'src/app/pipes/pipes.module';
 import { ImportListItemComponent } from './components/import-list-item/import-list-item.component';
 import { CreateImportComponent } from './dialogs/create-import/create-import.component';
 import { MatDialogModule } from '@angular/material/dialog';
+import { ImportStatusService } from './services/import-status.service';
 
 const routes: Routes = [
   { path: "", component: ImportIndexComponent }
@@ -45,7 +46,8 @@ const routes: Routes = [
     ImportService,
     BucketService,
     IndexStatusService,
-    MountService
+    MountService,
+    ImportStatusService
   ]
 })
 export class ImportModule { }
