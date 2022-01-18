@@ -8,6 +8,7 @@ import { MountEditorDialog } from '../../dialogs/mount-editor.dialog';
 import { StorageBucket } from '../../model/storage-bucket.model';
 import { StorageMount } from '../../model/storage-mount.model';
 import { BucketService } from '../../services/bucket.service';
+import { MountStatusService } from '../../services/mount-status.service';
 import { MountService } from '../../services/mount.service';
 
 @Component({
@@ -33,7 +34,8 @@ export class BucketInfoComponent implements OnInit {
     private bucketService: BucketService,
     private mountService: MountService,
     private dialog: MatDialog,
-    private router: Router
+    private router: Router,
+    public mountStatusService: MountStatusService
   ) {
     this.activatedRoute.paramMap.subscribe((paramMap) => {
       this.isLoadingMounts = true;
