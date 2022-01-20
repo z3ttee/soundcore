@@ -17,7 +17,7 @@
     </div>
 
     <div *ngIf="($currentResult | async)?.bestMatch" class="mb-4 px-4">
-      <h5 class="pb-2">Top-Ergebnis</h5>
+      <h5 class="pb-2 px-2">Top-Ergebnis</h5>
       <asc-best-match [item]="($currentResult | async)?.bestMatch"></asc-best-match>
     </div>
 
