@@ -24,15 +24,11 @@ export class PlaylistInfoComponent implements OnInit {
   public coverSrc: string = null;
   public accentColor: string = "";
 
-  public isAuthorLoading: boolean = false;
-  public author: User = null;
-
   public $songs: Observable<Song[]> = this._songSubject.asObservable();
 
   constructor(
     private activatedRoute: ActivatedRoute,
-    private playlistService: PlaylistService,
-    private authService: AuthenticationService
+    private playlistService: PlaylistService
   ) { }
 
   public async ngOnInit(): Promise<void> {
@@ -46,15 +42,6 @@ export class PlaylistInfoComponent implements OnInit {
         console.log(playlist)
 
         if(this.playlist) {
-          if(this.playlist.author?.id == this.authService.getUser()?.id) {
-            this.author = this.authService.getUser();
-          } else {
-            this.isAuthorLoading = true;
-            this.authService.findUserById(this.playlist.author?.id).then((user) => {
-              this.author = user;
-            }).finally(() => this.isAuthorLoading = false)
-          }
-
           this.playlistService.findSongsByPlaylist(this.playlist.id).then((page) => {
             this._songSubject.next(page.elements)
           });

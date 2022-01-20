@@ -13,7 +13,7 @@
             <h2 class="line-clamp-1">{{ playlist?.title }}</h2>
 
             <ul class="flex items-center pt-2">
-                <asc-profile-badge [user]="author"></asc-profile-badge>
+                <asc-profile-badge [user]="playlist?.author"></asc-profile-badge>
                 <li class="inline text-xs opacity-70 ml-4">{{ playlist?.songsCount }} {{ playlist?.songsCount != 1 ? "Songs" : "Song" }}</li>
                 <li class="inline text-xs opacity-70 ml-2">{{ playlist?.totalDuration | totalDurationPipe }}</li>
             </ul>
