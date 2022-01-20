@@ -4,9 +4,10 @@
 
 export const environment = {
   production: false,
+  sso_base_uri: "http://api.tsalliance.eu/sso",
   sso_client_id: "2VYhnrdDzaEJlEyQ",
   sso_redirect_uri: "http://localhost:4200/authorize",
-  api_base_uri: "http://localhost:3001"
+  api_base_uri: "http://localhost:3001",
 };
 
 /*

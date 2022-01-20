@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { Song } from 'src/app/features/song/entities/song.entity';
+import { User } from 'src/app/features/user/entities/user.entity';
 import { SSOUser } from 'src/app/model/sso-user.model';
 import { AuthenticationService } from 'src/app/services/authentication.service';
 import { environment } from 'src/environments/environment';
@@ -24,7 +25,7 @@ export class PlaylistInfoComponent implements OnInit {
   public accentColor: string = "";
 
   public isAuthorLoading: boolean = false;
-  public author: SSOUser = null;
+  public author: User = null;
 
   public $songs: Observable<Song[]> = this._songSubject.asObservable();
 
