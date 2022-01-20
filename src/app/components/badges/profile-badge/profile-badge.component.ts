@@ -16,8 +16,8 @@ export class ProfileBadgeComponent implements OnInit {
   @Input() public set user(val: User) {
     this._user = val;
 
-    if(val.avatarResourceId) {
-      this.avatarUrl = `${environment.sso_base_uri}/media/avatars/${val.avatarResourceId}`
+    if(val?.avatarResourceId) {
+      this.avatarUrl = `${environment.sso_base_uri}/media/avatars/${val?.avatarResourceId}`
     } else {
       this.avatarUrl = null;
     }
