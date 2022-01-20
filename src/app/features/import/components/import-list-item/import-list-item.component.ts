@@ -10,6 +10,8 @@ export class ImportListItemComponent implements OnInit {
 
   @Input() public import: ImportEntity;
 
+  // TODO: Add functionality to remove items if they are finished (errored, duplicate or just successful)
+
   constructor() { }
 
   ngOnInit(): void {
