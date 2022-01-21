@@ -8,6 +8,9 @@ export const environment = {
   sso_client_id: "2VYhnrdDzaEJlEyQ",
   sso_redirect_uri: "http://localhost:4200/authorize",
   api_base_uri: "http://localhost:3001",
+
+  auth0_domain: "tsalliance.eu.auth0.com",
+  auth0_client_id: "u8lI8gNU3B9cSGpAEovldBuPJn0jFk9t"
 };
 
 /*

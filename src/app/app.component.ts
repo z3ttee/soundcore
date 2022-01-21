@@ -18,7 +18,7 @@ export class AppComponent {
     this.showSplashScreen = sessionStorage.getItem(SPLASH_SESSIONSTORAGE) === "true" || true;
     sessionStorage.setItem(SPLASH_SESSIONSTORAGE, `${this.showSplashScreen}`);
 
-    this.authService.$isLoggedIn.subscribe((isLoggedIn) => this.showSplashScreen = !isLoggedIn)
+    this.authService.$isAuthenticated.subscribe((isLoggedIn) => this.showSplashScreen = !isLoggedIn)
 
     this.router.events.pipe(filter((event) => event instanceof NavigationStart || event instanceof NavigationEnd || event instanceof NavigationCancel || event instanceof NavigationError)).subscribe((event: NavigationStart | NavigationEnd) => {
       if(event instanceof NavigationStart) {
