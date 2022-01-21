@@ -9,6 +9,7 @@ import { SSOSession, SSOSessionType } from '../model/session.model';
 import { SSOCreateAuthorizationDTO } from '../dto/create-authorization.dto';
 import { SSOAccessToken } from '../model/sso-access-token.entity';
 import { SSOUser } from '../model/sso-user.model';
+import { AuthService } from '@auth0/auth0-angular';
 
 export interface SSOConfig {
 
@@ -28,7 +29,6 @@ export class AuthenticationService {
   /**
    * Session observable to provide session changes to other services
    */
-  public readonly $session: Observable<SSOSession> = this._sessionSubject.asObservable();
   public readonly $user: Observable<SSOUser> = this._userSubject.asObservable();
 
   /**
@@ -36,8 +36,8 @@ export class AuthenticationService {
    * The values most likely change during application init, as the session will be restored
    * from cookies / localStorage.
    */
-  public readonly $ready: Observable<boolean> = this._readySubject.asObservable();
-  public readonly $isLoggedIn: Observable<boolean> = combineLatest([this.$session, this.$ready]).pipe(map(([session, ready]) => (ready && !!session && session.type != SSOSessionType.SESSION_ANONYMOUS)))
+  // public readonly $ready: Observable<boolean> = this._readySubject.asObservable();
+  public readonly $isAuthenticated: Observable<boolean> = combineLatest([this.auth0.isAuthenticated$]).pipe(map(([isAuthenticated]) => isAuthenticated))
 
   /*public static forRoot(config: SSOConfig): ModuleWithProviders<GreetingModule> {
     return {
@@ -48,7 +48,10 @@ export class AuthenticationService {
     };
   }*/
 
-  constructor(private httpClient: HttpClient) {
+  constructor(
+    private httpClient: HttpClient,
+    private auth0: AuthService
+  ) {
     this.restoreSession().then((session) => {
       // Push restored session
       this._sessionSubject.next(session)
@@ -144,7 +147,7 @@ export class AuthenticationService {
    * Redirect user to authentication page to obtain grantCode.
    */
   public async redirectToAuthentication() {
-    window.location.href = `https://account.tsalliance.eu/authorize?client_id=${environment.sso_client_id}&redirect_uri=${environment.sso_redirect_uri}`
+    this.auth0.loginWithRedirect()
   }
 
   /**
