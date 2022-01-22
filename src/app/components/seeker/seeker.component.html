@@ -1,4 +1,4 @@
 
-<div class="block w-full relative h-[3px] hover:h-[6px] bg-primary pointer-events-none transition-all">
+<div class="block w-full relative bg-primary pointer-events-none transition-all">
     <input class="pointer-events-auto" #inputElement [max]="duration || 100" [min]="0" [value]="value" (input)="onInput()" (change)="onInputChanged($event)" type="range">
 </div>

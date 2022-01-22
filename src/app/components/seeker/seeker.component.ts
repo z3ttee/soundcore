@@ -9,11 +9,18 @@ export class SeekerComponent implements OnInit {
 
   @ViewChild("inputElement") public range: ElementRef<HTMLInputElement>;
 
-  @Input() public duration: number;
+  private _duration: number = 0;
+  @Input() public set duration(val: number){
+    this._duration = val*1000;
+  }
+
+  public get duration(): number {
+    return this._duration;
+  }
 
   @Input() public set current(val: number) {
     if(this.isInputting) return;
-    this.value = val;
+    this.value = val*1000;
     this.updateProgress();
   }
 
@@ -35,7 +42,7 @@ export class SeekerComponent implements OnInit {
 
   public onInputChanged(event: Event) {
     this.isInputting = false;
-    this.seek.emit(parseInt(event.target["value"]));
+    this.seek.emit(parseInt(event.target["value"]) / 1000);
   }
 
   public onInput() {
