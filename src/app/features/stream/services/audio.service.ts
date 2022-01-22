@@ -4,20 +4,111 @@ import { AuthenticationService } from "src/app/sso/authentication.service";
 import { environment } from "src/environments/environment";
 import { Song } from "../../song/entities/song.entity";
 import { StreamQueueService } from "./queue.service";
+import { StreamService } from "./stream.service";
 
-export class AudioInfo {
+/*export class AudioInfo {
     public volume: number = 0;
     public currentTime: number = 0;
     public paused: boolean = false;
     public loading: boolean = false;
-}
+}*/
 
 @Injectable({
     providedIn: "root"
 })
 export class AudioService {
 
-    private _songSubject: BehaviorSubject<Song> = new BehaviorSubject(null)
+    private audio = new Audio();
+
+    private _currentSongSubject: BehaviorSubject<Song> = new BehaviorSubject(null);
+    private _pausedSubject: BehaviorSubject<boolean> = new BehaviorSubject(false as boolean);
+    private _loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject(false as boolean);
+    private _currentTimeSubject: BehaviorSubject<number> = new BehaviorSubject(0);
+
+    public $currentSong: Observable<Song> = this._currentSongSubject.asObservable();
+    public $paused: Observable<boolean> = this._pausedSubject.asObservable();
+    public $loading: Observable<boolean> = this._loadingSubject.asObservable();
+    public $currentTime: Observable<number> = this._currentTimeSubject.asObservable();
+
+    constructor(
+        private streamService: StreamService,
+        private queueService: StreamQueueService
+    ) {
+
+        this.audio.autoplay = true;
+        this.audio.src = "";
+
+        this.audio.onplay = () => this.onPlayerResumed();
+        this.audio.onpause = () => this.onPlayerPaused();
+
+    }
+
+    /**
+     * Continue playing a song or provide a song object
+     * to force play a new song.
+     */
+    public async play(song?: Song) {
+        if(song) {
+            this.audio.src = await this.streamService.getStreamURL(song);
+        }
+
+        this._pausedSubject.next(false);
+        this.audio.play();
+    }
+
+    /**
+     * Enqueue new song to be played next.
+     * @param song Song
+     */
+    public async enqueueSong(song: Song) {
+        this.queueService.enqueue(song);
+    }
+
+    /**
+     * Pause the playing audio
+     */
+    public pause() {
+
+        
+        this.audio.pause();
+    }
+
+    /**
+     * Reset audio player.
+     */
+    public reset() {
+
+    }
+
+    public setCurrentTime() {
+        // TODO
+    }
+
+    public setVolume() {
+        // TODO:
+    }
+
+
+
+
+
+
+
+
+
+
+
+    private onPlayerPaused() {
+        this._pausedSubject.next(true);
+    }
+    private onPlayerResumed() {
+        this._pausedSubject.next(false);
+    }
+    private onTimeUpdated() {
+        this._currentTimeSubject.next(this.audio.currentTime);
+    }
+
+    /*private _songSubject: BehaviorSubject<Song> = new BehaviorSubject(null)
     private _infoSubject: BehaviorSubject<AudioInfo> = new BehaviorSubject(new AudioInfo())
 
 
@@ -123,7 +214,7 @@ export class AudioService {
         const info = this._infoSubject.getValue();
         info.currentTime = this.audio.currentTime;
         this._infoSubject.next(info)
-    }
+    }*/
 
 
 }

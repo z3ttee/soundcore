@@ -6,6 +6,7 @@ import { ChoosePlaylistComponent } from 'src/app/features/playlist/dialogs/choos
 import { Playlist } from 'src/app/features/playlist/entities/playlist.entity';
 import { PlaylistService } from 'src/app/features/playlist/services/playlist.service';
 import { Song } from 'src/app/features/song/entities/song.entity';
+import { AudioService } from 'src/app/features/stream/services/audio.service';
 import { StreamService } from 'src/app/features/stream/services/stream.service';
 import { ContextMenuService } from 'src/app/services/context-menu.service';
 import { environment } from 'src/environments/environment';
@@ -30,7 +31,7 @@ export class SongListItemComponent implements OnInit {
     public isPlayerPaused: boolean = true;
     
     constructor(
-        private streamService: StreamService,
+        private audioService: AudioService,
         public overlay: Overlay,
         public viewContainerRef: ViewContainerRef,
         private contextMenuService: ContextMenuService,
@@ -38,12 +39,12 @@ export class SongListItemComponent implements OnInit {
         private playlistService: PlaylistService
     ) {
         combineLatest([
-            this.streamService.$currentSong,
-            this.streamService.$player
-        ]).pipe(map(([song, status]) => ({ song, status }))).subscribe((state) => {
-            this.isActive = state.song && state.song?.id == this.song?.id && !state.status.paused;
+            this.audioService.$currentSong,
+            this.audioService.$paused
+        ]).pipe(map(([song, paused]) => ({ song, paused }))).subscribe((state) => {
+            this.isActive = state.song && state.song?.id == this.song?.id && !state.paused;
             this.isPlaying = state.song && state.song?.id == this.song?.id;
-            this.isPlayerPaused = state.status.paused
+            this.isPlayerPaused = state.paused
         })
     }
 
@@ -62,13 +63,13 @@ export class SongListItemComponent implements OnInit {
         this.contextMenuService.close();
 
         if(this.isPlaying) {
-            if(this.streamService.isPaused()) {
-                this.streamService.play();
+            if(this.isPlayerPaused) {
+                this.audioService.play();
             } else {
-                this.streamService.pause();
+                this.audioService.pause();
             }
         } else {
-            this.streamService.playSong(this.song);
+            this.audioService.play(this.song);
         }
         
     }

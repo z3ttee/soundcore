@@ -6,6 +6,8 @@ import { AppCommonModule } from "../../common.module"
 import { SeekerComponent } from 'src/app/components/seeker/seeker.component';
 import { RouterModule, Routes } from '@angular/router';
 import { PipesModule } from 'src/app/pipes/pipes.module';
+import { StreamService } from './services/stream.service';
+import { StreamQueueService } from './services/queue.service';
 
 const routes: Routes = []
 
@@ -22,6 +24,10 @@ const routes: Routes = []
   ],
   exports: [
     StreamPlayerBarComponent
+  ],
+  providers: [
+    StreamService,
+    StreamQueueService
   ]
 })
 export class StreamModule { }

@@ -1,12 +1,11 @@
-import { Overlay, OverlayRef } from '@angular/cdk/overlay';
-import { TemplatePortal } from '@angular/cdk/portal';
+import { Overlay } from '@angular/cdk/overlay';
 import { Component, Input, OnInit, TemplateRef, ViewChild, ViewContainerRef } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { combineLatest, filter, fromEvent, map, Observable, Subscription, take } from 'rxjs';
+import { combineLatest, map } from 'rxjs';
 import { ChoosePlaylistComponent } from 'src/app/features/playlist/dialogs/choose-playlist/choose-playlist.component';
 import { Playlist } from 'src/app/features/playlist/entities/playlist.entity';
 import { PlaylistService } from 'src/app/features/playlist/services/playlist.service';
-import { StreamService } from 'src/app/features/stream/services/stream.service';
+import { AudioService } from 'src/app/features/stream/services/audio.service';
 import { ContextMenuService } from 'src/app/services/context-menu.service';
 import { environment } from 'src/environments/environment';
 import { Song } from '../../../features/song/entities/song.entity';
@@ -31,7 +30,7 @@ export class SongGridItemComponent implements OnInit {
     public isPlayerPaused: boolean = true;
     
     constructor(
-        private streamService: StreamService,
+        private audioService: AudioService,
         public overlay: Overlay,
         public viewContainerRef: ViewContainerRef,
         private contextMenuService: ContextMenuService,
@@ -39,12 +38,12 @@ export class SongGridItemComponent implements OnInit {
         private playlistService: PlaylistService
     ) {
         combineLatest([
-            this.streamService.$currentSong,
-            this.streamService.$player
-        ]).pipe(map(([song, status]) => ({ song, status }))).subscribe((state) => {
-            this.isActive = state.song && state.song?.id == this.song?.id && !state.status.paused;
+            this.audioService.$currentSong,
+            this.audioService.$paused
+        ]).pipe(map(([song, paused]) => ({ song, paused }))).subscribe((state) => {
+            this.isActive = state.song && state.song?.id == this.song?.id && !state.paused;
             this.isPlaying = state.song && state.song?.id == this.song?.id;
-            this.isPlayerPaused = state.status.paused
+            this.isPlayerPaused = state.paused
         })
     }
 
@@ -63,13 +62,13 @@ export class SongGridItemComponent implements OnInit {
         this.contextMenuService.close();
 
         if(this.isPlaying) {
-            if(this.streamService.isPaused()) {
-                this.streamService.play();
+            if(this.isPlayerPaused) {
+                this.audioService.play();
             } else {
-                this.streamService.pause();
+                this.audioService.pause();
             }
         } else {
-            this.streamService.forcePlay(this.song);
+            this.audioService.play(this.song);
         }
         
     }

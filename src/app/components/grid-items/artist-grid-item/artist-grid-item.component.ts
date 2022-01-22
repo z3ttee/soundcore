@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { map, Observable } from 'rxjs';
-import { StreamService } from 'src/app/features/stream/services/stream.service';
+import { AudioService } from 'src/app/features/stream/services/audio.service';
 import { Artist } from 'src/app/model/artist.model';
 import { environment } from 'src/environments/environment';
 
@@ -18,8 +18,8 @@ export class ArtistGridItemComponent implements OnInit {
   public accentColor: string = "";
   public $isPlaying: Observable<boolean>;
 
-  constructor(private streamService: StreamService) {
-    this.$isPlaying = this.streamService.$currentSong.pipe(map((song) => !!song?.artists.find((artist) => artist.id == this.artist.id)));
+  constructor(private audioService: AudioService) {
+    this.$isPlaying = this.audioService.$currentSong.pipe(map((song) => !!song?.artists.find((artist) => artist.id == this.artist.id)));
   }
 
   public async ngOnInit() {
@@ -33,7 +33,7 @@ export class ArtistGridItemComponent implements OnInit {
 
   public async playOrPause() {
     if(!this.playable) return;
-    this.streamService.playArtist(this.artist);
+    // TODO: this.audioService.playArtist(this.artist);
   }
 
 }

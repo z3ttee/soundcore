@@ -1,22 +1,14 @@
 import { Injectable } from "@angular/core";
-import { BehaviorSubject, Observable } from "rxjs";
-import { Album } from "src/app/model/album.model";
-import { Artist } from "src/app/model/artist.model";
 import { AuthenticationService } from "src/app/sso/authentication.service";
 import { environment } from "src/environments/environment";
 import { Song } from "../../song/entities/song.entity";
-import { StreamStatus } from "../entities/stream-player.entity";
-import { AudioService } from "./audio.service";
-import { StreamQueueService } from "./queue.service";
 
-@Injectable({
-    providedIn: 'root'
-})
+@Injectable()
 export class StreamService {
 
     // TODO: Handle audio errors
     
-    private _currentSongSubject: BehaviorSubject<Song> = new BehaviorSubject(null)
+    /*private _currentSongSubject: BehaviorSubject<Song> = new BehaviorSubject(null)
     private _pauseEventSubject: BehaviorSubject<boolean> = new BehaviorSubject(true);
     private _statusSubject: BehaviorSubject<StreamStatus> = new BehaviorSubject({} as StreamStatus);
 
@@ -24,11 +16,9 @@ export class StreamService {
     public $pauseEvent: Observable<boolean> = this._pauseEventSubject.asObservable();
     public $player: Observable<StreamStatus> = this._statusSubject.asObservable();
 
-    private audio = new Audio();
+    private audio = new Audio();*/
 
     constructor(
-        private queueService: StreamQueueService,
-        private audioService: AudioService,
         private authService: AuthenticationService
     ) {}
 
@@ -37,63 +27,63 @@ export class StreamService {
         return `${environment.api_base_uri}/v1/streams/songs/${song.id}?accessToken=${this.authService.getAccessToken()}`;
     }
 
-    public async forcePlay(song: Song) {
+    /*public async forcePlay(song: Song) {
         console.log("[STREAM] Force play: " + song.title)
         this.audioService.forcePlay(song)
-    }
+    }*/
 
     /**
      * Play the audio stream.
      * This emits false on the $paused observable.
      */
-    public async play(): Promise<void> {
+    /*public async play(): Promise<void> {
         this._pauseEventSubject.next(false)
-    }
+    }*/
 
     /**
      * Pause the audio stream.
      * This emits true on the $paused observable.
      */
-     public async pause(): Promise<void> {
+    /*public async pause(): Promise<void> {
         this._pauseEventSubject.next(true)
-    }
+    }*/
 
     /**
      * Play selected song.
      * @param song Selected song
      */
-    public async playSong(song: Song): Promise<void> {
+    /*public async playSong(song: Song): Promise<void> {
         // this.audio.src = await this.getStreamURL(song);
         // this.audio.play()
         // this._currentSongSubject.next(song)
-    }
+    }*/
 
     /**
      * Play selected artist by creating a background queue containing the most popular songs of the artist.
      * @param artist Selected artist
      */
-    public async playArtist(artist: Artist): Promise<void> {
+    /*public async playArtist(artist: Artist): Promise<void> {
         console.log("TODO: Play artist: " + artist.name)
-    }
+    }*/
 
     /**
      * Play selected album by creating a background queue containing all songs of the album.
      * @param album Selected album
      */
-    public async playAlbum(album: Album): Promise<void> {
+    /*public async playAlbum(album: Album): Promise<void> {
         console.log("TODO: Play album: " + album.title)
-    }
+    }*/
 
     /**
      * Check if the audio player is paused.
      * @returns True or False
      */
-    public isPaused(): boolean {
+    /*public isPaused(): boolean {
         return this._statusSubject.getValue()?.paused;
     }
 
     public async setStatus(streamStatus: StreamStatus): Promise<void> {
         this._statusSubject.next(streamStatus);
-    }
+    }*/
 
 }

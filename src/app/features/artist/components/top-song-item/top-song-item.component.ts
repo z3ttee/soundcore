@@ -1,7 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { combineLatest, map } from 'rxjs';
 import { Song } from 'src/app/features/song/entities/song.entity';
-import { StreamService } from 'src/app/features/stream/services/stream.service';
+import { AudioService } from 'src/app/features/stream/services/audio.service';
 import { Artist } from 'src/app/model/artist.model';
 import { environment } from 'src/environments/environment';
 
@@ -27,16 +27,15 @@ export class TopSongItemComponent implements OnInit {
     public artists: Artist[] = [];
     
     constructor(
-        private streamService: StreamService,
+        private audioService: AudioService,
     ) {
-      
         combineLatest([
-            this.streamService.$currentSong,
-            this.streamService.$player
-        ]).pipe(map(([song, status]) => ({ song, status }))).subscribe((state) => {
-            this.isActive = state.song && state.song?.id == this.song?.id && !state.status.paused;
+            this.audioService.$currentSong,
+            this.audioService.$paused
+        ]).pipe(map(([song, paused]) => ({ song, paused }))).subscribe((state) => {
+            this.isActive = state.song && state.song?.id == this.song?.id && !state.paused;
             this.isPlaying = state.song && state.song?.id == this.song?.id;
-            this.isPlayerPaused = state.status.paused
+            this.isPlayerPaused = state.paused
         })
     }
 
@@ -55,15 +54,14 @@ export class TopSongItemComponent implements OnInit {
         if(!this.playable) return;
 
         if(this.isPlaying) {
-            if(this.streamService.isPaused()) {
-                this.streamService.play();
+            if(this.isPlayerPaused) {
+                this.audioService.play();
             } else {
-                this.streamService.pause();
+                this.audioService.pause();
             }
         } else {
-            this.streamService.playSong(this.song);
+            this.audioService.play(this.song);
         }
-        
     }
 
 }
