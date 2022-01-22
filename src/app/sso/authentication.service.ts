@@ -205,7 +205,7 @@ export class AuthenticationService {
   }
 
   public async findUserById(userId: string): Promise<User> {
-    return firstValueFrom(this.httpClient.get(`${environment.api_base_uri}/v1/authentication/users/${userId}`))
+    return firstValueFrom(this.httpClient.get(`${environment.api_base_uri}/v1/users/${userId}`))
       .then((response) => response as User)
       .catch(() => null)
   }
