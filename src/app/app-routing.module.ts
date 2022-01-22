@@ -2,7 +2,6 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { MainLayoutComponent } from './layout/main-layout/main-layout.component';
 import { AuthenticationCanActivateGuard } from './sso/guards/can-activate.guard';
-import { AuthorizeViewComponent } from './views/authorize-view/authorize-view.component';
 import { IndexViewComponent } from './views/index-view/index-view.component';
 
 const routes: Routes = [
@@ -26,8 +25,7 @@ const routes: Routes = [
     { path: "collection", canActivate: [AuthenticationCanActivateGuard], component: IndexViewComponent },
   ]},
 
-  { path: "authorize", canActivate: [AuthenticationCanActivateGuard], component: AuthorizeViewComponent },
-
+  { path: "**", canActivate: [AuthenticationCanActivateGuard], component: IndexViewComponent },
 ];
 
 @NgModule({

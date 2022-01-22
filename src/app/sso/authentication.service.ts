@@ -217,7 +217,11 @@ export class AuthenticationService {
    */
   public async findAndUpdateCurrentUser(): Promise<User> {
     return this.findCurrentUser().then((user) => {
-      if(user) this.updateUser(user);
+      if(this.getSession().type != SSOSessionType.SESSION_ANONYMOUS) {
+        if(user) this.updateUser(user);
+      } else {
+        this.updateUser(user)
+      }
       return user;
     }).catch((error) => {
       console.warn("[SSO] Could not fetch user data: ", error);

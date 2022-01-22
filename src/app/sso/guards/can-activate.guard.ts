@@ -53,10 +53,7 @@ export class AuthenticationCanActivateGuard implements CanActivate {
                                     this.router.navigate(["/"], { replaceUrl: true })
 
                                     // Persist user data, if finding the data was successful
-                                    this.authService.findAndUpdateCurrentUser().then(() => {
-                                        
-                                    })
-
+                                    this.authService.findAndUpdateCurrentUser()
                                     return
                                 });
 
