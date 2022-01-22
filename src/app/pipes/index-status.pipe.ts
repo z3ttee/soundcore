@@ -1,12 +1,13 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { IndexStatus } from '../enums/index-status.enum';
+import { ImportStatus } from '../features/import/entities/import.entity';
+import { IndexStatus } from '../features/upload/enums/index-status.enum';
 
 @Pipe({
-  name: 'statusPipe'
+  name: 'indexStatusPipe'
 })
-export class StatusPipePipe implements PipeTransform {
+export class IndexStatusPipe implements PipeTransform {
 
-  public transform(value: IndexStatus): string {
+  public transform(value: string | IndexStatus | ImportStatus): string {
     switch(value) {
       case IndexStatus.OK:
         return "Abgeschlossen";
@@ -22,6 +23,8 @@ export class StatusPipePipe implements PipeTransform {
         return "Abgebrochen";
       case IndexStatus.DUPLICATE:
         return "Duplikat";
+      case "downloading" as ImportStatus:
+        return "Wird heruntergeladen";
       default:
         return value;
     }

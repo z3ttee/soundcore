@@ -2,9 +2,9 @@ import { Pipe, PipeTransform } from '@angular/core';
 import { SearchBestMatchType } from '../features/search/entities/best-match.entity';
 
 @Pipe({
-  name: 'bestMatchTypePipe'
+  name: 'resourceTypePipe'
 })
-export class BestMatchTypePipe implements PipeTransform {
+export class ResourceTypePipe implements PipeTransform {
 
   transform(value: SearchBestMatchType): string {
     if(value == "album") return "Album";
@@ -14,6 +14,8 @@ export class BestMatchTypePipe implements PipeTransform {
     if(value == "distributor" || value == "publisher") return "Herausgeber";
     if(value == "label") return "Label";
     if(value == "genre") return "Genre";
+    if(value == "user") return "Nutzerprofil";
+
 
     return value;
   }

@@ -13,10 +13,7 @@
             <h2 class="line-clamp-1">{{ playlist?.title }}</h2>
 
             <ul class="flex items-center pt-2">
-                <li class="inline-flex items-center p-1 transition-all hover:bg-background-light rounded-full cursor-pointer active:bg-background-dark">
-                    <img class="w-6 aspect-square rounded-full" [src]="author?.avatarUrl || '/assets/img/missing_cover.png'">
-                    <p class="text-xs px-2">{{ author?.username }}</p>
-                </li>
+                <asc-profile-badge [user]="playlist?.author"></asc-profile-badge>
                 <li class="inline text-xs opacity-70 ml-4">{{ playlist?.songsCount }} {{ playlist?.songsCount != 1 ? "Songs" : "Song" }}</li>
                 <li class="inline text-xs opacity-70 ml-2">{{ playlist?.totalDuration | totalDurationPipe }}</li>
             </ul>

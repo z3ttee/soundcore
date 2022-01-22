@@ -17,7 +17,7 @@
     </div>
 
     <div *ngIf="($currentResult | async)?.bestMatch" class="mb-4 px-4">
-      <h5 class="pb-2">Top-Ergebnis</h5>
+      <h5 class="pb-2 px-2">Top-Ergebnis</h5>
       <asc-best-match [item]="($currentResult | async)?.bestMatch"></asc-best-match>
     </div>
 
@@ -64,6 +64,12 @@
           type="label"></asc-label-grid-item>
         <asc-label-grid-item *ngFor="let distributor of ($currentResult | async)?.distributors?.elements || []"
           [label]="distributor" type="distributor"></asc-label-grid-item>
+      </asc-horizontal-grid>
+    </div>
+
+    <div *ngIf="($currentResult | async)?.users" class="my-4">
+      <asc-horizontal-grid headline="Nutzerprofile">
+        <asc-user-grid-item *ngFor="let user of ($currentResult | async)?.users?.elements" [user]="user"></asc-user-grid-item>
       </asc-horizontal-grid>
     </div>
 </section>

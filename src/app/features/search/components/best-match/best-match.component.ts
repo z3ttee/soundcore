@@ -1,6 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { Playlist } from 'src/app/features/playlist/entities/playlist.entity';
 import { Song } from 'src/app/features/song/entities/song.entity';
+import { User } from 'src/app/features/user/entities/user.entity';
 import { Album } from 'src/app/model/album.model';
 import { Artist } from 'src/app/model/artist.model';
 import { environment } from 'src/environments/environment';
@@ -47,7 +48,7 @@ export class BestMatchComponent implements OnInit {
       this.coverSrc = `${environment.api_base_uri}/v1/artworks/${this.item.match["artwork"].id}`;
       this.accentColor = this.item.match["artwork"].accentColor || "#000000";
     } else {
-        this.coverSrc = null
+      this.coverSrc = "/assets/img/missing_cover.png"
     }
 
     if(this.item.type == "song" || this.item.type == "album" ||this.item.type == "playlist") {
@@ -62,6 +63,17 @@ export class BestMatchComponent implements OnInit {
 
     if(this.item.type == "song") {
       this.isExplicit = (this.item.match as Song).explicit
+    }
+
+    if(this.item.type == "user") {
+      const user = (this.item.match as User);
+      this.title = user.username
+
+      if(user.avatarResourceId) {
+        this.coverSrc = `${environment.sso_base_uri}/media/avatars/${(this.item.match as User).avatarResourceId}`;
+      } else {
+        this.coverSrc = "/assets/img/missing_cover.png"
+      }
     }
   }
 

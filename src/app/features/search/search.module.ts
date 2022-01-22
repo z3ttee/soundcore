@@ -14,6 +14,8 @@ import { HorizontalGridComponent } from 'src/app/components/grids/horizontal-gri
 import { LabelGridItemComponent } from 'src/app/components/grid-items/label-grid-item/label-grid-item.component';
 import { BestMatchComponent } from './components/best-match/best-match.component';
 import { PipesModule } from 'src/app/pipes/pipes.module';
+import { SearchService } from './services/search.service';
+import { UserGridItemComponent } from 'src/app/components/grid-items/user-grid-item/user-grid-item.component';
 
 const routes: Routes = [
   { path: "", component: SearchIndexComponent }
@@ -29,6 +31,7 @@ const routes: Routes = [
     AlbumGridItemComponent,
     HorizontalGridComponent,
     LabelGridItemComponent,
+    UserGridItemComponent,
     BestMatchComponent
   ],
   imports: [
@@ -42,6 +45,9 @@ const routes: Routes = [
     PipesModule,
 
     MatProgressBarModule
+  ],
+  providers: [
+    SearchService
   ]
 })
 export class SearchModule { }

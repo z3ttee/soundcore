@@ -1,5 +1,5 @@
 import { Injectable } from "@angular/core";
-import { BehaviorSubject, Observable } from "rxjs";
+import { BehaviorSubject, Observable, Subject } from "rxjs";
 import { io, Socket } from "socket.io-client";
 import { AuthenticationService } from "src/app/services/authentication.service";
 import { environment } from "src/environments/environment";
@@ -17,7 +17,10 @@ export class IndexStatusService {
     private _socket: Socket;
 
     private _socketConnectedSubject: BehaviorSubject<SocketStatus> = new BehaviorSubject(SocketStatus.CONNECTING);
+    private _onUpdateSubject: Subject<Index> = new Subject();
+
     public $socketConnected: Observable<SocketStatus> = this._socketConnectedSubject.asObservable();
+    public $onIndexUpdate: Observable<Index> = this._onUpdateSubject.asObservable();
 
     constructor(
         private authService: AuthenticationService,
@@ -53,6 +56,7 @@ export class IndexStatusService {
 
     private async handleIndexUpdateEvent(data: Index) {
         this.uploadService.updateIndex(data)
+        this._onUpdateSubject.next(data);
     }
 
     private async handleDisconnectEvent() {

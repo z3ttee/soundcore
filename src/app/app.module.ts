@@ -25,7 +25,6 @@ import { DeviceService } from './services/device.service';
 import { AccessTokenInterceptor } from './interceptors/access-token.interceptor';
 import {MatProgressBarModule} from '@angular/material/progress-bar';
 
-
 import { TeleportModule } from '@ngneat/overview';
 import { MainLayoutComponent } from './layout/main-layout/main-layout.component';
 import { PlaylistModule } from './features/playlist/playlist.module';
