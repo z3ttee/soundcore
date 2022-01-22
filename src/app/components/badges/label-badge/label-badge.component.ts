@@ -2,8 +2,8 @@ import { Component, OnInit } from '@angular/core';
 
 @Component({
   selector: 'asc-label',
-  templateUrl: './label.component.html',
-  styleUrls: ['./label.component.scss']
+  templateUrl: './label-badge.component.html',
+  styleUrls: ['./label-badge.component.scss']
 })
 export class LabelComponent implements OnInit {
 
