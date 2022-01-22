@@ -1,7 +1,8 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { BehaviorSubject, debounce, debounceTime, filter, Observable, of } from 'rxjs';
+import { ActivatedRoute, Router } from '@angular/router';
+import { BehaviorSubject, debounceTime, map, Observable, of, take } from 'rxjs';
 import { ComplexSearchResult } from '../../entities/search-result.model';
 import { SearchService } from '../../services/search.service';
 
@@ -22,14 +23,34 @@ export class SearchIndexComponent implements OnInit {
   public isSearching: boolean = false;
   public hasSearched: boolean = false;
 
-  constructor(private searchService: SearchService) {}
+  constructor(
+    private router: Router,
+    private activatedRoute: ActivatedRoute,
+    private searchService: SearchService,
+  ) {}
 
   ngOnInit(): void {
-    this.performComplexSearch("");
-    
-    this.searchInputControl.valueChanges.pipe(debounceTime(200)).subscribe((query) => {
-      this.hasSearched = true;
-      this.performComplexSearch(query);
+    this.activatedRoute.queryParamMap.pipe(take(1), map((query) => query.get("q"))).subscribe((query) => {
+      if(query) {
+        this.searchInputControl.setValue(query);
+        this.hasSearched = true;
+        this.performComplexSearch(query);
+      } else {
+        this.performComplexSearch("");
+      }
+
+      this.searchInputControl.valueChanges.pipe(debounceTime(200)).subscribe((input) => {
+        const queryParams = input && input != "" ? { q: input } : {};
+  
+        this.router.navigate([], {
+          replaceUrl: true,
+          relativeTo: this.activatedRoute,
+          queryParams
+        })
+        
+        this.hasSearched = true;
+        this.performComplexSearch(input);
+      })
     })
   }
 
