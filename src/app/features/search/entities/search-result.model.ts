@@ -8,6 +8,7 @@ import { Publisher } from "src/app/model/publisher.model";
 import { Genre } from "src/app/model/genre.entity";
 import { Playlist } from "../../playlist/entities/playlist.entity";
 import { SearchBestMatch } from "./best-match.entity";
+import { User } from "../../user/entities/user.entity";
 
 export class ComplexSearchResult {
 
@@ -22,6 +23,7 @@ export class ComplexSearchResult {
     public distributors: Page<Distributor>;
     public labels: Page<Label>;
     public publisher: Page<Publisher>;
+    public users: Page<User>;
 
     public bestMatch?: SearchBestMatch;
     

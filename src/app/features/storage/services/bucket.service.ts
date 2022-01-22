@@ -10,7 +10,7 @@ export class BucketService {
 
     constructor(private httpClient: HttpClient) {}
 
-    public async findAllBuckets(pageable: Pageable): Promise<Page<StorageBucket>> {
+    public async findAllBuckets(pageable?: Pageable): Promise<Page<StorageBucket>> {
         return firstValueFrom(this.httpClient.get(`${environment.api_base_uri}/v1/buckets${Pageable.toQuery(pageable)}`)) as Promise<Page<StorageBucket>>
     }
 

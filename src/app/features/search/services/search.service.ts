@@ -4,9 +4,7 @@ import { firstValueFrom } from 'rxjs';
 import { ComplexSearchResult } from 'src/app/features/search/entities/search-result.model';
 import { environment } from 'src/environments/environment';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable()
 export class SearchService {
 
   constructor(private httpClient: HttpClient) { }

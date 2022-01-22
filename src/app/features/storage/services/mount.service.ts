@@ -12,7 +12,7 @@ export class MountService {
 
     constructor(private httpClient: HttpClient) {}
 
-    public async findMountsByBucketId(bucketId: string, pageable: Pageable): Promise<Page<StorageMount>> {
+    public async findMountsByBucketId(bucketId: string, pageable?: Pageable): Promise<Page<StorageMount>> {
         if(!bucketId) return Page.of([]);
         return firstValueFrom(this.httpClient.get(`${environment.api_base_uri}/v1/mounts/byBucket/${bucketId}${Pageable.toQuery(pageable)}`)) as Promise<Page<StorageMount>>
     }
