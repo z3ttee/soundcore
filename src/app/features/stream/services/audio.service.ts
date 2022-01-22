@@ -1,5 +1,5 @@
 import { Injectable } from "@angular/core";
-import { BehaviorSubject, Observable } from "rxjs";
+import { BehaviorSubject, firstValueFrom, Observable } from "rxjs";
 import { AuthenticationService } from "src/app/sso/authentication.service";
 import { environment } from "src/environments/environment";
 import { Song } from "../../song/entities/song.entity";
@@ -40,7 +40,11 @@ export class AudioService {
 
         this.audio.onplay = () => this.onPlayerResumed();
         this.audio.onpause = () => this.onPlayerPaused();
-
+        this.audio.ontimeupdate = () => this.onTimeUpdated();
+        this.audio.onload = () => this.onLoadStart();
+        this.audio.onwaiting = () => this.onLoadStart();
+        this.audio.oncanplay = () => this.onLoadEnd();
+        this.audio.onloadeddata = () => this.onLoadEnd();
     }
 
     /**
@@ -50,10 +54,16 @@ export class AudioService {
     public async play(song?: Song) {
         if(song) {
             this.audio.src = await this.streamService.getStreamURL(song);
+            this._currentSongSubject.next(song);
         }
-
-        this._pausedSubject.next(false);
+        
         this.audio.play();
+    }
+
+    public async togglePause() {
+        const isPaused = this._pausedSubject.getValue();
+        if(isPaused) this.play();
+        else this.pause();
     }
 
     /**
@@ -80,12 +90,12 @@ export class AudioService {
 
     }
 
-    public setCurrentTime() {
-        // TODO
+    public setCurrentTime(currentTime: number) {
+        this.audio.currentTime = currentTime;
     }
 
-    public setVolume() {
-        // TODO:
+    public setVolume(volume: number) {
+        this.audio.volume = volume;
     }
 
 
@@ -97,14 +107,22 @@ export class AudioService {
 
 
 
-
+    private onLoadStart() {
+        this._loadingSubject.next(true)
+    }
+    private onLoadEnd() {
+        this._loadingSubject.next(false)
+    }
     private onPlayerPaused() {
+        console.log("on pause")
         this._pausedSubject.next(true);
     }
     private onPlayerResumed() {
+        console.log("on play")
         this._pausedSubject.next(false);
     }
     private onTimeUpdated() {
+        console.log("on time update")
         this._currentTimeSubject.next(this.audio.currentTime);
     }
 

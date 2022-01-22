@@ -1,9 +1,7 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { Observable, tap } from 'rxjs';
-import { Song } from 'src/app/features/song/entities/song.entity';
+import { Component, OnInit } from '@angular/core';
+import { map, Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { AudioService } from '../../services/audio.service';
-import { StreamService } from '../../services/stream.service';
 
 @Component({
   selector: 'asc-stream-player-bar',
@@ -12,10 +10,23 @@ import { StreamService } from '../../services/stream.service';
 })
 export class StreamPlayerBarComponent implements OnInit {
 
-  public currentSong: Song;
+  public $artworkUrl: Observable<string> = this.audioService.$currentSong.pipe(
+    map((song) => {
+      if(song.artwork) {
+        return `${environment.api_base_uri}/v1/artworks/${song.artwork.id}`;
+      }
+      return "/assets/img/missing_cover.png"
+    })
+  )
 
-  public $currentSong: Observable<Song> = this.audioService.$currentSong;
-  public $paused: Observable<boolean> = this.audioService.$paused;
+  public $accentColor: Observable<string> = this.audioService.$currentSong.pipe(
+    map((song) => {
+      if(song.artwork) {
+        return song.artwork.accentColor;
+      }
+      return "#000000";
+    })
+  )
 
   public currentSrc: string = "";
   public currentSeekValue: number = 0;
@@ -28,43 +39,14 @@ export class StreamPlayerBarComponent implements OnInit {
   public accentColor: string = "";
 
   constructor(
-    private audioService: AudioService
-  ) {
-    this.audioService.$currentSong.subscribe((song) => {
-      
-      /*// Check if same song is selected again, prevent further
-      // processing.
-      if(song && this.currentSong?.id == song.id) return;
-
-      // Reset the player's values
-      this.currentSong = song;
-      this.currentTime = 0;
-      this.currentSeekValue = 0;
-
-      if(!song) {
-        // Clear audio src if no song was selected or song is null in general
-        this.currentSrc = ""
-        return
-      }
-      
-      // Set audio src url
-      this.currentSrc = `${environment.api_base_uri}/v1/streams/songs/${song.id}`;
-
-      if(song.artwork) {
-        // Set artwork url and accentColor if an artwork exists on song
-        this.coverSrc = `${environment.api_base_uri}/v1/artworks/${song.artwork.id}`;
-        this.accentColor = song.artwork.accentColor || "#000000";
-      } else {
-        // Set default artwork image
-        this.coverSrc = "/assets/img/missing_cover.png"
-      }*/
-    });
-  }
+    public audioService: AudioService
+  ) {}
 
   public ngOnInit(): void {}
 
   public async onSeeking(data) {
     console.log(data)
+    this.audioService.setCurrentTime(data)
   }
 
 }
