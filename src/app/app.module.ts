@@ -30,8 +30,6 @@ import { MainLayoutComponent } from './layout/main-layout/main-layout.component'
 import { PlaylistModule } from './features/playlist/playlist.module';
 import { InfiniteScrollListComponent } from './components/lists/infinite-scroll-list/infinite-scroll-list.component';
 import { StreamModule } from './features/stream/stream.module';
-import { AuthModule } from '@auth0/auth0-angular';
-import { environment } from 'src/environments/environment';
 
 // TODO: https://angular.io/guide/i18n-common-prepare
 
@@ -68,12 +66,7 @@ import { environment } from 'src/environments/environment';
     MatListModule,
     MatDividerModule,
     MatProgressBarModule,
-    MatButtonModule,
-
-    AuthModule.forRoot({
-      domain: environment.auth0_domain,
-      clientId: environment.auth0_client_id
-    })
+    MatButtonModule
   ],
   providers: [
     DeviceService,
