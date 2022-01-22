@@ -1,4 +1,4 @@
-import { SSORole } from "./sso-role.model";
+import { SSORole } from "./sso-role.entity";
 
 export class SSOUser {
     public id: string;

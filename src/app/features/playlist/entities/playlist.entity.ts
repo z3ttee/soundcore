@@ -1,6 +1,6 @@
 import { Artwork } from "src/app/model/artwork.model";
-import { SSOUser } from "src/app/model/sso-user.model";
 import { Song } from "../../song/entities/song.entity";
+import { User } from "../../user/entities/user.entity";
 import { PlaylistPrivacy } from "../types/playlist-privacy.types";
 
 export class Playlist {
@@ -10,10 +10,10 @@ export class Playlist {
     public description?: string;
     public privacy?: PlaylistPrivacy;
     public collaborative: boolean;
-    public author?: SSOUser;
+    public author?: User;
 
     public artwork?: Artwork;
-    public collaborators?: SSOUser[];
+    public collaborators?: User[];
     public songs?: Song[];
 
     public songsCount?: number = 0;

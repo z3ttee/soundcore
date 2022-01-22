@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { AuthenticationCanActivateGuard } from './guards/can-activate.guard';
 import { MainLayoutComponent } from './layout/main-layout/main-layout.component';
+import { AuthenticationCanActivateGuard } from './sso/guards/can-activate.guard';
 import { AuthorizeViewComponent } from './views/authorize-view/authorize-view.component';
 import { IndexViewComponent } from './views/index-view/index-view.component';
 

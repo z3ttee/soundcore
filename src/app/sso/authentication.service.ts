@@ -5,10 +5,10 @@ import { BehaviorSubject, combineLatest, firstValueFrom, map, Observable, skip }
 import CookieApi from "js-cookie"
 import { SESSION_COOKIE_NAME, USER_LOCALSTORAGE } from '../constants';
 import { environment } from 'src/environments/environment';
-import { SSOSession, SSOSessionType } from '../model/session.model';
+import { SSOSession, SSOSessionType } from './entities/sso-session.entity';
 import { SSOCreateAuthorizationDTO } from '../dto/create-authorization.dto';
-import { SSOAccessToken } from '../model/sso-access-token.entity';
-import { SSOUser } from '../model/sso-user.model';
+import { SSOAccessToken } from './entities/sso-access-token.entity';
+import { User } from '../features/user/entities/user.entity';
 
 export interface SSOConfig {
 
@@ -22,14 +22,14 @@ export class AuthenticationService {
   // TODO: Make sure user never gets null
 
   private readonly _sessionSubject = new BehaviorSubject(SSOSession.anonymous());
-  private readonly _userSubject = new BehaviorSubject(SSOUser.anonymous());
+  private readonly _userSubject = new BehaviorSubject(User.anonymous());
   private readonly _readySubject = new BehaviorSubject(false);
 
   /**
    * Session observable to provide session changes to other services
    */
   public readonly $session: Observable<SSOSession> = this._sessionSubject.asObservable();
-  public readonly $user: Observable<SSOUser> = this._userSubject.asObservable();
+  public readonly $user: Observable<User> = this._userSubject.asObservable();
 
   /**
    * Ready observable. This provides info on the progress of authentication.
@@ -95,9 +95,9 @@ export class AuthenticationService {
 
   /**
    * Get snapshot of the current user.
-   * @returns SSOUser
+   * @returns User
    */
-   public getUser(): SSOUser {
+   public getUser(): User {
     return this._userSubject.getValue();
   }
 
@@ -125,11 +125,11 @@ export class AuthenticationService {
   /**
    * Restore user data from localStorage.
    */
-  private async restoreUser(): Promise<SSOUser> {
+  private async restoreUser(): Promise<User> {
     console.log("[SSO] Checking local user data.")
 
     const session = this.getSession();
-    const data: SSOUser = JSON.parse(localStorage.getItem(USER_LOCALSTORAGE)) || SSOUser.anonymous();
+    const data: User = JSON.parse(localStorage.getItem(USER_LOCALSTORAGE)) || User.anonymous();
 
     if(session.type == SSOSessionType.SESSION_ANONYMOUS) {
       console.warn("[SSO] No user data found or session anonymous. Switching to anonymous user instance.")
@@ -182,7 +182,7 @@ export class AuthenticationService {
    * Update user data. This pushes update to observables and persists data in localStorage.
    * @param user User data to update
    */
-  public async updateUser(user: SSOUser) {
+  public async updateUser(user: User) {
     this._userSubject.next(user);
     this.persistUser(user);
   }
@@ -191,31 +191,31 @@ export class AuthenticationService {
    * Write user data to localStorage.
    * @param user Data to persist
    */
-  private async persistUser(user: SSOUser) {
+  private async persistUser(user: User) {
     if(!user || user.isAnonymous) localStorage.removeItem(USER_LOCALSTORAGE);
     else localStorage.setItem(USER_LOCALSTORAGE, JSON.stringify(user))
   }
 
   /**
    * Find currently logged in users data by providing the request with the currently available accessToken of the session.
-   * @returns SSOUser
+   * @returns User
    */
-  public async findCurrentUser(): Promise<SSOUser> {
+  public async findCurrentUser(): Promise<User> {
     return this.findUserById("@me");
   }
 
-  public async findUserById(userId: string): Promise<SSOUser> {
+  public async findUserById(userId: string): Promise<User> {
     return firstValueFrom(this.httpClient.get(`${environment.api_base_uri}/v1/authentication/users/${userId}`))
-      .then((response) => response as SSOUser)
+      .then((response) => response as User)
       .catch(() => null)
   }
 
   /**
    * Find currently logged in users data by providing the request with the currently available accessToken of the session.
    * If it was successful, then the fetched data is pushed and persisted to localStorage.
-   * @returns SSOUser
+   * @returns User
    */
-  public async findAndUpdateCurrentUser(): Promise<SSOUser> {
+  public async findAndUpdateCurrentUser(): Promise<User> {
     return this.findCurrentUser().then((user) => {
       if(user) this.updateUser(user);
       return user;
@@ -231,7 +231,7 @@ export class AuthenticationService {
    */
   public async logout(): Promise<void> {
     console.warn("[SSO] Loggin out user.")
-    await this.updateUser(SSOUser.anonymous());
+    await this.updateUser(User.anonymous());
     await this.updateSession(SSOSession.anonymous())
   }
 
@@ -241,7 +241,7 @@ export class AuthenticationService {
    */
   private async logoutWithoutUpdate(): Promise<void> {
     console.warn("[SSO] Loggin out user without active update.")
-    await this.persistUser(SSOUser.anonymous());
+    await this.persistUser(User.anonymous());
     await this.persistSession(SSOSession.anonymous())
   }
 

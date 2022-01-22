@@ -1,10 +1,9 @@
 import { Injectable } from "@angular/core";
 import { BehaviorSubject, Observable } from "rxjs";
-import { AuthenticationService } from "src/app/services/authentication.service";
+import { AuthenticationService } from "src/app/sso/authentication.service";
 import { environment } from "src/environments/environment";
 import { Song } from "../../song/entities/song.entity";
 import { StreamQueueService } from "./queue.service";
-import { StreamService } from "./stream.service";
 
 export class AudioInfo {
     public volume: number = 0;

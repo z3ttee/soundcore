@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { BehaviorSubject, Observable } from "rxjs";
 import { io, Socket } from "socket.io-client";
-import { AuthenticationService } from "src/app/services/authentication.service";
+import { AuthenticationService } from "src/app/sso/authentication.service";
 import { environment } from "src/environments/environment";
 import { Index } from "../entities/index.entity";
 import { SocketStatus } from "../enums/socket-status.enum";

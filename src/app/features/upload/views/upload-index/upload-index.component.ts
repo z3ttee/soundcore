@@ -1,7 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { combineLatest, filter, map, Observable } from 'rxjs';
-import { Socket } from 'socket.io-client';
-import { AuthenticationService } from 'src/app/services/authentication.service';
+import { combineLatest, map, Observable } from 'rxjs';
 import { Index } from '../../entities/index.entity';
 import { Upload } from '../../entities/upload.entity';
 import { IndexStatus } from '../../enums/index-status.enum';
@@ -24,12 +22,8 @@ export class UploadIndexComponent implements OnInit {
 
   constructor(
     public uploadService: UploadService,
-    public indexStatusService: IndexStatusService,
-    private authService: AuthenticationService
-  ) {
-    //this.$queue = this.uploadService.$queue;
-    //this.$indexQueue = this.uploadService.$indexQueue;
-  }
+    public indexStatusService: IndexStatusService
+  ) {}
 
   ngOnInit(): void {}
 

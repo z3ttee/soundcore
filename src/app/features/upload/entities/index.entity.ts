@@ -1,6 +1,6 @@
-import { SSOUser } from "src/app/model/sso-user.model";
 import { Song } from "../../song/entities/song.entity";
 import { StorageMount } from "../../storage/model/storage-mount.model";
+import { User } from "../../user/entities/user.entity";
 import { IndexStatus } from "../enums/index-status.enum";
 
 export class Index {
@@ -13,5 +13,5 @@ export class Index {
     
     public song?: Song;
     public mount?: StorageMount;
-    public uploader?: SSOUser;
+    public uploader?: User;
 }

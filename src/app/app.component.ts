@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { NavigationCancel, NavigationEnd, NavigationError, NavigationStart, Router } from '@angular/router';
 import { filter } from 'rxjs';
 import { SPLASH_SESSIONSTORAGE } from './constants';
-import { AuthenticationService } from './services/authentication.service';
+import { AuthenticationService } from './sso/authentication.service';
 
 @Component({
   selector: 'app-root',

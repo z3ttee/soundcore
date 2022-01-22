@@ -1,10 +1,10 @@
 import { HttpErrorResponse } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot, UrlTree } from "@angular/router";
-import { combineLatest, filter, map, Observable, tap, zip } from "rxjs";
+import { filter, map, Observable, tap, zip } from "rxjs";
 import { environment } from "src/environments/environment";
-import { SSOSession, SSOSessionType } from "../model/session.model";
-import { AuthenticationService } from "../services/authentication.service";
+import { AuthenticationService } from "../authentication.service";
+import { SSOSession, SSOSessionType } from "../entities/sso-session.entity";
 
 @Injectable({
     providedIn: "root"

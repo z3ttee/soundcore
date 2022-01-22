@@ -2,7 +2,7 @@ import { Injectable } from "@angular/core";
 import { BehaviorSubject, Observable } from "rxjs";
 import { Album } from "src/app/model/album.model";
 import { Artist } from "src/app/model/artist.model";
-import { AuthenticationService } from "src/app/services/authentication.service";
+import { AuthenticationService } from "src/app/sso/authentication.service";
 import { environment } from "src/environments/environment";
 import { Song } from "../../song/entities/song.entity";
 import { StreamStatus } from "../entities/stream-player.entity";

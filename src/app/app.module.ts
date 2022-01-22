@@ -22,7 +22,7 @@ import {MatListModule} from '@angular/material/list';
 import {MatDividerModule} from '@angular/material/divider';
 import { AppCommonModule } from './common.module';
 import { DeviceService } from './services/device.service';
-import { AccessTokenInterceptor } from './interceptors/access-token.interceptor';
+import { AccessTokenInterceptor } from './sso/interceptors/access-token.interceptor';
 import {MatProgressBarModule} from '@angular/material/progress-bar';
 
 

@@ -1,8 +1,7 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import { firstValueFrom, Observable } from "rxjs";
+import { firstValueFrom } from "rxjs";
 import { Page, Pageable } from "src/app/pagination/pagination";
-import { AuthenticationService } from "src/app/services/authentication.service";
 import { environment } from "src/environments/environment";
 import { CreateMountDTO } from "../dto/create-mount.dto";
 import { UpdateMountDTO } from "../dto/update-mount.dto";
@@ -11,7 +10,7 @@ import { StorageMount } from "../model/storage-mount.model";
 @Injectable()
 export class MountService {
 
-    constructor(private httpClient: HttpClient, private authService: AuthenticationService) {}
+    constructor(private httpClient: HttpClient) {}
 
     public async findMountsByBucketId(bucketId: string, pageable: Pageable): Promise<Page<StorageMount>> {
         if(!bucketId) return Page.of([]);
