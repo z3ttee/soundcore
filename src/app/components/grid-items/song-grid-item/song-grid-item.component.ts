@@ -91,4 +91,9 @@ export class SongGridItemComponent implements OnInit {
         })
     }
 
+    public async enqueue() {
+        this.audioService.enqueueSong(this.song)
+        this.contextMenuService.close();
+    }
+
 }

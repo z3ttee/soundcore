@@ -33,7 +33,7 @@
         <ul class="mb-4">
             <label class="px-4 text-xs">Abspielen</label>
             <li class="py-3 px-4 text-opacity-70 bg-opacity-95 hover:bg-background-light active:bg-primary transition-all rounded-md cursor-pointer text-sm" (click)="playOrPause()" *ngIf="!isPlaying">Jetzt abspielen</li>
-            <li class="py-3 px-4 text-opacity-70 bg-opacity-95 hover:bg-background-light active:bg-primary transition-all rounded-md cursor-pointer text-sm">Zur Warteschlange</li>
+            <li class="py-3 px-4 text-opacity-70 bg-opacity-95 hover:bg-background-light active:bg-primary transition-all rounded-md cursor-pointer text-sm" (click)="enqueue()">Zur Warteschlange</li>
         </ul>
     
         <ul class="my-4">

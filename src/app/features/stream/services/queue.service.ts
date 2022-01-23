@@ -1,10 +1,14 @@
 import { Injectable } from "@angular/core";
+import { BehaviorSubject, Observable } from "rxjs";
 import { Song } from "../../song/entities/song.entity";
 
 @Injectable()
 export class StreamQueueService {
 
-    private _queue: Song[];
+    private _sizeSubject: BehaviorSubject<number> = new BehaviorSubject(0);
+    private _queue: Song[] = [];
+
+    public $size: Observable<number> = this._sizeSubject.asObservable();
 
     public get size(): number {
         return this._queue.length;
@@ -17,7 +21,23 @@ export class StreamQueueService {
      */
     public dequeue(): Song {
         if(this.isEmpty()) return null;
-        return this._queue.splice(0, 1)[0];
+
+        const item = this._queue.splice(0, 1)[0];
+        this._sizeSubject.next(this.size);
+        return item;
+    }
+
+    /**
+     * Dequeue a random element from the queue
+     * @returns Song
+     */
+     public random(): Song {
+        if(this.isEmpty()) return null;
+        const index = Math.floor(Math.random() * this.size);
+
+        const item = this._queue.splice(index, 1)[0];
+        this._sizeSubject.next(this.size);
+        return item;
     }
 
     /**
@@ -27,6 +47,7 @@ export class StreamQueueService {
      */
     public enqueue(song: Song): void {
         this._queue.push(song);
+        this._sizeSubject.next(this.size);
     }
 
     /**

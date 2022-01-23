@@ -60,7 +60,9 @@ export class SeekerComponent implements OnInit {
     let progress = (val/max * 100 )
 
     // This is done so the track doesnt lag behind the thumb
-    if(progress <= 40) progress += 0.5;
+    if(progress != 0) {
+      if(progress <= 40) progress += 0.25;
+    }
     
     this.range.nativeElement.style.backgroundSize = progress + '% 100%';
   }

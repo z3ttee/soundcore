@@ -2,29 +2,41 @@
     <asc-seeker *ngIf="(audioService.$currentSong | async)" [current]="(audioService.$currentTime | async)" [duration]="(audioService.$currentSong | async)?.duration" (seek)="onSeeking($event)"></asc-seeker>
 
     <div class="flex flex-1 p-4 px-6 items-center">
-        <div class="relative w-12 h-12 rounded-lg overflow-hidden mr-3 shadow-lg" *ngIf="(audioService.$currentSong | async)">
-            <img [src]="($artworkUrl | async)" class="w-full aspect-square mx-auto rounded-lg">
-            <span class="absolute top-1/2 left-1/2 transform-gpu -translate-x-1/2 -translate-y-1/2" *ngIf="isLoading"><i class="fa-solid fa-spinner fa-spin"></i></span>
-        </div>
 
-        <div class="inline-block w-64 flex-grow">
-            <p class="font-bold text-sm max-w-full overflow-hidden text-ellipsis whitespace-nowrap">{{ (audioService.$currentSong | async)?.title }}</p>
+        <div class="flex flex-1 w-1/3 items-center content-center">
+            <div class="relative w-12 h-12 rounded-lg overflow-hidden mr-3" [ngClass]="{'opacity-0 pointer-events-none': !(audioService.$currentSong | async)}">
+                <img [src]="($artworkUrl | async)" class="w-full aspect-square mx-auto rounded-lg">
+                <span class="absolute top-1/2 left-1/2 transform-gpu -translate-x-1/2 -translate-y-1/2" *ngIf="(audioService.$loading | async)"><i class="fa-solid fa-spinner fa-spin"></i></span>
+            </div>
 
-            <div class="line-clamp-1 opacity-60">
-                <ul>
-                    <li *ngIf="(audioService.$currentSong | async)?.explicit" class="inline"><span class="inline-flex font-light mr-1 items-center justify-center rounded-sm bg-primary-light text-xs w-4 aspect-square">E</span></li>
-                    <li *ngFor="let artist of (audioService.$currentSong | async)?.artists || []; index as i" class="inline"><span class="text-xs hover:underline cursor-pointer leading-3 pointer-events-all" [routerLink]="['/artists', artist.id]">{{ artist.name }}</span>{{ i + 1 < (audioService.$currentSong | async)?.artists.length ? ", " : "" }}</li>
-                </ul>
+            <div class="inline-block w-full">
+                <p class="font-normal text-sm max-w-full overflow-hidden text-ellipsis whitespace-nowrap">{{ (audioService.$currentSong | async)?.title }}</p>
+
+                <div class="line-clamp-1 opacity-60 -mt-1">
+                    <ul>
+                        <li *ngIf="(audioService.$currentSong | async)?.explicit" class="inline"><span class="inline-flex font-light mr-1 items-center justify-center rounded-sm bg-primary-light text-xs w-4 aspect-square">E</span></li>
+                        <li *ngFor="let artist of (audioService.$currentSong | async)?.artists || []; index as i" class="inline"><span class="text-xs tracking-wide font-light hover:underline cursor-pointer pointer-events-all" [routerLink]="['/artists', artist.id]">{{ artist.name }}</span>{{ i + 1 < (audioService.$currentSong | async)?.artists.length ? ", " : "" }}</li>
+                    </ul>
+                </div>
             </div>
         </div>
 
-        <div class="inline-flex items-center">
-            <button class="rounded-full w-11 h-11 inline-flex justify-center items-center bg-accent-dark text-background transform-gpu hover:scale-105 active:scale-95 transition-all" (click)="audioService.togglePause()">
+        <div class="flex items-center justify-center w-1/3 gap-1">
+            <button mat-icon-button class="opacity-50" [ngClass]="{'text-accent': (audioService.$shuffle | async)}" (click)="audioService.toggleShuffle()"><i class="text-sm fa-solid fa-shuffle"></i></button>
+            <button mat-icon-button [disabled]="true"><i class="fa-solid fa-backward-step"></i></button>
+
+            <button class="outline-none will-change-transform text-xxs rounded-full w-10 h-10 inline-flex justify-center items-center bg-accent-dark text-background transform-gpu hover:scale-105 active:scale-[97%] transition-all" (click)="audioService.togglePause()">
                 <i class="fa-solid fa-play" *ngIf="(audioService.$paused | async) || !(audioService.$currentSong | async)"></i>
                 <i class="fa-solid fa-pause" *ngIf="!(audioService.$paused | async) && (audioService.$currentSong | async)"></i>
             </button>
-            
-            <p class="w-32 text-center text-sm text-opacity-70 font-light">{{ audioService.$currentTime | async | songDurationPipe }} / {{ ((audioService.$currentSong | async)?.duration || 0) | songDurationPipe }}</p>
+
+            <button mat-icon-button [disabled]="(audioService.$queueSize | async) <= 0"><i class="fa-solid fa-forward-step" (click)="audioService.next()"></i></button>
+            <button mat-icon-button class="opacity-50" [ngClass]="{'text-accent': (audioService.$loop | async)}" (click)="audioService.toogleLoop()"><i class="text-sm fa-solid fa-repeat"></i></button>
+        </div>
+
+        <div class="flex items-center justify-end w-1/3 gap-2">
+            <p class="text-right text-sm opacity-40 font-light">{{ (audioService.$currentTime | async) | songDurationPipe }} / {{ ((audioService.$currentSong | async)?.duration || 0) | songDurationPipe }}</p>
+            <button mat-icon-button class="opacity-70"><i class="fa-solid fa-list"></i></button>
         </div>
     </div>
 </div>

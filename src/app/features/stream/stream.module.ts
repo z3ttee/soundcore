@@ -8,6 +8,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { PipesModule } from 'src/app/pipes/pipes.module';
 import { StreamService } from './services/stream.service';
 import { StreamQueueService } from './services/queue.service';
+import { MatButtonModule } from '@angular/material/button';
 
 const routes: Routes = []
 
@@ -20,7 +21,9 @@ const routes: Routes = []
     CommonModule,
     AppCommonModule,
     PipesModule,
-    RouterModule.forChild(routes)
+    RouterModule.forChild(routes),
+
+    MatButtonModule
   ],
   exports: [
     StreamPlayerBarComponent

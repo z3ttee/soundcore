@@ -12,7 +12,7 @@ export class StreamPlayerBarComponent implements OnInit {
 
   public $artworkUrl: Observable<string> = this.audioService.$currentSong.pipe(
     map((song) => {
-      if(song.artwork) {
+      if(song?.artwork) {
         return `${environment.api_base_uri}/v1/artworks/${song.artwork.id}`;
       }
       return "/assets/img/missing_cover.png"
@@ -21,7 +21,7 @@ export class StreamPlayerBarComponent implements OnInit {
 
   public $accentColor: Observable<string> = this.audioService.$currentSong.pipe(
     map((song) => {
-      if(song.artwork) {
+      if(song?.artwork) {
         return song.artwork.accentColor;
       }
       return "#000000";
