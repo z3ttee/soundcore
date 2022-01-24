@@ -1,5 +1,5 @@
+import { Album } from "../features/album/entities/album.entity";
 import { Song } from "../features/song/entities/song.entity";
-import { Album } from "./album.model";
 import { Artwork } from "./artwork.model";
 
 export class Artist {

@@ -1,8 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { map, Observable } from 'rxjs';
+import { Album } from 'src/app/features/album/entities/album.entity';
 import { AudioService } from 'src/app/features/stream/services/audio.service';
-import { StreamService } from 'src/app/features/stream/services/stream.service';
-import { Album } from 'src/app/model/album.model';
 import { environment } from 'src/environments/environment';
 
 @Component({

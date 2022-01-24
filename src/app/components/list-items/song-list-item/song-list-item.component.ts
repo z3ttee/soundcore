@@ -21,6 +21,8 @@ export class SongListItemComponent implements OnInit {
   @ViewChild('songMenu') songMenu: TemplateRef<any>;
 
     @Input() public song: Song;
+    @Input() public showAlbum: boolean = true;
+
     public playable: boolean = true;
 
     public coverSrc: string = null;

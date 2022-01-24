@@ -66,5 +66,4 @@ export class SearchIndexComponent implements OnInit {
           this.isSearching = false;
     });
   }
-
 }

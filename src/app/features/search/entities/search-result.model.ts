@@ -1,7 +1,6 @@
 import { Page } from "../../../pagination/pagination";
 import { Artist } from "../../../model/artist.model";
 import { Song } from "../../song/entities/song.entity";
-import { Album } from "src/app/model/album.model";
 import { Distributor } from "src/app/model/distributor.entity";
 import { Label } from "src/app/model/label.model";
 import { Publisher } from "src/app/model/publisher.model";
@@ -9,6 +8,7 @@ import { Genre } from "src/app/model/genre.entity";
 import { Playlist } from "../../playlist/entities/playlist.entity";
 import { SearchBestMatch } from "./best-match.entity";
 import { User } from "../../user/entities/user.entity";
+import { Album } from "../../album/entities/album.entity";
 
 export class ComplexSearchResult {
 

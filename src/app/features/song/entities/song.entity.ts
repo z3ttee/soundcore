@@ -1,10 +1,10 @@
-import { Album } from "src/app/model/album.model";
 import { Artist } from "src/app/model/artist.model";
 import { Artwork } from "src/app/model/artwork.model";
 import { Distributor } from "src/app/model/distributor.entity";
 import { Genre } from "src/app/model/genre.entity";
 import { Label } from "src/app/model/label.model";
 import { Publisher } from "src/app/model/publisher.model";
+import { Album } from "../../album/entities/album.entity";
 
 export class Song {
 

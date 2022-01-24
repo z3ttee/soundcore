@@ -22,11 +22,11 @@
         </div>
     </div>
 
-    <div class="max-w-60 mr-4 hidden md:block">
+    <div class="max-w-60 mr-4 hidden md:block" *ngIf="song?.albums && showAlbum">
         <p class="text-xs text-center opacity-80 line-clamp-1 hover:underline">{{ song?.albums[0]?.title }}</p>
     </div>
 
-    <div class="min-w-32 mr-4 hidden lg:block">
+    <div class="min-w-32 mr-4 hidden lg:block" *ngIf="song?.song2playlist">
         <p class="text-xs opacity-80">{{ song?.song2playlist | addedToPlaylist }}</p>
     </div>
 

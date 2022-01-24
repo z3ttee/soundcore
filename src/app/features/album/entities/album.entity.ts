@@ -1,9 +1,9 @@
-import { Song } from "../features/song/entities/song.entity";
-import { Artist } from "./artist.model";
-import { Artwork } from "./artwork.model";
-import { Distributor } from "./distributor.entity";
-import { Label } from "./label.model";
-import { Publisher } from "./publisher.model";
+import { Artist } from "src/app/model/artist.model";
+import { Artwork } from "src/app/model/artwork.model";
+import { Distributor } from "src/app/model/distributor.entity";
+import { Label } from "src/app/model/label.model";
+import { Publisher } from "src/app/model/publisher.model";
+import { Song } from "../../song/entities/song.entity";
 
 export class Album {
 

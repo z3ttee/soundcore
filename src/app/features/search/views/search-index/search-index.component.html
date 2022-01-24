@@ -43,7 +43,7 @@
 
     <div *ngIf="($currentResult | async)?.albums" class="my-4">
       <asc-horizontal-grid headline="Alben">
-        <asc-album-grid-item *ngFor="let album of ($currentResult | async)?.albums?.elements" [album]="album">
+        <asc-album-grid-item *ngFor="let album of ($currentResult | async)?.albums?.elements" [album]="album" [routerLink]="['/album', album.id]">
         </asc-album-grid-item>
       </asc-horizontal-grid>
     </div>

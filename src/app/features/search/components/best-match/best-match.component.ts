@@ -1,8 +1,8 @@
 import { Component, Input, OnInit } from '@angular/core';
+import { Album } from 'src/app/features/album/entities/album.entity';
 import { Playlist } from 'src/app/features/playlist/entities/playlist.entity';
 import { Song } from 'src/app/features/song/entities/song.entity';
 import { User } from 'src/app/features/user/entities/user.entity';
-import { Album } from 'src/app/model/album.model';
 import { Artist } from 'src/app/model/artist.model';
 import { environment } from 'src/environments/environment';
 import { SearchBestMatch } from '../../entities/best-match.entity';
