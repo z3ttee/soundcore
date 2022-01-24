@@ -4,7 +4,6 @@ import { ErrorMessageComponent } from "./components/error-message/error-message.
 import { LabelComponent } from "./components/badges/label-badge/label-badge.component";
 import { PlaylistListItemComponent } from "./components/list-items/playlist-list-item/playlist-list-item.component";
 import { MessageComponent } from "./components/message/message.component";
-import { SongListItemComponent } from "./components/list-items/song-list-item/song-list-item.component";
 import { PipesModule } from "./pipes/pipes.module";
 import { RouterModule } from "@angular/router";
 
@@ -20,7 +19,6 @@ import { RouterModule } from "@angular/router";
         LabelComponent,
 
         PlaylistListItemComponent,
-        SongListItemComponent
     ],
     exports: [
         ErrorMessageComponent,
@@ -28,7 +26,6 @@ import { RouterModule } from "@angular/router";
         LabelComponent,
 
         PlaylistListItemComponent,
-        SongListItemComponent
     ]
 })
 export class AppCommonModule {}

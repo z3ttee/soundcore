@@ -7,7 +7,6 @@ import { Playlist } from 'src/app/features/playlist/entities/playlist.entity';
 import { PlaylistService } from 'src/app/features/playlist/services/playlist.service';
 import { Song } from 'src/app/features/song/entities/song.entity';
 import { AudioService } from 'src/app/features/stream/services/audio.service';
-import { StreamService } from 'src/app/features/stream/services/stream.service';
 import { ContextMenuService } from 'src/app/services/context-menu.service';
 import { environment } from 'src/environments/environment';
 
@@ -18,7 +17,7 @@ import { environment } from 'src/environments/environment';
 })
 export class SongListItemComponent implements OnInit {
 
-  @ViewChild('songMenu') songMenu: TemplateRef<any>;
+    @ViewChild('songMenu') songMenu: TemplateRef<any>;
 
     @Input() public song: Song;
     @Input() public showAlbum: boolean = true;

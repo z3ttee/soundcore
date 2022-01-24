@@ -1,7 +1,7 @@
 import { Overlay, OverlayRef } from "@angular/cdk/overlay";
 import { TemplatePortal } from "@angular/cdk/portal";
 import { Injectable, TemplateRef, ViewContainerRef } from "@angular/core";
-import { filter, fromEvent, Subscription, take } from "rxjs";
+import { filter, fromEvent } from "rxjs";
 
 @Injectable({
     providedIn: "root"

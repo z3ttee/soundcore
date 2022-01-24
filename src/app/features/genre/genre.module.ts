@@ -5,7 +5,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { AppCommonModule } from 'src/app/common.module';
 import { MatPaginatorModule } from '@angular/material/paginator';
-import { SongModule } from '../song/song.module';
+import { AscSongModule } from 'src/app/components/song-components/song-components.module';
 
 const routes: Routes = [
   { path: ":genreId", component: GenreInfoComponent }
@@ -16,8 +16,7 @@ const routes: Routes = [
     GenreInfoComponent
   ],
   imports: [
-    // TODO
-    SongModule,
+    AscSongModule,
 
     CommonModule,
     AppCommonModule,

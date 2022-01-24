@@ -5,7 +5,6 @@ import { RouterModule, Routes } from '@angular/router';
 import { TeleportModule } from '@ngneat/overview';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { SongModule } from '../song/song.module';
 import { GenreGridItemComponent } from 'src/app/components/grid-items/genre-grid-item/genre-grid-item.component';
 import { ArtistGridItemComponent } from 'src/app/components/grid-items/artist-grid-item/artist-grid-item.component';
 import { StreamModule } from '../stream/stream.module';
@@ -16,6 +15,7 @@ import { BestMatchComponent } from './components/best-match/best-match.component
 import { PipesModule } from 'src/app/pipes/pipes.module';
 import { SearchService } from './services/search.service';
 import { UserGridItemComponent } from 'src/app/components/grid-items/user-grid-item/user-grid-item.component';
+import { AscSongModule } from 'src/app/components/song-components/song-components.module';
 
 const routes: Routes = [
   { path: "", component: SearchIndexComponent }
@@ -40,9 +40,9 @@ const routes: Routes = [
     RouterModule.forChild(routes),
     ReactiveFormsModule,
 
-    SongModule,
     StreamModule,
     PipesModule,
+    AscSongModule,
 
     MatProgressBarModule
   ],

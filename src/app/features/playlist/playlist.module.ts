@@ -14,6 +14,7 @@ import { PlaylistPrivacyPipe } from './pipes/playlist-privacy.pipe';
 import { ChoosePlaylistComponent } from './dialogs/choose-playlist/choose-playlist.component';
 import { PipesModule } from 'src/app/pipes/pipes.module';
 import { ProfileBadgeComponent } from 'src/app/components/badges/profile-badge/profile-badge.component';
+import { AscSongModule } from 'src/app/components/song-components/song-components.module';
 
 const routes: Routes = [
   { path: ":playlistId", component: PlaylistInfoComponent }
@@ -34,6 +35,7 @@ const routes: Routes = [
     RouterModule.forChild(routes),
 
     PipesModule,
+    AscSongModule,
 
     MatDialogModule,
     MatButtonModule,

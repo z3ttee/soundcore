@@ -21,6 +21,7 @@ import {MatIconModule} from '@angular/material/icon';
 import { TeleportModule } from '@ngneat/overview';
 import { AppCommonModule } from 'src/app/common.module';
 import { SongModule } from '../song/song.module';
+import { AscSongModule } from 'src/app/components/song-components/song-components.module';
 
 const routes: Routes = [
   { path: "", component: LibraryIndexComponent, children: [
@@ -44,7 +45,8 @@ const routes: Routes = [
     RouterModule.forChild(routes),
     TeleportModule,
     AppCommonModule,
-    SongModule,
+
+    AscSongModule,
 
     // Import Angular Material components
     MatTabsModule,

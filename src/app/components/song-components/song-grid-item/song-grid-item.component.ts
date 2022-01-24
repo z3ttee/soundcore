@@ -11,7 +11,7 @@ import { environment } from 'src/environments/environment';
 import { Song } from '../../../features/song/entities/song.entity';
 
 @Component({
-  selector: 'asc-song-item',
+  selector: 'asc-song-grid-item',
   templateUrl: './song-grid-item.component.html',
   styleUrls: ['./song-grid-item.component.scss']
 })

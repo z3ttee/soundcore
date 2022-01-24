@@ -6,7 +6,7 @@
     <p *ngIf="($uploadsPage | async).amount <= 0 && !isLoading">Keine Uploads gefunden</p>
 
     <div class="grid grid-cols-songs gap-4">
-        <asc-song-item *ngFor="let song of ($uploadsPage | async).elements" [song]="song"></asc-song-item>
+        <asc-song-grid-item *ngFor="let song of ($uploadsPage | async).elements" [song]="song"></asc-song-grid-item>
     </div>
 
     <mat-paginator color="accent" 
