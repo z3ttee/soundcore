@@ -13,8 +13,8 @@ import { PlaylistInfoComponent } from './views/playlist-info/playlist-info.compo
 import { PlaylistPrivacyPipe } from './pipes/playlist-privacy.pipe';
 import { ChoosePlaylistComponent } from './dialogs/choose-playlist/choose-playlist.component';
 import { PipesModule } from 'src/app/pipes/pipes.module';
-import { ProfileBadgeComponent } from 'src/app/components/badges/profile-badge/profile-badge.component';
 import { AscSongModule } from 'src/app/components/song-components/song-components.module';
+import { AscBadgeModule } from 'src/app/components/badge-components/badge-components.module';
 
 const routes: Routes = [
   { path: ":playlistId", component: PlaylistInfoComponent }
@@ -26,7 +26,6 @@ const routes: Routes = [
     PlaylistInfoComponent,
     PlaylistPrivacyPipe,
     ChoosePlaylistComponent,
-    ProfileBadgeComponent
   ],
   imports: [
     CommonModule,
@@ -36,6 +35,7 @@ const routes: Routes = [
 
     PipesModule,
     AscSongModule,
+    AscBadgeModule,
 
     MatDialogModule,
     MatButtonModule,

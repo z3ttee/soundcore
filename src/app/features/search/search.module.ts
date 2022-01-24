@@ -16,6 +16,7 @@ import { PipesModule } from 'src/app/pipes/pipes.module';
 import { SearchService } from './services/search.service';
 import { UserGridItemComponent } from 'src/app/components/grid-items/user-grid-item/user-grid-item.component';
 import { AscSongModule } from 'src/app/components/song-components/song-components.module';
+import { AscBadgeModule } from 'src/app/components/badge-components/badge-components.module';
 
 const routes: Routes = [
   { path: "", component: SearchIndexComponent }
@@ -43,6 +44,7 @@ const routes: Routes = [
     StreamModule,
     PipesModule,
     AscSongModule,
+    AscBadgeModule,
 
     MatProgressBarModule
   ],

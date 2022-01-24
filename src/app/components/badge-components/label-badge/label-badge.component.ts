@@ -1,11 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 
 @Component({
-  selector: 'asc-label',
+  selector: 'asc-label-badge',
   templateUrl: './label-badge.component.html',
   styleUrls: ['./label-badge.component.scss']
 })
-export class LabelComponent implements OnInit {
+export class LabelBadgeComponent implements OnInit {
 
   constructor() { }
 

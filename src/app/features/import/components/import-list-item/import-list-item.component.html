@@ -20,8 +20,8 @@
     </div>
 
     <div class="min-w-16 sm:block">
-        <asc-label *ngIf="!import.upgradeIndex">{{ import.status | indexStatusPipe }}</asc-label>
-        <asc-label *ngIf="import.upgradeIndex">{{ import.upgradeIndex.status | indexStatusPipe }}</asc-label>
+        <asc-label-badge *ngIf="!import.upgradeIndex">{{ import.status | indexStatusPipe }}</asc-label-badge>
+        <asc-label-badge *ngIf="import.upgradeIndex">{{ import.upgradeIndex.status | indexStatusPipe }}</asc-label-badge>
     </div>
 
     <div class="absolute -bottom-0.5 left-0 w-full" *ngIf="import.status == 'downloading' || import.status == 'preparing' || import.upgradeIndex?.status == 'preparing' || import.upgradeIndex?.status == 'processing'">
