@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
 import { ActivatedRoute, Router } from '@angular/router';
-import { BehaviorSubject, from, map, mapTo, Observable, switchMap } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { Page, Pageable } from 'src/app/pagination/pagination';
 import { MountEditorDialog } from '../../dialogs/mount-editor.dialog';
 import { StorageBucket } from '../../model/storage-bucket.model';

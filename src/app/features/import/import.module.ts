@@ -18,6 +18,7 @@ import { CreateImportComponent } from './dialogs/create-import/create-import.com
 import { MatDialogModule } from '@angular/material/dialog';
 import { ImportStatusService } from './services/import-status.service';
 import { AscBadgeModule } from 'src/app/components/badge-components/badge-components.module';
+import { AscMessageModule } from 'src/app/components/message-components/message-components.module';
 
 const routes: Routes = [
   { path: "", component: ImportIndexComponent }
@@ -42,7 +43,8 @@ const routes: Routes = [
     
     AppCommonModule,
     PipesModule,
-    AscBadgeModule
+    AscBadgeModule,
+    AscMessageModule
   ],
   providers: [
     ImportService,

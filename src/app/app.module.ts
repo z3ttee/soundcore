@@ -30,6 +30,7 @@ import { MainLayoutComponent } from './layout/main-layout/main-layout.component'
 import { PlaylistModule } from './features/playlist/playlist.module';
 import { InfiniteScrollListComponent } from './components/lists/infinite-scroll-list/infinite-scroll-list.component';
 import { StreamModule } from './features/stream/stream.module';
+import { AscMessageModule } from './components/message-components/message-components.module';
 
 // TODO: https://angular.io/guide/i18n-common-prepare
 
@@ -57,6 +58,7 @@ import { StreamModule } from './features/stream/stream.module';
 
     PlaylistModule,
     StreamModule,
+    AscMessageModule,
 
     // Import global Angular Material Components
     MatIconModule,

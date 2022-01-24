@@ -20,6 +20,7 @@ import { BucketInfoComponent } from './views/bucket-info/bucket-info.component';
 import { BucketListItemComponent } from './components/bucket-list-item/bucket-list-item.component';
 import { AppCommonModule } from 'src/app/common.module';
 import { MountStatusService } from './services/mount-status.service';
+import { AscMessageModule } from 'src/app/components/message-components/message-components.module';
 
 const routes: Routes = [
 
@@ -42,6 +43,8 @@ const routes: Routes = [
     FormsModule,
     ReactiveFormsModule,
     RouterModule.forChild(routes),
+
+    AscMessageModule,
 
     MatSelectModule,
     MatPaginatorModule,
