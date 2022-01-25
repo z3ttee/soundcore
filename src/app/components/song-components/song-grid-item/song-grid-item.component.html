@@ -7,7 +7,7 @@
             <i class="fa-solid fa-play" *ngIf="!isActive"></i>
         </div>
 
-        <img [src]="coverSrc" class="w-full aspect-square mx-auto rounded-lg" [style]="'box-shadow: 0px 0px 32px 5px '+accentColor+'50;'">
+        <asc-artwork [artwork]="song?.artwork" [showAccent]="true" [type]="'default'"></asc-artwork>
     </div>
 
     <div class="max-w-full overflow-hidden text-left flex-grow pt-2.5 px-1">
