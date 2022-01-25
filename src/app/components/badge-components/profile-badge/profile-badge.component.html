@@ -1,4 +1,4 @@
 <div class="inline-flex items-center p-1 transition-all hover:bg-background-light rounded-full cursor-pointer active:bg-background">
-    <img class="w-6 aspect-square rounded-full" [src]="avatarUrl || '/assets/img/missing_cover.png'">
+    <asc-user-avatar class="w-6 aspect-square rounded-full overflow-hidden" [resourceId]="user?.avatarResourceId"></asc-user-avatar>
     <p class="text-xs px-2">{{ user?.username }}</p>
 </div>

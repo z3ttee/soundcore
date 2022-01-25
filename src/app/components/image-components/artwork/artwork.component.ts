@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 
 @Component({
   selector: 'asc-artwork',
@@ -6,6 +6,8 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./artwork.component.scss']
 })
 export class ArtworkComponent implements OnInit {
+
+  
 
   constructor() { }
 
