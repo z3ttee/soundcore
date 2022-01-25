@@ -10,6 +10,7 @@ export class Playlist {
     public description?: string;
     public privacy?: PlaylistPrivacy;
     public collaborative: boolean;
+    public createdAt: Date;
     public author?: User;
 
     public artwork?: Artwork;

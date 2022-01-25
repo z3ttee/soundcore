@@ -28,7 +28,7 @@ export class ArtworkComponent implements OnInit, OnChanges {
   }
 
   public initUrl(artwork: Artwork): void {
-    if(artwork) {
+    if(artwork?.id) {
       this.artworkUrl = `${environment.api_base_uri}/v1/artworks/${artwork.id}`;
       this.accentColor = artwork.accentColor
     } else {

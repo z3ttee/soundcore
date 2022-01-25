@@ -16,6 +16,8 @@ import { PipesModule } from 'src/app/pipes/pipes.module';
 import { AscSongModule } from 'src/app/components/song-components/song-components.module';
 import { AscBadgeModule } from 'src/app/components/badge-components/badge-components.module';
 import { AscMessageModule } from 'src/app/components/message-components/message-components.module';
+import { AscImageModule } from 'src/app/components/image-components/image-components.module';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 const routes: Routes = [
   { path: ":playlistId", component: PlaylistInfoComponent }
@@ -38,12 +40,14 @@ const routes: Routes = [
     AscSongModule,
     AscBadgeModule,
     AscMessageModule,
+    AscImageModule,
 
     MatDialogModule,
     MatButtonModule,
     MatInputModule,
     MatProgressBarModule,
-    MatSelectModule
+    MatSelectModule,
+    MatTooltipModule
   ],
   exports: [
     CreatePlaylistDialog

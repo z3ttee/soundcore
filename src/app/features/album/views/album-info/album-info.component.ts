@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Song } from 'src/app/features/song/entities/song.entity';
 import { SongService } from 'src/app/features/song/services/song.service';
-import { environment } from 'src/environments/environment';
 import { Album } from '../../entities/album.entity';
 import { AlbumService } from '../../services/album.service';
 
@@ -24,8 +23,7 @@ export class AlbumInfoComponent implements OnInit {
   public bannerSrc: string = null;
 
   // Accent colors  
-  public accentColor: string = "";
-  public bannerAccentColor: string = "";
+  public accentColor: string = "#FFBF50";
 
   constructor(
     private activatedRoute: ActivatedRoute,
@@ -45,23 +43,6 @@ export class AlbumInfoComponent implements OnInit {
       this.albumService.findById(albumId).then((album) => {
         this.album = album;
 
-        console.log(album)
-
-        if(this.album?.artwork) {
-          this.coverSrc = `${environment.api_base_uri}/v1/artworks/${this.album.artwork.id}`;
-          this.accentColor = this.album.artwork.accentColor;
-        } else {
-          this.coverSrc = "/assets/img/missing_cover.png"
-        }
-
-        if(this.album?.banner) {
-          this.bannerSrc = `${environment.api_base_uri}/v1/artworks/${this.album.banner.id}`;
-          this.bannerAccentColor = this.album.banner.accentColor;
-        } else {
-          this.bannerSrc = null
-        }
-
-        // TODO: Use songservice to fetch songs of album
         this.songService.findByAlbum(albumId).then((page) => {
           this.songs = page.elements;
           console.log(this.songs)
