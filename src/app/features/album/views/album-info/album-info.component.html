@@ -31,7 +31,7 @@
             <!-- Quick info bar below title -->
             <div class="py-2 md:pt-2 md:pb-0 md:flex md:items-center">
                 <ul class="flex md:inline-flex items-center gap-2">
-                    <asc-artist-badge [artist]="album?.artist" [routerLink]="['/artists', album?.artist.id]"></asc-artist-badge>
+                    <asc-artist-badge [artist]="album?.artist" [routerLink]="['/artists', album?.artist?.id]"></asc-artist-badge>
     
                     <li class="inline opacity-60" *ngIf="album?.featuredArtists?.length > 0">
                         <div class="inline-flex items-center">
