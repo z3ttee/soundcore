@@ -12,12 +12,17 @@ export class Album {
     public released: Date;
     public description: string;
 
-    public artists?: Artist[];
+    public artist?: Artist;
+
     public songs?: Song[];
     public artwork?: Artwork;
     public banner?: Artwork;
     public distributor?: Distributor;
     public label?: Label;
     public publisher?: Publisher;
+
+    public featuredArtists?: Artist[];
+    public songsCount?: number;
+    public totalDuration?: number;
 
 }

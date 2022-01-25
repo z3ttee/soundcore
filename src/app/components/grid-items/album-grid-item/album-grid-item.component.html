@@ -14,7 +14,7 @@
 
         <div class="line-clamp-1 opacity-60">
             <ul>
-                <li *ngFor="let artist of album.artists; index as i" class="inline"><span class="text-xs hover:underline leading-3 pointer-events-all" [routerLink]="['/artists', artist.id]">{{ artist.name }}</span>{{ i + 1 < album.artists.length ? ", " : "" }}</li>
+                <li class="inline"><span class="text-xs leading-3 pointer-events-none mr-1">by</span><span class="text-xs hover:underline leading-3 pointer-events-all" [routerLink]="['/artists', album?.artist?.id]">{{ album?.artist?.name }}</span></li>
             </ul>
         </div>
     </div>

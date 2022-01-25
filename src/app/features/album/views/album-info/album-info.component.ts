@@ -45,6 +45,8 @@ export class AlbumInfoComponent implements OnInit {
       this.albumService.findById(albumId).then((album) => {
         this.album = album;
 
+        console.log(album)
+
         if(this.album?.artwork) {
           this.coverSrc = `${environment.api_base_uri}/v1/artworks/${this.album.artwork.id}`;
           this.accentColor = this.album.artwork.accentColor;

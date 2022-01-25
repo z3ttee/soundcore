@@ -6,6 +6,10 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { AlbumInfoComponent } from './views/album-info/album-info.component';
 import { AppCommonModule } from 'src/app/common.module';
 import { AscSongModule } from 'src/app/components/song-components/song-components.module';
+import { AscImageModule } from 'src/app/components/image-components/image-components.module';
+import { AscBadgeModule } from 'src/app/components/badge-components/badge-components.module';
+import { PipesModule } from 'src/app/pipes/pipes.module';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 const routes: Routes = [
   { path: ":albumId", component: AlbumInfoComponent }
@@ -23,9 +27,13 @@ const routes: Routes = [
     CommonModule,
     RouterModule.forChild(routes),
 
+    PipesModule,
     AscSongModule,
+    AscBadgeModule,
+    AscImageModule,
 
-    MatProgressBarModule
+    MatProgressBarModule,
+    MatTooltipModule
   ]
 })
 export class AlbumModule { }

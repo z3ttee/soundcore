@@ -57,11 +57,12 @@ export class BestMatchComponent implements OnInit {
       this.title = this.item.match["name"];
     }
 
-    if(this.item.type == "song" || this.item.type == "album") {
-      this.artists = (this.item.match as Song | Album).artists
+    if(this.item.type == "album") {
+      this.artists = [(this.item.match as Album).artist]
     }
 
     if(this.item.type == "song") {
+      this.artists = (this.item.match as Song).artists
       this.isExplicit = (this.item.match as Song).explicit
     }
 

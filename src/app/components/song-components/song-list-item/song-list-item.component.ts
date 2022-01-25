@@ -21,6 +21,7 @@ export class SongListItemComponent implements OnInit {
 
     @Input() public song: Song;
     @Input() public showAlbum: boolean = true;
+    @Input() public titleNr: number = undefined;
 
     public playable: boolean = true;
 
