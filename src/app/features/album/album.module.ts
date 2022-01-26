@@ -10,6 +10,8 @@ import { AscImageModule } from 'src/app/components/image-components/image-compon
 import { AscBadgeModule } from 'src/app/components/badge-components/badge-components.module';
 import { PipesModule } from 'src/app/pipes/pipes.module';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { AscGridsModule } from 'src/app/components/grids/grids.module';
+import { AscAlbumModule } from 'src/app/components/album-components/album-components.module';
 
 const routes: Routes = [
   { path: ":albumId", component: AlbumInfoComponent }
@@ -31,6 +33,8 @@ const routes: Routes = [
     AscSongModule,
     AscBadgeModule,
     AscImageModule,
+    AscGridsModule,
+    AscAlbumModule,
 
     MatProgressBarModule,
     MatTooltipModule

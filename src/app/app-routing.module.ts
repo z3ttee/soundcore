@@ -8,7 +8,7 @@ const routes: Routes = [
   
   { path: "", component: MainLayoutComponent, children: [
     { path: "", canActivate: [AuthenticationCanActivateGuard], component: IndexViewComponent },
-    { path: "artists", canActivate: [AuthenticationCanActivateGuard], component: IndexViewComponent },
+    { path: "artist", canActivate: [AuthenticationCanActivateGuard], component: IndexViewComponent },
     
     { path: "releases", canActivate: [AuthenticationCanActivateGuard], loadChildren: () => import("./features/releases/releases.module").then((m) => m.ReleasesModule) },
     { path: "search", canActivate: [AuthenticationCanActivateGuard], loadChildren: () => import("./features/search/search.module").then((m) => m.SearchModule) },
@@ -17,7 +17,7 @@ const routes: Routes = [
     { path: "storage", canActivate: [AuthenticationCanActivateGuard], loadChildren: () => import("./features/storage/storage.module").then((m) => m.StorageModule) },
     { path: "genres", canActivate: [AuthenticationCanActivateGuard], loadChildren: () => import("./features/genre/genre.module").then((m) => m.GenreModule) },
     { path: "playlists", canActivate: [AuthenticationCanActivateGuard], loadChildren: () => import("./features/playlist/playlist.module").then((m) => m.PlaylistModule) },
-    { path: "artists", canActivate: [AuthenticationCanActivateGuard], loadChildren: () => import("./features/artist/artist.module").then((m) => m.ArtistModule) },
+    { path: "artist", canActivate: [AuthenticationCanActivateGuard], loadChildren: () => import("./features/artist/artist.module").then((m) => m.ArtistModule) },
     { path: "import", canActivate: [AuthenticationCanActivateGuard], loadChildren: () => import("./features/import/import.module").then((m) => m.ImportModule) },
     { path: "album", canActivate: [AuthenticationCanActivateGuard], loadChildren: () => import("./features/album/album.module").then((m) => m.AlbumModule) },
 

@@ -1,4 +1,4 @@
-import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 
 @Component({
   selector: 'asc-horizontal-grid',
@@ -14,6 +14,9 @@ export class HorizontalGridComponent implements OnInit {
   @Input() public headline: string;
   @Input() public enableMore: boolean = false;
   @Input() public canScroll: boolean = true;
+  @Input() public customMoreText: string = "Alles anzeigen"
+
+  @Output() public more: EventEmitter<void> = new EventEmitter();
 
   public canGoPrev: boolean = false;
   public canGoNext: boolean = false;
@@ -39,6 +42,10 @@ export class HorizontalGridComponent implements OnInit {
   public scrollPrev() {
     const scrollAmount = this.container.nativeElement.getBoundingClientRect().width;
     this.scrollArea.nativeElement.scrollLeft -= scrollAmount;
+  }
+
+  public onMore() {
+    this.more.emit();
   }
 
 }

@@ -14,7 +14,8 @@
 
         <div class="line-clamp-1 opacity-60">
             <ul>
-                <li class="inline"><span class="text-xs leading-3 pointer-events-none mr-1">by</span><span class="text-xs hover:underline leading-3 pointer-events-all" [routerLink]="['/artists', album?.artist?.id]">{{ album?.artist?.name }}</span></li>
+                <li *ngIf="!preferDate" class="inline"><span class="text-xs leading-3 pointer-events-none mr-1">by</span><span class="text-xs hover:underline leading-3 pointer-events-all" [routerLink]="['/artist', album?.artist?.id]">{{ album?.artist?.name }}</span></li>
+                <li *ngIf="preferDate" class="inline"><span class="text-xs leading-3 pointer-events-all">{{ album?.released | date:"yyyy" }}</span></li>
             </ul>
         </div>
     </div>

@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Song } from 'src/app/features/song/entities/song.entity';
 import { SongService } from 'src/app/features/song/services/song.service';
 import { Album } from '../../entities/album.entity';
@@ -16,7 +16,8 @@ export class AlbumInfoComponent implements OnInit {
 
   // Main data objects
   public album: Album;
-  public songs: Song[];
+  public songs: Song[] = [];
+  public recommendedAlbums: Album[] = [];
   
   // Artworks
   public coverSrc: string = null;
@@ -28,7 +29,8 @@ export class AlbumInfoComponent implements OnInit {
   constructor(
     private activatedRoute: ActivatedRoute,
     private albumService: AlbumService,
-    private songService: SongService
+    private songService: SongService,
+    private router: Router
   ) { }
 
   public ngOnInit(): void {
@@ -47,8 +49,18 @@ export class AlbumInfoComponent implements OnInit {
           this.songs = page.elements;
           console.log(this.songs)
         })
+
+        this.albumService.findRecommendedProfilesByArtist(this.album?.artist?.id, [ this.album?.id ]).then((page) => {
+          this.recommendedAlbums = page.elements;
+          console.log(this.recommendedAlbums)
+        })
       }).finally(() => this.isLoading = false)
     })
+  }
+
+  public async showDiscography() {
+    if(!this.album?.artist) return;
+    this.router.navigate(["/artist", this.album.artist?.id, "discography"])
   }
 
 }

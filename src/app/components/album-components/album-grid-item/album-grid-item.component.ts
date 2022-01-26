@@ -13,6 +13,7 @@ export class AlbumGridItemComponent implements OnInit {
 
   @Input() public album: Album;
   @Input() public playable: boolean = true;
+  @Input() public preferDate: boolean = false;
 
   public coverSrc: string = null;
   public accentColor: string = "";

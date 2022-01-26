@@ -1,8 +1,8 @@
 <div>
     <div class="flex flex-1 w-full px-6 items-center" *ngIf="headline || enableMore">
-        <h5 class="flex-grow" *ngIf="headline">{{ headline }}</h5>
+        <h6 class="flex-grow tracking-wide" *ngIf="headline">{{ headline }}</h6>
         <div *ngIf="enableMore">
-            <a class="cursor-pointer text-sm opacity-70 hover:underline hover:opacity-100">Alles anzeigen</a>
+            <a class="cursor-pointer text-sm opacity-70 hover:underline hover:opacity-100" (click)="onMore()">{{ customMoreText }}</a>
         </div>
     </div>
 
@@ -11,7 +11,7 @@
             <button class="w-10 max-h-full aspect-square flex justify-center items-center border border-white-dark border-opacity-20 bg-primary-light rounded-full pointer-events-auto shadow-lg" *ngIf="scrollArea?.scrollLeft > 0" (click)="scrollPrev()"><i class="fa-solid fa-chevron-left"></i></button>
         </div>
 
-        <div #scrollArea (scroll)="onScroll($event)" class="scroll-area grid grid-flow-col gap-4 scroll-smooth overflow-x-auto overflow-y-hidden px-4 py-2" [ngClass]="{'not-scrollable': !canScroll}">
+        <div #scrollArea (scroll)="onScroll($event)" class="scroll-area grid grid-flow-col gap-4 scroll-smooth overflow-x-auto overflow-y-hidden px-6 py-2" [ngClass]="{'not-scrollable': !canScroll}">
             <ng-content></ng-content>
         </div>
 
