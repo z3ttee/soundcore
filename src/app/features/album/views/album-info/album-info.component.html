@@ -36,7 +36,7 @@
                     <li class="inline opacity-60" *ngIf="album?.featuredArtists?.length > 0">
                         <div class="inline-flex items-center">
                             <p class="text-sm mr-1">+{{ album?.featuredArtists?.length }}</p>
-                            <asc-artwork class="w-6 aspect-square rounded-full overflow-hidden transform-gpu cursor-pointer" [ngClass]="{'-translate-x-1/2 shadow-md': i != 0 }" *ngFor="let featured of album?.featuredArtists; index as i" [artwork]="featured.artwork" [showAccent]="false" [matTooltip]="featured.name" [routerLink]="['/artists', featured.id]"></asc-artwork>
+                            <asc-artwork class="w-6 aspect-square rounded-full overflow-hidden transform-gpu cursor-pointer" [ngClass]="{'shadow-md': i != 0 }" *ngFor="let featured of album?.featuredArtists; index as i" [artwork]="featured.artwork" [showAccent]="false" [matTooltip]="featured.name" [routerLink]="['/artist', featured.id]"></asc-artwork>
                         </div>
                     </li>
                 </ul>
