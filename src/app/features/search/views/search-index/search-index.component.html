@@ -36,7 +36,7 @@
 
     <div *ngIf="($currentResult | async)?.artists" class="my-4">
       <asc-horizontal-grid headline="Künstler">
-        <asc-artist-grid-item *ngFor="let artist of ($currentResult | async)?.artists?.elements" [artist]="artist">
+        <asc-artist-grid-item *ngFor="let artist of ($currentResult | async)?.artists?.elements" [artist]="artist" [routerLink]="['/artist', artist?.id]">
         </asc-artist-grid-item>
       </asc-horizontal-grid>
     </div>
@@ -69,7 +69,7 @@
 
     <div *ngIf="($currentResult | async)?.users" class="my-4">
       <asc-horizontal-grid headline="Nutzerprofile">
-        <asc-user-grid-item *ngFor="let user of ($currentResult | async)?.users?.elements" [user]="user"></asc-user-grid-item>
+        <asc-user-grid-item *ngFor="let user of ($currentResult | async)?.users?.elements" [user]="user" [routerLink]="['/profile', user?.id]"></asc-user-grid-item>
       </asc-horizontal-grid>
     </div>
 </section>

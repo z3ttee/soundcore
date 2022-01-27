@@ -1,21 +1,18 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { AlbumGridItemComponent } from './album-grid-item/album-grid-item.component';
-import { RouterModule } from '@angular/router';
+import { UserGridItemComponent } from './user-grid-item/user-grid-item.component';
 import { AscImageModule } from '../image-components/image-components.module';
 
 @NgModule({
   declarations: [
-    AlbumGridItemComponent
+    UserGridItemComponent
   ],
   imports: [
     CommonModule,
-    RouterModule,
-
     AscImageModule
   ],
   exports: [
-    AlbumGridItemComponent
+    UserGridItemComponent
   ]
 })
-export class AscAlbumModule { }
+export class AscUserModule { }
