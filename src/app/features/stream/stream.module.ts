@@ -9,6 +9,8 @@ import { StreamService } from './services/stream.service';
 import { StreamQueueService } from './services/queue.service';
 import { MatButtonModule } from '@angular/material/button';
 import { AscInputModule } from 'src/app/components/input-components/input-components.module';
+import { AscImageModule } from 'src/app/components/image-components/image-components.module';
+import {MatSnackBarModule} from '@angular/material/snack-bar';
 
 const routes: Routes = []
 
@@ -23,8 +25,10 @@ const routes: Routes = []
 
     PipesModule,
     AscInputModule,
+    AscImageModule,
 
-    MatButtonModule
+    MatButtonModule,
+    MatSnackBarModule
   ],
   exports: [
     StreamPlayerBarComponent

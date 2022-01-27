@@ -1,4 +1,5 @@
 import { Injectable } from "@angular/core";
+import { MatSnackBar } from "@angular/material/snack-bar";
 import { BehaviorSubject, filter, Observable } from "rxjs";
 import { environment } from "src/environments/environment";
 import { Song } from "../../song/entities/song.entity";
@@ -20,6 +21,7 @@ export class AudioService {
     private _doneSubject: BehaviorSubject<boolean> = new BehaviorSubject(true as boolean);
     private _loopSubject: BehaviorSubject<boolean> = new BehaviorSubject(false as boolean);
     private _shuffleSubject: BehaviorSubject<boolean> = new BehaviorSubject(false as boolean);
+    private _errorSubject: BehaviorSubject<string> = new BehaviorSubject(null);
 
     public $currentSong: Observable<Song> = this._currentSongSubject.asObservable();
     public $paused: Observable<boolean> = this._pausedSubject.asObservable();
@@ -29,12 +31,14 @@ export class AudioService {
     public $done: Observable<boolean> = this._doneSubject.asObservable();
     public $loop: Observable<boolean> = this._loopSubject.asObservable();
     public $shuffle: Observable<boolean> = this._shuffleSubject.asObservable();
+    public $error: Observable<string> = this._errorSubject.asObservable();
 
     public $queueSize: Observable<number>;
 
     constructor(
         private streamService: StreamService,
-        private queueService: StreamQueueService
+        private queueService: StreamQueueService,
+        private _snackBar: MatSnackBar
     ) {
         this.$queueSize = this.queueService.$size;
         this.reset();
@@ -48,6 +52,7 @@ export class AudioService {
         this.audio.onloadeddata = () => this.onLoadEnd();
         this.audio.onvolumechange = () => this.onVolumeChanged();
         this.audio.onended = () => this.onEnded();
+        this.audio.onerror = (event: Event) => this.onError(event);
 
         this.$paused.pipe(filter((paused) => !paused)).subscribe(() => {
             this.setSession(this._currentSongSubject.getValue());
@@ -64,7 +69,9 @@ export class AudioService {
             this._currentSongSubject.next(song);
         }
         
-        this.audio.play();
+        this.audio.play().catch(() => {
+            this.showError("Das Lied kann nicht abgespielt werden.")
+        });
     }
 
 
@@ -137,7 +144,7 @@ export class AudioService {
      */
     public reset() {
         this.audio.autoplay = true;
-        this.audio.src = "";
+        this.audio.src = null;
         this.audio.volume = 0.3;
     }
 
@@ -162,8 +169,6 @@ export class AudioService {
 
         console.log("[AUDIO] Updating mediaSession.")
 
-        // TODO: Add handlers to catch next and prev etc.
-
         navigator.mediaSession.metadata = new MediaMetadata({
             title: song.title,
             album: song.albums ? song.albums[0]?.title : undefined,
@@ -177,11 +182,34 @@ export class AudioService {
         navigator.mediaSession.setActionHandler("previoustrack", () => this.prev())
     }
 
+    private onError(event: Event) {
+        this._loadingSubject.next(false);
+        this.pause();
 
+        const error = event.currentTarget["error"] as MediaError;
+        if(!error) return;
+
+        if(error.code == 2) {
+            console.error("[AUDIO] Cannot play audio: Network Error")
+            this.showError("Das Lied kann nicht abgespielt werden: Bitte überprüfe deine Internetverbindung")
+        } else if(error.code == 3) {
+            console.error("[AUDIO] Error occured whilst decoding audio.")
+            this.showError("Es ist ein Fehler beim dekodieren aufgetreten.")
+        } else if(error.code == 1) {
+            console.warn("[AUDIO] Could not play audio because it was aborted.")
+        } else if(error.code == 4 && !this.audio.src.includes("null")) {
+            console.error("[AUDIO] Cannot play song, because the src is not supported")
+            this.showError("Das Lied kann nicht abgespielt werden.")
+        } else {
+            if(error.code == 4) return;
+            this.showError("Das Lied kann nicht abgespielt werden.")
+        }
+    }
     private onLoadStart() {
         this._loadingSubject.next(true)
     }
     private onLoadEnd() {
+        this._errorSubject.next(null)
         this._loadingSubject.next(false)
     }
     private onPlayerPaused() {
@@ -200,6 +228,11 @@ export class AudioService {
     }
     private onEnded() {
         this.next();
+    }
+
+
+    private showError(message: string) {
+        this._snackBar.open(message, null, { duration: 3000, panelClass: ["bg-primary", "bg-opacity-90", "backdrop-blur-sm", "text-white-dark", "border-2", "border-primary-light", "bottom-1/2"]})
     }
 
 }
