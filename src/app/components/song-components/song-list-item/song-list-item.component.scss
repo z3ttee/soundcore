@@ -8,10 +8,6 @@
 
         .play-button {
             @apply opacity-0 pointer-events-none scale-75;
-
-            &.active {
-                @include playButtonShow();
-            }
         }
 
         &:hover {

@@ -1,19 +1,26 @@
-<div (contextmenu)="openSongMenu($event, song)" class="item-container transition-all p-1 rounded-md text-center flex flex-1 items-center overflow-hidden h-full cursor-pointer w-full border-2 border-transparent hover:bg-background-light active:bg-background-dark">
+<div (contextmenu)="openSongMenu($event, song)" class="item-container transition-all gap-2 px-2 py-2.5 rounded-md text-center flex items-center overflow-hidden h-full cursor-pointer w-full border-2 border-transparent hover:bg-background-light hover:bg-opacity-60 hover:border-primary-light hover:border-opacity-50 active:bg-background active:bg-opacity-75">
 
-    <div class="inline-flex w-10 aspect-square relative justify-center items-center">
-        <div [ngClass]="{'active': isActive}" class="z-10 play-button transition-all transform-gpu absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 will-change-transform rounded-full bg-accent-dark shadow-lg text-background w-7 h-7 overflow-hidden flex justify-center items-center hover:scale-105" (click)="playOrPause()">
-            <i class="fa-solid fa-pause text-xs" *ngIf="!isPlayerPaused && isActive"></i>
-            <i class="fa-solid fa-play text-xs" *ngIf="isPlayerPaused && isActive"></i>
-            <i class="fa-solid fa-play text-xs" *ngIf="!isActive"></i>
+    <div class="inline-flex w-11 aspect-square relative justify-center items-center border">
+        
+        <div class="z-10 play-button transition-all transform-gpu absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 will-change-transform rounded-full bg-accent-dark shadow-lg text-background w-7 h-7 overflow-hidden flex justify-center items-center hover:scale-105" (click)="playOrPause()">
+            <i class="fa-solid fa-play text-xxs" *ngIf="!isPlayerPaused && !isActive"></i>
+            <i class="fa-solid fa-pause text-xxs" *ngIf="isPlayerPaused"></i>
         </div>
 
-        <p *ngIf="titleNr" class="font-light text-sm opacity-50">#{{ titleNr }}</p>
+        <div *ngIf="isActive">
+            <ng-lottie [options]="animOptions" class="w-8 aspect-square"></ng-lottie>
+        </div>
+        <div *ngIf="!isActive">
+            <p *ngIf="titleNr" class="font-light text-sm opacity-50">#{{ titleNr }}</p>
+        </div>
     </div>
 
-    <asc-artwork class="w-11 aspect-square rounded-lg overflow-hidden" [artwork]="song?.artwork" [showAccent]="false" *ngIf="showCover"></asc-artwork>
+    <div class="w-14 aspect-square rounded-md overflow-hidden border" *ngIf="showCover">
+        <asc-artwork class="" [artwork]="song?.artwork" [showAccent]="false"></asc-artwork>
+    </div>    
 
-    <div class="max-w-full overflow-hidden text-left flex-grow px-4">
-        <p class="font-bold text-sm max-w-full overflow-hidden text-ellipsis whitespace-nowrap">{{ song.title }}</p>
+    <div class="overflow-hidden text-left w-full border">
+        <p class="font-bold text-sm line-clamp-1">{{ song.title }}</p>
 
         <div class="line-clamp-2 opacity-60">
             <ul>
@@ -23,20 +30,20 @@
         </div>
     </div>
 
-    <div class="w-[30%] mx-4 hidden lg:block text-left">
+    <div class="w-[30%] hidden lg:block text-left border">
         <p class="text-sm opacity-80">{{ song?.streamCount || 0 }}</p>
     </div>
 
-    <div class="max-w-60 mr-4 hidden md:block" *ngIf="song?.albums && showAlbum">
+    <div class="w-[20%] hidden md:block border" *ngIf="song?.albums && showAlbum">
         <p class="text-xs text-center opacity-80 line-clamp-1 hover:underline" [routerLink]="['/album', song?.albums[0]?.id]">{{ song?.albums[0]?.title }}</p>
     </div>
 
-    <div class="min-w-32 mr-4 hidden lg:block" *ngIf="song?.song2playlist">
+    <div class="w-36 hidden lg:block border" *ngIf="song?.song2playlist">
         <p class="text-xs opacity-80">{{ song?.song2playlist | addedToPlaylist }}</p>
     </div>
 
-    <div class="min-w-16 hidden sm:block">
-        <p class="text-xs opacity-80">{{ song?.duration | songDurationPipe }}</p>
+    <div class="w-20 hidden sm:block border">
+        <p class="text-xs opacity-80 text-center">{{ song?.duration | songDurationPipe }}</p>
     </div>
 </div>
 

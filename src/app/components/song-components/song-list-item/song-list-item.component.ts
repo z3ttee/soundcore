@@ -1,6 +1,7 @@
 import { Overlay } from '@angular/cdk/overlay';
 import { Component, Input, OnInit, TemplateRef, ViewChild, ViewContainerRef } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
+import { AnimationOptions } from 'ngx-lottie';
 import { combineLatest, map } from 'rxjs';
 import { ChoosePlaylistComponent } from 'src/app/features/playlist/dialogs/choose-playlist/choose-playlist.component';
 import { Playlist } from 'src/app/features/playlist/entities/playlist.entity';
@@ -9,6 +10,7 @@ import { Song } from 'src/app/features/song/entities/song.entity';
 import { AudioService } from 'src/app/features/stream/services/audio.service';
 import { ContextMenuService } from 'src/app/services/context-menu.service';
 import { environment } from 'src/environments/environment';
+import audio_wave_anim from "src/assets/animated/audio_wave.json"
 
 @Component({
   selector: 'asc-song-list-item',
@@ -23,6 +25,12 @@ export class SongListItemComponent implements OnInit {
     @Input() public showAlbum: boolean = true;
     @Input() public showCover: boolean = true;
     @Input() public titleNr: number = undefined;
+
+    public animOptions: AnimationOptions = {
+        autoplay: true,
+        loop: true,
+        animationData: audio_wave_anim
+    }
 
     public playable: boolean = true;
 

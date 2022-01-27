@@ -5,6 +5,12 @@ import { RouterModule } from '@angular/router';
 import { SongListItemComponent } from './song-list-item/song-list-item.component';
 import { PipesModule } from 'src/app/pipes/pipes.module';
 import { AscImageModule } from '../image-components/image-components.module';
+import { LottieCacheModule, LottieModule } from 'ngx-lottie';
+import player from 'lottie-web/build/player/lottie_light';
+
+export function playerFactory() {
+  return player
+}
 
 @NgModule({
   declarations: [
@@ -16,7 +22,12 @@ import { AscImageModule } from '../image-components/image-components.module';
     RouterModule,
     PipesModule,
 
-    AscImageModule
+    AscImageModule,
+
+    LottieModule.forRoot({
+      player: playerFactory
+    }),
+    LottieCacheModule.forRoot()
   ],
   exports: [
     SongGridItemComponent,

@@ -26,6 +26,8 @@
     "@ngrx/store": "^13.0.2",
     "@tailwindcss/line-clamp": "^0.3.0",
     "js-cookie": "^3.0.1",
+    "lottie-web": "^5.8.1",
+    "ngx-lottie": "^8.0.1",
     "rxjs": "~7.4.0",
     "socket.io-client": "^4.4.0",
     "tslib": "^2.3.0",
