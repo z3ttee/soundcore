@@ -10,7 +10,7 @@
         <p *ngIf="titleNr" class="font-light text-sm opacity-50">#{{ titleNr }}</p>
     </div>
 
-    <img [src]="coverSrc" class="w-11 aspect-square rounded-lg">
+    <asc-artwork class="w-11 aspect-square rounded-lg overflow-hidden" [artwork]="song?.artwork" [showAccent]="false" *ngIf="showCover"></asc-artwork>
 
     <div class="max-w-full overflow-hidden text-left flex-grow px-4">
         <p class="font-bold text-sm max-w-full overflow-hidden text-ellipsis whitespace-nowrap">{{ song.title }}</p>

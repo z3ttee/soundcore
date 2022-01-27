@@ -26,8 +26,12 @@ export class UserAvatarComponent implements OnInit, OnChanges {
     if(resourceId) {
       this.avatarUrl = `${environment.sso_base_uri}/media/avatars/${resourceId}`;
     } else {
-      this.avatarUrl = "/assets/img/missing_cover.png"
+      this.onError()
     }
+  }
+
+  public onError() {
+    this.avatarUrl = "/assets/img/missing_cover.png";
   }
 
 }

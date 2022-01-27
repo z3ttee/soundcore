@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, OnInit, SimpleChanges, ViewEncapsulation } from '@angular/core';
+import { Component, ElementRef, Input, OnChanges, OnInit, SimpleChanges, ViewChild, ViewEncapsulation } from '@angular/core';
 import { Artwork } from 'src/app/model/artwork.model';
 import { environment } from 'src/environments/environment';
 
@@ -32,9 +32,13 @@ export class ArtworkComponent implements OnInit, OnChanges {
       this.artworkUrl = `${environment.api_base_uri}/v1/artworks/${artwork.id}`;
       this.accentColor = artwork.accentColor
     } else {
-      this.artworkUrl = "/assets/img/missing_cover.png"
-      this.accentColor = "#000000"
+      this.onError();
     }
+  }
+
+  public onError() {
+    this.artworkUrl = "/assets/img/missing_cover.png";
+    this.accentColor = "#000000";
   }
 
 }
