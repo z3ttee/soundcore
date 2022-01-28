@@ -3,6 +3,7 @@ import { AnimationOptions } from 'ngx-lottie';
 import { take, zip } from 'rxjs';
 import { Song } from 'src/app/features/song/entities/song.entity';
 import { AudioService } from 'src/app/features/stream/services/audio.service';
+import { LikeService } from 'src/app/services/like.service';
 import audio_wave_anim from "src/assets/animated/audio_wave.json"
 
 @Component({
@@ -26,7 +27,10 @@ export class SongListComponent implements OnInit {
         animationData: audio_wave_anim
     }
 
-    constructor(public audioService: AudioService) { }
+    constructor(
+        public audioService: AudioService,
+        private likeService: LikeService
+    ) { }
 
     ngOnInit(): void {
     }
@@ -51,21 +55,15 @@ export class SongListComponent implements OnInit {
                 this.audioService.play();
             }
         })
+    }
 
-        /*if(!this.playable) return;
+    public async likeSong(song: Song) {
+        this.likeService.likeSong(song?.id).then(() => {
+            const index = this.dataSource.findIndex((s) => s.id == song?.id);
+            if(index == -1) return;
 
-        this.contextMenuService.close();
-
-        if(this.isActive) {
-            if(this.isPlayerPaused) {
-                this.audioService.play();
-            } else {
-                this.audioService.pause();
-            }
-        } else {
-            this.audioService.play(this.song);
-        }*/
-        
+            this.dataSource[index].isLiked = !this.dataSource[index].isLiked;
+        });
     }
 
 }

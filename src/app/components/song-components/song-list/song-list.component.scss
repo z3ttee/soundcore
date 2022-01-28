@@ -10,7 +10,7 @@ table {
                     @apply rounded-r-md;
                 }
 
-                .row-btn {
+                .row-btn:not(.active) {
                     @apply opacity-0;
                 }
 

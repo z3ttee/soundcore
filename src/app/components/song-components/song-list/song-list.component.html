@@ -67,7 +67,10 @@
             
             <!-- Like button -->
             <td class="text-center hidden sm:table-cell">
-                <button class="row-btn" mat-icon-button><i class="fa-regular fa-heart"></i></button>
+                <button class="row-btn" [ngClass]="{'active': entry?.isLiked}" mat-icon-button (click)="likeSong(entry)">
+                    <i class="fa-regular fa-heart" *ngIf="!entry?.isLiked"></i>
+                    <i class="fa-solid fa-heart text-accent-dark" *ngIf="entry?.isLiked"></i>
+                </button>
             </td>
 
             <!-- Duration -->
