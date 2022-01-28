@@ -67,8 +67,7 @@ import { AscMessageModule } from './components/message-components/message-compon
     MatInputModule,
     MatListModule,
     MatDividerModule,
-    MatProgressBarModule,
-    MatButtonModule
+    MatProgressBarModule
   ],
   providers: [
     DeviceService,
