@@ -1,26 +1,26 @@
-<div (contextmenu)="openSongMenu($event, song)" class="item-container transition-all gap-2 px-2 py-2.5 rounded-md text-center flex items-center overflow-hidden h-full cursor-pointer w-full border-2 border-transparent hover:bg-background-light hover:bg-opacity-60 hover:border-primary-light hover:border-opacity-50 active:bg-background active:bg-opacity-75">
+<div (contextmenu)="openSongMenu($event, song)" class="item-container transition-all gap-2 px-2 py-2.5 rounded-md text-center flex items-center overflow-hidden h-full cursor-pointer w-full border-1 border-transparent hover:bg-background-light hover:bg-opacity-60 active:bg-background active:bg-opacity-75">
 
-    <div class="inline-flex w-11 aspect-square relative justify-center items-center border">
+    <div class="inline-flex w-11 aspect-square relative justify-center items-center">
         
         <div class="z-10 play-button transition-all transform-gpu absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 will-change-transform rounded-full bg-accent-dark shadow-lg text-background w-7 h-7 overflow-hidden flex justify-center items-center hover:scale-105" (click)="playOrPause()">
-            <i class="fa-solid fa-play text-xxs" *ngIf="!isPlayerPaused && !isActive"></i>
-            <i class="fa-solid fa-pause text-xxs" *ngIf="isPlayerPaused"></i>
+            <i class="fa-solid fa-play text-xxs" *ngIf="isPlayerPaused || !isActive"></i>
+            <i class="fa-solid fa-pause text-xxs" *ngIf="!isPlayerPaused && isActive"></i>
         </div>
 
-        <div *ngIf="isActive">
-            <ng-lottie [options]="animOptions" class="w-8 aspect-square"></ng-lottie>
+        <div *ngIf="!isPlayerPaused && isActive">
+            <ng-lottie [options]="animOptions" class="w-8 aspect-square text-accent-dark"></ng-lottie>
         </div>
-        <div *ngIf="!isActive">
-            <p *ngIf="titleNr" class="font-light text-sm opacity-50">#{{ titleNr }}</p>
+        <div *ngIf="isPlayerPaused || !isActive">
+            <p *ngIf="titleNr" class="text-xs opacity-60" [ngClass]="{'text-accent-dark drop-shadow-sm opacity-100': isActive}">#{{ titleNr }}</p>
         </div>
     </div>
 
-    <div class="w-14 aspect-square rounded-md overflow-hidden border" *ngIf="showCover">
+    <div class="w-14 aspect-square rounded-md overflow-hidden" *ngIf="showCover">
         <asc-artwork class="" [artwork]="song?.artwork" [showAccent]="false"></asc-artwork>
     </div>    
 
-    <div class="overflow-hidden text-left w-full border">
-        <p class="font-bold text-sm line-clamp-1">{{ song.title }}</p>
+    <div class="overflow-hidden text-left w-full">
+        <p class="font-bold text-sm line-clamp-1" [ngClass]="{'text-accent-dark drop-shadow-sm': isActive}">{{ song.title }}</p>
 
         <div class="line-clamp-2 opacity-60">
             <ul>
@@ -30,19 +30,19 @@
         </div>
     </div>
 
-    <div class="w-[30%] hidden lg:block text-left border">
+    <div class="w-[30%] hidden lg:block text-left">
         <p class="text-sm opacity-80">{{ song?.streamCount || 0 }}</p>
     </div>
 
-    <div class="w-[20%] hidden md:block border" *ngIf="song?.albums && showAlbum">
+    <div class="w-[20%] hidden md:block" *ngIf="song?.albums && showAlbum">
         <p class="text-xs text-center opacity-80 line-clamp-1 hover:underline" [routerLink]="['/album', song?.albums[0]?.id]">{{ song?.albums[0]?.title }}</p>
     </div>
 
-    <div class="w-36 hidden lg:block border" *ngIf="song?.song2playlist">
+    <div class="w-36 hidden lg:block" *ngIf="song?.song2playlist">
         <p class="text-xs opacity-80">{{ song?.song2playlist | addedToPlaylist }}</p>
     </div>
 
-    <div class="w-20 hidden sm:block border">
+    <div class="w-20 hidden sm:block">
         <p class="text-xs opacity-80 text-center">{{ song?.duration | songDurationPipe }}</p>
     </div>
 </div>

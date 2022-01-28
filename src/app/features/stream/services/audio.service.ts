@@ -146,6 +146,7 @@ export class AudioService {
         this.audio.autoplay = true;
         this.audio.src = null;
         this.audio.volume = 0.3;
+        this.pause()
     }
 
     public setCurrentTime(currentTime: number) {

@@ -1,0 +1,46 @@
+table {
+
+    tbody {
+        tr {
+            td {
+                &:first-of-type {
+                    @apply rounded-l-md;
+                }
+                &:last-of-type {
+                    @apply rounded-r-md;
+                }
+
+                &.row-btn {
+                    @apply opacity-0;
+                }
+
+                .play-btn {
+                    @apply opacity-0 pointer-events-none;
+                }
+
+                @apply transition-all overflow-hidden text-xs;
+            }
+
+            &:hover {
+                td {
+                    @apply bg-background-light bg-opacity-60;
+
+                    &.row-btn {
+                        @apply opacity-100;
+                    }
+
+                    .play-btn {
+                        @apply opacity-100 pointer-events-auto;
+                    }
+                }
+            }
+
+            &:active {
+                td {
+                    @apply bg-background bg-opacity-70;
+                }
+            }
+        }
+    }
+
+}

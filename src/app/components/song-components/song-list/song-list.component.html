@@ -1,0 +1,83 @@
+<table class="w-full border-collapse [border-spacing: 0.75rem] h-1">
+    <thead class="opacity-0 h-0 md:opacity-100 md:h-min" [ngClass]="{'opacity-0 h-0': !showHead}">
+        <tr class="text-xs">
+            <th scope="col" class="text-xs px-2.5 py-4 tracking-wide opacity-70 text-center w-11 sm:table-cell hidden">#</th>
+            <th scope="col" class="text-xs px-2.5 py-4 tracking-wide opacity-70 text-left">Titel</th>
+            <th scope="col" class="text-xs px-2.5 py-4 tracking-wide opacity-70 text-right hidden md:table-cell" *ngIf="showCount">Wiedergaben</th>
+            <th scope="col" class="text-xs px-2.5 py-4 tracking-wide opacity-70 text-right hidden md:table-cell" *ngIf="showAlbum">Album</th>
+            <th scope="col" class="text-xs px-2.5 py-4 tracking-wide opacity-70 text-right w-44 hidden lg:table-cell" *ngIf="showDate">Hinzugefügt am</th>
+            <th scope="col" class="text-xs px-2.5 py-4 tracking-wide opacity-70 text-center w-11 hidden sm:table-cell"></th> <!-- Like btn col -->
+            <th scope="col" class="text-xs px-2.5 py-4 tracking-wide opacity-70 text-right w-16 hidden sm:table-cell"><i class="fa-solid fa-stopwatch"></i></th>
+            <th scope="col" class="text-xs px-2.5 py-4 tracking-wide opacity-70 text-center w-11 table-cell lg:hidden"></th><!-- More btn col -->
+        </tr>
+    </thead>
+    <tbody>
+        <tr class="cursor-pointer" *ngFor="let entry of dataSource; index as i">
+
+            <!-- TitleNr -->
+            <td class="text-center relative sm:table-cell hidden">
+                <div class="play-btn z-10 transition-all transform-gpu absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 will-change-transform rounded-full bg-accent-dark shadow-lg text-background w-7 h-7 overflow-hidden flex justify-center items-center" (click)="playOrPause(entry)">
+                    <i class="fa-solid fa-play text-xxs" *ngIf="(audioService.$currentSong | async)?.id != entry.id"></i>
+                    <i class="fa-solid fa-play text-xxs" *ngIf="(audioService.$paused | async) && (audioService.$currentSong | async)?.id == entry.id"></i>
+                    <i class="fa-solid fa-pause text-xxs" *ngIf="!(audioService.$paused | async) && (audioService.$currentSong | async)?.id == entry.id"></i>
+                </div>
+
+                <div class="transform absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-9 pointer-events-none text-center" *ngIf="(audioService.$currentSong | async)?.id == entry.id && !(audioService.$paused | async)">
+                    <ng-lottie [options]="animOptions" class="aspect-square"></ng-lottie>
+                </div>
+
+                <span class="opacity-70" [ngClass]="{'text-accent-dark drop-shadow-sm': (audioService.$currentSong | async)?.id == entry.id}" *ngIf="(audioService.$currentSong | async)?.id != entry.id || (audioService.$paused | async)">{{ i + 1 }}</span>
+            </td>
+
+            <!-- Song title with cover -->
+            <td class="text-left px-2.5 pl-0 py-1.5">
+                <div class="flex items-center h-full align-middle">
+                    
+                    <div class="w-11 aspect-square" *ngIf="showCover">
+                        <asc-artwork class="inline-block align-middle w-10 aspect-square rounded-sm overflow-hidden" [artwork]="entry?.artwork" [showAccent]="false"></asc-artwork>
+                    </div>
+                    
+                    <div class="w-full px-2.5">
+                        <p class="font-bold text-sm line-clamp-1" [ngClass]="{'text-accent-dark drop-shadow-sm': (audioService.$currentSong | async)?.id == entry.id}">{{ entry.title }}</p>
+                        <div class="line-clamp-2 opacity-60">
+                            <ul>
+                                <li *ngIf="entry.explicit" class="inline"><span class="inline-flex font-light mr-1 items-center justify-center rounded-sm bg-primary-light text-xs w-4 aspect-square">E</span></li>
+                                <li *ngFor="let artist of entry.artists; index as i" class="inline"><span class="text-xs hover:underline leading-3 pointer-events-all cursor-pointer" [routerLink]="['/artist', artist.id]">{{ artist.name }}</span>{{ i + 1 < entry.artists.length ? ", " : "" }}</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </td>
+
+            <!-- Stream count -->
+            <td class="px-2.5 py-2 text-right hidden md:table-cell" *ngIf="showCount">
+                
+                <span class="text-xs opacity-80 line-clamp-1">{{ entry.streamCount || 0 }}</span>
+            </td>
+
+            <!-- First album title -->
+            <td class="px-2.5 py-2 text-right hidden md:table-cell" *ngIf="showAlbum">
+                <span class="text-xs opacity-80 line-clamp-1 hover:underline" *ngIf="entry?.albums?.length > 0">{{ entry.albums[0].title }}</span>
+            </td>
+            
+            <!-- Date added to playlist -->
+            <td class="px-2.5 py-2 text-right hidden lg:table-cell" *ngIf="showDate">
+                <span class="text-xs opacity-80 line-clamp-1" *ngIf="entry.song2playlist">{{ entry.song2playlist | addedToPlaylist }}</span>
+            </td>
+            
+            <!-- Like button -->
+            <td class="row-btn text-center hidden sm:table-cell">
+                <button mat-icon-button><i class="fa-regular fa-heart"></i></button>
+            </td>
+
+            <!-- Duration -->
+            <td class="px-2.5 py-2 text-right hidden sm:table-cell">{{ entry.duration | songDurationPipe }}</td>
+
+            <!-- More button -->
+            <td class="text-center table-cell lg:hidden">
+                <button mat-icon-button><i class="fa-solid fa-ellipsis-vertical"></i></button>
+            </td>
+
+        </tr>
+    </tbody>
+</table>

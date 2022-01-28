@@ -7,6 +7,8 @@ import { PipesModule } from 'src/app/pipes/pipes.module';
 import { AscImageModule } from '../image-components/image-components.module';
 import { LottieCacheModule, LottieModule } from 'ngx-lottie';
 import player from 'lottie-web/build/player/lottie_light';
+import { SongListComponent } from './song-list/song-list.component';
+import { MatButtonModule } from '@angular/material/button';
 
 export function playerFactory() {
   return player
@@ -15,7 +17,8 @@ export function playerFactory() {
 @NgModule({
   declarations: [
     SongGridItemComponent,
-    SongListItemComponent
+    SongListItemComponent,
+    SongListComponent
   ],
   imports: [
     CommonModule,
@@ -23,6 +26,7 @@ export function playerFactory() {
     PipesModule,
 
     AscImageModule,
+    MatButtonModule,
 
     LottieModule.forRoot({
       player: playerFactory
@@ -31,7 +35,8 @@ export function playerFactory() {
   ],
   exports: [
     SongGridItemComponent,
-    SongListItemComponent
+    SongListItemComponent,
+    SongListComponent
   ]
 })
 export class AscSongModule {}

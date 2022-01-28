@@ -1,15 +1,14 @@
 import { Overlay } from '@angular/cdk/overlay';
-import { Component, Input, OnInit, TemplateRef, ViewChild, ViewContainerRef } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit, TemplateRef, ViewChild, ViewContainerRef } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { AnimationOptions } from 'ngx-lottie';
-import { combineLatest, map } from 'rxjs';
+import { combineLatest, map, Subject, takeUntil } from 'rxjs';
 import { ChoosePlaylistComponent } from 'src/app/features/playlist/dialogs/choose-playlist/choose-playlist.component';
 import { Playlist } from 'src/app/features/playlist/entities/playlist.entity';
 import { PlaylistService } from 'src/app/features/playlist/services/playlist.service';
 import { Song } from 'src/app/features/song/entities/song.entity';
 import { AudioService } from 'src/app/features/stream/services/audio.service';
 import { ContextMenuService } from 'src/app/services/context-menu.service';
-import { environment } from 'src/environments/environment';
 import audio_wave_anim from "src/assets/animated/audio_wave.json"
 
 @Component({
@@ -17,7 +16,7 @@ import audio_wave_anim from "src/assets/animated/audio_wave.json"
   templateUrl: './song-list-item.component.html',
   styleUrls: ['./song-list-item.component.scss']
 })
-export class SongListItemComponent implements OnInit {
+export class SongListItemComponent implements OnInit, OnDestroy {
 
     @ViewChild('songMenu') songMenu: TemplateRef<any>;
 
@@ -35,11 +34,14 @@ export class SongListItemComponent implements OnInit {
     public playable: boolean = true;
 
     public coverSrc: string = null;
-    public accentColor: string = "";
+    public accentColor: string = "";    
 
-    public isPlaying: boolean = false;
+    // IsActive: 
     public isActive: boolean = false;
     public isPlayerPaused: boolean = true;
+    public isPlaying: boolean = false;
+
+    public _unsubscribeNotify: Subject<void> = new Subject();
     
     constructor(
         private audioService: AudioService,
@@ -48,24 +50,25 @@ export class SongListItemComponent implements OnInit {
         private contextMenuService: ContextMenuService,
         private dialog: MatDialog,
         private playlistService: PlaylistService
-    ) {
+    ) {}
+
+    public async ngOnInit() {
         combineLatest([
             this.audioService.$currentSong,
             this.audioService.$paused
-        ]).pipe(map(([song, paused]) => ({ song, paused }))).subscribe((state) => {
-            this.isActive = state.song && state.song?.id == this.song?.id && !state.paused;
-            this.isPlaying = state.song && state.song?.id == this.song?.id;
+        ]).pipe(
+            takeUntil(this._unsubscribeNotify),
+            map(([song, paused]) => ({ song, paused }))
+        ).subscribe((state) => {
+            this.isActive = state.song && state.song?.id == this.song?.id;
+            this.isPlaying = this.isActive && !state.paused;
             this.isPlayerPaused = state.paused
         })
     }
 
-    public async ngOnInit() {
-        if(this.song.artwork) {
-            this.coverSrc = `${environment.api_base_uri}/v1/artworks/${this.song.artwork.id}`;
-            this.accentColor = this.song.artwork.accentColor || "#000000";
-        } else {
-            this.coverSrc = "/assets/img/missing_cover.png"
-        }
+    public ngOnDestroy() {
+        this._unsubscribeNotify.next();
+        this._unsubscribeNotify.complete();
     }
 
     public async playOrPause() {
@@ -73,7 +76,7 @@ export class SongListItemComponent implements OnInit {
 
         this.contextMenuService.close();
 
-        if(this.isPlaying) {
+        if(this.isActive) {
             if(this.isPlayerPaused) {
                 this.audioService.play();
             } else {

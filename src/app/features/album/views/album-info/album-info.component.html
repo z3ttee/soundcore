@@ -52,9 +52,7 @@
 
     <section class="relative my-6 z-10 md:my-12">
         <!-- Songs list -->
-        <div class="block w-full">
-            <asc-song-list-item *ngFor="let song of songs; index as i" [song]="song" [showAlbum]="false" [titleNr]="i+1" [showCover]="false"></asc-song-list-item>
-        </div>
+        <asc-song-list [dataSource]="songs" [showAlbum]="false" [showDate]="false" [showCover]="false"></asc-song-list>
     </section>
 </section>
 
