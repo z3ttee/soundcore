@@ -10,7 +10,7 @@ table {
                     @apply rounded-r-md;
                 }
 
-                &.row-btn {
+                .row-btn {
                     @apply opacity-0;
                 }
 
@@ -25,7 +25,7 @@ table {
                 td {
                     @apply bg-background-light bg-opacity-60;
 
-                    &.row-btn {
+                    .row-btn {
                         @apply opacity-100;
                     }
 

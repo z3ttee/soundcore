@@ -1,5 +1,5 @@
 <table class="w-full border-collapse [border-spacing: 0.75rem] h-1">
-    <thead class="opacity-0 h-0 md:opacity-100 md:h-min" [ngClass]="{'opacity-0 h-0': !showHead}">
+    <thead [style]="showHead ? '' : 'visibility: collapse;'">
         <tr class="text-xs">
             <th scope="col" class="text-xs px-2.5 py-4 tracking-wide opacity-70 text-center w-11 sm:table-cell hidden">#</th>
             <th scope="col" class="text-xs px-2.5 py-4 tracking-wide opacity-70 text-left">Titel</th>
@@ -66,8 +66,8 @@
             </td>
             
             <!-- Like button -->
-            <td class="row-btn text-center hidden sm:table-cell">
-                <button mat-icon-button><i class="fa-regular fa-heart"></i></button>
+            <td class="text-center hidden sm:table-cell">
+                <button class="row-btn" mat-icon-button><i class="fa-regular fa-heart"></i></button>
             </td>
 
             <!-- Duration -->

@@ -54,12 +54,15 @@
             <div class="block md:flex md:flex-1">
                 <div class="flex-grow mr-6">
                     <h6 class="mb-4">Beliebte Songs</h6>
-                    <asc-top-song-item *ngFor="let song of topSongs" [song]="song" [excludeArtistIds]="[artist?.id]"></asc-top-song-item>
+
+                    <asc-song-list [dataSource]="topSongs" [showAlbum]="false" [showDate]="false" [showHead]="false"></asc-song-list>
+
+                    <!--<asc-top-song-item *ngFor="let song of topSongs" [song]="song" [excludeArtistIds]="[artist?.id]"></asc-top-song-item>-->
                 </div>
         
                 <div class="w-full my-4 md:w-1/3 md:m-0">
                     <div class="my-4" *ngIf="artist?.description">
-                        <p class="py-2 md:px-3">Über {{ artist?.name }}</p>
+                        <h6 class="py-2 md:px-3">Über {{ artist?.name }}</h6>
                     
                         <div class="w-full relative overflow-hidden h-44 bg-background bg-opacity-70 backdrop-blur-md border-2 border-primary-light border-opacity-20 rounded-lg">
                             <div class="inline-block w-full max-h-full overflow-hidden overflow-y-auto p-6">
@@ -72,7 +75,7 @@
                     </div>
 
                     <div class="my-4">
-                        <p class="py-2 md:px-3">Lieblingssongs</p>
+                        <h6 class="py-2 md:px-3">Lieblingssongs</h6>
 
                         <div class="flex items-center p-3 cursor-pointer bg-transparent border-2 border-transparent hover:border-opacity-50 hover:bg-background-light hover:bg-opacity-30 hover:border-primary-light hover:backdrop-blur-md active:bg-background active:bg-opacity-30 transition-all rounded-lg">
                             <div class="w-14 rounded-full aspect-square">
