@@ -16,8 +16,8 @@ export class AuthenticationCanActivateGuard implements CanActivate {
         private authService: AuthenticationService
     ) {}
 
-    public canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean | UrlTree | Observable<boolean | UrlTree> | Promise<boolean | UrlTree> {
-        return new Promise((resolve, reject) => {
+    public async canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Promise<boolean | UrlTree> {
+        return new Promise((resolve) => {
             zip([
                 this.authService.$ready.pipe(filter((ready) => ready)),
                 this.authService.$session
@@ -54,6 +54,7 @@ export class AuthenticationCanActivateGuard implements CanActivate {
 
                                     // Persist user data, if finding the data was successful
                                     this.authService.findAndUpdateCurrentUser()
+                                    resolve(true)
                                     return
                                 });
 

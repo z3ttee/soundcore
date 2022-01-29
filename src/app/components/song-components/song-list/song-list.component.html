@@ -62,7 +62,7 @@
             
             <!-- Date added to playlist -->
             <td class="px-2.5 py-2 text-right hidden lg:table-cell" *ngIf="showDate">
-                <span class="text-xs opacity-80 line-clamp-1" *ngIf="entry.song2playlist">{{ entry.song2playlist | addedToPlaylist }}</span>
+                <span class="text-xs opacity-80 line-clamp-1" *ngIf="entry.song2playlist || entry.likedAt">{{ (entry.song2playlist || entry.likedAt) | addedToPlaylist }}</span>
             </td>
             
             <!-- Like button -->

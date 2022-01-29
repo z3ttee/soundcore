@@ -34,5 +34,6 @@ export class Song {
     public streamCount?: number;
 
     public isLiked?: boolean;
+    public likedAt?: Date;
 
 }
