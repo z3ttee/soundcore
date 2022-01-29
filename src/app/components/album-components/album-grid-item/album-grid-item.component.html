@@ -6,7 +6,9 @@
             <i class="fa-solid fa-play" *ngIf="!($isPlaying | async)"></i>
         </div>
 
-        <asc-artwork [artwork]="album?.artwork" [type]="'default'"></asc-artwork>
+        <div class="inline-flex w-full aspect-square">
+            <asc-artwork [artwork]="album?.artwork" [showAccent]="true" [type]="'default'"></asc-artwork>
+        </div>
     </div>
 
     <div class="max-w-full overflow-hidden text-left flex-grow pt-2.5 px-1">
