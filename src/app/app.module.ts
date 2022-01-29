@@ -31,6 +31,7 @@ import { PlaylistModule } from './features/playlist/playlist.module';
 import { InfiniteScrollListComponent } from './components/lists/infinite-scroll-list/infinite-scroll-list.component';
 import { StreamModule } from './features/stream/stream.module';
 import { AscMessageModule } from './components/message-components/message-components.module';
+import { InfiniteScrollModule } from 'ngx-infinite-scroll';
 
 // TODO: https://angular.io/guide/i18n-common-prepare
 
@@ -55,6 +56,7 @@ import { AscMessageModule } from './components/message-components/message-compon
     StoreModule.forRoot({}, {}),
     AppCommonModule,
     TeleportModule,
+    InfiniteScrollModule,
 
     PlaylistModule,
     StreamModule,
