@@ -11,6 +11,7 @@ export class ScrollService {
     public $onBottomReached: Observable<void> = this._bottomScrolledSubject.asObservable();
 
     public async emitOnBottomReached() {
+        console.log("bottom reached")
         this._bottomScrolledSubject.next()
     }
 

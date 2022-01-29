@@ -5,7 +5,7 @@
             <th scope="col" class="text-xs px-2.5 py-4 tracking-wide opacity-70 text-left">Titel</th>
             <th scope="col" class="text-xs px-2.5 py-4 tracking-wide opacity-70 text-right hidden md:table-cell" *ngIf="showCount">Wiedergaben</th>
             <th scope="col" class="text-xs px-2.5 py-4 tracking-wide opacity-70 text-right hidden md:table-cell" *ngIf="showAlbum">Album</th>
-            <th scope="col" class="text-xs px-2.5 py-4 tracking-wide opacity-70 text-right w-44 hidden lg:table-cell" *ngIf="showDate">Hinzugefügt am</th>
+            <th scope="col" class="text-xs px-2.5 py-4 tracking-wide opacity-70 text-right hidden lg:table-cell" *ngIf="showDate">Hinzugefügt am</th>
             <th scope="col" class="text-xs px-2.5 py-4 tracking-wide opacity-70 text-center w-11 hidden sm:table-cell"></th> <!-- Like btn col -->
             <th scope="col" class="text-xs px-2.5 py-4 tracking-wide opacity-70 text-right w-16 hidden sm:table-cell"><i class="fa-solid fa-stopwatch"></i></th>
             <th scope="col" class="text-xs px-2.5 py-4 tracking-wide opacity-70 text-center w-11 table-cell lg:hidden"></th><!-- More btn col -->
@@ -39,7 +39,7 @@
                     
                     <div class="w-full px-2.5">
                         <p class="font-bold text-sm line-clamp-1" [ngClass]="{'text-accent-dark drop-shadow-sm': (audioService.$currentSong | async)?.id == entry.id}">{{ entry.title }}</p>
-                        <div class="line-clamp-2 opacity-60">
+                        <div class="line-clamp-1 opacity-60">
                             <ul>
                                 <li *ngIf="entry.explicit" class="inline"><span class="inline-flex font-light mr-1 items-center justify-center rounded-sm bg-primary-light text-xs w-4 aspect-square">E</span></li>
                                 <li *ngFor="let artist of entry.artists; index as i" class="inline"><span class="text-xs hover:underline leading-3 pointer-events-all cursor-pointer" [routerLink]="['/artist', artist.id]">{{ artist.name }}</span>{{ i + 1 < entry.artists.length ? ", " : "" }}</li>
@@ -51,7 +51,6 @@
 
             <!-- Stream count -->
             <td class="px-2.5 py-2 text-right hidden md:table-cell" *ngIf="showCount">
-                
                 <span class="text-xs opacity-80 line-clamp-1">{{ entry.streamCount || 0 }}</span>
             </td>
 

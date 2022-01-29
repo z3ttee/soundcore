@@ -2,7 +2,6 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SongGridItemComponent } from './song-grid-item/song-grid-item.component';
 import { RouterModule } from '@angular/router';
-import { SongListItemComponent } from './song-list-item/song-list-item.component';
 import { PipesModule } from 'src/app/pipes/pipes.module';
 import { AscImageModule } from '../image-components/image-components.module';
 import { LottieCacheModule, LottieModule } from 'ngx-lottie';
@@ -17,7 +16,6 @@ export function playerFactory() {
 @NgModule({
   declarations: [
     SongGridItemComponent,
-    SongListItemComponent,
     SongListComponent
   ],
   imports: [
@@ -35,7 +33,6 @@ export function playerFactory() {
   ],
   exports: [
     SongGridItemComponent,
-    SongListItemComponent,
     SongListComponent
   ]
 })
