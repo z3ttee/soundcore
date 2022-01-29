@@ -1,5 +1,7 @@
-import { Component, OnInit } from '@angular/core';
-import { map, Observable } from 'rxjs';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { map, Observable, Subject, takeUntil } from 'rxjs';
+import { Song } from 'src/app/features/song/entities/song.entity';
+import { LikeService } from 'src/app/services/like.service';
 import { environment } from 'src/environments/environment';
 import { AudioService } from '../../services/audio.service';
 
@@ -8,7 +10,10 @@ import { AudioService } from '../../services/audio.service';
   templateUrl: './stream-player-bar.component.html',
   styleUrls: ['./stream-player-bar.component.scss']
 })
-export class StreamPlayerBarComponent implements OnInit {
+export class StreamPlayerBarComponent implements OnInit, OnDestroy {
+
+  private _destroySubject: Subject<void> = new Subject();
+  private $destroy = this._destroySubject.asObservable();
 
   public $artworkUrl: Observable<string> = this.audioService.$currentSong.pipe(
     map((song) => {
@@ -38,15 +43,33 @@ export class StreamPlayerBarComponent implements OnInit {
   public coverSrc: string = null;
   public accentColor: string = "";
 
+  private _song: Song = null;
+
   constructor(
-    public audioService: AudioService
+    public audioService: AudioService,
+    public likeService: LikeService
   ) {}
 
-  public ngOnInit(): void {}
+  public ngOnInit(): void {
+    this.audioService.$currentSong.pipe(takeUntil(this.$destroy)).subscribe((song) => {
+      this._song = song;
+    })
+  }
+
+  public ngOnDestroy(): void {
+    this._destroySubject.next();
+    this._destroySubject.complete();
+  }
 
   public async onSeeking(data) {
     console.log(data)
     this.audioService.setCurrentTime(data)
+  }
+
+  public async likeSong() {
+    this.likeService.likeSong(this._song?.id).then(() => {
+      this._song.isLiked = !this._song.isLiked;
+    });
   }
 
 }
