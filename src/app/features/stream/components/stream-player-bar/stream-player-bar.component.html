@@ -6,7 +6,7 @@
 
         <!-- Title Section -->
         <div class="flex w-full md:w-1/3 items-center content-center gap-2 p-2 md:p-0 relative">
-            <div class="absolute left-0 right-0 top-[4px] bottom-0 border z-30 md:hidden" [routerLink]="['/player']"></div>
+            <div class="absolute left-0 right-0 top-[4px] bottom-0 z-30 md:hidden" [routerLink]="['/player']"></div>
 
             <!-- Title Cover -->
             <div class="relative inline-flex w-10 max-w-10 h-10 aspect-square" [ngClass]="{'opacity-0 pointer-events-none': !(audioService.$currentSong | async)}">
