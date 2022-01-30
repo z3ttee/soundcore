@@ -1,43 +1,17 @@
-:host {
-    .horizontal_scroll {
+.horizontal_scroll {
 
-        .scroll-area {
-            -webkit-overflow-scrolling: touch;
-            grid-auto-columns: minmax(10rem, 1fr);
-            grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+    .scroll-area {
+        -webkit-overflow-scrolling: touch;
+        grid-auto-columns: 10rem;
+        grid-template-columns: repeat(auto-fill, 10rem);
 
-            -ms-overflow-style: none;  /* IE and Edge */
-            scrollbar-width: none;  /* Firefox */
+        -ms-overflow-style: none;  /* IE and Edge */
+        scrollbar-width: none;  /* Firefox */
 
-            /* Hide scrollbar for Chrome, Safari and Opera */
-            &::-webkit-scrollbar {
-                display: none;
-            }
+        /* Hide scrollbar for Chrome, Safari and Opera */
+        &::-webkit-scrollbar {
+            display: none;
         }
-
     }
+
 }
-
-/*
-:host {
-    .horizontal_scroll {
-
-        .scroll-area {
-            overflow-y: hidden;
-            grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
-
-            &.not-scrollable {
-                border: 1px solid red;
-            }
-            
-            &:not(.not-scrollable) {
-                -webkit-overflow-scrolling: touch;
-                grid-auto-columns: minmax(10rem, 1fr);
-                overflow-x: auto;
-                grid-auto-flow: column;
-            }
-        }
-
-    }
-}
-*/

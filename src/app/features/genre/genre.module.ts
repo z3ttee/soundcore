@@ -7,6 +7,9 @@ import { AppCommonModule } from 'src/app/common.module';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { AscSongModule } from 'src/app/components/song-components/song-components.module';
 import { AscMessageModule } from 'src/app/components/message-components/message-components.module';
+import { AscGridsModule } from 'src/app/components/grids/grids.module';
+import { AscAlbumModule } from 'src/app/components/album-components/album-components.module';
+import { AscPlaylistModule } from 'src/app/components/playlist-components/playlist-components.module';
 
 const routes: Routes = [
   { path: ":genreId", component: GenreInfoComponent }
@@ -18,7 +21,10 @@ const routes: Routes = [
   ],
   imports: [
     AscSongModule,
+    AscAlbumModule,
     AscMessageModule,
+    AscGridsModule,
+    AscPlaylistModule,
 
     CommonModule,
     AppCommonModule,

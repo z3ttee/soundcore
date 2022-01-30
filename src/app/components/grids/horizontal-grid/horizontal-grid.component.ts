@@ -1,4 +1,5 @@
 import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { DeviceService } from 'src/app/services/device.service';
 
 @Component({
   selector: 'asc-horizontal-grid',
@@ -21,7 +22,7 @@ export class HorizontalGridComponent implements OnInit {
   public canGoPrev: boolean = false;
   public canGoNext: boolean = false;
 
-  constructor() { }
+  constructor(public deviceService: DeviceService) { }
 
   public ngOnInit(): void {
     
