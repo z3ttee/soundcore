@@ -18,6 +18,9 @@ export class PlaylistInfoComponent implements OnInit {
   public playlist: Playlist = null;
   public songs: Song[] = []
 
+  // Pagination
+  private currentPage: number = 0;
+
   // Accent colors  
   public accentColor: string = "#FFBF50";
 
@@ -36,15 +39,18 @@ export class PlaylistInfoComponent implements OnInit {
         console.log(playlist)
 
         if(this.playlist) {
-          this.playlistService.findSongsByPlaylist(this.playlist.id).then((page) => {
-            this.songs = page.elements;
-            console.log(this.songs)
-          });
+          this.findSongs();
         }
       }).finally(() => this.isLoading = false);
     })
-    
+  }
 
+  public async findSongs() {
+    this.playlistService.findSongsByPlaylist(this.playlist.id, { page: this.currentPage, size: 50 }).then((page) => {
+      if(page.elements.length > 0) this.currentPage++;
+      this.songs = page.elements;
+      console.log(this.songs)
+    });
   }
 
 }

@@ -56,7 +56,7 @@
     <section class="relative my-6 z-10 md:my-12">
 
         <!-- Songs list -->
-        <asc-song-list [dataSource]="songs" [showCount]="false"></asc-song-list>
+        <asc-song-list [dataSource]="songs" [showCount]="false" [showMore]="songs.length < playlist?.songsCount" (onMore)="findSongs()"></asc-song-list>
 
     </section>
 

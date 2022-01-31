@@ -17,7 +17,7 @@ export class CollectionInfoComponent implements OnInit {
 
   public collection: Collection;
   public songs: Song[] = [] // TODO: Implement infinite scroll
-  private currentPage: number = -1;
+  private currentPage: number = 0;
 
   public isLoading: boolean = false;
 
@@ -36,15 +36,20 @@ export class CollectionInfoComponent implements OnInit {
       this.collection = collection;
 
       this.scrollService.$onBottomReached.pipe(takeUntil(this.$destroy)).subscribe(() => {
-        this.collectionService.findSongsByCollection({
-          page: ++this.currentPage,
-          size: 30
-        }).then((page) => {
-          this.songs.push(...page.elements)
-        })
+        this.findSongs();
       })
     }).finally(() => {
       this.isLoading = false
+    })
+  }
+
+  public async findSongs() {
+    this.collectionService.findSongsByCollection({
+      page: this.currentPage,
+      size: 30
+    }).then((page) => {
+      if(page.elements.length > 0) this.currentPage++;
+      this.songs.push(...page.elements)
     })
   }
 

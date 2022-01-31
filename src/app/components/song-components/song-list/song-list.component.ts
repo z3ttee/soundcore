@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { AnimationOptions } from 'ngx-lottie';
 import { take, zip } from 'rxjs';
 import { Song } from 'src/app/features/song/entities/song.entity';
@@ -20,6 +20,9 @@ export class SongListComponent implements OnInit {
     @Input() public showCover: boolean = true;
     @Input() public showDate: boolean = true;
     @Input() public showCount: boolean = true;
+    @Input() public showMore: boolean = true;
+
+    @Output() public onMore: EventEmitter<void> = new EventEmitter();
 
     public animOptions: AnimationOptions = {
         autoplay: true,

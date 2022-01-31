@@ -51,14 +51,14 @@
         </div>
     </section>
 
-    <section class="relative my-6 z-10 md:my-12">
+    <section class="relative my-row z-10">
         <!-- Songs list -->
         <asc-song-list [dataSource]="songs" [showAlbum]="false" [showDate]="false" [showCover]="false"></asc-song-list>
     </section>
 </section>
 
 <!-- Recommended albums -->
-<section class="relative my-6 z-10" *ngIf="album?.artist && recommendedAlbums?.length > 0">
+<section class="relative mt-row z-10" *ngIf="album?.artist && recommendedAlbums?.length > 0">
     <asc-horizontal-grid [headline]="'Mehr von ' + album?.artist?.name" (more)="showDiscography()" [enableMore]="true" customMoreText="Diskographie anzeigen">
         <asc-album-grid-item *ngFor="let recommended of recommendedAlbums" [album]="recommended" [preferDate]="true" [routerLink]="['/album', recommended?.id]"></asc-album-grid-item>
     </asc-horizontal-grid>
