@@ -13,7 +13,7 @@
     </div>
 </section>
 
-<section *ngIf="!isLoading && !!playlist" class="relative p-6">
+<section *ngIf="!isLoading && !!playlist" class="relative p-window">
     <div class="absolute left-0 top-0 w-full h-[50vh]" [style]="'background: linear-gradient(180deg, ' + (playlist?.artwork?.accentColor || accentColor) + '80 0%, ' + (playlist?.artwork?.accentColor || accentColor) + '00 100%);'"></div>
 
     <!-- Playlist title section -->

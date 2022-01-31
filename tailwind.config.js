@@ -8,6 +8,12 @@ module.exports = {
     darkMode: 'class', // or 'media' or 'class'
     theme: {
       extend: {
+        padding: ({ theme }) => ({
+          window: theme("spacing.4"),
+        }),
+        margin: ({ theme }) => ({
+          row: theme("spacing.6"),
+        }),
         gridTemplateColumns: ({ theme }) => ({
           drawer: 'auto minmax(0, 1fr)',
           drawerClosed: 'auto',
@@ -16,7 +22,8 @@ module.exports = {
           auto: 'repeat(auto-fill, 1fr)'
         }),
         gridAutoColumns: ({ theme }) => ({
-          'songs-hr': 'minmax(' + theme("width.36") + ', 1fr))'
+          'songs-hr': 'minmax(' + theme("width.36") + ', 1fr))',
+          'songs-hr-mobile': 'minmax(' + theme("width.28") + ', 1fr))'
         }),
         colors: {
           background: {
@@ -93,7 +100,7 @@ module.exports = {
         xs: ['0.8rem', { lineHeight: '1rem' }],
         sm: ['0.9rem', { lineHeight: '1.1rem' }],
         base: ['0.98rem', { lineHeight: '1.25rem' }],
-        lg: ['1.125rem', { lineHeight: '1.75rem' }],
+        lg: ['1rem', { lineHeight: '1.75rem' }],
         xl: ['1.25rem', { lineHeight: '1.75rem' }],
         '2xl': ['1.5rem', { lineHeight: '2rem' }],
         '3xl': ['1.875rem', { lineHeight: '2.5rem' }],

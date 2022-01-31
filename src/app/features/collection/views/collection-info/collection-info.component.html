@@ -1,21 +1,10 @@
-<div class="absolute w-full top-0 left-0">
+<div class="absolute w-full top-0 left-0 right-0 z-10">
     <mat-progress-bar  mode="indeterminate" color="accent" *ngIf="isLoading"></mat-progress-bar>
 </div>
 
-<section *ngIf="!isLoading && !collection">
-    <div class="flex justify-center items-center flex-col w-full p-10 text-left">
-        <h1>
-            <span class="text-sm w-full block text-accent-dark">404 Not Found</span>
-            Whooops!
-        </h1>
+<div class="absolute left-0 top-0 w-full h-[50vh]" [style]="'background: linear-gradient(180deg, ' + (accentColor) + '80 0%, ' + (accentColor) + '00 100%);'"></div>
 
-        <p class="mt-4">Die Playlist, die du suchst, konnte nicht gefunden werden.</p>
-    </div>
-</section>
-
-<section *ngIf="!isLoading && !!collection" class="relative p-6">
-    <div class="absolute left-0 top-0 w-full h-[50vh]" [style]="'background: linear-gradient(180deg, ' + (accentColor) + '80 0%, ' + (accentColor) + '00 100%);'"></div>
-
+<section *ngIf="!isLoading && !!collection" class="relative p-window">
     <!-- Playlist title section -->
     <section class="block md:flex md:flex-1 md:items-end z-10 relative">
         <!-- Playlist cover -->
@@ -48,5 +37,4 @@
         <asc-song-list [dataSource]="songs" [showCount]="false"></asc-song-list>
 
     </section>
-
 </section>

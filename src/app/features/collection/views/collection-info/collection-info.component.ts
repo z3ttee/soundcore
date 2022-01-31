@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { BehaviorSubject, Subject, takeUntil } from 'rxjs';
+import { Subject, takeUntil } from 'rxjs';
 import { Song } from 'src/app/features/song/entities/song.entity';
 import { ScrollService } from 'src/app/services/scroll.service';
 import { AuthenticationService } from 'src/app/sso/authentication.service';
