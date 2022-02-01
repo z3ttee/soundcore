@@ -1,9 +1,12 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Song } from 'src/app/features/song/entities/song.entity';
-import { Artist } from 'src/app/model/artist.model';
-import { environment } from 'src/environments/environment';
+import { Artist } from 'src/app/features/artist/entities/artist.entity';
 import { ArtistService } from '../../services/artist.service';
+import { Album } from 'src/app/features/album/entities/album.entity';
+import { Playlist } from 'src/app/features/playlist/entities/playlist.entity';
+import { Genre } from 'src/app/model/genre.entity';
+import { Page } from 'src/app/pagination/pagination';
 
 @Component({
   selector: 'asc-artist-info',
@@ -22,10 +25,16 @@ export class ArtistInfoComponent implements OnInit {
   public bannerAccentColor: string = "";
 
   public topSongs: Song[] = [];
+  public genres: Page<Genre> = null;
+  public songs: Song[] = [];
+  public albums: Album[] = [];
+  public featAlbums: Album[] = [];
+  public featPlaylists: Playlist[] = [];
 
   constructor(
     private activatedRoute: ActivatedRoute,
-    private artistService: ArtistService
+    private artistService: ArtistService,
+    public router: Router
   ) { }
 
   public ngOnInit(): void {
@@ -40,22 +49,24 @@ export class ArtistInfoComponent implements OnInit {
       this.artistService.findProfileById(artistId).then((artist) => {
         this.artist = artist;
 
-        if(this.artist?.artwork) {
-          this.coverSrc = `${environment.api_base_uri}/v1/artworks/${this.artist.artwork.id}`;
-          this.accentColor = this.artist.artwork.accentColor;
-        } else {
-          this.coverSrc = "/assets/img/missing_cover.png"
-        }
-
-        if(this.artist?.banner) {
-          this.bannerSrc = `${environment.api_base_uri}/v1/artworks/${this.artist.banner.id}`;
-          this.bannerAccentColor = this.artist.banner.accentColor;
-        } else {
-          this.bannerSrc = null
-        }
-
         this.artistService.findTopSongsByArtist(artistId).then((songs) => {
           this.topSongs = songs
+        })
+
+        this.artistService.findGenresByArtist(artistId, { size: 12, page: 0 }).then((page) => {
+          this.genres = page;
+        })
+
+        this.artistService.findSongsByArtist(artistId, { size: 12, page: 0 }).then((page) => {
+          this.songs = page.elements;
+        })
+
+        this.artistService.findAlbumsByArtist(artistId, { size: 12, page: 0}).then((page) => {
+          this.albums = page.elements;
+        })
+
+        this.artistService.findFeaturedAlbumsWithArtist(artistId, { size: 12, page: 0 }).then((page) => {
+          this.featAlbums = page.elements;
         })
       }).finally(() => this.isLoading = false)
     })

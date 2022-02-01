@@ -1,7 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { map, Observable } from 'rxjs';
 import { AudioService } from 'src/app/features/stream/services/audio.service';
-import { Artist } from 'src/app/model/artist.model';
+import { Artist } from 'src/app/features/artist/entities/artist.entity';
 
 @Component({
   selector: 'asc-artist-grid-item',

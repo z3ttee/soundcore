@@ -1,8 +1,11 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
-import { Artist } from 'src/app/model/artist.model';
+import { Artist } from 'src/app/features/artist/entities/artist.entity';
+import { Genre } from 'src/app/model/genre.entity';
+import { Page, Pageable } from 'src/app/pagination/pagination';
 import { environment } from 'src/environments/environment';
+import { Album } from '../../album/entities/album.entity';
 import { Song } from '../../song/entities/song.entity';
 
 @Injectable({
@@ -19,5 +22,39 @@ export class ArtistService {
   public async findTopSongsByArtist(artistId: string): Promise<Song[]> {
     return firstValueFrom(this.httpClient.get(`${environment.api_base_uri}/v1/songs/byArtist/${artistId}/top`)) as Promise<Song[]>
   }
+
+  public async findAlbumsByArtist(artistId: string, pageable: Pageable): Promise<Page<Album>> {
+    return firstValueFrom(this.httpClient.get<Page<Album>>(`${environment.api_base_uri}/v1/albums/byArtist/${artistId}${Pageable.toQuery(pageable)}`))
+  }
+
+  public async findFeaturedAlbumsWithArtist(artistId: string, pageable: Pageable): Promise<Page<Album>> {
+    return firstValueFrom(this.httpClient.get<Page<Album>>(`${environment.api_base_uri}/v1/albums/byFeaturedArtist/${artistId}${Pageable.toQuery(pageable)}`))
+  }
+
+  public async findGenresByArtist(artistId: string, pageable: Pageable): Promise<Page<Genre>> {
+    if(!artistId) return Page.of([]);
+    return firstValueFrom(this.httpClient.get<Page<Genre>>(`${environment.api_base_uri}/v1/genres/byArtist/${artistId}${Pageable.toQuery(pageable)}`))
+  }
+
+  public async findGenreById(genreId: string): Promise<Genre> {
+    if(!genreId) null;
+    return firstValueFrom(this.httpClient.get<Genre>(`${environment.api_base_uri}/v1/genres/${genreId}`))
+  }
+
+  public async findSongsByGenreAndArtist(genreId: string, artistId: string, pageable: Pageable): Promise<Page<Song>> {
+    if(!genreId || !artistId) return Page.of([])
+    return firstValueFrom(this.httpClient.get<Page<Song>>(`${environment.api_base_uri}/v1/songs/byGenre/${genreId}/byArtist/${artistId}${Pageable.toQuery(pageable)}`));
+  }
+
+  public async findSongsByCollectionAndArtist(artistId: string, pageable: Pageable): Promise<Page<Song>> {
+    if(!artistId) return Page.of([])
+    return firstValueFrom(this.httpClient.get<Page<Song>>(`${environment.api_base_uri}/v1/songs/byCollection/byArtist/${artistId}${Pageable.toQuery(pageable)}`))
+  }
+
+  public async findSongsByArtist(artistId: string, pageable: Pageable): Promise<Page<Song>> {
+    if(!artistId) return Page.of([])
+    return firstValueFrom(this.httpClient.get<Page<Song>>(`${environment.api_base_uri}/v1/songs/byArtist/${artistId}${Pageable.toQuery(pageable)}`));
+  }
+
 
 }

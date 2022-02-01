@@ -1,6 +1,6 @@
 export class Pageable {
-    public size: number = 10;
-    public page: number = 0;
+    public size?: number = 30;
+    public page?: number = 0;
 
     public static toQuery(pageable: Pageable): string {
         if(!pageable) pageable = new Pageable();

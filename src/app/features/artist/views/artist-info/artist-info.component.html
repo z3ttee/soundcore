@@ -1,97 +1,93 @@
-<div class="absolute w-full top-0 left-0">
+<div class="absolute w-full top-0 left-0 right-0 z-10">
     <mat-progress-bar  mode="indeterminate" color="accent" *ngIf="isLoading"></mat-progress-bar>
 </div>
 
-<section *ngIf="!isLoading && !artist">
-    <div class="flex justify-center items-center flex-col w-full p-10 text-left">
-        <h1>
-            <span class="text-sm w-full block text-accent-dark">404 Not Found</span>
-            Whooops!
-        </h1>
+<div class="absolute left-0 top-0 w-full h-[50vh]" [style]="'background: linear-gradient(180deg, ' + (artist?.artwork?.accentColor) + '80 0%, ' + (artist?.artwork?.accentColor) + '00 100%);'"></div>
 
-        <p class="mt-4">Die Playlist die du suchst konnte nicht gefunden werden.</p>
-    </div>
+<section *ngIf="!isLoading && !!artist" class="relative p-window">
+    <!-- Playlist title section -->
+    <section class="block md:flex md:flex-1 md:items-end z-10 relative">
+        <!-- Playlist cover -->
+        <div class="block w-56 mx-auto md:m-0 relative">
+            <asc-artwork [artwork]="artist?.artwork" class="block aspect-square rounded-2xl overflow-hidden shadow-xl z-10" [showAccent]="false"></asc-artwork>
+        </div>
+
+        <!-- Playlist title -->
+        <div class="z-30 md:px-4 w-full pointer-events-auto mt-8 md:m-0">
+            <h6 class="font-light md:font-bold md:-mb-1 text-sm md:text-lg md:block hidden">Künstler</h6>
+            <h1 class="my-2 md:m-0 line-clamp-1 text-2xl md:text-5xl drop-shadow-md">{{ artist?.name }}</h1>
+
+            <!-- Quick info bar below title -->
+            <div class="py-2 md:flex md:items-center">
+                <ul class="flex md:inline-flex items-center gap-4">
+                    <li class="inline text-xs opacity-60">{{ artist?.albumCount || 0 }} {{ artist?.albumCount != 1 ? "Alben" : "Album" }}</li>
+                    <li class="inline text-xs opacity-60">{{ artist?.songCount || 0 }} {{ artist?.songCount != 1 ? "Songs" : "Song" }}</li>
+                    <li class="inline text-xs opacity-60">{{ artist?.streamCount || 0 }} {{ artist?.streamCount != 1 ? "Wiedergaben" : "Wiedergabe" }}</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <section class="my-row">
+        <div class="block md:flex md:flex-1 gap-12">
+            <div class="flex-grow mr-6">
+                <h6 class="mb-4">Beliebte Songs</h6>
+
+                <asc-song-list [dataSource]="topSongs" [showMore]="false" [showAlbum]="false" [showDate]="false" [showHead]="false"></asc-song-list>
+            </div>
+    
+            <div class="w-full my-4 md:w-1/3 md:m-0 px-0">
+
+                <!-- Collection section -->
+                <div class="my-4">
+                    <h6 class="py-2">Lieblingssongs</h6>
+
+                    <div [routerLink]="['.', 'collection']" class="flex items-center p-3 gap-3 cursor-pointer bg-transparent border-2 border-transparent active:border-opacity-60 hover:bg-background-light hover:bg-opacity-80 active:border-primary-light hover:backdrop-blur-md active:bg-background active:bg-opacity-80 transition-all rounded-lg">
+                        <div class="w-14 rounded-full overflow-hidden aspect-square">
+                            <asc-artwork [artwork]="artist?.artwork" [showAccent]="false"></asc-artwork>
+                        </div>
+
+                        <div class="w-full">
+                            <p class="">Du hast {{ artist?.likedCount || 0 }} {{ (artist?.likedCount || 0) != 1 ? "Lieder" : "Lied" }} geliked.</p>
+                            <p class="text-xs opacity-70">von {{ artist?.name }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Genres section -->
+                <div class="my-4" *ngIf="genres?.elements?.length > 0">
+                    <h6 class="py-2">Genres</h6>
+
+                    <div class="flex items-center flex-wrap gap-2">
+                        <asc-label-badge *ngFor="let genre of genres?.elements" [routerLink]="['.', 'genres', genre.id]">{{ genre.name }}</asc-label-badge>
+                        <p *ngIf="genres?.totalElements - 12 > 0" class="text-xs uppercase tracking-wide hover:underline cursor-pointer py-1.5 px-3" [routerLink]="['.', 'genres']">+{{ genres?.totalElements - 12 }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 </section>
 
-<section *ngIf="!isLoading && !!artist">
-    <section class="md:px-4 md:pt-4" [ngClass]="{'md:pb-36': !!bannerSrc}" [style]="'background: linear-gradient(180deg, ' + (bannerAccentColor || accentColor) + '50 0%, ' + (bannerAccentColor || accentColor) + '00 100%);'">
-        <div class="inline-block w-full" [ngClass]="{'h-96': !!bannerSrc}">
-            <div class="relative inline-block w-full items-center px-0 md:px-6 py-0 md:py-0 rounded-xl" [ngClass]="{'md:h-64 md:pt-20 md:shadow-md': !!bannerSrc}">
-                
-                <div class="absolute top-0 left-0 w-full h-full overflow-hidden rounded-xl hidden md:block" *ngIf="bannerSrc">
-                    <div class="w-full h-full bg-center bg-cover bg-no-repeat bg-transparent z-0 filter brightness-50 blur-[2px]" [style]="bannerSrc ? 'background-image: url(' + bannerSrc + ');' : ''"></div>
-                
-                    <div class="absolute bottom-4 right-4 z-10">
-                        <button class="py-3 px-4 rounded-full mr-2 bg-accent-dark text-background-dark text-xs transition-all"><i class="fa-solid fa-play"></i> Abspielen</button>
-                        <button class="py-3 px-4 rounded-full bg-accent-dark text-background-dark text-xs transition-all"><i class="fa-solid fa-heart"></i> Folgen</button>
-                    </div>
-                </div>
-                
-                <div class="z-10 md:bottom-0 md:left-8 md:right-8 transform-gpu pointer-events-none" [ngClass]="{'md:absolute md:translate-y-2/3': !!bannerSrc}">
-                    <div class="flex flex-1" [ngClass]="{'items-end': !!bannerSrc, 'items-center': !bannerSrc}">
-                        <img [src]="coverSrc" class="w-full md:w-32 aspect-square rounded-xl shadow-md filter brightness-50 md:brightness-100">
+<section class="my-row" *ngIf="songs.length > 0">
+    <asc-horizontal-grid headline="Neuste Songs" [enableMore]="true" (onMore)="router.navigate(['/artist', artist?.id, 'songs'])">
+        <asc-song-grid-item *ngFor="let song of songs" [song]="song"></asc-song-grid-item>
+      </asc-horizontal-grid>
+</section>
 
-                        <div class="z-30 p-4 w-full pointer-events-auto hidden md:block">
-                            <p class="text-sm mb-0">Künstler</p>
-                            <h2 class="line-clamp-1">{{ artist?.name }}</h2>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+<section class="my-row" *ngIf="albums.length > 0">
+    <asc-horizontal-grid headline="Alben" [enableMore]="true" (onMore)="router.navigate(['/artist', artist?.id, 'albums'])">
+        <asc-album-grid-item *ngFor="let album of albums" [album]="album" [routerLink]="['/album', album.id]"></asc-album-grid-item>
+      </asc-horizontal-grid>
+</section>
 
-    <section class="-mt-80 md:mt-4 relative" [ngClass]="{'md:-mt-36': !!bannerSrc}">
+<section class="my-row" *ngIf="featPlaylists.length > 0">
+    <asc-horizontal-grid headline="Enthalten in" [enableMore]="true" (onMore)="router.navigate(['/artist', artist?.id, 'playlists'])">
+        <!--<asc-album-grid-item *ngFor="let album of albums" [album]="album"></asc-album-grid-item>-->
+      </asc-horizontal-grid>
+</section>
 
-        <div class="px-4 pb-4 z-30 w-full pointer-events-auto block md:hidden">
-            <p class="text-xs opacity-75">Künstler</p>
-            <h4 class="line-clamp-2">{{ artist?.name }}</h4>
-        </div>
-
-        <div class="relative min-h-80 px-4 py-4 md:px-16 md:py-0 bg-background-dark md:bg-transparent rounded-3xl md:rounded-none overflow-hidden">
-            <div class="md:hidden absolute top-0 left-0 right-0 h-16 pointer-events-none z-0" [style]="'background: linear-gradient(180deg, ' + (accentColor) + '20 0%, ' + (accentColor) + '00 100%);'" [ngClass]="{'md:pb-36': !!bannerSrc}"></div>
-
-            <div class="block md:flex md:flex-1">
-                <div class="flex-grow mr-6">
-                    <h6 class="mb-4">Beliebte Songs</h6>
-
-                    <asc-song-list [dataSource]="topSongs" [showMore]="false" [showAlbum]="false" [showDate]="false" [showHead]="false"></asc-song-list>
-
-                    <!--<asc-top-song-item *ngFor="let song of topSongs" [song]="song" [excludeArtistIds]="[artist?.id]"></asc-top-song-item>-->
-                </div>
-        
-                <div class="w-full my-4 md:w-1/3 md:m-0">
-                    <div class="my-4" *ngIf="artist?.description">
-                        <h6 class="py-2 md:px-3">Über {{ artist?.name }}</h6>
-                    
-                        <div class="w-full relative overflow-hidden h-44 bg-background bg-opacity-70 backdrop-blur-md border-2 border-primary-light border-opacity-20 rounded-lg">
-                            <div class="inline-block w-full max-h-full overflow-hidden overflow-y-auto p-6">
-                                <p class="text-sm tracking-wide leading-6 opacity-75">{{ artist?.description }}</p>
-                            </div>
-        
-                            <div class="absolute -top-0.5 left-0 right-0 h-6 pointer-events-none" [style]="'background: linear-gradient(0deg, rgba(24, 28, 34, 0) 0%, rgba(24, 28, 34, 1) 100%);'"></div>
-                            <div class="absolute -bottom-0.5 left-0 right-0 h-6 pointer-events-none" [style]="'background: linear-gradient(180deg, rgba(24, 28, 34, 0) 0%, rgba(24, 28, 34, 1) 100%);'"></div>
-                        </div>
-                    </div>
-
-                    <div class="my-4">
-                        <h6 class="py-2 md:px-3">Lieblingssongs</h6>
-
-                        <div class="flex items-center p-3 cursor-pointer bg-transparent border-2 border-transparent hover:border-opacity-50 hover:bg-background-light hover:bg-opacity-30 hover:border-primary-light hover:backdrop-blur-md active:bg-background active:bg-opacity-30 transition-all rounded-lg">
-                            <div class="w-14 rounded-full aspect-square">
-                                <img [src]="coverSrc" class="w-full h-full rounded-full pointer-events-none">
-                            </div>
-
-                            <div class="w-full px-2">
-                                <p class="">Du hast % Lieder geliked.</p>
-                                <p class="text-xs opacity-70">von {{ artist?.name }}</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        
-    </section>
+<section class="my-row" *ngIf="featAlbums.length > 0">
+    <asc-horizontal-grid [headline]="'Alben mit ' + artist?.name" [enableMore]="true" (onMore)="router.navigate(['/artist', artist?.id, 'featuring'])">
+        <asc-album-grid-item *ngFor="let album of featAlbums" [album]="album" [routerLink]="['/album', album.id]"></asc-album-grid-item>
+      </asc-horizontal-grid>
 </section>

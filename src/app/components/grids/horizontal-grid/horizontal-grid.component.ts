@@ -17,7 +17,7 @@ export class HorizontalGridComponent implements OnInit {
   @Input() public canScroll: boolean = true;
   @Input() public customMoreText: string = "Alles anzeigen"
 
-  @Output() public more: EventEmitter<void> = new EventEmitter();
+  @Output() public onMore: EventEmitter<void> = new EventEmitter();
 
   public canGoPrev: boolean = false;
   public canGoNext: boolean = false;
@@ -43,10 +43,6 @@ export class HorizontalGridComponent implements OnInit {
   public scrollPrev() {
     const scrollAmount = this.container.nativeElement.getBoundingClientRect().width;
     this.scrollArea.nativeElement.scrollLeft -= scrollAmount;
-  }
-
-  public onMore() {
-    this.more.emit();
   }
 
 }

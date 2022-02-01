@@ -3,7 +3,7 @@ import { Album } from 'src/app/features/album/entities/album.entity';
 import { Playlist } from 'src/app/features/playlist/entities/playlist.entity';
 import { Song } from 'src/app/features/song/entities/song.entity';
 import { User } from 'src/app/features/user/entities/user.entity';
-import { Artist } from 'src/app/model/artist.model';
+import { Artist } from 'src/app/features/artist/entities/artist.entity';
 import { environment } from 'src/environments/environment';
 import { SearchBestMatch } from '../../entities/best-match.entity';
 

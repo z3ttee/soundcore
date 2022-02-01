@@ -2,7 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { combineLatest, map } from 'rxjs';
 import { Song } from 'src/app/features/song/entities/song.entity';
 import { AudioService } from 'src/app/features/stream/services/audio.service';
-import { Artist } from 'src/app/model/artist.model';
+import { Artist } from 'src/app/features/artist/entities/artist.entity';
 import { environment } from 'src/environments/environment';
 
 @Component({

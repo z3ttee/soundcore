@@ -5,7 +5,6 @@ import { RouterModule, Routes } from '@angular/router';
 import { TeleportModule } from '@ngneat/overview';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { GenreGridItemComponent } from 'src/app/components/grid-items/genre-grid-item/genre-grid-item.component';
 import { StreamModule } from '../stream/stream.module';
 import { BestMatchComponent } from './components/best-match/best-match.component';
 import { PipesModule } from 'src/app/pipes/pipes.module';
@@ -17,6 +16,7 @@ import { AscAlbumModule } from 'src/app/components/album-components/album-compon
 import { AscArtistModule } from 'src/app/components/artist-components/artist-components.module';
 import { AscLabelModule } from 'src/app/components/label-components/label-components.module';
 import { AscUserModule } from 'src/app/components/user-components/user-components.module';
+import { AscGenreModule } from 'src/app/components/genre-components/genre-components.module';
 
 const routes: Routes = [
   { path: "", component: SearchIndexComponent }
@@ -27,7 +27,6 @@ const routes: Routes = [
     SearchIndexComponent,
     BestMatchComponent,
 
-    GenreGridItemComponent,
     BestMatchComponent
   ],
   imports: [
@@ -45,6 +44,7 @@ const routes: Routes = [
     AscArtistModule,
     AscLabelModule,
     AscUserModule,
+    AscGenreModule,
 
     MatProgressBarModule
   ],

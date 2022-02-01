@@ -1,4 +1,4 @@
-import { Artist } from "src/app/model/artist.model";
+import { Artist } from "src/app/features/artist/entities/artist.entity";
 import { Artwork } from "src/app/model/artwork.model";
 import { Distributor } from "src/app/model/distributor.entity";
 import { Label } from "src/app/model/label.model";

@@ -2,7 +2,7 @@
     <div class="flex flex-1 w-full px-6 items-center" *ngIf="headline || enableMore">
         <h6 class="flex-grow " *ngIf="headline">{{ headline }}</h6>
         <div *ngIf="enableMore">
-            <a class="cursor-pointer text-sm opacity-70 hover:underline hover:opacity-100" (click)="onMore()">{{ customMoreText }}</a>
+            <a class="cursor-pointer text-sm opacity-70 hover:underline hover:opacity-100" (click)="onMore.emit()">{{ customMoreText }}</a>
         </div>
     </div>
 

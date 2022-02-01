@@ -61,8 +61,7 @@
             <!-- First album title -->
             <td class="px-2.5 py-2 text-right hidden md:table-cell" *ngIf="showAlbum">
                 <div class="absolute z-30 top-0 left-0 right-0 bottom-0 pointer-events-auto lg:hidden" (click)="playOrPause(entry)" *ngIf="entry?.albums?.length <= 0"></div>
-
-                <span class="text-xs opacity-80 line-clamp-1 hover:underline" *ngIf="entry?.albums?.length > 0">{{ entry.albums[0].title }}</span>
+                <span class="text-xs opacity-80 line-clamp-1 hover:underline" *ngIf="entry?.albums?.length > 0" [routerLink]="['/album', entry.albums[0].id]">{{ entry.albums[0].title }}</span>
             </td>
             
             <!-- Date added to playlist -->

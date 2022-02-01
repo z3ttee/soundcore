@@ -1,0 +1,10 @@
+<section class="p-window">
+    <h4>Alle Songs von {{ artist?.name }}</h4>
+
+    <!-- TODO: Make this a playable list -->
+
+    <div class="my-row">
+        <asc-song-list [dataSource]="songs" [showMore]="true" [showDate]="false" (onMore)="findSongs()" [showMore]="songs.length < totalElements"></asc-song-list>
+    </div>
+
+</section>

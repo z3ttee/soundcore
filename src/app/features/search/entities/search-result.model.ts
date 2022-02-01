@@ -1,5 +1,5 @@
 import { Page } from "../../../pagination/pagination";
-import { Artist } from "../../../model/artist.model";
+import { Artist } from "../../artist/entities/artist.entity";
 import { Song } from "../../song/entities/song.entity";
 import { Distributor } from "src/app/model/distributor.entity";
 import { Label } from "src/app/model/label.model";
