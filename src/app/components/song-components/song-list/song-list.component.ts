@@ -24,6 +24,8 @@ export class SongListComponent implements OnInit {
 
     @Output() public onMore: EventEmitter<void> = new EventEmitter();
 
+    public displayedColumns: string[] = [];
+
     public animOptions: AnimationOptions = {
         autoplay: true,
         loop: true,
@@ -33,9 +35,17 @@ export class SongListComponent implements OnInit {
     constructor(
         public audioService: AudioService,
         private likeService: LikeService
-    ) { }
+    ) {}
 
-    ngOnInit(): void {
+    public ngOnInit(): void {
+        this.displayedColumns.push("nr");
+        this.displayedColumns.push("title");
+        if(this.showCount) this.displayedColumns.push("streamCount")
+        if(this.showAlbum) this.displayedColumns.push("album")
+        if(this.showDate) this.displayedColumns.push("date")
+
+        this.displayedColumns.push("liked");
+        this.displayedColumns.push("duration");
     }
 
     public async playOrPause(song: Song) {
@@ -67,6 +77,10 @@ export class SongListComponent implements OnInit {
 
             this.dataSource[index].isLiked = !this.dataSource[index].isLiked;
         });
+    }
+
+    public trackBySongId(index: number, element: Song): string {
+        return element.id
     }
 
 }

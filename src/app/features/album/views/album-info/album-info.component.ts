@@ -1,7 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { Observable, Subject, takeUntil } from 'rxjs';
 import { Song } from 'src/app/features/song/entities/song.entity';
 import { SongService } from 'src/app/features/song/services/song.service';
+import { ScrollService } from 'src/app/services/scroll.service';
 import { Album } from '../../entities/album.entity';
 import { AlbumService } from '../../services/album.service';
 
@@ -9,12 +11,16 @@ import { AlbumService } from '../../services/album.service';
   templateUrl: './album-info.component.html',
   styleUrls: ['./album-info.component.scss']
 })
-export class AlbumInfoComponent implements OnInit {
+export class AlbumInfoComponent implements OnInit, OnDestroy {
+
+  private _destroySubject: Subject<void> = new Subject();
+  private $destroy: Observable<void> = this._destroySubject.asObservable();
 
   // Loading states
   public isLoading: boolean = false;
 
   // Main data objects
+  public albumId: string;
   public album: Album;
   public songs: Song[] = [];
   public recommendedAlbums: Album[] = [];
@@ -26,41 +32,53 @@ export class AlbumInfoComponent implements OnInit {
   // Accent colors  
   public accentColor: string = "#FFBF50";
 
+  // Pagination
+  public totalElements: number;
+  private currentPage: number = 0;
+
   constructor(
     private activatedRoute: ActivatedRoute,
     private albumService: AlbumService,
     private songService: SongService,
-    private router: Router
+    private router: Router,
+    private scrollService: ScrollService
   ) { }
 
   public ngOnInit(): void {
-    this.activatedRoute.paramMap.subscribe((paramMap) => {
-      const albumId = paramMap.get("albumId");
-      if(!albumId) {
-        this.album = null;
-        return;
-      }
+    this.activatedRoute.paramMap.pipe(takeUntil(this.$destroy)).subscribe((paramMap) => {
+      this.albumId = paramMap.get("albumId");
 
       this.isLoading = true;
-      this.albumService.findById(albumId).then((album) => {
+      this.albumService.findById(this.albumId).then((album) => {
         this.album = album;
 
-        this.songService.findByAlbum(albumId).then((page) => {
-          this.songs = page.elements;
-          console.log(this.songs)
+        this.scrollService.$onBottomReached.pipe(takeUntil(this.$destroy)).subscribe(() => {
+          this.findSongs()
         })
 
         this.albumService.findRecommendedProfilesByArtist(this.album?.artist?.id, [ this.album?.id ]).then((page) => {
           this.recommendedAlbums = page.elements;
-          console.log(this.recommendedAlbums)
         })
       }).finally(() => this.isLoading = false)
     })
   }
 
+  public ngOnDestroy(): void {
+      this._destroySubject.next();
+      this._destroySubject.complete();
+  }
+
   public async showDiscography() {
     if(!this.album?.artist) return;
     this.router.navigate(["/artist", this.album.artist?.id, "discography"])
+  }
+
+  public async findSongs() {
+    this.songService.findByAlbum(this.albumId, { page: this.currentPage }).then((page) => {
+      this.totalElements = page.totalElements;
+      if(page.elements.length > 0) this.currentPage++;
+      this.songs.push(...page.elements);
+    })
   }
 
 }

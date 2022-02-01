@@ -30,7 +30,7 @@ export class SongService {
     return firstValueFrom(this.httpClient.get(`${environment.api_base_uri}/v1/songs/byGenre/${genreId}${Pageable.toQuery(pageable)}`)).then((page) => page as Page<Song>)
   }
 
-  public async findByAlbum(albumId: string): Promise<Page<Song>> {
-    return firstValueFrom(this.httpClient.get(`${environment.api_base_uri}/v1/songs/byAlbum/${albumId}`)).then((page) => page as Page<Song>)
+  public async findByAlbum(albumId: string, pageable?: Pageable): Promise<Page<Song>> {
+    return firstValueFrom(this.httpClient.get(`${environment.api_base_uri}/v1/songs/byAlbum/${albumId}${Pageable.toQuery(pageable)}`)).then((page) => page as Page<Song>)
   }
 }

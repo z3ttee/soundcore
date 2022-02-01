@@ -1,7 +1,6 @@
 table {
     border-collapse: collapse;
 
-    tbody {
         tr {
             @apply transition-all will-change-transform;
 
@@ -14,7 +13,7 @@ table {
                 }
 
                 .row-btn:not(.active) {
-                    @apply opacity-0;
+                    @apply opacity-100 lg:opacity-0;
                 }
 
                 .play-btn {
@@ -38,14 +37,13 @@ table {
                 }
             }
 
-            &:active {
+            &:active:not(.no-effect) {
                 td {
                     @apply transform-gpu sm:bg-background sm:bg-opacity-70;
                 }
-
+                
                 @apply transform-gpu scale-[97%] lg:scale-100;
             }
         }
-    }
 
 }

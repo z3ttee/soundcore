@@ -32,6 +32,7 @@ import { InfiniteScrollListComponent } from './components/lists/infinite-scroll-
 import { StreamModule } from './features/stream/stream.module';
 import { AscMessageModule } from './components/message-components/message-components.module';
 import { InfiniteScrollModule } from 'ngx-infinite-scroll';
+import {ScrollingModule} from '@angular/cdk/scrolling';
 
 // TODO: https://angular.io/guide/i18n-common-prepare
 
@@ -69,7 +70,8 @@ import { InfiniteScrollModule } from 'ngx-infinite-scroll';
     MatInputModule,
     MatListModule,
     MatDividerModule,
-    MatProgressBarModule
+    MatProgressBarModule,
+    ScrollingModule
   ],
   providers: [
     DeviceService,

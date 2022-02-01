@@ -8,6 +8,7 @@ import { LottieCacheModule, LottieModule } from 'ngx-lottie';
 import player from 'lottie-web/build/player/lottie_light';
 import { SongListComponent } from './song-list/song-list.component';
 import { MatButtonModule } from '@angular/material/button';
+import {CdkTableModule} from '@angular/cdk/table';
 
 export function playerFactory() {
   return player
@@ -25,6 +26,7 @@ export function playerFactory() {
 
     AscImageModule,
     MatButtonModule,
+    CdkTableModule,
 
     LottieModule.forRoot({
       player: playerFactory
