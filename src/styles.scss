@@ -16,6 +16,7 @@
 /* General styling */
 * {
     font-family: 'Readex Pro', sans-serif;
+    -webkit-tap-highlight-color: transparent;
     @apply font-normal text-base;
 }
 
