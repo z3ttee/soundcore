@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Song } from 'src/app/features/song/entities/song.entity';
 import { Artist } from 'src/app/features/artist/entities/artist.entity';
@@ -7,24 +7,27 @@ import { Album } from 'src/app/features/album/entities/album.entity';
 import { Playlist } from 'src/app/features/playlist/entities/playlist.entity';
 import { Genre } from 'src/app/model/genre.entity';
 import { Page } from 'src/app/pagination/pagination';
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
 
 @Component({
   selector: 'asc-artist-info',
   templateUrl: './artist-info.component.html',
   styleUrls: ['./artist-info.component.scss']
 })
-export class ArtistInfoComponent implements OnInit {
+export class ArtistInfoComponent implements OnInit, OnDestroy {
 
-  public artist: Artist;
+  // Destroy subscriptions
+  private _destroySubject: Subject<void> = new Subject();
+  private $destroy: Observable<void> = this._destroySubject.asObservable();
+
+  // Loading states
   public isLoading: boolean = false;
 
-  public coverSrc: string = null;
-  public accentColor: string = "";
+  // Data providers
+  private _topSongsSubject: BehaviorSubject<Song[]> = new BehaviorSubject([]);
+  public $topSongs: Observable<Song[]> = this._topSongsSubject.asObservable();
 
-  public bannerSrc: string = null;
-  public bannerAccentColor: string = "";
-
-  public topSongs: Song[] = [];
+  public artist: Artist;
   public genres: Page<Genre> = null;
   public songs: Song[] = [];
   public albums: Album[] = [];
@@ -50,7 +53,10 @@ export class ArtistInfoComponent implements OnInit {
         this.artist = artist;
 
         this.artistService.findTopSongsByArtist(artistId).then((songs) => {
-          this.topSongs = songs
+          this._topSongsSubject.next([
+            ...this._topSongsSubject.getValue(),
+            ...songs
+          ])
         })
 
         this.artistService.findGenresByArtist(artistId, { size: 12, page: 0 }).then((page) => {
@@ -70,6 +76,11 @@ export class ArtistInfoComponent implements OnInit {
         })
       }).finally(() => this.isLoading = false)
     })
+  }
+
+  public ngOnDestroy(): void {
+      this._destroySubject.next();
+      this._destroySubject.complete();
   }
 
 }

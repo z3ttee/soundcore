@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { AnimationOptions } from 'ngx-lottie';
-import { take, zip } from 'rxjs';
+import { Observable, of, take, zip } from 'rxjs';
 import { Song } from 'src/app/features/song/entities/song.entity';
 import { AudioService } from 'src/app/features/stream/services/audio.service';
 import { LikeService } from 'src/app/services/like.service';
@@ -13,7 +13,8 @@ import audio_wave_anim from "src/assets/animated/audio_wave.json"
 })
 export class SongListComponent implements OnInit {
 
-    @Input() public dataSource: Song[] = [];
+    // Make dataSource to observable
+    @Input() public dataSource: Observable<Song[]> = of([]);
 
     @Input() public showHead: boolean = true;
     @Input() public showAlbum: boolean = true;
@@ -72,10 +73,12 @@ export class SongListComponent implements OnInit {
 
     public async likeSong(song: Song) {
         this.likeService.likeSong(song?.id).then(() => {
-            const index = this.dataSource.findIndex((s) => s.id == song?.id);
-            if(index == -1) return;
-
-            this.dataSource[index].isLiked = !this.dataSource[index].isLiked;
+            this.dataSource.pipe(take(1)).subscribe((songs) => {
+                const index = songs.findIndex((s) => s.id == song?.id);
+                if(index == -1) return;
+    
+                this.dataSource[index].isLiked = !this.dataSource[index].isLiked;
+            })
         });
     }
 

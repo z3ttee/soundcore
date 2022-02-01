@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Observable, Subject, takeUntil } from 'rxjs';
+import { BehaviorSubject, Observable, Subject, takeUntil } from 'rxjs';
 import { Song } from 'src/app/features/song/entities/song.entity';
 import { ScrollService } from 'src/app/services/scroll.service';
 import { Artist } from '../../entities/artist.entity';
@@ -17,7 +17,8 @@ export class ArtistCollectionComponent implements OnInit, OnDestroy {
   private $destroy: Observable<void> = this._destroySubject.asObservable();
 
   // Data providers
-  public songs: Song[] = [];
+  private _songsSubject: BehaviorSubject<Song[]> = new BehaviorSubject([])
+  public $songs: Observable<Song[]> = this._songsSubject.asObservable();
 
   public artistId: string = null;
   public artist: Artist = null;
@@ -51,7 +52,10 @@ export class ArtistCollectionComponent implements OnInit, OnDestroy {
     this.artistService.findSongsByCollectionAndArtist(this.artistId, { page: this.currentPage }).then((page) => {
       this.totalElements = page.totalElements;
       if(page.elements.length > 0) this.currentPage++;
-      this.songs.push(...page.elements);
+      this._songsSubject.next([
+        ...this._songsSubject.getValue(),
+        ...page.elements
+      ])
     })
   }
 

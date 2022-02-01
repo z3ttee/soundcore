@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { Song } from 'src/app/features/song/entities/song.entity';
 import { Playlist } from '../../entities/playlist.entity';
 import { PlaylistService } from '../../services/playlist.service';
@@ -15,8 +16,10 @@ export class PlaylistInfoComponent implements OnInit {
   public isAuthorLoading: boolean = false;
 
   // Data providers
+  private _songsSubject: BehaviorSubject<Song[]> = new BehaviorSubject([]);
+
   public playlist: Playlist = null;
-  public songs: Song[] = []
+  public $songs: Observable<Song[]> = this._songsSubject.asObservable();
 
   // Pagination
   private currentPage: number = 0;
@@ -48,8 +51,10 @@ export class PlaylistInfoComponent implements OnInit {
   public async findSongs() {
     this.playlistService.findSongsByPlaylist(this.playlist.id, { page: this.currentPage, size: 50 }).then((page) => {
       if(page.elements.length > 0) this.currentPage++;
-      this.songs = page.elements;
-      console.log(this.songs)
+      this._songsSubject.next([
+        ...this._songsSubject.getValue(),
+        ...page.elements
+      ])
     });
   }
 

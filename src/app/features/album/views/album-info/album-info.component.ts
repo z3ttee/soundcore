@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Observable, Subject, takeUntil } from 'rxjs';
+import { BehaviorSubject, Observable, Subject, takeUntil } from 'rxjs';
 import { Song } from 'src/app/features/song/entities/song.entity';
 import { SongService } from 'src/app/features/song/services/song.service';
 import { ScrollService } from 'src/app/services/scroll.service';
@@ -20,9 +20,11 @@ export class AlbumInfoComponent implements OnInit, OnDestroy {
   public isLoading: boolean = false;
 
   // Main data objects
+  private _songsSubject: BehaviorSubject<Song[]> = new BehaviorSubject([])
+  public $songs: Observable<Song[]> = this._songsSubject.asObservable();
+
   public albumId: string;
   public album: Album;
-  public songs: Song[] = [];
   public recommendedAlbums: Album[] = [];
   
   // Artworks
@@ -77,7 +79,11 @@ export class AlbumInfoComponent implements OnInit, OnDestroy {
     this.songService.findByAlbum(this.albumId, { page: this.currentPage }).then((page) => {
       this.totalElements = page.totalElements;
       if(page.elements.length > 0) this.currentPage++;
-      this.songs.push(...page.elements);
+      
+      this._songsSubject.next([
+        ...this._songsSubject.getValue(),
+        ...page.elements
+      ])
     })
   }
 

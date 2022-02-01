@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { Subject, takeUntil } from 'rxjs';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { BehaviorSubject, Observable, Subject, takeUntil } from 'rxjs';
 import { Song } from 'src/app/features/song/entities/song.entity';
 import { ScrollService } from 'src/app/services/scroll.service';
 import { AuthenticationService } from 'src/app/sso/authentication.service';
@@ -10,15 +10,22 @@ import { CollectionService } from '../../services/collection.service';
   templateUrl: './collection-info.component.html',
   styleUrls: ['./collection-info.component.scss']
 })
-export class CollectionInfoComponent implements OnInit {
+export class CollectionInfoComponent implements OnInit, OnDestroy {
 
-  private _destroySubject = new Subject();
+  // Destroy subscriptions
+  private _destroySubject: Subject<void> = new Subject();
   private $destroy = this._destroySubject.asObservable();
 
+  // Data providers
+  private _songsSubject: BehaviorSubject<Song[]> = new BehaviorSubject([]);
+
+  public $songs: Observable<Song[]> = this._songsSubject.asObservable();
   public collection: Collection;
-  public songs: Song[] = [] // TODO: Implement infinite scroll
+
+  // Pagination
   private currentPage: number = 0;
 
+  // Loading states
   public isLoading: boolean = false;
 
   // Accent colors  
@@ -43,13 +50,20 @@ export class CollectionInfoComponent implements OnInit {
     })
   }
 
+  public ngOnDestroy(): void {
+      this._destroySubject.next();
+      this._destroySubject.complete();
+  }
+
   public async findSongs() {
     this.collectionService.findSongsByCollection({
-      page: this.currentPage,
-      size: 30
+      page: this.currentPage
     }).then((page) => {
       if(page.elements.length > 0) this.currentPage++;
-      this.songs.push(...page.elements)
+      this._songsSubject.next([
+        ...this._songsSubject.getValue(),
+        ...page.elements
+      ])
     })
   }
 

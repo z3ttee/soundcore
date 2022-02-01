@@ -53,7 +53,7 @@
 
     <section class="relative my-row z-10">
         <!-- Songs list -->
-        <asc-song-list [dataSource]="songs" [showAlbum]="false" [showDate]="false" [showCover]="false" [showMore]="songs.length < totalElements"></asc-song-list>
+        <asc-song-list [dataSource]="$songs" [showAlbum]="false" [showDate]="false" [showCover]="false" [showMore]="($songs | async).length < totalElements"></asc-song-list>
     </section>
 </section>
 

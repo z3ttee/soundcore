@@ -34,7 +34,7 @@
     <section class="relative my-6 z-10 md:my-12">
 
         <!-- Songs list -->
-        <asc-song-list [dataSource]="songs" [showCount]="false" [showMore]="songs.length < collection?.songsCount" (onMore)="findSongs()"></asc-song-list>
+        <asc-song-list [dataSource]="$songs" [showCount]="false" [showMore]="($songs | async).length < collection?.songsCount" (onMore)="findSongs()"></asc-song-list>
 
     </section>
 </section>
