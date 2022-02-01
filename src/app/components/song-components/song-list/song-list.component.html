@@ -1,4 +1,4 @@
-<table class="w-full" cdk-table [dataSource]="dataSource" recycleRows [trackBy]="trackBySongId" *ngIf="(dataSource | async) && (dataSource | async).length > 0">
+<table class="w-full" cdk-table [dataSource]="dataSource" recycleRows [trackBy]="trackBySongId">
   <!-- Nr col -->
   <ng-container cdkColumnDef="nr">
     <th cdk-header-cell *cdkHeaderCellDef scope="col" class="text-xs px-2.5 py-4 tracking-wide opacity-70 text-center w-11 sm:table-cell hidden">#</th>

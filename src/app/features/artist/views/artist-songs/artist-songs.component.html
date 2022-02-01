@@ -4,7 +4,7 @@
     <!-- TODO: Make this a playable list -->
 
     <div class="my-row">
-        <asc-song-list [dataSource]="$songs" [showMore]="true" [showDate]="false" (onMore)="findSongs()" [showMore]="($songs | async).length < totalElements"></asc-song-list>
+        <asc-song-list [dataSource]="$songs" [showMore]="true" [showCover]="false" [showDate]="false" (onMore)="findSongs()" [showMore]="($songs | async).length < totalElements"></asc-song-list>
     </div>
 
 </section>
