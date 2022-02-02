@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Observable, Subject, takeUntil } from 'rxjs';
+import { BehaviorSubject, Observable, Subject, takeUntil } from 'rxjs';
 import { Genre } from 'src/app/model/genre.entity';
 import { ScrollService } from 'src/app/services/scroll.service';
 import { Artist } from '../../entities/artist.entity';
@@ -19,8 +19,9 @@ export class ArtistGenresComponent implements OnInit, OnDestroy {
   public isLoading: boolean = false;
 
   // Data providers
+  private _genresSubject: BehaviorSubject<Genre[]> = new BehaviorSubject([])
+  public $genres: Observable<Genre[]> = this._genresSubject.asObservable();
   public artist: Artist = null;
-  public genres: Genre[] = [];
 
   // Pagination
   private currentPage: number = 0;
@@ -59,8 +60,14 @@ export class ArtistGenresComponent implements OnInit, OnDestroy {
   public async findGenres() {
     this.artistService.findGenresByArtist(this.artist?.id, { size: 50, page: this.currentPage }).then((page) => {
       this.totalElements = page.totalElements
-      if(page.elements.length > 0) this.currentPage++;
-      this.genres.push(...page.elements)
+
+      if(page.elements.length > 0) {
+        this.currentPage++;
+        this._genresSubject.next([
+          ...this._genresSubject.getValue(),
+          ...page.elements
+        ])
+      }
     })
   }
 

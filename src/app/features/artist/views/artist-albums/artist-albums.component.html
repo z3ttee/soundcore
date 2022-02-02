@@ -1,10 +1,9 @@
-<section class="p-window">
-    <h4>Alle Alben von {{ artist?.name }}</h4>
-
-    <div class="my-row">
+<asc-playlist-view mode="titleOnly" [options]="{ type: 'collection', title: 'Alle Alben von ' + artist?.name, color: artist?.artwork?.accentColor }" *ngIf="!!artist">
+    <!-- Page contents -->
+    <div asc-contents>
+        <!-- TODO: Make to component, with maxItemWidth and minItemWidth in column definition -->
         <div class="vertical-grid">
             <asc-album-grid-item *ngFor="let album of ($albums | async)" [album]="album" [routerLink]="['/album', album.id]"></asc-album-grid-item>
         </div>
     </div>
-
-</section>
+</asc-playlist-view>

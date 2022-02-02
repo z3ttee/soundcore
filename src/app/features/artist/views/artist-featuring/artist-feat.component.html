@@ -1,12 +1,8 @@
-<section class="p-window">
-    <h4>Alle Alben von {{ artist?.name }}</h4>
-
-    <!-- TODO: Make this a playable list -->
-
-    <div class="my-row">
-        <asc-vertical-grid [showMore]="albums.length < totalElements" (onMore)="findAlbums()">
-            <asc-album-grid-item *ngFor="let album of albums" [album]="album" [routerLink]="['/album', album.id]"></asc-album-grid-item>
-        </asc-vertical-grid>
+<asc-playlist-view mode="titleOnly" [options]="{ type: 'collection', title: 'Alben featuring ' + artist?.name, color: artist?.artwork?.accentColor }" *ngIf="!!artist">
+    <!-- Page contents -->
+    <div asc-contents>
+        <div class="vertical-grid">
+            <asc-album-grid-item *ngFor="let album of ($albums | async)" [album]="album" [routerLink]="['/album', album.id]"></asc-album-grid-item>
+        </div>
     </div>
-
-</section>
+</asc-playlist-view>
