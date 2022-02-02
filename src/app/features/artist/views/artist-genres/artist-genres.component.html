@@ -1,11 +1,9 @@
-<section class="p-window">
-    <h5>Genres von</h5>
-    <h1>{{ artist?.name }}</h1>
 
-    <div class="my-row">
+<asc-playlist-view mode="titleOnly" [options]="{ type: 'collection', title: 'Genres von ' + artist?.name}" *ngIf="!!artist">
+    <!-- Page contents -->
+    <div asc-contents>
         <asc-vertical-grid [showMore]="genres.length < totalElements" (onMore)="findGenres()">
             <asc-genre-grid-item *ngFor="let genre of genres" [genre]="genre" [routerLink]="['.', genre.id]"></asc-genre-grid-item>
         </asc-vertical-grid>
     </div>
-</section>
-
+</asc-playlist-view>

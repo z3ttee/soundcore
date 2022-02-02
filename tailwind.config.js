@@ -89,11 +89,11 @@ module.exports = {
         }
       },
       screens: {
-        '2xl': {'min-width': '1550px'},
-        'xl': {'min-width': '1200px'},  // Desktop
-        'lg': {'min-width': '1000px'},
-        'md': {'min-width': '780px'},   // Tablet
-        'sm': {'min-width': '540px'}    // Mobile
+        'sm': '540px',
+        'md': '780px',
+        'lg': '1000px',
+        'xl': '1200px',
+        '2xl': '1550px'
       },
       fontSize: {
         xxs: ['0.65rem', { lineHeight: '1rem' }],

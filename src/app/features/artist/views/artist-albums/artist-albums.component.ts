@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Observable, Subject, takeUntil } from 'rxjs';
+import { BehaviorSubject, Observable, Subject, takeUntil } from 'rxjs';
 import { Album } from 'src/app/features/album/entities/album.entity';
 import { ScrollService } from 'src/app/services/scroll.service';
 import { Artist } from '../../entities/artist.entity';
@@ -16,7 +16,8 @@ export class ArtistAlbumsComponent implements OnInit, OnDestroy {
   private $destroy: Observable<void> = this._destroySubject.asObservable();
 
   // Data providers
-  public albums: Album[] = [];
+  private _albumsSubject: BehaviorSubject<Album[]> = new BehaviorSubject([])
+  public $albums: Observable<Album[]> = this._albumsSubject.asObservable();
 
   public artistId: string = null;
   public artist: Artist = null;
@@ -49,9 +50,18 @@ export class ArtistAlbumsComponent implements OnInit, OnDestroy {
   public async findAlbums() {
     this.artistService.findAlbumsByArtist(this.artistId, { page: this.currentPage }).then((page) => {
       this.totalElements = page.totalElements;
-      if(page.elements.length > 0) this.currentPage++;
-      this.albums.push(...page.elements);
+      if(page.elements.length > 0) {
+        this.currentPage++;
+        this._albumsSubject.next([
+          ...this._albumsSubject.getValue(),
+          ...page.elements
+        ])
+      }
     })
+  }
+
+  public trackByFn(index: number, element: Album): string {
+    return element.id;
   }
 
 }

@@ -9,7 +9,7 @@ import { VerticalGridComponent } from './vertical-grid/vertical-grid.component';
     VerticalGridComponent
   ],
   imports: [
-    CommonModule
+    CommonModule,
   ],
   exports: [
     HorizontalGridComponent,

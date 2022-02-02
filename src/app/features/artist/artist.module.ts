@@ -19,6 +19,7 @@ import { ArtistSongsComponent } from './views/artist-songs/artist-songs.componen
 import { ArtistAlbumsComponent } from './views/artist-albums/artist-albums.component';
 import { ArtistFeaturedComponent } from './views/artist-featuring/artist-feat.component';
 import { AscPlaylistViewModule } from 'src/app/components/views/playlist-view.module';
+import { VirtualScrollerModule } from '@iharbeck/ngx-virtual-scroller';
 
 const routes: Routes = [
   { path: ":artistId", component: ArtistInfoComponent },
@@ -46,6 +47,7 @@ const routes: Routes = [
     CommonModule,
     RouterModule.forChild(routes),
     PipesModule,
+    VirtualScrollerModule,
 
     AscSongModule,
     AscImageModule,

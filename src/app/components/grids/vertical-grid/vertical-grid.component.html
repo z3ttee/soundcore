@@ -1,11 +1,10 @@
-<div class="">
+<div class="w-full">
     <div class="flex flex-1 w-full px-6 items-center border" *ngIf="headline">
         <h6 class="flex-grow " *ngIf="headline">{{ headline }}</h6>
     </div>
 
-    <!-- TODO: Fix responsive cols -->
-    <div class="grid w-full overflow-hidden scroll-smooth relative border grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        <ng-content></ng-content>
+    <div class="w-full">
+            <ng-content></ng-content>
     </div>
 
     <div class="flex items-center mt-2" *ngIf="showMore">

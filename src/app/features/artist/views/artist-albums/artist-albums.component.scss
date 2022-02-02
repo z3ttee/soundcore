@@ -1,0 +1,7 @@
+.vertical-grid {
+    display: grid;
+    grid-auto-columns: 10rem;
+    grid-template-columns: repeat(auto-fill, 10rem);
+
+    @apply gap-3;
+}

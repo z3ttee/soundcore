@@ -3,19 +3,21 @@ import { CommonModule } from '@angular/common';
 import { AlbumGridItemComponent } from './album-grid-item/album-grid-item.component';
 import { RouterModule } from '@angular/router';
 import { AscImageModule } from '../image-components/image-components.module';
+import { VirtualScrollerModule } from "@iharbeck/ngx-virtual-scroller";
 
 @NgModule({
   declarations: [
-    AlbumGridItemComponent
+    AlbumGridItemComponent,
   ],
   imports: [
     CommonModule,
     RouterModule,
 
-    AscImageModule
+    AscImageModule,
+    VirtualScrollerModule
   ],
   exports: [
-    AlbumGridItemComponent
+    AlbumGridItemComponent,
   ]
 })
 export class AscAlbumModule { }
