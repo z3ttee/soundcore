@@ -19,8 +19,8 @@ export class ArtistService {
     return firstValueFrom(this.httpClient.get(`${environment.api_base_uri}/v1/artists/${artistId}`)) as Promise<Artist>
   }
 
-  public async findTopSongsByArtist(artistId: string): Promise<Song[]> {
-    return firstValueFrom(this.httpClient.get(`${environment.api_base_uri}/v1/songs/byArtist/${artistId}/top`)) as Promise<Song[]>
+  public async findTopSongsByArtist(artistId: string): Promise<Page<Song>> {
+    return firstValueFrom(this.httpClient.get<Page<Song>>(`${environment.api_base_uri}/v1/songs/byArtist/${artistId}/top`))
   }
 
   public async findAlbumsByArtist(artistId: string, pageable: Pageable): Promise<Page<Album>> {

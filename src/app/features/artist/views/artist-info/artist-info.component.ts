@@ -52,10 +52,10 @@ export class ArtistInfoComponent implements OnInit, OnDestroy {
       this.artistService.findProfileById(artistId).then((artist) => {
         this.artist = artist;
 
-        this.artistService.findTopSongsByArtist(artistId).then((songs) => {
+        this.artistService.findTopSongsByArtist(artistId).then((page) => {
           this._topSongsSubject.next([
             ...this._topSongsSubject.getValue(),
-            ...songs
+            ...page.elements
           ])
         })
 
