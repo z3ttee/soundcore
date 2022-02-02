@@ -1,10 +1,10 @@
 export class Pageable {
-    public size?: number = 15;
+    public size?: number = 30;
     public page?: number = 0;
 
     public static toQuery(pageable: Pageable): string {
         if(!pageable) pageable = new Pageable();
-        if(!pageable.size) pageable.size = 15;
+        if(!pageable.size) pageable.size = 30;
         if(!pageable.page) pageable.page = 0;
 
         const searchParams = new URLSearchParams();
