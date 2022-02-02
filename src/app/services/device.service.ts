@@ -16,7 +16,7 @@ export interface Breakpoint {
 @Injectable({
     providedIn: "root"
 })
-export class DeviceService implements OnInit {
+export class DeviceService {
     private _breakpointSubject: BehaviorSubject<Breakpoint>;
 
     private _tailwindConfig: TailwindConfig = resolveConfig(tailwindConfig);
@@ -28,7 +28,7 @@ export class DeviceService implements OnInit {
         // Transform breakpoints from tailwind
         const screens = this._tailwindConfig.theme.screens;
         for(const key in screens) {
-            screens[key] = parseInt(screens[key]["min-width"]?.replace("px", ""));
+            screens[key] = parseInt(screens[key]?.replace("px", ""));
         }
 
         this._breakpoints = Object.fromEntries(
@@ -40,10 +40,6 @@ export class DeviceService implements OnInit {
 
         this.updateBreakpoint();
         window.addEventListener("resize", () => this.onResizeEvent());
-    }
-
-    ngOnInit(): void {
-        throw new Error("Method not implemented.");
     }
 
     /**
@@ -125,7 +121,6 @@ export class DeviceService implements OnInit {
         const triggerWidth = this.findBreakpointByName(name);
 
         console.log("isDesktop(): " + this.isDesktop())
-
 
         return { name, triggerWidth, width: window.innerWidth, height: window.innerHeight, isDesktop: this.isDesktop() }
     }
