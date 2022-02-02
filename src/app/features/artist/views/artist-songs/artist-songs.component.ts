@@ -48,6 +48,9 @@ export class ArtistSongsComponent implements OnInit, OnDestroy {
   }
 
   public async findSongs() {
+    const currentItemCount = this._songsSubject.getValue().length;
+    if(currentItemCount != 0 && currentItemCount >= this.totalElements) return;
+    
     this.artistService.findSongsByArtist(this.artistId, { page: this.currentPage }).then((page) => {
       this.totalElements = page.totalElements;
       if(page.elements.length > 0) this.currentPage++;

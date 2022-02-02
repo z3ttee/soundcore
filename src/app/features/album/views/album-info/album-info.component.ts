@@ -35,7 +35,7 @@ export class AlbumInfoComponent implements OnInit, OnDestroy {
   public accentColor: string = "#FFBF50";
 
   // Pagination
-  public totalElements: number;
+  public totalElements: number = 0;
   private currentPage: number = 0;
 
   constructor(
@@ -76,6 +76,9 @@ export class AlbumInfoComponent implements OnInit, OnDestroy {
   }
 
   public async findSongs() {
+    const currentItemCount = this._songsSubject.getValue().length;
+    if(currentItemCount != 0 && currentItemCount >= this.totalElements) return;
+
     this.songService.findByAlbum(this.albumId, { page: this.currentPage }).then((page) => {
       this.totalElements = page.totalElements;
       if(page.elements.length > 0) this.currentPage++;
