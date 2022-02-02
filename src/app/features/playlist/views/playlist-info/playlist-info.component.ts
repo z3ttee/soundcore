@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, Subject, takeUntil } from 'rxjs';
 import { Song } from 'src/app/features/song/entities/song.entity';
+import { ScrollService } from 'src/app/services/scroll.service';
 import { Playlist } from '../../entities/playlist.entity';
 import { PlaylistService } from '../../services/playlist.service';
 
@@ -9,7 +10,10 @@ import { PlaylistService } from '../../services/playlist.service';
   templateUrl: './playlist-info.component.html',
   styleUrls: ['./playlist-info.component.scss']
 })
-export class PlaylistInfoComponent implements OnInit {
+export class PlaylistInfoComponent implements OnInit, OnDestroy {
+
+  private _destroySubject: Subject<void> = new Subject();
+  private $destroy: Observable<void> = this._destroySubject.asObservable();
 
   // Loading states
   public isLoading: boolean = false;
@@ -18,38 +22,49 @@ export class PlaylistInfoComponent implements OnInit {
   // Data providers
   private _songsSubject: BehaviorSubject<Song[]> = new BehaviorSubject([]);
 
+  public playlistId: string = null;
   public playlist: Playlist = null;
   public $songs: Observable<Song[]> = this._songsSubject.asObservable();
 
   // Pagination
   private currentPage: number = 0;
-
-  // Accent colors  
-  public accentColor: string = "#FFBF50";
+  public totalElements: number = 0;
 
   constructor(
     private activatedRoute: ActivatedRoute,
-    private playlistService: PlaylistService
+    private playlistService: PlaylistService,
+    private scrollService: ScrollService
   ) { }
 
   public async ngOnInit(): Promise<void> {
-    this.activatedRoute.paramMap.subscribe((paramMap) => {
-      const playlistId: string = paramMap.get("playlistId");
+    this.activatedRoute.paramMap.pipe(takeUntil(this.$destroy)).subscribe((paramMap) => {
+      this.reset();
+
+      this.playlistId = paramMap.get("playlistId");
 
       this.isLoading = true;
-      this.playlistService.findById(playlistId).then((playlist) => {
+      this.playlistService.findById(this.playlistId).then((playlist) => {
         this.playlist = playlist;
-        console.log(playlist)
-
-        if(this.playlist) {
-          this.findSongs();
-        }
       }).finally(() => this.isLoading = false);
+
+      this.scrollService.$onBottomReached.pipe(takeUntil(this.$destroy)).subscribe(() => this.findSongs())
     })
   }
 
+  public ngOnDestroy(): void {
+      this._destroySubject.next();
+      this._destroySubject.complete();
+  }
+
+  public async reset() {
+    this._songsSubject.next([]);
+    this.playlist = null;
+    this.playlistId = null;
+  }
+
   public async findSongs() {
-    this.playlistService.findSongsByPlaylist(this.playlist.id, { page: this.currentPage, size: 50 }).then((page) => {
+    this.playlistService.findSongsByPlaylist(this.playlistId, { page: this.currentPage }).then((page) => {
+      this.totalElements = page.totalElements;
       if(page.elements.length > 0) this.currentPage++;
       this._songsSubject.next([
         ...this._songsSubject.getValue(),

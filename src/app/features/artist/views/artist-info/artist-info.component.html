@@ -4,71 +4,61 @@
 
 <div class="absolute left-0 top-0 w-full h-[50vh]" [style]="'background: linear-gradient(180deg, ' + (artist?.artwork?.accentColor) + '80 0%, ' + (artist?.artwork?.accentColor) + '00 100%);'"></div>
 
-<section *ngIf="!isLoading && !!artist" class="relative p-window">
-    <!-- Playlist title section -->
-    <section class="block md:flex md:flex-1 md:items-end z-10 relative">
-        <!-- Playlist cover -->
-        <div class="block w-56 mx-auto md:m-0 relative">
-            <asc-artwork [artwork]="artist?.artwork" class="block aspect-square rounded-2xl overflow-hidden shadow-xl z-10" [showAccent]="false"></asc-artwork>
-        </div>
+<asc-playlist-view [options]="{ type: 'artist', title: artist?.name, artwork: artist?.artwork }" *ngIf="!isLoading && !!artist">
 
-        <!-- Playlist title -->
-        <div class="z-30 md:px-4 w-full pointer-events-auto mt-8 md:m-0">
-            <h6 class="font-light md:font-bold md:-mb-1 text-sm md:text-lg md:block hidden">Künstler</h6>
-            <h1 class="my-2 md:m-0 line-clamp-1 text-2xl md:text-5xl drop-shadow-md">{{ artist?.name }}</h1>
+    <!-- Quick info bar below title -->
+    <div class="py-2 md:flex md:items-center" asc-stats>
+        <ul class="flex md:inline-flex items-center gap-4">
+            <li class="inline text-xs opacity-60">{{ artist?.albumCount || 0 }} {{ artist?.albumCount != 1 ? "Alben" : "Album" }}</li>
+            <li class="inline text-xs opacity-60">{{ artist?.songCount || 0 }} {{ artist?.songCount != 1 ? "Songs" : "Song" }}</li>
+            <li class="inline text-xs opacity-60">{{ artist?.streamCount || 0 }} {{ artist?.streamCount != 1 ? "Wiedergaben" : "Wiedergabe" }}</li>
+        </ul>
+    </div>
 
-            <!-- Quick info bar below title -->
-            <div class="py-2 md:flex md:items-center">
-                <ul class="flex md:inline-flex items-center gap-4">
-                    <li class="inline text-xs opacity-60">{{ artist?.albumCount || 0 }} {{ artist?.albumCount != 1 ? "Alben" : "Album" }}</li>
-                    <li class="inline text-xs opacity-60">{{ artist?.songCount || 0 }} {{ artist?.songCount != 1 ? "Songs" : "Song" }}</li>
-                    <li class="inline text-xs opacity-60">{{ artist?.streamCount || 0 }} {{ artist?.streamCount != 1 ? "Wiedergaben" : "Wiedergabe" }}</li>
-                </ul>
-            </div>
-        </div>
-    </section>
-
-    <section class="my-row">
-        <div class="block md:flex md:flex-1 gap-12">
-            <div class="flex-grow mr-6">
-                <h6 class="mb-4">Beliebte Songs</h6>
-
-                <asc-song-list [dataSource]="$topSongs" [showMore]="false" [showAlbum]="false" [showDate]="false" [showHead]="false"></asc-song-list>
-            </div>
+    <!-- Page contents -->
+    <div asc-contents>
+        <section class="mb-row">
+            <div class="block md:flex md:flex-1 gap-12">
+                <div class="flex-grow mr-6">
+                    <h6 class="mb-4">Beliebte Songs</h6>
     
-            <div class="w-full my-4 md:w-1/3 md:m-0 px-0">
-
-                <!-- Collection section -->
-                <div class="my-4">
-                    <h6 class="py-2">Lieblingssongs</h6>
-
-                    <div [routerLink]="['.', 'collection']" class="flex items-center p-3 gap-3 cursor-pointer bg-transparent border-2 border-transparent active:border-opacity-60 hover:bg-background-light hover:bg-opacity-80 active:border-primary-light hover:backdrop-blur-md active:bg-background active:bg-opacity-80 transition-all rounded-lg">
-                        <div class="w-14 rounded-full overflow-hidden aspect-square">
-                            <asc-artwork [artwork]="artist?.artwork" [showAccent]="false"></asc-artwork>
-                        </div>
-
-                        <div class="w-full">
-                            <p class="">Du hast {{ artist?.likedCount || 0 }} {{ (artist?.likedCount || 0) != 1 ? "Lieder" : "Lied" }} geliked.</p>
-                            <p class="text-xs opacity-70">von {{ artist?.name }}</p>
+                    <asc-song-list [dataSource]="$topSongs" [showMore]="false" [showAlbum]="false" [showDate]="false" [showHead]="false"></asc-song-list>
+                </div>
+        
+                <div class="w-full my-4 md:w-1/3 md:m-0 px-0">
+    
+                    <!-- Collection section -->
+                    <div class="my-4">
+                        <h6 class="py-2">Lieblingssongs</h6>
+    
+                        <div [routerLink]="['.', 'collection']" class="flex items-center p-3 gap-3 cursor-pointer bg-transparent border-2 border-transparent active:border-opacity-60 hover:bg-background-light hover:bg-opacity-80 active:border-primary-light hover:backdrop-blur-md active:bg-background active:bg-opacity-80 transition-all rounded-lg">
+                            <div class="w-14 rounded-full overflow-hidden aspect-square">
+                                <asc-artwork [artwork]="artist?.artwork" [showAccent]="false"></asc-artwork>
+                            </div>
+    
+                            <div class="w-full">
+                                <p class="">Du hast {{ artist?.likedCount || 0 }} {{ (artist?.likedCount || 0) != 1 ? "Lieder" : "Lied" }} geliked.</p>
+                                <p class="text-xs opacity-70">von {{ artist?.name }}</p>
+                            </div>
                         </div>
                     </div>
-                </div>
-
-                <!-- Genres section -->
-                <div class="my-4" *ngIf="genres?.elements?.length > 0">
-                    <h6 class="py-2">Genres</h6>
-
-                    <div class="flex items-center flex-wrap gap-2">
-                        <asc-label-badge *ngFor="let genre of genres?.elements" [routerLink]="['.', 'genres', genre.id]">{{ genre.name }}</asc-label-badge>
-                        <p *ngIf="genres?.totalElements - 12 > 0" class="text-xs uppercase tracking-wide hover:underline cursor-pointer py-1.5 px-3" [routerLink]="['.', 'genres']">+{{ genres?.totalElements - 12 }}</p>
+    
+                    <!-- Genres section -->
+                    <div class="my-4" *ngIf="genres?.elements?.length > 0">
+                        <h6 class="py-2">Genres</h6>
+    
+                        <div class="flex items-center flex-wrap gap-2">
+                            <asc-label-badge *ngFor="let genre of genres?.elements" [routerLink]="['.', 'genres', genre.id]">{{ genre.name }}</asc-label-badge>
+                            <p *ngIf="genres?.totalElements - 12 > 0" class="text-xs uppercase tracking-wide hover:underline cursor-pointer py-1.5 px-3" [routerLink]="['.', 'genres']">+{{ genres?.totalElements - 12 }}</p>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
-</section>
+        </section>
+    </div>
+</asc-playlist-view>
 
-<section class="my-row" *ngIf="songs.length > 0">
+<section class="mb-row" *ngIf="songs.length > 0">
     <asc-horizontal-grid headline="Neuste Songs" [enableMore]="true" (onMore)="router.navigate(['/artist', artist?.id, 'songs'])">
         <asc-song-grid-item *ngFor="let song of songs" [song]="song"></asc-song-grid-item>
       </asc-horizontal-grid>
@@ -76,7 +66,7 @@
 
 <section class="my-row" *ngIf="albums.length > 0">
     <asc-horizontal-grid headline="Alben" [enableMore]="true" (onMore)="router.navigate(['/artist', artist?.id, 'albums'])">
-        <asc-album-grid-item *ngFor="let album of albums" [album]="album" [routerLink]="['/album', album.id]"></asc-album-grid-item>
+        <asc-album-grid-item *ngFor="let album of albums" [album]="album" [routerLink]="['/album', album.id]" [preferDate]="true"></asc-album-grid-item>
       </asc-horizontal-grid>
 </section>
 

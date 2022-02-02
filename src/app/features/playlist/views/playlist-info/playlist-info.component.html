@@ -13,51 +13,31 @@
     </div>
 </section>
 
-<section *ngIf="!isLoading && !!playlist" class="relative p-window">
-    <div class="absolute left-0 top-0 w-full h-[50vh]" [style]="'background: linear-gradient(180deg, ' + (playlist?.artwork?.accentColor || accentColor) + '80 0%, ' + (playlist?.artwork?.accentColor || accentColor) + '00 100%);'"></div>
+<asc-playlist-view [options]="{ type: 'playlist', title: playlist?.title, privacy: playlist?.privacy, artwork: playlist?.artwork }" *ngIf="!isLoading && !!playlist" >
 
-    <!-- Playlist title section -->
-    <section class="block md:flex md:flex-1 md:items-end z-10 relative">
-        <!-- Playlist cover -->
-        <div class="block w-56 mx-auto md:m-0 relative">
-            <asc-artwork [artwork]="playlist?.artwork" class="block aspect-square rounded-2xl overflow-hidden shadow-xl z-10" [showAccent]="false"></asc-artwork>
+    <!-- Quick info bar below title -->
+    <div class="py-2 md:pt-2 md:pb-0 md:flex md:items-center" asc-stats>
+        <ul class="flex md:inline-flex items-center gap-2">
+            <asc-profile-badge [user]="playlist?.author" [routerLink]="['/profile', playlist?.author.id]"></asc-profile-badge>
 
-            <asc-label-badge *ngIf="playlist?.privacy != 'public'" class="absolute top-2 left-2 opacity-70">{{ playlist?.privacy | playlistPrivacyPipe }}</asc-label-badge>
-        </div>
+            <li class="inline opacity-60" *ngIf="playlist?.collaborators?.length > 0">
+                <div class="inline-flex items-center">
+                    <p class="text-sm mr-1">+{{ playlist?.collaborators?.length }}</p>
+                    
+                    <asc-user-avatar class="w-6 aspect-square rounded-full overflow-hidden transform-gpu cursor-pointer" [ngClass]="{'-translate-x-1/2 shadow-md': i != 0 }" *ngFor="let user of playlist?.collaborators; index as i" [resourceId]="user.avatarResourceId" [matTooltip]="user.username" [routerLink]="['/profile', user.id]"></asc-user-avatar>
+                </div>
+            </li>
+        </ul>
 
-        <!-- Playlist title -->
-        <div class="z-30 md:px-4 w-full pointer-events-auto mt-8 md:m-0">
-            <h6 class="font-light md:font-bold md:-mb-1 text-sm md:text-lg md:block hidden">Playlist</h6>
-            <h1 class="my-2 md:m-0 line-clamp-1 text-2xl md:text-5xl drop-shadow-md">{{ playlist?.title }}</h1>
+        <ul class="pt-2 flex md:inline-flex items-center md:p-0 gap-3 md:ml-3">
+            <li class="inline text-xs opacity-60">{{ playlist?.createdAt | date:"yyyy" }}</li>
+            <li class="inline text-xs opacity-60">{{ playlist?.songsCount }} {{ playlist?.songsCount != 1 ? "Songs" : "Song" }}</li>
+            <li class="inline text-xs opacity-60">{{ playlist?.totalDuration | totalDurationPipe }}</li>
+        </ul>
+    </div>
 
-            <!-- Quick info bar below title -->
-            <div class="py-2 md:pt-2 md:pb-0 md:flex md:items-center">
-                <ul class="flex md:inline-flex items-center gap-2">
-                    <asc-profile-badge [user]="playlist?.author" [routerLink]="['/profile', playlist?.author.id]"></asc-profile-badge>
-    
-                    <li class="inline opacity-60" *ngIf="playlist?.collaborators?.length > 0">
-                        <div class="inline-flex items-center">
-                            <p class="text-sm mr-1">+{{ playlist?.collaborators?.length }}</p>
-                            
-                            <asc-user-avatar class="w-6 aspect-square rounded-full overflow-hidden transform-gpu cursor-pointer" [ngClass]="{'-translate-x-1/2 shadow-md': i != 0 }" *ngFor="let user of playlist?.collaborators; index as i" [resourceId]="user.avatarResourceId" [matTooltip]="user.username" [routerLink]="['/profile', user.id]"></asc-user-avatar>
-                        </div>
-                    </li>
-                </ul>
-    
-                <ul class="pt-2 flex md:inline-flex items-center md:p-0 gap-3 md:ml-3">
-                    <li class="inline text-xs opacity-60">{{ playlist?.createdAt | date:"yyyy" }}</li>
-                    <li class="inline text-xs opacity-60">{{ playlist?.songsCount }} {{ playlist?.songsCount != 1 ? "Songs" : "Song" }}</li>
-                    <li class="inline text-xs opacity-60">{{ playlist?.totalDuration | totalDurationPipe }}</li>
-                </ul>
-            </div>
-        </div>
-    </section>
-
-    <section class="relative my-6 z-10 md:my-12">
-
+    <div asc-contents>
         <!-- Songs list -->
         <asc-song-list [dataSource]="$songs" [showCount]="false" [showMore]="($songs | async).length < playlist?.songsCount" (onMore)="findSongs()"></asc-song-list>
-
-    </section>
-
-</section>
+    </div>
+</asc-playlist-view>

@@ -1,10 +1,6 @@
-<section class="p-window">
-    <h4>Alle Songs von {{ artist?.name }}</h4>
-
-    <!-- TODO: Make this a playable list -->
-
-    <div class="my-row">
+<asc-playlist-view mode="titleOnly" [options]="{ type: 'collection', title: 'Alle Songs von ' + artist?.name, color: artist?.artwork?.accentColor }" *ngIf="!!artist">
+    <!-- Page contents -->
+    <div asc-contents>
         <asc-song-list [dataSource]="$songs" [showMore]="true" [showCover]="false" [showDate]="false" (onMore)="findSongs()" [showMore]="($songs | async).length < totalElements"></asc-song-list>
     </div>
-
-</section>
+</asc-playlist-view>

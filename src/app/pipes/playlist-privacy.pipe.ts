@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from "@angular/core";
-import { PlaylistPrivacy } from "../types/playlist-privacy.types";
+import { PlaylistPrivacy } from "../features/playlist/types/playlist-privacy.types";
 
 @Pipe({
     name: "playlistPrivacyPipe"

@@ -4,37 +4,22 @@
 
 <div class="absolute left-0 top-0 w-full h-[50vh]" [style]="'background: linear-gradient(180deg, ' + (accentColor) + '80 0%, ' + (accentColor) + '00 100%);'"></div>
 
-<section *ngIf="!isLoading && !!collection" class="relative p-window">
-    <!-- Playlist title section -->
-    <section class="block md:flex md:flex-1 md:items-end z-10 relative">
-        <!-- Playlist cover -->
-        <div class="block w-56 mx-auto md:m-0 relative">
-            <asc-artwork [artwork]="null" class="block aspect-square rounded-2xl overflow-hidden shadow-xl z-10" [showAccent]="false"></asc-artwork>
-        </div>
+<asc-playlist-view [options]="{ type: 'collection', title: 'Lieblingssongs' }" *ngIf="!isLoading && !!collection" >
 
-        <!-- Playlist title -->
-        <div class="z-30 md:px-4 w-full pointer-events-auto mt-8 md:m-0">
-            <h6 class="font-light md:font-bold md:-mb-1 text-sm md:text-lg md:block hidden">Playlist</h6>
-            <h1 class="my-2 md:m-0 line-clamp-1 text-2xl md:text-5xl drop-shadow-md">Lieblingssongs</h1>
+    <!-- Quick info bar below title -->
+    <div class="py-2 md:pt-2 md:pb-0 md:flex md:items-center" asc-stats>
+        <ul class="flex md:inline-flex items-center gap-2">
+            <asc-profile-badge [user]="(authService.$user | async)" [routerLink]="['/profile', (authService.$user | async).id]"></asc-profile-badge>
+        </ul>
 
-            <!-- Quick info bar below title -->
-            <div class="py-2 md:pt-2 md:pb-0 md:flex md:items-center">
-                <ul class="flex md:inline-flex items-center gap-2">
-                    <asc-profile-badge [user]="(authService.$user | async)" [routerLink]="['/profile', (authService.$user | async).id]"></asc-profile-badge>
-                </ul>
-    
-                <ul class="pt-2 flex md:inline-flex items-center md:p-0 gap-3 md:ml-3">
-                    <li class="inline text-xs opacity-60">{{ collection?.songsCount }} {{ collection?.songsCount != 1 ? "Songs" : "Song" }}</li>
-                    <li class="inline text-xs opacity-60">{{ collection?.totalDuration | totalDurationPipe }}</li>
-                </ul>
-            </div>
-        </div>
-    </section>
+        <ul class="pt-2 flex md:inline-flex items-center md:p-0 gap-3 md:ml-3">
+            <li class="inline text-xs opacity-60">{{ collection?.songsCount }} {{ collection?.songsCount != 1 ? "Songs" : "Song" }}</li>
+            <li class="inline text-xs opacity-60">{{ collection?.totalDuration | totalDurationPipe }}</li>
+        </ul>
+    </div>
 
-    <section class="relative my-6 z-10 md:my-12">
-
+    <div asc-contents>
         <!-- Songs list -->
         <asc-song-list [dataSource]="$songs" [showCount]="false" [showMore]="($songs | async).length < collection?.songsCount" (onMore)="findSongs()"></asc-song-list>
-
-    </section>
-</section>
+    </div>
+</asc-playlist-view>

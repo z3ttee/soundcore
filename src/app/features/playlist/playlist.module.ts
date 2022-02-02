@@ -10,7 +10,6 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSelectModule } from '@angular/material/select';
 import { AppCommonModule } from 'src/app/common.module';
 import { PlaylistInfoComponent } from './views/playlist-info/playlist-info.component';
-import { PlaylistPrivacyPipe } from './pipes/playlist-privacy.pipe';
 import { ChoosePlaylistComponent } from './dialogs/choose-playlist/choose-playlist.component';
 import { PipesModule } from 'src/app/pipes/pipes.module';
 import { AscSongModule } from 'src/app/components/song-components/song-components.module';
@@ -18,6 +17,7 @@ import { AscBadgeModule } from 'src/app/components/badge-components/badge-compon
 import { AscMessageModule } from 'src/app/components/message-components/message-components.module';
 import { AscImageModule } from 'src/app/components/image-components/image-components.module';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { AscPlaylistViewModule } from 'src/app/components/views/playlist-view.module';
 
 const routes: Routes = [
   { path: ":playlistId", component: PlaylistInfoComponent }
@@ -27,8 +27,9 @@ const routes: Routes = [
   declarations: [
     CreatePlaylistDialog,
     PlaylistInfoComponent,
-    PlaylistPrivacyPipe,
     ChoosePlaylistComponent,
+
+    
   ],
   imports: [
     CommonModule,
@@ -41,6 +42,7 @@ const routes: Routes = [
     AscBadgeModule,
     AscMessageModule,
     AscImageModule,
+    AscPlaylistViewModule,
 
     MatDialogModule,
     MatButtonModule,

@@ -18,6 +18,7 @@ import { ArtistGenresInfoComponent } from './views/artist-genres-info/artist-gen
 import { ArtistSongsComponent } from './views/artist-songs/artist-songs.component';
 import { ArtistAlbumsComponent } from './views/artist-albums/artist-albums.component';
 import { ArtistFeaturedComponent } from './views/artist-featuring/artist-feat.component';
+import { AscPlaylistViewModule } from 'src/app/components/views/playlist-view.module';
 
 const routes: Routes = [
   { path: ":artistId", component: ArtistInfoComponent },
@@ -52,6 +53,7 @@ const routes: Routes = [
     AscGridsModule,
     AscAlbumModule,
     AscGenreModule,
+    AscPlaylistViewModule,
 
     MatProgressBarModule,
     MatButtonModule

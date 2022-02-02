@@ -8,6 +8,7 @@ import { AscImageModule } from 'src/app/components/image-components/image-compon
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { AscBadgeModule } from 'src/app/components/badge-components/badge-components.module';
 import { AscSongModule } from 'src/app/components/song-components/song-components.module';
+import { AscPlaylistViewModule } from 'src/app/components/views/playlist-view.module';
 
 const routes: Routes = [
   { path: "", component: CollectionInfoComponent }
@@ -28,6 +29,7 @@ const routes: Routes = [
     AscImageModule,
     AscBadgeModule,
     AscSongModule,
+    AscPlaylistViewModule,
 
     MatProgressBarModule
   ]

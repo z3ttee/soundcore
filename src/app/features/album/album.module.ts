@@ -12,6 +12,7 @@ import { PipesModule } from 'src/app/pipes/pipes.module';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { AscGridsModule } from 'src/app/components/grids/grids.module';
 import { AscAlbumModule } from 'src/app/components/album-components/album-components.module';
+import { AscPlaylistViewModule } from 'src/app/components/views/playlist-view.module';
 
 const routes: Routes = [
   { path: ":albumId", component: AlbumInfoComponent }
@@ -35,6 +36,7 @@ const routes: Routes = [
     AscImageModule,
     AscGridsModule,
     AscAlbumModule,
+    AscPlaylistViewModule,
 
     MatProgressBarModule,
     MatTooltipModule
