@@ -37,6 +37,14 @@
     </div>
 
     <div asc-contents>
+
+        <div class="flex items-center w-full border mb-row">
+            <button class="outline-none will-change-transform text-xxs rounded-full w-8 h-8 sm:w-10 sm:h-10 inline-flex justify-center items-center bg-accent-dark text-background transform-gpu sm:hover:scale-105 sm:active:scale-[97%] transition-all" (click)="playOrPauseList()">
+                <i class="fa-solid fa-play" *ngIf="(audioService.$paused | async) || !(audioService.$currentSong | async)"></i>
+                <i class="fa-solid fa-pause" *ngIf="!(audioService.$paused | async) && (audioService.$currentSong | async)"></i>
+            </button>
+        </div>
+
         <!-- Songs list -->
         <asc-song-list [dataSource]="$songs" [showCount]="false" [showMore]="($songs | async).length < playlist?.songsCount" (onMore)="findSongs()"></asc-song-list>
     </div>

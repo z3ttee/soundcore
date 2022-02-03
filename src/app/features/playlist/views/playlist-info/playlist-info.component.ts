@@ -1,7 +1,9 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { BehaviorSubject, Observable, Subject, takeUntil } from 'rxjs';
+import { PlayableList } from 'src/app/entities/playable-list.entity';
 import { Song } from 'src/app/features/song/entities/song.entity';
+import { AudioService } from 'src/app/features/stream/services/audio.service';
 import { ScrollService } from 'src/app/services/scroll.service';
 import { Playlist } from '../../entities/playlist.entity';
 import { PlaylistService } from '../../services/playlist.service';
@@ -33,7 +35,8 @@ export class PlaylistInfoComponent implements OnInit, OnDestroy {
   constructor(
     private activatedRoute: ActivatedRoute,
     private playlistService: PlaylistService,
-    private scrollService: ScrollService
+    private scrollService: ScrollService,
+    public audioService: AudioService
   ) { }
 
   public async ngOnInit(): Promise<void> {
@@ -71,6 +74,13 @@ export class PlaylistInfoComponent implements OnInit, OnDestroy {
         ...page.elements
       ])
     });
+  }
+
+  public async playOrPauseList() {
+    // TODO: Just a prototype
+    const playlist: PlayableList = PlayableList.forPlaylist(this.playlistId, 0);
+    console.log(playlist)
+    this.audioService.playList(playlist)
   }
 
 }

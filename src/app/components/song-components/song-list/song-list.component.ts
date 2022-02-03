@@ -24,6 +24,7 @@ export class SongListComponent implements OnInit {
     @Input() public showMore: boolean = true;
 
     @Output() public onMore: EventEmitter<void> = new EventEmitter();
+    @Output() public onPlay: EventEmitter<Song> = new EventEmitter();
 
     public displayedColumns: string[] = [];
 
@@ -50,7 +51,8 @@ export class SongListComponent implements OnInit {
     }
 
     public async playOrPause(song: Song) {
-        zip([
+        this.onPlay.emit(song);
+        /*zip([
             this.audioService.$currentSong,
             this.audioService.$paused
         ]).pipe(take(1)).subscribe((state) => {
@@ -68,17 +70,12 @@ export class SongListComponent implements OnInit {
             } else {
                 this.audioService.play();
             }
-        })
+        })*/
     }
 
     public async likeSong(song: Song) {
         this.likeService.likeSong(song?.id).then(() => {
-            this.dataSource.pipe(take(1)).subscribe((songs) => {
-                const index = songs.findIndex((s) => s.id == song?.id);
-                if(index == -1) return;
-    
-                this.dataSource[index].isLiked = !this.dataSource[index].isLiked;
-            })
+            song.isLiked = !song.isLiked;
         });
     }
 

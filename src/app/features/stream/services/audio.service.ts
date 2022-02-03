@@ -1,6 +1,7 @@
 import { Injectable } from "@angular/core";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { BehaviorSubject, filter, Observable } from "rxjs";
+import { PlayableList } from "src/app/entities/playable-list.entity";
 import { environment } from "src/environments/environment";
 import { Song } from "../../song/entities/song.entity";
 import { StreamQueueService } from "./queue.service";
@@ -74,12 +75,19 @@ export class AudioService {
         });
     }
 
+    /**
+     * Force play of the selected list.
+     */
+    public async playList(playableList: PlayableList) {
+        this.enqueueList(playableList)
+    }
+
 
     /**
      * Play next song in queue.
      */
     public async next() {
-        const nextSong = this._shuffleSubject.getValue() ? this.queueService.random() : this.queueService.dequeue();
+        const nextSong = this._shuffleSubject.getValue() ? await this.queueService.random() : await this.queueService.dequeue();
         if(!nextSong) {
             this._doneSubject.next(true);
             console.warn("[AUDIO] Can't start next song: Queue is empty.")
@@ -125,7 +133,17 @@ export class AudioService {
     public async enqueueSong(song: Song) {
         const done = this._doneSubject.getValue();
         console.log(done)
-        this.queueService.enqueue(song);
+        this.queueService.enqueueSong(song);
+
+        if(done) {
+            this.next();
+        }
+    }
+
+    public async enqueueList(list: PlayableList) {
+        const done = this._doneSubject.getValue();
+        console.log(done)
+        this.queueService.enqueueList(list);
 
         if(done) {
             this.next();

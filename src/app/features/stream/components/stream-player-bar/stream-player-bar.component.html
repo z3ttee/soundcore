@@ -42,6 +42,7 @@
                 </button>
             </span>
 
+            <!-- TODO: Make component -->
             <button class="outline-none will-change-transform text-xxs rounded-full w-8 h-8 sm:w-10 sm:h-10 inline-flex justify-center items-center bg-accent-dark text-background transform-gpu sm:hover:scale-105 sm:active:scale-[97%] transition-all" (click)="audioService.togglePause()">
                 <i class="fa-solid fa-play" *ngIf="(audioService.$paused | async) || !(audioService.$currentSong | async)"></i>
                 <i class="fa-solid fa-pause" *ngIf="!(audioService.$paused | async) && (audioService.$currentSong | async)"></i>
