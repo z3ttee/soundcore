@@ -22,6 +22,8 @@ const routes: Routes = [
     { path: "album", canActivate: [AuthenticationCanActivateGuard], loadChildren: () => import("./features/album/album.module").then((m) => m.AlbumModule) },
     { path: "collection", canActivate: [AuthenticationCanActivateGuard], loadChildren: () => import("./features/collection/collection.module").then((m) => m.CollectionModule) },
 
+    { path: "profile", canActivate: [AuthenticationCanActivateGuard], loadChildren: () => import("./features/user/user.module").then((m) => m.UserModule) },
+
     // Make every route below to AsyncModule
     { path: "activity", canActivate: [AuthenticationCanActivateGuard], component: IndexViewComponent },
   ]},

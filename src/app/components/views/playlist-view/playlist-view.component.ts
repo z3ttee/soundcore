@@ -2,7 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { PlaylistPrivacy } from 'src/app/features/playlist/types/playlist-privacy.types';
 import { Artwork } from 'src/app/model/artwork.model';
 
-export type PlaylistViewType = "playlist" | "song" | "artist" | "collection" | "album";
+export type PlaylistViewType = "playlist" | "song" | "artist" | "collection" | "album" | "user";
 export interface PlaylistViewOptions {
   type?: PlaylistViewType;
   privacy?: PlaylistPrivacy;

@@ -10,7 +10,7 @@ export class UserService {
     constructor(private httpClient: HttpClient){}
 
     public async findProfileById(userId: string): Promise<User> {
-        return firstValueFrom(this.httpClient.get(`${environment.sso_base_uri}/v1/users/${userId}`)) as Promise<User>
+        return firstValueFrom(this.httpClient.get(`${environment.api_base_uri}/v1/users/${userId}`)) as Promise<User>
     }
 
 }

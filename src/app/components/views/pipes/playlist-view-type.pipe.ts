@@ -11,6 +11,7 @@ export class PlaylistViewTypePipe implements PipeTransform {
         if(value == "song") return "Song"
         if(value == "collection") return "Kollektion"
         if(value == "album") return "Album"
+        if(value == "user") return "Nutzerprofil"
         return "Playlist"
     }
 
