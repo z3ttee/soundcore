@@ -1,0 +1,19 @@
+<div class="flex items-center w-full p-1.5 rounded-md overflow-hidden gap-2 hover:bg-background-light transition-all will-change-auto" [ngClass]="{'text-accent-dark bg-background-dark opacity-100 hover:bg-background-dark': routeActive}">
+    <div class="flex justify-start min-w-10 max-w-10 relative px-0.5">
+        <div class="min-w-7 max-w-7 aspect-square rounded-sm overflow-hidden">
+            <asc-artwork [artwork]="playlist?.artwork" [showAccent]="false"></asc-artwork>
+        </div>
+
+        <div class="absolute top-0 left-0 min-w-4 max-w-4 h-4 rounded-full overflow-hidden transform-gpu -translate-x-1/4 -translate-y-1/4" *ngIf="playlist?.author?.id != ($user | async)?.id">
+            <asc-user-avatar [resourceId]="playlist?.author?.avatarResourceId"></asc-user-avatar>
+        </div>
+    </div>
+
+    <div class="flex justify-center flex-col h-7 w-full">
+        <p class="text-sm line-clamp-1">{{ playlist?.title }}</p>
+    </div>
+
+    <div class="min-w-7 max-w-7 aspect-square text-center" *ngIf="playlist?.collaborative || playlist?.collaborators?.length > 0">
+        <i class="text-xxs opacity-60 fa-solid fa-user-group"></i>
+    </div>
+</div>

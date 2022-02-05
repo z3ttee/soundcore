@@ -33,6 +33,7 @@ import { StreamModule } from './features/stream/stream.module';
 import { AscMessageModule } from './components/message-components/message-components.module';
 import { InfiniteScrollModule } from 'ngx-infinite-scroll';
 import {ScrollingModule} from '@angular/cdk/scrolling';
+import { AscPlaylistModule } from './components/playlist-components/playlist-components.module';
 
 // TODO: https://angular.io/guide/i18n-common-prepare
 
@@ -62,6 +63,7 @@ import {ScrollingModule} from '@angular/cdk/scrolling';
     PlaylistModule,
     StreamModule,
     AscMessageModule,
+    AscPlaylistModule,
 
     // Import global Angular Material Components
     MatIconModule,

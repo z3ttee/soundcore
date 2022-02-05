@@ -3,11 +3,11 @@ ul {
     @apply my-2;
 
     label {
-        @apply block mt-6 px-9 pb-0 text-xs opacity-30;
+        @apply block mt-6 px-7 pb-0 text-xs opacity-30;
     }
 
     li {
-        @apply relative px-6 transition-all my-1 cursor-pointer;
+        @apply relative px-4 transition-all my-1 cursor-pointer;
 
         span {
             @apply py-3 px-3.5 block rounded-md transition-all my-1 opacity-70 text-sm;
