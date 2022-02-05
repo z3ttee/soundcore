@@ -84,10 +84,7 @@ export class SongGridItemComponent implements OnInit {
 
         ref.afterClosed().subscribe((playlist: Playlist) => {
             if(!playlist) return;
-            this.playlistService.updateSongs(playlist.id, {
-                action: "add",
-                songs: [ this.song ]
-            })
+            this.playlistService.addSongs(playlist.id, [ this.song.id ])
         })
     }
 

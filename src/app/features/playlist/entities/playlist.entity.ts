@@ -21,4 +21,6 @@ export class Playlist {
     public collaboratorsCount?: number = 0;
     public totalDuration?: number = 0;
 
+    public isLiked?: boolean = false;
+
 }

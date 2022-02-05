@@ -5,7 +5,6 @@ import { Page, Pageable } from 'src/app/pagination/pagination';
 import { environment } from 'src/environments/environment';
 import { Song } from '../../song/entities/song.entity';
 import { CreatePlaylistDTO } from '../dtos/create-playlist.dto';
-import { UpdatePlaylistSongsDTO } from '../dtos/update-songs.dto';
 import { Playlist } from '../entities/playlist.entity';
 
 const PLAYLIST_STORAGE_KEY = "asc_user_playlists"
@@ -37,8 +36,9 @@ export class PlaylistService {
     return firstValueFrom(this.httpClient.get(`${environment.api_base_uri}/v1/playlists/byAuthor/${authorId}`)) as Promise<Page<Playlist>>
   }
 
-  public async updateSongs(playlistId: string, updateSongsDto: UpdatePlaylistSongsDTO): Promise<Playlist> {
-    return firstValueFrom(this.httpClient.put(`${environment.api_base_uri}/v1/playlists/songs/${playlistId}`, updateSongsDto)) as Promise<Playlist>
+  public async addSongs(playlistId: string, songId: string[]): Promise<Playlist> {
+    const joinElement = "&songId=";
+    return firstValueFrom(this.httpClient.put<Playlist>(`${environment.api_base_uri}/v1/playlists/${playlistId}/add?songId=${songId.join(joinElement)}`, {}))
   }
 
   public async create(createPlaylistDto: CreatePlaylistDTO): Promise<Playlist> {
