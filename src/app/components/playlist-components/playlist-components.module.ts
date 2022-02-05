@@ -4,6 +4,7 @@ import { RouterModule } from '@angular/router';
 import { AscImageModule } from '../image-components/image-components.module';
 import { PlaylistGridItemComponent } from './playlist-grid-item/playlist-grid-item.component';
 import { PlaylistSimpleListItemComponent } from './playlist-list-item/playlist-list-item.component';
+import { AscPlaylistContextMenuModule } from '../context-menus/playlist-context-menu/playlist-context-menu.module';
 
 @NgModule({
   declarations: [
@@ -14,7 +15,8 @@ import { PlaylistSimpleListItemComponent } from './playlist-list-item/playlist-l
     CommonModule,
     RouterModule,
 
-    AscImageModule
+    AscImageModule,
+    AscPlaylistContextMenuModule
   ],
   exports: [
     PlaylistGridItemComponent,

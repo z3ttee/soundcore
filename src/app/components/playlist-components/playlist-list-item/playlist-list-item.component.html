@@ -1,4 +1,4 @@
-<div class="flex items-center w-full p-1.5 rounded-md overflow-hidden gap-2 hover:bg-background-light transition-all will-change-auto" [ngClass]="{'text-accent-dark bg-background-dark opacity-100 hover:bg-background-dark': routeActive}">
+<div (contextmenu)="contextMenu.open($event)" class="flex items-center w-full p-1.5 rounded-md overflow-hidden gap-2 hover:bg-background-light transition-all will-change-auto" [ngClass]="{'text-accent-dark bg-background-dark opacity-100 hover:bg-background-dark': routeActive}">
     <div class="flex justify-start min-w-10 max-w-10 relative px-0.5">
         <div class="min-w-7 max-w-7 aspect-square rounded-sm overflow-hidden">
             <asc-artwork [artwork]="playlist?.artwork" [showAccent]="false"></asc-artwork>
@@ -16,4 +16,28 @@
     <div class="min-w-7 max-w-7 aspect-square text-center" *ngIf="playlist?.collaborative || playlist?.collaborators?.length > 0">
         <i class="text-xxs opacity-60 fa-solid fa-user-group"></i>
     </div>
+
+    <div class="min-w-7 max-w-7 aspect-square text-center" *ngIf="!playlist?.collaborative && playlist?.collaborators?.length <= 0 && playlist?.isLiked">
+        <i class="text-xxs text-accent-dark fa-solid fa-heart"></i>
+    </div>
 </div>
+
+<asc-playlist-context-menu [playlist]="playlist" #contextMenu>
+    <div class="w-44">
+        <ul class="mb-4">
+            <label class="px-4 text-xs">Abspielen</label>
+            <li class="py-3 px-4 text-opacity-70 bg-opacity-95 hover:bg-background-light active:bg-primary transition-all rounded-md cursor-pointer text-sm" (click)="playList()">Jetzt abspielen</li>
+            <li class="py-3 px-4 text-opacity-70 bg-opacity-95 hover:bg-background-light active:bg-primary transition-all rounded-md cursor-pointer text-sm" (click)="enqueueList()">Zur Warteschlange</li>
+        </ul>
+    
+        <ul class="my-4">
+            <label class="px-4 text-xs">Aktionen</label>
+            <li class="py-3 px-4 text-opacity-70 bg-opacity-95 hover:bg-background-light active:bg-primary transition-all rounded-md cursor-pointer text-sm">Link teilen</li>
+        </ul>
+    
+        <ul class="mt-4">
+            <label class="px-4 text-xs">Verwaltung</label>
+            <li class="py-3 px-4 text-opacity-70 bg-opacity-95 hover:bg-background-light active:bg-primary transition-all rounded-md cursor-pointer text-sm">Bearbeiten</li>
+        </ul>
+    </div>
+</asc-playlist-context-menu>
