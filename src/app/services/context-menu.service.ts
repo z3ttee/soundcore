@@ -22,7 +22,7 @@ export class ContextMenuService {
         })
     }
 
-    public async open(event: MouseEvent, template: TemplateRef<any>, viewContainerRef: ViewContainerRef, context?: any) {
+    public async open(event: MouseEvent, template: TemplateRef<any>, viewContainerRef: ViewContainerRef, contextData?: any) {
         event.preventDefault();
         event.stopPropagation();
 
@@ -39,7 +39,7 @@ export class ContextMenuService {
         this.overlayRef = this.overlay.create({ positionStrategy, scrollStrategy: this.overlay.scrollStrategies.close() });
 
         this.overlayRef.attach(new TemplatePortal(template, viewContainerRef, {
-            $implicit: context
+            $implicit: contextData
         }));
     }
 
