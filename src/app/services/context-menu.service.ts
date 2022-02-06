@@ -36,7 +36,7 @@ export class ContextMenuService {
         this.deviceService.$breakpoint.pipe(take(1)).subscribe((breakpoint) => {
             if(!breakpoint.isDesktop) {
                 // Show bottom sheet on mobile devices
-                this.bottomSheet.open(template, { viewContainerRef, closeOnNavigation: true, data: contextData, panelClass: ["bg-transparent", "shadow-none"] })
+                this.bottomSheetRef = this.bottomSheet.open(template, { viewContainerRef, closeOnNavigation: true, data: contextData, panelClass: ["bg-transparent", "shadow-none"] })
                 return;
             }
 
@@ -55,8 +55,6 @@ export class ContextMenuService {
                 $implicit: contextData
             }));
         })
-
-        
     }
 
     public async close() {

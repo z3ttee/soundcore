@@ -33,9 +33,7 @@ export class SongGridItemComponent implements OnInit {
         private audioService: AudioService,
         public overlay: Overlay,
         public viewContainerRef: ViewContainerRef,
-        private contextMenuService: ContextMenuService,
-        private dialog: MatDialog,
-        private playlistService: PlaylistService
+        private contextMenuService: ContextMenuService
     ) {
         combineLatest([
             this.audioService.$currentSong,
@@ -70,22 +68,6 @@ export class SongGridItemComponent implements OnInit {
         } else {
             this.audioService.play(this.song);
         }
-        
-    }
-
-    public async openSongMenu(event: MouseEvent, song: Song) {
-        this.contextMenuService.open(event, this.songMenu, this.viewContainerRef, {
-            $implicit: song
-        });
-    }
-
-    public async openChoosePlaylist() {
-        const ref = this.dialog.open(ChoosePlaylistComponent)
-
-        ref.afterClosed().subscribe((playlist: Playlist) => {
-            if(!playlist) return;
-            this.playlistService.addSongs(playlist.id, [ this.song.id ])
-        })
     }
 
     public async enqueue() {
