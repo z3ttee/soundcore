@@ -63,6 +63,8 @@ export class PlaylistInfoComponent implements OnInit, OnDestroy {
     this._songsSubject.next([]);
     this.playlist = null;
     this.playlistId = null;
+    this.totalElements = 0;
+    this.currentPage = 0;
   }
 
   public async findSongs() {

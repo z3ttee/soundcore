@@ -8,6 +8,7 @@ import { PlaylistService } from 'src/app/features/playlist/services/playlist.ser
 import { Song } from 'src/app/features/song/entities/song.entity';
 import { AudioService } from 'src/app/features/stream/services/audio.service';
 import { ContextMenuService } from 'src/app/services/context-menu.service';
+import { LikeService } from 'src/app/services/like.service';
 import { AscChoosePlaylistDialogComponent } from '../../dialogs/choose-playlist-dialog/choose-playlist-dialog.component';
 import { AscContextMenuTemplateComponent } from '../context-menu-template/context-menu-template.component';
 
@@ -25,6 +26,7 @@ export class SongContextMenuComponent implements OnInit, OnDestroy {
   constructor(
     private audioService: AudioService,
     private playlistService: PlaylistService,
+    private likeService: LikeService,
 
     private contextService: ContextMenuService,
     private snackbar: MatSnackBar,
@@ -111,6 +113,20 @@ export class SongContextMenuComponent implements OnInit, OnDestroy {
         this.audioService.play(this.song);
       }
     })
-}
+  }
+
+  public async toggleLike() {
+    const wasLiked = this.song?.isLiked;
+    this.likeService.likeSong(this.song?.id).finally(() => {
+      if(wasLiked) {
+        this.snackbar.open("Song wurde von deinen Lieblingssongs entfernt.", null, { duration: 4000 })
+      } else {
+        this.snackbar.open("Song wurde deinen Lieblingssongs hinzugefügt.", null, { duration: 4000 })
+      }
+
+      this.song.isLiked = !this.song?.isLiked;
+      this.contextService.close();
+    })
+  }
 
 }
