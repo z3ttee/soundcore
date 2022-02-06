@@ -34,6 +34,7 @@ import { AscMessageModule } from './components/message-components/message-compon
 import { InfiniteScrollModule } from 'ngx-infinite-scroll';
 import {ScrollingModule} from '@angular/cdk/scrolling';
 import { AscPlaylistModule } from './components/playlist-components/playlist-components.module';
+import { MatBottomSheetModule } from '@angular/material/bottom-sheet';
 
 // TODO: https://angular.io/guide/i18n-common-prepare
 
@@ -73,6 +74,7 @@ import { AscPlaylistModule } from './components/playlist-components/playlist-com
     MatListModule,
     MatDividerModule,
     MatProgressBarModule,
+    MatBottomSheetModule,
     ScrollingModule
   ],
   providers: [

@@ -36,9 +36,20 @@ export class PlaylistService {
     return firstValueFrom(this.httpClient.get(`${environment.api_base_uri}/v1/playlists/byAuthor/${authorId}`)) as Promise<Page<Playlist>>
   }
 
-  public async addSongs(playlistId: string, songId: string[]): Promise<Playlist> {
-    const joinElement = "&songId=";
-    return firstValueFrom(this.httpClient.put<Playlist>(`${environment.api_base_uri}/v1/playlists/${playlistId}/add?songId=${songId.join(joinElement)}`, {}))
+  public async addSongs(playlistId: string, songIds: string[]): Promise<void> {
+    return firstValueFrom(this.httpClient.put<void>(`${environment.api_base_uri}/v1/playlists/${playlistId}/songs/add`, songIds))
+  }
+
+  public async removeSongs(playlistId: string, songIds: string[]): Promise<void> {
+    return firstValueFrom(this.httpClient.put<void>(`${environment.api_base_uri}/v1/playlists/${playlistId}/songs/remove`, songIds))
+  }
+
+  public async addCollaborators(playlistId: string, collaboratorIds: string[]): Promise<void> {
+    return firstValueFrom(this.httpClient.put<void>(`${environment.api_base_uri}/v1/playlists/${playlistId}/collaborators/add`, collaboratorIds))
+  }
+
+  public async removeCollaborators(playlistId: string, collaboratorIds: string[]): Promise<void> {
+    return firstValueFrom(this.httpClient.put<void>(`${environment.api_base_uri}/v1/playlists/${playlistId}/collaborators/remove`, collaboratorIds))
   }
 
   public async create(createPlaylistDto: CreatePlaylistDTO): Promise<Playlist> {
@@ -52,6 +63,12 @@ export class PlaylistService {
   public async restoreAndFindPlaylists(): Promise<Playlist[]> {
     // TODO: Restore from localStorage or maybe indexeddb
     return (await this.findAllOfMe()).elements
+  }
+
+  public async deleteById(playlistId: string): Promise<void> {
+    return firstValueFrom(this.httpClient.delete<void>(`${environment.api_base_uri}/v1/playlists/${playlistId}`)).then(() => {
+      this._playlistsSubject.next(this._playlistsSubject.getValue().filter((p) => p.id != playlistId))
+    });
   }
 
   private async findAllOfMe(): Promise<Page<Playlist>> {
