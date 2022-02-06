@@ -29,7 +29,7 @@ export class PlaylistService {
   }
 
   public async findSongsByPlaylist(playlistId: string, pageable: Pageable): Promise<Page<Song>> {
-    return firstValueFrom(this.httpClient.get(`${environment.api_base_uri}/v1/playlists/songs/${playlistId}${Pageable.toQuery(pageable)}`)) as Promise<Page<Song>>
+    return firstValueFrom(this.httpClient.get(`${environment.api_base_uri}/v1/playlists/${playlistId}/songs${Pageable.toQuery(pageable)}`)) as Promise<Page<Song>>
   }
 
   public async findPageByAuthor(authorId: string = "@me"): Promise<Page<Playlist>> {

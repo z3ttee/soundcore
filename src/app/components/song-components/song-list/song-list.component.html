@@ -97,7 +97,7 @@
   </ng-container>
 
   <tr cdk-header-row *cdkHeaderRowDef="displayedColumns" class="no-effect"></tr>
-  <tr cdk-row *cdkRowDef="let row; columns: displayedColumns;" class="cursor-pointer" (contextmenu)="songMenu.open($event, row)"></tr>
+  <tr cdk-row *cdkRowDef="let row; columns: displayedColumns;" class="cursor-pointer" (contextmenu)="songMenu.open($event, row, playlistContext)"></tr>
 </table>
 
 <div class="flex items-center mt-2" *ngIf="showMore">
