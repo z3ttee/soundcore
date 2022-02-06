@@ -33,7 +33,7 @@ export class PlaylistViewComponent implements OnInit {
 
   constructor() { }
 
-  ngOnInit(): void {
+  public ngOnInit(): void {
     if(this.mode == "titleOnly") this.accentColor = this.colorWhite
   }
 

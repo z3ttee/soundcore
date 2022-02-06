@@ -18,6 +18,7 @@ import { AscImageModule } from 'src/app/components/image-components/image-compon
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { AscPlaylistViewModule } from 'src/app/components/views/playlist-view.module';
 import { AscPlaylistModule } from 'src/app/components/playlist-components/playlist-components.module';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 const routes: Routes = [
   { path: ":playlistId", component: PlaylistInfoComponent }

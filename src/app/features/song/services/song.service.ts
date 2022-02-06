@@ -12,7 +12,7 @@ export class SongService {
 
   constructor(
     private httpClient: HttpClient
-) {}
+  ) {}
 
   public findLatestSongs(): Observable<Page<Song>> {
       return this.httpClient.get(`${environment.api_base_uri}/v1/songs/latest`) as Observable<Page<Song>>

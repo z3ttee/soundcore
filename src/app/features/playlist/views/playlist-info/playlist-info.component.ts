@@ -1,10 +1,14 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { BehaviorSubject, Observable, Subject, takeUntil } from 'rxjs';
+import { BehaviorSubject, filter, Observable, Subject, takeUntil } from 'rxjs';
 import { PlayableList } from 'src/app/entities/playable-list.entity';
 import { Song } from 'src/app/features/song/entities/song.entity';
+import { SongService } from 'src/app/features/song/services/song.service';
 import { AudioService } from 'src/app/features/stream/services/audio.service';
+import { User } from 'src/app/features/user/entities/user.entity';
+import { LikeService } from 'src/app/services/like.service';
 import { ScrollService } from 'src/app/services/scroll.service';
+import { AuthenticationService } from 'src/app/sso/authentication.service';
 import { Playlist } from '../../entities/playlist.entity';
 import { PlaylistService } from '../../services/playlist.service';
 
@@ -13,6 +17,15 @@ import { PlaylistService } from '../../services/playlist.service';
   styleUrls: ['./playlist-info.component.scss']
 })
 export class PlaylistInfoComponent implements OnInit, OnDestroy {
+
+  constructor(
+    private activatedRoute: ActivatedRoute,
+    private playlistService: PlaylistService,
+    private authService: AuthenticationService,
+    private scrollService: ScrollService,
+    private likeService: LikeService,
+    public audioService: AudioService
+  ) { }
 
   private _destroySubject: Subject<void> = new Subject();
   private $destroy: Observable<void> = this._destroySubject.asObservable();
@@ -28,16 +41,11 @@ export class PlaylistInfoComponent implements OnInit, OnDestroy {
   public playlist: Playlist = null;
   public $songs: Observable<Song[]> = this._songsSubject.asObservable();
 
+  public $user: Observable<User> = this.authService.$user.pipe(takeUntil(this.$destroy));
+
   // Pagination
   private currentPage: number = 0;
   public totalElements: number = 0;
-
-  constructor(
-    private activatedRoute: ActivatedRoute,
-    private playlistService: PlaylistService,
-    private scrollService: ScrollService,
-    public audioService: AudioService
-  ) { }
 
   public async ngOnInit(): Promise<void> {
     this.activatedRoute.paramMap.pipe(takeUntil(this.$destroy)).subscribe((paramMap) => {
@@ -51,6 +59,9 @@ export class PlaylistInfoComponent implements OnInit, OnDestroy {
       }).finally(() => this.isLoading = false);
 
       this.scrollService.$onBottomReached.pipe(takeUntil(this.$destroy)).subscribe(() => this.findSongs())
+      this.playlistService.$onSongsAdded.pipe(takeUntil(this.$destroy), filter((event) => event.playlistId == this.playlistId)).subscribe((event) => {
+        // Add event handler
+      })
     })
   }
 
@@ -83,6 +94,13 @@ export class PlaylistInfoComponent implements OnInit, OnDestroy {
     const playlist: PlayableList = PlayableList.forPlaylist(this.playlistId, 0);
     console.log(playlist)
     this.audioService.playList(playlist)
+  }
+
+  public async likePlaylist() {
+    this.likeService.likePlaylist(this.playlistId).then(() => {
+      // TODO: Add message as snackbar
+      this.playlist.isLiked = !this.playlist?.isLiked;
+    })
   }
 
 }

@@ -38,10 +38,18 @@
 
     <div asc-contents>
 
-        <div class="flex items-center w-full border mb-row">
+        <!-- Playlist controls -->
+        <div class="flex items-center w-full border mb-row gap-2">
+            <!-- Play btn -->
             <button class="outline-none will-change-transform text-xxs rounded-full w-8 h-8 sm:w-10 sm:h-10 inline-flex justify-center items-center bg-accent-dark text-background transform-gpu sm:hover:scale-105 sm:active:scale-[97%] transition-all" (click)="playOrPauseList()">
                 <i class="fa-solid fa-play" *ngIf="(audioService.$paused | async) || !(audioService.$currentSong | async)"></i>
                 <i class="fa-solid fa-pause" *ngIf="!(audioService.$paused | async) && (audioService.$currentSong | async)"></i>
+            </button>
+
+            <!-- Like btn -->
+            <button class="transition-all" mat-icon-button (click)="likePlaylist()" *ngIf="playlist?.author?.id != ($user | async)?.id && !playlist?.collaborative && playlist?.collaborators?.length <= 0">
+                <i class="fa-regular fa-heart" *ngIf="!playlist?.isLiked"></i>
+                <i class="fa-solid fa-heart text-accent-dark" *ngIf="playlist?.isLiked"></i>
             </button>
         </div>
 
