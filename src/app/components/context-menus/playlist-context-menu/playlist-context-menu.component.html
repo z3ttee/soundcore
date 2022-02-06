@@ -1,23 +1,21 @@
-<ng-template #menuRef>
-    <div class="inline-block bg-background p-2 rounded-lg overflow-hidden shadow-xl border-2 border-primary-light border-opacity-30 bg-opacity-95 backdrop-blur-sm" [ngClass]="{'block w-full bg-background-dark': !($breakpoint | async)?.isDesktop}">
-        <ul class="flex items-center gap-2">
-            <li><button mat-icon-button (click)="deletePlaylist()"><i class="fa-solid fa-trash-can"></i></button></li>
-        </ul>
-        
-        <ul class="mb-4">
-            <label class="px-4 text-xs">Abspielen</label>
-            <li class="py-3 px-4 text-opacity-70 bg-opacity-95 hover:bg-background-light active:bg-primary transition-all rounded-md cursor-pointer text-sm" (click)="playList()">Jetzt abspielen</li>
-            <li class="py-3 px-4 text-opacity-70 bg-opacity-95 hover:bg-background-light active:bg-primary transition-all rounded-md cursor-pointer text-sm" (click)="enqueueList()">Zur Warteschlange</li>
-        </ul>
+<asc-context-menu-template #templateRef>
+    <ul class="flex items-center gap-2">
+        <li><button mat-icon-button (click)="deletePlaylist()"><i class="fa-solid fa-trash-can"></i></button></li>
+    </ul>
     
-        <ul class="my-4">
-            <label class="px-4 text-xs">Aktionen</label>
-            <li class="py-3 px-4 text-opacity-70 bg-opacity-95 hover:bg-background-light active:bg-primary transition-all rounded-md cursor-pointer text-sm">Link teilen</li>
-        </ul>
-    
-        <ul class="mt-4">
-            <label class="px-4 text-xs">Verwaltung</label>
-            <li class="py-3 px-4 text-opacity-70 bg-opacity-95 hover:bg-background-light active:bg-primary transition-all rounded-md cursor-pointer text-sm">Bearbeiten</li>
-        </ul>
-    </div>
-</ng-template>
+    <ul class="mb-4">
+        <label class="px-4 text-xs">Abspielen</label>
+        <li class="py-3 px-4 text-opacity-70 bg-opacity-95 hover:bg-background-light active:bg-primary transition-all rounded-md cursor-pointer text-sm" (click)="playList()">Jetzt abspielen</li>
+        <li class="py-3 px-4 text-opacity-70 bg-opacity-95 hover:bg-background-light active:bg-primary transition-all rounded-md cursor-pointer text-sm" (click)="enqueueList()">Zur Warteschlange</li>
+    </ul>
+
+    <ul class="my-4">
+        <label class="px-4 text-xs">Aktionen</label>
+        <li class="py-3 px-4 text-opacity-70 bg-opacity-95 hover:bg-background-light active:bg-primary transition-all rounded-md cursor-pointer text-sm">Link teilen</li>
+    </ul>
+
+    <ul class="mt-4">
+        <label class="px-4 text-xs">Verwaltung</label>
+        <li class="py-3 px-4 text-opacity-70 bg-opacity-95 hover:bg-background-light active:bg-primary transition-all rounded-md cursor-pointer text-sm">Bearbeiten</li>
+    </ul>
+</asc-context-menu-template>

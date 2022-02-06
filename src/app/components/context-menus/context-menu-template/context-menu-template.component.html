@@ -1,0 +1,5 @@
+<ng-template #menuRef>
+    <div class="inline-block bg-background p-2 rounded-lg overflow-hidden shadow-xl border-2 border-primary-light border-opacity-30 bg-opacity-95 backdrop-blur-sm" [ngClass]="{'block w-full bg-background-dark': !($breakpoint | async)?.isDesktop}">
+        <ng-content></ng-content>
+    </div>
+</ng-template>

@@ -1,12 +1,11 @@
-import { Component, Input, OnInit, TemplateRef, ViewChild, ViewContainerRef } from '@angular/core';
+import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { PlayableList } from 'src/app/entities/playable-list.entity';
 import { Playlist } from 'src/app/features/playlist/entities/playlist.entity';
 import { PlaylistService } from 'src/app/features/playlist/services/playlist.service';
 import { AudioService } from 'src/app/features/stream/services/audio.service';
 import { ContextMenuService } from 'src/app/services/context-menu.service';
-import { Breakpoint, DeviceService } from 'src/app/services/device.service';
-import { Observable, Subject, takeUntil } from 'rxjs';
+import { AscContextMenuTemplateComponent } from '../context-menu-template/context-menu-template.component';
 
 @Component({
   selector: 'asc-playlist-context-menu',
@@ -15,32 +14,21 @@ import { Observable, Subject, takeUntil } from 'rxjs';
 })
 export class AscPlaylistContextMenuComponent implements OnInit {
 
-  @ViewChild('menuRef') public menuRef: TemplateRef<any>;
+  @ViewChild('templateRef') public templateRef: AscContextMenuTemplateComponent;
   @Input() public playlist: Playlist;
-
-  private _destroySubject: Subject<void> = new Subject();
-  private $destroy: Observable<void> = this._destroySubject.asObservable();
 
   constructor(
     private audioService: AudioService,
     private playlistService: PlaylistService,
-    private deviceService: DeviceService,
 
     private contextService: ContextMenuService,
-    private viewContainerRef: ViewContainerRef,
-    
     private snackbar: MatSnackBar,
   ) { }
-
-  public $breakpoint: Observable<Breakpoint> = this.deviceService.$breakpoint.pipe(takeUntil(this.$destroy));
 
   public ngOnInit(): void {}
 
   public async open(event: MouseEvent) {
-    event.stopPropagation();
-    event.preventDefault();
-
-    this.contextService.open(event, this.menuRef, this.viewContainerRef, this.playlist)
+    this.templateRef.open(event);
   }
 
   public async playList() {
