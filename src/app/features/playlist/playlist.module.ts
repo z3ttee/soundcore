@@ -10,7 +10,6 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSelectModule } from '@angular/material/select';
 import { AppCommonModule } from 'src/app/common.module';
 import { PlaylistInfoComponent } from './views/playlist-info/playlist-info.component';
-import { ChoosePlaylistComponent } from './dialogs/choose-playlist/choose-playlist.component';
 import { PipesModule } from 'src/app/pipes/pipes.module';
 import { AscSongModule } from 'src/app/components/song-components/song-components.module';
 import { AscBadgeModule } from 'src/app/components/badge-components/badge-components.module';
@@ -27,10 +26,7 @@ const routes: Routes = [
 @NgModule({
   declarations: [
     CreatePlaylistDialog,
-    PlaylistInfoComponent,
-    ChoosePlaylistComponent,
-
-    
+    PlaylistInfoComponent
   ],
   imports: [
     CommonModule,

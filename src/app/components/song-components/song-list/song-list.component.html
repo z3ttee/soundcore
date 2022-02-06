@@ -97,9 +97,11 @@
   </ng-container>
 
   <tr cdk-header-row *cdkHeaderRowDef="displayedColumns" class="no-effect"></tr>
-  <tr cdk-row *cdkRowDef="let row; columns: displayedColumns;" class="cursor-pointer"></tr>
+  <tr cdk-row *cdkRowDef="let row; columns: displayedColumns;" class="cursor-pointer" (contextmenu)="songMenu.open($event, row)"></tr>
 </table>
 
 <div class="flex items-center mt-2" *ngIf="showMore">
     <button class="py-2 px-3 rounded-md transition-all hover:bg-background hover:bg-opacity-60 active:bg-background-light active:border-opacity-30 active:bg-opacity-60 transform-gpu will-change-transform active:scale-95" (click)="onMore.emit()"><span class="text-xs tracking-wide text-white-dark">Mehr Laden</span></button>
 </div>
+
+<asc-song-context-menu [isPlayable]="true" #songMenu></asc-song-context-menu>

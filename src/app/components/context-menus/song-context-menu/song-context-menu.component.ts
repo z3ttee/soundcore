@@ -1,7 +1,7 @@
 import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { Observable, Subject, take, takeUntil } from 'rxjs';
+import { map, Observable, Subject, take, takeUntil } from 'rxjs';
 import { Playlist } from 'src/app/features/playlist/entities/playlist.entity';
 import { PlaylistService } from 'src/app/features/playlist/services/playlist.service';
 import { Song } from 'src/app/features/song/entities/song.entity';
@@ -18,9 +18,8 @@ import { AscContextMenuTemplateComponent } from '../context-menu-template/contex
 export class SongContextMenuComponent implements OnInit, OnDestroy {
 
   @ViewChild('templateRef') public templateRef: AscContextMenuTemplateComponent;
-  @Input() public song: Song;
+  
   @Input() public isPlayable: boolean = true;
-  @Input() public isPlaying: boolean = false;
 
   constructor(
     private audioService: AudioService,
@@ -34,6 +33,8 @@ export class SongContextMenuComponent implements OnInit, OnDestroy {
   private _destroySubject: Subject<void> = new Subject();
   private $destroy: Observable<void> = this._destroySubject.asObservable();
 
+  public song: Song;
+  public $isPlaying: Observable<boolean> = this.audioService.$currentSong.pipe(takeUntil(this.$destroy), map((song) => !!song && song?.id == this.song?.id));
   public $isPlayerPaused: Observable<boolean> = this.audioService.$paused.pipe(takeUntil(this.$destroy));
 
   public ngOnInit(): void {}
@@ -42,7 +43,8 @@ export class SongContextMenuComponent implements OnInit, OnDestroy {
       this._destroySubject.complete();
   }
 
-  public async open(event: MouseEvent) {
+  public async open(event: MouseEvent, contextData?: Song) {
+    this.song = contextData;
     this.templateRef.open(event);
   }
 
@@ -72,15 +74,16 @@ export class SongContextMenuComponent implements OnInit, OnDestroy {
 
     this.contextService.close();
 
-    if(this.isPlaying) {
-      this.$isPlayerPaused.pipe(take(1)).subscribe((isPaused) => {
-        if(isPaused) this.audioService.play();
-        else this.audioService.pause();
-      })
-    } else {
-      this.audioService.play(this.song);
-    }
-    
+    this.$isPlaying.pipe(take(1)).subscribe((isPlaying) => {
+      if(isPlaying) {
+        this.$isPlayerPaused.pipe(take(1)).subscribe((isPaused) => {
+          if(isPaused) this.audioService.play();
+          else this.audioService.pause();
+        })
+      } else {
+        this.audioService.play(this.song);
+      }
+    })
 }
 
 }
