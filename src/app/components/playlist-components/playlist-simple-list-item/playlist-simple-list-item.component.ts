@@ -7,8 +7,8 @@ import { AuthenticationService } from 'src/app/sso/authentication.service';
 
 @Component({
   selector: 'asc-playlist-simple-list-item',
-  templateUrl: './playlist-list-item.component.html',
-  styleUrls: ['./playlist-list-item.component.scss']
+  templateUrl: './playlist-simple-list-item.component.html',
+  styleUrls: ['./playlist-simple-list-item.component.scss']
 })
 export class PlaylistSimpleListItemComponent implements OnInit, OnDestroy {
 
