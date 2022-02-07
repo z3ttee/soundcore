@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { BehaviorSubject, filter, Observable, Subject, takeUntil } from 'rxjs';
+import { BehaviorSubject, filter, map, Observable, Subject, takeUntil } from 'rxjs';
 import { PlayableList } from 'src/app/entities/playable-list.entity';
 import { Song } from 'src/app/features/song/entities/song.entity';
 import { SongService } from 'src/app/features/song/services/song.service';
@@ -59,8 +59,11 @@ export class PlaylistInfoComponent implements OnInit, OnDestroy {
       }).finally(() => this.isLoading = false);
 
       this.scrollService.$onBottomReached.pipe(takeUntil(this.$destroy)).subscribe(() => this.findSongs())
-      this.playlistService.$onSongsAdded.pipe(takeUntil(this.$destroy), filter((event) => event?.playlistId == this.playlistId)).subscribe((event) => {
-        // Add event handler
+      this.playlistService.$onSongsAdded.pipe(takeUntil(this.$destroy), filter((event) => event?.playlistId == this.playlistId), map((event) => event.songs)).subscribe((songs) => {
+        this.addSongs(songs)
+      })
+      this.playlistService.$onSongsRemoved.pipe(takeUntil(this.$destroy), filter((event) => event?.playlistId == this.playlistId), map((event) => event.songs)).subscribe((songs) => {
+        this.addSongs(songs)
       })
     })
   }
@@ -101,6 +104,19 @@ export class PlaylistInfoComponent implements OnInit, OnDestroy {
       // TODO: Add message as snackbar
       this.playlist.isLiked = !this.playlist?.isLiked;
     })
+  }
+
+  public async addSongs(songs: Song[]) {
+    const songsArr = this._songsSubject.getValue();
+    const songsArrIds = songsArr.map((song) => song?.id);
+    
+    songsArr.push(...songs.filter((song) => !songsArrIds.includes(song?.id)));
+    this._songsSubject.next(songsArr);
+  }
+
+  public async removeSongs(songs: Song[]) {
+    const songIds = songs.map((song) => song?.id);
+    this._songsSubject.next(this._songsSubject.getValue().filter((song) => !songIds.includes(song?.id)));
   }
 
 }

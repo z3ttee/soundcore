@@ -61,7 +61,7 @@ export class SongContextMenuComponent implements OnInit, OnDestroy {
 
     ref.afterClosed().subscribe((playlist: Playlist) => {
       if(!playlist) return;
-      this.playlistService.addSongs(playlist.id, [ this.song.id ]).then(() => {
+      this.playlistService.addSongs(playlist.id, [ this.song ]).then(() => {
         this.snackbar.open("Song wurde zur Playlist hinzugefügt", null, { duration: 4000 })
       }).catch((reason: HttpErrorResponse) => {
         console.error(reason)
@@ -83,7 +83,7 @@ export class SongContextMenuComponent implements OnInit, OnDestroy {
       return
     }
 
-    this.playlistService.removeSongs(this.playlist.id, [ this.song.id ]).then(() => {
+    this.playlistService.removeSongs(this.playlist.id, [ this.song ]).then(() => {
       this.snackbar.open("Song wurde aus der Playlist entfernt.", null, { duration: 4000 })
     }).catch((reason: HttpErrorResponse) => {
       console.error(reason);
@@ -117,15 +117,7 @@ export class SongContextMenuComponent implements OnInit, OnDestroy {
   }
 
   public async toggleLike() {
-    const wasLiked = this.song?.isLiked;
-    this.likeService.likeSong(this.song?.id).finally(() => {
-      if(wasLiked) {
-        this.snackbar.open("Song wurde von deinen Lieblingssongs entfernt.", null, { duration: 4000 })
-      } else {
-        this.snackbar.open("Song wurde deinen Lieblingssongs hinzugefügt.", null, { duration: 4000 })
-      }
-
-      this.song.isLiked = !this.song?.isLiked;
+    this.likeService.likeSong(this.song).finally(() => {
       this.contextService.close();
     })
   }

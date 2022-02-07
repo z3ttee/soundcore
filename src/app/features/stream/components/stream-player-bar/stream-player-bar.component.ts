@@ -67,9 +67,7 @@ export class StreamPlayerBarComponent implements OnInit, OnDestroy {
   }
 
   public async likeSong() {
-    this.likeService.likeSong(this._song?.id).then(() => {
-      this._song.isLiked = !this._song.isLiked;
-    });
+    this.likeService.likeSong(this._song);
   }
 
 }

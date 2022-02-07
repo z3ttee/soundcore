@@ -36,6 +36,7 @@ import {ScrollingModule} from '@angular/cdk/scrolling';
 import { AscPlaylistModule } from './components/playlist-components/playlist-components.module';
 import { MatBottomSheetModule } from '@angular/material/bottom-sheet';
 import { MatDialogModule } from '@angular/material/dialog';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 // TODO: https://angular.io/guide/i18n-common-prepare
 
@@ -77,7 +78,8 @@ import { MatDialogModule } from '@angular/material/dialog';
     MatProgressBarModule,
     MatBottomSheetModule,
     ScrollingModule,
-    MatDialogModule
+    MatDialogModule,
+    MatSnackBarModule
   ],
   providers: [
     DeviceService,

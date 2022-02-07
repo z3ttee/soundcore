@@ -1,6 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { BehaviorSubject, Observable, Subject, takeUntil } from 'rxjs';
+import { BehaviorSubject, filter, Observable, Subject, takeUntil } from 'rxjs';
 import { Song } from 'src/app/features/song/entities/song.entity';
+import { LikeService } from 'src/app/services/like.service';
 import { ScrollService } from 'src/app/services/scroll.service';
 import { AuthenticationService } from 'src/app/sso/authentication.service';
 import { Collection } from '../../entities/collection.entity';
@@ -32,12 +33,13 @@ export class CollectionInfoComponent implements OnInit, OnDestroy {
   public accentColor: string = "#FFBF50";
 
   constructor(
+    private likeService: LikeService,
     private collectionService: CollectionService,
     private scrollService: ScrollService,
     public authService: AuthenticationService
   ) { }
 
-  ngOnInit(): void {
+  public ngOnInit(): void {
     this.isLoading = true;
     this.collectionService.findCollection().then((collection) => {
       this.collection = collection;
@@ -47,6 +49,11 @@ export class CollectionInfoComponent implements OnInit, OnDestroy {
       })
     }).finally(() => {
       this.isLoading = false
+    })
+
+    this.likeService.$onSongLike.pipe(takeUntil(this.$destroy)).subscribe((song) => {
+        if(song.isLiked) this.addSong(song)
+        else this.removeSong(song)
     })
   }
 
@@ -65,6 +72,24 @@ export class CollectionInfoComponent implements OnInit, OnDestroy {
         ...page.elements
       ])
     })
+  }
+
+  public async addSong(song: Song) {
+    const songs = this._songsSubject.getValue();
+    const existing = songs.find((s) => s?.id == song?.id);
+
+    if(existing) {
+      existing.isLiked = song?.isLiked
+    } else {
+      songs.push(song);
+      this._songsSubject.next(songs);
+      this.collection.songsCount++;
+    }
+  }
+
+  public async removeSong(song: Song) {
+    this._songsSubject.next(this._songsSubject.getValue().filter((s) => s?.id != song?.id))
+    this.collection.songsCount--;
   }
 
 }

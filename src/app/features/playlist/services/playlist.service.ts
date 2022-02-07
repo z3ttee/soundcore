@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, firstValueFrom, Observable, take } from 'rxjs';
+import { BehaviorSubject, firstValueFrom, Observable, Subject, take } from 'rxjs';
 import { Page, Pageable } from 'src/app/pagination/pagination';
 import { LikeService } from 'src/app/services/like.service';
 import { AuthenticationService } from 'src/app/sso/authentication.service';
@@ -12,7 +12,7 @@ import { Playlist } from '../entities/playlist.entity';
 const PLAYLIST_STORAGE_KEY = "asc_user_playlists"
 
 export interface SongEvent {
-  songIds: string[];
+  songs: Song[];
   playlistId: string;
 }
 
@@ -24,8 +24,8 @@ export class PlaylistService {
   private _playlistsSubject: BehaviorSubject<Playlist[]> = new BehaviorSubject([]);
   public $playlists: Observable<Playlist[]> = this._playlistsSubject.asObservable();
 
-  private _onSongsAddedSubject: BehaviorSubject<SongEvent> = new BehaviorSubject(null);
-  private _onSongsRemovedSubject: BehaviorSubject<SongEvent> = new BehaviorSubject(null);
+  private _onSongsAddedSubject: Subject<SongEvent> = new Subject();
+  private _onSongsRemovedSubject: Subject<SongEvent> = new Subject();
 
   public $onSongsAdded: Observable<SongEvent> = this._onSongsAddedSubject.asObservable();
   public $onSongsRemoved: Observable<SongEvent> = this._onSongsRemovedSubject.asObservable();
@@ -55,15 +55,15 @@ export class PlaylistService {
     return firstValueFrom(this.httpClient.get(`${environment.api_base_uri}/v1/playlists/byAuthor/${authorId}`)) as Promise<Page<Playlist>>
   }
 
-  public async addSongs(playlistId: string, songIds: string[]): Promise<void> {
-    return firstValueFrom(this.httpClient.put<void>(`${environment.api_base_uri}/v1/playlists/${playlistId}/songs/add`, songIds)).then(() => {
-      this._onSongsAddedSubject.next({ songIds, playlistId })
+  public async addSongs(playlistId: string, songs: Song[]): Promise<void> {
+    return firstValueFrom(this.httpClient.put<void>(`${environment.api_base_uri}/v1/playlists/${playlistId}/songs/add`, songs.map((song) => song?.id))).then(() => {
+      this._onSongsAddedSubject.next({ songs, playlistId })
     })
   }
 
-  public async removeSongs(playlistId: string, songIds: string[]): Promise<void> {
-    return firstValueFrom(this.httpClient.put<void>(`${environment.api_base_uri}/v1/playlists/${playlistId}/songs/remove`, songIds)).then(() => {
-      this._onSongsRemovedSubject.next({ songIds, playlistId })
+  public async removeSongs(playlistId: string, songs: Song[]): Promise<void> {
+    return firstValueFrom(this.httpClient.put<void>(`${environment.api_base_uri}/v1/playlists/${playlistId}/songs/remove`, songs.map((song) => song?.id))).then(() => {
+      this._onSongsRemovedSubject.next({ songs, playlistId })
     })
   }
 
