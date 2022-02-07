@@ -19,6 +19,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { AscPlaylistViewModule } from 'src/app/components/views/playlist-view.module';
 import { AscPlaylistModule } from 'src/app/components/playlist-components/playlist-components.module';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { AscPlaylistListItemModule } from 'src/app/components/playlist-components/playlist-list-item/playlist-list-item.module';
 
 const routes: Routes = [
   { path: ":playlistId", component: PlaylistInfoComponent }

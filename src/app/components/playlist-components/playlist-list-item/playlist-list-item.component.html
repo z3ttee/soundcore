@@ -1,0 +1,24 @@
+<div (contextmenu)="enableContextMenu ? contextMenu.open($event) : ''" class="flex items-center w-full p-2 rounded-md overflow-hidden cursor-pointer gap-4 transition-all will-change-auto border-2 border-transparent active:bg-background-dark" [ngClass]="{'hover:bg-background-light hover:border-primary-light hover:border-opacity-60': ($isDesktop | async), 'transform-gpu active:scale-[98%]': !($isDesktop | async)}">
+    <div class="flex justify-start min-w-14 max-w-14 relative">
+        <div class="min-w-14 max-w-14 h-14 aspect-square rounded-sm overflow-hidden">
+            <asc-artwork [artwork]="playlist?.artwork" [showAccent]="false"></asc-artwork>
+        </div>
+    </div>
+
+    <div class="flex justify-center flex-col w-full">
+        <p class="text-sm line-clamp-1">{{ playlist?.title }}</p>
+
+        <ul class="item-details inline-flex items-center font-light text-xs opacity-70">
+            <li class="inline-flex items-center gap-1">
+                <span *ngIf="playlist?.collaborative || playlist?.collaborators?.length > 0"><i class="text-xxs opacity-60 align-middle fa-solid fa-user-group"></i></span>
+                <span *ngIf="!playlist?.collaborative && playlist?.collaborators?.length <= 0 && playlist?.isLiked"><i class="text-sm text-accent-dark fa-solid fa-heart"></i></span>
+                <span class="text-xs font-light">Playlist</span>
+            </li>
+            <li class="inline-flex items-center gap-1" *ngIf="playlist?.author">
+                <span class="text-xs font-light">{{ playlist?.author?.username }}</span>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<asc-playlist-context-menu [playlist]="playlist" #contextMenu></asc-playlist-context-menu>

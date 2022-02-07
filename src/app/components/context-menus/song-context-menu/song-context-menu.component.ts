@@ -8,6 +8,7 @@ import { PlaylistService } from 'src/app/features/playlist/services/playlist.ser
 import { Song } from 'src/app/features/song/entities/song.entity';
 import { AudioService } from 'src/app/features/stream/services/audio.service';
 import { ContextMenuService } from 'src/app/services/context-menu.service';
+import { DialogService } from 'src/app/services/dialog.service';
 import { LikeService } from 'src/app/services/like.service';
 import { AscChoosePlaylistDialogComponent } from '../../dialogs/choose-playlist-dialog/choose-playlist-dialog.component';
 import { AscContextMenuTemplateComponent } from '../context-menu-template/context-menu-template.component';
@@ -30,7 +31,7 @@ export class SongContextMenuComponent implements OnInit, OnDestroy {
 
     private contextService: ContextMenuService,
     private snackbar: MatSnackBar,
-    private dialog: MatDialog
+    private dialogService: DialogService
   ) { }
 
   private _destroySubject: Subject<void> = new Subject();
@@ -56,7 +57,7 @@ export class SongContextMenuComponent implements OnInit, OnDestroy {
   }
 
   public async openChoosePlaylist() {
-    const ref = this.dialog.open(AscChoosePlaylistDialogComponent)
+    const ref = this.dialogService.openSync(AscChoosePlaylistDialogComponent)
 
     ref.afterClosed().subscribe((playlist: Playlist) => {
       if(!playlist) return;

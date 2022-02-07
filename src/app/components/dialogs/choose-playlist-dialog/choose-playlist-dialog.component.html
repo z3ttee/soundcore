@@ -1,9 +1,11 @@
-<h2 mat-dialog-title>Wähle eine Playlist</h2>
+<div class="w-96">
+    <h2 mat-dialog-title>Wähle eine Playlist</h2>
 
-<div mat-dialog-content>
-    <asc-playlist-simple-list-item *ngFor="let playlist of ($playlists | async)" [playlist]="playlist" (click)="choosePlaylist(playlist)"></asc-playlist-simple-list-item>
-</div>
-
-<div mat-dialog-actions [align]="'end'">
-    <button mat-stroked-button mat-dialog-close>Abbrechen</button>
+    <div mat-dialog-content>
+        <asc-playlist-list-item *ngFor="let playlist of ($playlists | async)" [playlist]="playlist" [enableContextMenu]="false" (click)="choosePlaylist(playlist)"></asc-playlist-list-item>
+    </div>
+    
+    <div mat-dialog-actions [align]="'end'">
+        <button mat-stroked-button mat-dialog-close>Abbrechen</button>
+    </div>
 </div>

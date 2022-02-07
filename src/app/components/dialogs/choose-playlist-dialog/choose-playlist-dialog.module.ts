@@ -1,9 +1,9 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AscChoosePlaylistDialogComponent } from './choose-playlist-dialog.component';
-import { AscPlaylistModule } from '../../playlist-components/playlist-components.module';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule } from '@angular/material/dialog';
+import { AscPlaylistListItemModule } from '../../playlist-components/playlist-list-item/playlist-list-item.module';
 
 @NgModule({
   declarations: [
@@ -14,7 +14,7 @@ import { MatDialogModule } from '@angular/material/dialog';
     MatButtonModule,
     MatDialogModule,
 
-    AscPlaylistModule
+    AscPlaylistListItemModule
   ],
   exports: [
     AscChoosePlaylistDialogComponent
