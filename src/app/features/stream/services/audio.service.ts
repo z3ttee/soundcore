@@ -33,8 +33,17 @@ export class AudioService {
     public $loop: Observable<boolean> = this._loopSubject.asObservable();
     public $shuffle: Observable<boolean> = this._shuffleSubject.asObservable();
     public $error: Observable<string> = this._errorSubject.asObservable();
-
     public $queueSize: Observable<number>;
+
+    public get paused(): boolean {
+        return this._pausedSubject.getValue();
+    }
+
+    public get currentSong(): Song {
+        return this._currentSongSubject.getValue();
+    }
+
+    
 
     constructor(
         private streamService: StreamService,
@@ -78,7 +87,7 @@ export class AudioService {
     /**
      * Force play of the selected list.
      */
-    public async playList(playableList: PlayableList) {
+    public async playList(playableList: PlayableList<any>) {
         this.enqueueList(playableList)
     }
 
@@ -140,7 +149,7 @@ export class AudioService {
         }
     }
 
-    public async enqueueList(list: PlayableList) {
+    public async enqueueList(list: PlayableList<any>) {
         const done = this._doneSubject.getValue();
         console.log(done)
         this.queueService.enqueueList(list);
@@ -162,8 +171,8 @@ export class AudioService {
      */
     public reset() {
         this.audio.autoplay = true;
-        this.audio.src = null;
         this.audio.volume = 0.3;
+        this.audio.removeAttribute("src")
         this.pause()
     }
 

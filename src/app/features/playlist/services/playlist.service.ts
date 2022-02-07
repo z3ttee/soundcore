@@ -95,7 +95,9 @@ export class PlaylistService {
   }
 
   private async findAllOfMe(): Promise<Page<Playlist>> {
-    return firstValueFrom(this.httpClient.get(`${environment.api_base_uri}/v1/playlists/byAuthor/@me`)) as Promise<Page<Playlist>>
+    return firstValueFrom(this.httpClient.get<Page<Playlist>>(`${environment.api_base_uri}/v1/playlists/byAuthor/@me`)).catch(() => {
+      return Page.of([])
+    })
   }
 
   private async handlePlaylistsUpdateEvent(playlists: Playlist[]): Promise<void> {

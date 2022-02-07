@@ -32,7 +32,7 @@
             </li>
             
             <li *ngFor="let playlist of ($playlists | async)">
-                <asc-playlist-simple-list-item [playlist]="playlist" [routerLink]="['/playlist', playlist.id]" routerLinkActive #rla="routerLinkActive" [routeActive]="rla.isActive"></asc-playlist-simple-list-item>
+                <asc-playlist-simple-list-item *ngIf="!!playlist" [playlist]="playlist" [routerLink]="['/playlist', playlist.id]" routerLinkActive #rla="routerLinkActive" [routeActive]="rla.isActive"></asc-playlist-simple-list-item>
             </li>
         </ul>
     </div>

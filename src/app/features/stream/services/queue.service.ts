@@ -9,12 +9,12 @@ abstract class QueueItem {
 }
 
 export class QueueList extends QueueItem {
-    public item: PlayableList;
+    public item: PlayableList<any>;
     public list: Song[] = [];
     private index: number = 0;
     private hasStarted: boolean = false;
 
-    constructor(playableList: PlayableList, private httpClient: HttpClient) {
+    constructor(playableList: PlayableList<any>, private httpClient: HttpClient) {
         super(true);
         this.item = playableList;
 
@@ -165,7 +165,7 @@ export class StreamQueueService {
      * @param song Song to enqueue
      * @returns Song
      */
-     public enqueueList(list: PlayableList): void {
+     public enqueueList(list: PlayableList<any>): void {
         if(this._queue.findIndex((i: QueueList) => i.isList && i?.item?.resourceId == list.resourceId) != -1) {
             console.warn("[QUEUE] Cannot enqueue playable list. Already in queue")
             return;

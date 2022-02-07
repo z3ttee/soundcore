@@ -1,12 +1,10 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { CreatePlaylistDialog } from 'src/app/features/playlist/dialogs/create-playlist/create-playlist.component';
-import { CreatePlaylistDTO } from 'src/app/features/playlist/dtos/create-playlist.dto';
 import { Playlist } from 'src/app/features/playlist/entities/playlist.entity';
 import { PlaylistService } from 'src/app/features/playlist/services/playlist.service';
-import { Page } from 'src/app/pagination/pagination';
 
 @Component({
   selector: 'asc-sidebar',

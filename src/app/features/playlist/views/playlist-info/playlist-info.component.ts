@@ -59,7 +59,7 @@ export class PlaylistInfoComponent implements OnInit, OnDestroy {
       }).finally(() => this.isLoading = false);
 
       this.scrollService.$onBottomReached.pipe(takeUntil(this.$destroy)).subscribe(() => this.findSongs())
-      this.playlistService.$onSongsAdded.pipe(takeUntil(this.$destroy), filter((event) => event.playlistId == this.playlistId)).subscribe((event) => {
+      this.playlistService.$onSongsAdded.pipe(takeUntil(this.$destroy), filter((event) => event?.playlistId == this.playlistId)).subscribe((event) => {
         // Add event handler
       })
     })
@@ -91,7 +91,7 @@ export class PlaylistInfoComponent implements OnInit, OnDestroy {
 
   public async playOrPauseList() {
     // TODO: Just a prototype
-    const playlist: PlayableList = PlayableList.forPlaylist(this.playlistId, 0);
+    const playlist = PlayableList.forPlaylist(this.playlistId, 0);
     console.log(playlist)
     this.audioService.playList(playlist)
   }
