@@ -1,9 +1,20 @@
 <asc-context-menu-template #templateRef>
-    <ul class="flex items-center mb-4" *ngIf="(authService.$user | async)?.id == playlist?.author?.id">
+
+    <div class="my-row w-full flex flex-col items-center gap-3" *ngIf="!($isDesktop | async)">
+        <div class="max-w-32 min-w-32 h-32 rounded-md overflow-hidden">
+            <asc-artwork [artwork]="playlist?.artwork" [showAccent]="false"></asc-artwork>
+        </div>
+
+        <div class="w-full text-center">
+            <h6 class="line-clamp-1">{{ playlist?.title }}</h6>
+            <p *ngIf="(authService.$user | async)?.id != playlist?.author?.id" class="line-clamp-1 text-xs text-white-dark text-opacity-70 font-light">Playlist &bull; {{ playlist?.author?.username}}</p>
+        </div>
+    </div>
+
+    <ul class="flex items-center mb-4" *ngIf="(authService.$user | async)?.id == playlist?.author?.id && ($isDesktop | async)">
         <li matTooltip="Bearbeiten"><button mat-icon-button (click)="editPlaylist()"><i class="text-xs text-white-dark fa-solid fa-pen"></i></button></li>
         <li matTooltip="Löschen"><button mat-icon-button (click)="deletePlaylist()">
-            <i class="text-xs text-white-dark fa-solid fa-trash-can" *ngIf="!isDeleting"></i>
-            <i class="text-xs text-white-dark fa-solid fa-spinner fa-spin" *ngIf="isDeleting"></i>
+            <i class="text-xs text-white-dark fa-solid fa-trash-can"></i>
         </button></li>
     </ul>
     
@@ -18,10 +29,11 @@
         <li class="p-3 text-opacity-70 bg-opacity-95 hover:bg-background-light active:bg-primary transition-all rounded-md cursor-pointer text-sm">Link teilen</li>
     </ul>
 
-    <ul *ngIf="(authService.$user | async)?.id == playlist?.author?.id && !(deviceService.$breakpoint | async)?.isDesktop">
+    <ul *ngIf="(authService.$user | async)?.id == playlist?.author?.id && !($isDesktop | async)">
         <label class="px-3 text-xs">Verwaltung</label>
         <li class="p-3 text-opacity-70 bg-opacity-95 hover:bg-background-light active:bg-primary transition-all rounded-md cursor-pointer text-sm" (click)="editPlaylist()">Bearbeiten</li>
-        <li class="p-3 text-opacity-70 bg-opacity-95 hover:bg-background-light active:bg-primary transition-all rounded-md cursor-pointer text-sm" (click)="deletePlaylist()">Bearbeiten</li>
-        
+        <li class="p-3 bg-opacity-95 hover:bg-background-light active:bg-primary transition-all rounded-md cursor-pointer" (click)="deletePlaylist()">
+            <span class="text-opacity-70 text-sm">Playlist löschen</span>
+        </li>
     </ul>
 </asc-context-menu-template>

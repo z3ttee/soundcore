@@ -4,6 +4,8 @@ import { AscPlaylistContextMenuComponent } from './playlist-context-menu.compone
 import { MatButtonModule } from '@angular/material/button';
 import { AscContextMenuTemplateModule } from '../context-menu-template/context-menu-template.module';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { AscImageModule } from '../../image-components/image-components.module';
+import { RouterModule } from '@angular/router';
 
 @NgModule({
   declarations: [
@@ -14,7 +16,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     MatButtonModule,
     MatTooltipModule,
 
-    AscContextMenuTemplateModule
+    AscImageModule,
+    AscContextMenuTemplateModule,
   ],
   exports: [
     AscPlaylistContextMenuComponent

@@ -27,7 +27,7 @@ export class AscPlaylistEditorDialogComponent implements OnInit {
   // Form handling
   public playlistDto: FormGroup = new FormGroup({
     title: new FormControl(this.options?.contextData?.title, [ Validators.required, Validators.minLength(3), Validators.maxLength(120) ]),
-    privacy: new FormControl(this.options?.contextData?.privacy)
+    privacy: new FormControl(this.options?.contextData?.privacy || "public")
   })
 
   // Provide list items for select-input
