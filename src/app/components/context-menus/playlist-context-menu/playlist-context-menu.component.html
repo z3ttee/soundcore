@@ -1,6 +1,10 @@
 <asc-context-menu-template #templateRef>
-    <ul class="flex items-center gap-2">
-        <li><button mat-icon-button (click)="deletePlaylist()"><i class="fa-solid fa-trash-can"></i></button></li>
+    <ul class="flex items-center mb-4" *ngIf="(authService.$user | async)?.id == playlist?.author?.id">
+        <li matTooltip="Bearbeiten"><button mat-icon-button (click)="editPlaylist()"><i class="text-xs text-white-dark fa-solid fa-pen"></i></button></li>
+        <li matTooltip="Löschen"><button mat-icon-button (click)="deletePlaylist()">
+            <i class="text-xs text-white-dark fa-solid fa-trash-can" *ngIf="!isDeleting"></i>
+            <i class="text-xs text-white-dark fa-solid fa-spinner fa-spin" *ngIf="isDeleting"></i>
+        </button></li>
     </ul>
     
     <ul class="mb-4">
@@ -14,8 +18,10 @@
         <li class="p-3 text-opacity-70 bg-opacity-95 hover:bg-background-light active:bg-primary transition-all rounded-md cursor-pointer text-sm">Link teilen</li>
     </ul>
 
-    <ul *ngIf="(authService.$user | async)?.id == playlist?.author?.id">
+    <ul *ngIf="(authService.$user | async)?.id == playlist?.author?.id && !(deviceService.$breakpoint | async)?.isDesktop">
         <label class="px-3 text-xs">Verwaltung</label>
         <li class="p-3 text-opacity-70 bg-opacity-95 hover:bg-background-light active:bg-primary transition-all rounded-md cursor-pointer text-sm" (click)="editPlaylist()">Bearbeiten</li>
+        <li class="p-3 text-opacity-70 bg-opacity-95 hover:bg-background-light active:bg-primary transition-all rounded-md cursor-pointer text-sm" (click)="deletePlaylist()">Bearbeiten</li>
+        
     </ul>
 </asc-context-menu-template>
