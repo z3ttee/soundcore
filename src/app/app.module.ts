@@ -37,6 +37,7 @@ import { AscPlaylistModule } from './components/playlist-components/playlist-com
 import { MatBottomSheetModule } from '@angular/material/bottom-sheet';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { AscPlaylistEditorDialogModule } from './components/dialogs/playlist-editor-dialog/playlist-editor-dialog.module';
 
 // TODO: https://angular.io/guide/i18n-common-prepare
 
@@ -63,10 +64,10 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
     TeleportModule,
     InfiniteScrollModule,
 
-    PlaylistModule,
     StreamModule,
     AscMessageModule,
     AscPlaylistModule,
+    AscPlaylistEditorDialogModule,
 
     // Import global Angular Material Components
     MatIconModule,

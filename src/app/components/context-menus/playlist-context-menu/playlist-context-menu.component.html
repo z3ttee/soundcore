@@ -4,18 +4,18 @@
     </ul>
     
     <ul class="mb-4">
-        <label class="px-4 text-xs">Abspielen</label>
-        <li class="py-3 px-4 text-opacity-70 bg-opacity-95 hover:bg-background-light active:bg-primary transition-all rounded-md cursor-pointer text-sm" (click)="playList()">Jetzt abspielen</li>
-        <li class="py-3 px-4 text-opacity-70 bg-opacity-95 hover:bg-background-light active:bg-primary transition-all rounded-md cursor-pointer text-sm" (click)="enqueueList()">Zur Warteschlange</li>
+        <label class="px-3 text-xs">Abspielen</label>
+        <li class="p-3 text-opacity-70 bg-opacity-95 hover:bg-background-light active:bg-primary transition-all rounded-md cursor-pointer text-sm" (click)="playList()">Jetzt abspielen</li>
+        <li class="p-3 text-opacity-70 bg-opacity-95 hover:bg-background-light active:bg-primary transition-all rounded-md cursor-pointer text-sm" (click)="enqueueList()">Zur Warteschlange</li>
     </ul>
 
-    <ul class="my-4">
-        <label class="px-4 text-xs">Aktionen</label>
-        <li class="py-3 px-4 text-opacity-70 bg-opacity-95 hover:bg-background-light active:bg-primary transition-all rounded-md cursor-pointer text-sm">Link teilen</li>
+    <ul class="mb-4">
+        <label class="px-3 text-xs">Aktionen</label>
+        <li class="p-3 text-opacity-70 bg-opacity-95 hover:bg-background-light active:bg-primary transition-all rounded-md cursor-pointer text-sm">Link teilen</li>
     </ul>
 
-    <ul class="mt-4">
-        <label class="px-4 text-xs">Verwaltung</label>
-        <li class="py-3 px-4 text-opacity-70 bg-opacity-95 hover:bg-background-light active:bg-primary transition-all rounded-md cursor-pointer text-sm">Bearbeiten</li>
+    <ul *ngIf="(authService.$user | async)?.id == playlist?.author?.id">
+        <label class="px-3 text-xs">Verwaltung</label>
+        <li class="p-3 text-opacity-70 bg-opacity-95 hover:bg-background-light active:bg-primary transition-all rounded-md cursor-pointer text-sm" (click)="editPlaylist()">Bearbeiten</li>
     </ul>
 </asc-context-menu-template>

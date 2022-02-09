@@ -2,9 +2,9 @@
     <mat-progress-bar mode="indeterminate" *ngIf="isLoading"></mat-progress-bar>
 </div>
 
-<h2 mat-dialog-title>Playlist erstellen</h2>
+<h4 class="mb-row">Playlist erstellen</h4>
 
-<mat-dialog-content class="h-full min-w-[500px] max-w-[500px] min-h-[350px]">
+<mat-dialog-content class="h-full w-full md:min-w-[500px] md:max-w-[500px] md:min-h-[350px] overflow-hidden">
 
     <asc-error-message [error]="error" *ngIf="error"></asc-error-message>
 
@@ -26,19 +26,6 @@
             </mat-error>
         </mat-form-field>
 
-        <!-- Description of the playlist -->
-        <mat-form-field class="mt-12 inline-block w-full" appearance="fill">
-            <mat-label>Beschreibung</mat-label>
-
-            <input type="text" matInput formControlName="description">
-            <mat-error *ngIf="playlistDto.get('description').hasError('maxlength')">
-                Die Beschreibung darf maximal 120 Zeichen lang sein.
-            </mat-error>
-            <mat-error *ngIf="playlistDto.get('description').hasError('minlength')">
-                Die Beschreibung muss mindestens 3 Zeichen lang sein.
-            </mat-error>
-        </mat-form-field>
-
         <!-- Privacy settings of the playlist -->
         <mat-form-field class="mt-12 inline-block w-full" appearance="fill">
             <mat-label>Sichtbarkeit</mat-label>
@@ -52,6 +39,11 @@
 </mat-dialog-content>
 
 <mat-dialog-actions align="end">
-    <button mat-button (click)="cancel()">Abbrechen</button>
-    <button mat-button (click)="save()" cdkFocusInitial>Erstellen</button>
+    <button mat-button (click)="cancel()">
+        <span class="text-sm tracking-wider font-normal text-white-dark">Abbrechen</span>
+    </button>
+    <button mat-button (click)="save()" cdkFocusInitial>
+        <span class="text-sm tracking-wider font-normal text-white-dark" *ngIf="options?.mode == 'create'">Erstellen</span>
+        <span class="text-sm tracking-wider font-normal text-white-dark" *ngIf="options?.mode != 'create'">Speichern</span>
+    </button>
 </mat-dialog-actions>

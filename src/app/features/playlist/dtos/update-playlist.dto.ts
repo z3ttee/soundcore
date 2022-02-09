@@ -1,8 +1,8 @@
 import { PlaylistPrivacy } from "../types/playlist-privacy.types";
 
-export class CreatePlaylistDTO {
+export class UpdatePlaylistDTO {
 
-    public title: string;
+    public title?: string;
     public privacy?: PlaylistPrivacy;
-    
+
 }

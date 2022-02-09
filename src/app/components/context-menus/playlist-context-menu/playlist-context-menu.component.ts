@@ -5,6 +5,7 @@ import { Playlist } from 'src/app/features/playlist/entities/playlist.entity';
 import { PlaylistService } from 'src/app/features/playlist/services/playlist.service';
 import { AudioService } from 'src/app/features/stream/services/audio.service';
 import { ContextMenuService } from 'src/app/services/context-menu.service';
+import { AuthenticationService } from 'src/app/sso/authentication.service';
 import { AscContextMenuTemplateComponent } from '../context-menu-template/context-menu-template.component';
 
 @Component({
@@ -20,9 +21,10 @@ export class AscPlaylistContextMenuComponent implements OnInit {
   constructor(
     private audioService: AudioService,
     private playlistService: PlaylistService,
+    public authService: AuthenticationService,
 
     private contextService: ContextMenuService,
-    private snackbar: MatSnackBar,
+    private snackbar: MatSnackBar
   ) { }
 
   public ngOnInit(): void {}
@@ -44,11 +46,16 @@ export class AscPlaylistContextMenuComponent implements OnInit {
   }
 
   public async deletePlaylist() {
+    this.contextService.close();
+
     this.playlistService.deleteById(this.playlist?.id).catch(() => {
       this.snackbar.open("Playlist konnte nicht gelöscht werden.")
-    }).finally(() => {
-      this.contextService.close();
     })
+  }
+
+  public async editPlaylist() {
+    this.contextService.close();
+    this.playlistService.openEditorDialog({ mode: "edit", contextData: this.playlist })
   }
 
 }

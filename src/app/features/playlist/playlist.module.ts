@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { RouterModule, Routes } from '@angular/router';
-import { CreatePlaylistDialog } from './dialogs/create-playlist/create-playlist.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
@@ -18,8 +17,6 @@ import { AscImageModule } from 'src/app/components/image-components/image-compon
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { AscPlaylistViewModule } from 'src/app/components/views/playlist-view.module';
 import { AscPlaylistModule } from 'src/app/components/playlist-components/playlist-components.module';
-import { MatSnackBarModule } from '@angular/material/snack-bar';
-import { AscPlaylistListItemModule } from 'src/app/components/playlist-components/playlist-list-item/playlist-list-item.module';
 
 const routes: Routes = [
   { path: ":playlistId", component: PlaylistInfoComponent }
@@ -27,7 +24,6 @@ const routes: Routes = [
 
 @NgModule({
   declarations: [
-    CreatePlaylistDialog,
     PlaylistInfoComponent
   ],
   imports: [
@@ -51,8 +47,6 @@ const routes: Routes = [
     MatSelectModule,
     MatTooltipModule
   ],
-  exports: [
-    CreatePlaylistDialog
-  ]
+  exports: []
 })
 export class PlaylistModule { }

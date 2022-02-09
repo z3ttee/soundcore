@@ -1,8 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
-import { map, Observable } from 'rxjs';
-import { CreatePlaylistDialog } from 'src/app/features/playlist/dialogs/create-playlist/create-playlist.component';
+import { Observable } from 'rxjs';
 import { Playlist } from 'src/app/features/playlist/entities/playlist.entity';
 import { PlaylistService } from 'src/app/features/playlist/services/playlist.service';
 
@@ -19,15 +17,12 @@ export class SidebarComponent implements OnInit {
 
   constructor(
     private playlistService: PlaylistService,
-    private dialog: MatDialog
   ) { }
 
   public async ngOnInit(): Promise<void> {}
 
   public async openCreatePlaylist() {
-      this.dialog.open(CreatePlaylistDialog, {
-        data: {},
-      });
+    this.playlistService.openEditorDialog({ mode: "create" })
   }
 
 }

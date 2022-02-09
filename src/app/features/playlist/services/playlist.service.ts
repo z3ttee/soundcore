@@ -1,12 +1,17 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, firstValueFrom, Observable, Subject, take } from 'rxjs';
+import { AscPlaylistEditorOptions } from 'src/app/components/dialogs/playlist-editor-dialog/dto/playlist-editor-options.dto';
+import { AscPlaylistEditorDialogComponent } from 'src/app/components/dialogs/playlist-editor-dialog/playlist-editor-dialog.component';
 import { Page, Pageable } from 'src/app/pagination/pagination';
+import { DialogService } from 'src/app/services/dialog.service';
 import { LikeService } from 'src/app/services/like.service';
+import { SnackbarService } from 'src/app/services/snackbar.service';
 import { AuthenticationService } from 'src/app/sso/authentication.service';
 import { environment } from 'src/environments/environment';
 import { Song } from '../../song/entities/song.entity';
 import { CreatePlaylistDTO } from '../dtos/create-playlist.dto';
+import { UpdatePlaylistDTO } from '../dtos/update-playlist.dto';
 import { Playlist } from '../entities/playlist.entity';
 
 const PLAYLIST_STORAGE_KEY = "asc_user_playlists"
@@ -33,7 +38,8 @@ export class PlaylistService {
   constructor(
     private httpClient: HttpClient,
     private likeService: LikeService,
-    private authService: AuthenticationService
+    private authService: AuthenticationService,
+    private dialogService: DialogService
   ) { 
     this.restoreAndFindPlaylists().then((playlists) => {
       this._playlistsSubject.next(playlists)
@@ -41,6 +47,12 @@ export class PlaylistService {
     })
 
     this.likeService.$onPlaylistLike.subscribe((playlistId) => this.handlePlaylistLikeToggleEvent(playlistId))
+  }
+
+  public openEditorDialog(options: AscPlaylistEditorOptions = new AscPlaylistEditorOptions()) {
+    return this.dialogService.open(AscPlaylistEditorDialogComponent, {
+      data: options
+    })
   }
 
   public async findById(playlistId: string): Promise<Playlist> {
@@ -76,10 +88,25 @@ export class PlaylistService {
   }
 
   public async create(createPlaylistDto: CreatePlaylistDTO): Promise<Playlist> {
-    return (firstValueFrom(this.httpClient.post(`${environment.api_base_uri}/v1/playlists`, createPlaylistDto)) as Promise<Playlist>).then((playlist) => {
+    return (firstValueFrom(this.httpClient.post<Playlist>(`${environment.api_base_uri}/v1/playlists`, createPlaylistDto))).then((playlist) => {
       const playlists = this._playlistsSubject.getValue();
       if(playlists.findIndex((p) => p.id == playlist.id) == -1) playlists.push(playlist);
       return playlist;
+    })
+  }
+
+  public async update(playlistId: string, updatePlaylistDto: UpdatePlaylistDTO): Promise<void> {
+    if(!playlistId) return;
+    return (firstValueFrom(this.httpClient.put<void>(`${environment.api_base_uri}/v1/playlists/${playlistId}`, updatePlaylistDto))).then(() => {
+      const playlists = this._playlistsSubject.getValue();
+      const playlist = playlists.find((pl) => pl?.id == playlistId)
+      if(!playlist) return;
+
+      // Update data locally after it was updated in backend
+      playlist.title = updatePlaylistDto.title || playlist.title;
+      playlist.privacy = updatePlaylistDto.privacy || playlist.privacy;
+
+      // TODO: Send event
     })
   }
 
