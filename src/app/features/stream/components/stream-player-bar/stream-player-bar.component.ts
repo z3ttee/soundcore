@@ -1,6 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { map, Observable, Subject, takeUntil } from 'rxjs';
 import { Song } from 'src/app/features/song/entities/song.entity';
+import { DeviceService } from 'src/app/services/device.service';
 import { LikeService } from 'src/app/services/like.service';
 import { environment } from 'src/environments/environment';
 import { AudioService } from '../../services/audio.service';
@@ -47,7 +48,8 @@ export class StreamPlayerBarComponent implements OnInit, OnDestroy {
 
   constructor(
     public audioService: AudioService,
-    public likeService: LikeService
+    public likeService: LikeService,
+    public deviceService: DeviceService
   ) {}
 
   public ngOnInit(): void {

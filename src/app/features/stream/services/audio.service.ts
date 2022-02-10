@@ -1,8 +1,7 @@
 import { Injectable } from "@angular/core";
 import { MatSnackBar } from "@angular/material/snack-bar";
-import { BehaviorSubject, combineLatest, filter, Observable } from "rxjs";
+import { BehaviorSubject, filter, Observable } from "rxjs";
 import { PlayableList } from "src/app/entities/playable-list.entity";
-import { DeviceService } from "src/app/services/device.service";
 import { environment } from "src/environments/environment";
 import { Song } from "../../song/entities/song.entity";
 import { StreamQueueService } from "./queue.service";
@@ -49,8 +48,7 @@ export class AudioService {
     constructor(
         private streamService: StreamService,
         private queueService: StreamQueueService,
-        private _snackBar: MatSnackBar,
-        private deviceService: DeviceService
+        private _snackBar: MatSnackBar
     ) {
         this.$queueSize = this.queueService.$size;
         this.reset();
@@ -187,7 +185,7 @@ export class AudioService {
     }
 
     public getRestoredVolume(): number {
-        return parseInt(localStorage?.getItem(PLAYER_VOLUME_KEY)) || 0.3;
+        return parseFloat(localStorage?.getItem(PLAYER_VOLUME_KEY)) || 1;
     }
 
     private async setSession(song: Song) {
@@ -255,6 +253,7 @@ export class AudioService {
         this._currentTimeSubject.next(this.audio.currentTime);
     }
     private onVolumeChanged() {
+        localStorage?.setItem(PLAYER_VOLUME_KEY, `${this.audio.volume}`)
         this._volumeSubject.next(this.audio.volume)
     }
     private onEnded() {

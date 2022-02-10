@@ -1,10 +1,12 @@
 <div class="flex items-center gap-1">
 
-    <span class="w-6 h-6 align-middle mt-1">
+    <span class="max-w-6 min-w-6 h-6 align-middle mt-1">
         <i class="text-white-dark fa-solid fa-volume-xmark" *ngIf="volume <= 0"></i>
         <i class="text-white-dark fa-solid fa-volume-low" *ngIf="volume > 0 && volume <= 60"></i>
         <i class="text-white-dark fa-solid fa-volume-high" *ngIf="volume > 60"></i>
     </span>
 
-    <input #slider type="range" orient="vertical" [value]="volume" (input)="onInputChanged($event)" [max]="100" [min]="0">
+    <span class="flex items-center w-full">
+        <input #slider type="range" orient="vertical" [value]="volume" (input)="onInputChanged($event)" [max]="100" [min]="0">
+    </span>
 </div>
