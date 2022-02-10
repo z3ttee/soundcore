@@ -21,11 +21,16 @@ import { BucketListItemComponent } from './components/bucket-list-item/bucket-li
 import { AppCommonModule } from 'src/app/common.module';
 import { MountStatusService } from './services/mount-status.service';
 import { AscMessageModule } from 'src/app/components/message-components/message-components.module';
+import { MountInfoComponent } from './views/mount-info/mount-info.component';
+import { IndexService } from './services/index.service';
+import { IndexInfoComponent } from './views/index-info/index-info.component';
 
 const routes: Routes = [
 
   { path: "", component: BucketsComponent},
-  { path: ":bucketId", component: BucketInfoComponent }
+  { path: ":bucketId", component: BucketInfoComponent },
+  { path: "mount/:mountId", component: MountInfoComponent },
+  { path: "index/:indexId", component: IndexInfoComponent }
 
 ]
 
@@ -35,7 +40,9 @@ const routes: Routes = [
     MountListItemComponent,
     MountEditorDialog,
     BucketInfoComponent,
-    BucketListItemComponent
+    BucketListItemComponent,
+    MountInfoComponent,
+    IndexInfoComponent
   ],
   imports: [
     CommonModule,
@@ -59,7 +66,8 @@ const routes: Routes = [
   providers: [
     BucketService,
     MountService,
-    MountStatusService
+    MountStatusService,
+    IndexService
   ]
 })
 export class StorageModule { }

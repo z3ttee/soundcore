@@ -17,6 +17,11 @@ export class MountService {
         return firstValueFrom(this.httpClient.get(`${environment.api_base_uri}/v1/mounts/byBucket/${bucketId}${Pageable.toQuery(pageable)}`)) as Promise<Page<StorageMount>>
     }
 
+    public async findById(mountId: string): Promise<StorageMount> {
+        if(!mountId) return null;
+        return firstValueFrom(this.httpClient.get<StorageMount>(`${environment.api_base_uri}/v1/mounts/${mountId}`))
+    }
+
     public async create(createMountDto: CreateMountDTO): Promise<StorageMount> {
         return firstValueFrom(this.httpClient.post(`${environment.api_base_uri}/v1/mounts`, createMountDto)) as Promise<StorageMount>
     }

@@ -53,16 +53,20 @@
         </div>
 
         <!-- Duration + Queue -->
-        <div class="hidden md:flex md:items-center md:justify-end md:w-1/3 md:gap-1 p-2 md:p-0">
-            <p class="text-right text-sm opacity-40 font-light">{{ (audioService.$currentTime | async) | songDurationPipe }} / {{ ((audioService.$currentSong | async)?.duration || 0) | songDurationPipe }}</p>
+        <div class="hidden md:flex md:items-center md:justify-end md:w-1/3 p-2 gap-3 lg:gap-5 md:p-0">
+            <p class="text-right text-xxs opacity-60 font-light">{{ (audioService.$currentTime | async) | songDurationPipe }} / {{ ((audioService.$currentSong | async)?.duration || 0) | songDurationPipe }}</p>
             
             <!-- Like button -->
-            <button *ngIf="(audioService.$currentSong | async)" [ngClass]="{'active': (audioService.$currentSong | async)?.isLiked}" mat-icon-button (click)="likeSong()">
-                <i class="fa-regular fa-heart" *ngIf="!(audioService.$currentSong | async)?.isLiked"></i>
-                <i class="fa-solid fa-heart text-accent-dark" *ngIf="(audioService.$currentSong | async)?.isLiked"></i>
+            <button *ngIf="(audioService.$currentSong | async)" [ngClass]="{'active': (audioService.$currentSong | async)?.isLiked}" matRipple [matRippleUnbounded]="true" [matRippleCentered]="true" [matRippleRadius]="16" [matRippleAnimation]="{ enterDuration: 100, exitDuration: 250 }" class="w-5 h-5 flex justify-center items-center" (click)="likeSong()">
+                <i class="text-white-dark fa-regular fa-heart" *ngIf="!(audioService.$currentSong | async)?.isLiked"></i>
+                <i class="text-accent-dark fa-solid fa-heart" *ngIf="(audioService.$currentSong | async)?.isLiked"></i>
             </button>
             
-            <button mat-icon-button class="opacity-70"><i class="fa-solid fa-list"></i></button>
+            <button matRipple [matRippleUnbounded]="true" [matRippleCentered]="true" [matRippleRadius]="16" [matRippleAnimation]="{ enterDuration: 100, exitDuration: 250 }" class="w-5 h-5 flex justify-center items-center"><i class="text-white-dark fa-solid fa-list"></i></button>
+        
+            <div class="w-24 lg:w-28">
+                <asc-volume-slider [volume]="(audioService.$volume | async)" (onVolume)="audioService.setVolume($event)"></asc-volume-slider>
+            </div>
         </div>
     </div>
 </div>

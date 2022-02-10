@@ -1,11 +1,14 @@
 import { Injectable } from "@angular/core";
 import { MatSnackBar } from "@angular/material/snack-bar";
-import { BehaviorSubject, filter, Observable } from "rxjs";
+import { BehaviorSubject, combineLatest, filter, Observable } from "rxjs";
 import { PlayableList } from "src/app/entities/playable-list.entity";
+import { DeviceService } from "src/app/services/device.service";
 import { environment } from "src/environments/environment";
 import { Song } from "../../song/entities/song.entity";
 import { StreamQueueService } from "./queue.service";
 import { StreamService } from "./stream.service";
+
+export const PLAYER_VOLUME_KEY = "asc::player_volume"
 
 @Injectable({
     providedIn: "root"
@@ -18,7 +21,7 @@ export class AudioService {
     private _pausedSubject: BehaviorSubject<boolean> = new BehaviorSubject(false as boolean);
     private _loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject(false as boolean);
     private _currentTimeSubject: BehaviorSubject<number> = new BehaviorSubject(0);
-    private _volumeSubject: BehaviorSubject<number> = new BehaviorSubject(0.3);
+    private _volumeSubject: BehaviorSubject<number> = new BehaviorSubject(this.getRestoredVolume());
     private _doneSubject: BehaviorSubject<boolean> = new BehaviorSubject(true as boolean);
     private _loopSubject: BehaviorSubject<boolean> = new BehaviorSubject(false as boolean);
     private _shuffleSubject: BehaviorSubject<boolean> = new BehaviorSubject(false as boolean);
@@ -43,16 +46,15 @@ export class AudioService {
         return this._currentSongSubject.getValue();
     }
 
-    
-
     constructor(
         private streamService: StreamService,
         private queueService: StreamQueueService,
-        private _snackBar: MatSnackBar
+        private _snackBar: MatSnackBar,
+        private deviceService: DeviceService
     ) {
         this.$queueSize = this.queueService.$size;
         this.reset();
-        
+            
         this.audio.onplay = () => this.onPlayerResumed();
         this.audio.onpause = () => this.onPlayerPaused();
         this.audio.ontimeupdate = () => this.onTimeUpdated();
@@ -171,7 +173,7 @@ export class AudioService {
      */
     public reset() {
         this.audio.autoplay = true;
-        this.audio.volume = 0.3;
+        this.audio.volume = this.getRestoredVolume();
         this.audio.removeAttribute("src")
         this.pause()
     }
@@ -184,8 +186,9 @@ export class AudioService {
         this.audio.volume = volume;
     }
 
-
-
+    public getRestoredVolume(): number {
+        return parseInt(localStorage?.getItem(PLAYER_VOLUME_KEY)) || 0.3;
+    }
 
     private async setSession(song: Song) {
         if(!song) return;
@@ -257,7 +260,6 @@ export class AudioService {
     private onEnded() {
         this.next();
     }
-
 
     private showError(message: string) {
         this._snackBar.open(message, null, { duration: 3000, panelClass: ["bg-primary", "bg-opacity-90", "backdrop-blur-sm", "text-white-dark", "border-2", "border-primary-light", "bottom-1/2"]})

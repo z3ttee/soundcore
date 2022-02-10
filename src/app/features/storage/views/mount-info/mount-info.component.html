@@ -1,24 +1,24 @@
 <section class="p-window">
     <div class="mb-4 flex flex-1 items-center">
         <div class="p-4 bg-background-light rounded-xl">
-            <img src="assets/img/icon_bucket.png" class="w-24 h-24">
+            <img src="assets/img/icon_harddrive.png" class="w-24 h-24">
         </div>
 
         <div class="p-4">
-            <h5 class="opacity-40">Speicherzone</h5>
-            <h2>{{ ($bucket | async)?.name || "Unknown name/abcd" }}</h2>
+            <h5 class="opacity-40">Mount</h5>
+            <h2>{{ ($mount | async)?.name || "Unknown name/abcd" }}</h2>
         </div>
     </div>
 
     <!-- Warning -->
-    <div class="my-4" *ngIf="(mountStatusService.$socketConnected | async) != 'ok' && (mountStatusService.$socketConnected | async) != 'connecting'">
+    <!--<div class="my-4" *ngIf="(mountStatusService.$socketConnected | async) != 'ok' && (mountStatusService.$socketConnected | async) != 'connecting'">
         <asc-message [mode]="'warn'">
             Es ist möglich, dass auf Grund einer Störung, keine Status-Updates empfangen werden können. Du kannst weiterhin alle Mounts verwalten, jedoch werden keine Neuigkeiten zu Hintergrundaktivitäten angezeigt.
         </asc-message>
-    </div>
+    </div>-->
 
     <div class="my-8">
-        <div class="flex flex-1 items-center">
+        <!--<div class="flex flex-1 items-center">
             <h4 class="flex-grow">Mounts</h4>
             <div>
                 <button mat-stroked-button (click)="openMountEditor()"><mat-icon class="align-middle mr-2">add</mat-icon>Mount koppeln</button>
@@ -29,18 +29,10 @@
         <div class="my-2 p-4 bg-warn rounded-md flex flex-1 items-center text-primary-dark" *ngIf="($availableMounts | async)?.elements.length <= 0 && !isLoadingMounts">
             <mat-icon>info</mat-icon>
             <p class="flex-grow pl-4 text-sm text-background-dark">Keine Mounts für diese Speicherzone gefunden.</p>
-        </div>
+        </div>-->  
 
-        <asc-mount-list-item *ngFor="let mount of ($availableMounts | async)?.elements" [mount]="mount" (delete)="deleteMount(mount)" (edit)="openMountEditor(mount)" [routerLink]="['..', 'mount', mount.id]"></asc-mount-list-item>    
-    
-        <mat-paginator 
-            color="primary"
-            [length]="($availableMounts | async)?.totalElements"
-            [pageSize]="selectedPageSize"
-            [pageSizeOptions]="pageSizeOptions"
-            (page)="onPageEvent($event)"
-            [disabled]="isLoadingMounts"
-            aria-label="Select page">
-        </mat-paginator>
+        <div class="w-full p-2 flex items-center border my-2" *ngFor="let index of ($index | async)" [routerLink]="['../..', 'index', index.id]">
+            <p>{{ index.filename }}</p>
+        </div>
     </div>
 </section>

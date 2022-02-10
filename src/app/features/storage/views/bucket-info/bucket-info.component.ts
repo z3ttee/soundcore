@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -13,7 +13,8 @@ import { MountService } from '../../services/mount.service';
 
 @Component({
   templateUrl: './bucket-info.component.html',
-  styleUrls: ['./bucket-info.component.scss']
+  styleUrls: ['./bucket-info.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class BucketInfoComponent implements OnInit {
 

@@ -11,6 +11,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { AscInputModule } from 'src/app/components/input-components/input-components.module';
 import { AscImageModule } from 'src/app/components/image-components/image-components.module';
 import {MatSnackBarModule} from '@angular/material/snack-bar';
+import { AscVolumeSliderModule } from 'src/app/components/input/volume-slider/volume-slider.module';
+import {MatRippleModule} from '@angular/material/core';
 
 const routes: Routes = []
 
@@ -26,9 +28,11 @@ const routes: Routes = []
     PipesModule,
     AscInputModule,
     AscImageModule,
+    AscVolumeSliderModule,
 
     MatButtonModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    MatRippleModule
   ],
   exports: [
     StreamPlayerBarComponent
