@@ -3,78 +3,7 @@ import { Injectable } from "@angular/core";
 import { BehaviorSubject, Observable } from "rxjs";
 import { PlayableList } from "src/app/entities/playable-list.entity";
 import { Song } from "../../song/entities/song.entity";
-
-abstract class QueueItem {
-    constructor(public isList: boolean = false){}
-}
-
-export class QueueList extends QueueItem {
-    public item: PlayableList<any>;
-    public list: Song[] = [];
-    private index: number = 0;
-    private hasStarted: boolean = false;
-
-    constructor(playableList: PlayableList<any>, private httpClient: HttpClient) {
-        super(true);
-        this.item = playableList;
-
-        let calculatedMinPage = Math.ceil(playableList.startSongIndex / playableList.pageSize);
-        if(calculatedMinPage <= 2) calculatedMinPage = 3; // Min. 3 Pages
-
-        this.index = playableList.startSongIndex || 0;
-    }
-
-    private async fetchNextPage(): Promise<Song[]> {
-        return this.item.fetchNextBatch(this.httpClient).then((songs) => {
-            console.log(songs)
-            this.list.push(...songs)
-            return this.list;
-        })
-    }
-
-    public async getNextItem(): Promise<Song> {
-        // Keine neuen Items verfügbar
-        // if(this.currentIndex >= this.item.totalElements) return null;
-
-        // Check if any item has been fetched previously
-        if(!this.hasStarted) {
-            await this.fetchNextPage();
-        }
-        
-        // Check if its time to load new songs (if there are only less than 5 songs left)
-        const availableElements = (this.item.nextPageIndex <= 1 ? 1 : this.item.nextPageIndex-1) * this.list.length;
-                
-        console.log(availableElements)
-        /*if(this.currentIndex+5 >= availableElements && this.currentIndex < this.item.totalElements || !this.hasStarted) {
-            // Fetch next page
-            if(this.currentIndex >= availableElements || !this.hasStarted) {
-                console.log("fetching await")
-                await this.fetchNextPage();
-            } else {
-                console.log("fetching")
-                this.fetchNextPage();
-            }
-        }*/
-
-        const item = this.list.splice(this.index, 1)[0];
-        if(!item) return null;
-        console.log(item?.title)
-        console.log()
-
-        // Has started is true as soon as the first item of the list is requested and returned
-        this.hasStarted = true;
-        return item;
-    }
-}
-
-export class QueueSong extends QueueItem {
-    public item: Song;
-
-    constructor(song: Song) {
-        super(false);
-        this.item = song;
-    }
-}
+import { QueueItem, QueueList, QueueSong } from "../entities/queue-item.entity";
 
 @Injectable()
 export class StreamQueueService {
@@ -111,12 +40,19 @@ export class StreamQueueService {
         const nextItem = this._queue[index];
 
         if(!nextItem.isList) {
+            // This is in case there is a single song added to the queue
+            // The song gets removed from queue array and will be returned.
+            // New size will be calculated and updated as a result.
             const item = (this._queue.splice(index, 1)[0] as QueueSong)?.item;
             this.setNewSize(this.size);
             return item;
         } else {
-            const item = await (nextItem as QueueList)?.getNextItem();
-            if(!item) {
+            // This is in case the nextItem is a list. Then the item is used to access to internal list
+            // of this data structure.
+            const listItem = (nextItem as QueueList);
+            const item = await listItem?.getNextItem();
+
+            if(!item || listItem?.list?.length <= 0) {
                 // Enqueued list is empty, that means it is done playing.
                 this._queue.splice(index, 1);
             }
