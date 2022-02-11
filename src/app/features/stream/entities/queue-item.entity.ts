@@ -29,6 +29,7 @@ export class QueueList extends QueueItem {
     public list: Song[] = [];
     private index: number = 0;
     private hasStarted: boolean = false;
+    private lastFetchFailed: boolean = false;
 
     constructor(playableList: PlayableList<any>, private httpClient: HttpClient) {
         super(true);
@@ -56,21 +57,24 @@ export class QueueList extends QueueItem {
         if(!this.hasStarted) {
             await this.fetchNextPage();
         }
-        
-        // Check if its time to load new songs (if there are only less than 5 songs left)
-        const availableElements = (this.item.nextPageIndex <= 1 ? 1 : this.item.nextPageIndex-1) * this.list.length;
-                
-        console.log(availableElements)
-        /*if(this.currentIndex+5 >= availableElements && this.currentIndex < this.item.totalElements || !this.hasStarted) {
-            // Fetch next page
-            if(this.currentIndex >= availableElements || !this.hasStarted) {
-                console.log("fetching await")
-                await this.fetchNextPage();
-            } else {
-                console.log("fetching")
-                this.fetchNextPage();
-            }
-        }*/
+
+        // Check if there are at least 5 items left in list.
+        // If not, fetch the next page but only if also
+        // there is enough to fetch (e.g.: A playlist with just 4 songs
+        // would not go through the process of fetching next songs)
+
+        // TODO: Optimize whole process, by completely fetching song ids contained in the playlist.
+        // This allows for better shuffle and streaming of music even if metadata is not received yet
+
+        if((this.list.length-5 <= 0 && this.item.totalElements > 5 && this.item.pageSize * (this.item.nextPageIndex) < this.item.totalElements) || this.lastFetchFailed) {
+            await this.fetchNextPage().then(() => this.lastFetchFailed = false).catch(() => this.lastFetchFailed = true);
+        } else {
+            // At this point it might be the case the fetching next page previously failed that often so there are no songs left to play.
+            // This forces the system to synchronously fetch the next page
+            /*if((this.list.length <= 0 && this.item.totalElements > 0 && this.item.pageSize * (this.item.nextPageIndex) < this.item.totalElements)) {
+                await this.fetchNextPage().then(() => this.lastFetchFailed = false).catch(() => this.lastFetchFailed = true);
+            }*/
+        }
 
         const item = this.list.splice(this.index, 1)[0];
         if(!item) return null;

@@ -17,7 +17,7 @@ export class PlayableList<T> {
     public readonly type: PlayableListType = "playlist"
     public readonly resourceId: string = this.id;
     public readonly startSongIndex: number = 0;
-    public readonly pageSize: number = 50;
+    public readonly pageSize: number = 5;
     public readonly contextData?: T;
 
     private _nextPageIndex: number = 0;

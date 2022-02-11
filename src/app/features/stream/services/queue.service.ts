@@ -15,6 +15,11 @@ export class StreamQueueService {
 
     constructor(private httpClient: HttpClient) {}
 
+    /**
+     * Returns calculate size of the whole queue. This takes single
+     * songs as well as playable lists into account by counting all songs
+     * in lists. Use "length" if you want actual length of items in queue.
+     */
     public get size(): number {
         const size = this._queue.reduce((size: number, item: QueueItem) => {
             if(!item.isList) {
@@ -29,36 +34,45 @@ export class StreamQueueService {
     }
 
     /**
+     * Returns actual length of items in queue. This does not count all songs in nested
+     * playable lists. If you want to use that, consider choosing "size".
+     */
+    public get length(): number {
+        return this._queue.length;
+    }
+
+    /**
      * Remove and get a song from the queue
      * @param song Song to enqueue
      * @returns Song
      */
-    public async dequeue(): Promise<Song> {
+    public async dequeue(random: boolean = false): Promise<Song> {
         if(this.isEmpty()) return null;
 
-        const index = 0;
+        const index = random ? Math.floor(Math.random() * this.length) : 0;
         const nextItem = this._queue[index];
+        let item: Song = null;
 
         if(!nextItem.isList) {
             // This is in case there is a single song added to the queue
             // The song gets removed from queue array and will be returned.
             // New size will be calculated and updated as a result.
-            const item = (this._queue.splice(index, 1)[0] as QueueSong)?.item;
-            this.setNewSize(this.size);
-            return item;
+            item = (this._queue.splice(index, 1)[0] as QueueSong)?.item;
         } else {
             // This is in case the nextItem is a list. Then the item is used to access to internal list
             // of this data structure.
             const listItem = (nextItem as QueueList);
-            const item = await listItem?.getNextItem();
+            item = await listItem?.getNextItem();
 
             if(!item || listItem?.list?.length <= 0) {
                 // Enqueued list is empty, that means it is done playing.
                 this._queue.splice(index, 1);
             }
-            this.setNewSize(this.size);
-            return item;
         }
+
+        // Calculate new size and push updates.
+        this.setNewSize(this.size);
+        return item;
     }
 
     /**
@@ -66,24 +80,7 @@ export class StreamQueueService {
      * @returns Song
      */
      public async random(): Promise<Song> {
-        if(this.isEmpty()) return null;
-
-        const index = Math.floor(Math.random() * this.size);
-        const nextItem = this._queue[index];
-
-        if(!nextItem.isList) {
-            const item = await (this._queue.splice(index, 1)[0] as QueueSong)?.item;
-            this.setNewSize(this.size);
-            return item;
-        } else {
-            const item = (nextItem as QueueList)?.getNextItem();
-            if(!item) {
-                // Enqueued list is empty, that means it is done playing.
-                this._queue.splice(index, 1);
-            }
-            this.setNewSize(this.size);
-            return item;
-        }
+        return this.dequeue(true)
     }
 
     /**
