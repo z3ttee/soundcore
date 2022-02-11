@@ -37,4 +37,10 @@ export class AscChoosePlaylistDialogComponent implements OnInit, OnDestroy {
     this.dialogRef.close(playlist);
   }
 
+  public async openPlaylistEditor() {
+    (await this.playlistService.openEditorDialog({ mode: "create" })).afterClosed().pipe(takeUntil(this.$destroy)).subscribe((playlist) => {
+      if(playlist) this.dialogRef.close(playlist)
+    })
+  }
+
 }
