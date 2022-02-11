@@ -78,8 +78,6 @@ export class QueueList extends QueueItem {
 
         const item = this.list.splice(this.index, 1)[0];
         if(!item) return null;
-        console.log(item?.title)
-        console.log()
 
         // Has started is true as soon as the first item of the list is requested and returned
         this.hasStarted = true;

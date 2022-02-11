@@ -24,7 +24,7 @@ export class AscChoosePlaylistDialogComponent implements OnInit, OnDestroy {
   // Data providers
   public $playlists: Observable<Playlist[]> = this.playlistService.$playlists.pipe(
     takeUntil(this.$destroy),
-    map((playlists) => playlists.filter((pl) => pl.author?.id == this.authService.getUser()?.id || pl.collaborative))
+    map((playlists) => playlists.filter((pl) => pl?.author?.id == this.authService.getUser()?.id || pl?.collaborative))
   );
 
   public ngOnInit(): void {}
