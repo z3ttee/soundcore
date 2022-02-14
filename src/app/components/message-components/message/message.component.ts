@@ -9,7 +9,7 @@ export class MessageComponent {
 
   @Input() public withIcon: boolean = true;
   @Input() public mode: "info" | "warn" | "error";
-  @Input() public faIcon: string = "fa-solid fa-triangle-exclamation"
+  @Input() public faIcon: string = "fa-solid fa-circle-info"
 
   constructor() { }
 

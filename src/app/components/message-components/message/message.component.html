@@ -1,9 +1,7 @@
-<div class="p-3 flex flex-1 rounded-md items-center bg-background-dark w-full" [ngClass]="{ 'bg-error': mode == 'error', 'bg-info': mode == 'info', 'bg-warn text-background': mode == 'warn' }">
-    <div class="pr-3" *ngIf="withIcon"><i [class]="faIcon"></i></div>
+<div class="p-2 flex flex-1 rounded-sm items-start w-full" [ngClass]="{ 'bg-error': mode == 'error', 'bg-info': mode == 'info', 'bg-warn text-background': mode == 'warn' }">
+    <span class="min-w-6 max-w-6 text-left align-middle text-xs" *ngIf="withIcon"><i [class]="faIcon"></i></span>
 
-    <div class="flex-grow">
-        <p class="text-sm" [ngClass]="{'text-background': mode == 'warn' }">
-            <ng-content></ng-content>
-        </p>
-    </div>
+    <p class="inline-block w-full align-middle text-xs tracking-wider font-normal" [ngClass]="{'text-background': mode == 'warn' }">
+        <ng-content></ng-content>
+    </p>
 </div>

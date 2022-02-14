@@ -20,17 +20,17 @@
     <!-- Quick info bar below title -->
     <div class="py-2 md:pt-2 md:pb-0 md:flex md:items-center" asc-stats>
         <ul class="flex md:inline-flex items-center gap-2">
-            <asc-artist-badge [artist]="album?.artist" [routerLink]="['/artist', album?.artist?.id]"></asc-artist-badge>
+            <asc-artist-badge *ngIf="album?.artist" [artist]="album?.artist" [routerLink]="['/artist', album?.artist?.id]"></asc-artist-badge>
 
             <li class="inline opacity-60" *ngIf="album?.featuredArtists?.length > 0">
                 <div class="inline-flex items-center">
-                    <p class="text-sm mr-1">+{{ album?.featuredArtists?.length }}</p>
+                    <span class="text-sm mr-1" *ngIf="album?.artist">+{{ album?.featuredArtists?.length }}</span>
                     <asc-artwork class="w-6 aspect-square rounded-full overflow-hidden transform-gpu cursor-pointer" [ngClass]="{'shadow-md': i != 0 }" *ngFor="let featured of album?.featuredArtists; index as i" [artwork]="featured.artwork" [showAccent]="false" [matTooltip]="featured.name" [routerLink]="['/artist', featured.id]"></asc-artwork>
                 </div>
             </li>
         </ul>
 
-        <ul class="pt-2 flex md:inline-flex items-center md:p-0 gap-3 md:ml-3">
+        <ul class="pt-2 flex md:inline-flex items-center md:p-0 gap-3 md:ml-0.5">
             <li class="inline text-xs opacity-60">{{ album?.released | date:"yyyy" }}</li>
             <li class="inline text-xs opacity-60">{{ album?.songsCount }} {{ album?.songsCount != 1 ? "Songs" : "Song" }}</li>
             <li class="inline text-xs opacity-60">{{ album?.totalDuration | totalDurationPipe }}</li>
@@ -39,9 +39,13 @@
 
     <!-- Page contents -->
     <div asc-contents>
-        <section class="relative mb-row z-10">
+        <section class="relative mb-row z-10" *ngIf="($songs | async)?.length > 0">
             <!-- Songs list -->
             <asc-song-list [dataSource]="$songs" [showAlbum]="false" [showDate]="false" [showCover]="false" [showMore]="($songs | async).length < totalElements"></asc-song-list>
+        </section>
+
+        <section>
+            <asc-message>Keine Songs für dieses Album gefunden.</asc-message>
         </section>
     </div>
 </asc-playlist-view>
