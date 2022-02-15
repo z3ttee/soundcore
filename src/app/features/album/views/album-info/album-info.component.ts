@@ -18,6 +18,7 @@ export class AlbumInfoComponent implements OnInit, OnDestroy {
 
   // Loading states
   public isLoading: boolean = false;
+  public isLoadingSongs: boolean = false;
 
   // Main data objects
   private _songsSubject: BehaviorSubject<Song[]> = new BehaviorSubject([])
@@ -79,6 +80,7 @@ export class AlbumInfoComponent implements OnInit, OnDestroy {
     const currentItemCount = this._songsSubject.getValue().length;
     if(currentItemCount != 0 && currentItemCount >= this.totalElements) return;
 
+    this.isLoadingSongs = true;
     this.songService.findByAlbum(this.albumId, { page: this.currentPage }).then((page) => {
       this.totalElements = page.totalElements;
       if(page.elements.length > 0) this.currentPage++;
@@ -87,6 +89,8 @@ export class AlbumInfoComponent implements OnInit, OnDestroy {
         ...this._songsSubject.getValue(),
         ...page.elements
       ])
+    }).finally(() => {
+      this.isLoadingSongs = false;
     })
   }
 

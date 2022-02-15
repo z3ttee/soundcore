@@ -44,7 +44,7 @@
             <asc-song-list [dataSource]="$songs" [showAlbum]="false" [showDate]="false" [showCover]="false" [showMore]="($songs | async).length < totalElements"></asc-song-list>
         </section>
 
-        <section>
+        <section *ngIf="($songs | async)?.length <= 0 && !isLoadingSongs">
             <asc-message>Keine Songs für dieses Album gefunden.</asc-message>
         </section>
     </div>
