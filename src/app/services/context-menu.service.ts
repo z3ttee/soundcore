@@ -31,6 +31,10 @@ export class ContextMenuService {
         event.preventDefault();
         event.stopPropagation();
 
+        if(navigator.vibrate) {
+            navigator?.vibrate(150);
+        }
+
         await this.close();
 
         this.deviceService.$breakpoint.pipe(take(1)).subscribe((breakpoint) => {
