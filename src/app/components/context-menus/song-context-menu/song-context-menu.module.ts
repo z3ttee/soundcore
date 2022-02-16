@@ -4,6 +4,7 @@ import { SongContextMenuComponent } from './song-context-menu.component';
 import { AscContextMenuTemplateModule } from '../context-menu-template/context-menu-template.module';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { AscChoosePlaylistDialogModule } from '../../dialogs/choose-playlist-dialog/choose-playlist-dialog.module';
+import { RouterModule } from '@angular/router';
 
 @NgModule({
   declarations: [
@@ -11,6 +12,7 @@ import { AscChoosePlaylistDialogModule } from '../../dialogs/choose-playlist-dia
   ],
   imports: [
     CommonModule,
+    RouterModule,
 
     MatSnackBarModule,
     AscContextMenuTemplateModule,

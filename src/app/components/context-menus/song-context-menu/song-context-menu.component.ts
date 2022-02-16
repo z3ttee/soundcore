@@ -2,6 +2,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { Router } from '@angular/router';
 import { map, Observable, Subject, take, takeUntil } from 'rxjs';
 import { Playlist } from 'src/app/features/playlist/entities/playlist.entity';
 import { PlaylistService } from 'src/app/features/playlist/services/playlist.service';
@@ -29,6 +30,7 @@ export class SongContextMenuComponent implements OnInit, OnDestroy {
     private playlistService: PlaylistService,
     private likeService: LikeService,
 
+    private router: Router,
     private contextService: ContextMenuService,
     private snackbar: MatSnackBar,
     private dialogService: DialogService
@@ -120,6 +122,11 @@ export class SongContextMenuComponent implements OnInit, OnDestroy {
     this.likeService.likeSong(this.song).finally(() => {
       this.contextService.close();
     })
+  }
+
+  public async navigateToIndex() {
+    this.contextService.close();
+    this.router.navigate(['/storage', 'index', this.song?.index?.id])
   }
 
 }
