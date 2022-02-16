@@ -10,8 +10,6 @@ import { DeviceService } from 'src/app/services/device.service';
 })
 export class AscLikeButtonComponent implements OnInit, OnDestroy {
   
-  // @Output() public click: EventEmitter<void> = new EventEmitter();
-
   constructor(
     private deviceService: DeviceService
   ) { }
@@ -27,11 +25,7 @@ export class AscLikeButtonComponent implements OnInit, OnDestroy {
   // Component props
   @Input() public set isLiked(val: boolean){ this._isLikedSubject.next(val); }
 
-  public ngOnInit(): void {
-    this.$isLiked.subscribe((liked) => {
-      console.log(liked)
-    })
-  }
+  public ngOnInit(): void {}
   public ngOnDestroy(): void {
       this._destroySubject.next();
       this._destroySubject.complete();

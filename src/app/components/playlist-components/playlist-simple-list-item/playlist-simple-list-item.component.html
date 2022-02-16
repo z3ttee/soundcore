@@ -16,10 +16,6 @@
     <div class="min-w-7 max-w-7 aspect-square text-center" *ngIf="playlist?.collaborative || playlist?.collaborators?.length > 0">
         <i class="text-xxs opacity-60 fa-solid fa-user-group"></i>
     </div>
-
-    <div class="min-w-7 max-w-7 aspect-square text-center" *ngIf="!playlist?.collaborative && playlist?.collaborators?.length <= 0 && playlist?.isLiked">
-        <i class="text-xxs text-accent-dark fa-solid fa-heart"></i>
-    </div>
 </div>
 
 <asc-playlist-context-menu [playlist]="playlist" #contextMenu></asc-playlist-context-menu>

@@ -46,7 +46,7 @@ export class PlaylistService {
       this.$playlists.subscribe((playlists) => this.handlePlaylistsUpdateEvent(playlists))
     })
 
-    this.likeService.$onPlaylistLike.subscribe((playlistId) => this.handlePlaylistLikeToggleEvent(playlistId))
+    this.likeService.$onPlaylistLike.subscribe((playlist) => this.handlePlaylistLikeToggleEvent(playlist.id))
   }
 
   public openEditorDialog(options: AscPlaylistEditorOptions = new AscPlaylistEditorOptions()) {
