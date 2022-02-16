@@ -3,7 +3,6 @@ import { ActivatedRoute } from '@angular/router';
 import { BehaviorSubject, filter, map, Observable, Subject, takeUntil } from 'rxjs';
 import { PlayableList } from 'src/app/entities/playable-list.entity';
 import { Song } from 'src/app/features/song/entities/song.entity';
-import { SongService } from 'src/app/features/song/services/song.service';
 import { AudioService } from 'src/app/features/stream/services/audio.service';
 import { User } from 'src/app/features/user/entities/user.entity';
 import { LikeService } from 'src/app/services/like.service';
@@ -100,8 +99,7 @@ export class PlaylistInfoComponent implements OnInit, OnDestroy {
   }
 
   public async likePlaylist() {
-    this.likeService.likePlaylist(this.playlistId).then(() => {
-      // TODO: Add message as snackbar
+    this.likeService.likePlaylist(this.playlist).then(() => {
       this.playlist.isLiked = !this.playlist?.isLiked;
     })
   }

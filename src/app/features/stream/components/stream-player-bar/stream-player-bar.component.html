@@ -31,24 +31,17 @@
 
         <!-- Media Controls Section -->
         <div class="flex items-center justify-center md:w-1/3 md:gap-1 p-2 md:p-0">
+            <!-- Shuffle -->
             <span class="opacity-50 hidden sm:inline"><button mat-icon-button [ngClass]="{'text-accent': (audioService.$shuffle | async)}" (click)="audioService.toggleShuffle()"><i class="text-sm fa-solid fa-shuffle"></i></button></span>
+            <!-- Prev -->
             <span class="opacity-80 hidden sm:inline"><button mat-icon-button [disabled]="true"><i class="fa-solid fa-backward-step"></i></button></span>
 
-            <!-- Like button -->
-            <span class="sm:hidden" *ngIf="(audioService.$currentSong | async)">
-                <button  [ngClass]="{'active': (audioService.$currentSong | async)?.isLiked}" mat-icon-button (click)="likeSong()">
-                    <i class="fa-regular fa-heart" *ngIf="!(audioService.$currentSong | async)?.isLiked"></i>
-                    <i class="fa-solid fa-heart text-accent-dark" *ngIf="(audioService.$currentSong | async)?.isLiked"></i>
-                </button>
-            </span>
+            <!-- Play button -->
+            <asc-play-button [isPaused]="(audioService.$paused | async) || !(audioService.$currentSong | async)" (click)="audioService.togglePause()"></asc-play-button>
 
-            <!-- TODO: Make component -->
-            <button class="outline-none will-change-transform text-xxs rounded-full w-8 h-8 sm:w-10 sm:h-10 inline-flex justify-center items-center bg-accent-dark text-background transform-gpu sm:hover:scale-105 sm:active:scale-[97%] transition-all" (click)="audioService.togglePause()">
-                <i class="fa-solid fa-play" *ngIf="(audioService.$paused | async) || !(audioService.$currentSong | async)"></i>
-                <i class="fa-solid fa-pause" *ngIf="!(audioService.$paused | async) && (audioService.$currentSong | async)"></i>
-            </button>
-
+            <!-- Next -->
             <span class="opacity-80 hidden sm:inline"><button mat-icon-button [disabled]="(audioService.$queueSize | async) <= 0"><i class="fa-solid fa-forward-step" (click)="audioService.next()"></i></button></span>
+            <!-- Loop -->
             <span class="opacity-50 hidden sm:inline"><button mat-icon-button [ngClass]="{'text-accent': (audioService.$loop | async)}" (click)="audioService.toogleLoop()"><i class="text-sm fa-solid fa-repeat"></i></button></span>
         </div>
 
@@ -57,11 +50,7 @@
             <p class="text-right text-xxs opacity-60 font-light">{{ (audioService.$currentTime | async) | songDurationPipe }} / {{ ((audioService.$currentSong | async)?.duration || 0) | songDurationPipe }}</p>
             
             <!-- Like button -->
-            <!--<button *ngIf="(audioService.$currentSong | async)" [ngClass]="{'active': (audioService.$currentSong | async)?.isLiked}" matRipple [matRippleUnbounded]="true" [matRippleCentered]="true" [matRippleRadius]="16" [matRippleAnimation]="{ enterDuration: 100, exitDuration: 250 }" class="w-5 h-5 flex justify-center items-center" (click)="likeSong()">
-                <i class="text-white-dark fa-regular fa-heart" *ngIf="!(audioService.$currentSong | async)?.isLiked"></i>
-                <i class="text-accent-dark fa-solid fa-heart" *ngIf="(audioService.$currentSong | async)?.isLiked"></i>
-            </button>-->
-            <asc-like-button [isLiked]="(audioService.$currentSong | async)?.isLiked" (click)="likeSong()"></asc-like-button>
+            <asc-like-button [isLiked]="(audioService.$currentSong | async)?.isLiked" (click)="likeSong()" *ngIf="(audioService.$currentSong | async)"></asc-like-button>
             
             <button matRipple [matRippleUnbounded]="true" [matRippleCentered]="true" [matRippleRadius]="16" [matRippleAnimation]="{ enterDuration: 100, exitDuration: 250 }" class="w-5 h-5 flex justify-center items-center"><i class="text-white-dark fa-solid fa-list"></i></button>
         

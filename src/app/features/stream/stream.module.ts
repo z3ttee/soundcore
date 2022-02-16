@@ -14,6 +14,7 @@ import {MatSnackBarModule} from '@angular/material/snack-bar';
 import { AscVolumeSliderModule } from 'src/app/components/input/volume-slider/volume-slider.module';
 import {MatRippleModule} from '@angular/material/core';
 import { AscLikeButtonModule } from 'src/app/components/buttons/like-button/like-button.module';
+import { AscPlayButtonModule } from 'src/app/components/buttons/play-button/play-button.module';
 
 const routes: Routes = []
 
@@ -30,6 +31,7 @@ const routes: Routes = []
     AscInputModule,
     AscImageModule,
     AscLikeButtonModule,
+    AscPlayButtonModule,
     AscVolumeSliderModule,
 
     MatButtonModule,

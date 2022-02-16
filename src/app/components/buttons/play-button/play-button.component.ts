@@ -1,5 +1,5 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
-import { map, Observable, Subject, takeUntil } from 'rxjs';
+import { ChangeDetectionStrategy, Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { BehaviorSubject, map, Observable, Subject, takeUntil } from 'rxjs';
 import { DeviceService } from 'src/app/services/device.service';
 
 @Component({
@@ -10,18 +10,19 @@ import { DeviceService } from 'src/app/services/device.service';
 })
 export class AscPlayButtonComponent implements OnInit, OnDestroy {
 
-  @Input() public isPaused: boolean = true;
-  @Output() public click: EventEmitter<void> = new EventEmitter();
-
   constructor(
     private deviceService: DeviceService
   ) { }
 
   // Destroy subscriptions
   private _destroySubject: Subject<void> = new Subject();
-  private $destroy: Observable<void> = this._destroySubject.asObservable();
+  private _pausedSubject: BehaviorSubject<boolean> = new BehaviorSubject(false);
 
+  private $destroy: Observable<void> = this._destroySubject.asObservable();
+  public $isPaused: Observable<boolean> = this._pausedSubject.asObservable();
   public $isDesktop: Observable<boolean> = this.deviceService.$breakpoint.pipe(takeUntil(this.$destroy), map((bp) => bp?.isDesktop))
+
+  @Input() public set isPaused(val: boolean) { this._pausedSubject.next(val) };
 
   public ngOnInit(): void {}
   public ngOnDestroy(): void {
