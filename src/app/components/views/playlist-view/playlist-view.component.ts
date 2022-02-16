@@ -23,6 +23,10 @@ export class PlaylistViewComponent implements OnInit {
   public colorWhite: string = "#DDDDDD";
 
   @Input() public mode: "default" | "titleOnly" | "reduced" = "default"
+  @Input() public playable: boolean = true;
+  @Input() public likeable: boolean = true;
+  @Input() public followable: boolean = false;
+
   @Input() public options: PlaylistViewOptions = {
     type: "playlist",
     privacy: "public",

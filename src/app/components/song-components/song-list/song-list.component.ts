@@ -1,6 +1,6 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { AnimationOptions } from 'ngx-lottie';
-import { Observable, of, take, zip } from 'rxjs';
+import { Observable, of, Subject, takeUntil } from 'rxjs';
 import { Playlist } from 'src/app/features/playlist/entities/playlist.entity';
 import { Song } from 'src/app/features/song/entities/song.entity';
 import { AudioService } from 'src/app/features/stream/services/audio.service';
@@ -10,7 +10,8 @@ import audio_wave_anim from "src/assets/animated/audio_wave.json"
 @Component({
   selector: 'asc-song-list',
   templateUrl: './song-list.component.html',
-  styleUrls: ['./song-list.component.scss']
+  styleUrls: ['./song-list.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SongListComponent implements OnInit {
 
@@ -69,6 +70,7 @@ export class SongListComponent implements OnInit {
     }
 
     public trackBySongId(index: number, element: Song): string {
+        console.log("trackby ", element.id)
         return element.id
     }
 

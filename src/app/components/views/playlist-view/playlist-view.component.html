@@ -24,6 +24,12 @@
         </div>
     </section>
 
+    <!-- Playlist controls -->
+    <section class="flex my-row items-center w-full gap-2 border" *ngIf="mode != 'titleOnly'">
+        <asc-play-button [isPaused]="true" *ngIf="playable"></asc-play-button>
+        <asc-like-button *ngIf="likeable"></asc-like-button>
+    </section>
+
     <section class="relative my-row z-10" [ngClass]="{'md:my-12': mode != 'titleOnly'}">
         <!-- Page content to blend with background gradient -->
         <ng-content select="[asc-contents]"></ng-content>

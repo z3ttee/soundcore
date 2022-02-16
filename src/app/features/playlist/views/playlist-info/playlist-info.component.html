@@ -13,7 +13,7 @@
     </div>
 </section>
 
-<asc-playlist-view [options]="{ type: 'playlist', title: playlist?.title, privacy: playlist?.privacy, artwork: playlist?.artwork }" *ngIf="!isLoading && !!playlist" >
+<asc-playlist-view [likeable]="playlist?.author?.id != ($user | async)?.id && !playlist?.collaborative && playlist?.collaborators?.length <= 0" [options]="{ type: 'playlist', title: playlist?.title, privacy: playlist?.privacy, artwork: playlist?.artwork }" *ngIf="!isLoading && !!playlist" >
 
     <!-- Quick info bar below title -->
     <div class="py-2 md:pt-2 md:pb-0 md:flex md:items-center" asc-stats>
@@ -39,19 +39,19 @@
     <div asc-contents>
 
         <!-- Playlist controls -->
-        <div class="flex items-center w-full border mb-row gap-2">
-            <!-- Play btn -->
+        <!-- <div class="flex items-center w-full border mb-row gap-2">-->
+            <!-- Play btn 
             <button class="outline-none will-change-transform text-xxs rounded-full w-8 h-8 sm:w-10 sm:h-10 inline-flex justify-center items-center bg-accent-dark text-background transform-gpu sm:hover:scale-105 sm:active:scale-[97%] transition-all" (click)="playOrPauseList()">
                 <i class="fa-solid fa-play" *ngIf="(audioService.$paused | async) || !(audioService.$currentSong | async)"></i>
                 <i class="fa-solid fa-pause" *ngIf="!(audioService.$paused | async) && (audioService.$currentSong | async)"></i>
-            </button>
+            </button>-->
 
-            <!-- Like btn -->
+            <!-- Like btn 
             <button class="transition-all" mat-icon-button (click)="likePlaylist()" *ngIf="playlist?.author?.id != ($user | async)?.id && !playlist?.collaborative && playlist?.collaborators?.length <= 0">
                 <i class="fa-regular fa-heart" *ngIf="!playlist?.isLiked"></i>
                 <i class="fa-solid fa-heart text-accent-dark" *ngIf="playlist?.isLiked"></i>
             </button>
-        </div>
+        </div>-->
 
         <!-- Songs list -->
         <asc-song-list [dataSource]="$songs" [playlistContext]="playlist" [showCount]="false" [showMore]="($songs | async).length < playlist?.songsCount" (onMore)="findSongs()"></asc-song-list>

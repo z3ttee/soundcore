@@ -4,7 +4,7 @@
 
 <div class="absolute left-0 top-0 w-full h-[50vh]" [style]="'background: linear-gradient(180deg, ' + (artist?.artwork?.accentColor) + '80 0%, ' + (artist?.artwork?.accentColor) + '00 100%);'"></div>
 
-<asc-playlist-view [options]="{ type: 'artist', title: artist?.name, artwork: artist?.artwork }" *ngIf="!isLoading && !!artist">
+<asc-playlist-view [likeable]="false" [followable]="true" [options]="{ type: 'artist', title: artist?.name, artwork: artist?.artwork }" *ngIf="!isLoading && !!artist">
 
     <!-- Quick info bar below title -->
     <div class="py-2 md:flex md:items-center" asc-stats>
