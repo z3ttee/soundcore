@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 import { MatSnackBar } from "@angular/material/snack-bar";
-import { BehaviorSubject, filter, Observable } from "rxjs";
+import { BehaviorSubject, filter, interval, Observable, skip, takeUntil, timer } from "rxjs";
 import { PlayableList } from "src/app/entities/playable-list.entity";
 import { environment } from "src/environments/environment";
 import { Song } from "../../song/entities/song.entity";
@@ -8,6 +8,9 @@ import { StreamQueueService } from "./queue.service";
 import { StreamService } from "./stream.service";
 
 export const PLAYER_VOLUME_KEY = "asc::player_volume"
+
+const FADE_AUDIO_CROSS_MS = 8000;
+const FADE_AUDIO_TOGGLE_MS = 1000;
 
 @Injectable({
     providedIn: "root"
@@ -73,15 +76,60 @@ export class AudioService {
      * Continue playing a song or provide a song object
      * to force play a new song.
      */
-    public async play(song?: Song) {
+    public async play(song?: Song, fadeIn: boolean = false) {
         if(song) {
             this.audio.src = await this.streamService.getStreamURL(song);
             this._currentSongSubject.next(song);
         }
         
-        this.audio.play().catch(() => {
+        if(!fadeIn) this.audio.volume = this._volumeSubject.getValue();
+        this.audio.play().then(() => {
+            if(fadeIn) this.fadeInAudio(FADE_AUDIO_TOGGLE_MS);
+        }).catch(() => {
             this.showError("Das Lied kann nicht abgespielt werden.")
         });
+    }
+
+    public async fadeInAudio(fadeDuration: number) {
+        return new Promise<void>((resolve) => {
+            const dstVolume = this._volumeSubject.getValue();
+            const delay = fadeDuration / 100;
+            const volumeInc = (dstVolume / fadeDuration) * delay;
+
+            this.audio.volume = 0;
+            const subscription = interval(delay).pipe(takeUntil(this.$paused.pipe(filter((paused) => paused))), takeUntil(this.$volume.pipe(skip(1)))).subscribe(() => {
+
+                if(this.audio.volume + volumeInc > 1 || this.audio.volume >= dstVolume) {
+                    this.audio.volume = this.audio.volume > 1 ? 1 : dstVolume;
+                    resolve();
+                    subscription.unsubscribe();
+                    return;
+                }
+
+                this.audio.volume += volumeInc;
+            })
+        })
+        
+    }
+
+    public async fadeOutAudio(fadeDuration: number) {
+        this._pausedSubject.next(true);
+        return new Promise<void>((resolve) => {
+            const srcVolume = this.audio.volume;
+            const delay = fadeDuration / 100;
+            const volumeInc = (srcVolume / fadeDuration) * delay;
+
+            const subscription = interval(delay).pipe(takeUntil(this.$paused.pipe(filter((paused) => !paused))), takeUntil(this.$volume.pipe(skip(1)))).subscribe(() => {               
+                if(this.audio.volume - volumeInc <= 0) {
+                    this.audio.volume = 0;
+                    resolve();
+                    subscription.unsubscribe();
+                    return;
+                }
+
+                this.audio.volume -= volumeInc;
+            })
+        })
     }
 
     /**
@@ -116,8 +164,8 @@ export class AudioService {
      */
     public async togglePause() {
         const isPaused = this._pausedSubject.getValue();
-        if(isPaused) this.play();
-        else this.pause();
+        if(isPaused) this.play(null, true);
+        else this.pause(true);
     }
 
     public async toogleLoop() {
@@ -162,8 +210,13 @@ export class AudioService {
     /**
      * Pause the playing audio
      */
-    public pause() {
-        this.audio.pause();
+    public pause(fadeOut: boolean = true) {
+        if(!fadeOut) {
+            this.audio.pause();
+            return;
+        }
+
+        this.fadeOutAudio(FADE_AUDIO_TOGGLE_MS).then(() => this.audio.pause());
     }
 
     /**
@@ -173,7 +226,7 @@ export class AudioService {
         this.audio.autoplay = true;
         this.audio.volume = this.getRestoredVolume();
         this.audio.removeAttribute("src")
-        this.pause()
+        this.pause(false)
     }
 
     public setCurrentTime(currentTime: number) {
@@ -182,6 +235,8 @@ export class AudioService {
 
     public setVolume(volume: number) {
         this.audio.volume = volume;
+        this._volumeSubject.next(this.audio.volume);
+        localStorage?.setItem(PLAYER_VOLUME_KEY, `${this.audio.volume}`)
     }
 
     public getRestoredVolume(): number {
@@ -208,6 +263,9 @@ export class AudioService {
         })
 
         navigator.mediaSession.setActionHandler("nexttrack", () => this.next())
+        navigator.mediaSession.setActionHandler("play", () => this.play())
+        navigator.mediaSession.setActionHandler("pause", () => this.pause())
+        navigator.mediaSession.setActionHandler("stop", () => this.pause())
         navigator.mediaSession.setActionHandler("previoustrack", () => this.prev())
     }
 
@@ -253,8 +311,8 @@ export class AudioService {
         this._currentTimeSubject.next(this.audio.currentTime);
     }
     private onVolumeChanged() {
-        localStorage?.setItem(PLAYER_VOLUME_KEY, `${this.audio.volume}`)
-        this._volumeSubject.next(this.audio.volume)
+        // localStorage?.setItem(PLAYER_VOLUME_KEY, `${this.audio.volume}`)
+        // this._volumeSubject.next(this.audio.volume)
     }
     private onEnded() {
         this.next();
