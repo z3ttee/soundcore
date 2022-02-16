@@ -63,11 +63,10 @@ export class AudioService {
         this.audio.onwaiting = () => this.onLoadStart();
         this.audio.oncanplay = () => this.onLoadEnd();
         this.audio.onloadeddata = () => this.onLoadEnd();
-        this.audio.onvolumechange = () => this.onVolumeChanged();
         this.audio.onended = () => this.onEnded();
         this.audio.onerror = (event: Event) => this.onError(event);
 
-        this.$paused.pipe(filter((paused) => !paused)).subscribe(() => {
+        this.$paused.subscribe(() => {
             this.setSession(this._currentSongSubject.getValue());
         })
     }
@@ -81,7 +80,7 @@ export class AudioService {
             this.audio.src = await this.streamService.getStreamURL(song);
             this._currentSongSubject.next(song);
         }
-        
+
         if(!fadeIn) this.audio.volume = this._volumeSubject.getValue();
         this.audio.play().then(() => {
             if(fadeIn) this.fadeInAudio(FADE_AUDIO_TOGGLE_MS);
@@ -90,46 +89,69 @@ export class AudioService {
         });
     }
 
+    /**
+     * Fade in audio from the currently playing audio element.
+     * @param fadeDuration Duration
+     * @returns void - Resolves after the fading has ended.
+     */
     public async fadeInAudio(fadeDuration: number) {
         return new Promise<void>((resolve) => {
-            const dstVolume = this._volumeSubject.getValue();
-            const delay = fadeDuration / 100;
-            const volumeInc = (dstVolume / fadeDuration) * delay;
-
             this.audio.volume = 0;
-            const subscription = interval(delay).pipe(takeUntil(this.$paused.pipe(filter((paused) => paused))), takeUntil(this.$volume.pipe(skip(1)))).subscribe(() => {
-
-                if(this.audio.volume + volumeInc > 1 || this.audio.volume >= dstVolume) {
-                    this.audio.volume = this.audio.volume > 1 ? 1 : dstVolume;
-                    resolve();
-                    subscription.unsubscribe();
-                    return;
-                }
-
-                this.audio.volume += volumeInc;
+            const dstVolume = this._volumeSubject.getValue();
+            this.calculateVolumeIncAndDelay(dstVolume, fadeDuration).then((result) => {
+                const volumeInc = result[0];
+                const delay = result[1];
+                
+                const subscription = interval(delay).pipe(takeUntil(this.$paused.pipe(filter((paused) => paused))), takeUntil(this.$volume.pipe(skip(1)))).subscribe(() => {
+                    if(this.audio.volume + volumeInc > 1 || this.audio.volume >= dstVolume) {
+                        this.audio.volume = this.audio.volume > 1 ? 1 : dstVolume;
+                        resolve();
+                        subscription.unsubscribe();
+                        return;
+                    }
+                    this.audio.volume += volumeInc;
+                })
             })
         })
-        
     }
 
+    /**
+     * Fade out audio from the currently playing audio element.
+     * @param fadeDuration Duration
+     * @returns void - Resolves after the fading has ended.
+     */
     public async fadeOutAudio(fadeDuration: number) {
         this._pausedSubject.next(true);
         return new Promise<void>((resolve) => {
-            const srcVolume = this.audio.volume;
-            const delay = fadeDuration / 100;
-            const volumeInc = (srcVolume / fadeDuration) * delay;
+            this.calculateVolumeIncAndDelay(this.audio.volume, fadeDuration).then((result) => {
+                const volumeInc = result[0];
+                const delay = result[1];
 
-            const subscription = interval(delay).pipe(takeUntil(this.$paused.pipe(filter((paused) => !paused))), takeUntil(this.$volume.pipe(skip(1)))).subscribe(() => {               
-                if(this.audio.volume - volumeInc <= 0) {
-                    this.audio.volume = 0;
-                    resolve();
-                    subscription.unsubscribe();
-                    return;
-                }
-
-                this.audio.volume -= volumeInc;
+                const subscription = interval(delay).pipe(takeUntil(this.$paused.pipe(filter((paused) => !paused)))).subscribe(() => {               
+                    if(this.audio.volume - volumeInc <= 0) {
+                        this.audio.volume = 0;
+                        resolve();
+                        subscription.unsubscribe();
+                        return;
+                    }
+    
+                    this.audio.volume -= volumeInc;
+                })
             })
         })
+    }
+
+    /**
+     * Get calculated delay and volume increment for fading audio.
+     * @param startVolume Value the equation will be based on.
+     * @param totalDuration Duration
+     * @returns [volumeInc, delay]
+     */
+    private async calculateVolumeIncAndDelay(startVolume: number, totalDuration: number): Promise<[number, number]> {
+        const delay = totalDuration / 100;
+        const volumeInc = (startVolume / totalDuration) * delay;
+
+        return [volumeInc, delay];
     }
 
     /**
@@ -210,7 +232,7 @@ export class AudioService {
     /**
      * Pause the playing audio
      */
-    public pause(fadeOut: boolean = true) {
+    public pause(fadeOut: boolean = false) {
         if(!fadeOut) {
             this.audio.pause();
             return;
@@ -244,7 +266,10 @@ export class AudioService {
     }
 
     private async setSession(song: Song) {
-        if(!song) return;
+        if(!song) {
+            console.warn("[AUDIO] Cannot update mediaSession: Song is null")
+            return;
+        }
 
         if(!navigator.mediaSession) {
             console.warn("[AUDIO] Browser does not support MediaSession API. This prevents the application from providing the OS information about the current song metadata.")
@@ -259,14 +284,15 @@ export class AudioService {
             artist: song.artists.map((a) => a.name).join(", "),
             artwork: [
                 { src: song.artwork ? `${environment.api_base_uri}/v1/artworks/${song.artwork.id}` : "/assets/img/missing_cover.png" }
-            ]
+            ],
+            
         })
 
         navigator.mediaSession.setActionHandler("nexttrack", () => this.next())
-        navigator.mediaSession.setActionHandler("play", () => this.play())
-        navigator.mediaSession.setActionHandler("pause", () => this.pause())
-        navigator.mediaSession.setActionHandler("stop", () => this.pause())
-        navigator.mediaSession.setActionHandler("previoustrack", () => this.prev())
+        navigator.mediaSession.setActionHandler("play", () => this.play(null, true))
+        navigator.mediaSession.setActionHandler("pause", () => this.pause(true))
+        navigator.mediaSession.setActionHandler("stop", () => this.pause(true))
+        navigator.mediaSession.setActionHandler("previoustrack", () => this.prev())        
     }
 
     private onError(event: Event) {
@@ -309,10 +335,6 @@ export class AudioService {
     }
     private onTimeUpdated() {
         this._currentTimeSubject.next(this.audio.currentTime);
-    }
-    private onVolumeChanged() {
-        // localStorage?.setItem(PLAYER_VOLUME_KEY, `${this.audio.volume}`)
-        // this._volumeSubject.next(this.audio.volume)
     }
     private onEnded() {
         this.next();

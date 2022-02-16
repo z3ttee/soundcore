@@ -1,6 +1,5 @@
 import { Overlay } from '@angular/cdk/overlay';
 import { Component, Input, OnInit, TemplateRef, ViewChild, ViewContainerRef } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
 import { combineLatest, map } from 'rxjs';
 import { AudioService } from 'src/app/features/stream/services/audio.service';
 import { ContextMenuService } from 'src/app/services/context-menu.service';
@@ -58,9 +57,9 @@ export class SongGridItemComponent implements OnInit {
 
         if(this.isPlaying) {
             if(this.isPlayerPaused) {
-                this.audioService.play();
+                this.audioService.play(null, true);
             } else {
-                this.audioService.pause();
+                this.audioService.pause(true);
             }
         } else {
             this.audioService.play(this.song);

@@ -56,9 +56,9 @@ export class SongListComponent implements OnInit {
     public async playOrPause(song: Song) {
         if(this.audioService.currentSong?.id == song?.id) {
             if(this.audioService.paused) {
-                this.audioService.play();
+                this.audioService.play(null, true);
             } else {
-                this.audioService.pause();
+                this.audioService.pause(true);
             }
         } else {
             this.audioService.play(song);
