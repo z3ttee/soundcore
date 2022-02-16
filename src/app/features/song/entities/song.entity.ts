@@ -5,6 +5,7 @@ import { Genre } from "src/app/model/genre.entity";
 import { Label } from "src/app/model/label.model";
 import { Publisher } from "src/app/model/publisher.model";
 import { Album } from "../../album/entities/album.entity";
+import { Index } from "../../upload/entities/index.entity";
 
 export class Song {
 
@@ -29,6 +30,7 @@ export class Song {
     public label?: Label;
     public albums?: Album[];
     public genres?: Genre[];
+    public index?: Index;
 
     public song2playlist?: Date;
     public streamCount?: number;
