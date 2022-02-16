@@ -21,14 +21,25 @@ export class LikeService {
         private snackbarService: SnackbarService
     ) {}
 
-    public async likeSong(song: Song): Promise<void> {
-        if(!song) return null;
-        return firstValueFrom(this.httpClient.post<void>(`${environment.api_base_uri}/v1/likes/song/${song.id}`, {})).then(() => {
-            if(song.isLiked) this.snackbarService.info("Song wurde von deinen Lieblingssongs entfernt.");
-            else this.snackbarService.info("Song wurde deinen Lieblingssongs hinzugefügt.");
+    public async likeSong(song: Song): Promise<boolean> {
+        if(!song) {
+            console.log("can't like song: song is null")
+            return song.isLiked;
+        }
+        return firstValueFrom(this.httpClient.post<boolean>(`${environment.api_base_uri}/v1/likes/song/${song.id}`, {})).then((isLiked) => {
+            song.isLiked = !!isLiked;
 
-            song.isLiked = !song.isLiked;
+            if(isLiked) {
+                this.snackbarService.info("Song wurde deinen Lieblingssongs hinzugefügt.");
+            } else {
+                this.snackbarService.info("Song wurde von deinen Lieblingssongs entfernt.");
+            }
+
             this._onSongLikeSubject.next(song);
+            return song.isLiked;
+        }).catch(() => {
+            this.snackbarService.error("Ein Fehler ist aufgetreten.");
+            return song.isLiked
         })
     }
 

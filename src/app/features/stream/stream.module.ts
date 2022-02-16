@@ -13,6 +13,7 @@ import { AscImageModule } from 'src/app/components/image-components/image-compon
 import {MatSnackBarModule} from '@angular/material/snack-bar';
 import { AscVolumeSliderModule } from 'src/app/components/input/volume-slider/volume-slider.module';
 import {MatRippleModule} from '@angular/material/core';
+import { AscLikeButtonModule } from 'src/app/components/buttons/like-button/like-button.module';
 
 const routes: Routes = []
 
@@ -28,6 +29,7 @@ const routes: Routes = []
     PipesModule,
     AscInputModule,
     AscImageModule,
+    AscLikeButtonModule,
     AscVolumeSliderModule,
 
     MatButtonModule,

@@ -17,6 +17,13 @@ export class SnackbarService {
         })
     }
 
+    public async error(text: string, config?: MatSnackBarConfig<any>): Promise<MatSnackBarRef<TextOnlySnackBar>> {
+        return this.snackbar.open(text, null, { 
+            duration: 4000,
+            ...config
+        })
+    }
+
     public async open(text: string, action?: string, config?: MatSnackBarConfig<any>): Promise<MatSnackBarRef<TextOnlySnackBar>> {
         return this.snackbar.open(text, action, { 
             duration: 4000,

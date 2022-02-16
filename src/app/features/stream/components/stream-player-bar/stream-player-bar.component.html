@@ -57,10 +57,11 @@
             <p class="text-right text-xxs opacity-60 font-light">{{ (audioService.$currentTime | async) | songDurationPipe }} / {{ ((audioService.$currentSong | async)?.duration || 0) | songDurationPipe }}</p>
             
             <!-- Like button -->
-            <button *ngIf="(audioService.$currentSong | async)" [ngClass]="{'active': (audioService.$currentSong | async)?.isLiked}" matRipple [matRippleUnbounded]="true" [matRippleCentered]="true" [matRippleRadius]="16" [matRippleAnimation]="{ enterDuration: 100, exitDuration: 250 }" class="w-5 h-5 flex justify-center items-center" (click)="likeSong()">
+            <!--<button *ngIf="(audioService.$currentSong | async)" [ngClass]="{'active': (audioService.$currentSong | async)?.isLiked}" matRipple [matRippleUnbounded]="true" [matRippleCentered]="true" [matRippleRadius]="16" [matRippleAnimation]="{ enterDuration: 100, exitDuration: 250 }" class="w-5 h-5 flex justify-center items-center" (click)="likeSong()">
                 <i class="text-white-dark fa-regular fa-heart" *ngIf="!(audioService.$currentSong | async)?.isLiked"></i>
                 <i class="text-accent-dark fa-solid fa-heart" *ngIf="(audioService.$currentSong | async)?.isLiked"></i>
-            </button>
+            </button>-->
+            <asc-like-button [isLiked]="(audioService.$currentSong | async)?.isLiked" (click)="likeSong()"></asc-like-button>
             
             <button matRipple [matRippleUnbounded]="true" [matRippleCentered]="true" [matRippleRadius]="16" [matRippleAnimation]="{ enterDuration: 100, exitDuration: 250 }" class="w-5 h-5 flex justify-center items-center"><i class="text-white-dark fa-solid fa-list"></i></button>
         
