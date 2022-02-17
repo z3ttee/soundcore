@@ -11,6 +11,7 @@ export class Album {
     public title: string;
     public released: Date;
     public description: string;
+    public slug: string;
 
     public artist?: Artist;
 

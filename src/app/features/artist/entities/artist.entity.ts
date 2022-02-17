@@ -9,6 +9,7 @@ export class Artist {
     public description: string;
     public name: string;
     public registeredAt: Date;
+    public slug: string;
 
     public songs?: Song[];
     public albums?: Album[];

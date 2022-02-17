@@ -11,6 +11,7 @@ export class Playlist {
     public privacy?: PlaylistPrivacy;
     public collaborative: boolean;
     public createdAt: Date;
+    public slug: string;
     public author?: User;
 
     public artwork?: Artwork;

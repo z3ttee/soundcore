@@ -5,6 +5,7 @@ export class Label {
 
     public id: string;
     public name: string;
+    public slug: string;
 
     public songs?: Song[];
     public artwork?: Artwork;

@@ -9,6 +9,7 @@ export class SSOUser {
     public avatarResourceId?: string;
     public avatarUrl?: string;
     public isAnonymous: boolean = false;
+    public slug: string;
 
     public static anonymous(): SSOUser {
         return {
@@ -17,7 +18,8 @@ export class SSOUser {
             email: "unknown@email.xyz",
             role: null,
             createdAt: new Date(),
-            isAnonymous: true
+            isAnonymous: true,
+            slug: "Unknown"
         }
     }
 

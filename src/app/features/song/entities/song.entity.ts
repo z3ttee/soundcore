@@ -20,6 +20,7 @@ export class Song {
     public createdAt: Date;
     public explicit: boolean;
     public description: string;
+    public slug: string;
 
     public artwork?: Artwork;
     public banner?: Artwork;
