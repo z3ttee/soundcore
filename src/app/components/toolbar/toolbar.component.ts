@@ -12,7 +12,7 @@ import { environment } from 'src/environments/environment';
   templateUrl: './toolbar.component.html',
   styleUrls: ['./toolbar.component.scss']
 })
-export class ToolbarComponent implements OnInit {
+export class AscToolbarComponent implements OnInit {
 
   @Input() public withMenu: boolean = true;
   @Output() public onMenuToggle: EventEmitter<void> = new EventEmitter()
@@ -25,15 +25,19 @@ export class ToolbarComponent implements OnInit {
 
   public isSearching: boolean = false;
 
-  constructor(private httpClient: HttpClient, private authService: AuthenticationService, private _location: Location) { }
+  constructor(
+    private httpClient: HttpClient, 
+    public authService: AuthenticationService, 
+    private _location: Location
+  ) { }
 
   ngOnInit(): void {
-    this.$complexSearchResult = this.myControl.valueChanges.pipe(
+    /*this.$complexSearchResult = this.myControl.valueChanges.pipe(
       startWith(''),
       distinctUntilChanged(),
       debounceTime(250),
       switchMap((query) => this._filter(query))
-    );
+    );*/
   }
 
   public emitMenuToggle(): void {
@@ -72,6 +76,7 @@ export class ToolbarComponent implements OnInit {
 
   public navigateNext() {
     this._location.forward();
+    
   }
 
 }

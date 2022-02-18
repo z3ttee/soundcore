@@ -1,0 +1,41 @@
+<div class="flex gap-2 items-center px-window">
+  <div class="min-w-fit max-w-fit">
+    <span class="inline-flex items-center lg:hidden">
+      <button mat-icon-button (click)="navigateBack()"><i class="fa-solid fa-arrow-left"></i></button>
+      <button mat-icon-button (click)="emitMenuToggle()" class="lg:hidden">
+        <mat-icon>menu</mat-icon>
+      </button>
+    </span>
+    <span class="items-center hidden lg:inline-flex">
+      <button mat-icon-button (click)="navigateBack()"><i class="fa-solid fa-chevron-left"></i></button>
+      <button mat-icon-button (click)="navigateNext()"><i class="fa-solid fa-chevron-right"></i></button>
+    </span>
+  </div>
+
+  <div class="">
+    <!-- TODO -->
+  </div>
+
+  <div class="toolbarSection w-full overflow-x-auto">
+    <div class="flex justify-start items-center flex-nowrap py-2">
+      <ng-container teleportOutlet="toolbarSection"></ng-container>
+    </div>
+  </div>
+
+  <div class="inline-flex items-center justify-end min-w-fit max-w-fit" *ngIf="(authService.$user | async)">
+    <!--<button mat-icon-button [routerLink]="['/upload']" routerLinkActive="active"><i
+        class="fa-solid fa-cloud-arrow-up"></i></button>
+    <button mat-icon-button [routerLink]="['/settings']">
+      <mat-icon>settings</mat-icon>
+    </button>
+    <button mat-icon-button (click)="logout()"><i class="fa-solid fa-power-off"></i></button>-->
+
+    <span class="hidden md:inline"><asc-profile-badge [align]="'rtl'" [user]="(authService.$user | async)" [matMenuTriggerFor]="menu"></asc-profile-badge></span>
+    <span class="w-6 h-6 rounded-full overflow-hidden md:hidden"><asc-user-avatar [resourceId]="(authService.$user | async).avatarResourceId"></asc-user-avatar></span>
+  </div>
+</div>
+
+<asc-profile-dropdown #menu></asc-profile-dropdown>
+<ng-template>
+  
+</ng-template>

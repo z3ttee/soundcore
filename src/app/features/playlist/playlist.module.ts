@@ -17,6 +17,7 @@ import { AscImageModule } from 'src/app/components/image-components/image-compon
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { AscPlaylistViewModule } from 'src/app/components/views/playlist-view.module';
 import { AscPlaylistModule } from 'src/app/components/playlist-components/playlist-components.module';
+import { AscProfileBadgeModule } from 'src/app/components/badge-components/profile-badge/profile-badge.module';
 
 const routes: Routes = [
   { path: ":playlistId", component: PlaylistInfoComponent }
@@ -35,6 +36,7 @@ const routes: Routes = [
     PipesModule,
     AscSongModule,
     AscBadgeModule,
+    AscProfileBadgeModule,
     AscMessageModule,
     AscImageModule,
     AscPlaylistModule,

@@ -7,8 +7,8 @@ export const environment = {
   sso_base_uri: "https://api.tsalliance.eu/sso",
   sso_client_id: "2VYhnrdDzaEJlEyQ",
   sso_redirect_uri: "http://localhost:4200/authorize",
-  api_base_uri: "https://api.tsalliance.eu/soundcore",
-  // api_base_uri: "http://localhost:3001",
+  // api_base_uri: "https://api.tsalliance.eu/soundcore",
+  api_base_uri: "http://localhost:3001",
 };
 
 /*

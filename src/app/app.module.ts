@@ -11,7 +11,6 @@ import { SplashComponent } from './views/splash/splash.component';
 import { StoreModule } from '@ngrx/store';
 
 import { HttpClientModule, HTTP_INTERCEPTORS } from "@angular/common/http"
-import { ToolbarComponent } from './views/shared/toolbar/toolbar.component';
 
 import {MatButtonModule} from '@angular/material/button';
 import {MatIconModule} from '@angular/material/icon';
@@ -38,6 +37,7 @@ import { MatBottomSheetModule } from '@angular/material/bottom-sheet';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { AscPlaylistEditorDialogModule } from './components/dialogs/playlist-editor-dialog/playlist-editor-dialog.module';
+import { AscToolbarModule } from './components/toolbar/toolbar.module';
 
 // TODO: https://angular.io/guide/i18n-common-prepare
 
@@ -50,7 +50,6 @@ import { AscPlaylistEditorDialogModule } from './components/dialogs/playlist-edi
     MainLayoutComponent,
     DrawerComponent,
     SidebarComponent,
-    ToolbarComponent,
     SplashComponent
   ],
   imports: [
@@ -68,6 +67,7 @@ import { AscPlaylistEditorDialogModule } from './components/dialogs/playlist-edi
     AscMessageModule,
     AscPlaylistModule,
     AscPlaylistEditorDialogModule,
+    AscToolbarModule,
 
     // Import global Angular Material Components
     MatIconModule,

@@ -9,5 +9,6 @@ import { User } from 'src/app/features/user/entities/user.entity';
 export class ProfileBadgeComponent {
 
   @Input() public user: User;
+  @Input() public align: "rtl" | "ltr" = "ltr";
 
 }

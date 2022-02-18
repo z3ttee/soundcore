@@ -4,7 +4,7 @@
     </div>
     <div class="h-full" asc-drawer-content>
         <div class="flex flex-1 flex-col h-full overflow-hidden">
-            <asc-toolbar class="w-full z-10" (onMenuToggle)="drawer.toggle()"></asc-toolbar>
+            <asc-toolbar (onMenuToggle)="drawer.toggle()"></asc-toolbar>
 
             <div infinite-scroll [scrollWindow]="false" (scrolled)="scrollService.emitOnBottomReached()" class="flex-grow pb-24 bg-background-dark rounded-2xl lg:rounded-r-none overflow-hidden overflow-y-auto shadow-inner relative">
                 <router-outlet></router-outlet>
