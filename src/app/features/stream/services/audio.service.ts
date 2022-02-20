@@ -89,6 +89,19 @@ export class AudioService {
         });
     }
 
+    public async playOrPause(song: Song) {
+        const isPlaying = this.currentSong?.id == song?.id
+        if(isPlaying) {
+            if(this.paused) {
+                this.play(null, true);
+            } else {
+                this.pause(true);
+            }
+        } else {
+            this.play(song);
+        }
+    }
+
     /**
      * Fade in audio from the currently playing audio element.
      * @param fadeDuration Duration

@@ -1,0 +1,6 @@
+<asc-playlist-view (onLike)="likeSong()" (onPlay)="playOrPause()" [isPaused]="(audioService.$paused | async) || !(audioService.$currentSong | async)" [options]="{ type: 'song', title: ($song | async)?.title, artwork: ($song | async)?.artwork }">
+
+    
+
+    
+</asc-playlist-view>

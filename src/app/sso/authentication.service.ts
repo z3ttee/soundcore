@@ -19,8 +19,6 @@ export interface SSOConfig {
 })
 export class AuthenticationService {
 
-  // TODO: Make sure user never gets null
-
   private readonly _sessionSubject = new BehaviorSubject(SSOSession.anonymous());
   private readonly _userSubject = new BehaviorSubject(User.anonymous());
   private readonly _readySubject = new BehaviorSubject(false);

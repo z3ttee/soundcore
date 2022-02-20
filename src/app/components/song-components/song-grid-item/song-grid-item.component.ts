@@ -54,16 +54,7 @@ export class SongGridItemComponent implements OnInit {
         if(!this.playable) return;
 
         this.contextMenuService.close();
-
-        if(this.isPlaying) {
-            if(this.isPlayerPaused) {
-                this.audioService.play(null, true);
-            } else {
-                this.audioService.pause(true);
-            }
-        } else {
-            this.audioService.play(this.song);
-        }
+        this.audioService.playOrPause(this.song);
     }
 
     public async enqueue() {

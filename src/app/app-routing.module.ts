@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { SongModule } from './features/song/song.module';
 import { MainLayoutComponent } from './layout/main-layout/main-layout.component';
 import { AuthenticationCanActivateGuard } from './sso/guards/can-activate.guard';
 import { IndexViewComponent } from './views/index-view/index-view.component';
@@ -21,6 +22,7 @@ const routes: Routes = [
     { path: "import", canActivate: [AuthenticationCanActivateGuard], loadChildren: () => import("./features/import/import.module").then((m) => m.ImportModule) },
     { path: "album", canActivate: [AuthenticationCanActivateGuard], loadChildren: () => import("./features/album/album.module").then((m) => m.AlbumModule) },
     { path: "collection", canActivate: [AuthenticationCanActivateGuard], loadChildren: () => import("./features/collection/collection.module").then((m) => m.CollectionModule) },
+    { path: "song", canActivate: [AuthenticationCanActivateGuard], loadChildren: () => import("./features/song/song.module").then((m) => m.SongModule) },
 
     { path: "profile", canActivate: [AuthenticationCanActivateGuard], loadChildren: () => import("./features/user/user.module").then((m) => m.UserModule) },
 
