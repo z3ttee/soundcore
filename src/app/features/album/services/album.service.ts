@@ -28,7 +28,7 @@ export class AlbumService {
      * @param artistId Artist's id
      * @returns Page<Album>
      */
-    public async findRecommendedProfilesByArtist(artistId: string, exceptAlbumIds: string[] = []): Promise<Page<Album>> {
+    public async findRecommendedByArtist(artistId: string, exceptAlbumIds: string[] = []): Promise<Page<Album>> {
         if(!artistId) return Page.of([]);
 
         const query = new URLSearchParams()

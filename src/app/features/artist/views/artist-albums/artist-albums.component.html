@@ -3,7 +3,7 @@
     <div asc-contents>
         <!-- TODO: Make to component, with maxItemWidth and minItemWidth in column definition -->
         <div class="vertical-grid">
-            <asc-album-grid-item *ngFor="let album of ($albums | async)" [album]="album" [routerLink]="['/album', album.id]"></asc-album-grid-item>
+            <asc-album-grid-item *ngFor="let album of ($albums | async)" [album]="album" [routerLink]="['/album', album.slug || album.id]"></asc-album-grid-item>
         </div>
     </div>
 </asc-playlist-view>

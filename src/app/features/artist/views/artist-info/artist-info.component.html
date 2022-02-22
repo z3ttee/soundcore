@@ -66,7 +66,7 @@
 
 <section class="my-row" *ngIf="albums.length > 0">
     <asc-horizontal-grid headline="Alben" [enableMore]="true" (onMore)="router.navigate(['/artist', artist?.id, 'albums'])">
-        <asc-album-grid-item *ngFor="let album of albums" [album]="album" [routerLink]="['/album', album.id]" [preferDate]="true"></asc-album-grid-item>
+        <asc-album-grid-item *ngFor="let album of albums" [album]="album" [routerLink]="['/album', album.slug || album.id]" [preferDate]="true"></asc-album-grid-item>
       </asc-horizontal-grid>
 </section>
 
@@ -78,6 +78,6 @@
 
 <section class="my-row" *ngIf="featAlbums.length > 0">
     <asc-horizontal-grid [headline]="'Alben mit ' + artist?.name" [enableMore]="true" (onMore)="router.navigate(['/artist', artist?.id, 'featuring'])">
-        <asc-album-grid-item *ngFor="let album of featAlbums" [album]="album" [routerLink]="['/album', album.id]"></asc-album-grid-item>
+        <asc-album-grid-item *ngFor="let album of featAlbums" [album]="album" [routerLink]="['/album', album.slug || album.id]"></asc-album-grid-item>
       </asc-horizontal-grid>
 </section>

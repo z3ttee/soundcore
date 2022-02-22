@@ -59,7 +59,7 @@ export class AlbumInfoComponent implements OnInit, OnDestroy {
           this.findSongs()
         })
 
-        this.albumService.findRecommendedProfilesByArtist(this.album?.artist?.id, [ this.album?.id ]).then((page) => {
+        this.albumService.findRecommendedByArtist(this.album?.artist?.id, [ this.album?.id ]).then((page) => {
           this.recommendedAlbums = page.elements;
         })
       }).finally(() => this.isLoading = false)
