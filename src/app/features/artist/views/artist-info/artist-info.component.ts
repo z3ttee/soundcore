@@ -42,6 +42,7 @@ export class ArtistInfoComponent implements OnInit, OnDestroy {
 
   public ngOnInit(): void {
     this.activatedRoute.paramMap.subscribe((paramMap) => {
+      this.reset();
       const artistId = paramMap.get("artistId");
       if(!artistId) {
         this.artist = null;
@@ -76,6 +77,10 @@ export class ArtistInfoComponent implements OnInit, OnDestroy {
         })
       }).finally(() => this.isLoading = false)
     })
+  }
+
+  public reset(): void {
+    this._topSongsSubject.next([]);
   }
 
   public ngOnDestroy(): void {
