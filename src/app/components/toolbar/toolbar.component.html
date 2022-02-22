@@ -32,6 +32,8 @@
   <ul>
     <li mat-menu-item [routerLink]="['/profile', (authService.$user | async)?.id]" class="font-bold"><i class="fa-solid fa-user"></i> Dein Profil</li>
     <li mat-menu-item [routerLink]="['/settings']" class="font-bold"><i class="fa-solid fa-gear"></i> Einstellungen</li>
+    <li mat-menu-item [routerLink]="['/upload']" class="font-bold"><i class="fa-solid fa-upload"></i> Hochladen</li>
+
     <li mat-menu-item (click)="logout()" class="font-bold"><i class="fa-solid fa-power-off"></i> Abmelden</li>
   </ul>
 </mat-menu>
