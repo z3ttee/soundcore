@@ -1,8 +1,7 @@
 import { HttpErrorResponse } from "@angular/common/http";
 import { Component, Inject } from "@angular/core";
 import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
-import { AllianceError } from "src/app/model/error.model";
-import { StorageMount } from "../model/storage-mount.model";
+import { Mount } from "../entities/mount.entity";
 import { MountService } from "../services/mount.service";
 
 @Component({
@@ -16,7 +15,7 @@ export class MountEditorDialog {
     constructor(
         private mountService: MountService,
         public dialogRef: MatDialogRef<MountEditorDialog>,
-        @Inject(MAT_DIALOG_DATA) public data: StorageMount
+        @Inject(MAT_DIALOG_DATA) public data: Mount
     ) {
         this.data["createIfNotExists"] = true
     }
@@ -35,7 +34,7 @@ export class MountEditorDialog {
 
         promise.then((mount) => {
             this.data = mount;
-            this.dialogRef.close();
+            this.dialogRef.close(mount);
         }).catch((error: HttpErrorResponse) => {
             this.error = error
         }).finally(() => {
@@ -45,7 +44,7 @@ export class MountEditorDialog {
     }
 
     public async cancel() {
-        this.data = {} as StorageMount;
+        this.data = {} as Mount;
         this.isLoading = false;
         this.dialogRef.close();
     }

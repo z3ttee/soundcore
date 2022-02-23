@@ -4,7 +4,7 @@ import { io, Socket } from "socket.io-client";
 import { AuthenticationService } from "src/app/sso/authentication.service";
 import { environment } from "src/environments/environment";
 import { SocketStatus } from "../../upload/enums/socket-status.enum";
-import { StorageMount } from "../model/storage-mount.model";
+import { Mount } from "../entities/mount.entity";
 
 const MOUNT_STATUS_EVENT = "onMountUpdate"
 
@@ -14,10 +14,10 @@ export class MountStatusService {
     private _socket: Socket;
 
     private _socketConnectedSubject: BehaviorSubject<SocketStatus> = new BehaviorSubject(SocketStatus.CONNECTING);
-    private _updatesSubject: BehaviorSubject<StorageMount> = new BehaviorSubject(null);
+    private _updatesSubject: BehaviorSubject<Mount> = new BehaviorSubject(null);
 
     public $socketConnected: Observable<SocketStatus> = this._socketConnectedSubject.asObservable();
-    public $updates: Observable<StorageMount> = this._updatesSubject.asObservable();
+    public $updates: Observable<Mount> = this._updatesSubject.asObservable();
 
     constructor(
         private authService: AuthenticationService
@@ -47,10 +47,10 @@ export class MountStatusService {
         this._socket.on("connect", () => this.handleConnectEvent());
         this._socket.on("error", () => this.handleErrorEvent());
         this._socket.on("connect_error", () => this.handleConnectionError());
-        this._socket.on(MOUNT_STATUS_EVENT, (data: StorageMount) => this.handleUpdateEvent(data));
+        this._socket.on(MOUNT_STATUS_EVENT, (data: Mount) => this.handleUpdateEvent(data));
     }
 
-    private async handleUpdateEvent(data: StorageMount) {
+    private async handleUpdateEvent(data: Mount) {
         console.log(data.status)
         this._updatesSubject.next(data);
     }

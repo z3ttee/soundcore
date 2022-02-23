@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
-import { filter, map, Observable, Subscription, tap } from 'rxjs';
-import { MountStatus, StorageMount } from '../../model/storage-mount.model';
+import { Subscription } from 'rxjs';
+import { Mount, MountStatus } from '../../entities/mount.entity';
 import { MountStatusService } from '../../services/mount-status.service';
 
 @Component({
@@ -10,7 +10,7 @@ import { MountStatusService } from '../../services/mount-status.service';
 })
 export class MountListItemComponent implements OnInit, OnDestroy {
 
-  @Input() public mount: StorageMount;
+  @Input() public mount: Mount;
   @Output() public edit: EventEmitter<void> = new EventEmitter();
   @Output() public delete: EventEmitter<void> = new EventEmitter();
 
@@ -32,11 +32,15 @@ export class MountListItemComponent implements OnInit, OnDestroy {
     if(this._statusSub) this._statusSub.unsubscribe();
   }
 
-  public async triggerEditEvent() {
+  public async triggerEditEvent(event: MouseEvent) {
+    event.preventDefault();
+    event.stopPropagation();
     this.edit.emit()
   }
 
-  public async triggerDeleteEvent() {
+  public async triggerDeleteEvent(event: MouseEvent) {
+    event.preventDefault();
+    event.stopPropagation();
     this.delete.emit()
   }
 

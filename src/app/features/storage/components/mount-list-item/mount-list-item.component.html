@@ -1,28 +1,26 @@
-<div class="transition-all rounded-md my-2 px-4 py-4 flex flex-1 items-center bg-background-light border-2 border-transparent hover:border-primary">
+<asc-interface-list-item-template>
+    <div class="flex items-center">
+        <img src="assets/img/icon_bucket.png" class="inline-block min-w-16 max-w-16 h-16">
+    
+        <div class="w-full pl-8">
+            <h6>{{ mount.name || "Unknown name" }}</h6>
 
-    <img src="assets/img/icon_harddrive.png" class="inline-block w-16 h-16">
+            <div>
+                <span class="text-xs leading-3 pointer-events-all opacity-60">{{ mount?.path || "Unknown path" }}</span>
+            </div>
 
-    <div class="w-full px-6">
-        <div class="">
-            <p class="font-bold text-sm max-w-full overflow-hidden text-ellipsis whitespace-nowrap">{{ mount?.name || "Unknown name" }}</p>
+            <ul class="item-details inline-flex items-center font-light text-xs pt-2">
+                <li class="inline-flex items-center font-light text-xs"><asc-label-badge>{{ (mount.status || "ok") == "ok" ? "OK" : "Indexierung läuft" }}</asc-label-badge></li>
+            </ul>
         </div>
 
-        <div>
-            <span class="text-xs leading-3 pointer-events-all opacity-60">{{ mount?.path || "Unknown path" }}</span>
-        </div>
-
-        <div class="mt-2">
-            <span class="align-middle py-1.5 px-4 bg-background rounded-full border border-primary-light border-opacity-50 text-xxs tracking-wide uppercase">{{ (status || "ok") == "ok" ? "OK" : "Indexierung läuft" }}</span>
+        <div class="inline-flex items-center">
+            <button mat-icon-button (click)="triggerEditEvent($event)" matTooltip="Bearbeiten">
+                <mat-icon>edit</mat-icon>
+            </button>
+            <button mat-icon-button color="warn" (click)="triggerDeleteEvent($event)" matTooltip="Löschen">
+                <mat-icon>delete</mat-icon>
+            </button>
         </div>
     </div>
-
-    <div class="inline-flex items-center">
-        <button mat-icon-button (click)="triggerEditEvent()" matTooltip="Bearbeiten">
-            <mat-icon>edit</mat-icon>
-        </button>
-        <button mat-icon-button color="warn" (click)="triggerDeleteEvent()" matTooltip="Löschen">
-            <mat-icon>delete</mat-icon>
-        </button>
-    </div>
-
-</div>
+</asc-interface-list-item-template>

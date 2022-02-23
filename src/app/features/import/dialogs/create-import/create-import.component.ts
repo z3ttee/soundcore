@@ -1,10 +1,9 @@
-import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { StorageBucket } from 'src/app/features/storage/model/storage-bucket.model';
-import { StorageMount } from 'src/app/features/storage/model/storage-mount.model';
+import { Bucket } from 'src/app/features/storage/entities/bucket.entity';
+import { Mount } from 'src/app/features/storage/entities/mount.entity';
 import { BucketService } from 'src/app/features/storage/services/bucket.service';
 import { MountService } from 'src/app/features/storage/services/mount.service';
 import { ImportService } from '../../services/import.service';
@@ -16,12 +15,12 @@ import { ImportService } from '../../services/import.service';
 })
 export class CreateImportComponent implements OnInit {
 
-  private _bucketsSubject: BehaviorSubject<StorageBucket[]> = new BehaviorSubject([]);
-  private _mountsSubject: BehaviorSubject<StorageMount[]> = new BehaviorSubject([]);
+  private _bucketsSubject: BehaviorSubject<Bucket[]> = new BehaviorSubject([]);
+  private _mountsSubject: BehaviorSubject<Mount[]> = new BehaviorSubject([]);
 
   // Data providers
-  public $buckets: Observable<StorageBucket[]> = this._bucketsSubject.asObservable();
-  public $mounts: Observable<StorageMount[]> = this._mountsSubject.asObservable();
+  public $buckets: Observable<Bucket[]> = this._bucketsSubject.asObservable();
+  public $mounts: Observable<Mount[]> = this._mountsSubject.asObservable();
 
   // Loading states
   public isLoadingBuckets: boolean = false;
@@ -51,7 +50,7 @@ export class CreateImportComponent implements OnInit {
 
   ngOnInit(): void {
     this.isLoadingBuckets = true
-    this.bucketService.findAllBuckets().then((page) => {
+    /*this.bucketService.findAllBuckets().then((page) => {
       this._bucketsSubject.next(page.elements);
     }).finally(() => this.isLoadingBuckets = false)
 
@@ -61,7 +60,7 @@ export class CreateImportComponent implements OnInit {
       this.mountService.findMountsByBucketId(value).then((page) => {
         this._mountsSubject.next(page.elements);
       }).finally(() => this.isLoadingMounts = false)
-    })
+    })*/
   }
 
   public onSave() {

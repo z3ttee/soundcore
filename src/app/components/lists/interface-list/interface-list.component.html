@@ -1,0 +1,19 @@
+<div class="bg-background-light rounded-md overflow-hidden">
+    <div class="flex w-full shadow-sm bg-background border-b border-b-primary-light">
+        <div class="w-full p-4 gap-2">
+            <ng-content select="[list-header]"></ng-content>
+        </div>
+    </div>
+
+    <div class="p-4">
+        <div #items>
+            <ng-content></ng-content>
+        </div>
+        <p *ngIf="currentSize <= 0 || items.children.length <= 0" class="text-sm opacity-70 text-center p-2"><i class="fa-solid fa-circle-info"></i> Keine Einträge gefunden</p>
+    </div>
+
+    <div>
+        <button *ngIf="currentSize < totalElements" class="mx-4 mb-4 py-2 px-3 rounded-md transition-all hover:bg-background hover:bg-opacity-60 active:bg-background-dark active:border-opacity-30 active:bg-opacity-60 transform-gpu will-change-transform active:scale-95" (click)="onMore.emit()"><span class="text-xs tracking-wide text-white-dark">Mehr Laden</span></button>
+        <ng-content select="[list-footer]"></ng-content>
+    </div>
+</div>

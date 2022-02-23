@@ -1,15 +1,14 @@
-<div class="bg-background-light rounded-md my-2 px-6 py-4 flex flex-1 items-center border-2 border-transparent hover:border-primary transition-all cursor-pointer active:bg-background-dark">
+<asc-interface-list-item-template>
+    <div class="flex items-center">
+        <img src="assets/img/icon_bucket.png" class="inline-block min-w-16 max-w-16 h-16">
+    
+        <div class="w-full pl-8">
+            <h6>{{ bucket.name || "Unknown name" }}</h6>
 
-    <img src="assets/img/icon_bucket.png" class="inline-block w-20 h-20">
-
-    <div class="flex-grow px-8">
-        <h6>{{ bucket.name || "Unknown name" }}</h6>
-
-        <ul class="flex gap-8 mt-2">
-            <li class="opacity-40 cursor-pointer" [matTooltip]="'Mounts: ' + (bucket.mounts?.length || 0)"><mat-icon class="align-middle mr-1">storage</mat-icon>{{ bucket.mounts?.length || 0 }}</li>
-            <li class="opacity-40 cursor-pointer" [matTooltip]="'BucketID: ' + bucket.id"><mat-icon class="align-middle mr-1">tag</mat-icon>{{ bucket.id.slice(0, 6) }}...</li>
-            <li class="opacity-40 cursor-pointer" [matTooltip]="'Maschine: ' + bucket.machineId"><mat-icon class="align-middle mr-1">computer</mat-icon>{{ bucket.machineId?.slice(0, 6) }}...</li>
-        </ul>
+            <ul class="item-details inline-flex items-center font-light text-xs opacity-30">
+                <li class="inline-flex items-center font-light text-xs">{{ bucket.id }}</li>
+                <li class="inline-flex items-center font-light text-xs gap-2"><i class="text-xs opacity-70 fa-solid fa-database"></i> {{ bucket.mountsCount || 0 }} {{ (bucket.mountsCount || 0) == 1 ? 'Mount' : 'Mounts' }}</li>
+            </ul>
+        </div>
     </div>
-
-</div>
+</asc-interface-list-item-template>

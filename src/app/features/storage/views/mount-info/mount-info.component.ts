@@ -3,7 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { BehaviorSubject, map, Observable, Subject, takeUntil } from 'rxjs';
 import { Index } from 'src/app/features/upload/entities/index.entity';
 import { ScrollService } from 'src/app/services/scroll.service';
-import { StorageMount } from '../../model/storage-mount.model';
+import { Mount } from '../../entities/mount.entity';
 import { IndexService } from '../../services/index.service';
 import { MountService } from '../../services/mount.service';
 
@@ -20,8 +20,8 @@ export class MountInfoComponent implements OnInit, OnDestroy {
 
   // Data providers
   private mountId: string;
-  private _mountSubject: BehaviorSubject<StorageMount> = new BehaviorSubject(null);
-  public $mount: Observable<StorageMount> = this._mountSubject.asObservable();
+  private _mountSubject: BehaviorSubject<Mount> = new BehaviorSubject(null);
+  public $mount: Observable<Mount> = this._mountSubject.asObservable();
 
   private _indexSubject: BehaviorSubject<Index[]> = new BehaviorSubject([]);
   public $index: Observable<Index[]> = this._indexSubject.asObservable();

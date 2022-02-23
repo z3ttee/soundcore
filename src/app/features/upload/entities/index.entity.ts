@@ -1,5 +1,5 @@
 import { Song } from "../../song/entities/song.entity";
-import { StorageMount } from "../../storage/model/storage-mount.model";
+import { Mount } from "../../storage/entities/mount.entity";
 import { User } from "../../user/entities/user.entity";
 import { IndexStatus } from "../enums/index-status.enum";
 
@@ -12,6 +12,6 @@ export class Index {
     public indexedAt: Date;
     
     public song?: Song;
-    public mount?: StorageMount;
+    public mount?: Mount;
     public uploader?: User;
 }

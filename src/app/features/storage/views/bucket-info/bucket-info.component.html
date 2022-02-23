@@ -5,8 +5,11 @@
         </div>
 
         <div class="p-4">
-            <h5 class="opacity-40">Speicherzone</h5>
+            <h6 class="opacity-40">Speicherzone</h6>
             <h2>{{ ($bucket | async)?.name || "Unknown name/abcd" }}</h2>
+            <div class="pt-2" *ngIf="($bucket | async)">
+                <asc-label-badge><i class="text-xs opacity-60 mr-1 align-middle fa-solid fa-database"></i> {{ ($bucket | async)?.mountsCount }} Mounts</asc-label-badge>
+            </div>
         </div>
     </div>
 
@@ -17,30 +20,17 @@
         </asc-message>
     </div>
 
-    <div class="my-8">
-        <div class="flex flex-1 items-center">
-            <h4 class="flex-grow">Mounts</h4>
-            <div>
+    <div class="my-row">
+        <h5 class="pb-2">Mounts</h5>
+
+        <asc-interface-list [pageSize]="pageSize" [totalElements]="totalElements" [currentPage]="currentPage" [currentSize]="($mounts | async).length" (onMore)="findMounts()">
+            <div list-header>
                 <button mat-stroked-button (click)="openMountEditor()"><mat-icon class="align-middle mr-2">add</mat-icon>Mount koppeln</button>
             </div>
-        </div>
-        <mat-progress-bar color="accent" mode="indeterminate" *ngIf="isLoadingMounts"></mat-progress-bar>
 
-        <div class="my-2 p-4 bg-warn rounded-md flex flex-1 items-center text-primary-dark" *ngIf="($availableMounts | async)?.elements.length <= 0 && !isLoadingMounts">
-            <mat-icon>info</mat-icon>
-            <p class="flex-grow pl-4 text-sm text-background-dark">Keine Mounts für diese Speicherzone gefunden.</p>
-        </div>
-
-        <asc-mount-list-item *ngFor="let mount of ($availableMounts | async)?.elements" [mount]="mount" (delete)="deleteMount(mount)" (edit)="openMountEditor(mount)" [routerLink]="['..', 'mount', mount.id]"></asc-mount-list-item>    
-    
-        <mat-paginator 
-            color="primary"
-            [length]="($availableMounts | async)?.totalElements"
-            [pageSize]="selectedPageSize"
-            [pageSizeOptions]="pageSizeOptions"
-            (page)="onPageEvent($event)"
-            [disabled]="isLoadingMounts"
-            aria-label="Select page">
-        </mat-paginator>
+            <div class="my-2" *ngFor="let mount of ($mounts | async)">
+                <asc-mount-list-item (delete)="deleteMount(mount)" (edit)="openMountEditor(mount)" [mount]="mount" [routerLink]="['/storage', 'mount', mount.id]"></asc-mount-list-item>    
+            </div>
+        </asc-interface-list>
     </div>
 </section>

@@ -1,12 +1,12 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { PageEvent } from '@angular/material/paginator';
 import { ActivatedRoute, Router } from '@angular/router';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { Page, Pageable } from 'src/app/pagination/pagination';
+import { Chart, ChartItem } from 'chart.js';
+import { BehaviorSubject, Observable, Subject, takeUntil } from 'rxjs';
+import { ScrollService } from 'src/app/services/scroll.service';
 import { MountEditorDialog } from '../../dialogs/mount-editor.dialog';
-import { StorageBucket } from '../../model/storage-bucket.model';
-import { StorageMount } from '../../model/storage-mount.model';
+import { Bucket } from '../../entities/bucket.entity';
+import { Mount } from '../../entities/mount.entity';
 import { BucketService } from '../../services/bucket.service';
 import { MountStatusService } from '../../services/mount-status.service';
 import { MountService } from '../../services/mount.service';
@@ -16,61 +16,78 @@ import { MountService } from '../../services/mount.service';
   styleUrls: ['./bucket-info.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class BucketInfoComponent implements OnInit {
-
-  private _mountsSubject: BehaviorSubject<Page<StorageMount>> = new BehaviorSubject(Page.of([]))
-  private _bucketSubject: BehaviorSubject<StorageBucket> = new BehaviorSubject(null)
-
-  public $bucket: Observable<StorageBucket> = this._bucketSubject.asObservable();
-  public $availableMounts: Observable<Page<StorageMount>> = this._mountsSubject.asObservable();
-
-  public isLoadingMounts: boolean = false;
-
-  public pageSizeOptions: number[] = [5, 10, 25, 30];
-  public selectedPageSize: number = 10;
-  public currentPageIndex: number = 0;
+export class BucketInfoComponent implements OnInit, OnDestroy {
 
   constructor(
     private activatedRoute: ActivatedRoute,
     private bucketService: BucketService,
     private mountService: MountService,
+    private scrollService: ScrollService,
     private dialog: MatDialog,
-    private router: Router,
     public mountStatusService: MountStatusService
-  ) {
-    this.activatedRoute.paramMap.subscribe((paramMap) => {
-      this.isLoadingMounts = true;
+  ) { }
 
-      const bucketId = paramMap.get("bucketId");
-      this.bucketService.findById(bucketId).finally(() => this.isLoadingMounts = false).catch(() => null).then((bucket) => {
+  // Destroy subscriptions
+  private _destroySubject: Subject<void> = new Subject();
+  private $destroy: Observable<void> = this._destroySubject.asObservable();
+
+  // Loading states
+  public isLoadingMounts: boolean = false;
+
+  // Data providers
+  private bucketId: string;
+  private _mountsSubject: BehaviorSubject<Mount[]> = new BehaviorSubject([])
+  private _bucketSubject: BehaviorSubject<Bucket> = new BehaviorSubject(null)
+
+  public $bucket: Observable<Bucket> = this._bucketSubject.asObservable();
+  public $mounts: Observable<Mount[]> = this._mountsSubject.asObservable();
+
+  // Pagination
+  public currentPage: number = 0;
+  public pageSize: number = 30;
+  public totalElements: number = 0;
+
+  public async ngOnInit(): Promise<void> {
+    this.activatedRoute.paramMap.pipe(takeUntil(this.$destroy)).subscribe((paramMap) => {
+      this.bucketId = paramMap.get("bucketId");
+
+      this.bucketService.findById(this.bucketId).finally(() => this.isLoadingMounts = false).catch(() => null).then((bucket) => {
         this._bucketSubject.next(bucket);
-        this.findMounts();
       });
+
+      this.scrollService.$onBottomReached.pipe(takeUntil(this.$destroy)).subscribe(() => {
+        this.findMounts();
+      })
+    })
+  } 
+  public ngOnDestroy(): void {
+      this._destroySubject.next();
+      this._destroySubject.complete();
+  }
+
+  public findMounts() {
+    // Find all mounts by selected bucket
+    this.mountService.findMountsByBucketId(this.bucketId, { size: this.pageSize, page: this.currentPage }).then((page) => {
+      this.totalElements = page.totalElements;
+
+      if(page.elements.length > 0) {
+        this.currentPage++;
+        this._mountsSubject.next([
+          ...this._mountsSubject.getValue(),
+          ...page.elements
+        ])
+      }
       
     })
   }
 
-  public async ngOnInit(): Promise<void> {} 
-
-  public async navigateToOverview() {
-    this.router.navigate(["storage/"])
+  public async deleteMount(mount: Mount) {
+    this.mountService.delete(mount.id).then(() => {
+      this._mountsSubject.next(this._mountsSubject.getValue().filter((m) => m.id != mount.id))
+    });
   }
 
-  public findMounts(pageable?: Pageable) {
-
-    // Find all mounts by selected bucket
-    this.mountService.findMountsByBucketId(this._bucketSubject.getValue()?.id, pageable).then((page) => {
-      this._mountsSubject.next(page)
-    }).finally(() => {
-      this.isLoadingMounts = false;
-    })
-  }
-
-  public async deleteMount(mount: StorageMount) {
-    this.mountService.delete(mount.id).then(() => this.findMounts());
-  }
-
-  public openMountEditor(mount?: StorageMount) {
+  public openMountEditor(mount?: Mount) {
     const dialogRef = this.dialog.open(MountEditorDialog, {
       data: {
         bucket: this._bucketSubject.getValue(),
@@ -79,15 +96,19 @@ export class BucketInfoComponent implements OnInit {
       }
     })
 
-    dialogRef.afterClosed().subscribe((mount: StorageMount) => {
-      this.findMounts()
-    })
-  }
+    dialogRef.afterClosed().subscribe((mount: Mount) => {
+      if(mount) {
+        const mounts = this._mountsSubject.getValue();
+        const index = mounts.findIndex((m) => m.id == mount.id);
 
-  public onPageEvent(event: PageEvent) {
-    this.findMounts({
-      page: event.pageIndex,
-      size: event.pageSize
+        if(index == -1) {
+          mounts.push(mount);
+        } else {
+          mounts[index] = mount;
+        }
+        
+        this._mountsSubject.next(mounts)
+      }
     })
   }
 

@@ -1,0 +1,12 @@
+:host {
+    li {
+        &::after {
+            content: "\2022";
+            @apply mx-3 opacity-40;
+        }
+
+        &:last-child::after {
+            content: "";
+        }
+    }
+}

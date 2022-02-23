@@ -35,6 +35,10 @@ export class IndexInfoComponent implements OnInit, OnDestroy {
       this.indexId = paramMap.get("indexId")
       this.findIndex();
       this.findReportByIndex();
+
+      /*this.scrollService.$onBottomReached.pipe(takeUntil(this.$destroy)).subscribe(() => {
+        this.findIndex()
+      })*/
     })
   }
   public ngOnDestroy(): void {

@@ -1,29 +1,10 @@
 <section class="p-window">
     <h2>Speicherzonen</h2>
+    <p class="text-sm tracking-wide py-4 text-white-dark">Speicherzonen (Buckets) sind Server, auf denen Dateien gespeichert werden. Ein Bucket beinhaltet verschiedene Mounts (Ordner), in denen alle Dateien verwaltet werden.</p>
 
-    <div class="my-4 p-4 bg-info rounded-md flex flex-1 items-center">
-        <mat-icon>info</mat-icon>
-        <p class="flex-grow pl-4 text-sm">Speicherzonen (Buckets) sind Server, auf denen Dateien gespeichert werden. Ein Bucket beinhaltet verschiedene Mounts (Ordner), in denen alle Dateien verwaltet werden.</p>
-    </div>
-
-    <div class="my-4">
-        <mat-progress-bar color="accent" mode="indeterminate" *ngIf="isLoadingBuckets"></mat-progress-bar>
-
-        <div class="my-2 p-4 bg-warn rounded-md flex flex-1 items-center text-primary-dark" *ngIf="($availableBuckets | async)?.elements.length <= 0 && !isLoadingBuckets">
-            <mat-icon>info</mat-icon>
-            <p class="flex-grow pl-4 text-sm text-background-dark">Keine Speicherzonen gefunden.</p>
+    <asc-interface-list [pageSize]="pageSize" [totalElements]="totalElements" [currentPage]="currentPage" [currentSize]="($buckets | async).length" (onMore)="findBuckets()">
+        <div class="my-2" *ngFor="let bucket of ($buckets | async)">
+            <asc-bucket-list-item [bucket]="bucket" [routerLink]="['/storage', 'bucket', bucket.id]"></asc-bucket-list-item>
         </div>
-
-        <asc-bucket-list-item *ngFor="let bucket of ($availableBuckets | async)?.elements" [bucket]="bucket" (click)="navigateToBucket(bucket)"></asc-bucket-list-item>
-    </div>
-
-    <mat-paginator 
-        color="primary"
-        [length]="($availableBuckets | async)?.totalElements"
-        [pageSize]="selectedPageSize"
-        [pageSizeOptions]="pageSizeOptions"
-        (page)="onPageEvent($event)"
-        [disabled]="isLoadingBuckets"
-        aria-label="Select page">
-    </mat-paginator>
+    </asc-interface-list>
 </section>

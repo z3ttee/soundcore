@@ -24,11 +24,14 @@ import { AscMessageModule } from 'src/app/components/message-components/message-
 import { MountInfoComponent } from './views/mount-info/mount-info.component';
 import { IndexService } from './services/index.service';
 import { IndexInfoComponent } from './views/index-info/index-info.component';
+import { AscInterfaceListItemTemplateModule } from 'src/app/components/list-items/interface-list-item-template/interface-list-item-template.module';
+import { AscInterfaceListModule } from 'src/app/components/lists/interface-list/interface-list.module';
+import { AscBadgeModule } from 'src/app/components/badge-components/badge-components.module';
 
 const routes: Routes = [
 
   { path: "", component: BucketsComponent},
-  { path: ":bucketId", component: BucketInfoComponent },
+  { path: "bucket/:bucketId", component: BucketInfoComponent },
   { path: "mount/:mountId", component: MountInfoComponent },
   { path: "index/:indexId", component: IndexInfoComponent }
 
@@ -52,9 +55,11 @@ const routes: Routes = [
     RouterModule.forChild(routes),
 
     AscMessageModule,
+    AscInterfaceListItemTemplateModule,
+    AscInterfaceListModule,
+    AscBadgeModule,
 
     MatSelectModule,
-    MatPaginatorModule,
     MatButtonModule,
     MatIconModule,
     MatTooltipModule,
