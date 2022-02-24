@@ -1,7 +1,6 @@
 import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Chart, ChartItem } from 'chart.js';
 import { BehaviorSubject, Observable, Subject, takeUntil } from 'rxjs';
 import { ScrollService } from 'src/app/services/scroll.service';
 import { MountEditorDialog } from '../../dialogs/mount-editor.dialog';
