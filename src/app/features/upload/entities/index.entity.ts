@@ -10,6 +10,8 @@ export class Index {
     public status: IndexStatus;
     public checksum: string;
     public indexedAt: Date;
+    public directory: string;
+
     
     public song?: Song;
     public mount?: Mount;

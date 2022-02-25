@@ -1,0 +1,26 @@
+<asc-interface-list-item-template>
+    <div class="flex items-center gap-4">
+        <img src="assets/img/icon_file.png" class="inline-block min-w-16 max-w-16 h-16">
+    
+        <div class="w-full">
+            <h6 class="line-clamp-1" [title]="index.filename">{{ index.filename || "Unknown name" }}</h6>
+
+            <div class="mt-2 mb-4">
+                <p class="text-xs leading-3 pointer-events-all opacity-60 line-clamp-2 break-words" [title]="index.mount.path + '/' + index.directory + '/' +index.filename">{{ index.mount.path + "/" + index.directory + "/" +index.filename }}</p>
+            </div>
+
+            <ul class="item-details inline-flex items-center font-light text-xs gap-4">
+                <li class="inline-flex items-center font-light text-xs"><asc-label-badge>{{ (index.status) }}</asc-label-badge></li>
+
+                <li class="text-xs leading-3 pointer-events-all font-light opacity-40 w-16 text-center">{{ (index.size | diskSpacePipe) }}</li>
+                <li class="text-xs leading-3 pointer-events-all font-light opacity-40 w-44 text-center">{{ (index.indexedAt | date:"dd.mm.yyyy - HH:mm:ss 'Uhr'") }}</li>
+            </ul>
+        </div>
+
+        <div class="inline-flex items-center min-w-16 max-w-16">
+            <button mat-icon-button color="warn" (click)="triggerDeleteEvent($event)" matTooltip="Löschen">
+                <mat-icon>delete</mat-icon>
+            </button>
+        </div>
+    </div>
+</asc-interface-list-item-template>

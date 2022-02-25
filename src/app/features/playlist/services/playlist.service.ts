@@ -6,7 +6,6 @@ import { AscPlaylistEditorDialogComponent } from 'src/app/components/dialogs/pla
 import { Page, Pageable } from 'src/app/pagination/pagination';
 import { DialogService } from 'src/app/services/dialog.service';
 import { LikeService } from 'src/app/services/like.service';
-import { SnackbarService } from 'src/app/services/snackbar.service';
 import { AuthenticationService } from 'src/app/sso/authentication.service';
 import { environment } from 'src/environments/environment';
 import { Song } from '../../song/entities/song.entity';

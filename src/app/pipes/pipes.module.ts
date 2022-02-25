@@ -7,6 +7,7 @@ import { TotalDurationPipe } from './total-duration.pipe';
 import { ResourceTypePipe } from './resource-type.pipe';
 import { IndexStatusPipe } from './index-status.pipe';
 import { PlaylistPrivacyPipe } from './playlist-privacy.pipe';
+import { DiskSpacePipe } from './disk-space.pipe';
 
 @NgModule({
   declarations: [
@@ -16,7 +17,8 @@ import { PlaylistPrivacyPipe } from './playlist-privacy.pipe';
     TotalDurationPipe,
     ResourceTypePipe,
     IndexStatusPipe,
-    PlaylistPrivacyPipe
+    PlaylistPrivacyPipe,
+    DiskSpacePipe
   ],
   imports: [
     CommonModule
@@ -28,7 +30,8 @@ import { PlaylistPrivacyPipe } from './playlist-privacy.pipe';
     TotalDurationPipe,
     ResourceTypePipe,
     IndexStatusPipe,
-    PlaylistPrivacyPipe
+    PlaylistPrivacyPipe,
+    DiskSpacePipe
   ]
 })
 export class PipesModule { }

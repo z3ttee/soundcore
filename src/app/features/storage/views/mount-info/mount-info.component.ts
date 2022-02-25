@@ -26,12 +26,14 @@ export class MountInfoComponent implements OnInit, OnDestroy {
   private _indexSubject: BehaviorSubject<Index[]> = new BehaviorSubject([]);
   public $index: Observable<Index[]> = this._indexSubject.asObservable();
 
-  // Loading states
+  // States
   private _loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject(false);
   public $isLoading: boolean = false;
+  public isSearchMode: boolean = false;
 
   // Pagination
   public totalElements = 0;
+  public pageSize = 30;
   public currentPage = 0;
 
   constructor(
@@ -69,7 +71,7 @@ export class MountInfoComponent implements OnInit, OnDestroy {
     const currentItemCount = this._indexSubject.getValue().length;
     if(currentItemCount != 0 && currentItemCount >= this.totalElements) return;
     
-    this.indexService.findPage(this.mountId, { page: this.currentPage }).then((page) => {
+    this.indexService.findPage(this.mountId, { page: this.currentPage, size: this.pageSize }).then((page) => {
       this.totalElements = page.totalElements;
       if(page.elements.length > 0) this.currentPage++;
       this._indexSubject.next([
@@ -78,5 +80,21 @@ export class MountInfoComponent implements OnInit, OnDestroy {
       ])
     })
   }
+
+  public async deleteIndex(index: Index) {
+    this.indexService.deleteById(index.id).then((deleted) => {
+      if(deleted) {
+        this._indexSubject.next(this._indexSubject.getValue().filter((i) => i.id != index.id))
+        this.totalElements--;
+
+        const mount = this._mountSubject.getValue();
+        mount.driveStats.mountUsedSpace -= index.size;
+        mount.indexCount--;
+        this._mountSubject.next(mount)
+      }
+    })
+  }
+
+  
 
 }

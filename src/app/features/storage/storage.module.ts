@@ -7,12 +7,10 @@ import { BucketService } from './services/bucket.service';
 import { MountService } from './services/mount.service';
 import {MatSelectModule} from '@angular/material/select';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import {MatPaginatorModule} from '@angular/material/paginator';
 import {MatButtonModule} from '@angular/material/button';
 import {MatIconModule} from '@angular/material/icon';
 import {MatTooltipModule} from '@angular/material/tooltip';
 import {MatDialogModule} from '@angular/material/dialog';
-import { MountEditorDialog } from './dialogs/mount-editor.dialog';
 import {MatInputModule} from '@angular/material/input';
 import {MatCheckboxModule} from '@angular/material/checkbox';
 import {MatProgressBarModule} from '@angular/material/progress-bar';
@@ -27,6 +25,9 @@ import { IndexInfoComponent } from './views/index-info/index-info.component';
 import { AscInterfaceListItemTemplateModule } from 'src/app/components/list-items/interface-list-item-template/interface-list-item-template.module';
 import { AscInterfaceListModule } from 'src/app/components/lists/interface-list/interface-list.module';
 import { AscBadgeModule } from 'src/app/components/badge-components/badge-components.module';
+import { IndexListItemComponent } from './components/index-list-item/index-list-item.component';
+import { PipesModule } from 'src/app/pipes/pipes.module';
+import { MountEditorDialog } from './dialogs/mount-editor/mount-editor.dialog';
 
 const routes: Routes = [
 
@@ -44,6 +45,7 @@ const routes: Routes = [
     MountEditorDialog,
     BucketInfoComponent,
     BucketListItemComponent,
+    IndexListItemComponent,
     MountInfoComponent,
     IndexInfoComponent
   ],
@@ -54,6 +56,7 @@ const routes: Routes = [
     ReactiveFormsModule,
     RouterModule.forChild(routes),
 
+    PipesModule,
     AscMessageModule,
     AscInterfaceListItemTemplateModule,
     AscInterfaceListModule,
