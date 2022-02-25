@@ -1,8 +1,8 @@
 import { HttpErrorResponse } from "@angular/common/http";
 import { Component, Inject } from "@angular/core";
 import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
-import { Mount } from "../entities/mount.entity";
-import { MountService } from "../services/mount.service";
+import { Mount } from "../../entities/mount.entity";
+import { MountService } from "../../services/mount.service";
 
 @Component({
     templateUrl: './mount-editor.dialog.html',

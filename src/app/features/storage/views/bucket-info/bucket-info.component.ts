@@ -1,9 +1,9 @@
 import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { BehaviorSubject, Observable, Subject, takeUntil } from 'rxjs';
 import { ScrollService } from 'src/app/services/scroll.service';
-import { MountEditorDialog } from '../../dialogs/mount-editor.dialog';
+import { MountEditorDialog } from '../../dialogs/mount-editor/mount-editor.dialog';
 import { Bucket } from '../../entities/bucket.entity';
 import { Mount } from '../../entities/mount.entity';
 import { BucketService } from '../../services/bucket.service';
@@ -81,8 +81,11 @@ export class BucketInfoComponent implements OnInit, OnDestroy {
   }
 
   public async deleteMount(mount: Mount) {
-    this.mountService.delete(mount.id).then(() => {
-      this._mountsSubject.next(this._mountsSubject.getValue().filter((m) => m.id != mount.id))
+    this.mountService.delete(mount.id).then((deleted) => {
+      if(deleted) {
+        this._mountsSubject.next(this._mountsSubject.getValue().filter((m) => m.id != mount.id))
+        this.totalElements--;
+      }
     });
   }
 
