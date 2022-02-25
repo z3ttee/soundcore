@@ -7,8 +7,8 @@
         <div class="p-4">
             <h6 class="opacity-40">Speicherzone</h6>
             <h2>{{ ($bucket | async)?.name || "Unknown name/abcd" }}</h2>
-            <div class="pt-2" *ngIf="($bucket | async)">
-                <asc-label-badge><i class="text-xs opacity-60 mr-1 align-middle fa-solid fa-database"></i> {{ ($bucket | async)?.mountsCount }} Mounts</asc-label-badge>
+            <div class="pt-2">
+                <asc-label-badge><i class="text-xs opacity-60 mr-1 align-middle fa-solid fa-database"></i> {{ ($bucket | async)?.mountsCount || 0 }} {{ ($bucket | async)?.mountsCount != 1 ? 'Mounts' : 'Mount' }}</asc-label-badge>
             </div>
         </div>
     </div>

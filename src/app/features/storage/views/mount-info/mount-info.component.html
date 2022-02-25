@@ -7,8 +7,8 @@
         <div class="w-full">
             <h6 class="opacity-40">Mount</h6>
             <h2 class="line-clamp-1">{{ ($mount | async)?.name || "Unknown name/abcd" }}</h2>
-            <div class="flex items-center pt-2 gap-2" *ngIf="($mount | async)">
-                <asc-label-badge><i class="text-xs opacity-60 mr-1 align-middle fa-solid fa-database"></i> {{ ($mount | async)?.indexCount }} Dateien</asc-label-badge>
+            <div class="flex items-center pt-2 gap-2">
+                <asc-label-badge><i class="text-xs opacity-60 mr-1 align-middle fa-solid fa-database"></i> {{ ($mount | async)?.indexCount || 0 }} Dateien</asc-label-badge>
                 <asc-label-badge>{{ ($mount | async)?.driveStats?.mountUsedSpace | diskSpacePipe }}</asc-label-badge>
             </div>
         </div>
