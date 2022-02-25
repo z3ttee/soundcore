@@ -38,6 +38,7 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { AscPlaylistEditorDialogModule } from './components/dialogs/playlist-editor-dialog/playlist-editor-dialog.module';
 import { AscToolbarModule } from './components/toolbar/toolbar.module';
+import { AscConfirmDialogModule } from './components/dialogs/confirm-dialog/confirm-dialog.module';
 
 // TODO: https://angular.io/guide/i18n-common-prepare
 
@@ -68,6 +69,7 @@ import { AscToolbarModule } from './components/toolbar/toolbar.module';
     AscPlaylistModule,
     AscPlaylistEditorDialogModule,
     AscToolbarModule,
+    AscConfirmDialogModule,
 
     // Import global Angular Material Components
     MatIconModule,
