@@ -17,7 +17,8 @@
             </ul>
         </div>
 
-        <div class="inline-flex items-center min-w-16 max-w-16">
+        <div class="inline-flex items-center">
+            <button mat-icon-button (click)="triggerReindex($event)" matTooltip="Erneut indexieren"><i class="fa-solid fa-rotate"></i></button>
             <button mat-icon-button color="warn" (click)="triggerDeleteEvent($event)" matTooltip="Löschen">
                 <mat-icon>delete</mat-icon>
             </button>

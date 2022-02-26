@@ -3,6 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { BehaviorSubject, map, Observable, Subject, takeUntil } from 'rxjs';
 import { Index } from 'src/app/features/upload/entities/index.entity';
 import { ScrollService } from 'src/app/services/scroll.service';
+import { SnackbarService } from 'src/app/services/snackbar.service';
 import { Mount } from '../../entities/mount.entity';
 import { IndexService } from '../../services/index.service';
 import { MountService } from '../../services/mount.service';
@@ -40,7 +41,8 @@ export class MountInfoComponent implements OnInit, OnDestroy {
     private mountService: MountService,
     private indexService: IndexService,
     private scrollService: ScrollService,
-    private activatedRoute: ActivatedRoute
+    private activatedRoute: ActivatedRoute,
+    private snackbarService: SnackbarService
   ) { }
 
   public ngOnInit(): void {
@@ -92,6 +94,14 @@ export class MountInfoComponent implements OnInit, OnDestroy {
         mount.indexCount--;
         this._mountSubject.next(mount)
       }
+    })
+  }
+
+  public async reindex(index: Index) {
+    this.indexService.reindex(index.id).then(() => {
+      this.snackbarService.info("Index wurde zur Warteschlange hinzugefügt.");
+    }).catch((error) => {
+      this.snackbarService.error(`Fehler: ${error.message}`);
     })
   }
 

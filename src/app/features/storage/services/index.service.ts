@@ -32,6 +32,11 @@ export class IndexService {
         return firstValueFrom(this.httpClient.get<IndexReport>(`${environment.api_base_uri}/v1/index/reports/${indexId}`));
     }
 
+    public async reindex(indexId: string): Promise<void> {
+        if(!indexId) return;
+        return firstValueFrom(this.httpClient.post<void>(`${environment.api_base_uri}/v1/index/reindex/${indexId}`, {}));
+    }
+
     public async searchIndexInMount(query: string, mountId: string, pageable: Pageable): Promise<Page<Index>> {    
         if(!mountId) return Page.of([]);   
         return firstValueFrom(this.httpClient.get<Page<Index>>(`${environment.api_base_uri}/v1/search/index/byMount/${mountId}?q=${query}`));
