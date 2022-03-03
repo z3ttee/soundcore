@@ -23,9 +23,9 @@ export class LikeService {
     ) {}
 
     public async likeSong(song: Song): Promise<boolean> {
-        if(!song) return song?.isLiked;
+        if(!song) return song?.liked;
         return firstValueFrom(this.httpClient.post<boolean>(`${environment.api_base_uri}/v1/likes/song/${song.id}`, {})).then((isLiked) => {
-            song.isLiked = !!isLiked;
+            song.liked = !!isLiked;
 
             if(isLiked) {
                 this.snackbarService.info("Song wurde deinen Lieblingssongs hinzugefügt.");
@@ -34,10 +34,10 @@ export class LikeService {
             }
 
             this._onSongLikeSubject.next(song);
-            return song.isLiked;
+            return song.liked;
         }).catch(() => {
             this.snackbarService.error("Ein Fehler ist aufgetreten.");
-            return song.isLiked
+            return song.liked
         })
     }
 

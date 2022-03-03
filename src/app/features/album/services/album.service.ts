@@ -1,11 +1,13 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import { firstValueFrom, Observable, of } from "rxjs";
+import { firstValueFrom } from "rxjs";
 import { Page } from "src/app/pagination/pagination";
 import { environment } from "src/environments/environment";
 import { Album } from "../entities/album.entity";
 
-@Injectable()
+@Injectable({
+    providedIn: "root"
+})
 export class AlbumService {
 
     constructor(

@@ -50,7 +50,10 @@ export class SongGridItemComponent implements OnInit {
         }
     }
 
-    public async playOrPause() {
+    public async playOrPause(event: MouseEvent) {
+        event.preventDefault();
+        event.stopPropagation();
+        
         if(!this.playable) return;
 
         this.contextMenuService.close();

@@ -31,10 +31,10 @@ export class ArtistService {
     return firstValueFrom(this.httpClient.get<Page<Album>>(`${environment.api_base_uri}/v1/albums/byFeaturedArtist/${artistId}${Pageable.toQuery(pageable)}`))
   }
 
-  public async findGenresByArtist(artistId: string, pageable: Pageable): Promise<Page<Genre>> {
+  /*public async findGenresByArtist(artistId: string, pageable: Pageable): Promise<Page<Genre>> {
     if(!artistId) return Page.of([]);
     return firstValueFrom(this.httpClient.get<Page<Genre>>(`${environment.api_base_uri}/v1/genres/byArtist/${artistId}${Pageable.toQuery(pageable)}`))
-  }
+  }*/
 
   public async findGenreById(genreId: string): Promise<Genre> {
     if(!genreId) null;

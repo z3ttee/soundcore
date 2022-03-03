@@ -1,12 +1,12 @@
 <section class="relative p-window">
-    <div class="absolute left-0 top-0 w-full h-[50vh]" [style]="'background: linear-gradient(180deg, ' + (options.artwork?.accentColor || options?.color || accentColor) + (mode == 'titleOnly' ? '20' : '80') + ' 0%, ' + (options.artwork?.accentColor|| options?.color || accentColor) + '00 ' + (mode == 'titleOnly' ? '40%' : '100%') + ');'"></div>
+    <div class="absolute left-0 top-0 w-full h-[50vh]" [style]="'background: linear-gradient(180deg, ' + (artwork?.accentColor || options.artwork?.accentColor || options?.color || accentColor) + (mode == 'titleOnly' ? '20' : '80') + ' 0%, ' + (artwork?.accentColor || options.artwork?.accentColor|| options?.color || accentColor) + '00 ' + (mode == 'titleOnly' ? '40%' : '100%') + ');'"></div>
 
     <!-- Playlist title section -->
     <section class="block md:flex md:flex-1 md:items-end z-10 relative">
         <!-- Playlist cover -->
         <div class="block min-w-48 max-w-48 mx-auto md:m-0 relative" *ngIf="mode != 'titleOnly'" [ngClass]="{'block aspect-square rounded-full overflow-hidden shadow-2xl': options?.type == 'user'}">
-            <asc-artwork *ngIf="options?.type != 'user'" [artwork]="options.artwork" class="block aspect-square rounded-2xl overflow-hidden shadow-xl z-10" [showAccent]="false"></asc-artwork>
-            <asc-user-avatar *ngIf="options?.type == 'user'" [resourceId]="options?.artwork?.id" class="z-10"></asc-user-avatar>
+            <asc-artwork *ngIf="options?.type != 'user'" [artwork]="artwork || options.artwork" class="block aspect-square rounded-2xl overflow-hidden shadow-xl z-10" [showAccent]="false"></asc-artwork>
+            <asc-user-avatar *ngIf="options?.type == 'user'" [resourceId]="artwork?.id || options?.artwork?.id" class="z-10"></asc-user-avatar>
 
             <asc-label-badge *ngIf="options?.privacy && options?.privacy != 'public'" class="absolute top-2 left-2 opacity-70">{{ options.privacy | playlistPrivacyPipe }}</asc-label-badge>
         </div>
@@ -27,7 +27,7 @@
     <!-- Playlist controls -->
     <section class="flex my-row items-center w-full gap-2 border" *ngIf="mode != 'titleOnly'">
         <asc-play-button [isPaused]="isPaused" *ngIf="playable" (click)="onPlay.emit()"></asc-play-button>
-        <asc-like-button *ngIf="likeable" (click)="onLike.emit()"></asc-like-button>
+        <asc-like-button *ngIf="likeable" [isLiked]="isLiked" (click)="onLike.emit()"></asc-like-button>
     </section>
 
     <section class="relative my-row z-10" [ngClass]="{'md:my-12': mode != 'titleOnly'}">

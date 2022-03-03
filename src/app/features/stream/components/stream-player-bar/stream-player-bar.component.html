@@ -50,7 +50,7 @@
             <p class="text-right text-xxs opacity-60 font-light">{{ (audioService.$currentTime | async) | songDurationPipe }} / {{ ((audioService.$currentSong | async)?.duration || 0) | songDurationPipe }}</p>
             
             <!-- Like button -->
-            <asc-like-button [isLiked]="(audioService.$currentSong | async)?.isLiked" (click)="likeSong()" *ngIf="(audioService.$currentSong | async)"></asc-like-button>
+            <asc-like-button [isLiked]="(audioService.$currentSong | async)?.liked" (click)="likeSong()" *ngIf="(audioService.$currentSong | async)"></asc-like-button>
             
             <button matRipple [matRippleUnbounded]="true" [matRippleCentered]="true" [matRippleRadius]="16" [matRippleAnimation]="{ enterDuration: 100, exitDuration: 250 }" class="w-5 h-5 flex justify-center items-center"><i class="text-white-dark fa-solid fa-list"></i></button>
         

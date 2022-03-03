@@ -1,6 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { BehaviorSubject, Observable, Subject, takeUntil } from 'rxjs';
+import { GenreService } from 'src/app/features/genre/services/genre.service';
 import { Genre } from 'src/app/model/genre.entity';
 import { ScrollService } from 'src/app/services/scroll.service';
 import { Artist } from '../../entities/artist.entity';
@@ -29,6 +30,7 @@ export class ArtistGenresComponent implements OnInit, OnDestroy {
 
   constructor(
     private activatedRoute: ActivatedRoute,
+    private genreService: GenreService,
     private artistService: ArtistService,
     private scrollService: ScrollService
   ) { }
@@ -58,7 +60,7 @@ export class ArtistGenresComponent implements OnInit, OnDestroy {
   }
 
   public async findGenres() {
-    this.artistService.findGenresByArtist(this.artist?.id, { size: 50, page: this.currentPage }).then((page) => {
+    this.genreService.findGenresByArtist(this.artist?.id, { size: 50, page: this.currentPage }).then((page) => {
       this.totalElements = page.totalElements
 
       if(page.elements.length > 0) {

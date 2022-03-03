@@ -8,6 +8,7 @@ import { Playlist } from 'src/app/features/playlist/entities/playlist.entity';
 import { Genre } from 'src/app/model/genre.entity';
 import { Page } from 'src/app/pagination/pagination';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
+import { GenreService } from 'src/app/features/genre/services/genre.service';
 
 @Component({
   selector: 'asc-artist-info',
@@ -36,6 +37,7 @@ export class ArtistInfoComponent implements OnInit, OnDestroy {
 
   constructor(
     private activatedRoute: ActivatedRoute,
+    private genreService: GenreService,
     private artistService: ArtistService,
     public router: Router
   ) { }
@@ -60,7 +62,7 @@ export class ArtistInfoComponent implements OnInit, OnDestroy {
           ])
         })
 
-        this.artistService.findGenresByArtist(artistId, { size: 12, page: 0 }).then((page) => {
+        this.genreService.findGenresByArtist(artistId, { size: 12, page: 0 }).then((page) => {
           this.genres = page;
         })
 

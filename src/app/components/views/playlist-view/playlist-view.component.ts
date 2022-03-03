@@ -29,13 +29,18 @@ export class PlaylistViewComponent implements OnInit, OnDestroy {
   @Input() public mode: "default" | "titleOnly" | "reduced" = "default"
   @Input() public playable: boolean = true;
   @Input() public likeable: boolean = true;
+  @Input() public isLiked: boolean = false;
   @Input() public followable: boolean = false;
   @Input() public isPaused: boolean = true;
+
+  @Input() public artwork: Artwork;
 
   @Input() public options: PlaylistViewOptions = {
     type: "playlist",
     privacy: "public",
     title: "Unknown title",
+
+    // TODO: Remove artwork from options object
     artwork: undefined,
     color: this.colorWhite
   };

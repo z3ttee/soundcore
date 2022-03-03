@@ -1,8 +1,12 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { BehaviorSubject, Observable, Subject } from 'rxjs';
+import { ActivatedRoute } from '@angular/router';
+import { BehaviorSubject, filter, map, Observable, Subject, takeUntil } from 'rxjs';
+import { Album } from 'src/app/features/album/entities/album.entity';
+import { AlbumService } from 'src/app/features/album/services/album.service';
 import { AudioService } from 'src/app/features/stream/services/audio.service';
 import { LikeService } from 'src/app/services/like.service';
 import { Song } from '../../entities/song.entity';
+import { SongService } from '../../services/song.service';
 
 @Component({
   selector: 'asc-song-info',
@@ -11,25 +15,56 @@ import { Song } from '../../entities/song.entity';
 })
 export class SongInfoComponent implements OnInit, OnDestroy {
 
-  private _songSubject: BehaviorSubject<Song> = new BehaviorSubject(null);
-  public $song: Observable<Song> = this._songSubject.asObservable();
-
   constructor(
+    public songService: SongService,
+    private albumService: AlbumService,
     public audioService: AudioService,
-    private likeService: LikeService
+    private likeService: LikeService,
+    private activatedRoute: ActivatedRoute
   ) { }
 
-  public ngOnInit(): void {}
+  // Destroy subscriptions
+  private _destroySubject: Subject<void> = new Subject();
+  private $destroy: Observable<void> = this._destroySubject.asObservable();
+
+  // Data providers
+  private songId: string;
+
+  private _songSubject: BehaviorSubject<Song> = new BehaviorSubject(null);
+  private _recommendedAlbumsSubject: BehaviorSubject<Album[]> = new BehaviorSubject([]);
+
+  public $song: Observable<Song> = this._songSubject.asObservable().pipe(takeUntil(this.$destroy));
+  public $recommendedAlbums: Observable<Album[]> = this._recommendedAlbumsSubject.asObservable().pipe(takeUntil(this.$destroy));
+  public $dataSource: Observable<Song[]> = this._songSubject.asObservable().pipe(takeUntil(this.$destroy), map((song) => !song ? [] : [song]));
+
+  public ngOnInit(): void {
+
+    // Subscribe to route changes
+    this.activatedRoute.paramMap.pipe(takeUntil(this.$destroy)).subscribe((paramMap) => {
+      this.songId = paramMap.get("songId")
+      this.songService.findById(this.songId).then((song) => {
+        this._songSubject.next(song);
+
+        this.albumService.findRecommendedByArtist(song?.artists?.[0]?.id).then((page) => {
+          this._recommendedAlbumsSubject.next(page.elements);
+        })
+      })
+    })
+
+    // Subscribe to like changes
+    this.likeService.$onSongLike.pipe(takeUntil(this.$destroy), filter((song) => song.id == this.songId)).subscribe((song) => {
+      this._songSubject.next(song);
+    })
+
+  }
+
   public ngOnDestroy(): void {
-      this._songSubject.complete();
+    this._destroySubject.next();
+    this._destroySubject.complete();
   }
 
   public likeSong() {
-    const song = this._songSubject.getValue();
-    this.likeService.likeSong(song).then((isLiked) => {
-      song.isLiked = isLiked;
-      this._songSubject.next(song);
-    });
+    this.likeService.likeSong(this._songSubject.getValue())
   }
 
   public playOrPause() {

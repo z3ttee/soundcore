@@ -52,7 +52,7 @@ export class CollectionInfoComponent implements OnInit, OnDestroy {
     })
 
     this.likeService.$onSongLike.pipe(takeUntil(this.$destroy)).subscribe((song) => {
-        if(song.isLiked) this.addSong(song)
+        if(song.liked) this.addSong(song)
         else this.removeSong(song)
     })
   }
@@ -79,7 +79,7 @@ export class CollectionInfoComponent implements OnInit, OnDestroy {
     const existing = songs.find((s) => s?.id == song?.id);
 
     if(existing) {
-      existing.isLiked = song?.isLiked
+      existing.liked = song?.liked
     } else {
       songs.push(song);
       this._songsSubject.next(songs);

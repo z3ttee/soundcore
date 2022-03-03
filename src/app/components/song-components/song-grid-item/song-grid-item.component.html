@@ -1,7 +1,7 @@
-<div (contextmenu)="songMenu.open($event, song)" [routerLink]="['/song', song?.id]" class="item-container transition-all p-3 rounded-md text-center flex flex-1 flex-col overflow-hidden h-full cursor-pointer w-full bg-background-light border-2 border-transparent hover:border-primary active:bg-background-dark">
+<div (contextmenu)="songMenu.open($event, song)" [routerLink]="['/song', song?.slug || song?.id]" class="item-container transition-all p-3 rounded-md text-center flex flex-1 flex-col overflow-hidden h-full cursor-pointer w-full bg-background-light border-2 border-transparent hover:border-primary active:bg-background-dark">
 
     <div class="block relative">
-        <div [ngClass]="{'active': isActive}" class="play-button transition-all transform-gpu absolute bottom-2 right-2 rounded-full bg-accent-dark shadow-lg text-background w-10 h-10 overflow-hidden flex justify-center items-center hover:scale-105" (click)="playOrPause()">
+        <div [ngClass]="{'active': isActive}" class="play-button transition-all transform-gpu absolute bottom-2 right-2 rounded-full bg-accent-dark shadow-lg text-background w-10 h-10 overflow-hidden flex justify-center items-center hover:scale-105" (click)="playOrPause($event)">
             <i class="fa-solid fa-pause" *ngIf="!isPlayerPaused && isActive"></i>
             <i class="fa-solid fa-play" *ngIf="isPlayerPaused && isActive"></i>
             <i class="fa-solid fa-play" *ngIf="!isActive"></i>

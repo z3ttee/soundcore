@@ -2,6 +2,7 @@ import { Injectable } from "@angular/core";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { BehaviorSubject, filter, interval, Observable, skip, takeUntil, timer } from "rxjs";
 import { PlayableList } from "src/app/entities/playable-list.entity";
+import { SnackbarService } from "src/app/services/snackbar.service";
 import { environment } from "src/environments/environment";
 import { Song } from "../../song/entities/song.entity";
 import { StreamQueueService } from "./queue.service";
@@ -51,7 +52,7 @@ export class AudioService {
     constructor(
         private streamService: StreamService,
         private queueService: StreamQueueService,
-        private _snackBar: MatSnackBar
+        private snackbarService: SnackbarService
     ) {
         this.$queueSize = this.queueService.$size;
         this.reset();
@@ -227,6 +228,8 @@ export class AudioService {
         console.log(done)
         this.queueService.enqueueSong(song);
 
+        this.snackbarService.info("Song zur Warteschlange hinzugefügt.")
+
         if(done) {
             this.next();
         }
@@ -236,6 +239,8 @@ export class AudioService {
         const done = this._doneSubject.getValue();
         console.log(done)
         this.queueService.enqueueList(list);
+
+
 
         if(done) {
             this.next();
@@ -354,7 +359,8 @@ export class AudioService {
     }
 
     private showError(message: string) {
-        this._snackBar.open(message, null, { duration: 3000, panelClass: ["bg-primary", "bg-opacity-90", "backdrop-blur-sm", "text-white-dark", "border-2", "border-primary-light", "bottom-1/2"]})
+        this.snackbarService.error(message);
+        // this._snackBar.open(message, null, { duration: 3000, panelClass: ["bg-primary", "bg-opacity-90", "backdrop-blur-sm", "text-white-dark", "border-2", "border-primary-light", "bottom-1/2"]})
     }
 
 }

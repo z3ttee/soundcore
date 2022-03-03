@@ -2,7 +2,7 @@ import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { firstValueFrom } from "rxjs";
 import { Genre } from "src/app/model/genre.entity";
-import { Page } from "src/app/pagination/pagination";
+import { Page, Pageable } from "src/app/pagination/pagination";
 import { environment } from "src/environments/environment";
 import { Album } from "../../album/entities/album.entity";
 import { Playlist } from "../../playlist/entities/playlist.entity";
@@ -16,6 +16,11 @@ export class GenreService {
 
     public async findGenreById(genreId: string): Promise<Genre> {
         return firstValueFrom(this.httpClient.get(`${environment.api_base_uri}/v1/genres/${genreId}`)) as Promise<Genre>
+    }
+
+    public async findGenresByArtist(artistId: string, pageable: Pageable): Promise<Page<Genre>> {
+        if(!artistId) return Page.of([])
+        return firstValueFrom(this.httpClient.get<Page<Genre>>(`${environment.api_base_uri}/v1/genres/byArtist/${artistId}${Pageable.toQuery(pageable)}`))
     }
 
     public async findPlaylistsByGenre(genreId: string): Promise<Page<Playlist>> {

@@ -15,8 +15,8 @@
             <span class="text-white-dark text-sm">Aus Playlist entfernen</span>
         </li>
         <li class="py-3 px-4 bg-opacity-95 hover:bg-background-light active:bg-primary transition-all rounded-md cursor-pointer" (click)="toggleLike()">
-            <span class="text-white-dark text-sm" *ngIf="song?.isLiked">Von Lieblingssongs entfernen</span>
-            <span class="text-white-dark text-sm" *ngIf="!song?.isLiked">Zu Lieblingssongs hinzufügen</span>
+            <span class="text-white-dark text-sm" *ngIf="song?.liked">Von Lieblingssongs entfernen</span>
+            <span class="text-white-dark text-sm" *ngIf="!song?.liked">Zu Lieblingssongs hinzufügen</span>
         </li>
     </ul>
 

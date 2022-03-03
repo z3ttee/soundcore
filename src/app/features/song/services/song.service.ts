@@ -14,6 +14,11 @@ export class SongService {
     private httpClient: HttpClient
   ) {}
 
+  public async findById(songId: string): Promise<Song> {
+    if(!songId) return null;
+    return firstValueFrom(this.httpClient.get<Song>(`${environment.api_base_uri}/v1/songs/${songId}`))
+  }
+
   public findLatestSongs(): Observable<Page<Song>> {
       return this.httpClient.get(`${environment.api_base_uri}/v1/songs/latest`) as Observable<Page<Song>>
   }
