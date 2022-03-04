@@ -12,7 +12,7 @@ export class ListCreator {
     constructor(private httpClient: HttpClient) {}
 
     public forPlaylist(context: Playlist) {
-        return new PlayableList<Playlist>("playlist", this.httpClient, `${environment.api_base_uri}/v1/songs/byPlaylist/${context.id}/ids`, `${environment.api_base_uri}/v1/songs`, context);
+        return new PlayableList<Playlist>("playlist", this.httpClient, `${environment.api_base_uri}/v1/songs/byPlaylist/${context.id}/ids`, `${environment.api_base_uri}/v1/songs/byPlaylist/${context.id}`, context);
     }
 
     /*public forArtist(context: Artist) {

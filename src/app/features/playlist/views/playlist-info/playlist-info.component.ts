@@ -45,10 +45,6 @@ export class PlaylistInfoComponent implements OnInit, OnDestroy {
 
   public $user: Observable<User> = this.authService.$user.pipe(takeUntil(this.$destroy));
 
-  // Pagination
-  private currentPage: number = 0;
-  public totalElements: number = 0;
-
   public async ngOnInit(): Promise<void> {
     this.activatedRoute.paramMap.pipe(takeUntil(this.$destroy)).subscribe((paramMap) => {
       this.reset();
@@ -68,12 +64,12 @@ export class PlaylistInfoComponent implements OnInit, OnDestroy {
       }).finally(() => this.isLoading = false);
 
       this.scrollService.$onBottomReached.pipe(takeUntil(this.$destroy)).subscribe(() => this.findSongs())
-      /*this.playlistService.$onSongsAdded.pipe(takeUntil(this.$destroy), filter((event) => event?.playlistId == this.playlistId), map((event) => event.songs)).subscribe((songs) => {
-        this.addSongs(songs)
+      this.playlistService.$onSongsAdded.pipe(takeUntil(this.$destroy), filter((event) => event?.playlistId == this.playlistId), map((event) => event.songs)).subscribe((songs) => {
+        this.playableList.addSongBulk(songs);
       })
       this.playlistService.$onSongsRemoved.pipe(takeUntil(this.$destroy), filter((event) => event?.playlistId == this.playlistId), map((event) => event.songs)).subscribe((songs) => {
-        this.addSongs(songs)
-      })*/
+        this.playableList.removeSongBulk(songs);
+      })
     })
   }
 
@@ -86,8 +82,6 @@ export class PlaylistInfoComponent implements OnInit, OnDestroy {
     this._songsSubject.next([]);
     this.playlist = null;
     this.playlistId = null;
-    this.totalElements = 0;
-    this.currentPage = 0;
   }
 
   public async findSongs() {
@@ -95,29 +89,13 @@ export class PlaylistInfoComponent implements OnInit, OnDestroy {
   }
 
   public async playOrPauseList() {
-    // TODO: Just a prototype
-    const list = this.listCreator.forPlaylist(this.playlist);
-    console.log(list)
-    this.audioService.playList(list)
+    this.audioService.playList(this.playableList)
   }
 
   public async likePlaylist() {
     this.likeService.likePlaylist(this.playlist).then(() => {
       this.playlist.isLiked = !this.playlist?.isLiked;
     })
-  }
-
-  public async addSongs(songs: Song[]) {
-    const songsArr = this._songsSubject.getValue();
-    const songsArrIds = songsArr.map((song) => song?.id);
-    
-    songsArr.push(...songs.filter((song) => !songsArrIds.includes(song?.id)));
-    this._songsSubject.next(songsArr);
-  }
-
-  public async removeSongs(songs: Song[]) {
-    const songIds = songs.map((song) => song?.id);
-    this._songsSubject.next(this._songsSubject.getValue().filter((song) => !songIds.includes(song?.id)));
   }
 
 }

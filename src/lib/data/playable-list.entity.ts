@@ -174,6 +174,36 @@ export class PlayableList<T> {
         })
     }
 
+    public async addSong(song: Song) {
+        this._resources[song.id] = song;
+        this._resourcesQueue.push(song.id);
+        this._dataSource[song.id] = song;
+        this._dataSourceSubject.next(Object.values(this._dataSource));
+    }
 
+    public async addSongBulk(songs: Song[]) {
+        for(const song of songs) {
+            await this.addSong(song);
+        }
+    }
+
+    public async removeSong(song: Song) {
+        const index = this._resourcesQueue.findIndex((id) => id == song.id);
+        if(index != -1) this._resourcesQueue.splice(index, 1);
+
+        delete this._resources[song.id];
+        delete this._dataSource[song.id];
+
+        this._dataSourceSubject.next(Object.values(this._dataSource));
+
+        this._totalElements--;
+        this._totalElementsSubject.next(this._totalElements);
+    }
+
+    public async removeSongBulk(songs: Song[]) {
+        for(const song of songs) {
+            await this.removeSong(song);
+        }
+    }
 
 }
