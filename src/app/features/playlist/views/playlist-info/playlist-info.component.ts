@@ -1,13 +1,14 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { BehaviorSubject, filter, map, Observable, Subject, takeUntil } from 'rxjs';
-import { PlayableList } from 'src/app/entities/playable-list.entity';
 import { Song } from 'src/app/features/song/entities/song.entity';
 import { AudioService } from 'src/app/features/stream/services/audio.service';
 import { User } from 'src/app/features/user/entities/user.entity';
 import { LikeService } from 'src/app/services/like.service';
 import { ScrollService } from 'src/app/services/scroll.service';
 import { AuthenticationService } from 'src/app/sso/authentication.service';
+import { ListCreator } from 'src/lib/data/list-creator';
+import { PlayableList } from 'src/lib/data/playable-list.entity';
 import { Playlist } from '../../entities/playlist.entity';
 import { PlaylistService } from '../../services/playlist.service';
 
@@ -23,7 +24,8 @@ export class PlaylistInfoComponent implements OnInit, OnDestroy {
     private authService: AuthenticationService,
     private scrollService: ScrollService,
     private likeService: LikeService,
-    public audioService: AudioService
+    public audioService: AudioService,
+    private listCreator: ListCreator
   ) { }
 
   private _destroySubject: Subject<void> = new Subject();
@@ -38,6 +40,7 @@ export class PlaylistInfoComponent implements OnInit, OnDestroy {
 
   public playlistId: string = null;
   public playlist: Playlist = null;
+  public playableList: PlayableList<Playlist>;
   public $songs: Observable<Song[]> = this._songsSubject.asObservable();
 
   public $user: Observable<User> = this.authService.$user.pipe(takeUntil(this.$destroy));
@@ -53,17 +56,24 @@ export class PlaylistInfoComponent implements OnInit, OnDestroy {
       this.playlistId = paramMap.get("playlistId");
 
       this.isLoading = true;
+      // Find playlist by route parameter
       this.playlistService.findById(this.playlistId).then((playlist) => {
+
+        // Update playlist and also playable list
         this.playlist = playlist;
+        this.playableList = this.listCreator.forPlaylist(this.playlist);
+
+        // Bind dataSource to component datasource
+        this.$songs = this.playableList.$dataSource;
       }).finally(() => this.isLoading = false);
 
       this.scrollService.$onBottomReached.pipe(takeUntil(this.$destroy)).subscribe(() => this.findSongs())
-      this.playlistService.$onSongsAdded.pipe(takeUntil(this.$destroy), filter((event) => event?.playlistId == this.playlistId), map((event) => event.songs)).subscribe((songs) => {
+      /*this.playlistService.$onSongsAdded.pipe(takeUntil(this.$destroy), filter((event) => event?.playlistId == this.playlistId), map((event) => event.songs)).subscribe((songs) => {
         this.addSongs(songs)
       })
       this.playlistService.$onSongsRemoved.pipe(takeUntil(this.$destroy), filter((event) => event?.playlistId == this.playlistId), map((event) => event.songs)).subscribe((songs) => {
         this.addSongs(songs)
-      })
+      })*/
     })
   }
 
@@ -81,21 +91,14 @@ export class PlaylistInfoComponent implements OnInit, OnDestroy {
   }
 
   public async findSongs() {
-    this.playlistService.findSongsByPlaylist(this.playlistId, { page: this.currentPage }).then((page) => {
-      this.totalElements = page.totalElements;
-      if(page.elements.length > 0) this.currentPage++;
-      this._songsSubject.next([
-        ...this._songsSubject.getValue(),
-        ...page.elements
-      ])
-    });
+    this.playableList?.fetchNextPage()
   }
 
   public async playOrPauseList() {
     // TODO: Just a prototype
-    const playlist = PlayableList.forPlaylist(this.playlistId, 0);
-    console.log(playlist)
-    this.audioService.playList(playlist)
+    const list = this.listCreator.forPlaylist(this.playlist);
+    console.log(list)
+    this.audioService.playList(list)
   }
 
   public async likePlaylist() {

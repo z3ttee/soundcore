@@ -1,13 +1,13 @@
 import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { map, Observable, Subject, takeUntil } from 'rxjs';
-import { PlayableList } from 'src/app/entities/playable-list.entity';
 import { Playlist } from 'src/app/features/playlist/entities/playlist.entity';
 import { PlaylistService } from 'src/app/features/playlist/services/playlist.service';
 import { AudioService } from 'src/app/features/stream/services/audio.service';
 import { ContextMenuService } from 'src/app/services/context-menu.service';
 import { DeviceService } from 'src/app/services/device.service';
 import { AuthenticationService } from 'src/app/sso/authentication.service';
+import { ListCreator } from 'src/lib/data/list-creator';
 import { AscContextMenuTemplateComponent } from '../context-menu-template/context-menu-template.component';
 
 @Component({
@@ -27,7 +27,8 @@ export class AscPlaylistContextMenuComponent implements OnInit, OnDestroy {
     public deviceService: DeviceService,
 
     private contextService: ContextMenuService,
-    private snackbar: MatSnackBar
+    private snackbar: MatSnackBar,
+    private listCreator: ListCreator
   ) { }
 
   // Destroy subscriptions
@@ -48,13 +49,13 @@ export class AscPlaylistContextMenuComponent implements OnInit, OnDestroy {
   }
 
   public async playList() {
-    const list = PlayableList.forPlaylist(this.playlist.id, 0);
+    const list = this.listCreator.forPlaylist(this.playlist);
     this.audioService.playList(list);
     this.contextService.close();
   }
 
   public async enqueueList() {
-    const list = PlayableList.forPlaylist(this.playlist.id, 0);
+    const list = this.listCreator.forPlaylist(this.playlist);
     this.audioService.enqueueList(list)
     this.contextService.close();
   }

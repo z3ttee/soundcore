@@ -1,9 +1,8 @@
 import { Injectable } from "@angular/core";
-import { MatSnackBar } from "@angular/material/snack-bar";
 import { BehaviorSubject, filter, interval, Observable, skip, takeUntil, timer } from "rxjs";
-import { PlayableList } from "src/app/entities/playable-list.entity";
 import { SnackbarService } from "src/app/services/snackbar.service";
 import { environment } from "src/environments/environment";
+import { PlayableList } from "src/lib/data/playable-list.entity";
 import { Song } from "../../song/entities/song.entity";
 import { StreamQueueService } from "./queue.service";
 import { StreamService } from "./stream.service";

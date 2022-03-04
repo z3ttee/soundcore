@@ -1,7 +1,6 @@
-import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { BehaviorSubject, Observable } from "rxjs";
-import { PlayableList } from "src/app/entities/playable-list.entity";
+import { PlayableList } from "src/lib/data/playable-list.entity";
 import { Song } from "../../song/entities/song.entity";
 import { QueueItem, QueueList, QueueSong } from "../entities/queue-item.entity";
 
@@ -12,8 +11,6 @@ export class StreamQueueService {
     private _queue: QueueItem[] = [];
 
     public $size: Observable<number> = this._sizeSubject.asObservable();
-
-    constructor(private httpClient: HttpClient) {}
 
     /**
      * Returns calculate size of the whole queue. This takes single
@@ -99,12 +96,12 @@ export class StreamQueueService {
      * @returns Song
      */
      public enqueueList(list: PlayableList<any>): void {
-        if(this._queue.findIndex((i: QueueList) => i.isList && i?.item?.resourceId == list.resourceId) != -1) {
+        if(this._queue.findIndex((i: QueueList) => i.isList && i?.item?.context.id == list.context.id) != -1) {
             console.warn("[QUEUE] Cannot enqueue playable list. Already in queue")
             return;
         }
         
-        this._queue.push(new QueueList(list, this.httpClient));
+        this._queue.push(new QueueList(list));
         this.setNewSize(this.size);
     }
 
