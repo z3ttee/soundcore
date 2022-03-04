@@ -1,32 +1,23 @@
-<section class="p-window" *ngIf="index">
-    <div class="mb-4 flex flex-1 items-center">
-        <div class="p-4 bg-background-light rounded-xl">
-            <img src="assets/img/icon_file.png" class="w-24 h-24">
-        </div>
-
-        <div class="p-4">
-            <h5 class="opacity-40">Index</h5>
-            <h2>{{ index?.filename || "Unknown filename" }}</h2>
-        </div>
+<asc-storage-item-view [type]="'index'" [item]="($index | async)">
+    <div class="flex items-center gap-2" asc-stats>
+        <asc-label-badge>{{ ($index | async)?.status | indexStatusPipe }}</asc-label-badge>
+        <asc-label-badge>{{ ($index | async)?.size | diskSpacePipe }}</asc-label-badge>
     </div>
+</asc-storage-item-view>
 
-    <div class="my-8">
+<div class="px-window my-row">
+    <h5 class="pb-2">Bericht</h5>
 
-        <h6 *ngIf="report">Report</h6>
-        <div class="bg-background-light w-full p-4 rounded-md" *ngIf="report">
+    <div class="bg-background-light w-full p-4 rounded-md" *ngIf="($report | async)">
+        <div class="flex items-start gap-3 p-2 py-3 w-full border-b-2 border-primary-light" *ngFor="let element of ($report | async)?.jsonContents">
+            <p class="min-w-56 max-w-56 font-mono text-sm">{{ element?.timestamp | date:"dd.mm.yyyy - HH:mm:ss.SSS "}}</p>
+            <p class="min-w-16 max-w-16 font-mono text-sm">{{ element?.status?.toUpperCase() }}</p>
 
-            <div class="flex items-start gap-3 p-2 py-3 w-full border-b-2 border-primary-light" *ngFor="let element of report?.jsonContents">
-                <p class="min-w-56 max-w-56 font-mono text-sm">{{ element?.timestamp | date:"dd.mm.yyyy - HH:mm:ss.SSS "}}</p>
-                <p class="min-w-16 max-w-16 font-mono text-sm">{{ element?.status?.toUpperCase() }}</p>
-
-                <div class="w-full">
-                    <p class="w-full font-mono text-sm">{{ element?.message }}</p>
-                    <p class="bg-background-dark rounded-md p-2 w-full font-mono text-xs mt-2" *ngIf="element?.stack">{{ element?.stack }}</p>
-                    <p class="bg-background-dark rounded-md p-2 w-full font-mono text-xs mt-2" *ngIf="element?.context">{{ element?.context | json }}</p>
-                </div>
-                
+            <div class="w-full">
+                <p class="w-full font-mono text-sm">{{ element?.message }}</p>
+                <p class="bg-background-dark rounded-md p-2 w-full font-mono text-xs mt-2" *ngIf="element?.stack">{{ element?.stack }}</p>
+                <p class="bg-background-dark rounded-md p-2 w-full font-mono text-xs mt-2" *ngIf="element?.context">{{ element?.context | json }}</p>
             </div>
-
         </div>
     </div>
-</section>
+</div>

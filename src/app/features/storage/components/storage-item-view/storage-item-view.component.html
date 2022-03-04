@@ -1,0 +1,26 @@
+<section class="relative p-window pb-0">
+    <div class="mb-row" *ngIf="error">
+        <asc-message [mode]="'error'">
+            {{ error?.["message"] || error || "Unbekannter Fehler" }}
+        </asc-message>
+    </div>
+
+    <!-- Storage item view title section -->
+    <section class="block md:flex md:flex-1 md:items-end z-10 relative">
+        <!-- Playlist cover -->
+        <div class="min-w-48 max-w-48 h-48 md:h-32 md:min-w-32 md:max-w-32 p-4 bg-background-light rounded-xl  mx-auto md:m-0 relative">
+            <img src="assets/img/icon_{{type}}.png" class="w-full h-full">
+        </div>
+
+        <!-- Storage item view title -->
+        <div class="z-30 md:px-4 w-full pointer-events-auto mt-row md:m-0">
+            <h6 class="font-light md:font-bold md:-mb-1 text-sm md:text-lg md:block hidden">{{ type | storageItemTypePipe }}</h6>
+            <h1 class="my-2 md:m-0 line-clamp-1 text-2xl md:text-5xl drop-shadow-md">{{ item?.["name"] || item?.["filename"] }}</h1>
+
+            <!-- Quick info bar below title -->
+            <div class="block w-full">
+                <ng-content></ng-content>
+            </div>
+        </div>
+    </section>
+</section>

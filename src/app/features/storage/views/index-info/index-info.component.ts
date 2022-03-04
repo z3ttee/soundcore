@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Observable, Subject, takeUntil } from 'rxjs';
+import { BehaviorSubject, Observable, Subject, takeUntil } from 'rxjs';
 import { Index } from 'src/app/features/upload/entities/index.entity';
 import { IndexReport } from '../../entities/index-report.entity';
 import { IndexService } from '../../services/index.service';
@@ -24,9 +24,13 @@ export class IndexInfoComponent implements OnInit, OnDestroy {
 
   // Data providers
   private indexId: string;
-  public index: Index;
-  public report: IndexReport;
 
+  private _indexSubject: BehaviorSubject<Index> = new BehaviorSubject(null);
+  private _reportSubject: BehaviorSubject<IndexReport> = new BehaviorSubject(null);
+
+  public $index: Observable<Index> = this._indexSubject.asObservable().pipe(takeUntil(this.$destroy));
+  public $report: Observable<IndexReport> = this._reportSubject.asObservable().pipe(takeUntil(this.$destroy));
+  
   // Loading states
   public isLoading: boolean = false;
 
@@ -49,15 +53,13 @@ export class IndexInfoComponent implements OnInit, OnDestroy {
   public async findIndex() {
     this.isLoading = true;
     this.indexService.findById(this.indexId).then((index) => {
-      this.index = index;
-      console.log(index)
+      this._indexSubject.next(index);
     }).finally(() => this.isLoading = false)
   }
 
   public async findReportByIndex() {
     this.indexService.findReportByIndex(this.indexId).then((report) => {
-      this.report = report;
-      console.log(report)
+      this._reportSubject.next(report);
     })
   }
 

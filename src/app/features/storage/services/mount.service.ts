@@ -31,11 +31,17 @@ export class MountService {
     }
 
     public async create(createMountDto: CreateMountDTO): Promise<Mount> {
-        return firstValueFrom(this.httpClient.post(`${environment.api_base_uri}/v1/mounts`, createMountDto)) as Promise<Mount>
+        return firstValueFrom(this.httpClient.post<Mount>(`${environment.api_base_uri}/v1/mounts`, createMountDto)).then((mount) => {
+            this.snackbarService.info(`Mount erstellt.`)
+            return mount;
+        })
     }
 
     public async update(mountId: string, updateMountDto: UpdateMountDTO): Promise<Mount> {
-        return firstValueFrom(this.httpClient.put(`${environment.api_base_uri}/v1/mounts/${mountId}`, updateMountDto)) as Promise<Mount>
+        return firstValueFrom(this.httpClient.put<Mount>(`${environment.api_base_uri}/v1/mounts/${mountId}`, updateMountDto)).then((mount) => {
+            this.snackbarService.info(`Mount aktualisiert.`)
+            return mount;
+        })
     }
 
     public async delete(mountId: string): Promise<boolean> {

@@ -28,6 +28,9 @@ import { AscBadgeModule } from 'src/app/components/badge-components/badge-compon
 import { IndexListItemComponent } from './components/index-list-item/index-list-item.component';
 import { PipesModule } from 'src/app/pipes/pipes.module';
 import { MountEditorDialog } from './dialogs/mount-editor/mount-editor.dialog';
+import { StorageItemViewComponent } from './components/storage-item-view/storage-item-view.component';
+import { StorageItemTypePipeModule } from 'src/app/pipes/storage-item-type/storage-item-type.module';
+import { AscImageModule } from 'src/app/components/image-components/image-components.module';
 
 const routes: Routes = [
 
@@ -47,7 +50,8 @@ const routes: Routes = [
     BucketListItemComponent,
     IndexListItemComponent,
     MountInfoComponent,
-    IndexInfoComponent
+    IndexInfoComponent,
+    StorageItemViewComponent
   ],
   imports: [
     CommonModule,
@@ -61,6 +65,8 @@ const routes: Routes = [
     AscInterfaceListItemTemplateModule,
     AscInterfaceListModule,
     AscBadgeModule,
+
+    StorageItemTypePipeModule,
 
     MatSelectModule,
     MatButtonModule,
