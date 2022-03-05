@@ -32,7 +32,7 @@ export class ContextMenuService {
         event.stopPropagation();
 
         if(navigator.vibrate) {
-            navigator?.vibrate(150);
+            navigator?.vibrate(80);
         }
 
         await this.close();
