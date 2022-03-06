@@ -10,6 +10,7 @@ import { SongListComponent } from './song-list/song-list.component';
 import { MatButtonModule } from '@angular/material/button';
 import {CdkTableModule} from '@angular/cdk/table';
 import { AscSongContextMenuModule } from '../context-menus/song-context-menu/song-context-menu.module';
+import { AscGridItemTemplateModule } from '../grid-items/grid-item-template/grid-item-template.module';
 
 export function playerFactory() {
   return player
@@ -27,6 +28,7 @@ export function playerFactory() {
 
     AscImageModule,
     AscSongContextMenuModule,
+    AscGridItemTemplateModule,
 
     MatButtonModule,
     CdkTableModule,

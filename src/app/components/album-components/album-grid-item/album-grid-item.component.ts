@@ -20,7 +20,7 @@ export class AlbumGridItemComponent implements OnInit {
   public $isPlaying: Observable<boolean>;
 
   constructor(private audioService: AudioService) {
-    this.$isPlaying = this.audioService.$currentSong.pipe(map((song) => !!song?.albums?.find((album) => album.id == this.album.id)));
+    this.$isPlaying = this.audioService.$currentItem.pipe(map((item) => !!item?.song?.albums?.find((album) => album.id == this.album.id)));
   }
 
   public async ngOnInit() {

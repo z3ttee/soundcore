@@ -42,7 +42,7 @@ export class SongContextMenuComponent implements OnInit, OnDestroy {
   public song: Song;
   public playlist: Playlist;
 
-  public $isPlaying: Observable<boolean> = this.audioService.$currentSong.pipe(takeUntil(this.$destroy), map((song) => !!song && song?.id == this.song?.id));
+  public $isPlaying: Observable<boolean> = this.audioService.$currentItem.pipe(takeUntil(this.$destroy), map((song) => !!song && song?.id == this.song?.id));
   public $isPlayerPaused: Observable<boolean> = this.audioService.$paused.pipe(takeUntil(this.$destroy));
 
   public ngOnInit(): void {}

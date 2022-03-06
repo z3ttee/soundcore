@@ -5,16 +5,16 @@
     <td cdk-cell *cdkCellDef="let element; let i = index" class="text-center relative sm:table-cell hidden">
         
         <div class="play-btn z-10 transition-all transform-gpu absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 will-change-transform rounded-full bg-accent-dark shadow-lg text-background w-7 h-7 overflow-hidden flex justify-center items-center" (click)="playOrPause(element)">
-            <i class="fa-solid fa-play text-xxs" *ngIf="(audioService.$currentSong | async)?.id != element.id"></i>
-            <i class="fa-solid fa-play text-xxs" *ngIf="(audioService.$paused | async) && (audioService.$currentSong | async)?.id == element.id"></i>
-            <i class="fa-solid fa-pause text-xxs" *ngIf="!(audioService.$paused | async) && (audioService.$currentSong | async)?.id == element.id"></i>
+            <i class="fa-solid fa-play text-xxs" *ngIf="(audioService.$currentItem | async)?.id != element.id"></i>
+            <i class="fa-solid fa-play text-xxs" *ngIf="(audioService.$paused | async) && (audioService.$currentItem | async)?.id == element.id"></i>
+            <i class="fa-solid fa-pause text-xxs" *ngIf="!(audioService.$paused | async) && (audioService.$currentItem | async)?.id == element.id"></i>
         </div>
 
-        <div class="transform absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-9 pointer-events-none text-center" *ngIf="(audioService.$currentSong | async)?.id == element.id && !(audioService.$paused | async)">
+        <div class="transform absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-9 pointer-events-none text-center" *ngIf="(audioService.$currentItem | async)?.id == element.id && !(audioService.$paused | async)">
             <ng-lottie [options]="animOptions" class="aspect-square"></ng-lottie>
         </div>
 
-        <span class="opacity-70" [ngClass]="{'text-accent-dark drop-shadow-sm': (audioService.$currentSong | async)?.id == element.id}" *ngIf="(audioService.$currentSong | async)?.id != element.id || (audioService.$paused | async)">{{ i + 1 }}</span>
+        <span class="opacity-70" [ngClass]="{'text-accent-dark drop-shadow-sm': (audioService.$currentItem | async)?.id == element.id}" *ngIf="(audioService.$currentItem | async)?.id != element.id || (audioService.$paused | async)">{{ i + 1 }}</span>
         <div class="absolute z-30 top-0 left-0 right-0 bottom-0 pointer-events-auto lg:hidden" (click)="playOrPause(element)"></div>
     
     </td>
@@ -32,7 +32,7 @@
             </div>
             
             <div class="w-full px-2.5">
-                <p class="font-bold text-sm line-clamp-1" [ngClass]="{'text-accent-dark drop-shadow-sm': (audioService.$currentSong | async)?.id == element.id}">{{ element.title }}</p>
+                <p class="font-bold text-sm line-clamp-1" [ngClass]="{'text-accent-dark drop-shadow-sm': (audioService.$currentItem | async)?.id == element.id}">{{ element.title }}</p>
                 <div class="line-clamp-1 opacity-60">
                     <ul>
                         <li *ngIf="element.explicit" class="inline"><span class="inline-flex font-light mr-1 items-center justify-center rounded-sm bg-primary-light text-xs w-4 aspect-square">E</span></li>

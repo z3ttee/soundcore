@@ -4,6 +4,7 @@ import { SnackbarService } from "src/app/services/snackbar.service";
 import { environment } from "src/environments/environment";
 import { PlayableList } from "src/lib/data/playable-list.entity";
 import { Song } from "../../song/entities/song.entity";
+import { CurrentPlayingItem } from "../entities/current-item.entity";
 import { QueueItem } from "../entities/queue-item.entity";
 import { StreamQueueService } from "./queue.service";
 import { StreamService } from "./stream.service";
@@ -20,7 +21,7 @@ export class AudioService {
 
     private audio = new Audio();
 
-    private _currentSongSubject: BehaviorSubject<Song> = new BehaviorSubject(null);
+    private _currentItemSubject: BehaviorSubject<CurrentPlayingItem<any>> = new BehaviorSubject(null);
     private _pausedSubject: BehaviorSubject<boolean> = new BehaviorSubject(false as boolean);
     private _loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject(false as boolean);
     private _currentTimeSubject: BehaviorSubject<number> = new BehaviorSubject(0);
@@ -30,7 +31,7 @@ export class AudioService {
     private _shuffleSubject: BehaviorSubject<boolean> = new BehaviorSubject(false as boolean);
     private _errorSubject: BehaviorSubject<string> = new BehaviorSubject(null);
 
-    public $currentSong: Observable<Song> = this._currentSongSubject.asObservable();
+    public $currentItem: Observable<CurrentPlayingItem<any>> = this._currentItemSubject.asObservable();
     public $paused: Observable<boolean> = this._pausedSubject.asObservable();
     public $loading: Observable<boolean> = this._loadingSubject.asObservable();
     public $currentTime: Observable<number> = this._currentTimeSubject.asObservable();
@@ -45,8 +46,8 @@ export class AudioService {
         return this._pausedSubject.getValue();
     }
 
-    public get currentSong(): Song {
-        return this._currentSongSubject.getValue();
+    public get currentItem(): CurrentPlayingItem<any> {
+        return this._currentItemSubject.getValue();
     }
 
     public get canPlayNext(): boolean {
@@ -72,7 +73,7 @@ export class AudioService {
         this.audio.onerror = (event: Event) => this.onError(event);
 
         this.$paused.subscribe(() => {
-            this.setSession(this._currentSongSubject.getValue());
+            this.setSession(this._currentItemSubject.getValue());
         })
 
         this.queueService.$onQueueWaiting.subscribe((item) => this.onQueueWaiting(item))
@@ -93,7 +94,7 @@ export class AudioService {
     public async play(song?: Song, fadeIn: boolean = false) {
         if(song) {
             this.audio.src = await this.streamService.getStreamURL(song);
-            this._currentSongSubject.next(song);
+            this._currentItemSubject.next(new CurrentPlayingItem(song, "song", null));
         }
 
         if(!fadeIn) this.audio.volume = this._volumeSubject.getValue();
@@ -105,7 +106,7 @@ export class AudioService {
     }
 
     public async playOrPause(song: Song) {
-        const isPlaying = this.currentSong?.id == song?.id
+        const isPlaying = this.currentItem?.id == song?.id
 
         if(isPlaying) {
             if(this.paused) {
@@ -284,8 +285,10 @@ export class AudioService {
         return parseFloat(localStorage?.getItem(PLAYER_VOLUME_KEY)) || 1;
     }
 
-    private async setSession(song: Song) {
-        if(!song) {
+    private async setSession(currentItem: CurrentPlayingItem<any>) {
+        const song = currentItem?.song;
+
+        if(!currentItem) {
             console.warn("[AUDIO] Cannot update mediaSession: Song is null")
             return;
         }

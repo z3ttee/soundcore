@@ -13,7 +13,7 @@
     </div>
 </section>
 
-<asc-playlist-view (onLike)="likePlaylist()" (onPlay)="playOrPauseList()" [isPaused]="(audioService.$paused | async) || !(audioService.$currentSong | async)" [likeable]="playlist?.author?.id != ($user | async)?.id && !playlist?.collaborative && playlist?.collaborators?.length <= 0" [options]="{ type: 'playlist', title: playlist?.title, privacy: playlist?.privacy, artwork: playlist?.artwork }" *ngIf="!isLoading && !!playlist" >
+<asc-playlist-view (onLike)="likePlaylist()" (onPlay)="playOrPauseList()" [isPaused]="(audioService.$paused | async) || !(audioService.$currentTime | async)" [likeable]="playlist?.author?.id != ($user | async)?.id && !playlist?.collaborative && playlist?.collaborators?.length <= 0" [options]="{ type: 'playlist', title: playlist?.title, privacy: playlist?.privacy, artwork: playlist?.artwork }" *ngIf="!isLoading && !!playlist" >
 
     <!-- Quick info bar below title -->
     <div class="py-2 md:pt-2 md:pb-0 md:flex md:items-center" asc-stats>

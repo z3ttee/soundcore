@@ -30,6 +30,8 @@ const routes: Routes = [
     { path: "activity", canActivate: [AuthenticationCanActivateGuard], component: IndexViewComponent },
   ]},
 
+  { path: "player", canActivate: [AuthenticationCanActivateGuard], loadChildren: () => import("./features/player/player.module").then((m) => m.PlayerModule) },
+
   { path: "**", canActivate: [AuthenticationCanActivateGuard], component: IndexViewComponent },
 ];
 

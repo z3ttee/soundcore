@@ -29,14 +29,14 @@ export class TopSongItemComponent implements OnInit {
     constructor(
         private audioService: AudioService,
     ) {
-        combineLatest([
+        /*combineLatest([
             this.audioService.$currentSong,
             this.audioService.$paused
         ]).pipe(map(([song, paused]) => ({ song, paused }))).subscribe((state) => {
             this.isActive = state.song && state.song?.id == this.song?.id && !state.paused;
             this.isPlaying = state.song && state.song?.id == this.song?.id;
             this.isPlayerPaused = state.paused
-        })
+        })*/
     }
 
     public async ngOnInit() {

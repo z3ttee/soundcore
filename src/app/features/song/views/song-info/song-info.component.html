@@ -1,4 +1,4 @@
-<asc-playlist-view (onLike)="likeSong()" (onPlay)="playOrPause()" [isLiked]="($song | async)?.liked" [isPaused]="(audioService.$paused | async) || !(audioService.$currentSong | async)" [options]="{ type: 'song', title: ($song | async)?.title, artwork: ($song | async)?.artwork }">
+<asc-playlist-view (onLike)="likeSong()" (onPlay)="playOrPause()" [isLiked]="($song | async)?.liked" [isPaused]="(audioService.$paused | async) || !(audioService.$currentTime | async)" [options]="{ type: 'song', title: ($song | async)?.title, artwork: ($song | async)?.artwork }">
 
     {{ ($dataSource | async) || undefined }}
 

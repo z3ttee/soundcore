@@ -16,7 +16,7 @@ export class ArtistGridItemComponent implements OnInit {
   public $isPlaying: Observable<boolean>;
 
   constructor(private audioService: AudioService) {
-    this.$isPlaying = this.audioService.$currentSong.pipe(map((song) => !!song?.artists.find((artist) => artist.id == this.artist.id)));
+    this.$isPlaying = this.audioService.$currentItem.pipe(map((item) => !!item?.song?.artists.find((artist) => artist.id == this.artist.id)));
   }
 
   public async ngOnInit() {
