@@ -72,7 +72,7 @@
     <th cdk-header-cell *cdkHeaderCellDef scope="col" class="text-xs px-2.5 py-4 tracking-wide opacity-70 text-right hidden lg:table-cell">Hinzugefügt am</th>
     <td cdk-cell *cdkCellDef="let element" class="px-2.5 py-2 text-right hidden lg:table-cell">
         <div class="absolute z-30 top-0 left-0 right-0 bottom-0 pointer-events-auto lg:hidden" (click)="playOrPause(element)"></div>
-        <span class="text-xs opacity-80 line-clamp-1" *ngIf="element.song2playlist || element.likedAt">{{ (element.song2playlist || element.likedAt) | addedToPlaylist }}</span>
+        <span class="text-xs opacity-80 line-clamp-1" *ngIf="element.playlists[0].createdAt">{{ (element.playlists[0].createdAt) | addedToPlaylist }}</span>
     </td>
   </ng-container>
 

@@ -1,7 +1,7 @@
 import { Artwork } from "src/app/model/artwork.model";
-import { Song } from "../../song/entities/song.entity";
 import { User } from "../../user/entities/user.entity";
 import { PlaylistPrivacy } from "../types/playlist-privacy.types";
+import { PlaylistItem } from "./playlist-item.entity";
 
 export class Playlist {
 
@@ -16,12 +16,12 @@ export class Playlist {
 
     public artwork?: Artwork;
     public collaborators?: User[];
-    public songs?: Song[];
+    public items?: PlaylistItem[];
 
     public songsCount?: number = 0;
     public collaboratorsCount?: number = 0;
     public totalDuration?: number = 0;
 
-    public isLiked?: boolean = false;
+    public liked?: boolean = false;
 
 }

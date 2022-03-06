@@ -142,7 +142,7 @@ export class PlaylistService {
         })
       } else {
         // Remove from playlists if user is not the author
-        if(playlist.isLiked) {
+        if(playlist.liked) {
           // The data is outdated, so in this case the playlist isn't liked anymore.
           this.authService.$user.pipe(take(1)).subscribe((user) => {
             if(playlist.author?.id != user?.id) {

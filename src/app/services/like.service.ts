@@ -42,9 +42,9 @@ export class LikeService {
     }
 
     public async likePlaylist(playlist: Playlist): Promise<boolean> {
-        if(!playlist?.id) return playlist?.isLiked;
+        if(!playlist?.id) return playlist?.liked;
         return firstValueFrom(this.httpClient.post<boolean>(`${environment.api_base_uri}/v1/likes/playlist/${playlist.id}`, {})).then((isLiked) => {
-            playlist.isLiked = !!isLiked;
+            playlist.liked = !!isLiked;
 
             if(isLiked) {
                 this.snackbarService.info("Playlist wurde deiner Bibliothek hinzugefügt");
@@ -53,10 +53,10 @@ export class LikeService {
             }
 
             this._onPlaylistLikeSubject.next(playlist);
-            return playlist.isLiked;
+            return playlist.liked;
         }).catch(() => {
             this.snackbarService.error("Ein Fehler ist aufgetreten.");
-            return playlist?.isLiked
+            return playlist?.liked
         })
     }
 
