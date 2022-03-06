@@ -1,9 +1,11 @@
 import { HttpClient } from "@angular/common/http";
-import { BehaviorSubject, firstValueFrom, Observable, of, Subject, take, takeUntil, tap } from "rxjs";
+import { BehaviorSubject, firstValueFrom, Observable, Subject, takeUntil } from "rxjs";
 import { PlaylistViewType } from "src/app/components/views/playlist-view/playlist-view.component";
 import { Song } from "src/app/features/song/entities/song.entity";
 import { Page, Pageable } from "src/app/pagination/pagination";
 import { environment } from "src/environments/environment";
+
+export const PLAYLIST_BATCH_SIZE = 50;
 
 export type PlayableListType = PlaylistViewType | "topSongs" | "likedArtistSongs" | "random"
 export class PlayableList<T> {
@@ -17,6 +19,7 @@ export class PlayableList<T> {
 
     public readonly type: PlayableListType;
     public readonly context: T;
+    public readonly id: string;
 
     private readonly $destroy: Observable<void> = this._destroySubject.asObservable();
     public readonly $dataSource: Observable<Song[]> = this._dataSourceSubject.asObservable().pipe(takeUntil(this.$destroy));
@@ -26,9 +29,9 @@ export class PlayableList<T> {
     public readonly $totalElements: Observable<number> = this._totalElementsSubject.asObservable().pipe(takeUntil(this.$destroy));
     public readonly $currentPageIndex: Observable<number> = this._currentPageIndexSubject.asObservable().pipe(takeUntil(this.$destroy));
 
-    private readonly _dataSource: Map<string, Song> = new Map();
-    private readonly _resources: Map<string, Song> = new Map();
-    private _resourcesQueue: string[] = [];
+    private readonly _dataSource: Record<string, Song> = {};
+    private readonly _resources: Record<string, Song> = {};
+    private readonly _resourcesQueue: string[] = [];
 
     private readonly _httpClient: HttpClient;
     private readonly _metadataUrl: string;
@@ -40,6 +43,7 @@ export class PlayableList<T> {
     private _totalElements: number = 0;
 
     constructor(type: PlayableListType, httpClient: HttpClient, listUrl: string, metadataUrl: string, context: T) {
+        this.id = PlayableList.buildId(type, context["id"])
         this.type = type;
         this.context = context;
 
@@ -48,6 +52,26 @@ export class PlayableList<T> {
         this._listUrl = listUrl;
 
         this.fetchSongsList();
+    }
+
+    public static buildId(type: PlayableListType, contextId: string) {
+        return `${type.toString().toLowerCase()}_${contextId}`
+    }
+
+    /**
+     * Get the current list of songs
+     * in the $dataSource observable.
+     */
+    public get dataSource(): Song[] {
+        return this._dataSourceSubject.getValue();
+    }
+
+    /**
+     * Get the current amount of queued songs
+     * of the playable list.
+     */
+    public get queueSize(): number {
+        return this._resourcesQueue.length;
     }
 
     /**
@@ -69,7 +93,7 @@ export class PlayableList<T> {
 
         console.log("fetching next page")
         this._loadingSubject.next(true);
-        firstValueFrom(this._httpClient.get<Page<Song>>(this._metadataUrl+Pageable.toQuery({ page: this._currentPageIndex, size: 30 }))).then((page) => {
+        firstValueFrom(this._httpClient.get<Page<Song>>(this._metadataUrl+Pageable.toQuery({ page: this._currentPageIndex, size: PLAYLIST_BATCH_SIZE }))).then((page) => {
             console.log(page)
             // Update totalElements count
             this._totalElements = page.totalElements;
@@ -129,7 +153,7 @@ export class PlayableList<T> {
                 i++;
             }
 
-            this._resourcesQueue = Object.values(this._resources);
+            this._resourcesQueue.push(...Object.keys(this._resources));
             return 
         }).catch((error: Error) => {
             // Emit error
@@ -150,12 +174,14 @@ export class PlayableList<T> {
      */
     public async emitNextSong(startAtIndex?: number): Promise<Song> {
         const nextKey = startAtIndex ? this._resourcesQueue.splice(startAtIndex, 1)?.[0] : this._resourcesQueue.splice(0, 1)?.[0]
-        const nextSong = this._resources.get(nextKey);
+        const nextSong = this._resources[nextKey];
 
         if(!nextKey || !nextSong) return null
 
         // Next song exists, delete from queue and resources
-        this._resources.delete(nextKey);
+
+        delete this._resources[nextKey];
+        console.log("next song: ", nextSong)
 
         const metadata = this._dataSource[nextKey];
 

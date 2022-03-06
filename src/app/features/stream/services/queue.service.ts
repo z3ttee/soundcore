@@ -1,16 +1,23 @@
 import { Injectable } from "@angular/core";
-import { BehaviorSubject, Observable } from "rxjs";
+import { BehaviorSubject, Observable, Subject } from "rxjs";
 import { PlayableList } from "src/lib/data/playable-list.entity";
 import { Song } from "../../song/entities/song.entity";
 import { QueueItem, QueueList, QueueSong } from "../entities/queue-item.entity";
 
-@Injectable()
+@Injectable({
+    providedIn: "root"
+})
 export class StreamQueueService {
 
-    private _sizeSubject: BehaviorSubject<number> = new BehaviorSubject(0);
-    private _queue: QueueItem[] = [];
+    private readonly _sizeSubject: BehaviorSubject<number> = new BehaviorSubject(0);
+    private readonly _onQueueWaitingSubject: Subject<QueueItem> = new Subject();
 
-    public $size: Observable<number> = this._sizeSubject.asObservable();
+    private readonly _queueMap: Record<string, QueueItem> = {};
+    private readonly _queue: QueueItem[] = [];
+
+    public readonly $size: Observable<number> = this._sizeSubject.asObservable();
+
+    public readonly $onQueueWaiting: Observable<QueueItem> = this._onQueueWaitingSubject.asObservable();
 
     /**
      * Returns calculate size of the whole queue. This takes single
@@ -22,7 +29,7 @@ export class StreamQueueService {
             if(!item.isList) {
                 size++;
             } else {
-                size += (item as QueueList).list.length
+                size += (item as QueueList).item.queueSize;
             }
             return size;
         }, 0);
@@ -55,15 +62,17 @@ export class StreamQueueService {
             // The song gets removed from queue array and will be returned.
             // New size will be calculated and updated as a result.
             item = (this._queue.splice(index, 1)[0] as QueueSong)?.item;
+            delete this._queueMap[nextItem.id];
         } else {
             // This is in case the nextItem is a list. Then the item is used to access to internal list
             // of this data structure.
             const listItem = (nextItem as QueueList);
             item = await listItem?.getNextItem();
 
-            if(!item || listItem?.list?.length <= 0) {
+            if(!item || listItem?.item?.queueSize <= 0) {
                 // Enqueued list is empty, that means it is done playing.
                 this._queue.splice(index, 1);
+                delete this._queueMap[listItem.id];
             }
         }
 
@@ -86,8 +95,11 @@ export class StreamQueueService {
      * @returns Song
      */
     public enqueueSong(song: Song): void {
-        this._queue.push(new QueueSong(song));
+        const item = new QueueSong(song)
+        this._queue.push(item);
+        this._queueMap[item.id] = item;
         this.setNewSize(this.size);
+        this._onQueueWaitingSubject.next(item);
     }
 
     /**
@@ -96,13 +108,16 @@ export class StreamQueueService {
      * @returns Song
      */
      public enqueueList(list: PlayableList<any>): void {
-        if(this._queue.findIndex((i: QueueList) => i.isList && i?.item?.context.id == list.context.id) != -1) {
+        if(this._queue.findIndex((i: QueueList) => i.isList && i?.item?.id == list.id) != -1) {
             console.warn("[QUEUE] Cannot enqueue playable list. Already in queue")
             return;
         }
         
-        this._queue.push(new QueueList(list));
+        const item = new QueueList(list);
+        this._queue.push(item);
+        this._queueMap[item.id] = item;
         this.setNewSize(this.size);
+        this._onQueueWaitingSubject.next(item);
     }
 
     /**
@@ -111,6 +126,14 @@ export class StreamQueueService {
      */
     public peek(): QueueItem {
         return this._queue[0];
+    }
+
+    public hasKey(key: string): boolean {
+        return !!this.get(key);
+    }
+
+    public get(key: string): QueueItem {
+        return this._queueMap[key];
     }
 
     /**
@@ -122,6 +145,7 @@ export class StreamQueueService {
     }
 
     private setNewSize(size: number) {
+        console.log("pushing new size: ", size)
         this._sizeSubject.next(size)
     }
 

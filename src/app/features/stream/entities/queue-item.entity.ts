@@ -3,7 +3,13 @@ import { PlayableList } from "src/lib/data/playable-list.entity";
 import { Song } from "../../song/entities/song.entity";
 
 export abstract class QueueItem {
-    constructor(public isList: boolean = false){}
+    public readonly id: string;
+    public readonly isList: boolean;
+
+    constructor(id: string, isList: boolean = false){
+        this.id = id;
+        this.isList = isList;
+    }
 }
 
 /**
@@ -15,7 +21,7 @@ export class QueueSong extends QueueItem {
     public item: Song;
 
     constructor(song: Song) {
-        super(false);
+        super(song.id, false);
         this.item = song;
     }
 }
@@ -26,11 +32,10 @@ export class QueueSong extends QueueItem {
  */
 export class QueueList extends QueueItem {
     public item: PlayableList<any>;
-    public list: Song[] = [];
 
-    constructor(playableList: PlayableList<any>) {
-        super(true);
-        this.item = playableList;
+    constructor(list: PlayableList<any>) {
+        super(list.id, true);
+        this.item = list;
     }
 
     public async getNextItem(): Promise<Song> {

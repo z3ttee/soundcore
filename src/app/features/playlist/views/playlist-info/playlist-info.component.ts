@@ -85,16 +85,18 @@ export class PlaylistInfoComponent implements OnInit, OnDestroy {
   }
 
   public async findSongs() {
+    console.log("find songs")
     this.playableList?.fetchNextPage()
   }
 
-  public async playOrPauseList() {
+  public async playOrPauseList(startAtIndex?: string) {
+    console.log(startAtIndex)
     this.audioService.playList(this.playableList)
   }
 
   public async likePlaylist() {
     this.likeService.likePlaylist(this.playlist).then(() => {
-      this.playlist.isLiked = !this.playlist?.isLiked;
+      // TODO: Use event this.playlist.isLiked = !this.playlist?.isLiked;
     })
   }
 

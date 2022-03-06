@@ -4,6 +4,7 @@ import { SnackbarService } from "src/app/services/snackbar.service";
 import { environment } from "src/environments/environment";
 import { PlayableList } from "src/lib/data/playable-list.entity";
 import { Song } from "../../song/entities/song.entity";
+import { QueueItem } from "../entities/queue-item.entity";
 import { StreamQueueService } from "./queue.service";
 import { StreamService } from "./stream.service";
 
@@ -48,6 +49,10 @@ export class AudioService {
         return this._currentSongSubject.getValue();
     }
 
+    public get canPlayNext(): boolean {
+        return this._doneSubject.getValue();
+    }
+
     constructor(
         private streamService: StreamService,
         private queueService: StreamQueueService,
@@ -69,6 +74,16 @@ export class AudioService {
         this.$paused.subscribe(() => {
             this.setSession(this._currentSongSubject.getValue());
         })
+
+        this.queueService.$onQueueWaiting.subscribe((item) => this.onQueueWaiting(item))
+    }
+
+    private onQueueWaiting(item: QueueItem) {
+        console.log("new item added to queue: ", item)
+        if(!this.canPlayNext) return
+
+        this._doneSubject.next(false);
+        this.next();
     }
 
     /**
@@ -91,6 +106,7 @@ export class AudioService {
 
     public async playOrPause(song: Song) {
         const isPlaying = this.currentSong?.id == song?.id
+
         if(isPlaying) {
             if(this.paused) {
                 this.play(null, true);
@@ -180,6 +196,7 @@ export class AudioService {
      */
     public async next() {
         const nextSong = this._shuffleSubject.getValue() ? await this.queueService.random() : await this.queueService.dequeue();
+
         if(!nextSong) {
             this._doneSubject.next(true);
             console.warn("[AUDIO] Can't start next song: Queue is empty.")
@@ -223,27 +240,12 @@ export class AudioService {
      * @param song Song
      */
     public async enqueueSong(song: Song) {
-        const done = this._doneSubject.getValue();
-        console.log(done)
         this.queueService.enqueueSong(song);
-
         this.snackbarService.info("Song zur Warteschlange hinzugefügt.")
-
-        if(done) {
-            this.next();
-        }
     }
 
     public async enqueueList(list: PlayableList<any>) {
-        const done = this._doneSubject.getValue();
-        console.log(done)
         this.queueService.enqueueList(list);
-
-
-
-        if(done) {
-            this.next();
-        }
     }
 
     /**
