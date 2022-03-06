@@ -1,27 +1,28 @@
-<div (contextmenu)="songMenu.open($event, song)" [routerLink]="['/song', song?.slug || song?.id]" class="item-container transition-all p-3 rounded-md text-center flex flex-1 flex-col overflow-hidden h-full cursor-pointer w-full bg-background-light border-2 border-transparent hover:border-primary active:bg-background-dark">
-
-    <div class="block relative">
-        <div [ngClass]="{'active': isActive}" class="play-button transition-all transform-gpu absolute bottom-2 right-2 rounded-full bg-accent-dark shadow-lg text-background w-10 h-10 overflow-hidden flex justify-center items-center hover:scale-105" (click)="playOrPause($event)">
-            <i class="fa-solid fa-pause" *ngIf="!isPlayerPaused && isActive"></i>
-            <i class="fa-solid fa-play" *ngIf="isPlayerPaused && isActive"></i>
-            <i class="fa-solid fa-play" *ngIf="!isActive"></i>
+<div (contextmenu)="songMenu.open($event, song)" [routerLink]="['/song', song?.slug || song?.id]" class="item-container h-full">
+    <asc-grid-item-template>
+        <div asc-cover>
+            <div [ngClass]="{'active': isActive}" class="play-button transition-all transform-gpu absolute bottom-2 right-2 rounded-full bg-accent-dark shadow-lg text-background w-10 h-10 overflow-hidden flex justify-center items-center hover:scale-105" (click)="playOrPause($event)">
+                <i class="fa-solid fa-pause" *ngIf="!isPlayerPaused && isActive"></i>
+                <i class="fa-solid fa-play" *ngIf="isPlayerPaused && isActive"></i>
+                <i class="fa-solid fa-play" *ngIf="!isActive"></i>
+            </div>
+    
+            <div class="inline-flex w-full aspect-square">
+                <asc-artwork [artwork]="song?.artwork" [showAccent]="true" [type]="'default'"></asc-artwork>
+            </div>
         </div>
 
-        <div class="inline-flex w-full aspect-square">
-            <asc-artwork [artwork]="song?.artwork" [showAccent]="true" [type]="'default'"></asc-artwork>
-        </div>
-    </div>
+        <div asc-description>
+            <p class="font-bold text-sm max-w-full overflow-hidden text-ellipsis whitespace-nowrap">{{ song.title }}</p>
 
-    <div class="max-w-full overflow-hidden text-left flex-grow pt-2.5 px-1">
-        <p class="font-bold text-sm max-w-full overflow-hidden text-ellipsis whitespace-nowrap">{{ song.title }}</p>
-
-        <div class="line-clamp-2 opacity-60">
-            <ul>
-                <li *ngIf="song.explicit" class="inline"><span class="inline-flex font-light mr-1 items-center justify-center rounded-sm bg-primary-light text-xs w-4 aspect-square">E</span></li>
-                <li *ngFor="let artist of song.artists; index as i" class="inline"><span class="text-xs hover:underline leading-3 pointer-events-all" [routerLink]="['/artist', artist.id]">{{ artist.name }}</span>{{ i + 1 < song.artists.length ? ", " : "" }}</li>
-            </ul>
+            <div class="line-clamp-2 opacity-60">
+                <ul>
+                    <li *ngIf="song.explicit" class="inline"><span class="inline-flex font-light mr-1 items-center justify-center rounded-sm bg-primary-light text-xs w-4 aspect-square">E</span></li>
+                    <li *ngFor="let artist of song.artists; index as i" class="inline"><span class="text-xs hover:underline leading-3 pointer-events-all" [routerLink]="['/artist', artist.id]">{{ artist.name }}</span>{{ i + 1 < song.artists.length ? ", " : "" }}</li>
+                </ul>
+            </div>
         </div>
-    </div>
+    </asc-grid-item-template>
 </div>
 
 <asc-song-context-menu [isPlayable]="true" #songMenu></asc-song-context-menu>
