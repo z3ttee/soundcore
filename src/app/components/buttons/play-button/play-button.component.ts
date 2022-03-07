@@ -23,6 +23,7 @@ export class AscPlayButtonComponent implements OnInit, OnDestroy {
   public $isDesktop: Observable<boolean> = this.deviceService.$breakpoint.pipe(takeUntil(this.$destroy), map((bp) => bp?.isDesktop))
 
   @Input() public set isPaused(val: boolean) { this._pausedSubject.next(val) };
+  @Input() public mode: "md" | "lg" = "md";
 
   public ngOnInit(): void {}
   public ngOnDestroy(): void {

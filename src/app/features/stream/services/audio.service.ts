@@ -5,7 +5,7 @@ import { environment } from "src/environments/environment";
 import { PlayableList } from "src/lib/data/playable-list.entity";
 import { Song } from "../../song/entities/song.entity";
 import { CurrentPlayingItem } from "../entities/current-item.entity";
-import { QueueItem } from "../entities/queue-item.entity";
+import { QueueItem, QueueList } from "../entities/queue-item.entity";
 import { StreamQueueService } from "./queue.service";
 import { StreamService } from "./stream.service";
 
@@ -21,7 +21,7 @@ export class AudioService {
 
     private audio = new Audio();
 
-    private _currentItemSubject: BehaviorSubject<CurrentPlayingItem<any>> = new BehaviorSubject(null);
+    private _currentItemSubject: BehaviorSubject<CurrentPlayingItem> = new BehaviorSubject(null);
     private _pausedSubject: BehaviorSubject<boolean> = new BehaviorSubject(false as boolean);
     private _loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject(false as boolean);
     private _currentTimeSubject: BehaviorSubject<number> = new BehaviorSubject(0);
@@ -31,7 +31,7 @@ export class AudioService {
     private _shuffleSubject: BehaviorSubject<boolean> = new BehaviorSubject(false as boolean);
     private _errorSubject: BehaviorSubject<string> = new BehaviorSubject(null);
 
-    public $currentItem: Observable<CurrentPlayingItem<any>> = this._currentItemSubject.asObservable();
+    public $currentItem: Observable<CurrentPlayingItem> = this._currentItemSubject.asObservable();
     public $paused: Observable<boolean> = this._pausedSubject.asObservable();
     public $loading: Observable<boolean> = this._loadingSubject.asObservable();
     public $currentTime: Observable<number> = this._currentTimeSubject.asObservable();
@@ -46,7 +46,7 @@ export class AudioService {
         return this._pausedSubject.getValue();
     }
 
-    public get currentItem(): CurrentPlayingItem<any> {
+    public get currentItem(): CurrentPlayingItem {
         return this._currentItemSubject.getValue();
     }
 
@@ -79,8 +79,11 @@ export class AudioService {
         this.queueService.$onQueueWaiting.subscribe((item) => this.onQueueWaiting(item))
     }
 
+    /**
+     * Handle event when a new item was added to queue.
+     * @param item Item
+     */
     private onQueueWaiting(item: QueueItem) {
-        console.log("new item added to queue: ", item)
         if(!this.canPlayNext) return
 
         this._doneSubject.next(false);
@@ -91,10 +94,10 @@ export class AudioService {
      * Continue playing a song or provide a song object
      * to force play a new song.
      */
-    public async play(song?: Song, fadeIn: boolean = false) {
-        if(song) {
-            this.audio.src = await this.streamService.getStreamURL(song);
-            this._currentItemSubject.next(new CurrentPlayingItem(song, "song", null));
+    private async play(item?: CurrentPlayingItem, fadeIn: boolean = false) {
+        if(item) {
+            this.audio.src = await this.streamService.getStreamURL(item.song);
+            this._currentItemSubject.next(item);
         }
 
         if(!fadeIn) this.audio.volume = this._volumeSubject.getValue();
@@ -105,18 +108,49 @@ export class AudioService {
         });
     }
 
+    /**
+     * Force play of the selected list.
+     */
+     private async playList(list: PlayableList<any>) {
+        console.log("force play")
+        const item = new QueueList(list);
+        
+        this.queueService.enqueueListTop(list)
+
+        // this._currentItemSubject.next();
+        // this.enqueueList(playableList)
+    }
+
+    /**
+     * Force play the selected list. If the list is already 
+     * playing then the playback is paused or resumed.
+     * @param list Song to play
+     */
     public async playOrPause(song: Song) {
         const isPlaying = this.currentItem?.id == song?.id
 
-        if(isPlaying) {
-            if(this.paused) {
-                this.play(null, true);
-            } else {
-                this.pause(true);
-            }
-        } else {
-            this.play(song);
-        }
+        if(isPlaying) this.togglePause();
+        else this.play(new CurrentPlayingItem(song));
+    }
+
+    /**
+     * Force play the selected list. If the list is already 
+     * playing then the playback is paused or resumed.
+     * @param list List to play
+     */
+    public async playOrPauseList(list: PlayableList<any>) {
+        const isPlaying = this.currentItem?.context?.id == list.id
+
+        if(isPlaying) this.togglePause();
+        else this.playList(list);
+    }
+
+    /**
+     * Pause or resume playback.
+     */
+    public async togglePause() {
+        if(this.paused) this.play(null, true);
+        else this.pause(true);
     }
 
     /**
@@ -185,14 +219,6 @@ export class AudioService {
     }
 
     /**
-     * Force play of the selected list.
-     */
-    public async playList(playableList: PlayableList<any>) {
-        this.enqueueList(playableList)
-    }
-
-
-    /**
      * Play next song in queue.
      */
     public async next() {
@@ -210,15 +236,6 @@ export class AudioService {
 
     public async prev() {
 
-    }
-
-    /**
-     * Toggle pause.
-     */
-    public async togglePause() {
-        const isPaused = this._pausedSubject.getValue();
-        if(isPaused) this.play(null, true);
-        else this.pause(true);
     }
 
     public async toogleLoop() {
@@ -285,7 +302,7 @@ export class AudioService {
         return parseFloat(localStorage?.getItem(PLAYER_VOLUME_KEY)) || 1;
     }
 
-    private async setSession(currentItem: CurrentPlayingItem<any>) {
+    private async setSession(currentItem: CurrentPlayingItem) {
         const song = currentItem?.song;
 
         if(!currentItem) {

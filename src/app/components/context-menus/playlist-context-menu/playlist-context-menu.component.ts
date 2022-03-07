@@ -50,7 +50,7 @@ export class AscPlaylistContextMenuComponent implements OnInit, OnDestroy {
 
   public async playList() {
     const list = this.listCreator.forPlaylist(this.playlist);
-    this.audioService.playList(list);
+    this.audioService.playOrPauseList(list);
     this.contextService.close();
   }
 

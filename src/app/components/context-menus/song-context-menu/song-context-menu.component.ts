@@ -63,17 +63,8 @@ export class SongContextMenuComponent implements OnInit, OnDestroy {
 
     ref.afterClosed().subscribe((playlist: Playlist) => {
       if(!playlist) return;
-      this.playlistService.addSongs(playlist.id, [ this.song ]).then(() => {
-        this.snackbar.open("Song wurde zur Playlist hinzugefügt", null, { duration: 4000 })
-      }).catch((reason: HttpErrorResponse) => {
-        console.error(reason)
-
-        if(reason.status == 409) {
-          this.snackbar.open("Dieser Song existiert bereits in der Playlist.", null, { duration: 4000 })
-        } else {
-          this.snackbar.open("Song konnte nicht zur Playlist hinzugefügt werden.", null, { duration: 4000 })
-        }
-      }).finally(() => {
+      
+      this.playlistService.addSongs(playlist.id, [ this.song ]).finally(() => {
         this.contextService.close();
       })
     })
@@ -85,13 +76,7 @@ export class SongContextMenuComponent implements OnInit, OnDestroy {
       return
     }
 
-    this.playlistService.removeSongs(this.playlist.id, [ this.song ]).then(() => {
-      this.snackbar.open("Song wurde aus der Playlist entfernt.", null, { duration: 4000 })
-    }).catch((reason: HttpErrorResponse) => {
-      console.error(reason);
-
-      this.snackbar.open("Song konnte nicht aus der Playlist entfernt werden.", null, { duration: 4000 })
-    }).finally(() => {
+    this.playlistService.removeSongs(this.playlist.id, [ this.song ]).finally(() => {
       this.contextService.close();
     })
   }
@@ -106,16 +91,7 @@ export class SongContextMenuComponent implements OnInit, OnDestroy {
 
     this.contextService.close();
 
-    this.$isPlaying.pipe(take(1)).subscribe((isPlaying) => {
-      if(isPlaying) {
-        this.$isPlayerPaused.pipe(take(1)).subscribe((isPaused) => {
-          if(isPaused) this.audioService.play();
-          else this.audioService.pause();
-        })
-      } else {
-        this.audioService.play(this.song);
-      }
-    })
+    this.audioService.playOrPause(this.song);
   }
 
   public async toggleLike() {

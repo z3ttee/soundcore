@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { BehaviorSubject, filter, map, Observable, Subject, takeUntil } from 'rxjs';
+import { BehaviorSubject, combineLatest, filter, map, Observable, Subject, takeUntil } from 'rxjs';
 import { Song } from 'src/app/features/song/entities/song.entity';
 import { AudioService } from 'src/app/features/stream/services/audio.service';
 import { User } from 'src/app/features/user/entities/user.entity';
@@ -28,6 +28,7 @@ export class PlaylistInfoComponent implements OnInit, OnDestroy {
     private listCreator: ListCreator
   ) { }
 
+  // Destroy subscriptions
   private _destroySubject: Subject<void> = new Subject();
   private $destroy: Observable<void> = this._destroySubject.asObservable();
 
@@ -41,9 +42,10 @@ export class PlaylistInfoComponent implements OnInit, OnDestroy {
   public playlistId: string = null;
   public playlist: Playlist = null;
   public playableList: PlayableList<Playlist>;
-  public $songs: Observable<Song[]> = this._songsSubject.asObservable();
 
   public $user: Observable<User> = this.authService.$user.pipe(takeUntil(this.$destroy));
+  public $songs: Observable<Song[]> = this._songsSubject.asObservable();
+  public $isPaused: Observable<boolean> = combineLatest([ this.audioService.$paused, this.audioService.$currentItem ]).pipe(takeUntil(this.$destroy), map(([paused, item]) => paused || item?.context?.context?.["id"] != this.playlistId))
 
   public async ngOnInit(): Promise<void> {
     this.activatedRoute.paramMap.pipe(takeUntil(this.$destroy)).subscribe((paramMap) => {
@@ -91,7 +93,7 @@ export class PlaylistInfoComponent implements OnInit, OnDestroy {
 
   public async playOrPauseList(startAtIndex?: string) {
     console.log(startAtIndex)
-    this.audioService.playList(this.playableList)
+    this.audioService.playOrPauseList(this.playableList)
   }
 
   public async likePlaylist() {

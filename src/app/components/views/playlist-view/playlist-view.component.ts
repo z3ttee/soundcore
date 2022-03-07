@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
 import { PlaylistPrivacy } from 'src/app/features/playlist/types/playlist-privacy.types';
+import { AudioService } from 'src/app/features/stream/services/audio.service';
 import { Artwork } from 'src/app/model/artwork.model';
 
 export type PlaylistViewType = "playlist" | "song" | "artist" | "collection" | "album" | "user";
@@ -18,6 +19,10 @@ export interface PlaylistViewOptions {
   styleUrls: ['./playlist-view.component.scss']
 })
 export class PlaylistViewComponent implements OnInit, OnDestroy {
+
+  constructor(
+    private audioService: AudioService
+  ) { }
 
   // Default colors  
   public accentColor: string = "#FFBF50";
@@ -48,8 +53,6 @@ export class PlaylistViewComponent implements OnInit, OnDestroy {
   @Output() public onPlay: EventEmitter<void> = new EventEmitter();
   @Output() public onLike: EventEmitter<void> = new EventEmitter();
   @Output() public onFollow: EventEmitter<void> = new EventEmitter();
-
-  constructor() { }
 
   public ngOnInit(): void {
     if(this.mode == "titleOnly") this.accentColor = this.colorWhite

@@ -26,8 +26,5 @@ export class ReleasesIndexComponent implements OnInit {
     
   }
 
-  public async selectSong(song: Song) {
-    this.audioService.play(song)
-  }
 
 }

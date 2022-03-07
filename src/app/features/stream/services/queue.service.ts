@@ -2,6 +2,7 @@ import { Injectable } from "@angular/core";
 import { BehaviorSubject, Observable, Subject } from "rxjs";
 import { PlayableList } from "src/lib/data/playable-list.entity";
 import { Song } from "../../song/entities/song.entity";
+import { CurrentPlayingItem } from "../entities/current-item.entity";
 import { QueueItem, QueueList, QueueSong } from "../entities/queue-item.entity";
 
 @Injectable({
@@ -13,7 +14,8 @@ export class StreamQueueService {
     private readonly _onQueueWaitingSubject: Subject<QueueItem> = new Subject();
 
     private readonly _queueMap: Record<string, QueueItem> = {};
-    private readonly _queue: QueueItem[] = [];
+    private readonly _songsQueue: QueueSong[] = [];
+    private readonly _listQueue: QueueList[] = [];
 
     public readonly $size: Observable<number> = this._sizeSubject.asObservable();
 
@@ -25,7 +27,12 @@ export class StreamQueueService {
      * in lists. Use "length" if you want actual length of items in queue.
      */
     public get size(): number {
-        const size = this._queue.reduce((size: number, item: QueueItem) => {
+        const queue = [
+            ...this._songsQueue,
+            ...this._listQueue
+        ]
+
+        const size = queue.reduce((size: number, item: QueueItem) => {
             if(!item.isList) {
                 size++;
             } else {
@@ -42,7 +49,7 @@ export class StreamQueueService {
      * playable lists. If you want to use that, consider choosing "size".
      */
     public get length(): number {
-        return this._queue.length;
+        return this._songsQueue.length + this._listQueue.length;
     }
 
     /**
@@ -50,30 +57,32 @@ export class StreamQueueService {
      * @param song Song to enqueue
      * @returns Song
      */
-    public async dequeue(random: boolean = false): Promise<Song> {
+    public async dequeue(random: boolean = false): Promise<CurrentPlayingItem> {
         if(this.isEmpty()) return null;
 
-        const index = random ? Math.floor(Math.random() * this.length) : 0;
-        const nextItem = this._queue[index];
-        let item: Song = null;
+        let item: CurrentPlayingItem = null;
+        let index: number = random ? Math.floor(Math.random() * this._songsQueue.length) : 0;
+        const nextSong: QueueSong = this._songsQueue[index];
 
-        if(!nextItem.isList) {
-            // This is in case there is a single song added to the queue
-            // The song gets removed from queue array and will be returned.
-            // New size will be calculated and updated as a result.
-            item = (this._queue.splice(index, 1)[0] as QueueSong)?.item;
-            delete this._queueMap[nextItem.id];
+        if(nextSong) {
+            const song = (this._songsQueue.splice(index, 1)[0] as QueueSong)?.item;
+            item = new CurrentPlayingItem(song, null);
+            delete this._queueMap[nextSong.id];
         } else {
+            index = random ? Math.floor(Math.random() * this._listQueue.length) : 0
+            const nextList: QueueList = this._listQueue[index];
+    
             // This is in case the nextItem is a list. Then the item is used to access to internal list
             // of this data structure.
-            const listItem = (nextItem as QueueList);
-            item = await listItem?.getNextItem();
-
-            if(!item || listItem?.item?.queueSize <= 0) {
+            const nextItem = await nextList?.getNextItem();
+    
+            if(!nextItem || nextList?.item?.queueSize <= 0) {
                 // Enqueued list is empty, that means it is done playing.
-                this._queue.splice(index, 1);
-                delete this._queueMap[listItem.id];
+                this._listQueue.splice(index, 1);
+                delete this._queueMap[nextList.id];
             }
+
+            item = new CurrentPlayingItem(nextItem, nextList.item);
         }
 
         // Calculate new size and push updates.
@@ -85,7 +94,7 @@ export class StreamQueueService {
      * Dequeue a random element from the queue
      * @returns Song
      */
-     public async random(): Promise<Song> {
+     public async random(): Promise<CurrentPlayingItem> {
         return this.dequeue(true)
     }
 
@@ -96,7 +105,7 @@ export class StreamQueueService {
      */
     public enqueueSong(song: Song): void {
         const item = new QueueSong(song)
-        this._queue.push(item);
+        this._songsQueue.push(item);
         this._queueMap[item.id] = item;
         this.setNewSize(this.size);
         this._onQueueWaitingSubject.next(item);
@@ -108,13 +117,31 @@ export class StreamQueueService {
      * @returns Song
      */
      public enqueueList(list: PlayableList<any>): void {
-        if(this._queue.findIndex((i: QueueList) => i.isList && i?.item?.id == list.id) != -1) {
+        if(this._queueMap[list.id]) {
             console.warn("[QUEUE] Cannot enqueue playable list. Already in queue")
             return;
         }
         
         const item = new QueueList(list);
-        this._queue.push(item);
+        this._listQueue.push(item);
+        this._queueMap[item.id] = item;
+        this.setNewSize(this.size);
+        this._onQueueWaitingSubject.next(item);
+    }
+
+    /**
+     * Add a song to the queue
+     * @param song Song to enqueue
+     * @returns Song
+     */
+     public enqueueListTop(list: PlayableList<any>): void {
+        if(this._queueMap[list.id]) {
+            console.warn("[QUEUE] Cannot enqueue playable list. Already in queue")
+            return;
+        }
+        
+        const item = new QueueList(list);
+        this._listQueue.unshift(item);
         this._queueMap[item.id] = item;
         this.setNewSize(this.size);
         this._onQueueWaitingSubject.next(item);
@@ -125,7 +152,7 @@ export class StreamQueueService {
      * @returns Song
      */
     public peek(): QueueItem {
-        return this._queue[0];
+        return this._songsQueue[0] || this._listQueue[0];
     }
 
     public hasKey(key: string): boolean {
@@ -141,7 +168,7 @@ export class StreamQueueService {
      * @returns True or False
      */
     public isEmpty(): boolean {
-        return this._queue.length <= 0;
+        return this._songsQueue.length <= 0 && this._listQueue.length <= 0;
     }
 
     private setNewSize(size: number) {

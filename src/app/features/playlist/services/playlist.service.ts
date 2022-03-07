@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, firstValueFrom, Observable, Subject, take } from 'rxjs';
 import { AscPlaylistEditorOptions } from 'src/app/components/dialogs/playlist-editor-dialog/dto/playlist-editor-options.dto';
@@ -6,6 +6,7 @@ import { AscPlaylistEditorDialogComponent } from 'src/app/components/dialogs/pla
 import { Page, Pageable } from 'src/app/pagination/pagination';
 import { DialogService } from 'src/app/services/dialog.service';
 import { LikeService } from 'src/app/services/like.service';
+import { SnackbarService } from 'src/app/services/snackbar.service';
 import { AuthenticationService } from 'src/app/sso/authentication.service';
 import { environment } from 'src/environments/environment';
 import { Song } from '../../song/entities/song.entity';
@@ -38,7 +39,8 @@ export class PlaylistService {
     private httpClient: HttpClient,
     private likeService: LikeService,
     private authService: AuthenticationService,
-    private dialogService: DialogService
+    private dialogService: DialogService,
+    private snackbarService: SnackbarService
   ) { 
     this.restoreAndFindPlaylists().then((playlists) => {
       this._playlistsSubject.next(playlists)
@@ -66,15 +68,31 @@ export class PlaylistService {
     return firstValueFrom(this.httpClient.get(`${environment.api_base_uri}/v1/playlists/byAuthor/${authorId}`)) as Promise<Page<Playlist>>
   }
 
-  public async addSongs(playlistId: string, songs: Song[]): Promise<void> {
-    return firstValueFrom(this.httpClient.put<void>(`${environment.api_base_uri}/v1/playlists/${playlistId}/songs/add`, songs.map((song) => song?.id))).then(() => {
+  public async addSongs(playlistId: string, songs: Song[]): Promise<Playlist> {
+    return firstValueFrom(this.httpClient.put<Playlist>(`${environment.api_base_uri}/v1/playlists/${playlistId}/songs/add`, songs.map((song) => song?.id))).then((playlist) => {
       this._onSongsAddedSubject.next({ songs, playlistId })
+      this.snackbarService.info("Songs zur Playlist hinzugefügt.")
+      this.updatePlaylistLocally(playlist)
+      return playlist;
+    }).catch((error: HttpErrorResponse) => {
+      if(error.status == 409) {
+        this.snackbarService.open("Dieser Song existiert bereits in der Playlist.", null, { duration: 4000 })
+      } else {
+        this.snackbarService.open("Song konnte nicht zur Playlist hinzugefügt werden.", null, { duration: 4000 })
+      }
+      return null;
     })
   }
 
-  public async removeSongs(playlistId: string, songs: Song[]): Promise<void> {
-    return firstValueFrom(this.httpClient.put<void>(`${environment.api_base_uri}/v1/playlists/${playlistId}/songs/remove`, songs.map((song) => song?.id))).then(() => {
+  public async removeSongs(playlistId: string, songs: Song[]): Promise<Playlist> {
+    return firstValueFrom(this.httpClient.put<Playlist>(`${environment.api_base_uri}/v1/playlists/${playlistId}/songs/remove`, songs.map((song) => song?.id))).then((playlist) => {
       this._onSongsRemovedSubject.next({ songs, playlistId })
+      this.snackbarService.info("Songs aus Playlist entfernt.")
+      this.updatePlaylistLocally(playlist)
+      return playlist;
+    }).catch((error: Error) => {
+      this.snackbarService.error(`Song konnte nicht aus der Playlist entfernt werden: ${error.message}`)
+      return null;
     })
   }
 
@@ -151,6 +169,15 @@ export class PlaylistService {
           })
         }
       }
+  }
+
+  private async updatePlaylistLocally(playlist: Playlist) {
+    const playlists = this._playlistsSubject.getValue();
+    const index = playlists.findIndex((p) => p.id == playlist.id);
+
+    if(index == -1) return;
+    playlists[index] = playlist;
+    this._playlistsSubject.next(playlists);
   }
 
 }

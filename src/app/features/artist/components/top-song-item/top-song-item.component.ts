@@ -53,15 +53,7 @@ export class TopSongItemComponent implements OnInit {
     public async playOrPause() {
         if(!this.playable) return;
 
-        if(this.isPlaying) {
-            if(this.isPlayerPaused) {
-                this.audioService.play();
-            } else {
-                this.audioService.pause();
-            }
-        } else {
-            this.audioService.play(this.song);
-        }
+        this.audioService.playOrPause(this.song);
     }
 
 }
