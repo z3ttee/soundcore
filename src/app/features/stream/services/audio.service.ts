@@ -1,5 +1,6 @@
 import { Injectable } from "@angular/core";
 import { BehaviorSubject, filter, interval, Observable, skip, takeUntil, timer } from "rxjs";
+import { SettingsService } from "src/app/services/settings.service";
 import { SnackbarService } from "src/app/services/snackbar.service";
 import { environment } from "src/environments/environment";
 import { PlayableList } from "src/lib/data/playable-list.entity";
@@ -57,7 +58,8 @@ export class AudioService {
     constructor(
         private streamService: StreamService,
         private queueService: StreamQueueService,
-        private snackbarService: SnackbarService
+        private snackbarService: SnackbarService,
+        private settingsService: SettingsService
     ) {
         this.$queueSize = this.queueService.$size;
         this.reset();
@@ -100,9 +102,9 @@ export class AudioService {
             this._currentItemSubject.next(item);
         }
 
-        if(!fadeIn) this.audio.volume = this._volumeSubject.getValue();
+        if(!fadeIn || !this.settingsService.isAudioFadeAllowed()) this.audio.volume = this._volumeSubject.getValue();
         this.audio.play().then(() => {
-            if(fadeIn) this.fadeInAudio(FADE_AUDIO_TOGGLE_MS);
+            if(fadeIn && this.settingsService.isAudioFadeAllowed()) this.fadeInAudio(FADE_AUDIO_TOGGLE_MS);
         }).catch(() => {
             this.showError("Das Lied kann nicht abgespielt werden.")
         });
@@ -270,7 +272,7 @@ export class AudioService {
      * Pause the playing audio
      */
     public pause(fadeOut: boolean = false) {
-        if(!fadeOut) {
+        if(!fadeOut || !this.settingsService.isAudioFadeAllowed()) {
             this.audio.pause();
             return;
         }
@@ -304,6 +306,7 @@ export class AudioService {
 
     private async setSession(currentItem: CurrentPlayingItem) {
         const song = currentItem?.song;
+        if(!song) return;
 
         if(!currentItem) {
             console.warn("[AUDIO] Cannot update mediaSession: Song is null")

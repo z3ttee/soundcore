@@ -23,6 +23,7 @@ const routes: Routes = [
     { path: "album", canActivate: [AuthenticationCanActivateGuard], loadChildren: () => import("./features/album/album.module").then((m) => m.AlbumModule) },
     { path: "collection", canActivate: [AuthenticationCanActivateGuard], loadChildren: () => import("./features/collection/collection.module").then((m) => m.CollectionModule) },
     { path: "song", canActivate: [AuthenticationCanActivateGuard], loadChildren: () => import("./features/song/song.module").then((m) => m.SongModule) },
+    { path: "settings", canActivate: [AuthenticationCanActivateGuard], loadChildren: () => import("./features/settings/settings.module").then((m) => m.SettingsModule) },
 
     { path: "profile", canActivate: [AuthenticationCanActivateGuard], loadChildren: () => import("./features/user/user.module").then((m) => m.UserModule) },
 
