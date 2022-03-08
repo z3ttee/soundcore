@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
-import { BehaviorSubject, map, Observable, Subject, take, takeUntil } from 'rxjs';
+import { BehaviorSubject, combineLatest, filter, map, Observable, Subject, take, takeUntil } from 'rxjs';
 import { Song } from 'src/app/features/song/entities/song.entity';
 import { DeviceService } from 'src/app/services/device.service';
 import { LikeService } from 'src/app/services/like.service';
@@ -35,9 +35,9 @@ export class StreamPlayerBarComponent implements OnInit, OnDestroy {
 
     // Listen for like event
     this.likeService.$onSongLike.pipe(takeUntil(this.$destroy)).subscribe((item) => {
-      const song = this._songSubject.getValue();
-      song.liked = item.liked;
-      this._songSubject.next(song);
+      this.$song.pipe(take(1), filter((song) => song?.id == item?.id)).subscribe((song) => {
+        this._songSubject.next(song);
+      })      
     })
   }
 
