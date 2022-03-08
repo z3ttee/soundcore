@@ -4,7 +4,7 @@
 
 <div class="absolute left-0 top-0 w-full h-[50vh]" [style]="'background: linear-gradient(180deg, ' + (accentColor) + '80 0%, ' + (accentColor) + '00 100%);'"></div>
 
-<asc-playlist-view [options]="{ type: 'collection', title: 'Lieblingssongs' }" *ngIf="!isLoading && !!collection" >
+<asc-playlist-view [options]="{ type: 'collection', title: 'Lieblingssongs' }" [likeable]="false" [isPaused]="($isPaused | async)" (onPlay)="playOrPauseList()" *ngIf="!isLoading && !!collection" >
 
     <!-- Quick info bar below title -->
     <div class="py-2 md:pt-2 md:pb-0 md:flex md:items-center" asc-stats>
@@ -20,6 +20,13 @@
 
     <div asc-contents>
         <!-- Songs list -->
-        <asc-song-list [dataSource]="$songs" [showCount]="false" [showMore]="($songs | async).length < collection?.songsCount" (onMore)="findSongs()"></asc-song-list>
+        <section *ngIf="(list.$totalElements | async) > 0 && !(list.$isLoading | async)">
+            <asc-song-list [dataSource]="list.$dataSource" [showCount]="false" [showMore]="(list.$dataSource | async)?.length < (list.$totalElements | async)" (onMore)="findSongs()"></asc-song-list>
+        </section>
+
+        <!-- Empty message -->
+        <section *ngIf="(list.$totalElements | async) <= 0 && !(list.$isLoading | async)">
+            <asc-message>Du hast bislang keine Songs mit "Gefällt mir" markiert</asc-message>
+        </section>
     </div>
 </asc-playlist-view>

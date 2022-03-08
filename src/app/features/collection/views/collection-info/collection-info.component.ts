@@ -1,9 +1,12 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { BehaviorSubject, filter, Observable, Subject, takeUntil } from 'rxjs';
+import { combineLatest, map, Observable, of, Subject, takeUntil } from 'rxjs';
 import { Song } from 'src/app/features/song/entities/song.entity';
+import { AudioService } from 'src/app/features/stream/services/audio.service';
 import { LikeService } from 'src/app/services/like.service';
 import { ScrollService } from 'src/app/services/scroll.service';
 import { AuthenticationService } from 'src/app/sso/authentication.service';
+import { ListCreator } from 'src/lib/data/list-creator';
+import { PlayableList } from 'src/lib/data/playable-list.entity';
 import { Collection } from '../../entities/collection.entity';
 import { CollectionService } from '../../services/collection.service';
 
@@ -13,18 +16,24 @@ import { CollectionService } from '../../services/collection.service';
 })
 export class CollectionInfoComponent implements OnInit, OnDestroy {
 
+  constructor(
+    private likeService: LikeService,
+    private collectionService: CollectionService,
+    private scrollService: ScrollService,
+    public authService: AuthenticationService,
+    private listCreator: ListCreator,
+    private audioService: AudioService
+  ) { }
+
   // Destroy subscriptions
   private _destroySubject: Subject<void> = new Subject();
   private $destroy = this._destroySubject.asObservable();
 
   // Data providers
-  private _songsSubject: BehaviorSubject<Song[]> = new BehaviorSubject([]);
+  public $isPaused: Observable<boolean> = combineLatest([ this.audioService.$paused, this.audioService.$currentItem ]).pipe(takeUntil(this.$destroy), map(([paused, item]) => paused || item?.context?.context?.["id"] != this.collection?.id))
 
-  public $songs: Observable<Song[]> = this._songsSubject.asObservable();
-  public collection: Collection;
-
-  // Pagination
-  private currentPage: number = 0;
+  public collection: Collection = null;
+  public list: PlayableList<Collection> = null;
 
   // Loading states
   public isLoading: boolean = false;
@@ -32,17 +41,12 @@ export class CollectionInfoComponent implements OnInit, OnDestroy {
   // Accent colors  
   public accentColor: string = "#FFBF50";
 
-  constructor(
-    private likeService: LikeService,
-    private collectionService: CollectionService,
-    private scrollService: ScrollService,
-    public authService: AuthenticationService
-  ) { }
-
   public ngOnInit(): void {
     this.isLoading = true;
+
     this.collectionService.findCollection().then((collection) => {
       this.collection = collection;
+      this.list = this.listCreator.forCollection(this.collection, this.authService.getUser()?.id);
 
       this.scrollService.$onBottomReached.pipe(takeUntil(this.$destroy)).subscribe(() => {
         this.findSongs();
@@ -63,33 +67,25 @@ export class CollectionInfoComponent implements OnInit, OnDestroy {
   }
 
   public async findSongs() {
-    this.collectionService.findSongsByCollection({
-      page: this.currentPage
-    }).then((page) => {
-      if(page.elements.length > 0) this.currentPage++;
-      this._songsSubject.next([
-        ...this._songsSubject.getValue(),
-        ...page.elements
-      ])
-    })
+    this.list.fetchNextPage();
   }
 
   public async addSong(song: Song) {
-    const songs = this._songsSubject.getValue();
-    const existing = songs.find((s) => s?.id == song?.id);
-
-    if(existing) {
-      existing.liked = song?.liked
-    } else {
-      songs.push(song);
-      this._songsSubject.next(songs);
+    this.list.addSong(song).then(() => {
       this.collection.songsCount++;
-    }
+      this.collection.totalDuration += song.duration
+    })
+  }
+
+  public async playOrPauseList() {
+    this.audioService.playOrPauseList(this.list)
   }
 
   public async removeSong(song: Song) {
-    this._songsSubject.next(this._songsSubject.getValue().filter((s) => s?.id != song?.id))
-    this.collection.songsCount--;
+    this.list.removeSong(song).then(() => {
+      this.collection.songsCount--;
+      this.collection.totalDuration -= song.duration
+    });
   }
 
 }

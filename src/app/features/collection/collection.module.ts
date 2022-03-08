@@ -10,6 +10,7 @@ import { AscBadgeModule } from 'src/app/components/badge-components/badge-compon
 import { AscSongModule } from 'src/app/components/song-components/song-components.module';
 import { AscPlaylistViewModule } from 'src/app/components/views/playlist-view.module';
 import { AscProfileBadgeModule } from 'src/app/components/badge-components/profile-badge/profile-badge.module';
+import { AscMessageModule } from 'src/app/components/message-components/message-components.module';
 
 const routes: Routes = [
   { path: "", component: CollectionInfoComponent }
@@ -32,6 +33,7 @@ const routes: Routes = [
     AscProfileBadgeModule,
     AscSongModule,
     AscPlaylistViewModule,
+    AscMessageModule,
 
     MatProgressBarModule
   ]
