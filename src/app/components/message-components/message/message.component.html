@@ -1,5 +1,5 @@
-<div class="p-2 flex flex-1 rounded-sm items-start w-full" [ngClass]="{ 'bg-error': mode == 'error', 'bg-info': mode == 'info', 'bg-warn text-background': mode == 'warn' }">
-    <span class="min-w-6 max-w-6 text-left align-middle text-xs" *ngIf="withIcon"><i [class]="faIcon"></i></span>
+<div class="p-3 flex flex-1 rounded-md items-start w-full" [ngClass]="{ 'bg-error': mode == 'error', 'bg-info': mode == 'info', 'bg-warn text-background': mode == 'warn' }">
+    <span class="min-w-7 max-w-7 text-left align-middle text-xs" *ngIf="withIcon"><i [class]="faIcon"></i></span>
 
     <p class="inline-block w-full align-middle text-xs tracking-wider font-normal" [ngClass]="{'text-background': mode == 'warn' }">
         <ng-content></ng-content>
