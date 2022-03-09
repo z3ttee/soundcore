@@ -21,6 +21,7 @@ const FADE_AUDIO_TOGGLE_MS = 1000;
 export class AudioService {
 
     private audio = new Audio();
+    private isCurrentlyFading: boolean = false;
 
     private _currentItemSubject: BehaviorSubject<CurrentPlayingItem> = new BehaviorSubject(null);
     private _pausedSubject: BehaviorSubject<boolean> = new BehaviorSubject(false as boolean);
@@ -97,6 +98,8 @@ export class AudioService {
      * to force play a new song.
      */
     private async play(item?: CurrentPlayingItem, fadeIn: boolean = false) {
+        if(this.isCurrentlyFading) return;
+
         if(item) {
             this.audio.src = await this.streamService.getStreamURL(item.song);
             this._currentItemSubject.next(item);
@@ -108,6 +111,20 @@ export class AudioService {
         }).catch(() => {
             this.showError("Das Lied kann nicht abgespielt werden.")
         });
+    }
+
+    /**
+     * Pause the playing audio
+     */
+     public pause(fadeOut: boolean = false) {
+        if(this.isCurrentlyFading) return;
+
+        if(!fadeOut || !this.settingsService.isAudioFadeAllowed()) {
+            this.audio.pause();
+            return;
+        }
+
+        this.fadeOutAudio(FADE_AUDIO_TOGGLE_MS).then(() => this.audio.pause());
     }
 
     /**
@@ -161,6 +178,7 @@ export class AudioService {
      * @returns void - Resolves after the fading has ended.
      */
     public async fadeInAudio(fadeDuration: number) {
+        this.isCurrentlyFading = true;
         return new Promise<void>((resolve) => {
             this.audio.volume = 0;
             const dstVolume = this._volumeSubject.getValue();
@@ -178,6 +196,8 @@ export class AudioService {
                     this.audio.volume += volumeInc;
                 })
             })
+        }).finally(() => {
+            this.isCurrentlyFading = false;
         })
     }
 
@@ -187,7 +207,9 @@ export class AudioService {
      * @returns void - Resolves after the fading has ended.
      */
     public async fadeOutAudio(fadeDuration: number) {
+        this.isCurrentlyFading = true;
         this._pausedSubject.next(true);
+
         return new Promise<void>((resolve) => {
             this.calculateVolumeIncAndDelay(this.audio.volume, fadeDuration).then((result) => {
                 const volumeInc = result[0];
@@ -204,6 +226,8 @@ export class AudioService {
                     this.audio.volume -= volumeInc;
                 })
             })
+        }).finally(() => {
+            this.isCurrentlyFading = false;
         })
     }
 
@@ -266,18 +290,6 @@ export class AudioService {
 
     public async enqueueList(list: PlayableList<any>) {
         this.queueService.enqueueList(list);
-    }
-
-    /**
-     * Pause the playing audio
-     */
-    public pause(fadeOut: boolean = false) {
-        if(!fadeOut || !this.settingsService.isAudioFadeAllowed()) {
-            this.audio.pause();
-            return;
-        }
-
-        this.fadeOutAudio(FADE_AUDIO_TOGGLE_MS).then(() => this.audio.pause());
     }
 
     /**
