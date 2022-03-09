@@ -1,7 +1,10 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { BehaviorSubject, firstValueFrom, Observable } from "rxjs";
+import { Page } from "src/app/pagination/pagination";
 import { environment } from "src/environments/environment";
+import { CreatePlaylistDTO } from "../../playlist/dtos/create-playlist.dto";
+import { Song } from "../../song/entities/song.entity";
 import { Index } from "../../upload/entities/index.entity";
 import { IndexStatusService } from "../../upload/services/index-status.service";
 import { CreateImportDTO } from "../dtos/create-import.dto";
@@ -79,6 +82,10 @@ export class ImportService {
         entity.upgradeIndex = index;
         imports[i] = entity;
         this._importsSubject.next(imports);
+    }
+
+    public async findSongsBySpotifyPlaylist(playlistUrl: string): Promise<Page<Song>> {
+        return firstValueFrom(this.httpClient.post<any>(`${environment.api_base_uri}/v1/imports/spotify`, { url: playlistUrl }))
     }
 
 }

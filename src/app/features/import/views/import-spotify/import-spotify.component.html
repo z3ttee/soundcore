@@ -1,0 +1,23 @@
+<section class="p-window">
+    <!-- Headline -->
+    <div class="mb-row">
+        <h3>Von Spotify importieren</h3>
+        <p class="opacity-70">Importiere Playlisten über Spotify-Links.</p>
+    </div>
+
+    <asc-message [mode]="'info'">Über diesen Dienst können keine Lieder von Spotify heruntergeladen werden. Es werden lediglich die Playlisten gespiegelt. Das bedeutet, dass alle Lieder auf dieser Plattform gesucht werden und zur passenden Playlist hinzugefügt werden.</asc-message>
+
+    <!-- Content -->
+    <div class="mt-row bg-background-light rounded-md overflow-hidden">
+        <div class="flex w-full shadow-sm bg-background border-b border-b-primary-light p-3">
+            <div class="w-full">
+                <button mat-stroked-button (click)="openCreateDialog()"><i class="fa-solid fa-plus"></i> Playlist importieren</button>
+            </div>
+        </div>
+
+        <div class="p-2">
+            <asc-import-list-item *ngFor="let import of ($imports | async)" [import]="import"></asc-import-list-item>
+            <p *ngIf="($imports | async).length <= 0" class="text-sm opacity-70 text-center p-2"><i class="fa-solid fa-circle-info"></i> Die Warteschlange ist leer.</p>
+        </div>
+    </div>
+</section>

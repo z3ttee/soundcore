@@ -1,21 +1,8 @@
-<section class="p-4">
-    <!-- Headline -->
-    <div class="mb-4">
-        <h3>Importieren</h3>
-        <p class="opacity-70">Importiere Lieder oder Playlisten über YouTube-Links.</p>
-    </div>
+<div *teleportTo="'toolbarSection'">
+    <ul class="inline-flex flex-nowrap justify-center">
+        <li class="inline-block px-3 py-3 mx-1 rounded-md hover:bg-background-light active:bg-background-dark text-xs cursor-pointer transition-all" [routerLink]="['/import']" [routerLinkActiveOptions]="{ exact: true }" [routerLinkActive]="'text-accent-dark'">YouTube</li>
+        <li class="inline-block px-3 py-3 mx-1 rounded-md hover:bg-background-light active:bg-background-dark text-xs cursor-pointer transition-all" [routerLink]="['/import/spotify']" [routerLinkActiveOptions]="{ exact: true }" [routerLinkActive]="'text-accent-dark'">Spotify</li>
+    </ul>
+</div>
 
-    <!-- Content -->
-    <div class="my-8 bg-background-light rounded-md overflow-hidden">
-        <div class="flex w-full shadow-sm bg-background border-b border-b-primary-light p-3">
-            <div class="w-full">
-                <button mat-stroked-button (click)="openCreateDialog()"><i class="fa-solid fa-plus"></i> Importieren</button>
-            </div>
-        </div>
-
-        <div class="p-2">
-            <asc-import-list-item *ngFor="let import of ($imports | async)" [import]="import"></asc-import-list-item>
-            <p *ngIf="($imports | async).length <= 0" class="text-sm opacity-70 text-center p-2"><i class="fa-solid fa-circle-info"></i> Die Warteschlange ist leer.</p>
-        </div>
-    </div>
-</section>
+<router-outlet></router-outlet>

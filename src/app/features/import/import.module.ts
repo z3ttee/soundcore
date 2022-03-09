@@ -19,18 +19,30 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { ImportStatusService } from './services/import-status.service';
 import { AscBadgeModule } from 'src/app/components/badge-components/badge-components.module';
 import { AscMessageModule } from 'src/app/components/message-components/message-components.module';
+import { TeleportModule } from '@ngneat/overview';
+import { ImportYoutubeComponent } from './views/import-youtube/import-youtube.component';
+import { ImportSpotifyComponent } from './views/import-spotify/import-spotify.component';
+import { CreateSpotifyDialogComponent } from './dialogs/create-spotify-import/create-spotify.component';
 
 const routes: Routes = [
-  { path: "", component: ImportIndexComponent }
+  { path: "", component: ImportIndexComponent, children: [
+    { path: "", component: ImportYoutubeComponent },
+    { path: "spotify", component: ImportSpotifyComponent }
+  ]}
 ]
 
 @NgModule({
   declarations: [
     ImportIndexComponent,
+    ImportYoutubeComponent,
+    ImportSpotifyComponent,
     ImportListItemComponent,
+
+    CreateSpotifyDialogComponent,
     CreateImportComponent
   ],
   imports: [
+    TeleportModule,
     CommonModule,
     RouterModule.forChild(routes),
 
