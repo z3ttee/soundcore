@@ -9,4 +9,20 @@
             <mat-checkbox [formControl]="enableAudioFadingControl" color="accent"><span class="font-normal">Audio-Fading aktivieren</span></mat-checkbox>
         </div>
     </div>
+
+    <div class="bg-background p-4 border border-primary-light rounded-md my-row">
+        <h6>Entwickler-Einstellungen</h6>
+        <p class="text-sm text-white-dark text-opacity-60">Diese Einstellungen sind nur für Entwickler geeignet und können dafür sorgen, dass dein Konto von Drittparteien übernommen wird.</p>
+
+        <div class="mt-row">
+            <p>Sitzungsschlüssel</p>
+            <textarea *ngIf="showSessionKey" class="mt-2 w-full border-2 border-primary-light bg-background-dark rounded-md outline-none px-4 text-xs text-white-dark font-normal" cols="1" type="text" rows="6" readonly>
+                {{ (authService.$session | async)?.accessToken }}
+            </textarea>
+
+            <div class="mt-2">
+                <button mat-stroked-button (click)="showSessionKey = !showSessionKey">{{ showSessionKey ? "Verstecken" : "Anzeigen" }}</button>
+            </div>
+        </div>
+    </div>
 </section>

@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { BehaviorSubject, Observable, Subject, takeUntil } from 'rxjs';
 import { SettingsService } from 'src/app/services/settings.service';
+import { AuthenticationService } from 'src/app/sso/authentication.service';
 
 @Component({
   templateUrl: './settings-index.component.html',
@@ -10,7 +11,8 @@ import { SettingsService } from 'src/app/services/settings.service';
 export class SettingsIndexComponent implements OnInit {
 
   constructor(
-    private settingsService: SettingsService
+    private settingsService: SettingsService,
+    public authService: AuthenticationService
   ) { }
 
   // Destroy subscriptions
@@ -19,6 +21,7 @@ export class SettingsIndexComponent implements OnInit {
 
   // Form fields
   public enableAudioFadingControl: FormControl = new FormControl(this.settingsService.isAudioFadeAllowed());
+  public showSessionKey: boolean = false;
 
   public ngOnInit(): void {
     this.enableAudioFadingControl.valueChanges.pipe(takeUntil(this.$destroy)).subscribe((value: boolean) => {
