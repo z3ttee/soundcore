@@ -39,6 +39,7 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { AscPlaylistEditorDialogModule } from './components/dialogs/playlist-editor-dialog/playlist-editor-dialog.module';
 import { AscToolbarModule } from './components/toolbar/toolbar.module';
 import { AscConfirmDialogModule } from './components/dialogs/confirm-dialog/confirm-dialog.module';
+import { KeycloakModule } from 'src/sso/keycloak.module';
 
 // TODO: https://angular.io/guide/i18n-common-prepare
 
@@ -54,6 +55,8 @@ import { AscConfirmDialogModule } from './components/dialogs/confirm-dialog/conf
     SplashComponent
   ],
   imports: [
+    KeycloakModule,
+
     BrowserModule,
     AppRoutingModule,
     BrowserAnimationsModule,
