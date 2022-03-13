@@ -3,7 +3,7 @@ import { FormControl } from '@angular/forms';
 import { KeycloakService } from 'keycloak-angular';
 import { BehaviorSubject, Observable, Subject, takeUntil } from 'rxjs';
 import { SettingsService } from 'src/app/services/settings.service';
-import { AuthenticationService } from 'src/app/sso/authentication.service';
+import { AuthenticationService } from 'src/sso/services/authentication.service';
 
 @Component({
   templateUrl: './settings-index.component.html',

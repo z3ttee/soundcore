@@ -24,7 +24,7 @@
                 <div class="inline-flex items-center">
                     <p class="text-sm mr-1">+{{ playlist?.collaborators?.length }}</p>
                     
-                    <asc-user-avatar class="w-6 aspect-square rounded-full overflow-hidden transform-gpu cursor-pointer" [ngClass]="{'-translate-x-1/2 shadow-md': i != 0 }" *ngFor="let user of playlist?.collaborators; index as i" [resourceId]="user.avatarResourceId" [matTooltip]="user.username" [routerLink]="['/profile', user.id]"></asc-user-avatar>
+                    <asc-user-avatar class="w-6 aspect-square rounded-full overflow-hidden transform-gpu cursor-pointer" [ngClass]="{'-translate-x-1/2 shadow-md': i != 0 }" *ngFor="let user of playlist?.collaborators; index as i" [resourceId]="null" [matTooltip]="user.username" [routerLink]="['/profile', user.id]"></asc-user-avatar>
                 </div>
             </li>
         </ul>

@@ -17,7 +17,7 @@
         <div class="mt-row">
             <p>Sitzungsschlüssel</p>
             <textarea *ngIf="showSessionKey" class="mt-2 w-full border-2 border-primary-light bg-background-dark rounded-md outline-none px-4 text-xs text-white-dark font-normal" cols="1" type="text" rows="6" readonly>
-                {{ (authService.$session | async)?.accessToken }}
+                {{ (authService.$token | async) }}
             </textarea>
 
             <div class="mt-2">

@@ -4,7 +4,7 @@ import { Playlist } from 'src/app/features/playlist/entities/playlist.entity';
 import { AudioService } from 'src/app/features/stream/services/audio.service';
 import { User } from 'src/app/features/user/entities/user.entity';
 import { DeviceService } from 'src/app/services/device.service';
-import { AuthenticationService } from 'src/app/sso/authentication.service';
+import { AuthenticationService } from 'src/sso/services/authentication.service';
 
 @Component({
   selector: 'asc-playlist-list-item',

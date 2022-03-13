@@ -70,11 +70,11 @@ export class BestMatchComponent implements OnInit {
       const user = (this.item.match as User);
       this.title = user.username
 
-      if(user.avatarResourceId) {
-        this.coverSrc = `${environment.sso_base_uri}/media/avatars/${(this.item.match as User).avatarResourceId}`;
-      } else {
+      // if(user.avatarResourceId) {
+      //   this.coverSrc = `${environment.sso_base_uri}/media/avatars/${(this.item.match as User).avatarResourceId}`;
+      // } else {
         this.coverSrc = "/assets/img/missing_cover.png"
-      }
+      // }
     }
   }
 

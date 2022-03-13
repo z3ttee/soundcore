@@ -24,7 +24,7 @@
 
   <div class="inline-flex items-center justify-end min-w-fit max-w-fit" *ngIf="(authService.$user | async)">
     <span class="hidden md:inline"><asc-profile-badge [align]="'rtl'" [user]="(authService.$user | async)" [matMenuTriggerFor]="menu"></asc-profile-badge></span>
-    <span class="w-6 h-6 rounded-full overflow-hidden md:hidden"><asc-user-avatar [resourceId]="(authService.$user | async).avatarResourceId" [matMenuTriggerFor]="menu"></asc-user-avatar></span>
+    <span class="w-6 h-6 rounded-full overflow-hidden md:hidden"><asc-user-avatar [resourceId]="null" [matMenuTriggerFor]="menu"></asc-user-avatar></span>
   </div>
 </div>
 

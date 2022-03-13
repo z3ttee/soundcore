@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { User } from 'src/app/features/user/entities/user.entity';
-import { AuthenticationService } from 'src/app/sso/authentication.service';
+import { AuthenticationService } from 'src/sso/services/authentication.service';
 
 @Component({
   selector: 'asc-profile-dropdown',
@@ -18,7 +18,7 @@ export class AscProfileDropdownComponent implements OnInit {
   public ngOnInit(): void {}
 
   public async logout() {
-    this.authService.logout().then(() => window.location.reload());
+    this.authService.logout();
   }
 
 }

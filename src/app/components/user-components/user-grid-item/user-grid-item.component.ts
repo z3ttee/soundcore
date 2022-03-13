@@ -19,12 +19,12 @@ export class UserGridItemComponent implements OnInit {
   }
 
   public async ngOnInit() {
-    if(this.user.avatarResourceId) {
-      this.coverSrc = `${environment.sso_base_uri}/media/avatars/${this.user.avatarResourceId}`;
+    // if(this.user.avatarResourceId) {
+    //   this.coverSrc = `${environment.sso_base_uri}/media/avatars/${this.user.avatarResourceId}`;
       // this.accentColor = this.artist.artwork.accentColor || "#000000";
-    } else {
+    // } else {
       this.coverSrc = "/assets/img/missing_cover.png"
-    }
+    // }
   }
 
 }

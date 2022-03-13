@@ -2,10 +2,10 @@ import { Location } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { catchError, debounceTime, distinctUntilChanged, Observable, of, startWith, switchMap, tap } from 'rxjs';
+import { catchError, Observable, of, tap } from 'rxjs';
 import { ComplexSearchResult } from 'src/app/features/search/entities/search-result.model';
-import { AuthenticationService } from 'src/app/sso/authentication.service';
 import { environment } from 'src/environments/environment';
+import { AuthenticationService } from 'src/sso/services/authentication.service';
 
 @Component({
   selector: 'asc-toolbar',
@@ -65,9 +65,7 @@ export class AscToolbarComponent implements OnInit {
   }
 
   public logout() {
-    this.authService.logout().then(() => {
-      window.location.reload()
-    })
+    this.authService.logout()
   }
 
   public navigateBack() {

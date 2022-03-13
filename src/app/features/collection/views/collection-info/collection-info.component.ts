@@ -4,9 +4,9 @@ import { Song } from 'src/app/features/song/entities/song.entity';
 import { AudioService } from 'src/app/features/stream/services/audio.service';
 import { LikeService } from 'src/app/services/like.service';
 import { ScrollService } from 'src/app/services/scroll.service';
-import { AuthenticationService } from 'src/app/sso/authentication.service';
 import { ListCreator } from 'src/lib/data/list-creator';
 import { PlayableList } from 'src/lib/data/playable-list.entity';
+import { AuthenticationService } from 'src/sso/services/authentication.service';
 import { Collection } from '../../entities/collection.entity';
 import { CollectionService } from '../../services/collection.service';
 

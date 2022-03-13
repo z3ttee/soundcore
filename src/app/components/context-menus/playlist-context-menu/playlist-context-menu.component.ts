@@ -6,8 +6,8 @@ import { PlaylistService } from 'src/app/features/playlist/services/playlist.ser
 import { AudioService } from 'src/app/features/stream/services/audio.service';
 import { ContextMenuService } from 'src/app/services/context-menu.service';
 import { DeviceService } from 'src/app/services/device.service';
-import { AuthenticationService } from 'src/app/sso/authentication.service';
 import { ListCreator } from 'src/lib/data/list-creator';
+import { AuthenticationService } from 'src/sso/services/authentication.service';
 import { AscContextMenuTemplateComponent } from '../context-menu-template/context-menu-template.component';
 
 @Component({

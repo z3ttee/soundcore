@@ -6,7 +6,8 @@ export const environment = {
   
   api_base_uri: "https://api.tsalliance.eu/soundcore",
 
-  keycloak_auth_server_url: "http://localhost:8888/auth",
-  keycloak_realm: "TSAlliance",
-  keycloak_client_id: "alliance-soundcore-app"
+  keycloak_auth_server_url: "https://sso.tsalliance.eu/auth",
+  keycloak_realm: "tsalliance",
+  keycloak_client_id: "alliance-soundcore-app",
+  keycloak_account_console_url: "https://sso.tsalliance.eu/realms/tsalliance/account/"
 };

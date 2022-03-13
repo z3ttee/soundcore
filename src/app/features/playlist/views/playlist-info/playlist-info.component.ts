@@ -6,9 +6,9 @@ import { AudioService } from 'src/app/features/stream/services/audio.service';
 import { User } from 'src/app/features/user/entities/user.entity';
 import { LikeService } from 'src/app/services/like.service';
 import { ScrollService } from 'src/app/services/scroll.service';
-import { AuthenticationService } from 'src/app/sso/authentication.service';
 import { ListCreator } from 'src/lib/data/list-creator';
 import { PlayableList } from 'src/lib/data/playable-list.entity';
+import { AuthenticationService } from 'src/sso/services/authentication.service';
 import { Playlist } from '../../entities/playlist.entity';
 import { PlaylistService } from '../../services/playlist.service';
 

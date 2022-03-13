@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
-import { AuthenticationService } from "src/app/sso/authentication.service";
 import { environment } from "src/environments/environment";
+import { AuthenticationService } from "src/sso/services/authentication.service";
 import { Song } from "../../song/entities/song.entity";
 
 @Injectable()
@@ -24,7 +24,7 @@ export class StreamService {
 
     public async getStreamURL(song: Song) {
         if(!song) return "";
-        return `${environment.api_base_uri}/v1/streams/songs/${song.id}?accessToken=${this.authService.getAccessToken()}`;
+        return `${environment.api_base_uri}/v1/streams/songs/${song.id}?accessToken=${await this.authService.getAccessToken()}`;
     }
 
     /*public async forcePlay(song: Song) {

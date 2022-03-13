@@ -7,8 +7,8 @@ import { Page, Pageable } from 'src/app/pagination/pagination';
 import { DialogService } from 'src/app/services/dialog.service';
 import { LikeService } from 'src/app/services/like.service';
 import { SnackbarService } from 'src/app/services/snackbar.service';
-import { AuthenticationService } from 'src/app/sso/authentication.service';
 import { environment } from 'src/environments/environment';
+import { AuthenticationService } from 'src/sso/services/authentication.service';
 import { Song } from '../../song/entities/song.entity';
 import { CreatePlaylistDTO } from '../dtos/create-playlist.dto';
 import { UpdatePlaylistDTO } from '../dtos/update-playlist.dto';
@@ -66,6 +66,10 @@ export class PlaylistService {
 
   public async findPageByAuthor(authorId: string = "@me"): Promise<Page<Playlist>> {
     return firstValueFrom(this.httpClient.get(`${environment.api_base_uri}/v1/playlists/byAuthor/${authorId}`)) as Promise<Page<Playlist>>
+  }
+
+  public async findByCurrentUser(): Promise<Page<Playlist>> {
+    return firstValueFrom(this.httpClient.get<Page<Playlist>>(`${environment.api_base_uri}/v1/playlists/byUser`))
   }
 
   public async addSongs(playlistId: string, songs: Song[]): Promise<Playlist> {
@@ -129,7 +133,9 @@ export class PlaylistService {
 
   public async restoreAndFindPlaylists(): Promise<Playlist[]> {
     // TODO: Restore from localStorage or maybe indexeddb
-    return (await this.findAllOfMe()).elements
+    const result = await this.findByCurrentUser();
+    console.log(result)
+    return result?.elements
   }
 
   public async deleteById(playlistId: string): Promise<void> {
@@ -138,11 +144,11 @@ export class PlaylistService {
     });
   }
 
-  private async findAllOfMe(): Promise<Page<Playlist>> {
+  /*private async findAllOfMe(): Promise<Page<Playlist>> {
     return firstValueFrom(this.httpClient.get<Page<Playlist>>(`${environment.api_base_uri}/v1/playlists/byAuthor/@me`)).catch(() => {
       return Page.of([])
     })
-  }
+  }*/
 
   private async handlePlaylistsUpdateEvent(playlists: Playlist[]): Promise<void> {
     // TODO: Properly save playlists for caching to localStorage or maybe IndexedDB?
