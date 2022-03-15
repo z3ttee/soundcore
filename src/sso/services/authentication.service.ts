@@ -11,9 +11,9 @@ export class AuthenticationService {
 
     private readonly _readSubject: BehaviorSubject<boolean> = new BehaviorSubject(false);
     private readonly _userSubject: BehaviorSubject<User> = new BehaviorSubject(new User());
+    private readonly _tokenSubject: BehaviorSubject<string> = new BehaviorSubject(null);
 
-    // TODO
-    public $token: Observable<string> = of(""); 
+    public $token: Observable<string> = this._tokenSubject.asObservable(); 
     // TODO
     public $user: Observable<User> = this._userSubject.asObservable();
     public $ready: Observable<boolean> = this._readSubject.asObservable();
@@ -21,6 +21,8 @@ export class AuthenticationService {
     constructor(
         private keycloakService: KeycloakService
     ) {
+        this.reloadSessionDetails();
+
         keycloakService.keycloakEvents$.subscribe((event: KeycloakEvent) => {
             if(event.type == KeycloakEventType.OnReady) {
                 const authenticated = event.args[0] as boolean;
@@ -33,18 +35,14 @@ export class AuthenticationService {
                 console.log("[AUTH] User logged out.")
                 window.location.reload();
             }
+
+            if(event.type == KeycloakEventType.OnAuthSuccess) {
+                this.reloadSessionDetails()
+                console.log("[AUTH] User logged in.")
+            }
         })
 
-        keycloakService.loadUserProfile().then((profile) => {
-            if(!profile) return;
-
-            const user = new User();
-            user.id = profile.id;
-            user.username = profile.username;
-
-            this._userSubject.next(user);
-            this._readSubject.next(true);
-        })
+        
     }
 
     public async getAccessToken() {
@@ -59,6 +57,27 @@ export class AuthenticationService {
         this.keycloakService.logout().then(() => {
             this.keycloakService.clearToken()
         });
+    }
+
+    public async goToAccount() {
+        this.keycloakService.getKeycloakInstance().accountManagement()
+    }
+
+    private async reloadSessionDetails() {
+        this.keycloakService.loadUserProfile().then((profile) => {
+            if(!profile) return;
+
+            const user = new User();
+            user.id = profile.id;
+            user.username = profile.username;
+
+            this._userSubject.next(user);
+            this._readSubject.next(true);
+
+            this.keycloakService.getToken().then((token) => {
+                this._tokenSubject.next(token)
+            })
+        })
     }
 
 

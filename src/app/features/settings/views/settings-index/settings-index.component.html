@@ -16,9 +16,10 @@
 
         <div class="mt-row">
             <p>Sitzungsschlüssel</p>
-            <textarea *ngIf="showSessionKey" class="mt-2 w-full border-2 border-primary-light bg-background-dark rounded-md outline-none px-4 text-xs text-white-dark font-normal" cols="1" type="text" rows="6" readonly>
-                {{ (authService.$token | async) }}
-            </textarea>
+
+            <div *ngIf="showSessionKey" class="w-full mt-2 border-2 border-primary-light bg-background-dark rounded-md outline-none p-4 ">
+                <p class="text-xs text-white-dark font-normal break-words">{{ (authService.$token | async) }}</p>
+            </div>
 
             <div class="mt-2">
                 <button mat-stroked-button (click)="showSessionKey = !showSessionKey">{{ showSessionKey ? "Verstecken" : "Anzeigen" }}</button>
