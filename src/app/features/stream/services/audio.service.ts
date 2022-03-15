@@ -101,7 +101,14 @@ export class AudioService {
         if(this.isCurrentlyFading) return;
 
         if(item) {
-            this.audio.src = await this.streamService.getStreamURL(item.song);
+            const token = await this.streamService.getTokenForSong(item.song).catch((error) => {
+                console.error(error);
+                this.showError("Das Lied kann nicht abgespielt werden.")
+                return null;
+            });
+
+            if(!token) return;
+            this.audio.src = await this.streamService.getStreamURL(token);
             this._currentItemSubject.next(item);
         }
 

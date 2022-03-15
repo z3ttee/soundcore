@@ -6,6 +6,7 @@ import { Label } from "src/app/model/label.model";
 import { Publisher } from "src/app/model/publisher.model";
 import { Album } from "../../album/entities/album.entity";
 import { PlaylistItem } from "../../playlist/entities/playlist-item.entity";
+import { StreamToken } from "../../stream/entities/stream-token.entity";
 import { Index } from "../../upload/entities/index.entity";
 
 export class Song {
