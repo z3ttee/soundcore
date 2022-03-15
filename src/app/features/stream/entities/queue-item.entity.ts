@@ -1,4 +1,3 @@
-import { HttpClient } from "@angular/common/http";
 import { PlayableList } from "src/lib/data/playable-list.entity";
 import { Song } from "../../song/entities/song.entity";
 

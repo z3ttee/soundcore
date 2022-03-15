@@ -1,8 +1,5 @@
-import { SSOUser } from "src/app/sso/entities/sso-user.entity";
-
-export class User extends SSOUser {
-    public override id: string;
-    public override username: string;
-    public override avatarResourceId?: string;
+export class User  {
+    public id: string;
+    public username: string;
     public accentColor?: string;
 }

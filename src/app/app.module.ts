@@ -21,7 +21,6 @@ import {MatListModule} from '@angular/material/list';
 import {MatDividerModule} from '@angular/material/divider';
 import { AppCommonModule } from './common.module';
 import { DeviceService } from './services/device.service';
-import { AccessTokenInterceptor } from './sso/interceptors/access-token.interceptor';
 import {MatProgressBarModule} from '@angular/material/progress-bar';
 
 import { TeleportModule } from '@ngneat/overview';
@@ -39,6 +38,7 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { AscPlaylistEditorDialogModule } from './components/dialogs/playlist-editor-dialog/playlist-editor-dialog.module';
 import { AscToolbarModule } from './components/toolbar/toolbar.module';
 import { AscConfirmDialogModule } from './components/dialogs/confirm-dialog/confirm-dialog.module';
+import { KeycloakModule } from 'src/sso/keycloak.module';
 
 // TODO: https://angular.io/guide/i18n-common-prepare
 
@@ -54,6 +54,8 @@ import { AscConfirmDialogModule } from './components/dialogs/confirm-dialog/conf
     SplashComponent
   ],
   imports: [
+    KeycloakModule,
+
     BrowserModule,
     AppRoutingModule,
     BrowserAnimationsModule,
@@ -85,12 +87,7 @@ import { AscConfirmDialogModule } from './components/dialogs/confirm-dialog/conf
     MatSnackBarModule
   ],
   providers: [
-    DeviceService,
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: AccessTokenInterceptor,
-      multi: true,
-    }
+    DeviceService
   ],
   bootstrap: [AppComponent]
 })

@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { map, Observable, Subject, switchMap, takeUntil } from 'rxjs';
+import { Observable, Subject, takeUntil } from 'rxjs';
 import { User } from '../../entities/user.entity';
 import { UserService } from '../../services/user.service';
 

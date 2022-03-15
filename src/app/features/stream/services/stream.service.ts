@@ -1,7 +1,10 @@
+import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import { AuthenticationService } from "src/app/sso/authentication.service";
+import { firstValueFrom } from "rxjs";
 import { environment } from "src/environments/environment";
+import { AuthenticationService } from "src/sso/services/authentication.service";
 import { Song } from "../../song/entities/song.entity";
+import { StreamToken } from "../entities/stream-token.entity";
 
 @Injectable()
 export class StreamService {
@@ -19,12 +22,18 @@ export class StreamService {
     private audio = new Audio();*/
 
     constructor(
+        private httpClient: HttpClient,
         private authService: AuthenticationService
     ) {}
 
-    public async getStreamURL(song: Song) {
-        if(!song) return "";
-        return `${environment.api_base_uri}/v1/streams/songs/${song.id}?accessToken=${this.authService.getAccessToken()}`;
+    public async getStreamURL(token: StreamToken) {
+        if(!token) return "";
+        return `${environment.api_base_uri}/v1/streams/songs?token=${token.token}`;
+    }
+
+    public async getTokenForSong(song: Song): Promise<StreamToken> {
+        if(!song) return null;
+        return firstValueFrom(this.httpClient.get<StreamToken>(`${environment.api_base_uri}/v1/streams/token/${song.id}`));
     }
 
     /*public async forcePlay(song: Song) {

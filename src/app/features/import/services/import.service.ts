@@ -3,7 +3,6 @@ import { Injectable } from "@angular/core";
 import { BehaviorSubject, firstValueFrom, Observable } from "rxjs";
 import { Page } from "src/app/pagination/pagination";
 import { environment } from "src/environments/environment";
-import { CreatePlaylistDTO } from "../../playlist/dtos/create-playlist.dto";
 import { Song } from "../../song/entities/song.entity";
 import { Index } from "../../upload/entities/index.entity";
 import { IndexStatusService } from "../../upload/services/index-status.service";

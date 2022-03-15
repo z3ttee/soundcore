@@ -5,7 +5,7 @@
         </div>
 
         <div class="absolute top-0 left-0 min-w-4 max-w-4 h-4 rounded-full overflow-hidden transform-gpu -translate-x-1/4 -translate-y-1/4" *ngIf="playlist?.author?.id != ($user | async)?.id">
-            <asc-user-avatar [resourceId]="playlist?.author?.avatarResourceId"></asc-user-avatar>
+            <asc-user-avatar [resourceId]="null"></asc-user-avatar>
         </div>
     </div>
 

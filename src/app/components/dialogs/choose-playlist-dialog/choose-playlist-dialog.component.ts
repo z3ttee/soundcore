@@ -1,9 +1,9 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
-import { filter, map, Observable, Subject, takeUntil } from 'rxjs';
+import { map, Observable, Subject, takeUntil } from 'rxjs';
 import { Playlist } from 'src/app/features/playlist/entities/playlist.entity';
 import { PlaylistService } from 'src/app/features/playlist/services/playlist.service';
-import { AuthenticationService } from 'src/app/sso/authentication.service';
+import { AuthenticationService } from 'src/sso/services/authentication.service';
 
 @Component({
   templateUrl: './choose-playlist-dialog.component.html',
