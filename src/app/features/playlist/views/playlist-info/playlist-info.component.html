@@ -54,6 +54,7 @@
         </div>-->
 
         <!-- Songs list -->
-        <asc-song-list [dataSource]="$songs" [playlistContext]="playlist" [showCount]="false" [showMore]="($songs | async).length < playlist?.songsCount" (onMore)="findSongs()"></asc-song-list>
+        <!--<asc-song-list [dataSource]="$songs" [playlistContext]="playlist" [showCount]="false" [showMore]="($songs | async).length < playlist?.songsCount" (onMore)="findSongs()"></asc-song-list>-->
+        <asc-playable-list [list]="playableList"></asc-playable-list>
     </div>
 </asc-playlist-view>

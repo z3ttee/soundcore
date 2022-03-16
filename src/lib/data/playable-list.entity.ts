@@ -15,6 +15,7 @@ export class PlayableList<T> {
     private readonly _dataSourceSubject: BehaviorSubject<Song[]> = new BehaviorSubject([]);
     private readonly _errorSubject: Subject<Error> = new Subject();
     private readonly _totalElementsSubject: BehaviorSubject<number> = new BehaviorSubject(0);
+    private readonly _sizeSubject: BehaviorSubject<number> = new BehaviorSubject(0);
     private readonly _currentPageIndexSubject: BehaviorSubject<number> = new BehaviorSubject(0);
 
     public readonly type: PlayableListType;
@@ -27,6 +28,7 @@ export class PlayableList<T> {
     public readonly $isReady: Observable<boolean> = this._readySubject.asObservable().pipe(takeUntil(this.$destroy));
     public readonly $error: Observable<Error> = this._errorSubject.asObservable().pipe(takeUntil(this.$destroy));
     public readonly $totalElements: Observable<number> = this._totalElementsSubject.asObservable().pipe(takeUntil(this.$destroy));
+    public readonly $size: Observable<number> = this._sizeSubject.asObservable().pipe(takeUntil(this.$destroy));
     public readonly $currentPageIndex: Observable<number> = this._currentPageIndexSubject.asObservable().pipe(takeUntil(this.$destroy));
 
     private readonly _dataSource: Record<string, Song> = {};
@@ -91,15 +93,14 @@ export class PlayableList<T> {
         const isLoading = this._loadingSubject.getValue();
         if(isLoading) return;
 
-        console.log("fetching next page")
         this._loadingSubject.next(true);
         firstValueFrom(this._httpClient.get<Page<Song>>(this._metadataUrl+Pageable.toQuery({ page: this._currentPageIndex, size: PLAYLIST_BATCH_SIZE }))).then((page) => {
-            console.log(page)
             // Update totalElements count
             this._totalElements = page.totalElements;
             this._totalElementsSubject.next(page.totalElements);
             
             if(page.elements.length > 0) {
+                this._sizeSubject.next(this._sizeSubject.getValue() + page.elements.length)
                 // Update page index
                 this._currentPageIndex++;
                 this._currentPageIndexSubject.next(this._currentPageIndex);
@@ -109,6 +110,7 @@ export class PlayableList<T> {
 
                 while (i < length) {
                     const song = page.elements[i];
+                    song.playableListId = this.id;
                     if(song) this._dataSource[song.id] = song;
                     i++;
                 }

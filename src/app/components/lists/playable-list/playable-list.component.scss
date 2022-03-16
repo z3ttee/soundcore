@@ -1,0 +1,58 @@
+:host {
+
+    .col-gap {
+        @apply gap-4;
+    }
+
+    .col {
+        @apply px-4;
+    }
+
+    .col-text {
+        @apply text-xs tracking-wide opacity-70;
+    }
+
+    .text {
+        @apply text-xs text-white-dark text-opacity-80;
+    }
+
+    .id-col {
+        @apply inline-flex max-w-11 min-w-11 w-11 aspect-square items-center justify-center;
+    }
+
+    .title-col {
+        @apply w-full;
+    }
+
+    .count-col {
+        @apply max-w-44 min-w-44 text-right;
+    }
+
+    .album-col {
+        @apply max-w-44 min-w-44 text-right line-clamp-1;
+    }
+    
+    .addedAt-col {
+        @apply max-w-44 min-w-44 text-right;
+    }
+
+    .duration-col {
+        @apply max-w-12 min-w-12 text-right;
+    }
+
+    .row {
+        .play-btn {
+            @apply opacity-0 pointer-events-none;
+        }
+
+        &:hover {
+            .id-text {
+                @apply opacity-0;
+            }
+            .play-btn {
+                @apply opacity-100 pointer-events-auto;
+            }
+        }
+    }
+
+}
