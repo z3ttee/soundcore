@@ -108,6 +108,7 @@ export class AudioService {
             });
 
             if(!token) return;
+            console.log(item.song.playableListId)
             this.audio.src = await this.streamService.getStreamURL(token);
             this._currentItemSubject.next(item);
         }

@@ -42,4 +42,6 @@ export class Song {
     public liked?: boolean;
     public likedAt?: Date;
 
+    public playableListId?: string;
+
 }

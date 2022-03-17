@@ -10,10 +10,10 @@ function initializeKeycloak(keycloak: KeycloakService) {
           realm: environment.keycloak_realm,
           clientId: environment.keycloak_client_id
         },
+        loadUserProfileAtStartUp: true,
         initOptions: {
           onLoad: 'check-sso',
-          silentCheckSsoRedirectUri:
-            window.location.origin + '/assets/silent-check-sso.html'
+          silentCheckSsoRedirectUri: window.location.origin + '/assets/silent-check-sso.html'
         }
       });
   }

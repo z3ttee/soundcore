@@ -1,0 +1,76 @@
+<div #container class="flex flex-col w-full gap-1" *ngIf="($list | async)">
+    <ul class="flex flex-1 w-full items-center px-2">
+        <li class="col-text col id-col" *ngIf="($showId | async)">#</li>
+        <li class="col-text flex-grow">Titel</li>
+        <li class="col-text col count-col" *ngIf="($showCount | async)">Wiedergaben</li>
+        <li class="col-text col album-col" *ngIf="($showAlbum | async)">Album</li>
+        <li class="col-text col addedAt-col" *ngIf="($showDate | async)">Hinzugefügt am</li>
+        <li class="col-text col duration-col text text-right"><i class="fa-solid fa-stopwatch"></i></li>
+        <li class="col-text menu-col"></li>
+    </ul>
+
+    <div (contextmenu)="openContextMenu($event, song)" class="row flex flex-1 w-full p-1.5 items-center rounded-md cursor-pointer hover:bg-background-light hover:bg-opacity-60" *ngFor="let song of (($list | async).$dataSource | async); index as i">
+        <!-- ID -->
+        <div class="id-col text relative" *ngIf="($showId | async)">
+            <span class="id-text opacity-70" [ngClass]="{'text-accent-dark drop-shadow-sm': (audioService.$currentItem | async)?.id == song.id}" *ngIf="(audioService.$currentItem | async)?.id != song.id || (audioService.$paused | async)">{{ i + 1 }}</span>
+            
+            <div class="transform absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-9 pointer-events-none text-center" *ngIf="(audioService.$currentItem | async)?.id == song.id && !(audioService.$paused | async)">
+                <ng-lottie [options]="animOptions" class="aspect-square"></ng-lottie>
+            </div>
+
+            <div class="play-btn z-10 transition-all transform-gpu absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 will-change-transform rounded-full bg-accent-dark shadow-lg text-background w-7 h-7 overflow-hidden flex justify-center items-center" (click)="playOrPause(song)">
+                <i class="fa-solid fa-play text-xxs" *ngIf="(audioService.$currentItem | async)?.id != song.id"></i>
+                <i class="fa-solid fa-play text-xxs" *ngIf="(audioService.$paused | async) && (audioService.$currentItem | async)?.id == song.id"></i>
+                <i class="fa-solid fa-pause text-xxs" *ngIf="!(audioService.$paused | async) && (audioService.$currentItem | async)?.id == song.id"></i>
+            </div>
+        </div>
+
+        <!-- Song title -->
+        <div class="w-full">
+            <div class="flex items-center gap-2">
+                <div class="min-w-11 max-w-11 h-11 rounded-sm overflow-hidden" *ngIf="($showCover | async)">
+                    <asc-artwork [artwork]="song?.artwork" [showAccent]="false"></asc-artwork>
+                </div>
+
+                <div class="w-full">
+                    <p class="font-bold text-sm line-clamp-1" [ngClass]="{'text-accent-dark drop-shadow-sm': (audioService.$currentItem | async)?.id == song.id}">{{ song.title }}</p>
+                    <div class="line-clamp-1 opacity-60">
+                        <ul>
+                            <li *ngIf="song.explicit" class="inline"><span class="inline-flex font-light mr-1 items-center justify-center rounded-sm bg-primary-light text-xs w-4 aspect-square">E</span></li>
+                            <li *ngFor="let artist of song.artists; index as i" class="inline"><span class="text-xs hover:underline leading-3 pointer-events-all cursor-pointer" [routerLink]="['/artist', artist.slug || artist.id]">{{ artist.name }}</span>{{ i + 1 < song.artists.length ? ", " : "" }}</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stream count -->
+        <div class="col count-col text" *ngIf="($showCount | async)">{{ song.streamCount || 0 }}</div>
+
+        <!-- Song album -->
+        <div class="col album-col" *ngIf="($showAlbum | async)">
+            <span [routerLink]="['/album', song.albums?.[0]?.slug || song.albums?.[0]?.id]" class="text-xs text-white-dark text-opacity-70 hover:underline cursor-pointer">{{ song.albums?.[0]?.title }}</span>
+        </div>
+
+        <!-- Date added to playlist -->
+        <div class="col addedAt-col text" *ngIf="($showDate | async)">{{ (song.playlists?.[0].createdAt) || song?.likedAt | addedToPlaylist }}</div>
+        
+        <!-- Duration -->
+        <div class="col duration-col text">{{ song.duration | songDurationPipe }}</div>
+       
+        <!-- Menu column -->
+        <div class="menu-col">
+            <button class="block w-full text-center" matRipple [matRippleRadius]="15" [matRippleCentered]="true" [matRippleUnbounded]="true" (click)="openContextMenu($event, song)"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+        </div>
+    </div>
+
+
+    <div class="flex items-center px-2 relative">
+        <div class="absolute w-full top-0 left-0 px-2" *ngIf="(($list | async).$isLoading | async)">
+            <mat-progress-bar [mode]="'indeterminate'" color="accent"></mat-progress-bar>
+        </div>
+        <button *ngIf="!(($list | async).$isLoading | async) && (($list | async).$totalElements | async) > (($list | async).$size | async)" class="py-2 px-3 rounded-md transition-all hover:bg-background hover:bg-opacity-60 active:bg-background-light active:border-opacity-30 active:bg-opacity-60 transform-gpu will-change-transform active:scale-95" (click)="fetchNextPage()"><span class="text-xs tracking-wide text-white-dark">Mehr Laden</span></button>
+    </div>
+</div>
+
+<asc-song-context-menu [isPlayable]="true" #songMenu></asc-song-context-menu>
