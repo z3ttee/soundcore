@@ -28,7 +28,6 @@
     "dexie": "^4.0.0-alpha.1",
     "js-cookie": "^3.0.1",
     "keycloak-angular": "^9.1.0",
-    "keycloak-js": "^17.0.0",
     "lottie-web": "^5.8.1",
     "ngx-infinite-scroll": "^10.0.1",
     "ngx-lottie": "^8.0.1",
