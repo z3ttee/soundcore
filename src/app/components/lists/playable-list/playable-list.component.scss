@@ -37,10 +37,17 @@
     }
 
     .duration-col {
-        @apply max-w-12 min-w-12 text-right;
+        @apply max-w-12 min-w-12 text-right hidden sm:block;
+    }
+
+    .menu-col {
+        @apply max-w-6 min-w-6 block md:hidden;
     }
 
     .row {
+        .id-text {
+            @apply opacity-100 transition-all;
+        }
         .play-btn {
             @apply opacity-0 pointer-events-none;
         }
