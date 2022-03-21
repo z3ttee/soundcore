@@ -5,7 +5,7 @@ import { AudioService } from 'src/app/features/stream/services/audio.service';
 import { PlayableList } from 'src/lib/data/playable-list.entity';
 import audio_wave_anim from "src/assets/animated/audio_wave.json"
 import { ScrollService } from 'src/app/services/scroll.service';
-import { BehaviorSubject, Observable, Subject, take, takeUntil } from 'rxjs';
+import { BehaviorSubject, combineLatest, map, Observable, Subject, take, takeUntil, tap } from 'rxjs';
 import { LikeService } from 'src/app/services/like.service';
 import { MatBottomSheet, MatBottomSheetRef } from '@angular/material/bottom-sheet';
 import { SongContextMenuComponent } from '../../context-menus/song-context-menu/song-context-menu.component';
