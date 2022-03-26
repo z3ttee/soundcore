@@ -1,28 +1,28 @@
 import { Injectable } from "@angular/core";
 import { ActivatedRouteSnapshot, Router, RouterStateSnapshot } from "@angular/router";
-import { KeycloakAuthGuard, KeycloakService } from "keycloak-angular";
 
 @Injectable({
     providedIn: 'root'
   })
-  export class KeycloakSSOGuard extends KeycloakAuthGuard {
+  export class KeycloakSSOGuard {
       
     constructor(
       router: Router,
-      protected readonly keycloak: KeycloakService
+      // protected readonly keycloak: KeycloakService
     ) {
-      super(router, keycloak);
+      
     }
   
     public async isAccessAllowed(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Promise<boolean> {
+      return true
       // Force the user to log in if currently unauthenticated.
-      if (!this.authenticated) {
+      /*if (!this.authenticated) {
         await this.keycloak.login({
           redirectUri: window.location.origin + state.url
         });
       }
 
-      return true;
+      return true;*/
   
       /*// Get the roles required from the route.
       const requiredRoles = route.data.roles;

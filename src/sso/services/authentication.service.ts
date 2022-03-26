@@ -1,5 +1,4 @@
 import { Injectable } from "@angular/core";
-import { KeycloakEvent, KeycloakEventType, KeycloakService } from "keycloak-angular";
 import { BehaviorSubject, Observable, of } from "rxjs";
 import { User } from "src/app/features/user/entities/user.entity";
 import { environment } from "src/environments/environment";
@@ -19,11 +18,11 @@ export class AuthenticationService {
     public $ready: Observable<boolean> = this._readSubject.asObservable();
 
     constructor(
-        private keycloakService: KeycloakService
+        // private keycloakService: KeycloakService
     ) {
         this.reloadSessionDetails();
 
-        keycloakService.keycloakEvents$.subscribe((event: KeycloakEvent) => {
+        /*keycloakService.keycloakEvents$.subscribe((event: KeycloakEvent) => {
             if(event.type == KeycloakEventType.OnReady) {
                 const authenticated = event.args[0] as boolean;
                 console.log("[AUTH] Auth handler initialized. User authenticated? ", authenticated)
@@ -40,13 +39,13 @@ export class AuthenticationService {
                 this.reloadSessionDetails()
                 console.log("[AUTH] User logged in.")
             }
-        })
+        })*/
 
         
     }
 
     public async getAccessToken() {
-        return this.keycloakService.getToken()
+        // return this.keycloakService.getToken()
     }
 
     public getUser(): User {
@@ -54,17 +53,17 @@ export class AuthenticationService {
     }
 
     public async logout() {
-        this.keycloakService.logout().then(() => {
+        /*this.keycloakService.logout().then(() => {
             this.keycloakService.clearToken()
-        });
+        });*/
     }
 
     public async goToAccount() {
-        this.keycloakService.getKeycloakInstance().accountManagement()
+        //this.keycloakService.getKeycloakInstance().accountManagement()
     }
 
     private async reloadSessionDetails() {
-        this.keycloakService.loadUserProfile().then((profile) => {
+        /*this.keycloakService.loadUserProfile().then((profile) => {
             if(!profile) return;
 
             const user = new User();
@@ -77,7 +76,7 @@ export class AuthenticationService {
             this.keycloakService.getToken().then((token) => {
                 this._tokenSubject.next(token)
             })
-        })
+        })*/
     }
 
 

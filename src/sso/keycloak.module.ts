@@ -1,8 +1,8 @@
 import { APP_INITIALIZER, NgModule } from "@angular/core";
-import { KeycloakAngularModule, KeycloakService } from "keycloak-angular";
 import { environment } from "src/environments/environment";
+import { AllianceAuthModule } from "src/lib/authentication/authentication.module";
 
-function initializeKeycloak(keycloak: KeycloakService) {
+/*function initializeKeycloak(keycloak: KeycloakService) {
     return () =>
       keycloak.init({
         config: {
@@ -12,23 +12,28 @@ function initializeKeycloak(keycloak: KeycloakService) {
         },
         loadUserProfileAtStartUp: true,
         initOptions: {
+          
+          checkLoginIframe: false,
           onLoad: 'check-sso',
           silentCheckSsoRedirectUri: window.location.origin + '/assets/silent-check-sso.html'
         }
       });
-  }
+  }*/
 
 @NgModule({
     imports: [
-        KeycloakAngularModule
+      AllianceAuthModule.forRoot({
+          clientId: "alliance-soundcore-app",
+          realm: "tsalliance",
+          url: "https://sso.tsalliance.eu"
+      })
+        /*AllianceAuthModule.forRoot({
+          clientId: "alliance-soundcore-app",
+          realm: "tsalliance"
+        })*/
     ],
     providers: [
-        {
-            provide: APP_INITIALIZER,
-            useFactory: initializeKeycloak,
-            multi: true,
-            deps: [KeycloakService]
-        }
+        
     ]
 })
 export class KeycloakModule {}
