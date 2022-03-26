@@ -1,8 +1,7 @@
 import { Injectable } from "@angular/core";
 import { KeycloakEvent, KeycloakEventType, KeycloakService } from "keycloak-angular";
-import { BehaviorSubject, Observable, of } from "rxjs";
+import { BehaviorSubject, Observable } from "rxjs";
 import { User } from "src/app/features/user/entities/user.entity";
-import { environment } from "src/environments/environment";
 
 @Injectable({
     providedIn: "root"
@@ -14,7 +13,6 @@ export class AuthenticationService {
     private readonly _tokenSubject: BehaviorSubject<string> = new BehaviorSubject(null);
 
     public $token: Observable<string> = this._tokenSubject.asObservable(); 
-    // TODO
     public $user: Observable<User> = this._userSubject.asObservable();
     public $ready: Observable<boolean> = this._readSubject.asObservable();
 
