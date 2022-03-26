@@ -10,7 +10,7 @@ import { SidebarComponent } from './views/shared/sidebar/sidebar.component';
 import { SplashComponent } from './views/splash/splash.component';
 import { StoreModule } from '@ngrx/store';
 
-import { HttpClientModule, HTTP_INTERCEPTORS } from "@angular/common/http"
+import { HttpClientModule } from "@angular/common/http"
 
 import {MatButtonModule} from '@angular/material/button';
 import {MatIconModule} from '@angular/material/icon';
@@ -38,7 +38,7 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { AscPlaylistEditorDialogModule } from './components/dialogs/playlist-editor-dialog/playlist-editor-dialog.module';
 import { AscToolbarModule } from './components/toolbar/toolbar.module';
 import { AscConfirmDialogModule } from './components/dialogs/confirm-dialog/confirm-dialog.module';
-import { KeycloakModule } from 'src/sso/keycloak.module';
+import { AuthModule } from 'src/sso/auth.module';
 
 // TODO: https://angular.io/guide/i18n-common-prepare
 
@@ -54,7 +54,7 @@ import { KeycloakModule } from 'src/sso/keycloak.module';
     SplashComponent
   ],
   imports: [
-    KeycloakModule,
+    AuthModule,
 
     BrowserModule,
     AppRoutingModule,

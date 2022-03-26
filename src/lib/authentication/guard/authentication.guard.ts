@@ -23,13 +23,6 @@ export class AllianceAuthGuard implements CanActivate, CanActivateChild {
         }
 
         return true;
-        /*return this.authService.isAuthenticated().then((authenticated) => {
-            if(!authenticated) {
-                return this.authService.
-            }
-            console.log("allow access to route? ", allowed)
-            return allowed
-        })*/
     }
 
 }

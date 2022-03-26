@@ -1,6 +1,7 @@
 import { Inject, Injectable } from "@angular/core";
 import Keycloak from "keycloak-js";
-import { BehaviorSubject, Observable, Subject } from "rxjs";
+import { BehaviorSubject, filter, firstValueFrom, Observable, Subject, take } from "rxjs";
+import { AllianceAuthConfig } from "./configs/auth-config";
 import { AllianceAuthEvent, AllianceAuthEventType } from "./events/auth.event";
 
 @Injectable()
@@ -34,11 +35,9 @@ export class AllianceAuthService {
     public $ready: Observable<boolean> = this._readySubject.asObservable();
 
     constructor(
-        @Inject("allianceAuthOptions") private readonly options: Keycloak.KeycloakConfig
+        @Inject("allianceAuthOptions") public readonly options: AllianceAuthConfig
     ) {
-        this._instance = Keycloak(this.options)
-
-        this._instance.authServerUrl = "https://sso.tsalliance.eu/auth"
+        this._instance = Keycloak(this.options.config)
 
         this._instance.onAuthSuccess = () => this._eventSubject.next(new AllianceAuthEvent("success"))
         this._instance.onAuthError = (errorData: Keycloak.KeycloakError) => this._eventSubject.next(new AllianceAuthEvent("error", errorData))
@@ -52,7 +51,7 @@ export class AllianceAuthService {
 
             if(authenticated) {
                 this.loadUserProfile().then((profile) => this._profileSubject.next(profile)).catch((error: Error) => {
-                    console.log(error)
+                    console.error(error)
                     this._profileSubject.next(null);
                 })
             }
@@ -62,14 +61,15 @@ export class AllianceAuthService {
     }
 
     public async isAuthenticated(): Promise<boolean> {
-        return this._authenticatedSubject.getValue();
+        return this.updateToken().then(() => {
+            return this._authenticatedSubject.getValue();
+        }).catch(() => {
+            return false;
+        })
     }
 
     public async login(redirectUri?: string): Promise<void> {
-        return this._instance.init({
-            onLoad: "check-sso",
-            silentCheckSsoRedirectUri: `${window.location.origin}/assets/silent-check-sso.html`
-        }).then((authenticated) => {
+        return this._instance.init(this.options.init).then((authenticated) => {
             if(authenticated) {
                 return null;
             } else {
@@ -87,8 +87,38 @@ export class AllianceAuthService {
         })
     }
 
+    public async getToken(): Promise<string> {
+        return this.updateToken().then(() => {
+            return this._instance.token
+        }).catch((error) => {
+            return null;
+        })
+    }
+
+    public isTokenExpired(minValidity: number = 0): boolean {
+        return this._instance.isTokenExpired(minValidity);
+    }
+
+    public async updateToken(): Promise<boolean> {
+        const validity = 10;
+
+        console.log(this.isTokenExpired(validity))
+
+        if(this.isTokenExpired(validity)) {
+            this.logout();
+            return false;
+        }
+
+        return this._instance.updateToken(validity).then(() => true).catch((error) => {
+            console.error(error);
+            return false
+        })
+    }
+
     private async loadUserProfile(): Promise<Keycloak.KeycloakProfile> {
-        return this._instance.loadUserProfile()
+        return firstValueFrom(this.$ready.pipe(filter((isReady) => isReady))).then(() => {
+            return this._instance.loadUserProfile()
+        })
     }
 
 }
