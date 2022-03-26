@@ -61,15 +61,22 @@ export class AllianceAuthService {
         this._readySubject.next(true);
     }
 
-    public async authenticate(): Promise<boolean> {
+    public async isAuthenticated(): Promise<boolean> {
+        return this._authenticatedSubject.getValue();
+    }
+
+    public async login(redirectUri?: string): Promise<void> {
         return this._instance.init({
             onLoad: "check-sso",
             silentCheckSsoRedirectUri: `${window.location.origin}/assets/silent-check-sso.html`
         }).then((authenticated) => {
-            return authenticated
-        }).catch((error: Error) => {
-            console.error(error)
-            return false;
+            if(authenticated) {
+                return null;
+            } else {
+                return this._instance.login({
+                    redirectUri: redirectUri || window.location.origin,
+                })
+            }
         })
     }
 

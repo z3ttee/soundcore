@@ -18,10 +18,18 @@ export class AllianceAuthGuard implements CanActivate, CanActivateChild {
     }
 
     private async checkAuthentication(): Promise<boolean> {
-        return this.authService.authenticate().then((allowed) => {
+        if(!await this.authService.isAuthenticated()) {
+            this.authService.login();
+        }
+
+        return true;
+        /*return this.authService.isAuthenticated().then((authenticated) => {
+            if(!authenticated) {
+                return this.authService.
+            }
             console.log("allow access to route? ", allowed)
             return allowed
-        })
+        })*/
     }
 
 }

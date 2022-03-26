@@ -5,6 +5,7 @@ import { FormControl } from '@angular/forms';
 import { catchError, Observable, of, tap } from 'rxjs';
 import { ComplexSearchResult } from 'src/app/features/search/entities/search-result.model';
 import { environment } from 'src/environments/environment';
+import { AllianceAuthService } from 'src/lib/authentication/authentication.service';
 import { AuthenticationService } from 'src/sso/services/authentication.service';
 
 @Component({
@@ -28,6 +29,7 @@ export class AscToolbarComponent implements OnInit {
   constructor(
     private httpClient: HttpClient, 
     public authService: AuthenticationService, 
+    public authServicev2: AllianceAuthService, 
     private _location: Location
   ) { }
 
@@ -65,7 +67,7 @@ export class AscToolbarComponent implements OnInit {
   }
 
   public logout() {
-    this.authService.logout()
+    this.authServicev2.logout()
   }
 
   public navigateBack() {
