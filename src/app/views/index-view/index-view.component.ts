@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { KeycloakService } from 'keycloak-angular';
 
 @Component({
   templateUrl: './index-view.component.html',
@@ -8,13 +7,13 @@ import { KeycloakService } from 'keycloak-angular';
 export class IndexViewComponent implements OnInit {
 
   constructor(
-    public keycloakService: KeycloakService
+    // public keycloakService: KeycloakService
   ) { }
 
   ngOnInit(): void {
-    this.keycloakService.keycloakEvents$.subscribe((event) => {
+    /*this.keycloakService.keycloakEvents$.subscribe((event) => {
       console.log(event)
-    })
+    })*/
   }
 
 }

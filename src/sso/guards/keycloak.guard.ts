@@ -5,7 +5,7 @@ import { KeycloakAuthGuard, KeycloakService } from "keycloak-angular";
 @Injectable({
     providedIn: 'root'
   })
-  export class KeycloakSSOGuard extends KeycloakAuthGuard {
+export class KeycloakSSOGuard extends KeycloakAuthGuard {
       
     constructor(
       router: Router,
@@ -23,16 +23,5 @@ import { KeycloakAuthGuard, KeycloakService } from "keycloak-angular";
       }
 
       return true;
-  
-      /*// Get the roles required from the route.
-      const requiredRoles = route.data.roles;
-  
-      // Allow the user to to proceed if no additional roles are required to access the route.
-      if (!(requiredRoles instanceof Array) || requiredRoles.length === 0) {
-        return true;
-      }
-  
-      // Allow the user to proceed if all the required roles are present.
-      return requiredRoles.every((role) => this.roles.includes(role));*/
     }
   }

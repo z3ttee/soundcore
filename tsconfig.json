@@ -12,6 +12,12 @@
     "noFallthroughCasesInSwitch": true,
     "sourceMap": true,
     "declaration": false,
+    "paths": {
+      "ng-keycloak-connect": [
+        "dist/ng-keycloak-connect/ng-keycloak-connect",
+        "dist/ng-keycloak-connect"
+      ]
+    },
     "downlevelIteration": true,
     "experimentalDecorators": true,
     "moduleResolution": "node",
