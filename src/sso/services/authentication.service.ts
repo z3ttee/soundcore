@@ -1,8 +1,7 @@
 import { Injectable } from "@angular/core";
+import { KeycloakEvent, KeycloakEventType, KeycloakService } from "keycloak-angular";
 import { BehaviorSubject, Observable } from "rxjs";
 import { User } from "src/app/features/user/entities/user.entity";
-import { AllianceAuthService } from "src/lib/authentication/authentication.service";
-import { AllianceAuthEvent } from "src/lib/authentication/events/auth.event";
 
 @Injectable({
     providedIn: "root"
@@ -18,24 +17,24 @@ export class AuthenticationService {
     public $ready: Observable<boolean> = this._readSubject.asObservable();
 
     constructor(
-        private keycloakService: AllianceAuthService
+        private keycloakService: KeycloakService
     ) {
         this.reloadSessionDetails();
 
-        keycloakService.$keycloakEvent.subscribe((event: AllianceAuthEvent) => {
-            if(event.type == "ready") {
-                const authenticated = event.data as boolean;
+        keycloakService.keycloakEvents$.subscribe((event: KeycloakEvent) => {
+            if(event.type == KeycloakEventType.OnReady) {
+                const authenticated = event.args[0] as boolean;
                 console.log("[AUTH] Auth handler initialized. User authenticated? ", authenticated)
             }
 
-            if(event.type == "logout") {
+            if(event.type == KeycloakEventType.OnAuthLogout) {
                 this._readSubject.next(false);
                 this._userSubject.next(new User());
                 console.log("[AUTH] User logged out.")
                 window.location.reload();
             }
 
-            if(event.type == "success") {
+            if(event.type == KeycloakEventType.OnAuthSuccess) {
                 this.reloadSessionDetails()
                 console.log("[AUTH] User logged in.")
             }
@@ -53,15 +52,17 @@ export class AuthenticationService {
     }
 
     public async logout() {
-        this.keycloakService.logout();
+        this.keycloakService.logout().then(() => {
+            this.keycloakService.clearToken()
+        });
     }
 
     public async goToAccount() {
-        // this.keycloakService.getInstance().accountManagement()
+        this.keycloakService.getKeycloakInstance().accountManagement()
     }
 
     private async reloadSessionDetails() {
-        /*this.keycloakService.loadUserProfile().then((profile) => {
+        this.keycloakService.loadUserProfile().then((profile) => {
             if(!profile) return;
 
             const user = new User();
@@ -74,7 +75,7 @@ export class AuthenticationService {
             this.keycloakService.getToken().then((token) => {
                 this._tokenSubject.next(token)
             })
-        })*/
+        })
     }
 
 

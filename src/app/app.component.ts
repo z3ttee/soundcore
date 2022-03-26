@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { AllianceAuthService } from 'src/lib/authentication/authentication.service';
+import { AuthenticationService } from 'src/sso/services/authentication.service';
 
 @Component({
   selector: 'app-root',
@@ -13,8 +13,7 @@ export class AppComponent {
   public showLoadingBar: boolean = false;
 
   constructor(
-    // public authService: AuthenticationService, 
-    public authService: AllianceAuthService,
+    public authService: AuthenticationService, 
     private router: Router
   ) {
 

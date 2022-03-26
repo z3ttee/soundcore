@@ -3,4 +3,4 @@
 </div>
 
 <router-outlet></router-outlet>
-<asc-splash *ngIf="!(authService.$authenticated | async)"></asc-splash>
+<asc-splash *ngIf="!(authService.$ready | async)"></asc-splash>
