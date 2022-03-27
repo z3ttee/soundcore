@@ -53,9 +53,9 @@ export class PlayableListComponent implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild("container") public containerRef: ElementRef<HTMLDivElement>;
   @ViewChild("songMenu") public contextMenuRef: SongContextMenuComponent;
 
-
   @Input() public set list(val: PlayableList<any>) {
     this._listSubject.next(val);
+    this.initView()
   }
   @Input() public set showCover(val: boolean) {
     if(typeof val == "undefined" || val == null) val = true;
@@ -99,6 +99,18 @@ export class PlayableListComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   public ngAfterViewInit(): void {
+    this.initView()
+  }
+
+  public ngOnDestroy(): void {
+      const container = this.containerRef.nativeElement;
+      this.resizeObserver.unobserve(container)
+
+      this._destroySubject.next();
+      this._destroySubject.complete();
+  }
+
+  public initView() {
     this.resizeObserver = new ResizeObserver((entries) => {
       this.zone.run(() => {
         for(const entry of entries) {
@@ -115,20 +127,10 @@ export class PlayableListComponent implements OnInit, OnDestroy, AfterViewInit {
         }
       })
     })
-    const container = this.containerRef.nativeElement;
-    this.resizeObserver.observe(container)
-  }
+    const container = this.containerRef?.nativeElement;
+    if(container) this.resizeObserver.observe(container)
 
-  public ngOnDestroy(): void {
-      const container = this.containerRef.nativeElement;
-      this.resizeObserver.unobserve(container)
-
-      this._destroySubject.next();
-      this._destroySubject.complete();
-  }
-
-  public async onContainerResize(entries: ResizeObserverEntry[]) {
-    
+    this.fetchNextPage();
   }
 
   public async playOrPause(song: Song) {
@@ -137,7 +139,7 @@ export class PlayableListComponent implements OnInit, OnDestroy, AfterViewInit {
 
   public async fetchNextPage() {
     this.$list.pipe(take(1)).subscribe((list) => {
-      list.fetchNextPage();
+      list?.fetchNextPage();
     })
   }
 
