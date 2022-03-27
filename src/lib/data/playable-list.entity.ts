@@ -1,9 +1,10 @@
 import { HttpClient } from "@angular/common/http";
-import { BehaviorSubject, firstValueFrom, Observable, Subject, takeUntil } from "rxjs";
+import { BehaviorSubject, combineAll, combineLatest, combineLatestAll, firstValueFrom, map, Observable, Subject, takeUntil, tap } from "rxjs";
 import { PlaylistViewType } from "src/app/components/views/playlist-view/playlist-view.component";
 import { Song } from "src/app/features/song/entities/song.entity";
 import { Page, Pageable } from "src/app/pagination/pagination";
 import { environment } from "src/environments/environment";
+import { SCResourceMapQueue } from "./resource";
 
 export const PLAYLIST_BATCH_SIZE = 50;
 
@@ -12,7 +13,6 @@ export class PlayableList<T> {
     private readonly _destroySubject: Subject<void> = new Subject();
     private readonly _loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject(false);
     private readonly _readySubject: BehaviorSubject<boolean> = new BehaviorSubject(false);
-    private readonly _dataSourceSubject: BehaviorSubject<Song[]> = new BehaviorSubject([]);
     private readonly _errorSubject: Subject<Error> = new Subject();
     private readonly _totalElementsSubject: BehaviorSubject<number> = new BehaviorSubject(0);
     private readonly _sizeSubject: BehaviorSubject<number> = new BehaviorSubject(0);
@@ -23,7 +23,6 @@ export class PlayableList<T> {
     public readonly id: string;
 
     private readonly $destroy: Observable<void> = this._destroySubject.asObservable();
-    public readonly $dataSource: Observable<Song[]> = this._dataSourceSubject.asObservable().pipe(takeUntil(this.$destroy));
     public readonly $isLoading: Observable<boolean> = this._loadingSubject.asObservable().pipe(takeUntil(this.$destroy));
     public readonly $isReady: Observable<boolean> = this._readySubject.asObservable().pipe(takeUntil(this.$destroy));
     public readonly $error: Observable<Error> = this._errorSubject.asObservable().pipe(takeUntil(this.$destroy));
@@ -31,9 +30,32 @@ export class PlayableList<T> {
     public readonly $size: Observable<number> = this._sizeSubject.asObservable().pipe(takeUntil(this.$destroy));
     public readonly $currentPageIndex: Observable<number> = this._currentPageIndexSubject.asObservable().pipe(takeUntil(this.$destroy));
 
+    private readonly resource: SCResourceMapQueue<Song> = new SCResourceMapQueue();
     private readonly _dataSource: Record<string, Song> = {};
-    private readonly _resources: Record<string, Song> = {};
-    private readonly _resourcesQueue: string[] = [];
+    private readonly _dataSourceSubject: BehaviorSubject<Song[]> = new BehaviorSubject([]);
+
+    /**
+     * Observable that emits new values every time the user loads more content via infinite scroll.
+     * This observable is suitable for displaying the playlists tracks in a list.
+     */
+    public readonly $dataSource: Observable<Song[]> = this._dataSourceSubject.asObservable().pipe(takeUntil(this.$destroy));
+
+    /**
+     * Observable that emits new values every time the internal queue is updated. This is just a filter of the $dataSource Observable
+     * and filters out the songs, that are not enqueued anymore. The purpose of this observable is displaying remaining items
+     * of an enqueued playable list.
+     */
+    public readonly $queue: Observable<Song[]> = combineLatest([
+        this.resource.$queue,
+        this.$dataSource
+        
+    ]).pipe(takeUntil(this.$destroy), map(([queue, songs]) => songs.filter((song) => {
+        // console.log("is Song enqued?", this.resource.isEnqueued(song.id));
+        return this.resource.isEnqueued(song.id);
+    })), tap((songs) => {
+        console.log("songs in queue: ", songs)
+    }));
+
 
     private readonly _httpClient: HttpClient;
     private readonly _metadataUrl: string;
@@ -73,7 +95,7 @@ export class PlayableList<T> {
      * of the playable list.
      */
     public get queueSize(): number {
-        return this._resourcesQueue.length;
+        return this.resource.size();
     }
 
     /**
@@ -151,11 +173,10 @@ export class PlayableList<T> {
             let i = 0;
             while (i < length) {
                 const song = page.elements[i];
-                if(song) this._resources[song.id] = song;
+                if(song) this.resource.enqueue(song);
                 i++;
             }
 
-            this._resourcesQueue.push(...Object.keys(this._resources));
             return 
         }).catch((error: Error) => {
             // Emit error
@@ -175,24 +196,20 @@ export class PlayableList<T> {
      * @returns Observable<Song>
      */
     public async emitNextSong(startAtIndex?: number): Promise<Song> {
-        const nextKey = startAtIndex ? this._resourcesQueue.splice(startAtIndex, 1)?.[0] : this._resourcesQueue.splice(0, 1)?.[0]
-        const nextSong = this._resources[nextKey];
-
-        if(!nextKey || !nextSong) return null
+        const nextSong = this.resource.dequeue();
+        if(!nextSong) return null
 
         // Next song exists, delete from queue and resources
-
-        delete this._resources[nextKey];
         console.log("next song: ", nextSong)
 
-        const metadata = this._dataSource[nextKey];
+        const metadata = this._dataSource[nextSong.id];
 
         // If metadata already fetched, return it
         if(metadata) return metadata;
                 
         // Otherwise fetch and return it afterwards
         // Also add it to the dataset, so the playlist doesn't have to fetch this song again (except if its in batch request)
-        return firstValueFrom(this._httpClient.get<Song>(`${environment.api_base_uri}/v1/songs/${nextKey}`).pipe(takeUntil(this.$destroy))).then((song) => {
+        return firstValueFrom(this._httpClient.get<Song>(`${environment.api_base_uri}/v1/songs/${nextSong.id}`).pipe(takeUntil(this.$destroy))).then((song) => {
             this._dataSource[song.id] = song;
             this._dataSourceSubject.next(Object.values(this._dataSource))
             return song;
@@ -203,10 +220,9 @@ export class PlayableList<T> {
     }
 
     public async addSong(song: Song) {
-        this._resources[song.id] = song;
-        this._resourcesQueue.push(song.id);
         this._dataSource[song.id] = song;
         this._dataSourceSubject.next(Object.values(this._dataSource));
+        this.resource.enqueue(song);
     }
 
     public async addSongBulk(songs: Song[]) {
@@ -216,10 +232,7 @@ export class PlayableList<T> {
     }
 
     public async removeSong(song: Song) {
-        const index = this._resourcesQueue.findIndex((id) => id == song.id);
-        if(index != -1) this._resourcesQueue.splice(index, 1);
-
-        delete this._resources[song.id];
+        this.resource.remove(song.id);
         delete this._dataSource[song.id];
 
         this._dataSourceSubject.next(Object.values(this._dataSource));

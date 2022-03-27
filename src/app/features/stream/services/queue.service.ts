@@ -10,6 +10,8 @@ import { QueueItem, QueueList, QueueSong } from "../entities/queue-item.entity";
 })
 export class StreamQueueService {
 
+    private readonly _songsSubject: BehaviorSubject<QueueSong[]> = new BehaviorSubject([]);
+    private readonly _listsSubject: BehaviorSubject<QueueList[]> = new BehaviorSubject([]);
     private readonly _sizeSubject: BehaviorSubject<number> = new BehaviorSubject(0);
     private readonly _onQueueWaitingSubject: Subject<QueueItem> = new Subject();
 
@@ -18,6 +20,8 @@ export class StreamQueueService {
     private readonly _listQueue: QueueList[] = [];
 
     public readonly $size: Observable<number> = this._sizeSubject.asObservable();
+    public readonly $songs: Observable<QueueSong[]> = this._songsSubject.asObservable();
+    public readonly $lists: Observable<QueueList[]> = this._listsSubject.asObservable();
 
     public readonly $onQueueWaiting: Observable<QueueItem> = this._onQueueWaitingSubject.asObservable();
 
@@ -86,7 +90,7 @@ export class StreamQueueService {
         }
 
         // Calculate new size and push updates.
-        this.setNewSize(this.size);
+        this.update();
         return item;
     }
 
@@ -107,7 +111,7 @@ export class StreamQueueService {
         const item = new QueueSong(song)
         this._songsQueue.push(item);
         this._queueMap[item.id] = item;
-        this.setNewSize(this.size);
+        this.update();
         this._onQueueWaitingSubject.next(item);
     }
 
@@ -125,7 +129,7 @@ export class StreamQueueService {
         const item = new QueueList(list);
         this._listQueue.push(item);
         this._queueMap[item.id] = item;
-        this.setNewSize(this.size);
+        this.update();
         this._onQueueWaitingSubject.next(item);
     }
 
@@ -143,7 +147,7 @@ export class StreamQueueService {
         const item = new QueueList(list);
         this._listQueue.unshift(item);
         this._queueMap[item.id] = item;
-        this.setNewSize(this.size);
+        this.update();
         this._onQueueWaitingSubject.next(item);
     }
 
@@ -171,9 +175,11 @@ export class StreamQueueService {
         return this._songsQueue.length <= 0 && this._listQueue.length <= 0;
     }
 
-    private setNewSize(size: number) {
-        console.log("pushing new size: ", size)
-        this._sizeSubject.next(size)
+    private update() {
+        console.log("pushing new size: ", this.size)
+        this._sizeSubject.next(this.size)
+        this._listsSubject.next(this._listQueue);
+        this._songsSubject.next(this._songsQueue);
     }
 
 
