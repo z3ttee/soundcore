@@ -1,4 +1,4 @@
-import { BehaviorSubject, firstValueFrom, Observable } from "rxjs";
+import { BehaviorSubject, Observable, Subject } from "rxjs";
 import { v4 as uuidv4 } from "uuid";
 
 /**
@@ -57,9 +57,11 @@ export class SCResourceQueue<T> {
 
     private _queueSubject: BehaviorSubject<T[]> = new BehaviorSubject([]);
     private _sizeSubject: BehaviorSubject<number> = new BehaviorSubject(0);
+    private _onQueueWaiting: Subject<void> = new Subject();
 
     public $items: Observable<T[]> = this._queueSubject.asObservable();
     public $size: Observable<number> = this._sizeSubject.asObservable();
+    public $onQueueWaiting: Observable<void> = this._onQueueWaiting.asObservable();
 
     constructor(private readonly isShuffled?: BehaviorSubject<boolean>) {}
     
@@ -74,6 +76,7 @@ export class SCResourceQueue<T> {
 
         this._queueSubject.next(queue);
         this._sizeSubject.next(queue.length);
+        this._onQueueWaiting.next();
         return queue.length-1;
     }
 
