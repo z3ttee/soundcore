@@ -56,7 +56,7 @@
             <!-- Like button -->
             <asc-like-button [isLiked]="($song | async)?.liked" (click)="likeSong()" *ngIf="($song | async)"></asc-like-button>
             
-            <button matRipple [matRippleUnbounded]="true" [matRippleCentered]="true" [matRippleRadius]="16" [matRippleAnimation]="{ enterDuration: 100, exitDuration: 250 }" class="w-5 h-5 flex justify-center items-center"><i class="text-white-dark fa-solid fa-list"></i></button>
+            <button [routerLink]="['/queue']" matRipple [matRippleUnbounded]="true" [matRippleCentered]="true" [matRippleRadius]="16" [matRippleAnimation]="{ enterDuration: 100, exitDuration: 250 }" class="w-5 h-5 flex justify-center items-center"><i class="text-white-dark fa-solid fa-list"></i></button>
         
             <div class="w-24 lg:w-28" *ngIf="(deviceService.$breakpoint | async).isDesktop">
                 <asc-volume-slider [volume]="(audioService.$volume | async)" (onVolume)="audioService.setVolume($event)"></asc-volume-slider>
