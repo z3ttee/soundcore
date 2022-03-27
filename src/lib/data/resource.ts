@@ -144,6 +144,14 @@ export class SCResourceQueue<T> {
         return this._queueSubject.getValue().length;
     }
 
+    /**
+     * Get the current list of items in the queue.
+     * @returns Items array
+     */
+    public items(): T[] {
+        return this._queueSubject.getValue();
+    }
+
     private getIndex(): number {
         if(this.isShuffled?.getValue()) return Math.floor(Math.random() * this.size());
         return 0;
