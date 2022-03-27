@@ -23,6 +23,7 @@ const routes: Routes = [
     { path: "collection", canActivate: [KeycloakSSOGuard], loadChildren: () => import("./features/collection/collection.module").then((m) => m.CollectionModule) },
     { path: "song", canActivate: [KeycloakSSOGuard], loadChildren: () => import("./features/song/song.module").then((m) => m.SongModule) },
     { path: "settings", canActivate: [KeycloakSSOGuard], loadChildren: () => import("./features/settings/settings.module").then((m) => m.SettingsModule) },
+    { path: "queue", canActivate: [KeycloakSSOGuard], loadChildren: () => import("./features/queue/queue.module").then((m) => m.QueueModule) },
 
     { path: "profile", canActivate: [KeycloakSSOGuard], loadChildren: () => import("./features/user/user.module").then((m) => m.UserModule) },
 
