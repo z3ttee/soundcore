@@ -1,8 +1,8 @@
 import { Injectable } from "@angular/core";
-import { BehaviorSubject, Observable, Subject } from "rxjs";
+import { BehaviorSubject, combineLatest, map, Observable, Subject } from "rxjs";
 import { PlayableList } from "src/lib/data/playable-list.entity";
+import { SCResourceMap, SCResourceQueue } from "src/lib/data/resource";
 import { Song } from "../../song/entities/song.entity";
-import { CurrentPlayingItem } from "../entities/current-item.entity";
 import { QueueItem, QueueList, QueueSong } from "../entities/queue-item.entity";
 
 @Injectable({
@@ -13,17 +13,34 @@ export class StreamQueueService {
     private readonly _songsSubject: BehaviorSubject<QueueSong[]> = new BehaviorSubject([]);
     private readonly _listsSubject: BehaviorSubject<QueueList[]> = new BehaviorSubject([]);
     private readonly _sizeSubject: BehaviorSubject<number> = new BehaviorSubject(0);
-    private readonly _onQueueWaitingSubject: Subject<QueueItem> = new Subject();
+    private readonly _onQueueWaitingSubject: Subject<void> = new Subject();
+    private readonly _shuffleSubject: BehaviorSubject<boolean> = new BehaviorSubject(false);
 
-    private readonly _queueMap: Record<string, QueueItem> = {};
-    private readonly _songsQueue: QueueSong[] = [];
-    private readonly _listQueue: QueueList[] = [];
+    private readonly queueMap: SCResourceMap<QueueItem> = new SCResourceMap();
+    private readonly songsQueue: SCResourceQueue<QueueSong> = new SCResourceQueue(this._shuffleSubject);
+    private readonly listsQueue: SCResourceQueue<QueueList> = new SCResourceQueue();
 
-    public readonly $size: Observable<number> = this._sizeSubject.asObservable();
-    public readonly $songs: Observable<QueueSong[]> = this._songsSubject.asObservable();
-    public readonly $lists: Observable<QueueList[]> = this._listsSubject.asObservable();
+    // private readonly _queueMap: Record<string, QueueItem> = {};
 
-    public readonly $onQueueWaiting: Observable<QueueItem> = this._onQueueWaitingSubject.asObservable();
+    // private readonly _songsQueue: QueueSong[] = [];
+    // private readonly _listQueue: QueueList[] = [];
+
+    // public readonly $size: Observable<number> = this._sizeSubject.asObservable();
+    // public readonly $songs: Observable<QueueSong[]> = this._songsSubject.asObservable();
+    // public readonly $lists: Observable<QueueList[]> = this._listsSubject.asObservable();
+
+    public readonly $size: Observable<number> = combineLatest([ this.songsQueue.$size, this.listsQueue.$size ]).pipe(map(([songs, lists]) => songs + lists));
+    public readonly $songs: Observable<QueueSong[]> = this.songsQueue.$items;
+    public readonly $lists: Observable<QueueList[]> = this.listsQueue.$items;
+
+    public readonly $onQueueWaiting: Observable<void> = this._onQueueWaitingSubject.asObservable();
+
+    public setShuffled(shuffled: boolean) {
+        this._shuffleSubject.next(shuffled);
+
+        this.songsQueue.$onQueueWaiting.subscribe(() => this._onQueueWaitingSubject.next())
+        this.listsQueue.$onQueueWaiting.subscribe(() => this._onQueueWaitingSubject.next())
+    }
 
     /**
      * Returns calculate size of the whole queue. This takes single
@@ -32,8 +49,8 @@ export class StreamQueueService {
      */
     public get size(): number {
         const queue = [
-            ...this._songsQueue,
-            ...this._listQueue
+            ...this.songsQueue.items(),
+            ...this.listsQueue.items()
         ]
 
         const size = queue.reduce((size: number, item: QueueItem) => {
@@ -53,7 +70,7 @@ export class StreamQueueService {
      * playable lists. If you want to use that, consider choosing "size".
      */
     public get length(): number {
-        return this._songsQueue.length + this._listQueue.length;
+        return this.songsQueue.size() + this.listsQueue.size();
     }
 
     /**
@@ -61,45 +78,34 @@ export class StreamQueueService {
      * @param song Song to enqueue
      * @returns Song
      */
-    public async dequeue(random: boolean = false): Promise<CurrentPlayingItem> {
+    public async dequeue(): Promise<Song> {
         if(this.isEmpty()) return null;
 
-        let item: CurrentPlayingItem = null;
-        let index: number = random ? Math.floor(Math.random() * this._songsQueue.length) : 0;
-        const nextSong: QueueSong = this._songsQueue[index];
-
-        if(nextSong) {
-            const song = (this._songsQueue.splice(index, 1)[0] as QueueSong)?.item;
-            item = new CurrentPlayingItem(song, null);
-            delete this._queueMap[nextSong.id];
-        } else {
-            index = random ? Math.floor(Math.random() * this._listQueue.length) : 0
-            const nextList: QueueList = this._listQueue[index];
-    
-            // This is in case the nextItem is a list. Then the item is used to access to internal list
-            // of this data structure.
-            const nextItem = await nextList?.getNextItem();
-    
-            if(!nextItem || nextList?.item?.queueSize <= 0) {
-                // Enqueued list is empty, that means it is done playing.
-                this._listQueue.splice(index, 1);
-                delete this._queueMap[nextList.id];
-            }
-
-            item = new CurrentPlayingItem(nextItem, nextList.item);
+        let queueItem: QueueItem = (await this.songsQueue.dequeue())
+        let song: Song = (queueItem as QueueSong)?.item
+        if(song) {
+            this.queueMap.remove(song.id)
+            return song;
         }
 
-        // Calculate new size and push updates.
-        this.update();
-        return item;
-    }
+        // Get next item from lists queue.
+        // Only peek the next element, as the playlist should remain
+        // enqueued until the list's internal queue is empty.
+        queueItem = (await this.listsQueue.peek())
+        const list = (queueItem as QueueList)?.item;
+        if(!list) return null;
 
-    /**
-     * Dequeue a random element from the queue
-     * @returns Song
-     */
-     public async random(): Promise<CurrentPlayingItem> {
-        return this.dequeue(true)
+        // Emit next song from list's internal queue
+        song = await list.emitNextSong();
+
+        // Check if the list's internal queue is empty.
+        // If so, remove from the queue.
+        if(list.queueSize <= 0) {
+            this.queueMap.remove(queueItem.id);
+            await this.listsQueue.dequeue();
+        }
+
+        return song;
     }
 
     /**
@@ -109,10 +115,10 @@ export class StreamQueueService {
      */
     public enqueueSong(song: Song): void {
         const item = new QueueSong(song)
-        this._songsQueue.push(item);
-        this._queueMap[item.id] = item;
-        this.update();
-        this._onQueueWaitingSubject.next(item);
+        this.queueMap.set(item);
+
+        // Songs are always added to the top of each other in the queue
+        this.songsQueue.enqueueTop(item); 
     }
 
     /**
@@ -121,16 +127,14 @@ export class StreamQueueService {
      * @returns Song
      */
      public enqueueList(list: PlayableList<any>): void {
-        if(this._queueMap[list.id]) {
+        /*if(this._queueMap[list.id]) {
             console.warn("[QUEUE] Cannot enqueue playable list. Already in queue")
             return;
-        }
+        }*/
         
         const item = new QueueList(list);
-        this._listQueue.push(item);
-        this._queueMap[item.id] = item;
-        this.update();
-        this._onQueueWaitingSubject.next(item);
+        this.queueMap.set(item);
+        this.listsQueue.enqueue(item);
     }
 
     /**
@@ -139,16 +143,14 @@ export class StreamQueueService {
      * @returns Song
      */
      public enqueueListTop(list: PlayableList<any>): void {
-        if(this._queueMap[list.id]) {
+        /*if(this._queueMap[list.id]) {
             console.warn("[QUEUE] Cannot enqueue playable list. Already in queue")
             return;
-        }
+        }*/
         
         const item = new QueueList(list);
-        this._listQueue.unshift(item);
-        this._queueMap[item.id] = item;
-        this.update();
-        this._onQueueWaitingSubject.next(item);
+        this.queueMap.set(item);
+        this.listsQueue.enqueueTop(item);
     }
 
     /**
@@ -156,7 +158,7 @@ export class StreamQueueService {
      * @returns Song
      */
     public peek(): QueueItem {
-        return this._songsQueue[0] || this._listQueue[0];
+        return this.songsQueue.peek() || this.listsQueue.peek();
     }
 
     public hasKey(key: string): boolean {
@@ -164,7 +166,7 @@ export class StreamQueueService {
     }
 
     public get(key: string): QueueItem {
-        return this._queueMap[key];
+        return this.queueMap.get(key);
     }
 
     /**
@@ -172,14 +174,7 @@ export class StreamQueueService {
      * @returns True or False
      */
     public isEmpty(): boolean {
-        return this._songsQueue.length <= 0 && this._listQueue.length <= 0;
-    }
-
-    private update() {
-        console.log("pushing new size: ", this.size)
-        this._sizeSubject.next(this.size)
-        this._listsSubject.next(this._listQueue);
-        this._songsSubject.next(this._songsQueue);
+        return this.songsQueue.size() <= 0 && this.listsQueue.size() <= 0;
     }
 
 

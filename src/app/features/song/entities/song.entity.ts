@@ -4,6 +4,7 @@ import { Distributor } from "src/app/model/distributor.entity";
 import { Genre } from "src/app/model/genre.entity";
 import { Label } from "src/app/model/label.model";
 import { Publisher } from "src/app/model/publisher.model";
+import { PlayableList } from "src/lib/data/playable-list.entity";
 import { Album } from "../../album/entities/album.entity";
 import { PlaylistItem } from "../../playlist/entities/playlist-item.entity";
 import { StreamToken } from "../../stream/entities/stream-token.entity";
@@ -42,6 +43,6 @@ export class Song {
     public liked?: boolean;
     public likedAt?: Date;
 
-    public playableListId?: string;
+    public listContext?: PlayableList<any>;
 
 }

@@ -132,7 +132,7 @@ export class PlayableList<T> {
 
                 while (i < length) {
                     const song = page.elements[i];
-                    song.playableListId = this.id;
+                    song.listContext = this;
                     if(song) this._dataSource[song.id] = song;
                     i++;
                 }

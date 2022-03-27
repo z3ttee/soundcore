@@ -6,7 +6,7 @@ import { environment } from "src/environments/environment";
 import { PlayableList } from "src/lib/data/playable-list.entity";
 import { Song } from "../../song/entities/song.entity";
 import { CurrentPlayingItem } from "../entities/current-item.entity";
-import { QueueItem, QueueList } from "../entities/queue-item.entity";
+import { QueueList } from "../entities/queue-item.entity";
 import { StreamQueueService } from "./queue.service";
 import { StreamService } from "./stream.service";
 
@@ -79,14 +79,17 @@ export class AudioService {
             this.setSession(this._currentItemSubject.getValue());
         })
 
-        this.queueService.$onQueueWaiting.subscribe((item) => this.onQueueWaiting(item))
+        this.queueService.$onQueueWaiting.subscribe((item) => this.onQueueWaiting())
+        this.$shuffle.subscribe((isShuffled) => {
+            this.queueService.setShuffled(isShuffled);
+        })
     }
 
     /**
      * Handle event when a new item was added to queue.
      * @param item Item
      */
-    private onQueueWaiting(item: QueueItem) {
+    private onQueueWaiting() {
         if(!this.canPlayNext) return
 
         this._doneSubject.next(false);
@@ -97,29 +100,43 @@ export class AudioService {
      * Continue playing a song or provide a song object
      * to force play a new song.
      */
-    private async play(item?: CurrentPlayingItem, fadeIn: boolean = false) {
-        if(this.isCurrentlyFading) return;
+    private async forcePlaySong(song: Song, fadeIn: boolean = false) {
+        // if(this.isCurrentlyFading) return;
 
-        if(item) {
-            const token = await this.streamService.getTokenForSong(item.song).catch((error) => {
-                console.error(error);
-                this.showError("Das Lied kann nicht abgespielt werden.")
-                return null;
-            });
+        // Request token for audio session
+        const token = await this.streamService.getTokenForSong(song).catch((error) => {
+            console.error(error);
+            this.showError("Es war nicht möglich eine Stream-Sitzung aufzubauen.")
+            return null;
+        });
+        if(!token) return;
+        
+        // Set stream url using the obtained token
+        this.audio.src = await this.streamService.getStreamURL(token);
 
-            if(!token) return;
-            console.log(item.song.playableListId)
-            this.audio.src = await this.streamService.getStreamURL(token);
-            this._currentItemSubject.next(item);
-        }
+        const context = song.listContext;
+        delete song.listContext;
+        const item = new CurrentPlayingItem(song, context)
+        this._currentItemSubject.next(item);
 
-        if(!fadeIn || !this.settingsService.isAudioFadeAllowed()) this.audio.volume = this._volumeSubject.getValue();
+
+        if(!fadeIn || !this.settingsService.isAudioFadeAllowed()) 
         this.resume();
     }
 
+    /**
+     * Resume with audio playback.
+     * @param fadeIn Define if audio should be faded in on resume. (Default: false)
+     */
     public resume(fadeIn: boolean = false) {
         this.audio.play().then(() => {
-            if(fadeIn && this.settingsService.isAudioFadeAllowed()) this.fadeInAudio(FADE_AUDIO_TOGGLE_MS);
+            // Check if audio fading is enabled. If so, start fading in audio.
+            // Otherwise the volume is set as it was before.
+            if(fadeIn && this.settingsService.isAudioFadeAllowed()){
+                this.fadeInAudio(FADE_AUDIO_TOGGLE_MS);
+            } else {
+                this.audio.volume = this._volumeSubject.getValue();
+            }
         }).catch(() => {
             this.showError("Das Lied kann nicht abgespielt werden.")
         });
@@ -139,29 +156,37 @@ export class AudioService {
         this.fadeOutAudio(FADE_AUDIO_TOGGLE_MS).then(() => this.audio.pause());
     }
 
+    
+
     /**
      * Force play of the selected list.
      */
-     private async playList(list: PlayableList<any>) {
+     private async forcePlayList(list: PlayableList<any>) {
         console.log("force play")
-        const item = new QueueList(list);
-        
-        this.queueService.enqueueListTop(list)
 
-        // this._currentItemSubject.next();
-        // this.enqueueList(playableList)
+        const item = new QueueList(list);
+        const firstSong = await item.getNextItem();
+
+        this.queueService.enqueueListTop(list);
+        this.forcePlaySong(firstSong)
     }
 
     /**
-     * Force play the selected list. If the list is already 
-     * playing then the playback is paused or resumed.
-     * @param list Song to play
+     * Force play the selected song. If the song is already 
+     * playing then the playback is paused or resumed accordingly.
+     * @param song Song to play
      */
     public async playOrPause(song: Song) {
         const isPlaying = this.currentItem?.id == song?.id
 
+        // Check if listContext exists, if so, the user played a song
+        // inside a playlist. This means we have to enqueue the playlist to the top and play the song.
+        if(song.listContext) {
+            // TODO
+        }
+
         if(isPlaying) this.togglePause();
-        else this.play(new CurrentPlayingItem(song));
+        else this.forcePlaySong(song);
     }
 
     /**
@@ -173,7 +198,7 @@ export class AudioService {
         const isPlaying = this.currentItem?.context?.id == list.id
 
         if(isPlaying) this.togglePause();
-        else this.playList(list);
+        else this.forcePlayList(list);
     }
 
     /**
@@ -260,7 +285,7 @@ export class AudioService {
      * Play next song in queue.
      */
     public async next() {
-        const nextSong = this._shuffleSubject.getValue() ? await this.queueService.random() : await this.queueService.dequeue();
+        const nextSong = await this.queueService.dequeue();
 
         if(!nextSong) {
             this._doneSubject.next(true);
@@ -269,7 +294,7 @@ export class AudioService {
         }
 
         this._doneSubject.next(false);
-        this.play(nextSong);
+        this.forcePlaySong(nextSong);
     }
 
     public async prev() {
@@ -355,7 +380,7 @@ export class AudioService {
         })
 
         navigator.mediaSession.setActionHandler("nexttrack", () => this.next())
-        navigator.mediaSession.setActionHandler("play", () => this.play(null, true))
+        navigator.mediaSession.setActionHandler("play", () => this.resume(true))
         navigator.mediaSession.setActionHandler("pause", () => this.pause(true))
         navigator.mediaSession.setActionHandler("stop", () => this.pause(true))
         navigator.mediaSession.setActionHandler("previoustrack", () => this.prev())        
