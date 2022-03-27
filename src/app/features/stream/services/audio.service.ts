@@ -114,6 +114,10 @@ export class AudioService {
         }
 
         if(!fadeIn || !this.settingsService.isAudioFadeAllowed()) this.audio.volume = this._volumeSubject.getValue();
+        this.resume();
+    }
+
+    public resume(fadeIn: boolean = false) {
         this.audio.play().then(() => {
             if(fadeIn && this.settingsService.isAudioFadeAllowed()) this.fadeInAudio(FADE_AUDIO_TOGGLE_MS);
         }).catch(() => {
@@ -124,7 +128,7 @@ export class AudioService {
     /**
      * Pause the playing audio
      */
-     public pause(fadeOut: boolean = false) {
+    public pause(fadeOut: boolean = false) {
         if(this.isCurrentlyFading) return;
 
         if(!fadeOut || !this.settingsService.isAudioFadeAllowed()) {
@@ -176,7 +180,7 @@ export class AudioService {
      * Pause or resume playback.
      */
     public async togglePause() {
-        if(this.paused) this.play(null, true);
+        if(this.paused) this.resume(true);
         else this.pause(true);
     }
 
