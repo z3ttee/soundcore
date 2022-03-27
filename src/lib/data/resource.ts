@@ -34,6 +34,11 @@ export class SCResourceMap<T> {
         return !!map[id];
     }
 
+    public get(id: string): T {
+        const map = this._mapSubject.getValue();
+        return map[id];
+    }
+
     public hasValue(item: T): boolean {
         const map = this._mapSubject.getValue();
         return Object.values(map).findIndex((i) => i == item) != -1
