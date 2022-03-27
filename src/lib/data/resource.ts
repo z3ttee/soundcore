@@ -1,4 +1,4 @@
-import { BehaviorSubject, Observable } from "rxjs";
+import { BehaviorSubject, firstValueFrom, Observable } from "rxjs";
 import { v4 as uuidv4 } from "uuid";
 
 /**
@@ -61,10 +61,13 @@ export class SCResourceQueue<T> {
     public $items: Observable<T[]> = this._queueSubject.asObservable();
     public $size: Observable<number> = this._sizeSubject.asObservable();
 
-    constructor() {
-        
-    }
+    constructor(private readonly isShuffled?: BehaviorSubject<boolean>) {}
     
+    /**
+     * Add items to the queue.
+     * @param item Item to enqueue.
+     * @returns Position in queue as number
+     */
     public enqueue(item: T): number {
         const queue = this._queueSubject.getValue();
         queue.push(item);
@@ -74,18 +77,41 @@ export class SCResourceQueue<T> {
         return queue.length-1;
     }
 
-    public dequeue(): T {
+    /**
+     * Enqueue items to the top of the queue (position 0).
+     * This causes the item to be executed next.
+     * @param item Item to enqueue.
+     * @returns Position in queue as number
+     */
+    public enqueueTop(item: T): number {
         const queue = this._queueSubject.getValue();
+        queue.unshift(item);
 
-        console.log("dequeue 1: ", queue.length)
-        const item = queue.splice(0, 1)?.[0];
+        this._queueSubject.next(queue);
+        this._sizeSubject.next(queue.length);
+        return 0;
+    }
 
-        console.log("dequeue 2: ", queue.length)
+    /**
+     * Dequeue the next item. This removes the item from the queue.
+     * @returns Item object
+     */
+    public async dequeue(): Promise<T> {
+        const queue = this._queueSubject.getValue();
+        const item: T = queue.splice(this.getIndex(), 1)?.[0];
+
         this._queueSubject.next(queue);
         this._sizeSubject.next(queue.length);
         return item;
     }
 
+    /**
+     * Remove an item from the queue by its id.
+     * It is not recommended to remove items from the queue, as this has a complexity of O(n).
+     * NOTE: The item must be an object with a valid id property.
+     * @param id ID of the object.
+     * @returns Removed item object.
+     */
     public remove(id: string): T {
         const queue = this._queueSubject.getValue();
         const index = queue.findIndex((item) => item["id"] == id);
@@ -97,33 +123,42 @@ export class SCResourceQueue<T> {
         return item;
     }
 
+    /**
+     * Get the next element from the queue without removing it.
+     * NOTE: If isShuffled=true, the next random element will be taken.
+     * @returns Item object
+     */
     public peek(): T {
         const queue = this._queueSubject.getValue();
-        return queue[0];
+        return queue[this.getIndex()];
     }
 
+    /**
+     * Get the current size of the queue.
+     * @returns Size as number
+     */
     public size(): number {
         return this._queueSubject.getValue().length;
+    }
+
+    private getIndex(): number {
+        if(this.isShuffled?.getValue()) return Math.floor(Math.random() * this.size());
+        return 0;
     }
 
 }
 
 
 export class SCResourceMapQueue<T> {
+    constructor(private readonly isShuffled?: BehaviorSubject<boolean>) {}
 
     private _map: SCResourceMap<T> = new SCResourceMap();
     private _queueMap: SCResourceMap<T> = new SCResourceMap();
-    private _queue: SCResourceQueue<T> = new SCResourceQueue();
+    private _queue: SCResourceQueue<T> = new SCResourceQueue(this.isShuffled);
 
     public $map = this._map.$map;
     public $queue = this._queue.$items;
     public $size = this._queue.$size;
-
-    constructor() {
-        this.$queue.subscribe((items) => {
-            console.log(items)
-        })
-    }
 
     public enqueue(item: T): number {
         if(!item["id"]) item["id"] = uuidv4();
@@ -133,10 +168,10 @@ export class SCResourceMapQueue<T> {
         return position;
     }
 
-    public dequeue(): T {
-        const next = this._queue.peek();
+    public async dequeue(): Promise<T> {
+        const next = await this._queue.peek();
         this._queueMap.remove(next["id"]);
-        this._queue.dequeue();
+        await this._queue.dequeue();
         return next;
     }
 

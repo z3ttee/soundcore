@@ -196,7 +196,7 @@ export class PlayableList<T> {
      * @returns Observable<Song>
      */
     public async emitNextSong(startAtIndex?: number): Promise<Song> {
-        const nextSong = this.resource.dequeue();
+        const nextSong = await this.resource.dequeue();
         if(!nextSong) return null
 
         // Next song exists, delete from queue and resources
