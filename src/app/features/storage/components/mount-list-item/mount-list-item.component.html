@@ -1,22 +1,26 @@
-<div class="bg-background-dark rounded-md my-2 px-6 py-4 flex flex-1 items-center shadow-md">
+<asc-interface-list-item-template>
+    <div class="flex items-center">
+        <img src="assets/img/icon_mount.png" class="inline-block min-w-16 max-w-16 h-16">
+    
+        <div class="w-full pl-8">
+            <h6>{{ mount.name || "Unknown name" }}</h6>
 
-    <img src="assets/img/icon_harddrive.png" class="inline-block w-16 h-16">
+            <div>
+                <span class="text-xs leading-3 pointer-events-all opacity-60">{{ mount?.path || "Unknown path" }}</span>
+            </div>
 
-    <div class="flex-grow px-6">
-        <h6>{{ mount?.name || "Unknown name" }}</h6>
+            <ul class="item-details inline-flex items-center font-light text-xs pt-2">
+                <li class="inline-flex items-center font-light text-xs"><asc-label-badge>{{ (mount.status || "ok") == "ok" ? "OK" : "Indexierung läuft" }}</asc-label-badge></li>
+            </ul>
+        </div>
 
-        <ul class="flex gap-8">
-            <li class="opacity-40 cursor-pointer">{{ mount?.path || "Unknown path" }}</li>
-        </ul>
+        <div class="inline-flex items-center">
+            <button mat-icon-button (click)="triggerEditEvent($event)" matTooltip="Bearbeiten">
+                <mat-icon>edit</mat-icon>
+            </button>
+            <button mat-icon-button color="warn" (click)="triggerDeleteEvent($event)" matTooltip="Löschen">
+                <mat-icon>delete</mat-icon>
+            </button>
+        </div>
     </div>
-
-    <div class="inline-flex items-center">
-        <button mat-icon-button (click)="triggerEditEvent()" matTooltip="Bearbeiten">
-            <mat-icon>edit</mat-icon>
-        </button>
-        <button mat-icon-button color="warn" (click)="triggerDeleteEvent()" matTooltip="Löschen">
-            <mat-icon>delete</mat-icon>
-        </button>
-    </div>
-
-</div>
+</asc-interface-list-item-template>

@@ -1,0 +1,4 @@
+<button class="inline-flex items-center justify-center p-1.5 transition-all aspect-square" mat-icon-button mat-ripple [matRippleCentered]="true" [matRippleUnbounded]="true" [matRippleRadius]="16" [matRippleAnimation]="{ enterDuration: 150, exitDuration: 250 }">
+    <i class="fa-regular fa-heart" *ngIf="!($isLiked | async)"></i>
+    <i class="fa-solid fa-heart text-accent-dark" *ngIf="($isLiked | async)"></i>
+</button>

@@ -9,7 +9,7 @@
     </div>
 
     <div class="my-3">
-        <span class="rounded-full bg-info py-2 px-4 text-xs" [ngClass]="{'bg-warn text-background': index?.status == 'duplicate', 'bg-error-dark': index?.status == 'errored', 'bg-success': index?.status == 'ok', 'bg-primary': index?.status == 'aborted'}">{{ index?.status | statusPipe }}</span>
+        <span class="rounded-full bg-info py-2 px-4 text-xs" [ngClass]="{'bg-warn text-background': index?.status == 'duplicate', 'bg-error-dark': index?.status == 'errored', 'bg-success': index?.status == 'ok', 'bg-primary': index?.status == 'aborted'}">{{ index?.status | indexStatusPipe }}</span>
     
         <button mat-icon-button (click)="retryUpload()" matTooltip="Erneut versuchen" *ngIf="index?.status == 'errored'"><i class="fa-solid fa-arrow-rotate-right"></i></button>
     </div>

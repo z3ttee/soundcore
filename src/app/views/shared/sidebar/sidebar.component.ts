@@ -1,4 +1,8 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
+import { Observable } from 'rxjs';
+import { Playlist } from 'src/app/features/playlist/entities/playlist.entity';
+import { PlaylistService } from 'src/app/features/playlist/services/playlist.service';
 
 @Component({
   selector: 'asc-sidebar',
@@ -7,9 +11,18 @@ import { Component, OnInit } from '@angular/core';
 })
 export class SidebarComponent implements OnInit {
 
-  constructor() { }
+  public $playlists: Observable<Playlist[]> = this.playlistService.$playlists;
 
-  ngOnInit(): void {
+  public error: HttpErrorResponse = undefined;
+
+  constructor(
+    private playlistService: PlaylistService,
+  ) { }
+
+  public async ngOnInit(): Promise<void> {}
+
+  public async openCreatePlaylist() {
+    this.playlistService.openEditorDialog({ mode: "create" })
   }
 
 }

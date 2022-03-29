@@ -1,9 +1,8 @@
-import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import { BehaviorSubject, Observable } from "rxjs";
+import { BehaviorSubject, Observable, Subject } from "rxjs";
 import { io, Socket } from "socket.io-client";
-import { AuthenticationService } from "src/app/services/authentication.service";
 import { environment } from "src/environments/environment";
+import { AuthenticationService } from "src/sso/services/authentication.service";
 import { Index } from "../entities/index.entity";
 import { SocketStatus } from "../enums/socket-status.enum";
 import { UploadService } from "./upload.service";
@@ -18,10 +17,12 @@ export class IndexStatusService {
     private _socket: Socket;
 
     private _socketConnectedSubject: BehaviorSubject<SocketStatus> = new BehaviorSubject(SocketStatus.CONNECTING);
+    private _onUpdateSubject: Subject<Index> = new Subject();
+
     public $socketConnected: Observable<SocketStatus> = this._socketConnectedSubject.asObservable();
+    public $onIndexUpdate: Observable<Index> = this._onUpdateSubject.asObservable();
 
     constructor(
-        private httpClient: HttpClient, 
         private authService: AuthenticationService,
         private uploadService: UploadService
     ){
@@ -34,10 +35,15 @@ export class IndexStatusService {
      * $socketAvailable Observable.
      */
     private async connectToSocket() {
-        const socketUrl = environment.api_base_uri + (environment.production ? "/soundcore" : "" ) + "/index-status/";
-        this._socket = io(`${socketUrl}`, {
+        const url = new URL(environment.api_base_uri + "/index-status");
+        const hostname = url.host;
+        const pathname = url.pathname;
+
+        console.log(hostname, pathname)
+        this._socket = io(hostname, {
+            path: pathname,
             extraHeaders: {
-              "Authorization": "Bearer " + this.authService.getAccessToken()
+              "Authorization": "Bearer " + (await this.authService.getAccessToken())
             }
         })
 
@@ -50,6 +56,7 @@ export class IndexStatusService {
 
     private async handleIndexUpdateEvent(data: Index) {
         this.uploadService.updateIndex(data)
+        this._onUpdateSubject.next(data);
     }
 
     private async handleDisconnectEvent() {

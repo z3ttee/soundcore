@@ -1,6 +1,6 @@
-import { Song } from "src/app/model/song.model";
-import { SSOUser } from "src/app/model/sso-user.model";
-import { StorageMount } from "../../storage/model/storage-mount.model";
+import { Song } from "../../song/entities/song.entity";
+import { Mount } from "../../storage/entities/mount.entity";
+import { User } from "../../user/entities/user.entity";
 import { IndexStatus } from "../enums/index-status.enum";
 
 export class Index {
@@ -10,8 +10,10 @@ export class Index {
     public status: IndexStatus;
     public checksum: string;
     public indexedAt: Date;
+    public directory: string;
+
     
     public song?: Song;
-    public mount?: StorageMount;
-    public uploader?: SSOUser;
+    public mount?: Mount;
+    public uploader?: User;
 }

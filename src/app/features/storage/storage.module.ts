@@ -7,23 +7,37 @@ import { BucketService } from './services/bucket.service';
 import { MountService } from './services/mount.service';
 import {MatSelectModule} from '@angular/material/select';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import {MatPaginatorModule} from '@angular/material/paginator';
 import {MatButtonModule} from '@angular/material/button';
 import {MatIconModule} from '@angular/material/icon';
 import {MatTooltipModule} from '@angular/material/tooltip';
 import {MatDialogModule} from '@angular/material/dialog';
-import { MountEditorDialog } from './dialogs/mount-editor.dialog';
 import {MatInputModule} from '@angular/material/input';
 import {MatCheckboxModule} from '@angular/material/checkbox';
 import {MatProgressBarModule} from '@angular/material/progress-bar';
 import { BucketInfoComponent } from './views/bucket-info/bucket-info.component';
 import { BucketListItemComponent } from './components/bucket-list-item/bucket-list-item.component';
 import { AppCommonModule } from 'src/app/common.module';
+import { MountStatusService } from './services/mount-status.service';
+import { AscMessageModule } from 'src/app/components/message-components/message-components.module';
+import { MountInfoComponent } from './views/mount-info/mount-info.component';
+import { IndexService } from './services/index.service';
+import { IndexInfoComponent } from './views/index-info/index-info.component';
+import { AscInterfaceListItemTemplateModule } from 'src/app/components/list-items/interface-list-item-template/interface-list-item-template.module';
+import { AscInterfaceListModule } from 'src/app/components/lists/interface-list/interface-list.module';
+import { AscBadgeModule } from 'src/app/components/badge-components/badge-components.module';
+import { IndexListItemComponent } from './components/index-list-item/index-list-item.component';
+import { PipesModule } from 'src/app/pipes/pipes.module';
+import { MountEditorDialog } from './dialogs/mount-editor/mount-editor.dialog';
+import { StorageItemViewComponent } from './components/storage-item-view/storage-item-view.component';
+import { StorageItemTypePipeModule } from 'src/app/pipes/storage-item-type/storage-item-type.module';
+import { AscImageModule } from 'src/app/components/image-components/image-components.module';
 
 const routes: Routes = [
 
   { path: "", component: BucketsComponent},
-  { path: ":bucketId", component: BucketInfoComponent }
+  { path: "bucket/:bucketId", component: BucketInfoComponent },
+  { path: "mount/:mountId", component: MountInfoComponent },
+  { path: "index/:indexId", component: IndexInfoComponent }
 
 ]
 
@@ -33,7 +47,11 @@ const routes: Routes = [
     MountListItemComponent,
     MountEditorDialog,
     BucketInfoComponent,
-    BucketListItemComponent
+    BucketListItemComponent,
+    IndexListItemComponent,
+    MountInfoComponent,
+    IndexInfoComponent,
+    StorageItemViewComponent
   ],
   imports: [
     CommonModule,
@@ -42,8 +60,15 @@ const routes: Routes = [
     ReactiveFormsModule,
     RouterModule.forChild(routes),
 
+    PipesModule,
+    AscMessageModule,
+    AscInterfaceListItemTemplateModule,
+    AscInterfaceListModule,
+    AscBadgeModule,
+
+    StorageItemTypePipeModule,
+
     MatSelectModule,
-    MatPaginatorModule,
     MatButtonModule,
     MatIconModule,
     MatTooltipModule,
@@ -54,7 +79,9 @@ const routes: Routes = [
   ],
   providers: [
     BucketService,
-    MountService
+    MountService,
+    MountStatusService,
+    IndexService
   ]
 })
 export class StorageModule { }

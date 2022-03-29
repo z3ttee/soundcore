@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { AuthenticationService } from 'src/app/services/authentication.service';
 
 @Component({
   templateUrl: './index-view.component.html',
@@ -7,9 +6,14 @@ import { AuthenticationService } from 'src/app/services/authentication.service';
 })
 export class IndexViewComponent implements OnInit {
 
-  constructor(public authService: AuthenticationService) { }
+  constructor(
+    // public keycloakService: KeycloakService
+  ) { }
 
   ngOnInit(): void {
+    /*this.keycloakService.keycloakEvents$.subscribe((event) => {
+      console.log(event)
+    })*/
   }
 
 }

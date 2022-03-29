@@ -15,8 +15,9 @@ import {MatDialogModule} from '@angular/material/dialog';
 import { ConfirmAbortDialog } from './dialogs/confirm-abort/confirm-abort.component';
 import { MatButtonModule } from '@angular/material/button';
 import { IndexListItemComponent } from './components/index-list-item/index-list-item.component';
-import { StatusPipePipe } from './pipes/status-pipe.pipe';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { PipesModule } from 'src/app/pipes/pipes.module';
+import { AscMessageModule } from 'src/app/components/message-components/message-components.module';
 
 
 const routes: Routes = [
@@ -31,12 +32,14 @@ const routes: Routes = [
     UploadIndexComponent,
     ConfirmAbortDialog,
     IndexListItemComponent,
-    StatusPipePipe
   ],
   imports: [
     CommonModule,
     AppCommonModule,
     RouterModule.forChild(routes),
+
+    PipesModule,
+    AscMessageModule,
 
     MatPaginatorModule,
     MatProgressBarModule,

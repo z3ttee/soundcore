@@ -10,47 +10,68 @@ import { SidebarComponent } from './views/shared/sidebar/sidebar.component';
 import { SplashComponent } from './views/splash/splash.component';
 import { StoreModule } from '@ngrx/store';
 
-import { HttpClientModule, HTTP_INTERCEPTORS } from "@angular/common/http"
-import { ToolbarComponent } from './views/shared/toolbar/toolbar.component';
-import { AudioplayerModule } from './features/audioplayer/audioplayer.module';
+import { HttpClientModule } from "@angular/common/http"
 
 import {MatButtonModule} from '@angular/material/button';
 import {MatIconModule} from '@angular/material/icon';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { ReactiveFormsModule } from '@angular/forms';
 import {MatAutocompleteModule} from '@angular/material/autocomplete';
 import {MatInputModule} from '@angular/material/input';
 import {MatListModule} from '@angular/material/list';
 import {MatDividerModule} from '@angular/material/divider';
 import { AppCommonModule } from './common.module';
-import { StreamService } from './services/stream.service';
 import { DeviceService } from './services/device.service';
-import { AccessTokenInterceptor } from './interceptors/access-token.interceptor';
 import {MatProgressBarModule} from '@angular/material/progress-bar';
 
-
 import { TeleportModule } from '@ngneat/overview';
+import { MainLayoutComponent } from './layout/main-layout/main-layout.component';
+import { PlaylistModule } from './features/playlist/playlist.module';
+import { InfiniteScrollListComponent } from './components/lists/infinite-scroll-list/infinite-scroll-list.component';
+import { StreamModule } from './features/stream/stream.module';
+import { AscMessageModule } from './components/message-components/message-components.module';
+import { InfiniteScrollModule } from 'ngx-infinite-scroll';
+import {ScrollingModule} from '@angular/cdk/scrolling';
+import { AscPlaylistModule } from './components/playlist-components/playlist-components.module';
+import { MatBottomSheetModule } from '@angular/material/bottom-sheet';
+import { MatDialogModule } from '@angular/material/dialog';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { AscPlaylistEditorDialogModule } from './components/dialogs/playlist-editor-dialog/playlist-editor-dialog.module';
+import { AscToolbarModule } from './components/toolbar/toolbar.module';
+import { AscConfirmDialogModule } from './components/dialogs/confirm-dialog/confirm-dialog.module';
+import { AuthModule } from 'src/sso/auth.module';
 
 // TODO: https://angular.io/guide/i18n-common-prepare
 
 @NgModule({
   declarations: [
+    InfiniteScrollListComponent,
+
     AppComponent,
     IndexViewComponent,
+    MainLayoutComponent,
     DrawerComponent,
     SidebarComponent,
-    ToolbarComponent,
     SplashComponent
   ],
   imports: [
+    AuthModule,
+
     BrowserModule,
     AppRoutingModule,
     BrowserAnimationsModule,
     HttpClientModule,
-    AudioplayerModule,
     ReactiveFormsModule,
     StoreModule.forRoot({}, {}),
     AppCommonModule,
     TeleportModule,
+    InfiniteScrollModule,
+
+    StreamModule,
+    AscMessageModule,
+    AscPlaylistModule,
+    AscPlaylistEditorDialogModule,
+    AscToolbarModule,
+    AscConfirmDialogModule,
 
     // Import global Angular Material Components
     MatIconModule,
@@ -59,16 +80,14 @@ import { TeleportModule } from '@ngneat/overview';
     MatInputModule,
     MatListModule,
     MatDividerModule,
-    MatProgressBarModule
+    MatProgressBarModule,
+    MatBottomSheetModule,
+    ScrollingModule,
+    MatDialogModule,
+    MatSnackBarModule
   ],
   providers: [
-    StreamService,
-    DeviceService,
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: AccessTokenInterceptor,
-      multi: true,
-    }
+    DeviceService
   ],
   bootstrap: [AppComponent]
 })

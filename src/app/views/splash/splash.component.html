@@ -1,11 +1,11 @@
-<div *ngIf="active" class="splash-wrapper fixed left-0 top-0 flex flex-col justify-center content-center items-center w-full h-full overflow-hidden bg-background">
+<div class="splash-wrapper fixed left-0 top-0 flex flex-col justify-center content-center items-center w-full h-full overflow-hidden bg-background">
     <div class="block">
-        <img [src]="appLogoUri" class="w-14 h-14 block mx-auto animate-pulse">
+        <img src="../../../assets/branding/soundcore_logo_full.svg" class="w-14 h-14 block mx-auto animate-pulse">
     </div>
 
-    <div class="mt-8 text-center" *ngIf="appTitle || subtitle">
-        <h2 *ngIf="appTitle">{{ appTitle }}</h2>
-        <p *ngIf="subtitle" class="opacity-30 text-sm">{{ subtitle }}</p>
+    <div class="mt-8 text-center">
+        <h2>Soundcore</h2>
+        <p class="opacity-30 text-sm">by TSAlliance</p>
     </div>
 
     <div class="absolute top-0 p-6 w-full" *ngIf="errorMessage">
@@ -15,4 +15,3 @@
     </div>
 </div>
 
-<ng-content *ngIf="!active"></ng-content>

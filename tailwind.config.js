@@ -8,12 +8,22 @@ module.exports = {
     darkMode: 'class', // or 'media' or 'class'
     theme: {
       extend: {
+        padding: ({ theme }) => ({
+          window: theme("spacing.4"),
+        }),
+        margin: ({ theme }) => ({
+          row: theme("spacing.6"),
+        }),
         gridTemplateColumns: ({ theme }) => ({
           drawer: 'auto minmax(0, 1fr)',
           drawerClosed: 'auto',
           songs: 'repeat(auto-fill, minmax(' + theme("width.36") + ', 1fr))',
           uploads: 'repeat(auto-fill, minmax(' + theme("width.80") + ', 1fr))',
-          ...theme('spacing')
+          auto: 'repeat(auto-fill, 1fr)'
+        }),
+        gridAutoColumns: ({ theme }) => ({
+          'songs-hr': 'minmax(' + theme("width.36") + ', 1fr))',
+          'songs-hr-mobile': 'minmax(' + theme("width.28") + ', 1fr))'
         }),
         colors: {
           background: {
@@ -23,8 +33,8 @@ module.exports = {
           },
           primary: {
             light: "#272e38",
-            DEFAULT: "#272e38",
-            dark: "#14181d"
+            DEFAULT: "#232932",
+            dark: "#1b2027"
           },
           accent: {
             light: "#FFD97E",
@@ -58,6 +68,15 @@ module.exports = {
           'gr-info': "linear-gradient(60deg, " + theme('colors.info.light') + " 0%, " + theme('colors.info.dark') + " 100%);",
           'gr-warn': "linear-gradient(60deg, " + theme('colors.warn.light') + " 0%, " + theme('colors.warn.dark') + " 100%);",
           'gr-error': "linear-gradient(60deg, " + theme('colors.error.light') + " 0%, " + theme('colors.error.dark') + " 100%);"
+        }),
+        minWidth: theme => ({
+          ...theme("spacing")
+        }),
+        minHeight: theme => ({
+          ...theme("spacing")
+        }),
+        maxWidth: theme => ({
+          ...theme("spacing")
         })
       },
       colors: {
@@ -70,22 +89,23 @@ module.exports = {
         }
       },
       screens: {
-        '2xl': {'min-width': '1550px'},
-        'xl': {'min-width': '1200px'},  // Desktop
-        'lg': {'min-width': '1000px'},
-        'md': {'min-width': '780px'},   // Tablet
-        'sm': {'min-width': '540px'}    // Mobile
+        'sm': '540px',
+        'md': '780px',
+        'lg': '1000px',
+        'xl': '1200px',
+        '2xl': '1550px'
       },
       fontSize: {
+        xxs: ['0.65rem', { lineHeight: '1rem' }],
         xs: ['0.8rem', { lineHeight: '1rem' }],
         sm: ['0.9rem', { lineHeight: '1.1rem' }],
         base: ['0.98rem', { lineHeight: '1.25rem' }],
-        lg: ['1.125rem', { lineHeight: '1.75rem' }],
+        lg: ['1rem', { lineHeight: '1.75rem' }],
         xl: ['1.25rem', { lineHeight: '1.75rem' }],
         '2xl': ['1.5rem', { lineHeight: '2rem' }],
-        '3xl': ['1.875rem', { lineHeight: '2.25rem' }],
-        '4xl': ['2.25rem', { lineHeight: '2.5rem' }],
-        '5xl': ['3rem', { lineHeight: '1' }]
+        '3xl': ['1.875rem', { lineHeight: '2.5rem' }],
+        '4xl': ['2.25rem', { lineHeight: '3rem' }],
+        '5xl': ['3rem', { lineHeight: '4rem' }]
       },
       fontWeight: {
         light: '300',

@@ -1,0 +1,27 @@
+:host {
+
+    @mixin playButtonShow {
+        @apply opacity-100 pointer-events-auto scale-100;
+    }
+
+    .item-container {
+
+        .play-button {
+            @apply opacity-0 pointer-events-none scale-75;
+
+            &.active {
+                @include playButtonShow();
+            }
+        }
+
+        &:hover {
+            .play-button {
+                @include playButtonShow();
+            }
+        }
+
+    }
+
+    
+
+}

@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { map, Observable, of, take, tap } from 'rxjs';
-import { Song } from 'src/app/model/song.model';
+import { Observable } from 'rxjs';
+import { Song } from 'src/app/features/song/entities/song.entity';
+import { SongService } from 'src/app/features/song/services/song.service';
+import { AudioService } from 'src/app/features/stream/services/audio.service';
 import { Page } from 'src/app/pagination/pagination';
-import { SongService } from 'src/app/services/song.service';
-import { StreamService } from 'src/app/services/stream.service';
 
 @Component({
   selector: 'asc-releases-index',
@@ -14,7 +14,10 @@ export class ReleasesIndexComponent implements OnInit {
 
   public $latestSongs: Observable<Page<Song>>;
 
-  constructor(private songService: SongService, private streamService: StreamService) {
+  constructor(
+    private songService: SongService, 
+    private audioService: AudioService
+  ) {
     this.$latestSongs = this.songService.findLatestSongs();
   }
 
@@ -23,8 +26,5 @@ export class ReleasesIndexComponent implements OnInit {
     
   }
 
-  public async selectSong(song: Song) {
-    this.streamService.playSong(song)
-  }
 
 }

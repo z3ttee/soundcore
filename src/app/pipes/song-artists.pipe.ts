@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from "@angular/core";
-import { Artist } from "../model/artist.model";
+import { Artist } from "../features/artist/entities/artist.entity";
 
 @Pipe({
     name: "songArtistsJoin"

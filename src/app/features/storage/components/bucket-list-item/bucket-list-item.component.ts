@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { StorageBucket } from '../../model/storage-bucket.model';
+import { Bucket } from '../../entities/bucket.entity';
 
 @Component({
   selector: 'asc-bucket-list-item',
@@ -8,7 +8,7 @@ import { StorageBucket } from '../../model/storage-bucket.model';
 })
 export class BucketListItemComponent implements OnInit {
 
-  @Input() public bucket: StorageBucket;
+  @Input() public bucket: Bucket;
 
   constructor() { }
 

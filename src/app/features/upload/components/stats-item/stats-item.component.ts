@@ -9,6 +9,7 @@ export class StatsItemComponent {
 
   @Input() public title: string;
   @Input() public value: string | number;
+  @Input() public max: string | number;
   @Input() public mode: "info" | "success" | "warn" | "error" = "info"
 
   constructor() { }

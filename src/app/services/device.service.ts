@@ -5,20 +5,18 @@ import resolveConfig from 'tailwindcss/resolveConfig'
 import { TailwindConfig } from "tailwindcss/tailwind-config";
 import tailwindConfig from "../../../tailwind.config.js"
 
-// const tailwindConfig = require("../../tailwind.config.js");
-
-export type Breakpoint = {
+export interface Breakpoint {
     name: string;
     triggerWidth: number;
     width: number;
     height: number;
-    isMobile: boolean;
+    isDesktop: boolean;
 }
 
 @Injectable({
     providedIn: "root"
 })
-export class DeviceService implements OnInit {
+export class DeviceService {
     private _breakpointSubject: BehaviorSubject<Breakpoint>;
 
     private _tailwindConfig: TailwindConfig = resolveConfig(tailwindConfig);
@@ -30,7 +28,7 @@ export class DeviceService implements OnInit {
         // Transform breakpoints from tailwind
         const screens = this._tailwindConfig.theme.screens;
         for(const key in screens) {
-            screens[key] = parseInt(screens[key]["min-width"]?.replace("px", ""));
+            screens[key] = parseInt(screens[key]?.replace("px", ""));
         }
 
         this._breakpoints = Object.fromEntries(
@@ -42,10 +40,6 @@ export class DeviceService implements OnInit {
 
         this.updateBreakpoint();
         window.addEventListener("resize", () => this.onResizeEvent());
-    }
-
-    ngOnInit(): void {
-        throw new Error("Method not implemented.");
     }
 
     /**
@@ -115,7 +109,7 @@ export class DeviceService implements OnInit {
      * Update current breakpoint value.
      */
     private updateBreakpoint() {
-        this._breakpointSubject.next(this.computeBreakpoint())
+        this._breakpointSubject.next(this.computeBreakpoint());
     }
 
     /**
@@ -126,15 +120,13 @@ export class DeviceService implements OnInit {
         const name = this.getBreakpointNameByWidth(window.innerWidth);
         const triggerWidth = this.findBreakpointByName(name);
 
-        return { name, triggerWidth, width: window.innerWidth, height: window.innerHeight, isMobile: this.isMobile() }
+        console.log("isDesktop(): " + this.isDesktop())
+
+        return { name, triggerWidth, width: window.innerWidth, height: window.innerHeight, isDesktop: this.isDesktop() }
     }
 
-    /**
-     * Most simple way to check if user agent belongs to mobile device (very unreliable as manipulating the ua causes different outcomes...)
-     * @returns True or False
-     */
-    private isMobile(): boolean {
-        return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Windows Phone/i.test(navigator.userAgent)
+    private isDesktop(): boolean {       
+        return !(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Windows Phone/i.test(navigator.userAgent))
     }
 
 }
