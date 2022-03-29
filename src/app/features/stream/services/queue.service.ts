@@ -1,5 +1,6 @@
 import { Injectable } from "@angular/core";
 import { BehaviorSubject, combineLatest, map, Observable, Subject } from "rxjs";
+import { SnackbarService } from "src/app/services/snackbar.service";
 import { PlayableList } from "src/lib/data/playable-list.entity";
 import { SCResourceMap, SCResourceQueue } from "src/lib/data/resource";
 import { Song } from "../../song/entities/song.entity";
@@ -9,6 +10,10 @@ import { QueueItem, QueueList, QueueSong } from "../entities/queue-item.entity";
     providedIn: "root"
 })
 export class StreamQueueService {
+
+    constructor(
+        private snackbarService: SnackbarService,
+    ) {}
 
     private readonly _songsSubject: BehaviorSubject<QueueSong[]> = new BehaviorSubject([]);
     private readonly _listsSubject: BehaviorSubject<QueueList[]> = new BehaviorSubject([]);
@@ -127,12 +132,13 @@ export class StreamQueueService {
      * @returns Song
      */
      public enqueueList(list: PlayableList<any>): void {
-        /*if(this._queueMap[list.id]) {
-            console.warn("[QUEUE] Cannot enqueue playable list. Already in queue")
-            return;
-        }*/
-        
         const item = new QueueList(list);
+
+        if(this.queueMap.has(item.id)) {
+            this.snackbarService.error("Die Playlist befindet sich bereits in der Warteschlange.");
+            return;
+        }
+        
         this.queueMap.set(item);
         this.listsQueue.enqueue(item);
     }
@@ -143,12 +149,12 @@ export class StreamQueueService {
      * @returns Song
      */
      public enqueueListTop(list: PlayableList<any>): void {
-        /*if(this._queueMap[list.id]) {
-            console.warn("[QUEUE] Cannot enqueue playable list. Already in queue")
-            return;
-        }*/
-        
         const item = new QueueList(list);
+
+        if(this.queueMap.has(item.id)) {
+            this.listsQueue.remove(item.id);
+        }
+        
         this.queueMap.set(item);
         this.listsQueue.enqueueTop(item);
     }
