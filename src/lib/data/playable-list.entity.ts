@@ -31,14 +31,14 @@ export class PlayableList<T> {
     public readonly $currentPageIndex: Observable<number> = this._currentPageIndexSubject.asObservable().pipe(takeUntil(this.$destroy));
 
     private readonly resource: SCResourceMapQueue<Song> = new SCResourceMapQueue();
-    private readonly _dataSource: Record<string, Song> = {};
+    // private readonly _dataSource: Record<string, Song> = {};
     private readonly _dataSourceSubject: BehaviorSubject<Song[]> = new BehaviorSubject([]);
 
     /**
      * Observable that emits new values every time the user loads more content via infinite scroll.
      * This observable is suitable for displaying the playlists tracks in a list.
      */
-    public readonly $dataSource: Observable<Song[]> = this._dataSourceSubject.asObservable().pipe(takeUntil(this.$destroy));
+    public readonly $dataSource: Observable<Song[]> = this.resource.$map.pipe(takeUntil(this.$destroy), map((map) => Object.values(map))) // this._dataSourceSubject.asObservable().pipe(takeUntil(this.$destroy));
 
     /**
      * Observable that emits new values every time the internal queue is updated. This is just a filter of the $dataSource Observable
@@ -133,11 +133,14 @@ export class PlayableList<T> {
                 while (i < length) {
                     const song = page.elements[i];
                     song.listContext = this;
-                    if(song) this._dataSource[song.id] = song;
+                    if(song) {
+                        this.resource.set(song);
+                        // this._dataSource[song.id] = song;
+                    }
                     i++;
                 }
 
-                this._dataSourceSubject.next(Object.values(this._dataSource))
+                // this._dataSourceSubject.next(Object.values(this.resource.))
             }
         }).catch((error: Error) => {
             // Emit error
@@ -189,39 +192,49 @@ export class PlayableList<T> {
 
     /**
      * Emits the next song of the playable list.
-     * This returns an observable, because it may happen that the 
-     * song's metadata needs to be fetched. The observable emits 
-     * exactly two times: First one is always the song's id as this value 
-     * is always present. The last emit represents the song's metadata
-     * @returns Observable<Song>
+     * This returns a promise, because it may happen that the 
+     * song's metadata needs to be fetched. The promise resolves as soon
+     * as the metadata is available.
+     * @returns Promise<Song>
      */
-    public async emitNextSong(startAtIndex?: number): Promise<Song> {
+    public async emitNextSong(): Promise<Song> {
+        // Next song exists, delete from queue and resources
         const nextSong = await this.resource.dequeue();
         if(!nextSong) return null
 
-        // Next song exists, delete from queue and resources
         console.log("next song: ", nextSong)
 
-        const metadata = this._dataSource[nextSong.id];
-
         // If metadata already fetched, return it
+        const metadata = this.resource.get(nextSong.id);
         if(metadata) return metadata;
                 
         // Otherwise fetch and return it afterwards
         // Also add it to the dataset, so the playlist doesn't have to fetch this song again (except if its in batch request)
-        return firstValueFrom(this._httpClient.get<Song>(`${environment.api_base_uri}/v1/songs/${nextSong.id}`).pipe(takeUntil(this.$destroy))).then((song) => {
-            this._dataSource[song.id] = song;
-            this._dataSourceSubject.next(Object.values(this._dataSource))
-            return song;
-        }).catch((error: Error) => {
-            this._errorSubject.next(error)
-            return null;
-        })
+        return this.fetchSongMetadata(nextSong.id);
+    }
+
+    /**
+     * Emits a song by a specific id.
+     * This returns a promise, because it may happen that the 
+     * song's metadata needs to be fetched. The promise resolves as soon
+     * as the metadata is available.
+     * @param songId Song's id
+     * @returns Promise<Song>
+     */
+    public async emitId(songId: string): Promise<Song> {
+        const nextSong = await this.resource.dequeueId(songId);
+        if(!nextSong) return null
+
+        const metadata = this.resource.get(nextSong.id);
+        if(metadata) return metadata;
+
+        return this.fetchSongMetadata(songId);
     }
 
     public async addSong(song: Song) {
-        this._dataSource[song.id] = song;
-        this._dataSourceSubject.next(Object.values(this._dataSource));
+        this.resource.set(song);
+        // this._dataSource[song.id] = song;
+        // this._dataSourceSubject.next(Object.values(this._dataSource));
         this.resource.enqueue(song);
     }
 
@@ -233,9 +246,8 @@ export class PlayableList<T> {
 
     public async removeSong(song: Song) {
         this.resource.remove(song.id);
-        delete this._dataSource[song.id];
-
-        this._dataSourceSubject.next(Object.values(this._dataSource));
+        // delete this._dataSource[song.id];
+        // this._dataSourceSubject.next(Object.values(this._dataSource));
 
         this._totalElements--;
         this._totalElementsSubject.next(this._totalElements);
@@ -245,6 +257,16 @@ export class PlayableList<T> {
         for(const song of songs) {
             await this.removeSong(song);
         }
+    }
+
+    private async fetchSongMetadata(songId: string): Promise<Song> {
+        return firstValueFrom(this._httpClient.get<Song>(`${environment.api_base_uri}/v1/songs/${songId}`).pipe(takeUntil(this.$destroy))).then((song) => {
+            this.resource.set(song);
+            return song;
+        }).catch((error: Error) => {
+            this._errorSubject.next(error)
+            return null;
+        })
     }
 
 }

@@ -44,5 +44,6 @@ export class Song {
     public likedAt?: Date;
 
     public listContext?: PlayableList<any>;
+    public isEnqueued?: boolean = false;
 
 }

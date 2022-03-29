@@ -182,7 +182,13 @@ export class AudioService {
         // Check if listContext exists, if so, the user played a song
         // inside a playlist. This means we have to enqueue the playlist to the top and play the song.
         if(song.listContext) {
-            // TODO
+
+            // Set playlist on top the queue
+            this.queueService.enqueueListTop(song.listContext)
+            song.listContext.emitId(song.id);
+            
+            this.forcePlaySong(song);
+            return;
         }
 
         if(isPlaying) this.togglePause();
