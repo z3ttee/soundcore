@@ -4,24 +4,18 @@
     <div class="my-row">
         <h6>Aktueller Titel</h6>
 
-        <div *ngIf="($current | async)">
-            {{ ($current | async).song.title }} aus {{ ($current | async).context?.context?.title || "---" }}
-        </div>
+        <asc-message  *ngIf="($currentAsList | async).length <= 0">Derzeit wird kein Song abgespielt.</asc-message>
+        <asc-song-list [dataSource]="$currentAsList" [showHeader]="false" [showDate]="false" [showCount]="false"></asc-song-list>
     </div>
     
-    <div class="my-row">
+    <div class="my-row" *ngIf="($songs | async).length > 0">
         <h6>Als nächstes</h6>
 
-        <div *ngFor="let song of ($songs | async)">
-            {{ song.item.title }}
-        </div>
+        <asc-song-list [dataSource]="$songs" [showHeader]="false" [showDate]="false" [showCount]="false"></asc-song-list>
     </div>
 
     <div class="my-row" *ngFor="let list of ($lists | async)">
         <h6>Als nächstes aus: {{ list.item.context.title }}</h6>
-
-        <div *ngFor="let song of (list.item.$queue | async)">
-            {{ song.title }}
-        </div>
+        <asc-playable-list [list]="list.item" [showHeader]="false" [showDate]="false" [showCount]="false" [useQueueView]="true"></asc-playable-list>
     </div>
 </section>

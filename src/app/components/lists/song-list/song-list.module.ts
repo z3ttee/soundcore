@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { PlayableListComponent } from './playable-list.component';
 import { PipesModule } from 'src/app/pipes/pipes.module';
 import { AscImageModule } from '../../image-components/image-components.module';
 import { RouterModule } from '@angular/router';
@@ -9,7 +8,7 @@ import player from 'lottie-web/build/player/lottie_light';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatRippleModule } from '@angular/material/core';
 import { AscSongContextMenuModule } from '../../context-menus/song-context-menu/song-context-menu.module';
-import { AscSongListModule } from '../song-list/song-list.module';
+import { AscSongListComponent } from './song-list.component';
 
 export function playerFactory() {
   return player
@@ -17,7 +16,7 @@ export function playerFactory() {
 
 @NgModule({
   declarations: [
-    PlayableListComponent
+    AscSongListComponent
   ],
   imports: [
     RouterModule,
@@ -26,7 +25,6 @@ export function playerFactory() {
     PipesModule,
     AscImageModule,
     AscSongContextMenuModule,
-    AscSongListModule,
 
     MatProgressBarModule,
     MatRippleModule,
@@ -37,7 +35,7 @@ export function playerFactory() {
     LottieCacheModule.forRoot()
   ],
   exports: [
-    PlayableListComponent
+    AscSongListComponent
   ]
 })
-export class AscPlayableListModule { }
+export class AscSongListModule { }

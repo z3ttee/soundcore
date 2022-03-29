@@ -20,9 +20,10 @@ export class QueueViewComponent implements OnInit, OnDestroy {
   private $destroy: Observable<void> = this._destroySubject.asObservable();
 
   public $current = this.audioService.$currentItem.pipe(takeUntil(this.$destroy))
-  public $songs = this.queueService.$songs.pipe(takeUntil(this.$destroy));
+  public $currentAsList = this.audioService.$currentItem.pipe(takeUntil(this.$destroy), map((item) => item ? [item.song] : []))
+  
+  public $songs = this.queueService.$songs.pipe(takeUntil(this.$destroy), map((songs) => songs.map((s) => s.item)));
   public $lists = this.queueService.$lists.pipe(takeUntil(this.$destroy));
-
 
   public ngOnInit(): void {
 
