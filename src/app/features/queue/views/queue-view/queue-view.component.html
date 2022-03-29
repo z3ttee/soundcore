@@ -2,7 +2,7 @@
     <h3>Warteschlange</h3>
 
     <div class="my-row">
-        <h6>Aktueller Titel</h6>
+        <h6>Aktueller Titel<span *ngIf="($current | async)?.context?.context"> aus: {{ ($current | async)?.context?.context?.title }}</span></h6>
 
         <asc-message  *ngIf="($currentAsList | async).length <= 0">Derzeit wird kein Song abgespielt.</asc-message>
         <asc-song-list [dataSource]="$currentAsList" [showHeader]="false" [showDate]="false" [showCount]="false"></asc-song-list>

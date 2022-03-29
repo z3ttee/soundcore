@@ -1,5 +1,5 @@
 <div class="flex flex-col w-full gap-1" *ngIf="list">
-    <asc-song-list [dataSource]="useQueueView ? list.$queue : list.$dataSource" [list]="list" [showId]="showId" [showHeader]="showHeader" [showAlbum]="showAlbum" [showCount]="showCount" [showCover]="showCover"></asc-song-list>
+    <asc-song-list [dataSource]="useQueueView ? list.$queue : list.$dataSource" [list]="list" [showId]="showId" [showHeader]="showHeader" [showAlbum]="showAlbum" [showCount]="showCount" [showCover]="showCover" [showDate]="showDate"></asc-song-list>
 
     <div class="flex items-center px-2 relative">
         <div class="absolute w-full top-0 left-0 px-2" *ngIf="(list.$isLoading | async)">
