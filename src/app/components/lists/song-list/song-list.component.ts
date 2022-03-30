@@ -87,7 +87,6 @@ export class AscSongListComponent implements OnInit, OnDestroy, AfterViewInit {
   @Input() public set showCount(val: boolean) {
     if(typeof val == "undefined" || val == null) val = true;
     this._showCount = val;
-    console.log("show count: ", this._showCount)
     this._showCountSubject.next(val || false);
   }
 
@@ -124,13 +123,9 @@ export class AscSongListComponent implements OnInit, OnDestroy, AfterViewInit {
         for(const entry of entries) {
           const width = entry.borderBoxSize[0].inlineSize
 
-          console.log(width >= 850)
-          console.log(this._showCount && width >= 850)
-
           this._showCountSubject.next(this._showCount && width >= 850)
           this._showDateSubject.next(this._showDate && width >= 700)
           this._showAlbumSubject.next(this._showAlbum && width >= 550)
-          // this._.next(width >= 500
           this._showIdSubject.next(this._showId && width >= 500)
         }
       })
