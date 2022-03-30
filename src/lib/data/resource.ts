@@ -224,7 +224,7 @@ export class SCResourceMapQueue<T> {
     public async dequeue(random: boolean = false): Promise<T> {
         // Peek next element to check if there is any item left.
         const peek = await this._queue.peek(random)
-        if(!peek) return null;
+        if(!peek || !peek.item) return null;
 
         // Dequeue the peeked item.
         this._queueMap.remove(peek.item["id"]);
