@@ -19,7 +19,7 @@ export class PlayableList<T> {
     private readonly _currentPageIndexSubject: BehaviorSubject<number> = new BehaviorSubject(0);
 
     public readonly type: PlayableListType;
-    public readonly context: T;
+    public context: T;
     public readonly id: string;
 
     private readonly $destroy: Observable<void> = this._destroySubject.asObservable();

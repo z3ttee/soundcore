@@ -15,7 +15,7 @@
     </div>
 </section>-->
 
-<asc-playlist-view (onPlay)="playOrPauseList()" [isPaused]="($isPaused | async)" [options]="{ type: 'album', title: ($album | async)?.title, artwork: ($album | async)?.artwork }" *ngIf="!($isLoading | async) && !!($album | async)" >
+<asc-playlist-view (onPlay)="playOrPauseList()" (onLike)="likeAlbum()" [isLiked]="($album | async)?.liked" [isPaused]="($isPaused | async)" [options]="{ type: 'album', title: ($album | async)?.title, artwork: ($album | async)?.artwork }" *ngIf="!($isLoading | async) && !!($album | async)" >
 
     <!-- Quick info bar below title -->
     <div class="py-2 md:pt-2 md:pb-0 md:flex md:items-center" asc-stats>

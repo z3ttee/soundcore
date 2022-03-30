@@ -1,8 +1,9 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { BehaviorSubject, combineLatest, map, Observable, Subject, takeUntil } from 'rxjs';
+import { BehaviorSubject, combineLatest, filter, map, Observable, Subject, takeUntil } from 'rxjs';
 import { Song } from 'src/app/features/song/entities/song.entity';
 import { AudioService } from 'src/app/features/stream/services/audio.service';
+import { LikeService } from 'src/app/services/like.service';
 import { ListCreator } from 'src/lib/data/list-creator';
 import { PlayableList } from 'src/lib/data/playable-list.entity';
 import { Album } from '../../entities/album.entity';
@@ -38,7 +39,8 @@ export class AlbumInfoComponent implements OnInit, OnDestroy {
     private albumService: AlbumService,
     private router: Router,
     private listCreator: ListCreator,
-    private audioService: AudioService
+    private audioService: AudioService,
+    private likeService: LikeService
   ) { }
 
   public ngOnInit(): void {
@@ -61,7 +63,7 @@ export class AlbumInfoComponent implements OnInit, OnDestroy {
     return this.albumService.findById(id).finally(() => this._loadingSubject.next(false))
   }
 
-  public async setAlbum(album: Album) {
+  private async setAlbum(album: Album) {
     this._albumSubject.next(album);
 
     if(!album) this.list = null;
@@ -72,6 +74,11 @@ export class AlbumInfoComponent implements OnInit, OnDestroy {
     })
   }
 
+  private updateAlbum(album: Album) {
+    this._albumSubject.next(album);
+    this.list.context = album;
+  }
+
   public async showDiscography() {
     const album = this._albumSubject.getValue();
     if(!album?.artist) return;
@@ -80,6 +87,14 @@ export class AlbumInfoComponent implements OnInit, OnDestroy {
 
   public async playOrPauseList() {
     this.audioService.playOrPauseList(this.list)
+  }
+
+  public async likeAlbum() {
+    this.likeService.likeAlbum(this._albumSubject.getValue()).then((isLiked) => {
+      const album = this._albumSubject.getValue();
+      album.liked = !!isLiked;
+      this.updateAlbum(album);
+    });
   }
 
 }

@@ -26,4 +26,6 @@ export class Album {
     public songsCount?: number;
     public totalDuration?: number;
 
+    public liked?: boolean;
+
 }
