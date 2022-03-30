@@ -1,5 +1,6 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
+import { Album } from "src/app/features/album/entities/album.entity";
 import { Collection } from "src/app/features/collection/entities/collection.entity";
 import { Playlist } from "src/app/features/playlist/entities/playlist.entity";
 import { QueueList } from "src/app/features/stream/entities/queue-item.entity";
@@ -14,6 +15,13 @@ export class URLRegistry {
         return {
             listUrl: `${environment.api_base_uri}/v1/songs/byPlaylist/${id}/ids`,
             metadataUrl: `${environment.api_base_uri}/v1/songs/byPlaylist/${id}`
+        }
+    }
+
+    public static albums(id: string): EndpointEntry {
+        return {
+            listUrl: `${environment.api_base_uri}/v1/songs/byAlbum/${id}/ids`,
+            metadataUrl: `${environment.api_base_uri}/v1/songs/byAlbum/${id}`
         }
     }
 
@@ -40,6 +48,12 @@ export class ListCreator {
         if(!context) return null;
         const urls = URLRegistry.playlists(context.id)
         return this.forExistingId("playlist", context.id) || new PlayableList<Playlist>("playlist", this.httpClient, urls.listUrl, urls.metadataUrl, context);
+    }
+
+    public forAlbum(context: Album): PlayableList<Album> {
+        if(!context) return null;
+        const urls = URLRegistry.albums(context.id)
+        return this.forExistingId("album", context.id) || new PlayableList<Album>("album", this.httpClient, urls.listUrl, urls.metadataUrl, context);
     }
 
     public forCollection(context: Collection, userId: string): PlayableList<Collection> {

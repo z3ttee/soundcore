@@ -14,6 +14,7 @@ import { AscGridsModule } from 'src/app/components/grids/grids.module';
 import { AscAlbumModule } from 'src/app/components/album-components/album-components.module';
 import { AscPlaylistViewModule } from 'src/app/components/views/playlist-view.module';
 import { AscMessageModule } from 'src/app/components/message-components/message-components.module';
+import { AscPlayableListModule } from 'src/app/components/lists/playable-list/playable-list.module';
 
 const routes: Routes = [
   { path: ":albumId", component: AlbumInfoComponent }
@@ -39,6 +40,7 @@ const routes: Routes = [
     AscAlbumModule,
     AscPlaylistViewModule,
     AscMessageModule,
+    AscPlayableListModule,
 
     MatProgressBarModule,
     MatTooltipModule

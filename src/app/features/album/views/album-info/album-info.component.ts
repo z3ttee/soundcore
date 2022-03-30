@@ -1,9 +1,10 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { BehaviorSubject, Observable, Subject, takeUntil } from 'rxjs';
+import { BehaviorSubject, combineLatest, map, Observable, Subject, takeUntil } from 'rxjs';
 import { Song } from 'src/app/features/song/entities/song.entity';
-import { SongService } from 'src/app/features/song/services/song.service';
-import { ScrollService } from 'src/app/services/scroll.service';
+import { AudioService } from 'src/app/features/stream/services/audio.service';
+import { ListCreator } from 'src/lib/data/list-creator';
+import { PlayableList } from 'src/lib/data/playable-list.entity';
 import { Album } from '../../entities/album.entity';
 import { AlbumService } from '../../services/album.service';
 
@@ -16,53 +17,37 @@ export class AlbumInfoComponent implements OnInit, OnDestroy {
   private _destroySubject: Subject<void> = new Subject();
   private $destroy: Observable<void> = this._destroySubject.asObservable();
 
-  // Loading states
-  public isLoading: boolean = false;
-  public isLoadingSongs: boolean = false;
-
   // Main data objects
-  private _songsSubject: BehaviorSubject<Song[]> = new BehaviorSubject([])
-  public $songs: Observable<Song[]> = this._songsSubject.asObservable();
+  private _songsSubject: BehaviorSubject<Song[]> = new BehaviorSubject([]);
+  private _albumSubject: BehaviorSubject<Album> = new BehaviorSubject(null);
+  private _loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject(true);
 
-  public albumId: string;
-  public album: Album;
+  public $songs: Observable<Song[]> = this._songsSubject.asObservable();
+  public $album: Observable<Album> = this._albumSubject.asObservable();
+  public $isLoading: Observable<boolean> = this._loadingSubject.asObservable();
+  public $isPaused: Observable<boolean> = combineLatest([ this.audioService.$paused, this.audioService.$currentItem ]).pipe(takeUntil(this.$destroy), map(([paused, item]) => paused || item?.context?.id != this.list?.id))
+
   public recommendedAlbums: Album[] = [];
-  
-  // Artworks
-  public coverSrc: string = null;
-  public bannerSrc: string = null;
+  public list: PlayableList<Album>;
 
   // Accent colors  
   public accentColor: string = "#FFBF50";
 
-  // Pagination
-  public totalElements: number = 0;
-  private currentPage: number = 0;
-
   constructor(
     private activatedRoute: ActivatedRoute,
     private albumService: AlbumService,
-    private songService: SongService,
     private router: Router,
-    private scrollService: ScrollService
+    private listCreator: ListCreator,
+    private audioService: AudioService
   ) { }
 
   public ngOnInit(): void {
     this.activatedRoute.paramMap.pipe(takeUntil(this.$destroy)).subscribe((paramMap) => {
-      this.albumId = paramMap.get("albumId");
-
-      this.isLoading = true;
-      this.albumService.findById(this.albumId).then((album) => {
-        this.album = album;
-
-        this.scrollService.$onBottomReached.pipe(takeUntil(this.$destroy)).subscribe(() => {
-          this.findSongs()
-        })
-
-        this.albumService.findRecommendedByArtist(this.album?.artist?.id, [ this.album?.id ]).then((page) => {
-          this.recommendedAlbums = page.elements;
-        })
-      }).finally(() => this.isLoading = false)
+      const id = paramMap.get("albumId");
+      this.setAlbum(null);
+      
+      this.findAlbum(id).then((album) => this.setAlbum(album));
+      // TODO: Implement error message
     })
   }
 
@@ -71,27 +56,30 @@ export class AlbumInfoComponent implements OnInit, OnDestroy {
       this._destroySubject.complete();
   }
 
-  public async showDiscography() {
-    if(!this.album?.artist) return;
-    this.router.navigate(["/artist", this.album.artist?.id, "discography"])
+  private async findAlbum(id: string) {
+    this._loadingSubject.next(true)
+    return this.albumService.findById(id).finally(() => this._loadingSubject.next(false))
   }
 
-  public async findSongs() {
-    const currentItemCount = this._songsSubject.getValue().length;
-    if(currentItemCount != 0 && currentItemCount >= this.totalElements) return;
+  public async setAlbum(album: Album) {
+    this._albumSubject.next(album);
 
-    this.isLoadingSongs = true;
-    this.songService.findByAlbum(this.albumId, { page: this.currentPage }).then((page) => {
-      this.totalElements = page.totalElements;
-      if(page.elements.length > 0) this.currentPage++;
-      
-      this._songsSubject.next([
-        ...this._songsSubject.getValue(),
-        ...page.elements
-      ])
-    }).finally(() => {
-      this.isLoadingSongs = false;
+    if(!album) this.list = null;
+    else this.list = this.listCreator.forAlbum(album);
+
+    this.albumService.findRecommendedByArtist(album?.artist?.id, [ album?.id ]).then((page) => {
+      this.recommendedAlbums = page.elements;
     })
+  }
+
+  public async showDiscography() {
+    const album = this._albumSubject.getValue();
+    if(!album?.artist) return;
+    this.router.navigate(["/artist", album.artist?.id, "discography"])
+  }
+
+  public async playOrPauseList() {
+    this.audioService.playOrPauseList(this.list)
   }
 
 }
