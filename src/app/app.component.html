@@ -1,5 +1,5 @@
-<div class="absolute top-0 left-0 w-full z-50" *ngIf="showLoadingBar">
-    <mat-progress-bar class="bg-transparent" mode="indeterminate" value="40"></mat-progress-bar>
+<div class="absolute top-0 left-0 w-full z-[1000000]" *ngIf="($isRouteLoading | async)">
+    <mat-progress-bar class="bg-transparent" mode="indeterminate" color="accent"></mat-progress-bar>
 </div>
 
 <router-outlet></router-outlet>
