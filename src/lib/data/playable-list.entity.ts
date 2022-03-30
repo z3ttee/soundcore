@@ -31,8 +31,6 @@ export class PlayableList<T> {
     public readonly $currentPageIndex: Observable<number> = this._currentPageIndexSubject.asObservable().pipe(takeUntil(this.$destroy));
 
     private readonly resource: SCResourceMapQueue<Song> = new SCResourceMapQueue();
-    // private readonly _dataSource: Record<string, Song> = {};
-    private readonly _dataSourceSubject: BehaviorSubject<Song[]> = new BehaviorSubject([]);
 
     /**
      * Observable that emits new values every time the user loads more content via infinite scroll.
@@ -50,11 +48,8 @@ export class PlayableList<T> {
         this.$dataSource
         
     ]).pipe(takeUntil(this.$destroy), map(([queue, songs]) => songs.filter((song) => {
-        // console.log("is Song enqued?", this.resource.isEnqueued(song.id));
         return this.resource.isEnqueued(song.id);
-    })), tap((songs) => {
-        console.log("songs in queue: ", songs)
-    }));
+    })));
 
 
     private readonly _httpClient: HttpClient;
@@ -87,7 +82,7 @@ export class PlayableList<T> {
      * in the $dataSource observable.
      */
     public get dataSource(): Song[] {
-        return this._dataSourceSubject.getValue();
+        return this.resource.items();
     }
 
     /**
@@ -135,12 +130,9 @@ export class PlayableList<T> {
                     song.listContext = this;
                     if(song) {
                         this.resource.set(song);
-                        // this._dataSource[song.id] = song;
                     }
                     i++;
                 }
-
-                // this._dataSourceSubject.next(Object.values(this.resource.))
             }
         }).catch((error: Error) => {
             // Emit error
@@ -158,7 +150,6 @@ export class PlayableList<T> {
      * valid ids, no other properties are populated.
      */
     private async fetchSongsList() {
-        console.log("getting songs list")
         this._readySubject.next(false);
 
         // Fetch first page
@@ -168,8 +159,6 @@ export class PlayableList<T> {
 
         // Retrieve complete songs list (only contains song ids)
         firstValueFrom(this._httpClient.get<Page<Song>>(this._listUrl)).then((page) => {
-            console.log(page)
-
             this._totalElements = page.totalElements;
             const length = page.elements.length;
 
@@ -197,12 +186,10 @@ export class PlayableList<T> {
      * as the metadata is available.
      * @returns Promise<Song>
      */
-    public async emitNextSong(): Promise<Song> {
+    public async emitNextSong(random: boolean = false): Promise<Song> {
         // Next song exists, delete from queue and resources
-        const nextSong = await this.resource.dequeue();
+        const nextSong = await this.resource.dequeue(random);
         if(!nextSong) return null
-
-        console.log("next song: ", nextSong)
 
         // If metadata already fetched, return it
         const metadata = this.resource.get(nextSong.id);
@@ -233,8 +220,6 @@ export class PlayableList<T> {
 
     public async addSong(song: Song) {
         this.resource.set(song);
-        // this._dataSource[song.id] = song;
-        // this._dataSourceSubject.next(Object.values(this._dataSource));
         this.resource.enqueue(song);
     }
 
@@ -246,9 +231,6 @@ export class PlayableList<T> {
 
     public async removeSong(song: Song) {
         this.resource.remove(song.id);
-        // delete this._dataSource[song.id];
-        // this._dataSourceSubject.next(Object.values(this._dataSource));
-
         this._totalElements--;
         this._totalElementsSubject.next(this._totalElements);
     }

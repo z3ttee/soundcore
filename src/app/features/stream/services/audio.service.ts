@@ -11,6 +11,7 @@ import { StreamQueueService } from "./queue.service";
 import { StreamService } from "./stream.service";
 
 export const PLAYER_VOLUME_KEY = "asc::player_volume"
+export const SHUFFLE_KEY = "asc::shuffle"
 
 const FADE_AUDIO_CROSS_MS = 8000;
 const FADE_AUDIO_TOGGLE_MS = 1000;
@@ -30,7 +31,7 @@ export class AudioService {
     private _volumeSubject: BehaviorSubject<number> = new BehaviorSubject(this.getRestoredVolume());
     private _doneSubject: BehaviorSubject<boolean> = new BehaviorSubject(true as boolean);
     private _loopSubject: BehaviorSubject<boolean> = new BehaviorSubject(false as boolean);
-    private _shuffleSubject: BehaviorSubject<boolean> = new BehaviorSubject(false as boolean);
+    private _shuffleSubject: BehaviorSubject<boolean> = new BehaviorSubject(this.getRestoredShuffle());
     private _errorSubject: BehaviorSubject<string> = new BehaviorSubject(null);
 
     public $currentItem: Observable<CurrentPlayingItem> = this._currentItemSubject.asObservable();
@@ -82,6 +83,7 @@ export class AudioService {
         this.queueService.$onQueueWaiting.subscribe((item) => this.onQueueWaiting())
         this.$shuffle.subscribe((isShuffled) => {
             this.queueService.setShuffled(isShuffled);
+            localStorage.setItem(SHUFFLE_KEY, `${isShuffled}`);
         })
     }
 
@@ -162,10 +164,8 @@ export class AudioService {
      * Force play of the selected list.
      */
      private async forcePlayList(list: PlayableList<any>) {
-        console.log("force play")
-
         const item = new QueueList(list);
-        const firstSong = await item.getNextItem();
+        const firstSong = await item.item.emitNextSong(this._shuffleSubject.getValue());
 
         this.queueService.enqueueListTop(list);
         this.forcePlaySong(firstSong)
@@ -318,8 +318,8 @@ export class AudioService {
     }
 
     public async toggleShuffle() {
-        const shuffled = this._shuffleSubject.getValue();
-        this._shuffleSubject.next(!shuffled);
+        const shuffled = !this._shuffleSubject.getValue();
+        this._shuffleSubject.next(shuffled);
     }
 
     /**
@@ -357,6 +357,11 @@ export class AudioService {
 
     public getRestoredVolume(): number {
         return parseFloat(localStorage?.getItem(PLAYER_VOLUME_KEY)) || 1;
+    }
+    public getRestoredShuffle(): boolean {
+        const value = localStorage?.getItem(SHUFFLE_KEY);
+        if(typeof value == "undefined" || value == null || value == "false") return false;
+        return true;
     }
 
     private async setSession(currentItem: CurrentPlayingItem) {

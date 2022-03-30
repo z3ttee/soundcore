@@ -1,6 +1,13 @@
 import { BehaviorSubject, Observable, Subject } from "rxjs";
 import { v4 as uuidv4 } from "uuid";
 
+export interface SCQueuePeekResult<T> {
+
+    item?: T;
+    position?: number;
+
+}
+
 /**
  * Basic Map datastructure.
  * Support operations like add, remove and has.
@@ -48,6 +55,10 @@ export class SCResourceMap<T> {
         this._mapSubject.next({});
     }
 
+    public items() {
+        return Object.values(this._mapSubject.getValue());
+    }
+
 }
 
 /**
@@ -67,8 +78,6 @@ export class SCResourceQueue<T> {
     public $items: Observable<T[]> = this._queueSubject.asObservable();
     public $size: Observable<number> = this._sizeSubject.asObservable();
     public $onQueueWaiting: Observable<void> = this._onQueueWaiting.asObservable();
-
-    constructor(private readonly isShuffled?: BehaviorSubject<boolean>) {}
     
     /**
      * Add items to the queue.
@@ -104,9 +113,14 @@ export class SCResourceQueue<T> {
      * Dequeue the next item. This removes the item from the queue.
      * @returns Item object
      */
-    public async dequeue(): Promise<T> {
+    public async dequeue(random: boolean = false): Promise<T> {
+        const index = this.getIndex(random);
+        return this.dequeuePosition(index);
+    }
+
+    public async dequeuePosition(position: number): Promise<T> {
         const queue = this._queueSubject.getValue();
-        const item: T = queue.splice(this.getIndex(), 1)?.[0];
+        const item: T = queue.splice(position, 1)?.[0];
 
         this._queueSubject.next(queue);
         this._sizeSubject.next(queue.length);
@@ -136,9 +150,14 @@ export class SCResourceQueue<T> {
      * NOTE: If isShuffled=true, the next random element will be taken.
      * @returns Item object
      */
-    public peek(): T {
+    public peek(random: boolean = false): SCQueuePeekResult<T> {
+        const index = this.getIndex(random);
         const queue = this._queueSubject.getValue();
-        return queue[this.getIndex()];
+
+        return {
+            item: queue[index],
+            position: index
+        };
     }
 
     /**
@@ -157,8 +176,8 @@ export class SCResourceQueue<T> {
         return this._queueSubject.getValue();
     }
 
-    private getIndex(): number {
-        if(this.isShuffled?.getValue()) return Math.floor(Math.random() * this.size());
+    private getIndex(random: boolean = false): number {
+        if(random) return Math.floor(Math.random() * this.size());
         return 0;
     }
 
@@ -170,15 +189,17 @@ export class SCResourceQueue<T> {
  * that has not yet been dequeued.
  */
 export class SCResourceMapQueue<T> {
-    constructor(private readonly isShuffled?: BehaviorSubject<boolean>) {}
-
     private _map: SCResourceMap<T> = new SCResourceMap();
     private _queueMap: SCResourceMap<T> = new SCResourceMap();
-    private _queue: SCResourceQueue<T> = new SCResourceQueue(this.isShuffled);
+    private _queue: SCResourceQueue<T> = new SCResourceQueue();
 
     public $map = this._map.$map;
     public $queue = this._queue.$items;
     public $size = this._queue.$size;
+
+    public items(): T[] {
+        return this._map.items();
+    }
 
     /**
      * Enqueue an item. The item will also be added to the internal map
@@ -200,12 +221,16 @@ export class SCResourceMapQueue<T> {
      * NOTE: This will not remove the item from the internal map.
      * @returns Item
      */
-    public async dequeue(): Promise<T> {
-        const next = await this._queue.peek();
-        const id = next["id"];
-        this._queueMap.remove(id);
-        await this._queue.dequeue();
-        return this.get(id);
+    public async dequeue(random: boolean = false): Promise<T> {
+        // Peek next element to check if there is any item left.
+        const peek = await this._queue.peek(random)
+        if(!peek) return null;
+
+        // Dequeue the peeked item.
+        this._queueMap.remove(peek.item["id"]);
+        const item = await this._queue.dequeuePosition(peek.position);
+
+        return this.get(item["id"]);
     }
 
     /**

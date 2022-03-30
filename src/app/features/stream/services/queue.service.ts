@@ -15,24 +15,12 @@ export class StreamQueueService {
         private snackbarService: SnackbarService,
     ) {}
 
-    private readonly _songsSubject: BehaviorSubject<QueueSong[]> = new BehaviorSubject([]);
-    private readonly _listsSubject: BehaviorSubject<QueueList[]> = new BehaviorSubject([]);
-    private readonly _sizeSubject: BehaviorSubject<number> = new BehaviorSubject(0);
     private readonly _onQueueWaitingSubject: Subject<void> = new Subject();
     private readonly _shuffleSubject: BehaviorSubject<boolean> = new BehaviorSubject(false);
 
     private readonly queueMap: SCResourceMap<QueueItem> = new SCResourceMap();
-    private readonly songsQueue: SCResourceQueue<QueueSong> = new SCResourceQueue(this._shuffleSubject);
+    private readonly songsQueue: SCResourceQueue<QueueSong> = new SCResourceQueue();
     private readonly listsQueue: SCResourceQueue<QueueList> = new SCResourceQueue();
-
-    // private readonly _queueMap: Record<string, QueueItem> = {};
-
-    // private readonly _songsQueue: QueueSong[] = [];
-    // private readonly _listQueue: QueueList[] = [];
-
-    // public readonly $size: Observable<number> = this._sizeSubject.asObservable();
-    // public readonly $songs: Observable<QueueSong[]> = this._songsSubject.asObservable();
-    // public readonly $lists: Observable<QueueList[]> = this._listsSubject.asObservable();
 
     public readonly $size: Observable<number> = combineLatest([ this.songsQueue.$size, this.listsQueue.$size ]).pipe(map(([songs, lists]) => songs + lists));
     public readonly $songs: Observable<QueueSong[]> = this.songsQueue.$items;
@@ -84,24 +72,27 @@ export class StreamQueueService {
      * @returns Song
      */
     public async dequeue(): Promise<Song> {
+        const random = this._shuffleSubject.getValue();
         if(this.isEmpty()) return null;
 
-        let queueItem: QueueItem = (await this.songsQueue.dequeue())
-        let song: Song = (queueItem as QueueSong)?.item
+        let queueItem: QueueItem = (await this.songsQueue.dequeue(random));
+        let song: Song = (queueItem as QueueSong)?.item;
         if(song) {
-            this.queueMap.remove(song.id)
+            this.queueMap.remove(song.id);
             return song;
         }
 
         // Get next item from lists queue.
         // Only peek the next element, as the playlist should remain
         // enqueued until the list's internal queue is empty.
-        queueItem = (await this.listsQueue.peek())
+        const peek = (await this.listsQueue.peek());
+        queueItem = peek.item;
+
         const list = (queueItem as QueueList)?.item;
         if(!list) return null;
 
         // Emit next song from list's internal queue
-        song = await list.emitNextSong();
+        song = await list.emitNextSong(random);
 
         // Check if the list's internal queue is empty.
         // If so, remove from the queue.
@@ -131,7 +122,7 @@ export class StreamQueueService {
      * @param song Song to enqueue
      * @returns Song
      */
-     public enqueueList(list: PlayableList<any>): void {
+    public enqueueList(list: PlayableList<any>): void {
         const item = new QueueList(list);
 
         if(this.queueMap.has(item.id)) {
@@ -157,14 +148,6 @@ export class StreamQueueService {
         
         this.queueMap.set(item);
         this.listsQueue.enqueueTop(item);
-    }
-
-    /**
-     * Get next element from queue without removing it.
-     * @returns Song
-     */
-    public peek(): QueueItem {
-        return this.songsQueue.peek() || this.listsQueue.peek();
     }
 
     public hasKey(key: string): boolean {
