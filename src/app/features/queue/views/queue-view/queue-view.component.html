@@ -15,7 +15,9 @@
     </div>
 
     <div class="my-row" *ngFor="let list of ($lists | async)">
-        <h6>Als nächstes aus: {{ list.item.context.title }}</h6>
-        <asc-playable-list [list]="list.item" [showHeader]="false" [showDate]="false" [showCount]="false" [useQueueView]="true"></asc-playable-list>
+        <div *ngIf="(list.$queueSize | async) > 0">
+            <h6>Als nächstes aus: {{ list.item.context.title }}</h6>
+            <asc-playable-list [list]="list.item" [showHeader]="false" [showDate]="false" [showCount]="false" [useQueueView]="true"></asc-playable-list>
+        </div>
     </div>
 </section>

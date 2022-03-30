@@ -1,3 +1,4 @@
+import { map, Observable } from "rxjs";
 import { PlayableList } from "src/lib/data/playable-list.entity";
 import { Song } from "../../song/entities/song.entity";
 
@@ -31,10 +32,12 @@ export class QueueSong extends QueueItem {
  */
 export class QueueList extends QueueItem {
     public item: PlayableList<any>;
+    public $queueSize: Observable<number>;
 
     constructor(list: PlayableList<any>) {
         super(list.id, true);
         this.item = list;
+        this.$queueSize = this.item.$queue.pipe(map((songs) => songs.length));
     }
 
     public async getNextItem(): Promise<Song> {
