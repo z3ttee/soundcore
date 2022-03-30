@@ -103,8 +103,6 @@ export class AudioService {
      * to force play a new song.
      */
     private async forcePlaySong(song: Song, fadeIn: boolean = false) {
-        // if(this.isCurrentlyFading) return;
-
         // Request token for audio session
         const token = await this.streamService.getTokenForSong(song).catch((error) => {
             console.error(error);

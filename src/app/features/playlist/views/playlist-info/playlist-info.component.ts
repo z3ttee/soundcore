@@ -91,8 +91,7 @@ export class PlaylistInfoComponent implements OnInit, OnDestroy {
     this.playableList?.fetchNextPage()
   }
 
-  public async playOrPauseList(startAtIndex?: string) {
-    console.log(startAtIndex)
+  public async playOrPauseList() {
     this.audioService.playOrPauseList(this.playableList)
   }
 
