@@ -7,7 +7,6 @@ import { IndexViewComponent } from './views/index-view/index-view.component';
 import { DrawerComponent } from './components/drawer/drawer.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { SidebarComponent } from './views/shared/sidebar/sidebar.component';
-import { SplashComponent } from './views/splash/splash.component';
 import { StoreModule } from '@ngrx/store';
 
 import { HttpClientModule } from "@angular/common/http"
@@ -25,7 +24,6 @@ import {MatProgressBarModule} from '@angular/material/progress-bar';
 
 import { TeleportModule } from '@ngneat/overview';
 import { MainLayoutComponent } from './layout/main-layout/main-layout.component';
-import { PlaylistModule } from './features/playlist/playlist.module';
 import { InfiniteScrollListComponent } from './components/lists/infinite-scroll-list/infinite-scroll-list.component';
 import { StreamModule } from './features/stream/stream.module';
 import { AscMessageModule } from './components/message-components/message-components.module';
@@ -50,8 +48,7 @@ import { AuthModule } from 'src/sso/auth.module';
     IndexViewComponent,
     MainLayoutComponent,
     DrawerComponent,
-    SidebarComponent,
-    SplashComponent
+    SidebarComponent
   ],
   imports: [
     AuthModule,
