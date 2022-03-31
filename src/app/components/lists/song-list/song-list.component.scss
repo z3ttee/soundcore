@@ -1,5 +1,51 @@
 :host {
 
+    .row {
+        .id-text {
+            @apply opacity-100 transition-all;
+        }
+        .play-btn {
+            @apply opacity-0 pointer-events-none;
+        }
+
+        &:hover {
+            @apply bg-background-light bg-opacity-60;
+
+            .id-text {
+                @apply opacity-0;
+            }
+            .play-btn {
+                @apply opacity-100 pointer-events-auto;
+            }
+        }
+    }
+
+    .touch {
+        .row {
+            @apply p-0 mb-2.5 rounded-none will-change-transform transform-gpu transition-all;
+
+            &:hover {
+                @apply bg-transparent;
+            }
+
+            &:active {
+                @apply scale-[98%];
+            }
+
+            .title-col, .col {
+                @apply pointer-events-none;
+            }
+
+            .id-text {
+                @apply opacity-100;
+            }
+
+            .play-btn {
+                @apply hidden;
+            }
+        }
+    }
+
     .col-gap {
         @apply gap-4;
     }
@@ -42,24 +88,6 @@
 
     .menu-col {
         @apply max-w-6 min-w-6 block md:hidden;
-    }
-
-    .row {
-        .id-text {
-            @apply opacity-100 transition-all;
-        }
-        .play-btn {
-            @apply opacity-0 pointer-events-none;
-        }
-
-        &:hover {
-            .id-text {
-                @apply opacity-0;
-            }
-            .play-btn {
-                @apply opacity-100 pointer-events-auto;
-            }
-        }
     }
 
 }

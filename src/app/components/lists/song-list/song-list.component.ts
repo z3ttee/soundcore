@@ -1,12 +1,13 @@
-import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, EventEmitter, Input, NgZone, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, Input, NgZone, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { AnimationOptions } from 'ngx-lottie';
 import { Song } from 'src/app/features/song/entities/song.entity';
 import { AudioService } from 'src/app/features/stream/services/audio.service';
 import audio_wave_anim from "src/assets/animated/audio_wave.json"
-import { BehaviorSubject, Observable, Subject, take, takeUntil } from 'rxjs';
+import { BehaviorSubject, firstValueFrom, Observable, Subject, take, takeUntil } from 'rxjs';
 import { LikeService } from 'src/app/services/like.service';
 import { SongContextMenuComponent } from '../../context-menus/song-context-menu/song-context-menu.component';
 import { PlayableList } from 'src/lib/data/playable-list.entity';
+import { DeviceService } from 'src/app/services/device.service';
 
 @Component({
   selector: 'asc-song-list',
@@ -19,6 +20,7 @@ export class AscSongListComponent implements OnInit, OnDestroy, AfterViewInit {
   constructor(
     public audioService: AudioService,
     private likeService: LikeService,
+    public deviceService: DeviceService,
     private zone: NgZone
   ) { }
 
@@ -46,8 +48,6 @@ export class AscSongListComponent implements OnInit, OnDestroy, AfterViewInit {
   public $list: Observable<PlayableList<any>> = this._listSubject.asObservable();
 
   private _showId: boolean = true;
-  private _showHeader: boolean = true;
-  private _showCover: boolean = true; // TODO
   private _showAlbum: boolean = true;
   private _showDate: boolean = true;
   private _showCount: boolean = true;
@@ -61,7 +61,6 @@ export class AscSongListComponent implements OnInit, OnDestroy, AfterViewInit {
   }
   @Input() public set showHeader(val: boolean) {
     if(typeof val == "undefined" || val == null) val = true;
-    this._showHeader = val;
     this._showHeaderSubject.next(val || false);
   }
   @Input() public set showId(val: boolean) {
@@ -71,7 +70,6 @@ export class AscSongListComponent implements OnInit, OnDestroy, AfterViewInit {
   }
   @Input() public set showCover(val: boolean) {
     if(typeof val == "undefined" || val == null) val = true;
-    this._showCover = val;
     this._showCoverSubject.next(val || false);
   }
   @Input() public set showAlbum(val: boolean) {
@@ -134,11 +132,24 @@ export class AscSongListComponent implements OnInit, OnDestroy, AfterViewInit {
     if(container) this.resizeObserver.observe(container);
   }
 
+  public async playOrPauseIfTouch(event: MouseEvent, song: Song) {
+    event.preventDefault();
+    event.stopPropagation();
+    
+    firstValueFrom(this.deviceService.$breakpoint).then((breakpoint) => {
+      if(breakpoint.isDesktop) return;
+      this.audioService.playOrPause(song);
+    })
+  }
+
   public async playOrPause(song: Song) {
     this.audioService.playOrPause(song);
   }
 
   public async openContextMenu(event: MouseEvent, song: Song) {
+    event.preventDefault();
+    event.stopPropagation();
+
     if(!this.contextMenuRef) return;
 
     this.$list.pipe(take(1)).subscribe((list) => {
