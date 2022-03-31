@@ -1,6 +1,7 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { Album } from "src/app/features/album/entities/album.entity";
+import { Artist } from "src/app/features/artist/entities/artist.entity";
 import { Collection } from "src/app/features/collection/entities/collection.entity";
 import { Playlist } from "src/app/features/playlist/entities/playlist.entity";
 import { QueueList } from "src/app/features/stream/entities/queue-item.entity";
@@ -22,6 +23,20 @@ export class URLRegistry {
         return {
             listUrl: `${environment.api_base_uri}/v1/songs/byAlbum/${id}/ids`,
             metadataUrl: `${environment.api_base_uri}/v1/songs/byAlbum/${id}`
+        }
+    }
+
+    public static artistsTop(id: string): EndpointEntry {
+        return {
+            listUrl: `${environment.api_base_uri}/v1/songs/byArtist/${id}/top/ids`,
+            metadataUrl: `${environment.api_base_uri}/v1/songs/byArtist/${id}/top`
+        }
+    }
+
+    public static artists(id: string): EndpointEntry {
+        return {
+            listUrl: `${environment.api_base_uri}/v1/songs/byArtist/${id}/ids`,
+            metadataUrl: `${environment.api_base_uri}/v1/songs/byArtist/${id}`
         }
     }
 
@@ -56,6 +71,19 @@ export class ListCreator {
         return this.forExistingId("album", context.id) || new PlayableList<Album>("album", this.httpClient, urls.listUrl, urls.metadataUrl, context);
     }
 
+    public forArtist(context: Artist): PlayableList<Artist> {
+        if(!context) return null;
+        const urls = URLRegistry.artists(context.id)
+        return this.forExistingId("artist", context.id) || new PlayableList<Artist>("artist", this.httpClient, urls.listUrl, urls.metadataUrl, context);
+    }
+
+    public forTopArtistSongs(context: Artist): PlayableList<Artist> {
+        if(!context) return null;
+        const urls = URLRegistry.artistsTop(context.id)
+        console.log(this.forExistingId("topSongs", context.id))
+        return this.forExistingId("topSongs", context.id) || new PlayableList<Artist>("topSongs", this.httpClient, urls.listUrl, urls.metadataUrl, context);
+    }
+
     public forCollection(context: Collection, userId: string): PlayableList<Collection> {
         if(!context) return null;
         context.id = userId;
@@ -81,32 +109,5 @@ export class ListCreator {
 
         return null;
     }
-
-    /*public forArtist(context: Artist) {
-        const list = new PlayableList<Artist>("artist", this.httpClient, `${environment.api_base_uri}/v1/artist/${context.id}/songs`, `${environment.api_base_uri}/v1/songs/byArtist/${context.id}/top`, context);
-        return list;
-    }*/
-
-
-
-    /*public static forCollection(startSongIndex: number = 0, contextData?: Collection) {
-        const list = new PlayableList<Collection>("@me", "collection", startSongIndex, contextData);
-        return list;
-    }
-
-    public static forPlaylist(resourceId: string, startSongIndex: number = 0, contextData?: Playlist) {
-        const list = new PlayableList<Playlist>(resourceId, "playlist", startSongIndex, contextData);
-        return list;
-    }
-
-    public static forAlbum(resourceId: string, startSongIndex: number = 0, contextData?: Album) {
-        const list = new PlayableList<Album>(resourceId, "album", startSongIndex, contextData);
-        return list;
-    }
-
-    public static forRandom(resourceId: string, contextData?: any) {
-        const list = new PlayableList<any>(resourceId, "random", 0, contextData);
-        return list;
-    }*/
 
 }

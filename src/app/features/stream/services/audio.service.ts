@@ -162,11 +162,13 @@ export class AudioService {
      * Force play of the selected list.
      */
      private async forcePlayList(list: PlayableList<any>) {
-        const item = new QueueList(list);
-        const firstSong = await item.item.emitNextSong(this._shuffleSubject.getValue());
-
-        this.queueService.enqueueListTop(list);
-        this.forcePlaySong(firstSong)
+        list.$isReady.pipe(filter((ready) => !!ready)).subscribe(async () => {
+            const item = new QueueList(list);
+            const firstSong = await item.item.emitNextSong(this._shuffleSubject.getValue());
+        
+            this.queueService.enqueueListTop(list);
+            this.forcePlaySong(firstSong)
+        })
     }
 
     /**
@@ -199,6 +201,7 @@ export class AudioService {
      * @param list List to play
      */
     public async playOrPauseList(list: PlayableList<any>) {
+        if(!list) return;
         const isPlaying = this.currentItem?.context?.id == list.id
 
         if(isPlaying) this.togglePause();
@@ -293,7 +296,6 @@ export class AudioService {
 
         if(!nextSong) {
             this._doneSubject.next(true);
-            console.warn("[AUDIO] Can't start next song: Queue is empty.")
             return;
         }
 

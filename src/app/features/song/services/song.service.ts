@@ -38,4 +38,9 @@ export class SongService {
   public async findByAlbum(albumId: string, pageable?: Pageable): Promise<Page<Song>> {
     return firstValueFrom(this.httpClient.get(`${environment.api_base_uri}/v1/songs/byAlbum/${albumId}${Pageable.toQuery(pageable)}`)).then((page) => page as Page<Song>)
   }
+
+  public async findByArtist(artistId: string, pageable: Pageable): Promise<Page<Song>> {
+    if(!artistId) return Page.of([])
+    return firstValueFrom(this.httpClient.get<Page<Song>>(`${environment.api_base_uri}/v1/songs/byArtist/${artistId}${Pageable.toQuery(pageable)}`));
+  }
 }

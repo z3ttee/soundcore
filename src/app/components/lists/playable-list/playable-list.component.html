@@ -2,10 +2,10 @@
     <asc-song-list [dataSource]="useQueueView ? list.$queue : list.$dataSource" [list]="list" [showId]="showId" [showHeader]="showHeader" [showAlbum]="showAlbum" [showCount]="showCount" [showCover]="showCover" [showDate]="showDate"></asc-song-list>
 
     <div class="flex items-center px-2 relative">
-        <div class="absolute w-full top-0 left-0 px-2" *ngIf="(list.$isLoading | async)">
+        <div class="absolute w-full top-0 left-0 px-2" *ngIf="(list.$isFetching | async)">
             <mat-progress-bar [mode]="'indeterminate'" color="accent"></mat-progress-bar>
         </div>
-        <button *ngIf="!(list.$isLoading | async) && (list.$totalElements | async) > (list.$size | async)" class="py-2 px-3 rounded-md transition-all hover:bg-background hover:bg-opacity-60 active:bg-background-light active:border-opacity-30 active:bg-opacity-60 transform-gpu will-change-transform active:scale-95" (click)="fetchNextPage()"><span class="text-xs tracking-wide text-white-dark">Mehr Laden</span></button>
+        <button *ngIf="!(list.$isFetching | async) && (list.$totalElements | async) > (list.$size | async)" class="py-2 px-3 rounded-md transition-all hover:bg-background hover:bg-opacity-60 active:bg-background-light active:border-opacity-30 active:bg-opacity-60 transform-gpu will-change-transform active:scale-95" (click)="fetchNextPage()"><span class="text-xs tracking-wide text-white-dark">Mehr Laden</span></button>
     </div>
 </div>
 

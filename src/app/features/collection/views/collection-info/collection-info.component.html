@@ -20,12 +20,12 @@
 
     <div asc-contents>
         <!-- Songs list -->
-        <section *ngIf="(list.$totalElements | async) > 0 && !(list.$isLoading | async)">
+        <section *ngIf="(list.$totalElements | async) > 0 && !(list.$isFetching | async)">
             <asc-song-list [dataSource]="list.$dataSource" [showCount]="false" [showMore]="(list.$dataSource | async)?.length < (list.$totalElements | async)" (onMore)="findSongs()"></asc-song-list>
         </section>
 
         <!-- Empty message -->
-        <section *ngIf="(list.$totalElements | async) <= 0 && !(list.$isLoading | async)">
+        <section *ngIf="(list.$totalElements | async) <= 0 && !(list.$isFetching | async)">
             <asc-message>Du hast bislang keine Songs mit "Gefällt mir" markiert</asc-message>
         </section>
     </div>

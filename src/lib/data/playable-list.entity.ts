@@ -1,18 +1,18 @@
 import { HttpClient } from "@angular/common/http";
-import { BehaviorSubject, combineAll, combineLatest, combineLatestAll, firstValueFrom, map, Observable, Subject, takeUntil, tap } from "rxjs";
+import { BehaviorSubject, combineLatest, firstValueFrom, map, Observable, Subject, takeUntil } from "rxjs";
 import { PlaylistViewType } from "src/app/components/views/playlist-view/playlist-view.component";
 import { Song } from "src/app/features/song/entities/song.entity";
 import { Page, Pageable } from "src/app/pagination/pagination";
 import { environment } from "src/environments/environment";
-import { SCResourceMapQueue } from "./resource";
+import { SCResourceList, SCResourceMap, SCResourceMapQueue } from "./resource";
 
 export const PLAYLIST_BATCH_SIZE = 50;
 
 export type PlayableListType = PlaylistViewType | "topSongs" | "likedArtistSongs" | "random"
 export class PlayableList<T> {
     private readonly _destroySubject: Subject<void> = new Subject();
-    private readonly _loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject(false);
     private readonly _readySubject: BehaviorSubject<boolean> = new BehaviorSubject(false);
+    private readonly _fetchingStateSubject: BehaviorSubject<boolean> = new BehaviorSubject(false);
     private readonly _errorSubject: Subject<Error> = new Subject();
     private readonly _totalElementsSubject: BehaviorSubject<number> = new BehaviorSubject(0);
     private readonly _sizeSubject: BehaviorSubject<number> = new BehaviorSubject(0);
@@ -23,20 +23,32 @@ export class PlayableList<T> {
     public readonly id: string;
 
     private readonly $destroy: Observable<void> = this._destroySubject.asObservable();
-    public readonly $isLoading: Observable<boolean> = this._loadingSubject.asObservable().pipe(takeUntil(this.$destroy));
+
+    /**
+     * Observable that emits the state of loading. Loading means in this context: Loading the complete list of ids
+     * contained in that list. For actually getting the state of loading metadata, use $isFetching.
+     */
     public readonly $isReady: Observable<boolean> = this._readySubject.asObservable().pipe(takeUntil(this.$destroy));
+
+    /**
+     * Observable that emits the state of ongoing fetches. This means, true is emitted every time any kind of metadata
+     * is fetched from the backend.
+     */
+    public readonly $isFetching: Observable<boolean> = this._fetchingStateSubject.asObservable().pipe(takeUntil(this.$destroy));
+
     public readonly $error: Observable<Error> = this._errorSubject.asObservable().pipe(takeUntil(this.$destroy));
     public readonly $totalElements: Observable<number> = this._totalElementsSubject.asObservable().pipe(takeUntil(this.$destroy));
     public readonly $size: Observable<number> = this._sizeSubject.asObservable().pipe(takeUntil(this.$destroy));
     public readonly $currentPageIndex: Observable<number> = this._currentPageIndexSubject.asObservable().pipe(takeUntil(this.$destroy));
 
     private readonly resource: SCResourceMapQueue<Song> = new SCResourceMapQueue();
+    private readonly dataSourceList: SCResourceList<Song> = new SCResourceList();
 
     /**
      * Observable that emits new values every time the user loads more content via infinite scroll.
      * This observable is suitable for displaying the playlists tracks in a list.
      */
-    public readonly $dataSource: Observable<Song[]> = this.resource.$map.pipe(takeUntil(this.$destroy), map((map) => Object.values(map))) // this._dataSourceSubject.asObservable().pipe(takeUntil(this.$destroy));
+    public readonly $dataSource: Observable<Song[]> = this.dataSourceList.$items.pipe(takeUntil(this.$destroy)); // this.resource.$map.pipe(takeUntil(this.$destroy), map((map) => Object.values(map))) // this._dataSourceSubject.asObservable().pipe(takeUntil(this.$destroy));
 
     /**
      * Observable that emits new values every time the internal queue is updated. This is just a filter of the $dataSource Observable
@@ -107,10 +119,15 @@ export class PlayableList<T> {
      * @returns 
      */
     public async fetchNextPage() {
-        const isLoading = this._loadingSubject.getValue();
-        if(isLoading) return;
+        // Check if the list is already fetching some content.
+        // To prevent conflicts, do not continue if already fetching.
+        const isFetching = this._fetchingStateSubject.getValue();
+        if(isFetching) return;
 
-        this._loadingSubject.next(true);
+        // Update fetching state
+        this._fetchingStateSubject.next(true);
+
+        // Send the fetch request.
         firstValueFrom(this._httpClient.get<Page<Song>>(this._metadataUrl+Pageable.toQuery({ page: this._currentPageIndex, size: PLAYLIST_BATCH_SIZE }))).then((page) => {
             // Update totalElements count
             this._totalElements = page.totalElements;
@@ -130,6 +147,7 @@ export class PlayableList<T> {
                     song.listContext = this;
                     if(song) {
                         this.resource.set(song);
+                        this.dataSourceList.add(song);
                     }
                     i++;
                 }
@@ -139,7 +157,8 @@ export class PlayableList<T> {
             this._errorSubject.next(error);
         }).finally(() => {
             // Set loading back to false
-            this._loadingSubject.next(false);
+            this._fetchingStateSubject.next(false);
+
         })
     }
 
@@ -152,11 +171,6 @@ export class PlayableList<T> {
     private async fetchSongsList() {
         this._readySubject.next(false);
 
-        // Fetch first page
-        this.fetchNextPage().catch((error) => {
-            this._errorSubject.next(error);
-        })
-
         // Retrieve complete songs list (only contains song ids)
         firstValueFrom(this._httpClient.get<Page<Song>>(this._listUrl)).then((page) => {
             this._totalElements = page.totalElements;
@@ -168,6 +182,11 @@ export class PlayableList<T> {
                 if(song) this.resource.enqueue(song);
                 i++;
             }
+
+            // Fetch first page
+            this.fetchNextPage().catch((error) => {
+                this._errorSubject.next(error);
+            })
 
             return 
         }).catch((error: Error) => {
@@ -193,7 +212,7 @@ export class PlayableList<T> {
 
         // If metadata already fetched, return it
         const metadata = this.resource.get(nextSong.id);
-        if(metadata) return metadata;
+        if(metadata && metadata.title) return metadata;
                 
         // Otherwise fetch and return it afterwards
         // Also add it to the dataset, so the playlist doesn't have to fetch this song again (except if its in batch request)
@@ -249,6 +268,12 @@ export class PlayableList<T> {
             this._errorSubject.next(error)
             return null;
         })
+    }
+
+
+
+    public async updateSong(song: Song) {
+        this.resource.set(song);
     }
 
 }

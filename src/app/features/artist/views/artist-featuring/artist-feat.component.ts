@@ -2,6 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { BehaviorSubject, Observable, Subject, takeUntil } from 'rxjs';
 import { Album } from 'src/app/features/album/entities/album.entity';
+import { AlbumService } from 'src/app/features/album/services/album.service';
 import { ScrollService } from 'src/app/services/scroll.service';
 import { Artist } from '../../entities/artist.entity';
 import { ArtistService } from '../../services/artist.service';
@@ -29,6 +30,7 @@ export class ArtistFeaturedComponent implements OnInit, OnDestroy {
   constructor(
     private activatedRoute: ActivatedRoute,
     private artistService: ArtistService,
+    private albumService: AlbumService,
     private scrollService: ScrollService
   ) { }
 
@@ -48,7 +50,7 @@ export class ArtistFeaturedComponent implements OnInit, OnDestroy {
   }
 
   public async findAlbums() {
-    this.artistService.findFeaturedAlbumsWithArtist(this.artistId, { page: this.currentPage }).then((page) => {
+    this.albumService.findFeaturedAlbumsWithArtist(this.artistId, { page: this.currentPage }).then((page) => {
       this.totalElements = page.totalElements;
       if(page.elements.length > 0) {
         this._albumsSubject.next([

@@ -2,6 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { BehaviorSubject, Observable, Subject, takeUntil } from 'rxjs';
 import { Song } from 'src/app/features/song/entities/song.entity';
+import { SongService } from 'src/app/features/song/services/song.service';
 import { ScrollService } from 'src/app/services/scroll.service';
 import { Artist } from '../../entities/artist.entity';
 import { ArtistService } from '../../services/artist.service';
@@ -29,6 +30,7 @@ export class ArtistSongsComponent implements OnInit, OnDestroy {
   constructor(
     private activatedRoute: ActivatedRoute,
     private artistService: ArtistService,
+    private songService: SongService,
     private scrollService: ScrollService
   ) { }
 
@@ -51,7 +53,7 @@ export class ArtistSongsComponent implements OnInit, OnDestroy {
     const currentItemCount = this._songsSubject.getValue().length;
     if(currentItemCount != 0 && currentItemCount >= this.totalElements) return;
     
-    this.artistService.findSongsByArtist(this.artistId, { page: this.currentPage, size: 2000 }).then((page) => {
+    this.songService.findByArtist(this.artistId, { page: this.currentPage, size: 2000 }).then((page) => {
       this.totalElements = page.totalElements;
       if(page.elements.length > 0) this.currentPage++;
       this._songsSubject.next([

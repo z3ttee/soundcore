@@ -19,6 +19,7 @@ import { ArtistSongsComponent } from './views/artist-songs/artist-songs.componen
 import { ArtistAlbumsComponent } from './views/artist-albums/artist-albums.component';
 import { ArtistFeaturedComponent } from './views/artist-featuring/artist-feat.component';
 import { AscPlaylistViewModule } from 'src/app/components/views/playlist-view.module';
+import { AscPlayableListModule } from 'src/app/components/lists/playable-list/playable-list.module';
 
 const routes: Routes = [
   { path: ":artistId", component: ArtistInfoComponent },
@@ -54,6 +55,7 @@ const routes: Routes = [
     AscAlbumModule,
     AscGenreModule,
     AscPlaylistViewModule,
+    AscPlayableListModule,
 
     MatProgressBarModule,
     MatButtonModule

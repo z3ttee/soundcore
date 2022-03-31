@@ -2,9 +2,10 @@ import { AfterViewInit, Component, Input, OnDestroy, OnInit, ViewChild } from '@
 import { AudioService } from 'src/app/features/stream/services/audio.service';
 import { PlayableList } from 'src/lib/data/playable-list.entity';
 import { ScrollService } from 'src/app/services/scroll.service';
-import { Observable, Subject, takeUntil } from 'rxjs';
+import { combineLatest, map, Observable, Subject, takeUntil } from 'rxjs';
 import { LikeService } from 'src/app/services/like.service';
 import { SongContextMenuComponent } from '../../context-menus/song-context-menu/song-context-menu.component';
+import { SCResourceList } from 'src/lib/data/resource';
 
 @Component({
   selector: 'asc-playable-list',
@@ -43,6 +44,7 @@ export class PlayableListComponent implements OnInit, OnDestroy, AfterViewInit {
     this.likeService.$onSongLike.pipe(takeUntil(this.$destroy)).subscribe((song) => {
       
     })
+
   }
 
   public ngAfterViewInit(): void {}
@@ -53,7 +55,14 @@ export class PlayableListComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   public async fetchNextPage() {
-    this.list?.fetchNextPage();
+    combineLatest([
+      this.list.$totalElements,
+      this.list.$size
+    ]).pipe(takeUntil(this.$destroy), map(([total, current]) => ({ total, current }))).subscribe((state) => {
+      if(state.current < state.total) {
+        this.list?.fetchNextPage();
+      }
+    })
   }
 
 }

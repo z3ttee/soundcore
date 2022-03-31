@@ -16,19 +16,12 @@ export class ArtistService {
   constructor(private httpClient: HttpClient) { }
 
   public async findProfileById(artistId: string): Promise<Artist> {
+    if(!artistId) return null;
     return firstValueFrom(this.httpClient.get(`${environment.api_base_uri}/v1/artists/${artistId}`)) as Promise<Artist>
   }
 
   public async findTopSongsByArtist(artistId: string): Promise<Page<Song>> {
     return firstValueFrom(this.httpClient.get<Page<Song>>(`${environment.api_base_uri}/v1/songs/byArtist/${artistId}/top`))
-  }
-
-  public async findAlbumsByArtist(artistId: string, pageable: Pageable): Promise<Page<Album>> {
-    return firstValueFrom(this.httpClient.get<Page<Album>>(`${environment.api_base_uri}/v1/albums/byArtist/${artistId}${Pageable.toQuery(pageable)}`))
-  }
-
-  public async findFeaturedAlbumsWithArtist(artistId: string, pageable: Pageable): Promise<Page<Album>> {
-    return firstValueFrom(this.httpClient.get<Page<Album>>(`${environment.api_base_uri}/v1/albums/byFeaturedArtist/${artistId}${Pageable.toQuery(pageable)}`))
   }
 
   /*public async findGenresByArtist(artistId: string, pageable: Pageable): Promise<Page<Genre>> {
@@ -49,11 +42,6 @@ export class ArtistService {
   public async findSongsByCollectionAndArtist(artistId: string, pageable: Pageable): Promise<Page<Song>> {
     if(!artistId) return Page.of([])
     return firstValueFrom(this.httpClient.get<Page<Song>>(`${environment.api_base_uri}/v1/songs/byCollection/byArtist/${artistId}${Pageable.toQuery(pageable)}`))
-  }
-
-  public async findSongsByArtist(artistId: string, pageable: Pageable): Promise<Page<Song>> {
-    if(!artistId) return Page.of([])
-    return firstValueFrom(this.httpClient.get<Page<Song>>(`${environment.api_base_uri}/v1/songs/byArtist/${artistId}${Pageable.toQuery(pageable)}`));
   }
 
 
