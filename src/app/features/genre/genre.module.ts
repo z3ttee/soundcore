@@ -10,6 +10,7 @@ import { AscMessageModule } from 'src/app/components/message-components/message-
 import { AscGridsModule } from 'src/app/components/grids/grids.module';
 import { AscAlbumModule } from 'src/app/components/album-components/album-components.module';
 import { AscPlaylistModule } from 'src/app/components/playlist-components/playlist-components.module';
+import { AscPlaylistGridItemModule } from 'src/app/components/playlist-components/playlist-grid-item/playlist-grid-item.module';
 
 const routes: Routes = [
   { path: ":genreId", component: GenreInfoComponent }
@@ -24,6 +25,7 @@ const routes: Routes = [
     AscAlbumModule,
     AscMessageModule,
     AscGridsModule,
+    AscPlaylistGridItemModule,
     AscPlaylistModule,
 
     CommonModule,

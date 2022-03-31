@@ -15,6 +15,7 @@ import { PlayableList } from 'src/lib/data/playable-list.entity';
 import { SCLoadingState } from 'src/lib/states/loading-state';
 import { AlbumService } from 'src/app/features/album/services/album.service';
 import { SongService } from 'src/app/features/song/services/song.service';
+import { PlaylistService } from 'src/app/features/playlist/services/playlist.service';
 
 @Component({
   selector: 'asc-artist-info',
@@ -31,6 +32,7 @@ export class ArtistInfoComponent implements OnInit, OnDestroy {
     private genreService: GenreService,
     private artistService: ArtistService,
     private audioService: AudioService,
+    private playlistService: PlaylistService,
     private listCreator: ListCreator,
     public router: Router
   ) { }
@@ -54,7 +56,7 @@ export class ArtistInfoComponent implements OnInit, OnDestroy {
   private _songsSubject: BehaviorSubject<Page<Song>> = new BehaviorSubject(Page.of([]));
   private _albumsSubject: BehaviorSubject<Page<Album>> = new BehaviorSubject(Page.of([]));
   private _featAlbumsSubject: BehaviorSubject<Page<Album>> = new BehaviorSubject(Page.of([]));
-  private _featPlaylistsSubject: BehaviorSubject<Playlist[]> = new BehaviorSubject([]);
+  private _featPlaylistsSubject: BehaviorSubject<Page<Playlist>> = new BehaviorSubject(Page.of([]));
   private _genresSubject: BehaviorSubject<Page<Genre>> = new BehaviorSubject(null);
 
   public $artist: Observable<Artist> = this._artistSubject.asObservable();
@@ -62,7 +64,7 @@ export class ArtistInfoComponent implements OnInit, OnDestroy {
   public $songs: Observable<Page<Song>> = this._songsSubject.asObservable();
   public $albums: Observable<Page<Album>> = this._albumsSubject.asObservable();
   public $featAlbums: Observable<Page<Album>> = this._featAlbumsSubject.asObservable();
-  public $featPlaylists: Observable<Playlist[]> = this._featPlaylistsSubject.asObservable();
+  public $featPlaylists: Observable<Page<Playlist>> = this._featPlaylistsSubject.asObservable();
   public $genres: Observable<Page<Genre>> = this._genresSubject.asObservable();
 
   private artistId: string;
@@ -85,6 +87,7 @@ export class ArtistInfoComponent implements OnInit, OnDestroy {
       this.findGenres();
       this.findAlbums();
       this.findFeaturedAlbums();
+      this.findFeaturedPlaylists();
     })
   }
 
@@ -172,7 +175,7 @@ export class ArtistInfoComponent implements OnInit, OnDestroy {
    * state automatically.
    * @returns Page<Album>
    */
-   public async findFeaturedAlbums(): Promise<Page<Album>> {
+  public async findFeaturedAlbums(): Promise<Page<Album>> {
     this.featAlbumLoadingState.set(true)
     return this.albumService.findFeaturedAlbumsWithArtist(this.artistId, { size: 12, page: 0 }).then((page) => {
       this._featAlbumsSubject.next(page);
@@ -182,6 +185,24 @@ export class ArtistInfoComponent implements OnInit, OnDestroy {
       this.featAlbumLoadingState.setError(error);
       return Page.of([]);
     }).finally(() => this.featAlbumLoadingState.set(false))
+  }
+
+  /**
+   * Find playlists featuring an artist.
+   * This will fetch the first 12 playlists and update the loading
+   * state automatically.
+   * @returns Page<Playlist>
+   */
+   public async findFeaturedPlaylists(): Promise<Page<Playlist>> {
+    this.featPlaylistLoadingState.set(true)
+    return this.playlistService.findByArtist(this.artistId, { size: 12, page: 0 }).then((page) => {
+      this._featPlaylistsSubject.next(page);
+      return page;
+    }).catch((error: Error) => {
+      this._featPlaylistsSubject.next(Page.of([]));
+      this.featPlaylistLoadingState.setError(error);
+      return Page.of([]);
+    }).finally(() => this.featPlaylistLoadingState.set(false))
   }
 
   public async playOrPauseTopSongs() {
@@ -208,5 +229,13 @@ export class ArtistInfoComponent implements OnInit, OnDestroy {
       this.router.navigate(['/artist', artist?.id, 'featuring'])
     })
   }
+
+  public async onMorePlaylists() {
+    firstValueFrom(this.$artist).then((artist) => {
+      if(!artist) return
+      this.router.navigate(['/artist', artist?.id, 'playlists'])
+    })
+  }
+
 
 }

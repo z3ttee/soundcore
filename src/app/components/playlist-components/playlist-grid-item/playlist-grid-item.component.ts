@@ -1,9 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { map, Observable } from 'rxjs';
-import { Album } from 'src/app/features/album/entities/album.entity';
 import { Playlist } from 'src/app/features/playlist/entities/playlist.entity';
 import { AudioService } from 'src/app/features/stream/services/audio.service';
-import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'asc-playlist-grid-item',

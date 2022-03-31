@@ -72,6 +72,11 @@ export class PlaylistService {
     return firstValueFrom(this.httpClient.get<Page<Playlist>>(`${environment.api_base_uri}/v1/playlists/byUser`))
   }
 
+  public async findByArtist(artistId: string, pageable: Pageable): Promise<Page<Playlist>> {
+    if(!artistId) return Page.of([]);
+    return firstValueFrom(this.httpClient.get<Page<Playlist>>(`${environment.api_base_uri}/v1/playlists/byArtist/${artistId}${Pageable.toQuery(pageable)}`))
+  }
+
   public async addSongs(playlistId: string, songs: Song[]): Promise<Playlist> {
     return firstValueFrom(this.httpClient.put<Playlist>(`${environment.api_base_uri}/v1/playlists/${playlistId}/songs/add`, songs.map((song) => song?.id))).then((playlist) => {
       this._onSongsAddedSubject.next({ songs, playlistId })

@@ -70,11 +70,11 @@
     </asc-horizontal-grid>
 </section>
 
-<!--<section class="my-row" *ngIf="featPlaylists.length > 0">
-    <asc-horizontal-grid headline="Enthalten in" [enableMore]="true" (onMore)="router.navigate(['/artist', artist?.id, 'playlists'])">
-        <asc-album-grid-item *ngFor="let album of albums" [album]="album"></asc-album-grid-item>
+<section class="my-row" *ngIf="($featPlaylists | async).elements.length > 0">
+    <asc-horizontal-grid headline="Enthalten in" [enableMore]="true" (onMore)="onMorePlaylists()">
+        <asc-playlist-grid-item *ngFor="let playlist of ($featPlaylists | async).elements" [playlist]="playlist" [routerLink]="['/playlist', playlist.slug || playlist.id]"></asc-playlist-grid-item>
       </asc-horizontal-grid>
-</section>-->
+</section>
 
 <section class="my-row" *ngIf="($featAlbums | async)?.elements.length > 0">
     <asc-horizontal-grid [headline]="'Alben mit ' + ($artist | async)?.name" [enableMore]="true" (onMore)="onMoreFeaturedAlbums()">

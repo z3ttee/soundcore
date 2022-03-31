@@ -2,13 +2,11 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { AscImageModule } from '../image-components/image-components.module';
-import { PlaylistGridItemComponent } from './playlist-grid-item/playlist-grid-item.component';
 import { PlaylistSimpleListItemComponent } from './playlist-simple-list-item/playlist-simple-list-item.component';
 import { AscPlaylistContextMenuModule } from '../context-menus/playlist-context-menu/playlist-context-menu.module';
 
 @NgModule({
   declarations: [
-    PlaylistGridItemComponent,
     PlaylistSimpleListItemComponent
   ],
   imports: [
@@ -19,7 +17,6 @@ import { AscPlaylistContextMenuModule } from '../context-menus/playlist-context-
     AscPlaylistContextMenuModule
   ],
   exports: [
-    PlaylistGridItemComponent,
     PlaylistSimpleListItemComponent
   ]
 })

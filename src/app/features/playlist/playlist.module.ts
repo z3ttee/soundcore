@@ -19,6 +19,7 @@ import { AscPlaylistViewModule } from 'src/app/components/views/playlist-view.mo
 import { AscPlaylistModule } from 'src/app/components/playlist-components/playlist-components.module';
 import { AscProfileBadgeModule } from 'src/app/components/badge-components/profile-badge/profile-badge.module';
 import { AscPlayableListModule } from 'src/app/components/lists/playable-list/playable-list.module';
+import { AscPlaylistGridItemModule } from 'src/app/components/playlist-components/playlist-grid-item/playlist-grid-item.module';
 
 const routes: Routes = [
   { path: ":playlistId", component: PlaylistInfoComponent }
@@ -41,6 +42,7 @@ const routes: Routes = [
     AscMessageModule,
     AscImageModule,
     AscPlaylistModule,
+    AscPlaylistGridItemModule,
     AscPlaylistViewModule,
     AscPlayableListModule,
 
