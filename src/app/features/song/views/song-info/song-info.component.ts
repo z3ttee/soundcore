@@ -42,6 +42,7 @@ export class SongInfoComponent implements OnInit, OnDestroy {
     // Subscribe to route changes
     this.activatedRoute.paramMap.pipe(takeUntil(this.$destroy)).subscribe((paramMap) => {
       this.songId = paramMap.get("songId")
+
       this.songService.findById(this.songId).then((song) => {
         this._songSubject.next(song);
 

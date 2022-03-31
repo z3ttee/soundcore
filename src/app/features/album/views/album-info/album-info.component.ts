@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { BehaviorSubject, combineLatest, filter, map, Observable, Subject, takeUntil } from 'rxjs';
+import { BehaviorSubject, combineLatest, map, Observable, Subject, takeUntil } from 'rxjs';
 import { Song } from 'src/app/features/song/entities/song.entity';
 import { AudioService } from 'src/app/features/stream/services/audio.service';
 import { LikeService } from 'src/app/services/like.service';
@@ -22,17 +22,15 @@ export class AlbumInfoComponent implements OnInit, OnDestroy {
   private _songsSubject: BehaviorSubject<Song[]> = new BehaviorSubject([]);
   private _albumSubject: BehaviorSubject<Album> = new BehaviorSubject(null);
   private _loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject(true);
+  private _recommendedAlbumsSubject: BehaviorSubject<Album[]> = new BehaviorSubject([]);
 
   public $songs: Observable<Song[]> = this._songsSubject.asObservable();
   public $album: Observable<Album> = this._albumSubject.asObservable();
+  public $recommended: Observable<Album[]> = this._recommendedAlbumsSubject.asObservable();
   public $isLoading: Observable<boolean> = this._loadingSubject.asObservable();
   public $isPaused: Observable<boolean> = combineLatest([ this.audioService.$paused, this.audioService.$currentItem ]).pipe(takeUntil(this.$destroy), map(([paused, item]) => paused || item?.context?.id != this.list?.id))
 
-  public recommendedAlbums: Album[] = [];
   public list: PlayableList<Album>;
-
-  // Accent colors  
-  public accentColor: string = "#FFBF50";
 
   constructor(
     private activatedRoute: ActivatedRoute,
@@ -70,7 +68,7 @@ export class AlbumInfoComponent implements OnInit, OnDestroy {
     else this.list = this.listCreator.forAlbum(album);
 
     this.albumService.findRecommendedByArtist(album?.artist?.id, [ album?.id ]).then((page) => {
-      this.recommendedAlbums = page.elements;
+      this._recommendedAlbumsSubject.next(page?.elements || [])
     })
   }
 

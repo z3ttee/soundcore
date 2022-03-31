@@ -40,16 +40,12 @@
     <!-- Page contents -->
     <div asc-contents>
         <asc-playable-list [list]="list" [showDate]="false" [showCover]="false" [showAlbum]="false"></asc-playable-list>
-        <!--
-        <section *ngIf="($songs | async)?.length <= 0 && !isLoadingSongs">
-            <asc-message>Keine Songs für dieses Album gefunden.</asc-message>
-        </section>-->
     </div>
 </asc-playlist-view>
 
 <!-- Recommended albums -->
-<section class="relative mt-row z-10" *ngIf="($album | async)?.artist && recommendedAlbums?.length > 0">
+<section class="relative mt-row z-10" *ngIf="($album | async)?.artist && ($recommended | async)?.length > 0">
     <asc-horizontal-grid [headline]="'Mehr von ' + ($album | async)?.artist?.name" (more)="showDiscography()" [enableMore]="true" customMoreText="Diskographie anzeigen">
-        <asc-album-grid-item *ngFor="let recommended of recommendedAlbums" [album]="recommended" [preferDate]="true" [routerLink]="['/album', recommended?.slug || recommended?.id]"></asc-album-grid-item>
+        <asc-album-grid-item *ngFor="let recommended of ($recommended | async)" [album]="recommended" [preferDate]="true" [routerLink]="['/album', recommended?.slug || recommended?.id]"></asc-album-grid-item>
     </asc-horizontal-grid>
 </section>
