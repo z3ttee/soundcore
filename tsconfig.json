@@ -16,6 +16,10 @@
       "ng-keycloak-connect": [
         "dist/ng-keycloak-connect/ng-keycloak-connect",
         "dist/ng-keycloak-connect"
+      ],
+      "soundcore-sdk": [
+        "dist/soundcore-sdk/soundcore-sdk",
+        "dist/soundcore-sdk"
       ]
     },
     "downlevelIteration": true,
