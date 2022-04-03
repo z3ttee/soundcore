@@ -19,6 +19,8 @@
       ],
       "soundcore-sdk": [
         "dist/soundcore-sdk/soundcore-sdk",
+        "dist/soundcore-sdk",
+        "dist/soundcore-sdk/soundcore-sdk",
         "dist/soundcore-sdk"
       ]
     },

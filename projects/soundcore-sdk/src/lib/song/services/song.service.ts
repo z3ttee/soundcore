@@ -2,7 +2,7 @@ import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 
 @Injectable()
-export class SongService {
+export class SCDKSongService {
 
     constructor(private httpClient: HttpClient) {}
 
