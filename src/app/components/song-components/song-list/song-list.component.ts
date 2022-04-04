@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { AnimationOptions } from 'ngx-lottie';
 import { Observable, of } from 'rxjs';
-import { Playlist } from 'src/app/features/playlist/entities/playlist.entity';
+import { Playlist } from 'soundcore-sdk';
 import { Song } from 'src/app/features/song/entities/song.entity';
 import { AudioService } from 'src/app/features/stream/services/audio.service';
 import { LikeService } from 'src/app/services/like.service';

@@ -1,4 +1,4 @@
-import { Playlist } from "src/app/features/playlist/entities/playlist.entity";
+import { Playlist } from "soundcore-sdk";
 
 export class AscPlaylistEditorOptions {
 

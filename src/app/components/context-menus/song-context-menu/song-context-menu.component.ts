@@ -1,16 +1,13 @@
-import { HttpErrorResponse } from '@angular/common/http';
 import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
-import { map, Observable, Subject, take, takeUntil } from 'rxjs';
-import { Playlist } from 'src/app/features/playlist/entities/playlist.entity';
-import { PlaylistService } from 'src/app/features/playlist/services/playlist.service';
+import { firstValueFrom, map, Observable, Subject, takeUntil } from 'rxjs';
+import { Playlist, SCDKPlaylistService } from 'soundcore-sdk';
 import { Song } from 'src/app/features/song/entities/song.entity';
 import { AudioService } from 'src/app/features/stream/services/audio.service';
 import { ContextMenuService } from 'src/app/services/context-menu.service';
 import { DialogService } from 'src/app/services/dialog.service';
 import { LikeService } from 'src/app/services/like.service';
+import { SnackbarService } from 'src/app/services/snackbar.service';
 import { AscChoosePlaylistDialogComponent } from '../../dialogs/choose-playlist-dialog/choose-playlist-dialog.component';
 import { AscContextMenuTemplateComponent } from '../context-menu-template/context-menu-template.component';
 
@@ -27,12 +24,12 @@ export class SongContextMenuComponent implements OnInit, OnDestroy {
 
   constructor(
     private audioService: AudioService,
-    private playlistService: PlaylistService,
+    private playlistService: SCDKPlaylistService,
     private likeService: LikeService,
 
     private router: Router,
     private contextService: ContextMenuService,
-    private snackbar: MatSnackBar,
+    private snackbarService: SnackbarService,
     private dialogService: DialogService
   ) { }
 
@@ -64,7 +61,12 @@ export class SongContextMenuComponent implements OnInit, OnDestroy {
     ref.afterClosed().subscribe((playlist: Playlist) => {
       if(!playlist) return;
       
-      this.playlistService.addSongs(playlist.id, [ this.song ]).finally(() => {
+      firstValueFrom(this.playlistService.addSongs(playlist.id, [ this.song ])).then(() => {
+        this.snackbarService.info(`Song zur Playlist "${playlist.title}" hinzugefügt`)
+      }).catch((error) => {
+        console.error(error)
+        this.snackbarService.error(`Song konnte nicht zur Playlist "${playlist.title}" hinzugefügt werden.`)
+      }).finally(() => {
         this.contextService.close();
       })
     })
@@ -76,7 +78,12 @@ export class SongContextMenuComponent implements OnInit, OnDestroy {
       return
     }
 
-    this.playlistService.removeSongs(this.playlist.id, [ this.song ]).finally(() => {
+    firstValueFrom(this.playlistService.removeSongs(this.playlist.id, [ this.song ])).then(() => {
+      this.snackbarService.info(`Song aus Playlist "${this.playlist.title}" entfernt`)
+    }).catch((error) => {
+      console.error(error)
+      this.snackbarService.error(`Song konnte nicht von der Playlist "${this.playlist.title}" entfernt werden.`)
+    }).finally(() => {
       this.contextService.close();
     })
   }

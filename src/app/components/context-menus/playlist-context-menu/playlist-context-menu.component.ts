@@ -1,11 +1,11 @@
 import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import { map, Observable, Subject, takeUntil } from 'rxjs';
-import { Playlist } from 'src/app/features/playlist/entities/playlist.entity';
-import { PlaylistService } from 'src/app/features/playlist/services/playlist.service';
+import { firstValueFrom, map, Observable, Subject, takeUntil } from 'rxjs';
+import { Playlist, SCDKPlaylistService } from 'soundcore-sdk';
 import { AudioService } from 'src/app/features/stream/services/audio.service';
 import { ContextMenuService } from 'src/app/services/context-menu.service';
 import { DeviceService } from 'src/app/services/device.service';
+import { DialogService } from 'src/app/services/dialog.service';
+import { SnackbarService } from 'src/app/services/snackbar.service';
 import { ListCreator } from 'src/lib/data/list-creator';
 import { AuthenticationService } from 'src/sso/services/authentication.service';
 import { AscContextMenuTemplateComponent } from '../context-menu-template/context-menu-template.component';
@@ -22,12 +22,13 @@ export class AscPlaylistContextMenuComponent implements OnInit, OnDestroy {
 
   constructor(
     private audioService: AudioService,
-    private playlistService: PlaylistService,
+    private playlistService: SCDKPlaylistService,
     public authService: AuthenticationService,
     public deviceService: DeviceService,
+    private dialogService: DialogService,
 
     private contextService: ContextMenuService,
-    private snackbar: MatSnackBar,
+    private snackbarService: SnackbarService,
     private listCreator: ListCreator
   ) { }
 
@@ -62,14 +63,16 @@ export class AscPlaylistContextMenuComponent implements OnInit, OnDestroy {
 
   public async deletePlaylist() {
     this.contextService.close();
-    this.playlistService.deleteById(this.playlist?.id).catch(() => {
-      this.snackbar.open("Playlist konnte nicht gelöscht werden.")
+    firstValueFrom(this.playlistService.deleteById(this.playlist?.id)).then(() => {
+      this.snackbarService.info("Playlist gelöscht.")
+    }).catch(() => {
+      this.snackbarService.error("Playlist konnte nicht gelöscht werden.")
     })
   }
 
   public async editPlaylist() {
     this.contextService.close();
-    this.playlistService.openEditorDialog({ mode: "edit", contextData: this.playlist })
+    this.dialogService.openPlaylistEditorDialog({ mode: "edit", contextData: this.playlist })
   }
 
 }

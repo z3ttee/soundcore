@@ -1,6 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { BehaviorSubject, combineLatest, filter, map, Observable, Subject, takeUntil } from 'rxjs';
+import { Playlist, SCDKPlaylistService } from 'soundcore-sdk';
 import { Song } from 'src/app/features/song/entities/song.entity';
 import { AudioService } from 'src/app/features/stream/services/audio.service';
 import { User } from 'src/app/features/user/entities/user.entity';
@@ -9,8 +10,6 @@ import { ScrollService } from 'src/app/services/scroll.service';
 import { ListCreator } from 'src/lib/data/list-creator';
 import { PlayableList } from 'src/lib/data/playable-list.entity';
 import { AuthenticationService } from 'src/sso/services/authentication.service';
-import { Playlist } from '../../entities/playlist.entity';
-import { PlaylistService } from '../../services/playlist.service';
 
 @Component({
   templateUrl: './playlist-info.component.html',
@@ -20,7 +19,7 @@ export class PlaylistInfoComponent implements OnInit, OnDestroy {
 
   constructor(
     private activatedRoute: ActivatedRoute,
-    private playlistService: PlaylistService,
+    private playlistService: SCDKPlaylistService,
     private authService: AuthenticationService,
     private scrollService: ScrollService,
     private likeService: LikeService,
@@ -55,7 +54,8 @@ export class PlaylistInfoComponent implements OnInit, OnDestroy {
 
       this.isLoading = true;
       // Find playlist by route parameter
-      this.playlistService.findById(this.playlistId).then((playlist) => {
+      this.playlistService.findById(this.playlistId).pipe(takeUntil(this.$destroy)).subscribe((playlist) => {
+        this.isLoading = false
 
         // Update playlist and also playable list
         this.playlist = playlist;
@@ -63,15 +63,15 @@ export class PlaylistInfoComponent implements OnInit, OnDestroy {
 
         // Bind dataSource to component datasource
         this.$songs = this.playableList.$dataSource;
-      }).finally(() => this.isLoading = false);
+      });
 
       this.scrollService.$onBottomReached.pipe(takeUntil(this.$destroy)).subscribe(() => this.findSongs())
-      this.playlistService.$onSongsAdded.pipe(takeUntil(this.$destroy), filter((event) => event?.playlistId == this.playlistId), map((event) => event.songs)).subscribe((songs) => {
+      /*this.playlistService.$onSongsAdded.pipe(takeUntil(this.$destroy), filter((event) => event?.playlistId == this.playlistId), map((event) => event.songs)).subscribe((songs) => {
         this.playableList.addSongBulk(songs);
       })
       this.playlistService.$onSongsRemoved.pipe(takeUntil(this.$destroy), filter((event) => event?.playlistId == this.playlistId), map((event) => event.songs)).subscribe((songs) => {
         this.playableList.removeSongBulk(songs);
-      })
+      })*/
     })
   }
 

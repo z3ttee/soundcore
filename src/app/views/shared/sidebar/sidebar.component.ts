@@ -1,10 +1,8 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
-import { KeycloakService } from 'keycloak-angular';
-import { Observable } from 'rxjs';
-import { Playlist } from 'src/app/features/playlist/entities/playlist.entity';
-import { PlaylistService } from 'src/app/features/playlist/services/playlist.service';
 import { AuthenticationService } from 'src/sso/services/authentication.service';
+import { SCDKPlaylistService } from "soundcore-sdk"
+import { DialogService } from 'src/app/services/dialog.service';
 
 @Component({
   selector: 'asc-sidebar',
@@ -13,12 +11,11 @@ import { AuthenticationService } from 'src/sso/services/authentication.service';
 })
 export class SidebarComponent implements OnInit {
 
-  public $playlists: Observable<Playlist[]> = this.playlistService.$playlists;
-
   public error: HttpErrorResponse = undefined;
 
   constructor(
-    private playlistService: PlaylistService,
+    public playlistService: SCDKPlaylistService,
+    private dialogService: DialogService,
     public authService: AuthenticationService
   ) { }
 
@@ -27,7 +24,7 @@ export class SidebarComponent implements OnInit {
   }
 
   public async openCreatePlaylist() {
-    this.playlistService.openEditorDialog({ mode: "create" })
+    this.dialogService.openPlaylistEditorDialog({ mode: "create" })
   }
 
 }

@@ -12,10 +12,6 @@
     <div class="flex justify-center flex-col h-7 w-full">
         <p class="text-sm line-clamp-1">{{ playlist?.title }}</p>
     </div>
-
-    <div class="min-w-7 max-w-7 aspect-square text-center" *ngIf="playlist?.collaborative || playlist?.collaborators?.length > 0">
-        <i class="text-xxs opacity-60 fa-solid fa-user-group"></i>
-    </div>
 </div>
 
 <asc-playlist-context-menu [playlist]="playlist" #contextMenu></asc-playlist-context-menu>

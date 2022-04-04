@@ -1,15 +1,13 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { PageEvent } from '@angular/material/paginator';
 import { ActivatedRoute } from '@angular/router';
 import { BehaviorSubject, Observable, Subject, takeUntil } from 'rxjs';
+import { Playlist } from 'soundcore-sdk';
 import { Album } from 'src/app/features/album/entities/album.entity';
-import { Playlist } from 'src/app/features/playlist/entities/playlist.entity';
 import { Song } from 'src/app/features/song/entities/song.entity';
 import { SongService } from 'src/app/features/song/services/song.service';
 import { Genre } from 'src/app/model/genre.entity';
-import { Page, Pageable } from 'src/app/pagination/pagination';
-import { ScrollService } from 'src/app/services/scroll.service';
+import { Page } from 'src/app/pagination/pagination';
 import { GenreService } from '../../services/genre.service';
 
 @Component({

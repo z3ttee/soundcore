@@ -2,6 +2,8 @@ import { ComponentType } from "@angular/cdk/portal";
 import { Injectable } from "@angular/core";
 import { MatDialog, MatDialogConfig, MatDialogRef } from "@angular/material/dialog";
 import { AscConfirmDialogComponent, ConfirmDialogOptions } from "../components/dialogs/confirm-dialog/confirm-dialog.component";
+import { AscPlaylistEditorOptions } from "../components/dialogs/playlist-editor-dialog/dto/playlist-editor-options.dto";
+import { AscPlaylistEditorDialogComponent } from "../components/dialogs/playlist-editor-dialog/playlist-editor-dialog.component";
 
 @Injectable({
     providedIn: "root"
@@ -28,5 +30,11 @@ export class DialogService {
             ...config
         })
     }
+
+    public openPlaylistEditorDialog(options: AscPlaylistEditorOptions = new AscPlaylistEditorOptions()) {
+        return this.open(AscPlaylistEditorDialogComponent, {
+          data: options
+        })
+      }
 
 }

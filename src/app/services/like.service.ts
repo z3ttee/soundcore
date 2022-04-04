@@ -1,9 +1,9 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { firstValueFrom, Observable, Subject } from "rxjs";
+import { Playlist } from "soundcore-sdk";
 import { environment } from "src/environments/environment";
 import { Album } from "../features/album/entities/album.entity";
-import { Playlist } from "../features/playlist/entities/playlist.entity";
 import { Song } from "../features/song/entities/song.entity";
 import { SnackbarService } from "./snackbar.service";
 

@@ -1,9 +1,10 @@
 import { Song } from "../../song/entities/song.entity";
 import { Playlist } from "./playlist.entity";
 
+export type PlaylistItemID = number;
 export class PlaylistItem {
 
-    public id: number;
+    public id: PlaylistItemID;
     public createdAt: Date;
     public order: number;
 

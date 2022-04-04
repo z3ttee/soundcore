@@ -1,9 +1,9 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
+import { Playlist } from "soundcore-sdk";
 import { Album } from "src/app/features/album/entities/album.entity";
 import { Artist } from "src/app/features/artist/entities/artist.entity";
 import { Collection } from "src/app/features/collection/entities/collection.entity";
-import { Playlist } from "src/app/features/playlist/entities/playlist.entity";
 import { QueueList } from "src/app/features/stream/entities/queue-item.entity";
 import { StreamQueueService } from "src/app/features/stream/services/queue.service";
 import { environment } from "src/environments/environment";

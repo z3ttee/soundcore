@@ -1,8 +1,8 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
 import { map, Observable, Subject, takeUntil } from 'rxjs';
-import { Playlist } from 'src/app/features/playlist/entities/playlist.entity';
-import { PlaylistService } from 'src/app/features/playlist/services/playlist.service';
+import { Playlist, SCDKPlaylistService } from 'soundcore-sdk';
+import { DialogService } from 'src/app/services/dialog.service';
 import { AuthenticationService } from 'src/sso/services/authentication.service';
 
 @Component({
@@ -12,8 +12,9 @@ import { AuthenticationService } from 'src/sso/services/authentication.service';
 export class AscChoosePlaylistDialogComponent implements OnInit, OnDestroy {
 
   constructor(
-    private playlistService: PlaylistService,
+    private playlistService: SCDKPlaylistService,
     private authService: AuthenticationService,
+    private dialogService: DialogService,
     public dialogRef: MatDialogRef<AscChoosePlaylistDialogComponent>
   ) { }
 
@@ -24,7 +25,7 @@ export class AscChoosePlaylistDialogComponent implements OnInit, OnDestroy {
   // Data providers
   public $playlists: Observable<Playlist[]> = this.playlistService.$playlists.pipe(
     takeUntil(this.$destroy),
-    map((playlists) => playlists.filter((pl) => pl?.author?.id == this.authService.getUser()?.id || pl?.collaborative))
+    map((playlists) => playlists.filter((pl) => pl?.author?.id == this.authService.getUser()?.id))
   );
 
   public ngOnInit(): void {}
@@ -38,7 +39,7 @@ export class AscChoosePlaylistDialogComponent implements OnInit, OnDestroy {
   }
 
   public async openPlaylistEditor() {
-    (await this.playlistService.openEditorDialog({ mode: "create" })).afterClosed().pipe(takeUntil(this.$destroy)).subscribe((playlist) => {
+    (await this.dialogService.openPlaylistEditorDialog({ mode: "create" })).afterClosed().pipe(takeUntil(this.$destroy)).subscribe((playlist) => {
       if(playlist) this.dialogRef.close(playlist)
     })
   }

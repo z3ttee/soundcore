@@ -37,6 +37,8 @@ import { AscPlaylistEditorDialogModule } from './components/dialogs/playlist-edi
 import { AscToolbarModule } from './components/toolbar/toolbar.module';
 import { AscConfirmDialogModule } from './components/dialogs/confirm-dialog/confirm-dialog.module';
 import { AuthModule } from 'src/sso/auth.module';
+import { SCDKModule } from 'soundcore-sdk';
+import { environment } from 'src/environments/environment';
 
 // TODO: https://angular.io/guide/i18n-common-prepare
 
@@ -52,6 +54,9 @@ import { AuthModule } from 'src/sso/auth.module';
   ],
   imports: [
     AuthModule,
+    SCDKModule.forRoot({
+      api_base_uri: environment.api_base_uri
+    }),
 
     BrowserModule,
     AppRoutingModule,

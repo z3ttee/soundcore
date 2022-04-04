@@ -4,7 +4,6 @@ import { Song } from 'src/app/features/song/entities/song.entity';
 import { Artist } from 'src/app/features/artist/entities/artist.entity';
 import { ArtistService } from '../../services/artist.service';
 import { Album } from 'src/app/features/album/entities/album.entity';
-import { Playlist } from 'src/app/features/playlist/entities/playlist.entity';
 import { Genre } from 'src/app/model/genre.entity';
 import { Page } from 'src/app/pagination/pagination';
 import { BehaviorSubject, combineLatest, firstValueFrom, map, Observable, Subject, takeUntil, tap } from 'rxjs';
@@ -15,7 +14,7 @@ import { PlayableList } from 'src/lib/data/playable-list.entity';
 import { SCLoadingState } from 'src/lib/states/loading-state';
 import { AlbumService } from 'src/app/features/album/services/album.service';
 import { SongService } from 'src/app/features/song/services/song.service';
-import { PlaylistService } from 'src/app/features/playlist/services/playlist.service';
+import { Playlist, SCDKPlaylistService } from 'soundcore-sdk';
 
 @Component({
   selector: 'asc-artist-info',
@@ -32,7 +31,7 @@ export class ArtistInfoComponent implements OnInit, OnDestroy {
     private genreService: GenreService,
     private artistService: ArtistService,
     private audioService: AudioService,
-    private playlistService: PlaylistService,
+    private playlistService: SCDKPlaylistService,
     private listCreator: ListCreator,
     public router: Router
   ) { }
@@ -195,7 +194,7 @@ export class ArtistInfoComponent implements OnInit, OnDestroy {
    */
    public async findFeaturedPlaylists(): Promise<Page<Playlist>> {
     this.featPlaylistLoadingState.set(true)
-    return this.playlistService.findByArtist(this.artistId, { size: 12, page: 0 }).then((page) => {
+    return firstValueFrom(this.playlistService.findByArtist(this.artistId, { size: 12, page: 0 })).then((page) => {
       this._featPlaylistsSubject.next(page);
       return page;
     }).catch((error: Error) => {

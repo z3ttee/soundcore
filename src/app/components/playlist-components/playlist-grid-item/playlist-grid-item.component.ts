@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { Playlist } from 'src/app/features/playlist/entities/playlist.entity';
+import { Playlist } from 'soundcore-sdk';
 import { AudioService } from 'src/app/features/stream/services/audio.service';
 
 @Component({

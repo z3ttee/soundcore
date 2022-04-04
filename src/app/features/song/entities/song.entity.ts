@@ -1,3 +1,4 @@
+import { PlaylistItem } from "soundcore-sdk";
 import { Artist } from "src/app/features/artist/entities/artist.entity";
 import { Artwork } from "src/app/model/artwork.model";
 import { Distributor } from "src/app/model/distributor.entity";
@@ -6,8 +7,6 @@ import { Label } from "src/app/model/label.model";
 import { Publisher } from "src/app/model/publisher.model";
 import { PlayableList } from "src/lib/data/playable-list.entity";
 import { Album } from "../../album/entities/album.entity";
-import { PlaylistItem } from "../../playlist/entities/playlist-item.entity";
-import { StreamToken } from "../../stream/entities/stream-token.entity";
 import { Index } from "../../upload/entities/index.entity";
 
 export class Song {

@@ -13,20 +13,21 @@
     </div>
 </section>
 
-<asc-playlist-view (onLike)="likePlaylist()" (onPlay)="playOrPauseList()" [isPaused]="($isPaused | async)" [likeable]="playlist?.author?.id != ($user | async)?.id && !playlist?.collaborative && playlist?.collaborators?.length <= 0" [options]="{ type: 'playlist', title: playlist?.title, privacy: playlist?.privacy, artwork: playlist?.artwork }" *ngIf="!isLoading && !!playlist" >
+<!-- [likeable]="playlist?.author?.id != ($user | async)?.id && !playlist?.collaborative && playlist?.collaborators?.length <= 0" -->
+<asc-playlist-view (onLike)="likePlaylist()" (onPlay)="playOrPauseList()" [isPaused]="($isPaused | async)" [likeable]="playlist?.author?.id != ($user | async)?.id" [options]="{ type: 'playlist', title: playlist?.title, privacy: playlist?.privacy, artwork: playlist?.artwork }" *ngIf="!isLoading && !!playlist" >
 
     <!-- Quick info bar below title -->
     <div class="py-2 md:pt-2 md:pb-0 md:flex md:items-center" asc-stats>
         <ul class="flex md:inline-flex items-center gap-2">
             <asc-profile-badge [user]="playlist?.author" [routerLink]="['/profile', playlist?.author.id]"></asc-profile-badge>
 
-            <li class="inline opacity-60" *ngIf="playlist?.collaborators?.length > 0">
+            <!--<li class="inline opacity-60" *ngIf="playlist?.collaborators?.length > 0">
                 <div class="inline-flex items-center">
                     <p class="text-sm mr-1">+{{ playlist?.collaborators?.length }}</p>
                     
                     <asc-user-avatar class="w-6 aspect-square rounded-full overflow-hidden transform-gpu cursor-pointer" [ngClass]="{'-translate-x-1/2 shadow-md': i != 0 }" *ngFor="let user of playlist?.collaborators; index as i" [resourceId]="null" [matTooltip]="user.username" [routerLink]="['/profile', user.id]"></asc-user-avatar>
                 </div>
-            </li>
+            </li>-->
         </ul>
 
         <ul class="pt-2 flex md:inline-flex items-center md:p-0 gap-3 md:ml-3">

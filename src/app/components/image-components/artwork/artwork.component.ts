@@ -1,6 +1,9 @@
-import { Component, ElementRef, Input, OnChanges, OnInit, SimpleChanges, ViewChild, ViewEncapsulation } from '@angular/core';
-import { Artwork } from 'src/app/model/artwork.model';
+import { Component, Input, OnChanges, OnInit, SimpleChanges, ViewEncapsulation } from '@angular/core';
+import { Artwork as ArtworkV1 } from 'src/app/model/artwork.model';
 import { environment } from 'src/environments/environment';
+import { Artwork as ArtworkV2 } from 'soundcore-sdk';
+
+type Artwork = ArtworkV1 | ArtworkV2
 
 @Component({
   selector: 'asc-artwork',

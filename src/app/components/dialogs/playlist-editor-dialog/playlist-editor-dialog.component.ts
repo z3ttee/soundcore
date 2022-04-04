@@ -2,7 +2,8 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { PlaylistService } from 'src/app/features/playlist/services/playlist.service';
+import { firstValueFrom } from 'rxjs';
+import { SCDKPlaylistService } from 'soundcore-sdk';
 import { PlaylistPrivacy } from 'src/app/features/playlist/types/playlist-privacy.types';
 import { AscPlaylistEditorOptions } from './dto/playlist-editor-options.dto';
 
@@ -13,7 +14,7 @@ import { AscPlaylistEditorOptions } from './dto/playlist-editor-options.dto';
 export class AscPlaylistEditorDialogComponent implements OnInit {
 
   constructor(
-    private playlistService: PlaylistService,
+    private playlistService: SCDKPlaylistService,
     private dialog: MatDialogRef<AscPlaylistEditorDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public options: AscPlaylistEditorOptions = new AscPlaylistEditorOptions()
   ) { }
@@ -45,17 +46,17 @@ export class AscPlaylistEditorDialogComponent implements OnInit {
 
     if(this.options.mode == "create") {
       // Create playlist
-      this.playlistService.create(this.playlistDto.value).then((playlist) => {
+      firstValueFrom(this.playlistService.createPlaylist(this.playlistDto.value)).then((playlist) => {
         this.dialog.close(playlist);
       }).catch((reason: HttpErrorResponse) => {
         this.error = reason;
       }).finally(() => this.isLoading = false)
     } else {
       // Update playlist
-      this.playlistService.update(this.options.contextData?.id, { 
+      firstValueFrom(this.playlistService.updatePlaylist(this.options.contextData?.id, { 
         title: this.playlistDto.get("title").value, 
         privacy: this.playlistDto.get("privacy").value 
-      }).then(() => {
+      })).then(() => {
         this.options.contextData.title = this.playlistDto.get("title").value || this.options.contextData.title
         this.options.contextData.privacy = this.playlistDto.get("privacy").value || this.options.contextData.privacy;
         this.dialog.close(this.options.contextData)

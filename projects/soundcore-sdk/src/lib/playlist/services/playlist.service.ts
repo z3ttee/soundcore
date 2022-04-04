@@ -1,11 +1,11 @@
 import { HttpClient } from "@angular/common/http";
 import { Inject, Injectable } from "@angular/core";
-import { SCResourceMap } from "projects/soundcore-sdk/src/utils/structures/resource-map";
 import { BehaviorSubject, catchError, Observable, of, Subject, tap } from "rxjs";
 import { Page } from "../../pagination/page";
 import { Pageable } from "../../pagination/pageable";
 import { SCDKOptions, SCDK_OPTIONS } from "../../scdk.module";
 import { Song } from "../../song/entities/song.entity";
+import { SCResourceMap } from "../../utils/structures/resource-map";
 import { CreatePlaylistDTO } from "../dtos/create-playlist.dto";
 import { UpdatePlaylistDTO } from "../dtos/update-playlist.dto";
 import { Playlist } from "../entities/playlist.entity";
@@ -70,7 +70,14 @@ export class SCDKPlaylistService {
      * @returns Observable<Page<Playlist>>
      */
     public findByCurrentUser(): Observable<Page<Playlist>> {
-        return this.httpClient.get<Page<Playlist>>(`${this.options.api_base_uri}/v1/playlists/@me`)
+        return this.httpClient.get<Page<Playlist>>(`${this.options.api_base_uri}/v1/playlists/@me`).pipe(tap((page) => {
+            if(!page) return;
+            for(const playlist of page.elements) {
+                this._playlistsMap.set(playlist);
+            }
+            
+            this._playlistsSubject.next(this._playlistsMap.items());
+        }))
     }
 
     /**

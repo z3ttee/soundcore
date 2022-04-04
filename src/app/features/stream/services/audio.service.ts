@@ -333,6 +333,7 @@ export class AudioService {
 
     public async enqueueList(list: PlayableList<any>) {
         this.queueService.enqueueList(list);
+        this.snackbarService.info("Playlist zur Warteschlange hinzugefügt.")
     }
 
     /**

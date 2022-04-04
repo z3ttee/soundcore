@@ -1,5 +1,8 @@
 import { Component, Input } from '@angular/core';
-import { User } from 'src/app/features/user/entities/user.entity';
+import { User as UserV2 } from 'soundcore-sdk';
+import { User as UserV1 } from 'src/app/features/user/entities/user.entity';
+
+type User = UserV1 | UserV2
 
 @Component({
   selector: 'asc-profile-badge',

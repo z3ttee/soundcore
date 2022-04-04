@@ -10,8 +10,7 @@
 
         <ul class="item-details inline-flex items-center font-light text-xs opacity-70">
             <li class="inline-flex items-center gap-1">
-                <span *ngIf="playlist?.collaborative || playlist?.collaborators?.length > 0"><i class="text-xxs opacity-60 align-middle fa-solid fa-user-group"></i></span>
-                <span *ngIf="!playlist?.collaborative && playlist?.collaborators?.length <= 0 && playlist?.liked"><i class="text-sm text-accent-dark fa-solid fa-heart"></i></span>
+                <span *ngIf="playlist?.liked"><i class="text-sm text-accent-dark fa-solid fa-heart"></i></span>
                 <span class="text-xs font-light">Playlist</span>
             </li>
             <li class="inline-flex items-center gap-1" *ngIf="playlist?.author">

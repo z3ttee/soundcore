@@ -1,6 +1,6 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { Observable, Subject, takeUntil } from 'rxjs';
-import { Playlist } from 'src/app/features/playlist/entities/playlist.entity';
+import { Playlist } from 'soundcore-sdk';
 import { AudioService } from 'src/app/features/stream/services/audio.service';
 import { User } from 'src/app/features/user/entities/user.entity';
 import { AuthenticationService } from 'src/sso/services/authentication.service';
