@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { BehaviorSubject, combineLatest, filter, map, Observable, Subject, takeUntil } from 'rxjs';
 import { Playlist, SCDKPlaylistService } from 'soundcore-sdk';
 import { Song } from 'src/app/features/song/entities/song.entity';
@@ -24,7 +24,8 @@ export class PlaylistInfoComponent implements OnInit, OnDestroy {
     private scrollService: ScrollService,
     private likeService: LikeService,
     public audioService: AudioService,
-    private listCreator: ListCreator
+    private listCreator: ListCreator,
+    private router: Router
   ) { }
 
   // Destroy subscriptions
@@ -66,12 +67,25 @@ export class PlaylistInfoComponent implements OnInit, OnDestroy {
       });
 
       this.scrollService.$onBottomReached.pipe(takeUntil(this.$destroy)).subscribe(() => this.findSongs())
-      /*this.playlistService.$onSongsAdded.pipe(takeUntil(this.$destroy), filter((event) => event?.playlistId == this.playlistId), map((event) => event.songs)).subscribe((songs) => {
-        this.playableList.addSongBulk(songs);
+
+      // Subscribe to change events and update the playlist if needed
+      this.playlistService.$events.pipe(filter((event) => event.playlist.id == this.playlistId), takeUntil(this.$destroy)).subscribe((event) => {
+        if(event.type == "removed") {
+          this.router.navigate(["/library"]);
+          return;
+        } else {
+          this.playlist = event.playlist;
+        }
       })
-      this.playlistService.$onSongsRemoved.pipe(takeUntil(this.$destroy), filter((event) => event?.playlistId == this.playlistId), map((event) => event.songs)).subscribe((songs) => {
-        this.playableList.removeSongBulk(songs);
-      })*/
+
+      this.playlistService.$songEvents.pipe(filter((event) => event.playlist.id == this.playlistId), takeUntil(this.$destroy)).subscribe((event) => {
+        console.log(event);
+        if(event.type == "added") {
+          this.playableList.addSongBulk(event.songs as Song[]);
+        } else if(event.type == "removed") {
+          this.playableList.removeSongBulk(event.songs as Song[]);
+        }
+      })
     })
   }
 

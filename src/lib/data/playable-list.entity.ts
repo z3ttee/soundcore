@@ -240,6 +240,7 @@ export class PlayableList<T> {
     public async addSong(song: Song) {
         this.resource.set(song);
         this.resource.enqueue(song);
+        this.dataSourceList.add(song);
     }
 
     public async addSongBulk(songs: Song[]) {
@@ -250,6 +251,7 @@ export class PlayableList<T> {
 
     public async removeSong(song: Song) {
         this.resource.remove(song.id);
+        this.dataSourceList.remove(song);
         this._totalElements--;
         this._totalElementsSubject.next(this._totalElements);
     }

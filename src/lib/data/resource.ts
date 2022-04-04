@@ -31,7 +31,6 @@ export class SCResourceMap<T> {
         const map = this._mapSubject.getValue();
         const item = map[id];
         delete map[id];
-
         this._mapSubject.next(map);
         return item;
     }
