@@ -5,7 +5,8 @@
     "ng": "ng",
     "start": "ng serve",
     "start:prod": "ng serve --watch --configuration production",
-    "build": "ng build --configuration production",
+    "build": "npm run build:sdk && ng build --configuration production",
+    "build:sdk": "ng build soundcore-sdk",
     "build:sdk:watch": "ng build soundcore-sdk --watch",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"

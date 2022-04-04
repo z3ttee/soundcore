@@ -56,7 +56,12 @@ export class SCResourceMap<T> {
     }
 
     public items() {
-        return Object.values(this._mapSubject.getValue());
+        const map = this._mapSubject.getValue();
+        const values: T[] = [];
+        for(const key in map) {
+            values.push(map[key])
+        }
+        return values;
     }
 
 }
