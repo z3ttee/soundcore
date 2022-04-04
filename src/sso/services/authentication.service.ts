@@ -1,7 +1,8 @@
 import { Injectable } from "@angular/core";
 import { KeycloakEvent, KeycloakEventType, KeycloakService } from "keycloak-angular";
-import { BehaviorSubject, Observable } from "rxjs";
+import { BehaviorSubject, map, Observable } from "rxjs";
 import { User } from "src/app/features/user/entities/user.entity";
+import { environment } from "src/environments/environment";
 
 @Injectable({
     providedIn: "root"
@@ -15,6 +16,9 @@ export class AuthenticationService {
     public $token: Observable<string> = this._tokenSubject.asObservable(); 
     public $user: Observable<User> = this._userSubject.asObservable();
     public $ready: Observable<boolean> = this._readSubject.asObservable();
+
+    public $isAdmin: Observable<boolean> = this._userSubject.asObservable().pipe(map((user) => user.roles.includes(environment.admin_role)));
+    public $isMod: Observable<boolean> = this._userSubject.asObservable().pipe(map((user) => user.roles.includes(environment.mod_role)));
 
     constructor(
         private keycloakService: KeycloakService
@@ -68,6 +72,7 @@ export class AuthenticationService {
             const user = new User();
             user.id = profile.id;
             user.username = profile.username;
+            user.roles = this.keycloakService.getUserRoles();
 
             this._userSubject.next(user);
             this._readSubject.next(true);

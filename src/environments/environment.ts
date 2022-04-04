@@ -9,7 +9,10 @@ export const environment = {
 
   keycloak_url: "https://sso.tsalliance.eu/",
   keycloak_realm: "tsalliance",
-  keycloak_client_id: "alliance-soundcore-app"
+  keycloak_client_id: "alliance-soundcore-app",
+
+  admin_role: "admin",
+  mod_role: "mod"
 };
 
 /*

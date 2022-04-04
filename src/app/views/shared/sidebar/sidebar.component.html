@@ -13,7 +13,7 @@
             <li [routerLink]="['/library']" [routerLinkActive]="'active'"><span><i class="fa-solid fa-layer-group"></i>Bibliothek</span></li>
         </ul>
     
-        <ul>
+        <ul *ngIf="(authService.$isAdmin | async)">
             <label>Administration</label>
             <li [routerLink]="['/storage']" [routerLinkActive]="'active'"><span><i class="fa-solid fa-hard-drive"></i>Speicherzonen</span></li>
             <li [routerLink]="['/import']" [routerLinkActive]="'active'"><span><i class="fa-solid fa-download"></i>Importieren</span></li>

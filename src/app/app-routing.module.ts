@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { environment } from 'src/environments/environment';
 import { KeycloakSSOGuard } from 'src/sso/guards/keycloak.guard';
 import { MainLayoutComponent } from './layout/main-layout/main-layout.component';
 import { IndexViewComponent } from './views/index-view/index-view.component';
@@ -14,7 +15,7 @@ const routes: Routes = [
     { path: "search", canActivate: [KeycloakSSOGuard], loadChildren: () => import("./features/search/search.module").then((m) => m.SearchModule) },
     { path: "library", canActivate: [KeycloakSSOGuard], loadChildren: () => import("./features/library/library.module").then((m) => m.LibraryModule) },
     { path: "upload", canActivate: [KeycloakSSOGuard], loadChildren: () => import("./features/upload/upload.module").then((m) => m.UploadModule) },
-    { path: "storage", canActivate: [KeycloakSSOGuard], loadChildren: () => import("./features/storage/storage.module").then((m) => m.StorageModule) },
+    { path: "storage", canActivate: [KeycloakSSOGuard], loadChildren: () => import("./features/storage/storage.module").then((m) => m.StorageModule), data: { role: environment.admin_role } },
     { path: "genre", canActivate: [KeycloakSSOGuard], loadChildren: () => import("./features/genre/genre.module").then((m) => m.GenreModule) },
     { path: "playlist", canActivate: [KeycloakSSOGuard], loadChildren: () => import("./features/playlist/playlist.module").then((m) => m.PlaylistModule) },
     { path: "artist", canActivate: [KeycloakSSOGuard], loadChildren: () => import("./features/artist/artist.module").then((m) => m.ArtistModule) },
