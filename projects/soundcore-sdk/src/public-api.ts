@@ -30,6 +30,12 @@ export * from "./lib/playlist/events/playlist.event";
 export * from "./lib/playlist/events/songs.event";
 
 /**
+ * Export all album sdk parts
+ */
+ export * from "./lib/album/services/album.service";
+ export * from "./lib/album/entities/album.entity";
+
+/**
  * Export all artwork sdk parts
  */
  export * from "./lib/artwork/entities/artwork.entity";

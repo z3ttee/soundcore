@@ -17,27 +17,27 @@ import { PlaylistSongsEvent } from "../events/songs.event";
 })
 export class SCDKPlaylistService {
 
-    constructor(
-        @Inject(SCDK_OPTIONS) private readonly options: SCDKOptions,
-        private httpClient: HttpClient
-    ) {}
-
     private readonly _playlistsMap: SCResourceMap<Playlist> = new SCResourceMap();
     private readonly _playlistsSubject: BehaviorSubject<Playlist[]> = new BehaviorSubject([]);
     public readonly $playlists: Observable<Playlist[]> = this._playlistsSubject.asObservable();
 
     private readonly _onSongsEventSubject: Subject<PlaylistSongsEvent> = new Subject();
     private readonly _onEventSubject: Subject<PlaylistEvent> = new Subject();
-    
+
     /**
      * Observable that emits events if a song of playlist was added or removed.
      */
-    public readonly $songEvents: Observable<PlaylistSongsEvent> = this._onSongsEventSubject.asObservable();
+     public readonly $songEvents: Observable<PlaylistSongsEvent> = this._onSongsEventSubject.asObservable();
 
-    /**
-     * Observable that emits events if a playlist was created or removed from the $playlists observable.
-     */
-    public readonly $events: Observable<PlaylistEvent> = this._onEventSubject.asObservable();
+     /**
+      * Observable that emits events if a playlist was created or removed from the $playlists observable.
+      */
+     public readonly $events: Observable<PlaylistEvent> = this._onEventSubject.asObservable();
+
+    constructor(
+        @Inject(SCDK_OPTIONS) private readonly options: SCDKOptions,
+        private httpClient: HttpClient
+    ) { }
 
     /**
      * Find a playlist by its id.
@@ -89,6 +89,16 @@ export class SCDKPlaylistService {
     public findByArtist(artistId: string, pageable: Pageable): Observable<Page<Playlist>> {
         if(!artistId) return of(Page.of([]));
         return this.httpClient.get<Page<Playlist>>(`${this.options.api_base_uri}/v1/playlists/byArtist/${artistId}${Pageable.toQuery(pageable)}`)
+    }
+
+    /**
+     * Find playlist by a genre.
+     * @param genreId Genre's id
+     * @returns Observable<Page<Playlist>>
+     */
+    public findByGenre(genreId: string): Observable<Page<Playlist>> {
+        if(!genreId) return of(Page.of([]));
+        return this.httpClient.get<Page<Playlist>>(`${this.options.api_base_uri}/v1/playlists/byGenre/${genreId}`)
     }
 
     /**
