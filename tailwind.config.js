@@ -40,7 +40,17 @@ module.exports = {
           DEFAULT: "#277cad",
           dark: "#23719E"
         }
+      },
+      spacing: {
+        window: "24px"
       }
+    },
+    screens: {
+      'sm': '540px', // >= Tablet
+      'md': '780px', // >= Laptop
+      'lg': '1000px', // >= Desktop
+      'xl': '1200px', // >= Bigger Desktop
+      '2xl': '1550px'
     },
     fontSize: {
       xs: ["10px", { lineHeight: "0.96rem" }],
@@ -58,6 +68,13 @@ module.exports = {
       normal: 500,
       semi: 600,
       bold: 700
+    },
+    borderRadius: {
+      none: "0",
+      sm: "4px",
+      DEFAULT: "8px",
+      md: "12px",
+      full: "9999px"
     }
   },
   plugins: [
