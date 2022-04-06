@@ -1,23 +1,24 @@
-# SCDK :: Soundcore SDK
-This part of the repository contains the development kit for the soundcore project. The goal of this package is to create an api client
-to divide the frontend and frontend-to-backend communication.
+# SoundcoreSdk
 
-## Usage
-Before using all the services etc, you may want to register the sdk inside `app.module.ts` first. This can be done as follows:
-```javascript
-import { SCDKModule } from 'soundcore-sdk';
-import { environment } from 'src/environments/environment';
+This library was generated with [Angular CLI](https://github.com/angular/angular-cli) version 13.2.0.
 
-@NgModule({
-  imports: [
-    SCDKModule.forRoot({
-      api_base_uri: environment.api_base_uri
-    })
-  ],
-  bootstrap: [AppComponent]
-})
-export class AppModule {}
-```
+## Code scaffolding
 
-The most important configuration step is to set the `api_base_uri` correctly. This url will be used to build all the endpoints for communicating, therefor the
-base url must point to the main entry point the api is reachable through.
+Run `ng generate component component-name --project soundcore-sdk` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module --project soundcore-sdk`.
+> Note: Don't forget to add `--project soundcore-sdk` or else it will be added to the default project in your `angular.json` file. 
+
+## Build
+
+Run `ng build soundcore-sdk` to build the project. The build artifacts will be stored in the `dist/` directory.
+
+## Publishing
+
+After building your library with `ng build soundcore-sdk`, go to the dist folder `cd dist/soundcore-sdk` and run `npm publish`.
+
+## Running unit tests
+
+Run `ng test soundcore-sdk` to execute the unit tests via [Karma](https://karma-runner.github.io).
+
+## Further help
+
+To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.

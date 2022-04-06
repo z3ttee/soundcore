@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { ActivatedRouteSnapshot, Router, RouterStateSnapshot, UrlTree } from "@angular/router";
 import { KeycloakAuthGuard, KeycloakService } from "keycloak-angular";
-import { SnackbarService } from "src/app/services/snackbar.service";
+// import { SnackbarService } from "src/app/services/snackbar.service";
 
 @Injectable({
     providedIn: 'root'
@@ -11,12 +11,13 @@ export class KeycloakSSOGuard extends KeycloakAuthGuard {
     constructor(
       router: Router,
       protected readonly keycloak: KeycloakService,
-      private snackbarService: SnackbarService
+      // private snackbarService: SnackbarService
     ) {
       super(router, keycloak);
     }
   
     public async isAccessAllowed(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Promise<boolean | UrlTree> {
+      console.log("guard")
       // Force the user to log in if currently unauthenticated.
       if (!this.authenticated) {
         await this.keycloak.login({
@@ -28,7 +29,7 @@ export class KeycloakSSOGuard extends KeycloakAuthGuard {
       // the route.
       const requiredRole: string = route.data["role"];
       if(requiredRole && !this.keycloak.isUserInRole(requiredRole)) {
-        this.snackbarService.error("Keine Berechtigung.")
+        // this.snackbarService.error("Keine Berechtigung.")
         return this.router.createUrlTree(["/"]);
       }
 

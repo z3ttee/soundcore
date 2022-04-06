@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "alliance-soundcore": {
+    "soundcore": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -15,26 +15,19 @@
       },
       "root": "",
       "sourceRoot": "src",
-      "i18n": {
-        "sourceLocale": "en-US"
-      },
-      "prefix": "asc",
+      "prefix": "app",
       "architect": {
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "outputPath": "dist/alliance-soundcore",
+            "outputPath": "dist/soundcore",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": "src/polyfills.ts",
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
-            "allowedCommonJsDependencies": [
-              "tailwindcss/resolveConfig"
-            ],
             "assets": [
               "src/favicon.ico",
-              "src/favicon.png",
               "src/assets"
             ],
             "styles": [
@@ -49,7 +42,7 @@
                 {
                   "type": "initial",
                   "maximumWarning": "500kb",
-                  "maximumError": "3mb"
+                  "maximumError": "1mb"
                 },
                 {
                   "type": "anyComponentStyle",
@@ -80,10 +73,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "alliance-soundcore:build:production"
+              "browserTarget": "soundcore:build:production"
             },
             "development": {
-              "browserTarget": "alliance-soundcore:build:development"
+              "browserTarget": "soundcore:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -91,7 +84,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "alliance-soundcore:build"
+            "browserTarget": "soundcore:build"
           }
         },
         "test": {
@@ -104,7 +97,6 @@
             "inlineStyleLanguage": "scss",
             "assets": [
               "src/favicon.ico",
-              "src/favicon.png",
               "src/assets"
             ],
             "styles": [
@@ -120,7 +112,7 @@
       "projectType": "library",
       "root": "projects/soundcore-sdk",
       "sourceRoot": "projects/soundcore-sdk/src",
-      "prefix": "lib",
+      "prefix": "scdk",
       "architect": {
         "build": {
           "builder": "@angular-devkit/build-angular:ng-packagr",
@@ -146,7 +138,43 @@
           }
         }
       }
+    },
+    "soundcore-ngx": {
+      "projectType": "library",
+      "root": "projects/soundcore-ngx",
+      "sourceRoot": "projects/soundcore-ngx/src",
+      "prefix": "scngx",
+      "schematics": {
+        "@schematics/angular:component": {
+          "style": "scss"
+        }
+      },
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:ng-packagr",
+          "options": {
+            "project": "projects/soundcore-ngx/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/soundcore-ngx/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/soundcore-ngx/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "projects/soundcore-ngx/src/test.ts",
+            "tsConfig": "projects/soundcore-ngx/tsconfig.spec.json",
+            "karmaConfig": "projects/soundcore-ngx/karma.conf.js"
+          }
+        }
+      }
     }
   },
-  "defaultProject": "alliance-soundcore"
+  "defaultProject": "soundcore"
 }

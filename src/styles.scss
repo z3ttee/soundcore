@@ -6,11 +6,10 @@
 @import 'tailwindcss/utilities';
 
 /* Import Readex Pro Font from Google Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Readex+Pro:wght@300;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Readex+Pro:wght@400;500;600;700&display=swap');
 
 /* Import Font Awesome */
 @import "../node_modules/@fortawesome/fontawesome-free/css/all.min.css";
-
 @import "../node_modules/@angular/material/prebuilt-themes/pink-bluegrey.css";
 
 /* General styling */
@@ -24,46 +23,41 @@ html, body {
     height: 100%; 
     width: 100%;
     overflow: hidden;
-    @apply text-white;
+    @apply text-font;
 }
 body { 
-    margin: 0; 
-    @apply bg-background;
+    margin: 0;
+    @apply bg-body;
 }
 
-
-h1, h2, h3, h4, h5, h6 {
+/**
+[]=============================[]
+          Headlines
+[]=============================[]
+*/
+h1,h2,h3,h4,h5,h6 {
+    font-family: 'Readex Pro', sans-serif;
     @apply font-bold;
 }
 
 h1 {
-    @apply text-5xl;
+    @apply text-4xl tracking-tight;
 }
 h2 {
-    @apply text-4xl;
-}
-h3 {
     @apply text-3xl;
 }
+h3 {
+    @apply text-2xl font-semi;
+}
 h4 {
-    @apply text-2xl;
+    @apply text-xl font-semi;
 }
 h5 {
-    @apply text-xl;
+    @apply text-lg font-normal;
 }
 h6 {
-    @apply text-lg tracking-wide font-normal;
+    @apply text-md font-normal tracking-wide;
 }
-
-label {
-    @apply inline-block text-white-dark opacity-60 px-1 text-xs my-1;
-}
-
-.mat-paginator {
-    background: none;
-    @apply text-sm;
-}
-
 
 /**
 []=============================[]
@@ -77,9 +71,11 @@ label {
   
 /* Handle */
 ::-webkit-scrollbar-thumb {
-    @apply bg-primary rounded-full;
+    @apply bg-body-light rounded-full;
 }
 
 ::-webkit-scrollbar-track {
-    @apply bg-background-light;
+    @apply bg-transparent;
 }
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }

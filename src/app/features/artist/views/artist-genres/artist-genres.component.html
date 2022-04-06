@@ -1,9 +1,0 @@
-
-<asc-playlist-view mode="titleOnly" [options]="{ type: 'collection', title: 'Genres von ' + artist?.name}" *ngIf="!!artist">
-    <!-- Page contents -->
-    <div asc-contents>
-        <div class="vertical-grid">
-            <asc-genre-grid-item *ngFor="let genre of ($genres | async)" [genre]="genre" [routerLink]="['.', genre.id]"></asc-genre-grid-item>
-        </div>
-    </div>
-</asc-playlist-view>

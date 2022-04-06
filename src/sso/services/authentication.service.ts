@@ -1,7 +1,8 @@
 import { Injectable } from "@angular/core";
 import { KeycloakEvent, KeycloakEventType, KeycloakService } from "keycloak-angular";
 import { BehaviorSubject, map, Observable } from "rxjs";
-import { User } from "src/app/features/user/entities/user.entity";
+import { User } from "soundcore-sdk";
+// import { User } from "src/app/features/user/entities/user.entity";
 import { environment } from "src/environments/environment";
 
 @Injectable({
