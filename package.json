@@ -29,6 +29,7 @@
     "keycloak-angular": "^9.1.0",
     "keycloak-js": "^17.0.1",
     "lottie-web": "^5.9.1",
+    "ng-heroicon": "^2.0.0",
     "rxjs": "~7.5.0",
     "socket.io-client": "^4.4.1",
     "soundcore-ngx": "file:dist/soundcore-ngx",
