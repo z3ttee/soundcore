@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { BehaviorSubject, Observable, Subject, takeUntil } from 'rxjs';
+import { BehaviorSubject, firstValueFrom, Observable, Subject, takeUntil } from 'rxjs';
 import { Album } from 'src/app/features/album/entities/album.entity';
 import { AlbumService } from 'src/app/features/album/services/album.service';
 import { ScrollService } from 'src/app/services/scroll.service';
@@ -50,7 +50,7 @@ export class ArtistFeaturedComponent implements OnInit, OnDestroy {
   }
 
   public async findAlbums() {
-    this.albumService.findFeaturedAlbumsWithArtist(this.artistId, { page: this.currentPage }).then((page) => {
+    firstValueFrom(this.albumService.findFeaturedAlbumsByArtist(this.artistId, { page: this.currentPage })).then((page) => {
       this.totalElements = page.totalElements;
       if(page.elements.length > 0) {
         this._albumsSubject.next([

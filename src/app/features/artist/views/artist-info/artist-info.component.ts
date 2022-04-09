@@ -158,7 +158,7 @@ export class ArtistInfoComponent implements OnInit, OnDestroy {
    */
   public async findAlbums(): Promise<Page<Album>> {
     this.albumLoadingState.set(true)
-    return this.albumService.findAlbumsByArtist(this.artistId, { size: 12, page: 0 }).then((page) => {
+    return firstValueFrom(this.albumService.findByArtist(this.artistId, { size: 12, page: 0 })).then((page) => {
       this._albumsSubject.next(page);
       return page;
     }).catch((error: Error) => {
@@ -176,7 +176,7 @@ export class ArtistInfoComponent implements OnInit, OnDestroy {
    */
   public async findFeaturedAlbums(): Promise<Page<Album>> {
     this.featAlbumLoadingState.set(true)
-    return this.albumService.findFeaturedAlbumsWithArtist(this.artistId, { size: 12, page: 0 }).then((page) => {
+    return firstValueFrom(this.albumService.findFeaturedAlbumsByArtist(this.artistId, { size: 12, page: 0 })).then((page) => {
       this._featAlbumsSubject.next(page);
       return page;
     }).catch((error: Error) => {
