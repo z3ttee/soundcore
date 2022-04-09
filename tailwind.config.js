@@ -43,7 +43,16 @@ module.exports = {
       },
       spacing: {
         window: "24px"
-      }
+      },
+      minWidth: theme => ({
+        ...theme("spacing")
+      }),
+      minHeight: theme => ({
+        ...theme("spacing")
+      }),
+      maxWidth: theme => ({
+        ...theme("spacing")
+      }),
     },
     screens: {
       'sm': '540px', // >= Tablet
@@ -54,7 +63,7 @@ module.exports = {
     },
     fontSize: {
       xs: ["10px", { lineHeight: "0.96rem" }],
-      sm: ["13px", { lineHeight: "1.2rem" }],
+      sm: ["12px", { lineHeight: "1.1rem" }],
       base: ["15px", { lineHeight: "1.5rem" }],
       md: ["20px", { lineHeight: "1.8rem" }],
       lg: ["25px", { lineHeight: "2.2rem" }],

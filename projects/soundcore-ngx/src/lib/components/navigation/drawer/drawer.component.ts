@@ -1,4 +1,5 @@
 import { AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
+import { SCNGXScreenService } from '../../../services/screen/screen.service';
 
 @Component({
   selector: 'scngx-drawer',
@@ -7,12 +8,18 @@ import { AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild } from '
 })
 export class SCNGXDrawerComponent implements OnInit, AfterViewInit {
 
-  constructor() { }
+  constructor(
+    private readonly screenService: SCNGXScreenService
+  ) { }
 
   @ViewChild("toggler") public toggler: ElementRef<HTMLDivElement>;
   @Input() public rail: boolean = false;
 
-  public ngOnInit(): void {}
+  public ngOnInit(): void {
+    /*this.screenService.$screen.subscribe(() => {
+      
+    })*/
+  }
   public ngAfterViewInit(): void {}
 
   public toggleRail(event: MouseEvent) {

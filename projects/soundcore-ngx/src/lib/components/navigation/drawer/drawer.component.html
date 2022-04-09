@@ -1,6 +1,6 @@
 <div class="flex w-full relative h-full overflow-hidden">
-    <div class="min-w-[250px] max-w-[250px] h-full bg-body-dark relative" [ngClass]="{'min-w-[80px] max-w-[80px]': rail}">
-        <div class="inline-block w-full overflow-hidden">
+    <div class="min-w-[80px] max-w-[80px] h-full bg-body-dark relative" [ngClass]="{'min-w-[280px] max-w-[280px]': !rail}">
+        <div class="inline-block w-full overflow-hidden h-full">
             <ng-content select="[scngx-drawer]"></ng-content>
         </div>
 
