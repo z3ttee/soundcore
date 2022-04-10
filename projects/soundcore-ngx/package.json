@@ -4,8 +4,7 @@
   "peerDependencies": {
     "@angular/common": "^13.2.0",
     "@angular/core": "^13.2.0",
-    "ng-heroicon": "^2.0.0",
-    "soundcore-sdk": "^0.0.1"
+    "ng-heroicon": "^2.0.0"
   },
   "dependencies": {
     "tslib": "^2.3.0"
