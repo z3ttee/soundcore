@@ -6,15 +6,20 @@ export * from "./lib/components/navigation/bottom-nav/bottom-nav.module";
 export * from "./lib/components/navigation/bottom-nav/bottom-nav.component";
 export * from "./lib/components/navigation/bottom-nav/item-component/item-component.component";
 
-// Navigation
 export * from "./lib/components/navigation/drawer/drawer.module";
 export * from "./lib/components/navigation/drawer/drawer.component";
+
+export * from "./lib/components/navigation/tabbar/tabbar.module";
+export * from "./lib/components/navigation/tabbar/tabbar.component";
+export * from "./lib/components/navigation/tabbar/tab-item/tab-item.component";
 
 // Service exports
 export * from "./lib/services/screen/screen.module";
 export * from "./lib/services/screen/screen.service";
 
 // Song grid item exports
+export * from "./lib/components/grid/resource-grid-item/resource-grid-item.module";
+export * from "./lib/components/grid/resource-grid-item/resource-grid-item.component";
 export * from "./lib/components/grid/song-grid-item/song-grid-item.module";
 export * from "./lib/components/grid/song-grid-item/song-grid-item.component";
 

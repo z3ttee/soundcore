@@ -1,0 +1,9 @@
+<li 
+    class="inline-block py-2 px-4 text-sm text-center cursor-pointer rounded-sm w-full lg:w-min transition-all active:bg-opacity-50 active:bg-body-light" 
+    [routerLink]="route.commands" 
+    routerLinkActive="bg-body-light" 
+    [routerLinkActiveOptions]="{exact: route.exact}"
+    [ngClass]="{'hover:bg-body-light hover:bg-opacity-70': !(screenService.$isTouch | async)}">
+
+    <ng-content></ng-content>
+</li>

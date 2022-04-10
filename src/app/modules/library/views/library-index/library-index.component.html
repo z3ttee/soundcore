@@ -1,1 +1,11 @@
-<p>library-index works!</p>
+<section class="p-window">
+    <scngx-tabbar>
+        <scngx-tab-item [route]="{ commands: ['./'], exact: true }">Playlists</scngx-tab-item>
+        <scngx-tab-item [route]="{ commands: ['./albums']}">Alben</scngx-tab-item>
+        <scngx-tab-item [route]="{ commands: ['./artists']}">Künstler</scngx-tab-item>
+    </scngx-tabbar>
+
+    <div class="w-full mt-row">
+        <router-outlet></router-outlet>
+    </div>
+</section>
