@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, Input, OnChanges, OnInit, SimpleChanges, ViewChild } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { Artwork, SCDKArtworkService } from 'soundcore-sdk';
 
@@ -10,9 +10,16 @@ import { Artwork, SCDKArtworkService } from 'soundcore-sdk';
 export class SCNGXArtworkComponent implements OnInit, AfterViewInit, OnChanges {
 
   @Input() public artwork: Artwork;
-  public src: string;
 
-  constructor(private readonly artworkService: SCDKArtworkService) { }
+  @ViewChild("image") public imageRef: ElementRef<HTMLImageElement>;
+
+  public src: string;
+  public isLoading: boolean = false;
+  public canShow: boolean = false;
+
+  constructor(
+    private readonly artworkService: SCDKArtworkService
+  ) { }
 
   public ngOnInit(): void {
     this.init(this.artwork);
@@ -25,11 +32,19 @@ export class SCNGXArtworkComponent implements OnInit, AfterViewInit, OnChanges {
   }
 
   public onError() {
-    console.log("error on img")
+    this.isLoading = false;
+    this.canShow = false;
+    this.src = "assets/img/missing_cover.png";
   }
 
   public onLoad() {
-    console.log("load on img")
+    this.isLoading = false;
+    this.canShow = true;
+  }
+
+  public onLoadStart() {
+    this.isLoading = true;
+    this.canShow = false;
   }
 
   private init(artwork: Artwork) {

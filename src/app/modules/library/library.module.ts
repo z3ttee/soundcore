@@ -6,7 +6,7 @@ import { LibraryPlaylistsComponent } from './views/library-playlists/library-pla
 import { LibraryAlbumsComponent } from './views/library-albums/library-albums.component';
 import { LibraryArtistsComponent } from './views/library-artists/library-artists.component';
 import { Error404Module } from 'src/app/shared/error404/error404.module';
-import { SCNGXTabbarModule } from 'soundcore-ngx';
+import { SCNGXCollectionGridItemModule, SCNGXResourceGridItemModule, SCNGXTabbarModule } from 'soundcore-ngx';
 
 const routes: Routes = [
   { path: "", component: LibraryIndexComponent, children: [
@@ -29,7 +29,9 @@ const routes: Routes = [
     RouterModule.forChild(routes),
     Error404Module,
 
-    SCNGXTabbarModule
+    SCNGXTabbarModule,
+    SCNGXResourceGridItemModule,
+    SCNGXCollectionGridItemModule
   ]
 })
 export class LibraryModule { }

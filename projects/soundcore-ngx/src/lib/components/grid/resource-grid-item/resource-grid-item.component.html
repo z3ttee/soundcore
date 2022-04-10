@@ -1,0 +1,16 @@
+<div class="select-none transition-all p-4 rounded-md text-center flex flex-1 flex-col shadow-sm overflow-hidden h-full cursor-pointer w-full bg-body-light bg-opacity-30 border border-body-light border-opacity-0 hover:border-opacity-100 hover:bg-opacity-50 active:bg-opacity-40">
+
+    <div class="relative inline-flex justify-center items-center w-full overflow-hidden">
+        <scngx-artwork class="w-full aspect-square rounded overflow-hidden" [ngClass]="{'rounded-full': type == 'artist' || type == 'profile'}"></scngx-artwork>
+    </div>
+
+    <div class="overflow-hidden text-left pt-4">
+        <p class="font-bold max-w-full overflow-hidden text-ellipsis whitespace-nowrap">Titel</p>
+
+        <div class="line-clamp-2 opacity-60">
+            <ul>
+                <li class="text-sm">Test</li>
+            </ul>
+        </div>
+    </div>
+</div>

@@ -22,6 +22,8 @@ export * from "./lib/components/grid/resource-grid-item/resource-grid-item.modul
 export * from "./lib/components/grid/resource-grid-item/resource-grid-item.component";
 export * from "./lib/components/grid/song-grid-item/song-grid-item.module";
 export * from "./lib/components/grid/song-grid-item/song-grid-item.component";
+export * from "./lib/components/grid/collection-grid-item/collection-grid-item.module";
+export * from "./lib/components/grid/collection-grid-item/collection-grid-item.component";
 
 // List exports
 export * from "./lib/components/list/nav-list-item/nav-list-item.module";
