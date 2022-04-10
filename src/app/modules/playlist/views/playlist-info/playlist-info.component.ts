@@ -7,6 +7,9 @@ import { Component, OnInit } from '@angular/core';
 })
 export class PlaylistInfoComponent implements OnInit {
 
+
+  public showError404: boolean = false;
+
   constructor() { }
 
   ngOnInit(): void {

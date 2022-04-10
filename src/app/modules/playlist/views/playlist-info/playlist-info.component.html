@@ -1,1 +1,6 @@
-<p>playlist-info works!</p>
+<app-error404 *ngIf="showError404"></app-error404>
+
+<section *ngIf="!showError404">
+    <p>playlist-info works!</p>
+</section>
+
