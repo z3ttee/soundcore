@@ -193,6 +193,11 @@ export class SCDKPlaylistService {
         )
     }
 
+    public movePosition(prevIndex: number, currentIndex: number): Observable<Playlist> {
+        console.log("TODO") // TODO
+        return of(null);
+    }
+
 
 
 }

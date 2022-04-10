@@ -6,6 +6,8 @@ import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AuthModule } from 'src/sso/auth.module';
 import { SCNGXModule } from 'projects/soundcore-ngx/src/lib/scngx.module';
+import { SCDKModule } from 'soundcore-sdk';
+import { environment } from 'src/environments/environment';
 
 @NgModule({
   declarations: [
@@ -17,6 +19,9 @@ import { SCNGXModule } from 'projects/soundcore-ngx/src/lib/scngx.module';
     BrowserAnimationsModule,
 
     AuthModule,
+    SCDKModule.forRoot({
+      api_base_uri: environment.api_base_uri
+    }),
     SCNGXModule.register({
       screen: {
         screens: [

@@ -3,6 +3,7 @@ import { NgModule } from "@angular/core";
 import { SCNGXDrawerComponent } from './drawer.component';
 import { HeroIconModule, chevronRight } from 'ng-heroicon';
 import { SCNGXScreenModule } from "../../../services/screen/screen.module";
+import { SCNGXNavListItemModule } from "../../list/nav-list-item/nav-list-item.module";
 
 @NgModule({
   declarations: [
@@ -11,10 +12,12 @@ import { SCNGXScreenModule } from "../../../services/screen/screen.module";
   imports: [
     CommonModule,
     HeroIconModule.withIcons({ chevronRight }, { defaultHostDisplay: 'inlineBlock', attachDefaultDimensionsIfNoneFound: true }),
-    SCNGXScreenModule
+    SCNGXScreenModule,
+    SCNGXNavListItemModule
   ],
   exports: [
-    SCNGXDrawerComponent
+    SCNGXDrawerComponent,
+    SCNGXNavListItemModule
   ]
 })
 export class SCNGXDrawerModule {}

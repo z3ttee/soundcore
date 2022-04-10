@@ -4,6 +4,9 @@ import { SCNGXBottomNavModule, SCNGXDrawerModule } from "soundcore-ngx"
 import { RouterModule } from "@angular/router";
 import { CommonModule } from "@angular/common";
 import { HeroIconModule, home, search, user, bookmarkAlt, chevronDown } from "ng-heroicon";
+import { SCDKPlaylistModule } from "soundcore-sdk";
+import { SCNGXPlaylistListItemModule } from "projects/soundcore-ngx/src/public-api";
+import {DragDropModule} from '@angular/cdk/drag-drop';
 
 @NgModule({
     declarations: [
@@ -12,8 +15,12 @@ import { HeroIconModule, home, search, user, bookmarkAlt, chevronDown } from "ng
     imports: [
         CommonModule,
         RouterModule,
+        DragDropModule,
         SCNGXDrawerModule,
         SCNGXBottomNavModule,
+        SCNGXPlaylistListItemModule,
+
+        SCDKPlaylistModule,
 
         HeroIconModule.withIcons({ home, search, user, bookmarkAlt, chevronDown }, { defaultHostDisplay: 'inlineBlock', attachDefaultDimensionsIfNoneFound: true })
     ],

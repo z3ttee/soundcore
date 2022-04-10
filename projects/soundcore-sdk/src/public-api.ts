@@ -38,7 +38,10 @@ export * from "./lib/playlist/events/songs.event";
 /**
  * Export all artwork sdk parts
  */
+ export * from "./lib/artwork/artwork.module";
+ export * from "./lib/artwork/services/artwork.service";
  export * from "./lib/artwork/entities/artwork.entity";
+
 
 /**
  * Export all utils

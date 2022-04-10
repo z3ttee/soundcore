@@ -13,3 +13,12 @@ export * from "./lib/services/screen/screen.module";
 export * from "./lib/services/screen/screen.service";
 
 
+export * from "./lib/components/grid/song-grid-item/song-grid-item.module";
+export * from "./lib/components/grid/song-grid-item/song-grid-item.component";
+
+export * from "./lib/components/list/playlist-list-item/playlist-list-item.module";
+export * from "./lib/components/list/playlist-list-item/playlist-list-item.component";
+
+// Image exports
+export * from "./lib/components/images/artwork/artwork.module";
+export * from "./lib/components/images/artwork/artwork.component";

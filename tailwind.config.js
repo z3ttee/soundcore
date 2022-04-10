@@ -44,6 +44,12 @@ module.exports = {
       spacing: {
         window: "24px"
       },
+      margin: ({ theme }) => ({
+        row: theme("spacing.6"),
+      }),
+      padding: ({ theme }) => ({
+        row: theme("spacing.6"),
+      }),
       minWidth: theme => ({
         ...theme("spacing")
       }),
@@ -52,6 +58,9 @@ module.exports = {
       }),
       maxWidth: theme => ({
         ...theme("spacing")
+      }),
+      backgroundImage: theme => ({
+        "divider": "linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.25) 50%, rgba(255,255,255,0) 100%);"
       }),
     },
     screens: {

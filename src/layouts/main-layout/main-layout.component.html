@@ -1,4 +1,5 @@
 <scngx-drawer #drawer [rail]="false" *ngIf="!(screenService.$isTouch | async)">
+    <!-- Drawer sections -->
     <div class="flex flex-col relative h-full" scngx-drawer>
 
         <!--<div>
@@ -7,36 +8,47 @@
             <p>Is touch? {{ (screenService.$isTouch | async) }}</p>
         </div>-->
 
-        <div class="block p-window">
+        <div class="block p-window pb-0">
             <div class="flex items-center w-full" [ngClass]="{'flex-col': drawer.rail}">
                 <div class="w-1/2">
-                    <img src="assets/branding/soundcore_logo_full.svg" class="min-w-10 max-w-10 h-10 block">
+                    <img src="assets/branding/soundcore_logo_full.svg" class="min-w-10 max-w-10 h-10 block cursor-pointer" [routerLink]="['/']">
                 </div>
 
                 <div class="w-1/2 text-right">
-                    <button class="inline-flex items-center justify-center bg-body-light rounded-full w-9 h-9 mr-1.5 transform-gpu transition-all will-change-transform active:scale-95"><hero-icon [name]="'chevron-down'" [class]="'h-5 w-5 transform-gpu rotate-90'"></hero-icon></button>
-                    <button class="inline-flex items-center justify-center bg-body-light rounded-full w-9 h-9 transform-gpu transition-all will-change-transform active:scale-95"><hero-icon [name]="'chevron-down'" [class]="'h-5 w-5 transform-gpu -rotate-90'"></hero-icon></button>
+                    <button (click)="navigateBack()" class="inline-flex items-center justify-center bg-body-light rounded-full w-9 h-9 mr-1.5 transform-gpu transition-all will-change-transform active:scale-95"><hero-icon [name]="'chevron-down'" [class]="'h-5 w-5 transform-gpu rotate-90'"></hero-icon></button>
+                    <button (click)="navigateNext()" class="inline-flex items-center justify-center bg-body-light rounded-full w-9 h-9 transform-gpu transition-all will-change-transform active:scale-95"><hero-icon [name]="'chevron-down'" [class]="'h-5 w-5 transform-gpu -rotate-90'"></hero-icon></button>
                 </div>
             </div>
 
-            <div class="w-full mt-4" *ngIf="!drawer.rail">
+            <div class="w-full mt-row" *ngIf="!drawer.rail">
                 <input type="text" placeholder="Suchen" class="outline-none appearance-none w-full bg-body-light border border-transparent focus:border-font focus:border-opacity-30 transition-colors rounded-full text-sm py-3 px-4 placeholder:font-semi placeholder:text-font-secondary">
             </div>
         </div>
 
+        <hr class="my-row bg-divider min-h-[3px] max-h-[3px] rounded-full appearance-none border-none w-[90%] mx-auto">
+
         <div class="block">
             <ul class="flex flex-col select-none">
-                <li [routerLink]="['/']" [routerLinkActiveOptions]="{exact: true}" routerLinkActive="text-accent opacity-100" class="relative flex gap-4 px-window py-3 cursor-pointer opacity-70 hover:opacity-100 transition-all"><hero-icon [name]="'home'" [class]="'h-6 w-6'"></hero-icon><span>Startseite</span></li>
-                <li [routerLink]="['/library']" routerLinkActive="text-accent opacity-100" class="relative flex gap-4 px-window py-3 cursor-pointer opacity-70 hover:opacity-100 transition-all"><hero-icon [name]="'bookmark-alt'" [class]="'h-6 w-6'"></hero-icon><span>Bibliothek</span></li>
-                <li [routerLink]="['/profile']" routerLinkActive="text-accent opacity-100" class="relative flex gap-4 px-window py-3 cursor-pointer opacity-70 hover:opacity-100 transition-all"><hero-icon [name]="'user'" [class]="'h-6 w-6'"></hero-icon><span>Dein Profil</span></li>
+                <li [routerLink]="['/']" [routerLinkActiveOptions]="{exact: true}" routerLinkActive="text-accent" class="relative flex gap-4 px-window py-3 cursor-pointer hover:opacity-100 transition-all"><hero-icon [name]="'home'" [class]="'h-6 w-6'"></hero-icon><span>Startseite</span></li>
+                <li [routerLink]="['/library']" routerLinkActive="text-accent" class="relative flex gap-4 px-window py-3 cursor-pointer hover:opacity-100 transition-all"><hero-icon [name]="'bookmark-alt'" [class]="'h-6 w-6'"></hero-icon><span>Bibliothek</span></li>
+                <li [routerLink]="['/profile']" routerLinkActive="text-accent" class="relative flex gap-4 px-window py-3 cursor-pointer hover:opacity-100 transition-all"><hero-icon [name]="'user'" [class]="'h-6 w-6'"></hero-icon><span>Dein Profil</span></li>
             </ul>
         </div>
 
-        <div class="block border">
-            
+        <hr class="mt-row bg-divider min-h-[3px] max-h-[3px] rounded-full appearance-none border-none w-[90%] mx-auto">
+
+        <div class="block h-full overflow-hidden overflow-y-scroll py-row">
+
+            <div cdkDropList class="list" (cdkDropListDropped)="onPlaylistItemDrop($event)">
+                <div *ngFor="let playlist of (playlistService.$playlists | async)" cdkDrag cdkDragLockAxis="y" cdkDragBoundary=".list">
+                    <scngx-playlist-list-item class="cursor-pointer" [playlist]="playlist" [routerLink]="['/playlist', playlist.slug || playlist.id]" routerLinkActive="text-accent"></scngx-playlist-list-item>
+                </div>
+            </div>
         </div>
 
-        <div class="flex items-center gap-2 p-window">
+        <hr class="mb-row bg-divider min-h-[3px] max-h-[3px] rounded-full appearance-none border-none w-[90%] mx-auto">
+
+        <div class="flex items-center gap-2 p-window pt-0">
             <div class="flex items-center justify-center min-w-11 max-w-11 h-11 bg-body-light rounded-full">
 
             </div>
@@ -48,16 +60,16 @@
                 <hero-icon [name]="'chevron-down'" [class]="'h-5 w-5'"></hero-icon>
             </div>
         </div>
-
-        
-
     </div>
+
+    <!-- Page contents -->
     <div scngx-content>
         <router-outlet></router-outlet>
     </div>
 </scngx-drawer>
 
 <scngx-bottom-nav *ngIf="(screenService.$isTouch | async)">
+    <!-- Bottom navigation items -->
     <scngx-nav-item [label]="'Home'" [routerLink]="['/']" [routerLinkActiveOptions]="{exact: true}" routerLinkActive #rla="routerLinkActive" [active]="rla.isActive">
         <hero-icon [name]="'home'" [class]="'h-5 w-5 transition-all'"></hero-icon>
     </scngx-nav-item>
@@ -67,4 +79,9 @@
     <scngx-nav-item [label]="'Bibliothek'" [routerLink]="['/library']" routerLinkActive #rla2="routerLinkActive" [active]="rla2.isActive">
         <hero-icon [name]="'bookmark-alt'" [class]="'h-5 w-5 transition-all'"></hero-icon>
     </scngx-nav-item>
+
+    <!-- Page contents -->
+    <div scngx-content>
+        <router-outlet></router-outlet>
+    </div>
 </scngx-bottom-nav>
