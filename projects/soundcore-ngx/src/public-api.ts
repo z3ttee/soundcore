@@ -9,6 +9,9 @@ export * from "./lib/components/navigation/bottom-nav/item-component/item-compon
 export * from "./lib/components/navigation/drawer/drawer.module";
 export * from "./lib/components/navigation/drawer/drawer.component";
 
+export * from "./lib/components/navigation/toolbar/toolbar.module";
+export * from "./lib/components/navigation/toolbar/toolbar.component";
+
 export * from "./lib/components/navigation/tabbar/tabbar.module";
 export * from "./lib/components/navigation/tabbar/tabbar.component";
 export * from "./lib/components/navigation/tabbar/tab-item/tab-item.component";
@@ -24,6 +27,8 @@ export * from "./lib/components/grid/song-grid-item/song-grid-item.module";
 export * from "./lib/components/grid/song-grid-item/song-grid-item.component";
 export * from "./lib/components/grid/collection-grid-item/collection-grid-item.module";
 export * from "./lib/components/grid/collection-grid-item/collection-grid-item.component";
+export * from "./lib/components/grid/playlist-grid-item/playlist-grid-item.module";
+export * from "./lib/components/grid/playlist-grid-item/playlist-grid-item.component";
 
 // List exports
 export * from "./lib/components/list/nav-list-item/nav-list-item.module";

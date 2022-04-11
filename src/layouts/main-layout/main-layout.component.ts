@@ -1,6 +1,7 @@
 import { CdkDragDrop } from "@angular/cdk/drag-drop";
 import { Location } from "@angular/common";
 import { Component, OnInit } from "@angular/core";
+import { Router } from "@angular/router";
 import { SCNGXPlaylistListItemComponent } from "projects/soundcore-ngx/src/public-api";
 import { firstValueFrom } from "rxjs";
 import { SCNGXScreenService } from "soundcore-ngx";
@@ -16,7 +17,8 @@ export class AscMainLayoutComponent implements OnInit {
         public readonly screenService: SCNGXScreenService,
         public readonly authService: AuthenticationService,
         public readonly playlistService: SCDKPlaylistService,
-        private _location: Location
+        private readonly router: Router,
+        private readonly _location: Location
     ) {}
 
     public ngOnInit(): void {
@@ -35,6 +37,10 @@ export class AscMainLayoutComponent implements OnInit {
     
     public navigateNext() {
         this._location.forward();
+    }
+
+    public navigateToSearch() {
+        this.router.navigate(['/search'])
     }
 
 }

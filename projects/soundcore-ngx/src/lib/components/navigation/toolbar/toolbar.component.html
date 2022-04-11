@@ -1,0 +1,9 @@
+<div class="flex items-center w-full p-4 px-window gap-2 pointer-events-auto" [ngClass]="{'bg-body-dark': !transparent}">
+    <div class="min-w-10 max-w-10" *ngIf="showNavigation">
+        <button (click)="navigateBack()" class="inline-flex items-center justify-center rounded-full w-9 h-9 transition-all" matRipple [matRippleCentered]="true"><hero-icon [name]="'chevron-down'" [class]="'h-6 w-6 transform-gpu rotate-90'"></hero-icon></button>
+    </div>
+
+    <div class="w-full">
+        <ng-content></ng-content>
+    </div>
+</div>

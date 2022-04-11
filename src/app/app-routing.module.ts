@@ -13,6 +13,7 @@ const routes: Routes = [
     { path: "library", canActivate: [KeycloakSSOGuard], loadChildren: () => import("./modules/library/library.module").then((m) => m.LibraryModule) },
     { path: "profile", canActivate: [KeycloakSSOGuard], loadChildren: () => import("./modules/settings/settings.module").then((m) => m.SettingsModule) },
     { path: "settings", canActivate: [KeycloakSSOGuard], loadChildren: () => import("./modules/settings/settings.module").then((m) => m.SettingsModule) },
+    { path: "search", canActivate: [KeycloakSSOGuard], loadChildren: () => import("./modules/search/search.module").then((m) => m.SearchModule) },
     { path: "**", component: Error404Component }
   ]},
   { path: "**", redirectTo: "/" }

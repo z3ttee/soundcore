@@ -1,12 +1,12 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { SCDKSongGridItemComponent } from './song-grid-item.component';
 import { SCNGXResourceGridItemModule } from '../resource-grid-item/resource-grid-item.module';
 import { SCNGXArtworkModule } from '../../images/artwork/artwork.module';
+import { SCDKPlaylistGridItemComponent } from './playlist-grid-item.component';
 
 @NgModule({
   declarations: [
-    SCDKSongGridItemComponent
+    SCDKPlaylistGridItemComponent
   ],
   imports: [
     CommonModule,
@@ -14,7 +14,7 @@ import { SCNGXArtworkModule } from '../../images/artwork/artwork.module';
     SCNGXArtworkModule
   ],
   exports: [
-    SCDKSongGridItemComponent
+    SCDKPlaylistGridItemComponent
   ]
 })
-export class SCNGXSongGridItemModule { }
+export class SCNGXPlaylistGridItemModule { }
