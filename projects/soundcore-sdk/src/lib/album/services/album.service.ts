@@ -1,20 +1,23 @@
 import { HttpClient } from "@angular/common/http";
 import { Inject, Injectable } from "@angular/core";
-import { Observable, of } from "rxjs";
+import { BehaviorSubject, Observable, of } from "rxjs";
 import { Page } from "../../pagination/page";
 import { Pageable } from "../../pagination/pageable";
 import { SCDKOptions, SCDK_OPTIONS } from "../../scdk.module";
 import { Album } from "../entities/album.entity";
 
-@Injectable({
-    providedIn: "root"
-})
+@Injectable()
 export class SCDKAlbumService {
+
+    private _collectionSubject: BehaviorSubject<Album[]> = new BehaviorSubject([]);
+    public $collection: Observable<Album[]> = this._collectionSubject.asObservable();
 
     constructor(
         private httpClient: HttpClient,
         @Inject(SCDK_OPTIONS) private readonly options: SCDKOptions
-    ) {}
+    ) {
+        console.log("album service init")
+    }
 
     /**
      * Find album by its id.

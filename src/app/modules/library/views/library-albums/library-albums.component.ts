@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { SCDKAlbumService } from 'soundcore-sdk';
 
 @Component({
   selector: 'app-library-albums',
@@ -7,7 +8,9 @@ import { Component, OnInit } from '@angular/core';
 })
 export class LibraryAlbumsComponent implements OnInit {
 
-  constructor() { }
+  constructor(
+    public readonly albumService: SCDKAlbumService
+  ) { }
 
   ngOnInit(): void {
   }

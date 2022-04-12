@@ -36,6 +36,16 @@ export * from "./lib/components/list/nav-list-item/nav-list-item.component";
 export * from "./lib/components/list/playlist-list-item/playlist-list-item.module";
 export * from "./lib/components/list/playlist-list-item/playlist-list-item.component";
 
+export * from "./lib/components/list/bullet-list/bullet-list.module";
+export * from "./lib/components/list/bullet-list/bullet-list.component";
+
+
+// Grids
+export * from "./lib/components/grids/vertical-grid/vertical-grid.module";
+export * from "./lib/components/grids/vertical-grid/vertical-grid.component";
+
+
 // Image exports
 export * from "./lib/components/images/artwork/artwork.module";
 export * from "./lib/components/images/artwork/artwork.component";
+

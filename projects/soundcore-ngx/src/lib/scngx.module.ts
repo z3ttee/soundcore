@@ -1,6 +1,7 @@
 import { ModuleWithProviders, NgModule } from "@angular/core";
 import { SCNGXScreenConfig } from "./config/screen.config";
 import { LottieModule, LottieCacheModule  } from 'ngx-lottie';
+import { SCNGXScrollModule } from "./services/scroll/scroll.module";
 
 export const SCNGX_OPTIONS = "scngx-options";
 export interface SCNGXOptions {
@@ -16,7 +17,9 @@ export function playerFactory() {
 @NgModule({
     imports: [
         LottieModule.forRoot({ player: playerFactory }), 
-        LottieCacheModule.forRoot()
+        LottieCacheModule.forRoot(),
+
+        SCNGXScrollModule
     ],
     exports: [
         LottieModule,
