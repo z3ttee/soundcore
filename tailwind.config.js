@@ -8,6 +8,7 @@ module.exports = {
     extend: {
       colors: {
         body: {
+          lighter: "#3d3d3d",
           light: "#2d2d2d",
           DEFAULT: "#191919",
           dark: "#000000"
@@ -63,6 +64,15 @@ module.exports = {
         "divider": "linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.25) 50%, rgba(255,255,255,0) 100%);",
         "collection": "linear-gradient(130deg, rgba(255,191,80,0.7) -20%, rgba(166,150,121,0.5) 100%)"
       }),
+      keyframes: theme => ({
+        skeleton: {
+          "0%, 100%": { backgroundColor: theme("colors.body.light") },
+          "50%": { backgroundColor: theme("colors.body.lighter") }
+        }
+      }),
+      animation: {
+        skeleton: "skeleton 2s ease-in-out infinite"
+      }
     },
     screens: {
       'sm': '540px', // >= Tablet

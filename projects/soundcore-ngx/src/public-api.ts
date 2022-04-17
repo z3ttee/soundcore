@@ -1,6 +1,11 @@
 /*
  * Public API Surface of soundcore-ngx
  */
+
+// Skeletons
+export * from "./lib/components/skeletons/skeleton/skeleton.module";
+export * from "./lib/components/skeletons/skeleton/skeleton.component";
+
 // Navigation
 export * from "./lib/components/navigation/bottom-nav/bottom-nav.module";
 export * from "./lib/components/navigation/bottom-nav/bottom-nav.component";
