@@ -1,9 +1,17 @@
+<!-- Toolbar (touch devices only) -->
 <scngx-toolbar [showNavigation]="false" [transparent]="true" *ngIf="(screenService.$isTouch | async)">
     <div class="flex items-center">
-        <input type="text" placeholder="Suchen" class="outline-none appearance-none w-full bg-body-light border border-transparent focus:border-font focus:border-opacity-30 transition-colors rounded-full text-sm py-3 px-4 placeholder:font-semi placeholder:text-font-secondary">
+        <input type="text" placeholder="Suchen" class="outline-none appearance-none w-full bg-body-light border border-transparent focus:border-font focus:border-opacity-30 transition-colors rounded-full py-4 px-5 placeholder:font-semi placeholder:text-font-secondary" >
     </div>
 </scngx-toolbar>
 
-<section class="p-window">
-    
+<section class="p-window" [ngClass]="{'pt-0': (screenService.$isTouch | async)}">
+    <div class="w-full">
+        <h6>Letzte Suchanfragen</h6>
+
+    </div>
+    <div class="w-full">
+        <h6>Deine favorisierten Genre</h6>
+
+    </div>
 </section>

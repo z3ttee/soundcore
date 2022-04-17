@@ -1,6 +1,57 @@
-<app-error404 *ngIf="showError404"></app-error404>
+<app-error404 *ngIf="showError404" [title]="'Playlist nicht gefunden'"></app-error404>
 
-<section *ngIf="!showError404">
-    <p>playlist-info works!</p>
+<section *ngIf="!showError404" class="p-window">
+    <div class="flex items-end w-full mb-row">
+
+        <div class="block min-w-52 max-w-52 aspect-square rounded overflow-hidden">
+            <scngx-skeleton *ngIf="isLoadingPlaylist" [class]="'w-52 aspect-square rounded'"></scngx-skeleton>
+            <div *ngIf="!isLoadingPlaylist" class="block w-52 aspect-square bg-body-light rounded"></div>
+        </div>
+
+        <div class="block w-full p-4">
+            <scngx-skeleton *ngIf="isLoadingPlaylist" [class]="'h-12 w-4/5 max-w-96'"></scngx-skeleton>
+
+            <h3 *ngIf="!isLoadingPlaylist">
+                {{ playlist?.title }}
+            </h3>
+
+            <ul class="flex items-center w-full mt-2 gap-4">
+                <li class="text-font-secondary">
+                    <scngx-skeleton *ngIf="isLoadingPlaylist" [class]="'h-5 w-32'"></scngx-skeleton>
+                    <span *ngIf="playlist?.author && !isLoadingPlaylist">by {{ playlist?.author?.username }}</span>
+                </li>
+                <li class="text-font-secondary">
+                    <scngx-skeleton *ngIf="isLoadingPlaylist" [class]="'h-5 w-24'"></scngx-skeleton>
+                    <span *ngIf="!isLoadingPlaylist">{{ playlist?.songsCount }} {{ playlist?.songsCount != 1 ? 'Songs' : 'Song' }}</span>
+                </li>
+                <li class="text-font-secondary">
+                    <scngx-skeleton *ngIf="isLoadingPlaylist" [class]="'h-5 w-14'"></scngx-skeleton>
+                    <span *ngIf="!isLoadingPlaylist">{{ playlist?.totalDuration | durationPipe }} min</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="my-row">
+        <scngx-skeleton *ngIf="isLoadingPlaylist" [class]="'h-12 w-56'"></scngx-skeleton>
+
+        <div *ngIf="!isLoadingPlaylist" class="flex items-center w-full gap-2">
+            <button class="w-14 flex items-center justify-center aspect-square bg-accent transition-all will-change-transform text-body rounded-full hover:scale-105 active:scale-[97%]">
+                <!--<hero-icon [name]="'play'" [class]="'h-full w-full p-4'"></hero-icon>-->
+            </button>
+
+            <button class="flex items-center p-2 rounded-full" matRipple [matRippleCentered]="true">
+                <hero-icon [name]="'heart'" [class]="'h-7 aspect-square'"></hero-icon>
+            </button>
+
+            <button class="flex items-center p-2 rounded-full" matRipple [matRippleCentered]="true">
+                <hero-icon [name]="'dots-vertical'" [class]="'h-7 aspect-square'"></hero-icon>
+            </button>
+        </div>
+    </div>
+
+    <div class="block w-full mt-row">
+
+    </div>
 </section>
 

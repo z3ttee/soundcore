@@ -32,17 +32,22 @@ export * from "./lib/playlist/events/songs.event";
 /**
  * Export all album sdk parts
  */
- export * from "./lib/album/album.module";
- export * from "./lib/album/services/album.service";
- export * from "./lib/album/entities/album.entity";
+export * from "./lib/album/album.module";
+export * from "./lib/album/services/album.service";
+export * from "./lib/album/entities/album.entity";
 
 /**
  * Export all artwork sdk parts
  */
- export * from "./lib/artwork/artwork.module";
- export * from "./lib/artwork/services/artwork.service";
- export * from "./lib/artwork/entities/artwork.entity";
+export * from "./lib/artwork/artwork.module";
+export * from "./lib/artwork/services/artwork.service";
+export * from "./lib/artwork/entities/artwork.entity";
 
+ /**
+ * Export all search sdk parts
+ */
+export * from "./lib/search/search.module";
+export * from "./lib/search/services/search.service";
 
 /**
  * Export all utils

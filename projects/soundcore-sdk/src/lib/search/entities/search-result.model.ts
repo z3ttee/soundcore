@@ -24,6 +24,4 @@ export class ComplexSearchResult {
     public users: Page<User>;
 
     public bestMatch?: SearchBestMatch;
-    
-
 }
