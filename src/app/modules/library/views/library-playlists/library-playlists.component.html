@@ -1,5 +1,5 @@
 <div class="vertical-grid">
-    <scngx-collection-grid-item class="col-span-2"></scngx-collection-grid-item>
+    <scngx-collection-grid-item class="col-span-2" [routerLink]="['/collection']"></scngx-collection-grid-item>
 
     <scngx-playlist-grid-item *ngFor="let playlist of (playlistService.$playlists | async)" [item]="playlist" [routerLink]="['/playlist', playlist.slug || playlist.id]"></scngx-playlist-grid-item>
 </div>

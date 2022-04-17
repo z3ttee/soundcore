@@ -38,6 +38,14 @@
         <hr class="mt-row bg-divider min-h-[3px] max-h-[3px] rounded-full appearance-none border-none w-[90%] mx-auto">
 
         <div class="block h-full overflow-hidden overflow-y-scroll py-row">
+            <li [routerLink]="['/collection']" routerLinkActive="text-accent" class="relative flex items-center gap-4 px-window py-3 cursor-pointer hover:opacity-100 transition-all">
+                <div class="inline-block min-w-8 max-w-8 h-8 rounded-sm overflow-hidden">
+                    <img src="assets/img/collection_cover.png"> 
+                </div>
+                <div class="w-full line-clamp-1">
+                    Lieblingssongs
+                </div>
+            </li>
 
             <div cdkDropList class="list" (cdkDropListDropped)="onPlaylistItemDrop($event)">
                 <div *ngFor="let playlist of (playlistService.$playlists | async)" cdkDrag cdkDragLockAxis="y" cdkDragBoundary=".list">

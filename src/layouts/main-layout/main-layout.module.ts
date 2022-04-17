@@ -22,6 +22,7 @@ import {DragDropModule} from '@angular/cdk/drag-drop';
 
         SCDKPlaylistModule,
 
+
         HeroIconModule.withIcons({ home, search, user, bookmarkAlt, chevronDown }, { defaultHostDisplay: 'inlineBlock', attachDefaultDimensionsIfNoneFound: true })
     ],
     exports: [
