@@ -1,6 +1,6 @@
 import { NgModule } from "@angular/core";
 import { AscMainLayoutComponent } from "./main-layout.component";
-import { SCNGXBottomNavModule, SCNGXDrawerModule } from "soundcore-ngx"
+import { SCNGXBottomNavModule, SCNGXDrawerModule, SCNGXProgressbarModule } from "soundcore-ngx"
 import { RouterModule } from "@angular/router";
 import { CommonModule } from "@angular/common";
 import { HeroIconModule, home, search, user, bookmarkAlt, chevronDown } from "ng-heroicon";
@@ -16,9 +16,11 @@ import {DragDropModule} from '@angular/cdk/drag-drop';
         CommonModule,
         RouterModule,
         DragDropModule,
+        
         SCNGXDrawerModule,
         SCNGXBottomNavModule,
         SCNGXPlaylistListItemModule,
+        SCNGXProgressbarModule,
 
         SCDKPlaylistModule,
 

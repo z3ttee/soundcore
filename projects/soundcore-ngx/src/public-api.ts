@@ -5,7 +5,6 @@
 export * from "./lib/ui/tooltip/tooltip.module";
 export * from "./lib/ui/tooltip/directive/tooltip.directive";
 
-
 // Skeletons
 export * from "./lib/components/skeletons/skeleton/skeleton.module";
 export * from "./lib/components/skeletons/skeleton/skeleton.component";
@@ -48,13 +47,15 @@ export * from "./lib/components/list/playlist-list-item/playlist-list-item.compo
 export * from "./lib/components/list/bullet-list/bullet-list.module";
 export * from "./lib/components/list/bullet-list/bullet-list.component";
 
-
 // Grids
 export * from "./lib/components/grids/vertical-grid/vertical-grid.module";
 export * from "./lib/components/grids/vertical-grid/vertical-grid.component";
 
-
 // Image exports
 export * from "./lib/components/images/artwork/artwork.module";
 export * from "./lib/components/images/artwork/artwork.component";
+
+// Progress
+export * from "./lib/components/progress/progressbar/progressbar.module";
+export * from "./lib/components/progress/progressbar/progressbar.component";
 

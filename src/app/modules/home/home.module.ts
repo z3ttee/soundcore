@@ -13,7 +13,7 @@ const routes: Routes = [
         CommonModule,
         RouterModule.forChild(routes),
         SCNGXScreenModule,
-        SCNGXTooltipModule
+        SCNGXTooltipModule,
     ],
     declarations: [
       HomeComponent

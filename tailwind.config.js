@@ -68,10 +68,20 @@ module.exports = {
         skeleton: {
           "0%, 100%": { backgroundColor: theme("colors.body.light") },
           "50%": { backgroundColor: theme("colors.body.lighter") }
+        },
+        progressInc: {
+          "0%": { left: "-5%", width: "5%" },
+          "100%": { left: "130%", width: "100%" }
+        },
+        progressDec: {
+          "0%": { left: "-80%", width: "80%" },
+          "100%": { left: "110%", width: "10%" }
         }
       }),
       animation: {
-        skeleton: "skeleton 2s ease-in-out infinite"
+        skeleton: "skeleton 2s ease-in-out infinite",
+        progressInc: "progressInc 2s infinite",
+        progressDec: "progressDec 2s 0.45s infinite"
       }
     },
     screens: {

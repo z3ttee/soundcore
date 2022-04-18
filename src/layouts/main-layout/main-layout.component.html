@@ -1,3 +1,9 @@
+<!-- Navigation status loading bar -->
+<div class="fixed w-full top-0 left-0 z-[1000000000000000000]" *ngIf="isNavigating">
+    <scngx-progressbar [transparent]="true"></scngx-progressbar>
+</div>
+
+<!-- Layout - Drawer -->
 <scngx-drawer #drawer [rail]="false" *ngIf="!(screenService.$isTouch | async)">
     <!-- Drawer sections -->
     <div class="flex flex-col relative h-full" scngx-drawer>
@@ -76,6 +82,7 @@
     </div>
 </scngx-drawer>
 
+<!-- Layout - Mobile -->
 <scngx-bottom-nav *ngIf="(screenService.$isTouch | async)">
     <!-- Bottom navigation items -->
     <scngx-nav-item [label]="'Home'" [routerLink]="['/']" [routerLinkActiveOptions]="{exact: true}" routerLinkActive #rla="routerLinkActive" [active]="rla.isActive">
