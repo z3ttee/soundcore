@@ -1,12 +1,17 @@
-import { Directive, ElementRef, Input, NgZone, OnDestroy, OnInit, ViewContainerRef } from '@angular/core';
-import { autoPlacement, computePosition, flip, Placement, shift } from '@floating-ui/dom';
+import { Directive, ElementRef, Input, OnDestroy, OnInit, ViewContainerRef } from '@angular/core';
+import { computePosition, flip, Placement, shift } from '@floating-ui/dom';
+import { fromEvent, Subject, takeUntil } from 'rxjs';
 import { SCNGXTooltipComponent } from '../components/tooltip.component';
+
+const SCALE_BEGIN_CLASS = "scale-95";
+const SCALE_END_CLASS = "scale-100";
 
 @Directive({
   selector: '[scngxTooltip]'
 })
 export class SCNGXTooltipDirective implements OnDestroy, OnInit {
 
+  private _destroy: Subject<void> = new Subject();
   private _tooltip: HTMLElement;
 
   @Input() public scngxTooltipText: string;
@@ -14,13 +19,15 @@ export class SCNGXTooltipDirective implements OnDestroy, OnInit {
 
   constructor(
     private readonly elementRef: ElementRef<HTMLElement>,
-    private readonly viewContainerRef: ViewContainerRef,
-    private readonly zone: NgZone
+    private readonly viewContainerRef: ViewContainerRef
   ) {}
 
   public ngOnInit(): void {
     const host = this.prepareHost();
     this._tooltip = this.prepareTooltip();
+
+    fromEvent<MouseEvent>(host, "mouseenter").pipe(takeUntil(this._destroy)).subscribe((event) => this.onMouseEnter(event));
+    fromEvent<MouseEvent>(host, "mouseleave").pipe(takeUntil(this._destroy)).subscribe((event) => this.onMouseLeave(event));
 
     computePosition(host, this._tooltip, {
       placement: this.scngxTooltipPosition || "bottom",
@@ -38,30 +45,24 @@ export class SCNGXTooltipDirective implements OnDestroy, OnInit {
 
   public ngOnDestroy(): void {
     this._tooltip?.remove();
-    // this.elementRef.nativeElement.removeEventListener("mouseenter",)
+    this._destroy.next();
+    this._destroy.complete();
   }
 
-  public onMouseEnter(event: MouseEvent) {
-    this.zone.run(() => {
-      this._tooltip.style.opacity = "1"
-      this._tooltip.classList.add("scale-100")
-    })
+  private onMouseEnter(event: MouseEvent) {
+    this._tooltip.style.opacity = "1"
+    this._tooltip.classList.remove(SCALE_BEGIN_CLASS)
+    this._tooltip.classList.add(SCALE_END_CLASS)
   }
 
-  public onMouseLeave(event: MouseEvent) {
-    this.zone.run(() => {
-      this._tooltip.style.opacity = "0"
-      this._tooltip.classList.remove("scale-100")
-    })
+  private onMouseLeave(event: MouseEvent) {
+    this._tooltip.style.opacity = "0"
+    this._tooltip.classList.remove(SCALE_END_CLASS)
+    this._tooltip.classList.add(SCALE_BEGIN_CLASS)
   }
 
   private prepareHost(): HTMLElement {
     const host = this.elementRef.nativeElement;
-    // host.classList.add("transition-all", "transform-gpu", "will-change-transform")
-    // host.style.opacity = "0"
-    host.addEventListener("mouseenter", (event) => this.onMouseEnter(event))
-    host.addEventListener("mouseleave", (event) => this.onMouseLeave(event))
-
     return host;
   }
 
@@ -74,7 +75,7 @@ export class SCNGXTooltipDirective implements OnDestroy, OnInit {
     const tooltip = componentRef.location.nativeElement;
 
     // Add initial styling
-    tooltip.classList.add("transition-all", "transform-gpu", "will-change-transform", "opacity-0", "pointer-events-none", "scale-95")
+    tooltip.classList.add("transition-all", "transform-gpu", "will-change-transform", "opacity-0", "pointer-events-none", SCALE_BEGIN_CLASS)
     tooltip.style.position = "absolute";
 
     return tooltip;
