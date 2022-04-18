@@ -1,7 +1,9 @@
 import { CommonModule } from "@angular/common";
 import { NgModule } from "@angular/core";
+import { MatRippleModule } from "@angular/material/core";
 import { RouterModule, Routes } from "@angular/router";
-import { SCNGXScreenModule, SCNGXTooltipModule } from "soundcore-ngx";
+import { bell, HeroIconModule } from "ng-heroicon";
+import { SCNGXScreenModule, SCNGXToolbarModule, SCNGXTooltipModule } from "soundcore-ngx";
 import { HomeComponent } from './views/home/home.component';
 
 const routes: Routes = [
@@ -14,6 +16,10 @@ const routes: Routes = [
         RouterModule.forChild(routes),
         SCNGXScreenModule,
         SCNGXTooltipModule,
+        SCNGXToolbarModule,
+
+        HeroIconModule.withIcons({ bell }),
+        MatRippleModule,
     ],
     declarations: [
       HomeComponent

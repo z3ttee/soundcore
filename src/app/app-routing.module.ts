@@ -15,6 +15,7 @@ const routes: Routes = [
     { path: "profile", canActivate: [KeycloakSSOGuard], loadChildren: () => import("./modules/settings/settings.module").then((m) => m.SettingsModule) },
     { path: "settings", canActivate: [KeycloakSSOGuard], loadChildren: () => import("./modules/settings/settings.module").then((m) => m.SettingsModule) },
     { path: "search", canActivate: [KeycloakSSOGuard], loadChildren: () => import("./modules/search/search.module").then((m) => m.SearchModule) },
+    { path: "notifications", canActivate: [KeycloakSSOGuard], loadChildren: () => import("./modules/notifications/notifications.module").then((m) => m.NotificationsModule) },
     { path: "**", component: Error404Component }
   ]},
   { path: "**", redirectTo: "/" }

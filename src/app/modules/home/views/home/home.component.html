@@ -1,4 +1,18 @@
-<section class="p-window">
+<scngx-toolbar [showNavigation]="false" [transparent]="true">
+    <div class="flex items-center">
+        <div class="w-full overflow-hidden">
+            <h6 class="line-clamp-1 lg:text-lg">{{ greeting }}</h6>
+        </div>
+
+        <ul>
+            <li class="flex items-center justify-center cursor-pointer relative" matRipple [matRippleCentered]="true" [matRippleUnbounded]="true" [matRippleRadius]="20" [routerLink]="['/notifications']">
+                <hero-icon [name]="'bell'" [class]="'w-7 h-7'"></hero-icon>
+            </li>
+        </ul>
+    </div>
+</scngx-toolbar>
+
+<section class="px-window">
     <p>home works!</p>
     <a [routerLink]="['/settings']">Settings</a>
 
