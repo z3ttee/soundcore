@@ -30,18 +30,16 @@ export class AuthenticationService {
             if(event.type == KeycloakEventType.OnReady) {
                 const authenticated = event.args[0] as boolean;
                 console.log("[AUTH] Auth handler initialized. User authenticated? ", authenticated)
-            }
-
-            if(event.type == KeycloakEventType.OnAuthLogout) {
+            } else if(event.type == KeycloakEventType.OnAuthLogout) {
                 this._readSubject.next(false);
                 this._userSubject.next(new User());
                 console.log("[AUTH] User logged out.")
                 window.location.reload();
-            }
-
-            if(event.type == KeycloakEventType.OnAuthSuccess) {
+            } else if(event.type == KeycloakEventType.OnAuthSuccess) {
                 this.reloadSessionDetails()
                 console.log("[AUTH] User logged in.")
+            } else {
+                console.log(event)
             }
         })
 

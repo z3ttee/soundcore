@@ -1,6 +1,10 @@
 /*
  * Public API Surface of soundcore-ngx
  */
+// Tooltip
+export * from "./lib/ui/tooltip/tooltip.module";
+export * from "./lib/ui/tooltip/directive/tooltip.directive";
+
 
 // Skeletons
 export * from "./lib/components/skeletons/skeleton/skeleton.module";

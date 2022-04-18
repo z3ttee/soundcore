@@ -1,7 +1,7 @@
 import { CommonModule } from "@angular/common";
 import { NgModule } from "@angular/core";
 import { RouterModule, Routes } from "@angular/router";
-import { SCNGXScreenModule } from "soundcore-ngx";
+import { SCNGXScreenModule, SCNGXTooltipModule } from "soundcore-ngx";
 import { HomeComponent } from './views/home/home.component';
 
 const routes: Routes = [
@@ -12,7 +12,8 @@ const routes: Routes = [
     imports: [
         CommonModule,
         RouterModule.forChild(routes),
-        SCNGXScreenModule
+        SCNGXScreenModule,
+        SCNGXTooltipModule
     ],
     declarations: [
       HomeComponent
