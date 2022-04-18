@@ -1,0 +1,34 @@
+<div class="flex items-center gap-2 p-window cursor-pointer select-none relative" (mouseenter)="onMouseEnter($event)" (mouseleave)="onMouseLeave($event)">
+    <div class="flex items-center justify-center min-w-11 max-w-11 h-11 bg-body-light rounded-full">
+
+    </div>
+    <div class="w-full">
+        <p class="text-sm text-font-secondary -mb-0.5">Angemeldet als</p>
+        <p class="font-semi">{{ user?.username }}</p>
+    </div>
+    <div class="flex items-center justify-center min-w-10 max-w-10 h-10 rounded-full">
+        <span class="transition-all will-change-transform inline-flex justify-center items-center" [ngClass]="{'transform-gpu rotate-180': showOverlay}"><hero-icon [name]="'chevron-down'" [class]="'h-5 w-5'"></hero-icon></span>
+    </div>
+
+    <div #profileRef class="absolute block w-full p-2 left-0 right-0 top-0 transform-gpu -translate-y-[85%] scale-95 opacity-0 will-change-auto transition-all pointer-events-none" [ngClass]="{'pointer-events-auto select-none scale-100 opacity-100': showOverlay }">
+        <div class="bg-body rounded p-2.5 cursor-default">
+            <ul>
+                <li class="flex items-center cursor-pointer gap-4 p-2.5 transition-all bg-body-light bg-opacity-0 active:bg-opacity-80 rounded-sm" [ngClass]="{'hover:bg-opacity-50': !(screenService.$isTouch | async)}" [routerLink]="['/notifications']">
+                    <hero-icon [name]="'bell'" [class]="'h-5 w-5'"></hero-icon> 
+                    <span>Benachrichtungen</span>
+                </li>
+                <li class="flex items-center cursor-pointer gap-4 p-2.5 transition-all bg-body-light bg-opacity-0 active:bg-opacity-80 rounded-sm" [ngClass]="{'hover:bg-opacity-50': !(screenService.$isTouch | async)}" [routerLink]="['/settings']">
+                    <hero-icon [name]="'cog'" [class]="'h-5 w-5'"></hero-icon> 
+                    <span>Einstellungen</span>
+                </li>
+
+                <hr class="appearance-none border-none bg-divider h-[2px] my-2">
+
+                <li class="flex items-center cursor-pointer gap-4 p-2.5 transition-all bg-error-light bg-opacity-0 active:bg-opacity-20 rounded-sm text-error-light" [ngClass]="{'hover:bg-opacity-10': !(screenService.$isTouch | async)}" (click)="authService.logout()">
+                    <hero-icon [name]="'logout'" [class]="'h-5 w-5'"></hero-icon> 
+                    <span>Abmelden</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>

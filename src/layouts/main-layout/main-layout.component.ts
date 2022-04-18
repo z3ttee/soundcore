@@ -35,8 +35,6 @@ export class AscMainLayoutComponent implements OnInit, OnDestroy {
             } else {
                 this.isNavigating = false;
             }
-
-            console.log(this.isNavigating)
         })
     }
 

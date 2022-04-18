@@ -60,20 +60,8 @@
             </div>
         </div>
 
-        <hr class="mb-row bg-divider min-h-[3px] max-h-[3px] rounded-full appearance-none border-none w-[90%] mx-auto">
-
-        <div class="flex items-center gap-2 p-window pt-0">
-            <div class="flex items-center justify-center min-w-11 max-w-11 h-11 bg-body-light rounded-full">
-
-            </div>
-            <div class="w-full">
-                <p class="text-sm text-font-secondary -mb-0.5">Angemeldet als</p>
-                <p class="font-semi">{{ (authService.$user | async).username }}</p>
-            </div>
-            <div class="flex items-center justify-center min-w-10 max-w-10 h-10 rounded-full">
-                <hero-icon [name]="'chevron-down'" [class]="'h-5 w-5'"></hero-icon>
-            </div>
-        </div>
+        <hr class="bg-divider min-h-[3px] max-h-[3px] rounded-full appearance-none border-none w-[90%] mx-auto">
+        <app-profile-bar [user]="(authService.$user | async)"></app-profile-bar>
     </div>
 
     <!-- Page contents -->

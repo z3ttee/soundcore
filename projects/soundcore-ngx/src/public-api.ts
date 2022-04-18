@@ -58,4 +58,3 @@ export * from "./lib/components/images/artwork/artwork.component";
 // Progress
 export * from "./lib/components/progress/progressbar/progressbar.module";
 export * from "./lib/components/progress/progressbar/progressbar.component";
-
