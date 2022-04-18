@@ -38,6 +38,11 @@ export class AuthenticationService {
             } else if(event.type == KeycloakEventType.OnAuthSuccess) {
                 this.reloadSessionDetails()
                 console.log("[AUTH] User logged in.")
+            } else if(event.type == KeycloakEventType.OnTokenExpired) {
+                this.keycloakService.updateToken().catch((error) => {
+                    console.error(error);
+                    this.logout().then(() => this.keycloakService.login());
+                })             
             } else {
                 console.log(event)
             }
