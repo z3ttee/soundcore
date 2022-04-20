@@ -17,6 +17,7 @@
     "moduleResolution": "node",
     "importHelpers": true,
     "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
     "paths": {
       "soundcore-ngx": [
         "dist/soundcore-ngx/soundcore-ngx",

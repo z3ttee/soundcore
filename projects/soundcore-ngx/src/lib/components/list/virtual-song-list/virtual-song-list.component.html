@@ -1,0 +1,22 @@
+<cdk-virtual-scroll-viewport itemSize="64" class="w-full h-full" minBufferPx="450" maxBufferPx="450">
+
+    <div class="block w-full">
+        <ng-content select="[scngx-list-header]"></ng-content>
+    </div>
+
+    <div class="flex flex-col w-full" [ngClass]="{'p-window': usePadding}">
+        <ng-container *cdkVirtualFor="let item of dataSource; index as i">
+            <div class="w-full h-16">
+                <scngx-song-list-item [song]="item" [index]="i" (onContext)="emitOnContext()"></scngx-song-list-item>
+    
+                <!--<div class="w-full h-full bg-body-light" *ngIf="!item"></div>-->
+            </div>
+        </ng-container>
+    </div>
+
+    <div class="block w-full">
+        <ng-content select="[scngx-list-footer]"></ng-content>
+    </div>
+
+
+</cdk-virtual-scroll-viewport>

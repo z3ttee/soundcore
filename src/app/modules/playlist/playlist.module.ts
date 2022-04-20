@@ -5,8 +5,8 @@ import { RouterModule, Routes } from '@angular/router';
 import { Error404Module } from 'src/app/shared/error404/error404.module';
 import { HeroIconModule, play, heart, dotsVertical } from 'ng-heroicon';
 import { MatRippleModule } from '@angular/material/core';
-import { SCDurationPipeModule } from 'src/app/pipes/duration/duration-pipe.module';
-import { SCNGXSkeletonModule } from 'soundcore-ngx';
+import { ScrollingModule } from '@angular/cdk/scrolling';
+import { SCNGXSkeletonModule, SCNGXSongListItemModule, SCNGXVirtualSongListModule } from 'soundcore-ngx';
 
 const routes: Routes = [
   { path: ":playlistId", component: PlaylistInfoComponent }
@@ -17,14 +17,16 @@ const routes: Routes = [
     PlaylistInfoComponent
   ],
   imports: [
+    ScrollingModule,
     CommonModule,
     RouterModule.forChild(routes),
     Error404Module,
     HeroIconModule.withIcons({ play, heart, dotsVertical }),
     MatRippleModule,
-    SCDurationPipeModule,
-
-    SCNGXSkeletonModule
+    
+    SCNGXSkeletonModule,
+    SCNGXVirtualSongListModule,
+    SCNGXSongListItemModule
   ]
 })
 export class PlaylistModule { }

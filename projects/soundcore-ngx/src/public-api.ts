@@ -47,6 +47,13 @@ export * from "./lib/components/list/playlist-list-item/playlist-list-item.compo
 export * from "./lib/components/list/bullet-list/bullet-list.module";
 export * from "./lib/components/list/bullet-list/bullet-list.component";
 
+export * from "./lib/components/list/song-list-item/song-list-item.module";
+export * from "./lib/components/list/song-list-item/song-list-item.component";
+
+export * from "./lib/components/list/virtual-song-list/virtual-song-list.module";
+export * from "./lib/components/list/virtual-song-list/virtual-song-list.component";
+
+
 // Grids
 export * from "./lib/components/grids/vertical-grid/vertical-grid.module";
 export * from "./lib/components/grids/vertical-grid/vertical-grid.component";
@@ -58,3 +65,14 @@ export * from "./lib/components/images/artwork/artwork.component";
 // Progress
 export * from "./lib/components/progress/progressbar/progressbar.module";
 export * from "./lib/components/progress/progressbar/progressbar.component";
+
+// Badges
+export * from "./lib/components/badges/explicit-badge/explicit-badge.module";
+export * from "./lib/components/badges/explicit-badge/explicit-badge.component";
+
+
+// Pipes
+export * from "./lib/pipes/song-duration/song-duration.module";
+export * from "./lib/pipes/song-duration/song-duration.pipe";
+export * from "./lib/pipes/added-to-playlist/added-to-playlist.module";
+export * from "./lib/pipes/added-to-playlist/added-to-playlist.pipe";
