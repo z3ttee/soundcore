@@ -59,7 +59,7 @@ export class TrackListDataSource extends DataSource<Song> {
      * @returns Page number
      */
     private _getPageForIndex(index: number): number {
-      return Math.floor(index / this.options.pageSize);
+      return Math.floor(index / this.options.totalElements);
     }
   
     /**
