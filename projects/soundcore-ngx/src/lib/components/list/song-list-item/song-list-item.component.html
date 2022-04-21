@@ -1,4 +1,4 @@
-<div (contextmenu)="emitOnContext($event)" (click)="emitOnPlay($event)" class="flex flex-1 gap-1 h-16 px-1.5 w-full items-center rounded select-none cursor-pointer bg-body-light bg-opacity-0 hover:bg-opacity-30 active:bg-opacity-50">
+<div (contextmenu)="emitOnContext($event)" (click)="emitOnPlay($event)" class="row flex flex-1 gap-1 h-16 px-1.5 w-full items-center rounded select-none cursor-pointer bg-body-light bg-opacity-0 hover:bg-opacity-30 active:bg-opacity-50">
     <!-- ID -->
     <div class="relative inline-flex max-w-11 min-w-11 h-11 justify-center items-center" *ngIf="showId">
         <scngx-skeleton *ngIf="!song" [class]="'h-5 w-5 align-middle'"></scngx-skeleton>
@@ -19,7 +19,7 @@
     </div>
 
     <!-- Song title -->
-    <div class="flex w-full">
+    <div class="flex w-full overflow-hidden">
         <!-- Skeleton View -->
         <div *ngIf="!song" class="inline-flex w-full gap-2 items-center">
             <scngx-skeleton [class]="'min-w-12 max-w-12 h-12'"></scngx-skeleton>
@@ -32,15 +32,17 @@
         <!-- Actual View -->
         <div *ngIf="song" class="inline-flex w-full gap-2 items-center">
             <div class="min-w-12 max-w-12 h-12 rounded-sm overflow-hidden" *ngIf="showCover">
-                <scngx-artwork [artwork]="song?.artwork" class="w-full h-full"></scngx-artwork>
+                <scngx-artwork [artwork]="song?.artwork" class=""></scngx-artwork>
             </div>
     
             <div class="w-full">
-                <p class="line-clamp-1" [ngClass]="{'text-accent-dark drop-shadow-sm': isActive}">{{ song?.title }}</p>
+                <p class="line-clamp-1" [ngClass]="{'text-accent-dark drop-shadow-sm': isActive}">
+                    {{ song?.title }}
+                </p>
                 <div class="line-clamp-1">
-                    <ul class="flex items-center gap-2">
-                        <li *ngIf="song.explicit" scngxTooltip scngxTooltipText="Expliziter Inhalt" [scngxTooltipPosition]="'bottom'"><scngx-explicit-badge [extended]="false"></scngx-explicit-badge></li>
-                        <li *ngFor="let artist of song.artists; index as i" class="text-font text-opacity-70"><span class="text-sm hover:underline pointer-events-all cursor-pointer" [routerLink]="['/artist', artist.slug || artist.id]">{{ artist.name }}</span>{{ i + 1 < song.artists.length ? ", " : "" }}</li>
+                    <ul class="">
+                        <li *ngIf="song.explicit" class="inline"><scngx-explicit-badge [extended]="false"></scngx-explicit-badge></li>
+                        <li *ngFor="let artist of song.artists; index as i" class="inline text-font text-opacity-70"><span class="text-sm hover:underline pointer-events-all cursor-pointer" [routerLink]="['/artist', artist.slug || artist.id]">{{ artist.name }}</span>{{ i + 1 < song.artists.length ? ", " : "" }}</li>
                     </ul>
                 </div>
             </div>
@@ -65,6 +67,12 @@
 
         <span class="text-font text-opacity-70 text-sm" *ngIf="song">
             {{ (song?.playlists?.[0]?.createdAt) || song?.likedAt | scngxAddedToPlaylistPipe | async }}
+        </span>
+    </div>
+
+    <div class="like-col inline-flex justify-center items-end max-w-10 min-w-10 px-2 opacity-0 pointer-events-none transition-all" [ngClass]="{'opacity-100 pointer-events-auto': song?.liked || ($hovering | async), 'text-accent': song?.liked}">
+        <span class="w-6 h-6" matRipple [matRippleCentered]="true" [matRippleUnbounded]="true" [matRippleRadius]="20" (click)="emitOnLike($event)">
+            <hero-icon [name]="'heart'" type="outline" [class]="'w-6 h-6 ' + (song?.liked ? 'fill-accent' : '')"></hero-icon>
         </span>
     </div>
     

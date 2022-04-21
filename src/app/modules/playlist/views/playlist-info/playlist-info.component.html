@@ -2,7 +2,7 @@
 
 <section *ngIf="!showError404" class="h-full border">
 
-    <scngx-virtual-song-list [dataSource]="tracks">
+    <scngx-virtual-song-list *ngIf="tracks" [dataSource]="tracks">
 
         <div scngx-list-header>
             <div class="flex items-end w-full p-window">

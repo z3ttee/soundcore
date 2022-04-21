@@ -76,3 +76,6 @@ export * from "./lib/pipes/song-duration/song-duration.module";
 export * from "./lib/pipes/song-duration/song-duration.pipe";
 export * from "./lib/pipes/added-to-playlist/added-to-playlist.module";
 export * from "./lib/pipes/added-to-playlist/added-to-playlist.pipe";
+
+// Datasource
+export * from "./lib/utils/datasource/track-list.datasource";

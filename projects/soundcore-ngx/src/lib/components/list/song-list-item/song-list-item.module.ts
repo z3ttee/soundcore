@@ -10,6 +10,7 @@ import { RouterModule } from '@angular/router';
 import { SCNGXExplicitBadgeModule } from "../../badges/explicit-badge/explicit-badge.module"
 import { SCNGXTooltipModule } from '../../../ui/tooltip/tooltip.module';
 import { SCNGXSkeletonModule } from '../../skeletons/skeleton/skeleton.module';
+import { HeroIconModule, heart } from 'ng-heroicon';
 
 @NgModule({
   declarations: [
@@ -19,6 +20,7 @@ import { SCNGXSkeletonModule } from '../../skeletons/skeleton/skeleton.module';
     CommonModule,
     RouterModule,
     LottieModule,
+    HeroIconModule.withIcons({ heart }),
 
     MatRippleModule,
 

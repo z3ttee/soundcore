@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { AnimationOptions } from 'ngx-lottie';
-import { Subject } from 'rxjs';
+import { BehaviorSubject, combineLatest, fromEvent, map, Observable, Subject, takeUntil, tap } from 'rxjs';
 import { Song } from 'soundcore-sdk';
 import audio_wave_anim from "../../../assets/lottie/audio_wave.json"
 import { SCNGXScreenService } from '../../../services/screen/screen.service';
@@ -33,6 +33,10 @@ export class SCNGXSongListItemComponent implements OnInit, OnDestroy {
 
   @Output() public onContext: EventEmitter<Song> = new EventEmitter();
   @Output() public onPlay: EventEmitter<Song> = new EventEmitter();
+  @Output() public onLike: EventEmitter<Song> = new EventEmitter();
+
+  private _hoverSubject: BehaviorSubject<boolean> = new BehaviorSubject(false);
+  public $hovering: Observable<boolean> = this._hoverSubject.asObservable().pipe(takeUntil(this._destroy));
 
   // Lottie animations options
   public animOptions: AnimationOptions = {
@@ -42,7 +46,13 @@ export class SCNGXSongListItemComponent implements OnInit, OnDestroy {
   }
 
   public ngOnInit(): void {
-    console.log(this.elementRef)
+    fromEvent(this.elementRef.nativeElement, "mouseenter").pipe(takeUntil(this._destroy)).subscribe((event) => {
+      this._hoverSubject.next(true);
+    })
+
+    fromEvent(this.elementRef.nativeElement, "mouseleave").pipe(takeUntil(this._destroy)).subscribe((event) => {
+      this._hoverSubject.next(false);
+    })
   }
 
   public ngOnDestroy(): void {
@@ -67,6 +77,14 @@ export class SCNGXSongListItemComponent implements OnInit, OnDestroy {
     }
 
     this.onPlay.emit(this.song);
+  }
+
+  public emitOnLike(event: MouseEvent) {
+    if(this.onLike.observed) {
+      this.cancelEvent(event);
+    }
+    
+    this.onLike.emit(this.song);
   }
 
   private cancelEvent(event: Event) {
