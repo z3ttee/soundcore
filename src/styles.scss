@@ -66,12 +66,12 @@ h6 {
 */
 /* width */
 ::-webkit-scrollbar {
-    @apply h-1 w-1;
+    @apply w-3;
 }
   
 /* Handle */
 ::-webkit-scrollbar-thumb {
-    @apply bg-body-light rounded-full;
+    @apply bg-body-light rounded;
 }
 
 ::-webkit-scrollbar-track {
