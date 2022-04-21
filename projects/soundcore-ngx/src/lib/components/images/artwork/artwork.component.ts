@@ -43,11 +43,6 @@ export class SCNGXArtworkComponent implements OnInit, AfterViewInit, OnChanges {
     this.canShow = true;
   }
 
-  public onLoadStart() {
-    this.isLoading = true;
-    this.canShow = false;
-  }
-
   private init(artwork: Artwork) {
     firstValueFrom(this.artworkService.buildArtworkURL(artwork)).then((url: string) => {
       this._srcSubject.next(url);
