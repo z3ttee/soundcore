@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, ElementRef, Input, OnChanges, OnInit, SimpleChanges, ViewChild } from '@angular/core';
-import { firstValueFrom } from 'rxjs';
+import { BehaviorSubject, firstValueFrom, Observable } from 'rxjs';
 import { Artwork, SCDKArtworkService } from 'soundcore-sdk';
 
 @Component({
@@ -13,7 +13,8 @@ export class SCNGXArtworkComponent implements OnInit, AfterViewInit, OnChanges {
 
   @ViewChild("image") public imageRef: ElementRef<HTMLImageElement>;
 
-  public src: string;
+  private _srcSubject: BehaviorSubject<string> = new BehaviorSubject("");
+  public $src: Observable<string> = this._srcSubject.asObservable();
   public isLoading: boolean = false;
   public canShow: boolean = false;
 
@@ -34,7 +35,7 @@ export class SCNGXArtworkComponent implements OnInit, AfterViewInit, OnChanges {
   public onError() {
     this.isLoading = false;
     this.canShow = false;
-    this.src = "assets/img/missing_cover.png";
+    this._srcSubject.next("assets/img/missing_cover.png");
   }
 
   public onLoad() {
@@ -48,10 +49,8 @@ export class SCNGXArtworkComponent implements OnInit, AfterViewInit, OnChanges {
   }
 
   private init(artwork: Artwork) {
-    // console.log(artwork)
     firstValueFrom(this.artworkService.buildArtworkURL(artwork)).then((url: string) => {
-      this.src = url;
-      console.log(url);
+      this._srcSubject.next(url);
     })
   }
 
