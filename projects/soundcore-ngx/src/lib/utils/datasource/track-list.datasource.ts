@@ -1,7 +1,7 @@
 import { CollectionViewer, DataSource } from "@angular/cdk/collections";
 import { HttpClient } from "@angular/common/http";
 import { BehaviorSubject, firstValueFrom, Observable, of, Subscription } from "rxjs";
-import { Page, PlaylistItem, Song } from "soundcore-sdk";
+import { Page, Pageable, PlaylistItem, Song } from "soundcore-sdk";
 
 export interface TrackListDataSourceOptions {
   type: TrackListType;
@@ -67,7 +67,6 @@ export class TrackListDataSource extends DataSource<Song> {
      * @param pageNr Page to fetch
      */
     private _fetchPage(pageNr: number) {
-      console.log("start fetching")
       firstValueFrom(this.findInitialTrackList()).then(() => {
         // Check if page was already fetched.
         if (this._fetchedPages.has(pageNr)) {
@@ -75,7 +74,10 @@ export class TrackListDataSource extends DataSource<Song> {
           return;
         }
 
-        firstValueFrom(this.httpClient.get<Page<Song>>(`${this.options.apiBaseUri}/v1/songs/${this.options.type}/${this.options.resourceId}`)).then((page) => {
+        const pageable: Pageable = { page: pageNr, size: this.options.pageSize }
+        console.log("fetching next page: ", pageable)
+
+        firstValueFrom(this.httpClient.get<Page<Song>>(`${this.options.apiBaseUri}/v1/songs/${this.options.type}/${this.options.resourceId}${Pageable.toQuery(pageable)}`)).then((page) => {
             // Add page to the fetchedPages list.
             // Only on success, because if it fails it can be refetched next time.
             this._fetchedPages.add(pageNr);
