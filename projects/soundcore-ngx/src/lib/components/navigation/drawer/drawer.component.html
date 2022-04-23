@@ -3,14 +3,6 @@
         <div class="inline-block w-full h-full">
             <ng-content select="[scngx-drawer]"></ng-content>
         </div>
-
-        <!--<div class="flex justify-center absolute top-0 right-0 pl-window transform-gpu translate-x-1/2 h-full" (mouseenter)="showToggler()" (mouseleave)="hideToggler()" (mousemove)="moveToggler($event)">
-            <div #toggler class="absolute opacity-0 top-0 left-1/2 transform-gpu -translate-x-1/2 -translate-y-1/2 inline-block pl-window pt-window rounded-sm shadow-md bg-body-light pointer-events-auto cursor-pointer transition-opacity" (click)="toggleRail($event)">
-                <span class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full flex items-center justify-center" [ngClass]="{'transform-gpu rotate-180 will-change-auto': !rail}">              
-                    <hero-icon [name]="'chevron-right'" [class]="'h-5 w-5 text-font'" ></hero-icon>  
-                </span>
-            </div>
-        </div>-->
     </div>
 
     <div class="w-full h-full relative overflow-hidden">
