@@ -1,5 +1,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { AdminLayoutComponent } from 'src/layouts/admin-layout/admin-layout.component';
+import { AdminLayoutModule } from 'src/layouts/admin-layout/admin-layout.module';
 import { AscMainLayoutComponent } from 'src/layouts/main-layout/main-layout.component';
 import { AscMainLayoutModule } from 'src/layouts/main-layout/main-layout.module';
 import { KeycloakSSOGuard } from 'src/sso/guards/keycloak.guard';
@@ -7,6 +9,9 @@ import { Error404Component } from './shared/error404/error404.component';
 import { Error404Module } from './shared/error404/error404.module';
 
 const routes: Routes = [
+  { path: "admin", component: AdminLayoutComponent, canActivate: [ KeycloakSSOGuard ], children: [
+    { path: "**", component: Error404Component }
+  ]},
   { path: "", component: AscMainLayoutComponent, canActivate: [KeycloakSSOGuard], children: [
     { path: "", canActivate: [KeycloakSSOGuard], loadChildren: () => import("./modules/home/home.module").then((m) => m.HomeModule) },
     { path: "playlist", canActivate: [KeycloakSSOGuard], loadChildren: () => import("./modules/playlist/playlist.module").then((m) => m.PlaylistModule) },
@@ -25,6 +30,7 @@ const routes: Routes = [
   imports: [
     RouterModule.forRoot(routes),
     AscMainLayoutModule,
+    AdminLayoutModule,
     Error404Module
   ],
   exports: [

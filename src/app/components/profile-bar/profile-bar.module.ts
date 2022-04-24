@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ProfileBarComponent } from './profile-bar.component';
-import { chevronDown, HeroIconModule, cog, bell, logout } from 'ng-heroicon';
+import { chevronDown, HeroIconModule, cog, bell, logout, shieldExclamation } from 'ng-heroicon';
 import { SCNGXNavListItemModule, SCNGXScreenModule } from 'soundcore-ngx';
 import { RouterModule } from '@angular/router';
 
@@ -12,7 +12,7 @@ import { RouterModule } from '@angular/router';
   imports: [
     CommonModule,
     RouterModule,
-    HeroIconModule.withIcons({ chevronDown, cog, bell, logout }, { defaultHostDisplay: 'inlineBlock', attachDefaultDimensionsIfNoneFound: true }),
+    HeroIconModule.withIcons({ chevronDown, cog, bell, logout, shieldExclamation }, { defaultHostDisplay: 'inlineBlock', attachDefaultDimensionsIfNoneFound: true }),
     SCNGXNavListItemModule,
     SCNGXScreenModule
   ],
