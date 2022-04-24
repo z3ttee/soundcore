@@ -4,10 +4,17 @@
 export * from "./lib/scdk.module";
 
 /**
+ * Export all artist sdk parts
+ */
+export * from "./lib/artist/artist.module";
+export * from "./lib/artist/services/artist.service";
+export * from "./lib/artist/entities/artist.entity";
+
+/**
  * Export all user sdk parts
  */
- export * from "./lib/user/user.module";
- export * from "./lib/user/entities/user.entity";
+export * from "./lib/user/user.module";
+export * from "./lib/user/entities/user.entity";
 
 
 /**

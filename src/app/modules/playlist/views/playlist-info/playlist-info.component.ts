@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Subject, Subscription, takeUntil } from 'rxjs';
-import { TrackListDataSource } from 'soundcore-ngx';
+import { SCNGXSongColConfig, TrackListDataSource } from 'soundcore-ngx';
 import { Playlist, SCDKPlaylistService } from 'soundcore-sdk';
 import { environment } from 'src/environments/environment';
 
@@ -20,6 +20,14 @@ export class PlaylistInfoComponent implements OnInit, OnDestroy {
   public isLoadingPlaylist: boolean = false;
   public playlist: Playlist;
   public tracks: TrackListDataSource;
+
+  public columns: SCNGXSongColConfig = {
+    id: { enabled: true, collapseAt: 380 },
+    cover: { enabled: true },
+    album: { enabled: true, collapseAt: 560 },
+    date: { enabled: true, collapseAt: 900 },
+    duration: { enabled: true, collapseAt: 0 }
+  }
 
   constructor(
     private readonly httpClient: HttpClient,

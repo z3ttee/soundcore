@@ -1,9 +1,23 @@
-import { ChangeDetectionStrategy, Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, EventEmitter, Input, NgZone, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { AnimationOptions } from 'ngx-lottie';
-import { BehaviorSubject, combineLatest, fromEvent, map, Observable, Subject, takeUntil, tap } from 'rxjs';
+import { BehaviorSubject, fromEvent, Observable, Subject, takeUntil } from 'rxjs';
 import { Song } from 'soundcore-sdk';
 import audio_wave_anim from "../../../assets/lottie/audio_wave.json"
 import { SCNGXScreenService } from '../../../services/screen/screen.service';
+
+export class SCNGXSongCol {
+  public enabled: boolean = true;
+  public collapseAt?: number = 0;
+}
+
+export class SCNGXSongColConfig {
+  public id?: SCNGXSongCol = new SCNGXSongCol();
+  public cover?: SCNGXSongCol = new SCNGXSongCol();
+  public count?: SCNGXSongCol = new SCNGXSongCol();
+  public album?: SCNGXSongCol = new SCNGXSongCol();
+  public date?: SCNGXSongCol = new SCNGXSongCol();
+  public duration?: SCNGXSongCol = new SCNGXSongCol();
+}
 
 @Component({
   selector: 'scngx-song-list-item',
@@ -11,32 +25,40 @@ import { SCNGXScreenService } from '../../../services/screen/screen.service';
   styleUrls: ['./song-list-item.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class SCNGXSongListItemComponent implements OnInit, OnDestroy {
+export class SCNGXSongListItemComponent implements OnInit, OnDestroy, AfterViewInit {
 
   constructor(
     private readonly screenService: SCNGXScreenService,
-    private readonly elementRef: ElementRef
+    private readonly elementRef: ElementRef,
+    private readonly zone: NgZone
   ) { }
 
-  private _destroy: Subject<void> = new Subject();
+  private $destroy: Subject<void> = new Subject();
+  private resizeObserver: ResizeObserver;
 
   @Input() public song: Song;
   @Input() public index: number;
   @Input() public isActive: boolean = false;
   @Input() public isPaused: boolean = false;
 
-  @Input() public showId: boolean = true;
-  @Input() public showCover: boolean = true;
-  @Input() public showCount: boolean = true;
-  @Input() public showAlbum: boolean = true;
-  @Input() public showDate: boolean = true;
+  @Input() public columns: SCNGXSongColConfig = new SCNGXSongColConfig();
 
   @Output() public onContext: EventEmitter<Song> = new EventEmitter();
   @Output() public onPlay: EventEmitter<Song> = new EventEmitter();
   @Output() public onLike: EventEmitter<Song> = new EventEmitter();
 
+  @ViewChild("container") public containerRef: ElementRef<HTMLDivElement>;
+
   private _hoverSubject: BehaviorSubject<boolean> = new BehaviorSubject(false);
-  public $hovering: Observable<boolean> = this._hoverSubject.asObservable().pipe(takeUntil(this._destroy));
+  public $hovering: Observable<boolean> = this._hoverSubject.asObservable().pipe(takeUntil(this.$destroy));
+  public $isTouch: Observable<boolean> = this.screenService.$isTouch.pipe(takeUntil(this.$destroy))
+
+  public $showId: BehaviorSubject<boolean> = new BehaviorSubject(true);
+  public $showCover: BehaviorSubject<boolean> = new BehaviorSubject(true);
+  public $showCount: BehaviorSubject<boolean> = new BehaviorSubject(true);
+  public $showAlbum: BehaviorSubject<boolean> = new BehaviorSubject(true);
+  public $showDate: BehaviorSubject<boolean> = new BehaviorSubject(true);
+  public $showDuration: BehaviorSubject<boolean> = new BehaviorSubject(true);
 
   // Lottie animations options
   public animOptions: AnimationOptions = {
@@ -46,21 +68,53 @@ export class SCNGXSongListItemComponent implements OnInit, OnDestroy {
   }
 
   public ngOnInit(): void {
-    fromEvent(this.elementRef.nativeElement, "mouseenter").pipe(takeUntil(this._destroy)).subscribe((event) => {
+    fromEvent(this.elementRef.nativeElement, "mouseenter").pipe(takeUntil(this.$destroy)).subscribe((event) => {
       this._hoverSubject.next(true);
     })
 
-    fromEvent(this.elementRef.nativeElement, "mouseleave").pipe(takeUntil(this._destroy)).subscribe((event) => {
+    fromEvent(this.elementRef.nativeElement, "mouseleave").pipe(takeUntil(this.$destroy)).subscribe((event) => {
       this._hoverSubject.next(false);
     })
+    
+    this.$showId.next(this.columns.id?.enabled);
+    this.$showCover.next(this.columns.count?.enabled);
+    this.$showCount.next(this.columns.count?.enabled);
+    this.$showAlbum.next(this.columns.album?.enabled);
+    this.$showDate.next(this.columns.date?.enabled);
+    this.$showDuration.next(this.columns.duration?.enabled);
+  }
+
+  public ngAfterViewInit(): void {
+    this.resizeObserver = new ResizeObserver((entries, observer) => {
+      this.zone.run(() => this.onResize(entries, observer))
+    })
+
+    this.resizeObserver.observe(this.containerRef.nativeElement, { box: "border-box" })
   }
 
   public ngOnDestroy(): void {
-      this._destroy.next();
-      this._destroy.complete();
+      this.$destroy.next();
+      this.$destroy.complete();
 
       this.onContext.complete();
       this.onPlay.complete();
+
+      this.resizeObserver.disconnect();
+      this.resizeObserver = null;
+  }
+
+  private onResize(entries: ResizeObserverEntry[], observer: ResizeObserver) {
+    const containerWidth = this.containerRef.nativeElement.getBoundingClientRect().width;
+    console.log(containerWidth)
+
+    for(const entry of entries) {
+      this.$showId.next((this.columns.id?.collapseAt || 0) < containerWidth && this.columns.id?.enabled)
+      this.$showCover.next((this.columns.cover?.collapseAt || 0) < containerWidth && this.columns.cover?.enabled)
+      this.$showCount.next((this.columns.count?.collapseAt || 0) < containerWidth && this.columns.count?.enabled)
+      this.$showAlbum.next((this.columns.album?.collapseAt || 0) < containerWidth && this.columns.album?.enabled)
+      this.$showDate.next((this.columns.date?.collapseAt || 0) < containerWidth && this.columns.date?.enabled)
+      this.$showDuration.next((this.columns.duration?.collapseAt || 0) < containerWidth && this.columns.date?.enabled)
+    }
   }
 
   public emitOnContext(event: MouseEvent) {

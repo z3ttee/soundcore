@@ -4,9 +4,7 @@ import { Observable, of } from "rxjs";
 import { SCDKOptions, SCDK_OPTIONS } from "../../scdk.module";
 import { Artist } from "../entities/artist.entity";
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable()
 export class SCDKArtistService {
 
   constructor(

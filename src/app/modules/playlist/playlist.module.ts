@@ -7,6 +7,7 @@ import { HeroIconModule, play, heart, dotsVertical } from 'ng-heroicon';
 import { MatRippleModule } from '@angular/material/core';
 import { ScrollingModule } from '@angular/cdk/scrolling';
 import { SCNGXSkeletonModule, SCNGXSongListItemModule, SCNGXVirtualSongListModule } from 'soundcore-ngx';
+import { ListViewModule } from 'src/app/components/resource-views/list-view/list-view.module';
 
 const routes: Routes = [
   { path: ":playlistId", component: PlaylistInfoComponent }
@@ -23,6 +24,8 @@ const routes: Routes = [
     Error404Module,
     HeroIconModule.withIcons({ play, heart, dotsVertical }),
     MatRippleModule,
+
+    ListViewModule,
     
     SCNGXSkeletonModule,
     SCNGXVirtualSongListModule,

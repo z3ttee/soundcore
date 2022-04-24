@@ -1,0 +1,30 @@
+<div class="block w-full">
+    <div class="block items-end w-full" [ngClass]="{'flex': !($isTouch | async)}">
+
+        <!-- Playlist Cover -->
+        <div class="block min-w-52 max-w-52 mx-auto aspect-square rounded overflow-hidden" [ngClass]="{'block min-w-60 max-w-60 border': ($isTouch | async)}">
+            <scngx-skeleton *ngIf="isLoading" [class]="'w-full h-full rounded'"></scngx-skeleton>
+            <div *ngIf="!isLoading" class="w-full h-full bg-body-light rounded"></div>
+        </div>
+
+        <!-- Playlist Title -->
+        <div class="block w-full p-4" [ngClass]="{'px-0 ': ($isTouch | async)}">
+            <scngx-skeleton *ngIf="isLoading" [class]="'h-12 w-4/5 max-w-96'"></scngx-skeleton>
+
+            <h3 *ngIf="!isLoading" [ngClass]="{'text-xl': ($isTouch | async)}">
+                {{ title }}
+            </h3>
+
+            <!-- Playlist Stats -->
+            <ul class="flex items-center w-full mt-2 gap-4">
+                <scngx-skeleton *ngIf="isLoading" [class]="'h-5 w-1/4'"></scngx-skeleton>
+                <ng-content *ngIf="!isLoading" select="[scngx-stats]"></ng-content>
+            </ul>
+        </div>
+    </div>
+
+    <div class="flex flex-row items-center w-full gap-2 py-row">
+        <scngx-skeleton *ngIf="isLoading" [class]="'h-12 w-56'"></scngx-skeleton>
+        <ng-content *ngIf="!isLoading" select="[scngx-controls]"></ng-content>
+    </div>
+</div>

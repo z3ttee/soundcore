@@ -1,6 +1,7 @@
-<div (contextmenu)="emitOnContext($event)" (click)="emitOnPlay($event)" class="row flex flex-1 gap-1 h-16 px-1.5 w-full items-center rounded select-none cursor-pointer bg-body-light bg-opacity-0 hover:bg-opacity-30 active:bg-opacity-50">
+<div #container (contextmenu)="emitOnContext($event)" (click)="emitOnPlay($event)" class="flex flex-1 gap-1 h-16 px-1.5 w-full overflow-x-hidden items-center rounded select-none cursor-pointer bg-body-light bg-opacity-0 hover:bg-opacity-30 active:bg-opacity-50">
+    
     <!-- ID -->
-    <div class="relative inline-flex max-w-11 min-w-11 h-11 justify-center items-center" *ngIf="showId">
+    <div class="relative inline-flex max-w-11 min-w-11 h-11 justify-center items-center border" *ngIf="($showId | async)">
         <scngx-skeleton *ngIf="!song" [class]="'h-5 w-5 align-middle'"></scngx-skeleton>
 
         <div class="flex justify-center items-center w-full h-full relative" *ngIf="song" >
@@ -10,7 +11,7 @@
                 <ng-lottie [options]="animOptions" class="aspect-square"></ng-lottie>
             </div>
 
-            <!--<div class="play-btn z-10 transition-all transform-gpu absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 will-change-transform rounded-full bg-accent-dark shadow-lg text-background w-7 h-7 overflow-hidden flex justify-center items-center" (click)="emitOnPlay($event)">
+            <!--<div class="z-10 transition-all transform-gpu absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 will-change-transform rounded-full bg-accent-dark shadow-lg text-background w-7 h-7 overflow-hidden flex justify-center items-center" (click)="emitOnPlay($event)">
                 <i class="fa-solid fa-play text-xxs" *ngIf="!isActive"></i>
                 <i class="fa-solid fa-play text-xxs" *ngIf="isPaused && isActive"></i>
                 <i class="fa-solid fa-pause text-xxs" *ngIf="!isPaused && isActive"></i>
@@ -19,7 +20,7 @@
     </div>
 
     <!-- Song title -->
-    <div class="flex w-full overflow-hidden">
+    <div class="flex w-full overflow-hidden border">
         <!-- Skeleton View -->
         <div *ngIf="!song" class="inline-flex w-full gap-2 items-center">
             <scngx-skeleton [class]="'min-w-12 max-w-12 h-12'"></scngx-skeleton>
@@ -30,8 +31,8 @@
         </div>
 
         <!-- Actual View -->
-        <div *ngIf="song" class="inline-flex w-full gap-2 items-center">
-            <div class="min-w-12 max-w-12 h-12 rounded-sm overflow-hidden" *ngIf="showCover">
+        <div *ngIf="song" class="inline-flex w-full gap-2 items-center border">
+            <div class="min-w-12 max-w-12 h-12 rounded-sm overflow-hidden" *ngIf="($showCover | async)">
                 <scngx-artwork [artwork]="song?.artwork" class=""></scngx-artwork>
             </div>
     
@@ -41,7 +42,7 @@
                 </p>
                 <div class="line-clamp-1">
                     <ul class="">
-                        <li *ngIf="song.explicit" class="inline"><scngx-explicit-badge [extended]="false"></scngx-explicit-badge></li>
+                        <li *ngIf="song.explicit" class="inline mr-2"><scngx-explicit-badge [extended]="false"></scngx-explicit-badge></li>
                         <li *ngFor="let artist of song.artists; index as i" class="inline text-font text-opacity-70"><span class="text-sm hover:underline pointer-events-all cursor-pointer" [routerLink]="['/artist', artist.slug || artist.id]">{{ artist.name }}</span>{{ i + 1 < song.artists.length ? ", " : "" }}</li>
                     </ul>
                 </div>
@@ -50,19 +51,19 @@
     </div>
 
     <!-- Stream count -->
-    <div class="max-w-44 min-w-44 px-2 text-right text-sm text-font text-opacity-70" *ngIf="showCount">
+    <div class="max-w-44 min-w-44 px-2 text-right text-sm text-font text-opacity-70 border" *ngIf="($showCount | async)">
         <scngx-skeleton *ngIf="!song" [class]="'h-5 w-full'"></scngx-skeleton>
         <span *ngIf="song" class="text-inherit text-sm">{{ song?.streamCount || 0 }}</span>
     </div>
 
     <!-- Song album -->
-    <div class="max-w-44 min-w-44 px-2 text-right line-clamp-1 text-font text-opacity-70" *ngIf="showAlbum">
+    <div class="max-w-44 min-w-44 px-2 text-right line-clamp-1 text-font text-opacity-70 border" *ngIf="($showAlbum | async)">
         <scngx-skeleton *ngIf="!song" [class]="'h-5 w-full'"></scngx-skeleton>
         <span [routerLink]="['/album', song?.albums?.[0]?.slug || song?.albums?.[0]?.id]" class="text-sm text-font text-opacity-70 hover:underline cursor-pointer">{{ song?.albums?.[0]?.title }}</span>
     </div>
 
     <!-- Date added to playlist -->
-    <div class="max-w-44 min-w-44 px-2 text-right" *ngIf="showDate">
+    <div class="max-w-44 min-w-44 px-2 text-right border" *ngIf="($showDate | async)">
         <scngx-skeleton *ngIf="!song" [class]="'h-5 w-full'"></scngx-skeleton>
 
         <span class="text-font text-opacity-70 text-sm" *ngIf="song">
@@ -70,20 +71,21 @@
         </span>
     </div>
 
-    <div class="like-col inline-flex justify-center items-end max-w-10 min-w-10 px-2 opacity-0 pointer-events-none transition-all" [ngClass]="{'opacity-100 pointer-events-auto': song?.liked || ($hovering | async), 'text-accent': song?.liked}">
+    <!-- Like Col -->
+    <div class="inline-flex justify-center items-end max-w-10 min-w-10 px-2 opacity-0 pointer-events-none transition-all border" [ngClass]="{'opacity-100 pointer-events-auto': song?.liked || ($hovering | async) || ($isTouch | async), 'text-accent': song?.liked}">
         <span class="w-6 h-6" matRipple [matRippleCentered]="true" [matRippleUnbounded]="true" [matRippleRadius]="20" (click)="emitOnLike($event)">
             <hero-icon [name]="'heart'" type="outline" [class]="'w-6 h-6 ' + (song?.liked ? 'fill-accent' : '')"></hero-icon>
         </span>
     </div>
     
     <!-- Duration -->
-    <div class="max-w-14 min-w-14 px-2 text-right hidden sm:block">
+    <div class="max-w-14 min-w-14 px-2 text-right hidden sm:block border" *ngIf="($showDuration | async)"> 
         <scngx-skeleton *ngIf="!song" [class]="'h-5 w-full'"></scngx-skeleton>
         <span *ngIf="song" class="text-sm text-font text-opacity-70">{{ song?.duration | scngxSongDurationPipe }}</span>
     </div>
 
     <!-- Menu column -->
-    <div class="max-w-6 min-w-6 block md:hidden">
+    <div class="max-w-6 min-w-6 border" [ngClass]="{'hidden': !($isTouch | async)}">
         <button class="block w-full text-center" matRipple [matRippleRadius]="15" [matRippleCentered]="true" [matRippleUnbounded]="true" (click)="emitOnContext($event)"><i class="fa-solid fa-ellipsis-vertical"></i></button>
     </div>
 </div>

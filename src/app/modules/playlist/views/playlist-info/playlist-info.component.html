@@ -1,130 +1,44 @@
 <app-error404 *ngIf="showError404" [title]="'Playlist nicht gefunden'"></app-error404>
 
-<section *ngIf="!showError404" class="h-full border">
 
-    <scngx-virtual-song-list *ngIf="tracks" [dataSource]="tracks">
+<scngx-virtual-song-list *ngIf="!showError404 && tracks" [dataSource]="tracks" [columns]="columns">
+    <ng-container scngx-list-header>
 
-        <div scngx-list-header>
-            <div class="flex items-end w-full p-window">
+        <div class="px-window pt-window">
+            <!-- Playlist title section -->
+            <app-list-view [title]="playlist?.title" [isLoading]="isLoadingPlaylist" [artwork]="playlist?.artwork">
+                <ng-container scngx-stats>
+                    <li class="text-font-secondary">
+                        <span *ngIf="playlist?.author">by {{ playlist?.author?.username }}</span>
+                    </li>
+                    <li class="text-font-secondary">
+                        <span>{{ playlist?.songsCount }} {{ playlist?.songsCount != 1 ? 'Songs' : 'Song' }}</span>
+                    </li>
+                    <li class="text-font-secondary">
+                        <span>{{ playlist?.totalDuration | scngxSongDurationPipe }} min</span>
+                    </li>
+                </ng-container>
 
-                <!-- Playlist Cover -->
-                <div class="block min-w-52 max-w-52 aspect-square rounded overflow-hidden">
-                    <scngx-skeleton *ngIf="isLoadingPlaylist" [class]="'w-52 aspect-square rounded'"></scngx-skeleton>
-                    <div *ngIf="!isLoadingPlaylist" class="block w-52 aspect-square bg-body-light rounded"></div>
-                </div>
-    
-                <!-- Playlist Title -->
-                <div class="block w-full p-4">
-                    <scngx-skeleton *ngIf="isLoadingPlaylist" [class]="'h-12 w-4/5 max-w-96'"></scngx-skeleton>
-    
-                    <h3 *ngIf="!isLoadingPlaylist">
-                        {{ playlist?.title }}
-                    </h3>
-    
-                    <!-- Playlist Stats -->
-                    <ul class="flex items-center w-full mt-2 gap-4">
-                        <li class="text-font-secondary">
-                            <scngx-skeleton *ngIf="isLoadingPlaylist" [class]="'h-5 w-32'"></scngx-skeleton>
-                            <span *ngIf="playlist?.author && !isLoadingPlaylist">by {{ playlist?.author?.username }}</span>
-                        </li>
-                        <li class="text-font-secondary">
-                            <scngx-skeleton *ngIf="isLoadingPlaylist" [class]="'h-5 w-24'"></scngx-skeleton>
-                            <span *ngIf="!isLoadingPlaylist">{{ playlist?.songsCount }} {{ playlist?.songsCount != 1 ? 'Songs' : 'Song' }}</span>
-                        </li>
-                        <li class="text-font-secondary">
-                            <scngx-skeleton *ngIf="isLoadingPlaylist" [class]="'h-5 w-14'"></scngx-skeleton>
-                            <span *ngIf="!isLoadingPlaylist">{{ playlist?.totalDuration | scngxSongDurationPipe }} min</span>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-    
-            <!-- Playlist Controls -->
-            <div class="py-row px-window">
-                <scngx-skeleton *ngIf="isLoadingPlaylist" [class]="'h-12 w-56'"></scngx-skeleton>
-    
-                <div *ngIf="!isLoadingPlaylist" class="flex items-center w-full gap-2">
+                <!-- Playlist Controls -->
+                <ng-container scngx-controls>
                     <button class="w-14 flex items-center justify-center aspect-square bg-accent transition-all will-change-transform text-body rounded-full hover:scale-105 active:scale-[97%]">
+                        <img class="w-7 h-7 text-body ml-0.5" src="assets/icons/play.svg">
                     </button>
-    
+
                     <button class="flex items-center p-2 rounded-full" matRipple [matRippleCentered]="true">
                         <hero-icon [name]="'heart'" [class]="'h-7 aspect-square'"></hero-icon>
                     </button>
-    
+
                     <button class="flex items-center p-2 rounded-full" matRipple [matRippleCentered]="true">
                         <hero-icon [name]="'dots-vertical'" [class]="'h-7 aspect-square'"></hero-icon>
                     </button>
-                </div>
-            </div>
+                </ng-container>
+            </app-list-view>
         </div>
+    </ng-container>
 
-
-        <div scngx-list-footer>
-            <h6>Weitere Songs</h6>
-        </div>
-    </scngx-virtual-song-list>
-
-    <!--<cdk-virtual-scroll-viewport itemSize="56" class="w-full border h-full" minBufferPx="450" maxBufferPx="450">
-
-        <div class="flex items-end w-full p-window border-2 border-red-400">
-
-            <div class="block min-w-52 max-w-52 aspect-square rounded overflow-hidden">
-                <scngx-skeleton *ngIf="isLoadingPlaylist" [class]="'w-52 aspect-square rounded'"></scngx-skeleton>
-                <div *ngIf="!isLoadingPlaylist" class="block w-52 aspect-square bg-body-light rounded"></div>
-            </div>
-
-            <div class="block w-full p-4">
-                <scngx-skeleton *ngIf="isLoadingPlaylist" [class]="'h-12 w-4/5 max-w-96'"></scngx-skeleton>
-
-                <h3 *ngIf="!isLoadingPlaylist">
-                    {{ playlist?.title }}
-                </h3>
-
-                <ul class="flex items-center w-full mt-2 gap-4">
-                    <li class="text-font-secondary">
-                        <scngx-skeleton *ngIf="isLoadingPlaylist" [class]="'h-5 w-32'"></scngx-skeleton>
-                        <span *ngIf="playlist?.author && !isLoadingPlaylist">by {{ playlist?.author?.username }}</span>
-                    </li>
-                    <li class="text-font-secondary">
-                        <scngx-skeleton *ngIf="isLoadingPlaylist" [class]="'h-5 w-24'"></scngx-skeleton>
-                        <span *ngIf="!isLoadingPlaylist">{{ playlist?.songsCount }} {{ playlist?.songsCount != 1 ? 'Songs' : 'Song' }}</span>
-                    </li>
-                    <li class="text-font-secondary">
-                        <scngx-skeleton *ngIf="isLoadingPlaylist" [class]="'h-5 w-14'"></scngx-skeleton>
-                        <span *ngIf="!isLoadingPlaylist">{{ playlist?.totalDuration | durationPipe }} min</span>
-                    </li>
-                </ul>
-            </div>
-        </div>
-
-        <div class="py-row px-window border-2 border-red-400">
-            <scngx-skeleton *ngIf="isLoadingPlaylist" [class]="'h-12 w-56'"></scngx-skeleton>
-
-            <div *ngIf="!isLoadingPlaylist" class="flex items-center w-full gap-2">
-                <button class="w-14 flex items-center justify-center aspect-square bg-accent transition-all will-change-transform text-body rounded-full hover:scale-105 active:scale-[97%]">
-                </button>
-
-                <button class="flex items-center p-2 rounded-full" matRipple [matRippleCentered]="true">
-                    <hero-icon [name]="'heart'" [class]="'h-7 aspect-square'"></hero-icon>
-                </button>
-
-                <button class="flex items-center p-2 rounded-full" matRipple [matRippleCentered]="true">
-                    <hero-icon [name]="'dots-vertical'" [class]="'h-7 aspect-square'"></hero-icon>
-                </button>
-            </div>
-        </div>
-
-        <div class="block w-full border h-full p-row">
-            <ng-container *cdkVirtualFor="let item of tracks">
-                <div class="h-14">
-                    {{ item || 'Loading...' }}
-                </div>
-            </ng-container>
-        </div>
-
-        <div class="block w-full border h-28">
-            Hello World
-        </div>
-    </cdk-virtual-scroll-viewport>-->
-</section>
+    <ng-container scngx-list-footer>
+        <h6>Weitere Songs</h6>
+    </ng-container>
+</scngx-virtual-song-list>
 
