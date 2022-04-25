@@ -105,7 +105,6 @@ export class SCNGXSongListItemComponent implements OnInit, OnDestroy, AfterViewI
 
   private onResize(entries: ResizeObserverEntry[], observer: ResizeObserver) {
     const containerWidth = this.containerRef.nativeElement.getBoundingClientRect().width;
-    console.log(containerWidth)
 
     for(const entry of entries) {
       this.$showId.next((this.columns.id?.collapseAt || 0) < containerWidth && this.columns.id?.enabled)
