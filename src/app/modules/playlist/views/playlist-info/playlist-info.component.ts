@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Subject, Subscription, takeUntil } from 'rxjs';
-import { SCNGXSongColConfig, TrackListDataSource } from 'soundcore-ngx';
+import { SCNGXSongColConfig, SCNGXTrackListDataSource } from 'soundcore-ngx';
 import { Playlist, SCDKPlaylistService } from 'soundcore-sdk';
 import { environment } from 'src/environments/environment';
 
@@ -19,10 +19,12 @@ export class PlaylistInfoComponent implements OnInit, OnDestroy {
   public showError404: boolean = false;
   public isLoadingPlaylist: boolean = false;
   public playlist: Playlist;
-  public tracks: TrackListDataSource;
+
+  public tracks: SCNGXTrackListDataSource;
+  public items = []
 
   public columns: SCNGXSongColConfig = {
-    id: { enabled: true, collapseAt: 380 },
+    id: { enabled: true, collapseAt: 420 },
     cover: { enabled: true },
     album: { enabled: true, collapseAt: 560 },
     date: { enabled: true, collapseAt: 900 },
@@ -33,7 +35,11 @@ export class PlaylistInfoComponent implements OnInit, OnDestroy {
     private readonly httpClient: HttpClient,
     private readonly activatedRoute: ActivatedRoute,
     private readonly playlistService: SCDKPlaylistService
-  ) { }
+  ) {
+    for(let i = 0; i < 100000; i++) {
+      this.items.push(i);
+    }
+  }
 
 
   public ngOnInit(): void {
@@ -53,13 +59,16 @@ export class PlaylistInfoComponent implements OnInit, OnDestroy {
         this.playlist = playlist;
 
         // Init playable list datasource
-        this.tracks = new TrackListDataSource(this.httpClient, {
-          type: "byPlaylist",
-          resourceId: this.playlist.id,
-          apiBaseUri: environment.api_base_uri,
-          pageSize: 50,
-          totalElements: this.playlist.songsCount
-        });
+        this.tracks = new SCNGXTrackListDataSource(
+          this.httpClient, 
+          {
+            type: "byPlaylist",
+            resourceId: this.playlist.id,
+            apiBaseUri: environment.api_base_uri,
+            pageSize: 50,
+            totalElements: this.playlist.songsCount
+          }
+        );
 
         this.showError404 = !playlist;
         this.isLoadingPlaylist = false;

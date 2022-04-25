@@ -1,25 +1,11 @@
-<cdk-virtual-scroll-viewport itemSize="64" class="w-full h-full" minBufferPx="450" maxBufferPx="450">
-
-    <div class="block w-full">
-        <ng-content select="[scngx-list-header]"></ng-content>
-    </div>
-
-    <div class="flex flex-col w-full" [ngClass]="{'p-window': usePadding}">
-        <ng-container *cdkVirtualFor="let item of dataSource; index as i">
-            <div class="w-full h-16">
-                <scngx-song-list-item 
+<div class="w-full h-full">
+    <virtual-scroller class="w-full h-full" #scroll [items]="($stream | async)" [parentScroll]="parentScroll" (vsEnd)="fetchMore($event)">
+        <scngx-song-list-item 
+                    *ngFor="let item of scroll.viewPortItems; trackBy: entryTrackBy"
                     [columns]="columns"
-
-                    [song]="item" [index]="i" 
+                    [song]="item?.data" 
+                    [index]="item?.index" 
                     (onContext)="emitOnContext()"
                 ></scngx-song-list-item>
-            </div>
-        </ng-container>
-    </div>
-
-    <div class="block w-full" [ngClass]="{'p-window': usePadding}">
-        <ng-content select="[scngx-list-footer]"></ng-content>
-    </div>
-
-
-</cdk-virtual-scroll-viewport>
+    </virtual-scroller>
+</div>

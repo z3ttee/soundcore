@@ -78,7 +78,8 @@ export * from "./lib/pipes/added-to-playlist/added-to-playlist.module";
 export * from "./lib/pipes/added-to-playlist/added-to-playlist.pipe";
 
 // Datasource
-export * from "./lib/utils/datasource/track-list.datasource";
+// export * from "./lib/utils/datasource/track-list.datasource";
+export * from "./lib/utils/datasource/datasource";
 
 // Notifications
 export * from "./lib/components/notification/notification-list-item/notification-list-item.module";
