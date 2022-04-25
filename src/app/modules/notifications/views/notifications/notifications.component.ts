@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { SCDKNotificationService } from 'soundcore-sdk';
 
 @Component({
   templateUrl: './notifications.component.html',
@@ -6,8 +7,14 @@ import { Component, OnInit } from '@angular/core';
 })
 export class NotificationsComponent implements OnInit {
 
-  constructor() { }
+  constructor(
+    public readonly notificationService: SCDKNotificationService
+  ) { }
 
-  public ngOnInit(): void {}
+  public ngOnInit(): void {
+    this.notificationService.findByCurrentUser({ page: 0, size: 30 }).subscribe((page) => {
+      console.log(page)
+    })
+  }
 
 }

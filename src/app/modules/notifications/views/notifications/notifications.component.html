@@ -1,9 +1,18 @@
-<scngx-toolbar [showNavigation]="false" [transparent]="true">
-    <div class="flex items-center">
-        <h5>Benachrichtigungen</h5>
-    </div>
-</scngx-toolbar>
-
-<section>
-    <app-error404 [title]="'Keine neuen Nachrichten'" [message]="'Komme später wieder. Eventuell gibt\'s dann was Neues.'"></app-error404>
-</section>
+<div class="h-full overflow-y-auto">
+    <scngx-toolbar [showNavigation]="false" [transparent]="true">
+        <div class="flex items-center">
+            <h5>Benachrichtigungen</h5>
+        </div>
+    </scngx-toolbar>
+    
+    <section class="px-window">
+        <button class="py-2 px-6 bg-body-lighter rounded-sm" (click)="notificationService.test()">Test</button>
+    </section>
+    
+    <section>
+        <app-error404 *ngIf="(notificationService.$notifications | async).length <= 0" [title]="'Keine neuen Nachrichten'" [message]="'Komme später wieder. Eventuell gibt\'s dann was Neues.'"></app-error404>
+        <div class="flex flex-col gap-4 p-window max-w-[800px]">
+            <scngx-notification-list-item *ngFor="let notification of (notificationService.$notifications | async)" [notification]="notification"></scngx-notification-list-item>
+        </div>
+    </section>
+</div>

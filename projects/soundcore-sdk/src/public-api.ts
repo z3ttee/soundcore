@@ -70,3 +70,14 @@ export * from "./lib/utils/structures/resource-map";
 export * from "./lib/utils/structures/resource-queue";
 export * from "./lib/utils/structures/resource-queue-map";
 
+/**
+ * Notification SDK
+ */
+export * from "./lib/notification/notification.module";
+export * from "./lib/notification/services/notification.service";
+export * from "./lib/notification/entities/notification.entity";
+
+/**
+ * Gateway SDK
+ */
+export * from "./lib/utils/gateway/gateway";

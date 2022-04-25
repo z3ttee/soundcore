@@ -3,7 +3,8 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Routes } from '@angular/router';
 import { NotificationsComponent } from './views/notifications/notifications.component';
 import { Error404Module } from 'src/app/shared/error404/error404.module';
-import { SCNGXToolbarModule } from 'soundcore-ngx';
+import { SCNGXNotificationListItemModule, SCNGXToolbarModule } from 'soundcore-ngx';
+import { SCDKNotificationModule } from 'soundcore-sdk';
 
 const routes: Routes = [
   { path: "", component: NotificationsComponent }
@@ -18,7 +19,10 @@ const routes: Routes = [
     Error404Module,
     RouterModule.forChild(routes),
 
-    SCNGXToolbarModule
+    SCNGXToolbarModule,
+
+    SCDKNotificationModule,
+    SCNGXNotificationListItemModule
   ]
 })
 export class NotificationsModule { }
