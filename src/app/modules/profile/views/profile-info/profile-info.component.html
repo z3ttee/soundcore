@@ -1,0 +1,22 @@
+<app-error404 *ngIf="!($loading | async) && !($profile | async)"></app-error404>
+
+<section class="h-full w-full overflow-y-auto p-window" *ngIf="!($loading | async) && !!($profile | async)">
+    <app-list-view [artwork]="null" [isLoading]="($loading | async)" [title]="($profile | async)?.username">
+
+        <ng-container scngx-stats>
+            <li class="text-font-secondary">
+                Seit 2022
+                <!--<span *ngIf="playlist?.author">by {{ playlist?.author?.username }}</span>-->
+            </li>
+            <li class="text-font-secondary">
+                3 Freunde
+                <!--<span>{{ playlist?.songsCount }} {{ playlist?.songsCount != 1 ? 'Songs' : 'Song' }}</span>-->
+            </li>
+            <li class="text-font-secondary">
+                10 öffentliche Playlists
+                <!--<span>{{ playlist?.totalDuration | scngxSongDurationPipe }} min</span>-->
+            </li>
+        </ng-container>
+
+    </app-list-view>
+</section>
