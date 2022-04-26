@@ -61,6 +61,7 @@ export * from "./lib/search/services/search.service";
  */
 export * from "./lib/pagination/page";
 export * from "./lib/pagination/pageable";
+export * from "./lib/utils/entities/resource";
 
 /**
  * Export all datastructures
