@@ -81,3 +81,10 @@ export * from "./lib/notification/entities/notification.entity";
  * Gateway SDK
  */
 export * from "./lib/utils/gateway/gateway";
+
+/**
+ * Profile SDK
+ */
+export * from "./lib/profile/profile.module";
+export * from "./lib/profile/services/profile.service";
+
