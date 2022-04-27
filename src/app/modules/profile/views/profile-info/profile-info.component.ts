@@ -23,24 +23,6 @@ export class ProfileInfoComponent implements OnInit, OnDestroy {
     private readonly activatedRoute: ActivatedRoute
   ) { }
 
-  /*public readonly $profile: Observable<User> = this.activatedRoute.paramMap.pipe(
-    map((paramMap) => paramMap.get("profileId")),
-    tap(() => this._loadingSubject.next(true)),
-    switchMap((profileId) => {
-      if(profileId == "@me") return this.profileService.findByCurrentUser();
-      return this.profileService.findByUserId(profileId)
-    }),
-    catchError((err) => {
-      console.error(err);
-      return of(null);
-    }),
-    tap((profile) => {
-      console.log(profile)
-      this._loadingSubject.next(false)
-    }),
-    takeUntil(this._destroy)
-  );*/
-
   public ngOnInit(): void {
     this.activatedRoute.paramMap.pipe(takeUntil(this._destroy)).subscribe((paramMap) => {
       this._profileSubject.next(null);
@@ -49,7 +31,7 @@ export class ProfileInfoComponent implements OnInit, OnDestroy {
       const profileId = paramMap.get("profileId");
       const request = profileId == "@me" ? this.profileService.findByCurrentUser() : this.profileService.findByUserId(profileId);
 
-      request.subscribe((profile) => {
+      request.pipe(catchError((err) => of(null))).subscribe((profile) => {
         this._profileSubject.next(profile);
         this._loadingSubject.next(false);
       })
@@ -60,5 +42,4 @@ export class ProfileInfoComponent implements OnInit, OnDestroy {
       this._destroy.next();
       this._destroy.complete();
   }
-
 }

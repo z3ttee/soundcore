@@ -1,6 +1,6 @@
 <app-error404 *ngIf="!($loading | async) && !($profile | async)"></app-error404>
 
-<section class="h-full w-full overflow-y-auto p-window" *ngIf="!($loading | async) && !!($profile | async)">
+<section class="h-full w-full overflow-y-auto p-window">
     <app-list-view [artwork]="null" [isLoading]="($loading | async)" [title]="($profile | async)?.username">
 
         <ng-container scngx-stats>
@@ -18,5 +18,23 @@
             </li>
         </ng-container>
 
+        <ng-container scngx-controls>
+            <button class="p-2 px-6 bg-body-light bg-opacity-10 border-2 border-body-light rounded-sm hover:bg-opacity-25 active:bg-opacity-50 transition-all">
+                Freund hinzufügen
+            </button>
+        </ng-container>
+
     </app-list-view>
+
+    <div class="w-full my-row">
+        <h6>Öffentliche Playlists</h6>
+    </div>
+
+    <div class="w-full my-row">
+        <h6>Top Künstler der letzten 30 Tage</h6>
+    </div>
+
+    <div class="w-full my-row">
+        <h6>Meistgehört in 30 Tagen</h6>
+    </div>
 </section>
