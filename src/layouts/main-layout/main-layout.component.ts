@@ -4,7 +4,7 @@ import { Component, OnDestroy, OnInit } from "@angular/core";
 import { NavigationCancel, NavigationEnd, NavigationError, NavigationStart, Router } from "@angular/router";
 import { SCNGXPlaylistListItemComponent } from "projects/soundcore-ngx/src/public-api";
 import { filter, firstValueFrom, Subject, takeUntil } from "rxjs";
-import { SCNGXScreenService } from "soundcore-ngx";
+import { SCNGXDialogService, SCNGXScreenService } from "soundcore-ngx";
 import { Playlist, SCDKPlaylistService } from "soundcore-sdk";
 import { AuthenticationService } from "src/sso/services/authentication.service";
 
@@ -20,6 +20,7 @@ export class AscMainLayoutComponent implements OnInit, OnDestroy {
         public readonly screenService: SCNGXScreenService,
         public readonly authService: AuthenticationService,
         public readonly playlistService: SCDKPlaylistService,
+        private readonly dialogService: SCNGXDialogService,
         private readonly router: Router,
         private readonly _location: Location
     ) {}
@@ -57,6 +58,10 @@ export class AscMainLayoutComponent implements OnInit, OnDestroy {
 
     public navigateToSearch() {
         this.router.navigate(['/search'])
+    }
+
+    public openTestDialog() {
+        this.dialogService.confirm("Aktion bestätigen", "Du musst die Aktion bestätigen").afterClosed().subscribe(() => console.log("closed"))
     }
 
 }
