@@ -1,6 +1,6 @@
 import { CdkDragDrop } from "@angular/cdk/drag-drop";
 import { Location } from "@angular/common";
-import { Component, OnDestroy, OnInit } from "@angular/core";
+import { Component, OnDestroy, OnInit, ViewContainerRef } from "@angular/core";
 import { NavigationCancel, NavigationEnd, NavigationError, NavigationStart, Router } from "@angular/router";
 import { SCNGXPlaylistListItemComponent } from "projects/soundcore-ngx/src/public-api";
 import { filter, firstValueFrom, Subject, takeUntil } from "rxjs";
