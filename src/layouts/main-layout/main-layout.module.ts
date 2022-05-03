@@ -8,6 +8,7 @@ import { SCDKPlaylistModule } from "soundcore-sdk";
 import { SCNGXPlaylistListItemModule } from "projects/soundcore-ngx/src/public-api";
 import {DragDropModule} from '@angular/cdk/drag-drop';
 import { ProfileBarModule } from "src/app/components/profile-bar/profile-bar.module";
+import { PlayerBarModule } from "src/app/components/player-bar/player-bar.module";
 
 @NgModule({
     declarations: [
@@ -18,6 +19,7 @@ import { ProfileBarModule } from "src/app/components/profile-bar/profile-bar.mod
         RouterModule,
         DragDropModule,
         ProfileBarModule,
+        PlayerBarModule,
         
         SCNGXDrawerModule,
         SCNGXBottomNavModule,
