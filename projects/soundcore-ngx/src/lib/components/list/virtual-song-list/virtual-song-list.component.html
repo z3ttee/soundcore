@@ -1,4 +1,8 @@
 <div class="w-full h-full">
+    <div class="flex items-center justify-start w-full gap-2 p-2 rounded bg-body-light bg-opacity-30">
+        <hero-icon name="information-circle" [class]="'h-7 w-7 align-middle'"></hero-icon>
+        <p>Keine Lieder gefunden.</p>
+    </div>
     <virtual-scroller class="w-full h-full" #scroll [items]="($stream | async)" [parentScroll]="parentScroll" (vsEnd)="fetchMore($event)">
         <scngx-song-list-item 
                     *ngFor="let item of scroll.viewPortItems; trackBy: entryTrackBy"

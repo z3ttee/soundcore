@@ -1,9 +1,9 @@
 import {  Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
 import { Song } from 'soundcore-sdk';
-import { DataSourceItem, SCNGXTrackListDataSource } from '../../../utils/datasource/datasource';
 import { SCNGXSongColConfig } from '../song-list-item/song-list-item.component';
 import { IPageInfo } from 'ngx-virtual-scroller';
+import { SCNGXTrackListDataSourceV2, TrackDataSourceItem } from '../../../utils/datasource/datasourcev2';
 
 @Component({
   selector: 'scngx-virtual-song-list',
@@ -14,13 +14,13 @@ export class SCNGXVirtualSongListComponent implements OnInit, OnDestroy, OnChang
 
   @Input() public parentScroll?: HTMLElement;
 
-  @Input() public dataSource: SCNGXTrackListDataSource;
+  @Input() public dataSource: SCNGXTrackListDataSourceV2;
 
   @Input() public usePadding: boolean = true;
   @Input() public columns: SCNGXSongColConfig = new SCNGXSongColConfig();
 
   private _onMoreSubject: Subject<IPageInfo> = new Subject();
-  public $stream: Observable<DataSourceItem[]>;
+  public $stream: Observable<TrackDataSourceItem[]>;
 
   constructor() { }
 
@@ -28,8 +28,8 @@ export class SCNGXVirtualSongListComponent implements OnInit, OnDestroy, OnChang
   }
 
   public ngOnChanges(changes: SimpleChanges): void {
-      const prev = changes["dataSource"].previousValue as SCNGXTrackListDataSource;
-      const current = changes["dataSource"].currentValue as SCNGXTrackListDataSource;
+      const prev = changes["dataSource"].previousValue as SCNGXTrackListDataSourceV2;
+      const current = changes["dataSource"].currentValue as SCNGXTrackListDataSourceV2;
 
       if(!!prev) {
         prev.disconnect();

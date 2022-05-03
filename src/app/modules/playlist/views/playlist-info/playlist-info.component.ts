@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Subject, Subscription, takeUntil } from 'rxjs';
-import { SCNGXSongColConfig, SCNGXTrackListDataSource } from 'soundcore-ngx';
+import { SCNGXSongColConfig, SCNGXPlayableList } from 'soundcore-ngx';
 import { Playlist, SCDKPlaylistService } from 'soundcore-sdk';
 import { environment } from 'src/environments/environment';
 
@@ -20,8 +20,10 @@ export class PlaylistInfoComponent implements OnInit, OnDestroy {
   public isLoadingPlaylist: boolean = false;
   public playlist: Playlist;
 
-  public tracks: SCNGXTrackListDataSource;
+  // public tracks: SCNGXTrackListDataSource;
   public items = []
+
+  public list: SCNGXPlayableList;
 
   public columns: SCNGXSongColConfig = {
     id: { enabled: true, collapseAt: 420 },
@@ -44,6 +46,8 @@ export class PlaylistInfoComponent implements OnInit, OnDestroy {
 
   public ngOnInit(): void {
     this.activatedRoute.paramMap.pipe(takeUntil(this._destroy)).subscribe((paramMap) => {
+      console.log(paramMap)
+
       // Cancel ongoing http request.
       this._cancel.next();
 
@@ -51,7 +55,11 @@ export class PlaylistInfoComponent implements OnInit, OnDestroy {
       this.isLoadingPlaylist = true;
       this.showError404 = false;
       this.playlist = null;
-      this.tracks = null;
+
+      // Close down previously initialized list
+      this.list?.release();
+      this.list = null;
+      // this.tracks = null;
 
       // Trigger http request.
       this._playlistSub = this.playlistService.findById(paramMap.get("playlistId")).subscribe((playlist) => {
@@ -59,7 +67,12 @@ export class PlaylistInfoComponent implements OnInit, OnDestroy {
         this.playlist = playlist;
 
         // Init playable list datasource
-        this.tracks = new SCNGXTrackListDataSource(
+        this.list = new SCNGXPlayableList(this.httpClient, {
+          detailsUrl: `${environment.api_base_uri}/v1/songs/byPlaylist/${this.playlist.id}`,
+          tracksUrl: `${environment.api_base_uri}/v1/songs/byPlaylist/${this.playlist.id}/ids`
+        })
+
+        /*this.tracks = new SCNGXTrackListDataSource(
           this.httpClient, 
           {
             type: "byPlaylist",
@@ -68,7 +81,7 @@ export class PlaylistInfoComponent implements OnInit, OnDestroy {
             pageSize: 50,
             totalElements: this.playlist.songsCount
           }
-        );
+        );*/
 
         this.showError404 = !playlist;
         this.isLoadingPlaylist = false;
@@ -84,7 +97,8 @@ export class PlaylistInfoComponent implements OnInit, OnDestroy {
   public ngOnDestroy(): void {
       this._destroy.next();
       this._destroy.complete();
-      this.tracks.disconnect();
+      // this.tracks.disconnect();
+      this.list.release();
   }
 
 }
