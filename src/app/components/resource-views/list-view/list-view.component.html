@@ -24,7 +24,7 @@
     </div>
 
     <div class="flex flex-row items-center w-full gap-2 py-row">
-        <scngx-skeleton *ngIf="isLoading" [class]="'h-12 w-56'"></scngx-skeleton>
+        <scngx-skeleton *ngIf="isLoading" [class]="'h-14 w-56'"></scngx-skeleton>
         <ng-content *ngIf="!isLoading" select="[scngx-controls]"></ng-content>
     </div>
 </div>
