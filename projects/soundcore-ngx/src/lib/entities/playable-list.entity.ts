@@ -1,8 +1,9 @@
 import { HttpClient, HttpErrorResponse } from "@angular/common/http";
 import { BehaviorSubject, firstValueFrom, Observable, Subject, takeUntil } from "rxjs";
-import { Album, Artist, Page, Playlist } from "soundcore-sdk";
+import { Album, Artist, Page, Playlist, Song } from "soundcore-sdk";
 import { SCNGXTrackListDataSourceV2 } from "../utils/datasource/datasourcev2";
 import { SCNGXLogger } from "../utils/logger/logger";
+import { SCNGXPlayableSource, SCNGXTrackID } from "./playable-source.entity";
 
 export interface SCNGXPlayableListUrls {
 
@@ -22,16 +23,8 @@ export interface SCNGXPlayableListUrls {
     detailsUrl: string;
 
 }
-export class SCNGXTrackID {
-    public id: string;
-}
-export class SCNGXPlayableList {
-    private readonly logger: SCNGXLogger = new SCNGXLogger("PlaylistService");
 
-    /**
-     * Subject used to destroy subscriptions.
-     */
-    private readonly _destroySubject: Subject<void> = new Subject();
+export class SCNGXPlayableList extends SCNGXPlayableSource {
 
     /**
      * Ready subject that pushes new values to the $ready observable.
@@ -61,33 +54,32 @@ export class SCNGXPlayableList {
      */
     public readonly $dataSource: Observable<SCNGXTrackListDataSourceV2> = this._dataSourceSubject.asObservable().pipe(takeUntil(this._destroySubject));
 
-    public readonly id: string;
-    public readonly context: Playlist | Album | Artist; 
-    
+    public readonly context: Playlist | Album | Artist;
     private tracks: SCNGXTrackID[] = [];
-    private readonly queue: SCNGXTrackID[];
 
     constructor(
         private readonly httpClient: HttpClient,
         private readonly urls: SCNGXPlayableListUrls
     ) {
+        super();
         this.init();
     }
 
+    protected findByTrack(track: SCNGXTrackID): Observable<Song> {
+        return this._dataSourceSubject.getValue().findByTrack(track);
+    }
 
     /**
      * Close down the playable list and release
      * all resources.
      */
-    public release() {
-        this._destroySubject.next();
-        this._destroySubject.complete();
-
+    public override release() {
         this._dataSourceSubject.next(null);
         this._dataSourceSubject.complete();
 
         this._readySubject.complete();
-        this.logger.log(`Destroyed playable list.`)
+
+        super.release();
     }
 
     /**
@@ -97,15 +89,20 @@ export class SCNGXPlayableList {
     private init() {
         firstValueFrom(this.httpClient.get<Page<SCNGXTrackID>>(`${this.urls.tracksUrl}`).pipe(takeUntil(this._destroySubject))).then((page) => {
             this.logger.log(`Successfully fetched track list from ${this.urls.tracksUrl}. Setting up dataSource for ui...`)
-
-            const dataSource = new SCNGXTrackListDataSourceV2(this.httpClient, {
-                url: this.urls.detailsUrl,
-                pageSize: 50,
-                totalElements: page.totalElements
-            })
-
-            this._dataSourceSubject.next(dataSource);
+            
             this.tracks = page.elements;
+            this.addAll(page.elements);
+
+            const dataSource = new SCNGXTrackListDataSourceV2(
+                this.httpClient, 
+                {
+                    url: this.urls.detailsUrl,
+                    pageSize: 50,
+                    totalElements: page.totalElements
+                },
+                this.tracks
+            );
+            this._dataSourceSubject.next(dataSource);
         }).catch((error: HttpErrorResponse) => {
             console.error(error);
         }).finally(() => {
