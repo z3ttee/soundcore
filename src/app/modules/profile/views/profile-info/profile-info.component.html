@@ -1,58 +1,81 @@
 <app-error404 *ngIf="!($loading | async) && !($profile | async)"></app-error404>
 
-<section class="h-full w-full overflow-y-auto py-window">
-    <div class="w-full p-window px-window">
-        <app-list-view [artwork]="null" [isLoading]="($loading | async)" [title]="($profile | async)?.username">
+<section class="h-full w-full overflow-y-auto py-window" #parent>
+    <virtual-scroller #pageScroll [parentScroll]="parent" [enableUnequalChildrenSizes]="true">
+        <div class="w-full px-window">
+            <app-list-view [resource]="($profile | async)" [artwork]="null" [isLoading]="($loading | async)" [title]="($profile | async)?.username">
 
-            <ng-container scngx-stats>
-                <li class="text-font-secondary" scngxTooltip [scngxTooltipText]="($profile | async).createdAt | date:'dd.MM.yyyy'">
-                    {{ ($profile | async).createdAt | date:"yyyy" }}
-                </li>
-                <li class="text-font-secondary">
-                    {{ ($profile | async).friendsCount || 0 }} Freunde
-                </li>
-                <li class="text-font-secondary">
-                    {{ ($playlists | async)?.length || 0 }} Öffentliche Playlists
-                </li>
-            </ng-container>
-    
-            <ng-container scngx-controls>
-                <button class="p-2 px-6 bg-body-light bg-opacity-10 border-2 border-body-light rounded-sm hover:bg-opacity-25 active:bg-opacity-50 transition-all">
-                    Freund hinzufügen
-                </button>
-            </ng-container>
-    
-        </app-list-view>
-    </div>
-
-    <div class="w-full my-row">
-        <div class="flex items-center px-window gap-4">
-            <h6 class="font-semi line-clamp-1 flex-grow">Öffentliche Playlists</h6>
-            <p>Alles anzeigen</p>
-        </div>
+                <ng-container scngx-stats>
+                    <li class="text-font-secondary" scngxTooltip [scngxTooltipText]="($profile | async).createdAt | date:'dd.MM.yyyy'">
+                        Seit {{ ($profile | async).createdAt | date:"yyyy" }}
+                    </li>
+                    <li class="text-font-secondary">
+                        {{ ($profile | async).friendsCount || 0 }} Freunde
+                    </li>
+                    <li class="text-font-secondary">
+                        {{ ($playlists | async)?.length || 0 }} Öffentliche Playlists
+                    </li>
+                </ng-container>
         
-
-        <div class="w-full py-4" #scrollArea>
-            <virtual-scroller class="w-full h-64" #scroll [parentScroll]="scrollArea" [items]="($playlists | async)" [horizontal]="true" [scrollbarWidth]="0" [scrollbarHeight]="0">
-                <div class="w-48 h-full mx-2 first:ml-window last:mr-window" *ngFor="let playlist of scroll.viewPortItems">
-                    <scngx-playlist-grid-item 
-                        [item]="playlist">
-                    </scngx-playlist-grid-item>
-                </div>
-            </virtual-scroller>
-        </div>
+                <ng-container scngx-controls>
+                    <button class="p-2 px-6 bg-body-light bg-opacity-10 border-2 border-body-light rounded-sm hover:bg-opacity-25 active:bg-opacity-50 transition-all">
+                        Freund hinzufügen
+                    </button>
+                </ng-container>
         
-    </div>
-</section>
+            </app-list-view>
+        </div>
 
-<section>
-    
+        <!-- Playlists row -->
+        <div class="w-full my-row">
+            <div class="flex items-center px-window gap-4">
+                <h6 class="font-semi line-clamp-1 flex-grow">Öffentliche Playlists</h6>
+                <p>Alles anzeigen</p>
+            </div>
+            
 
-    <div class="w-full my-row">
-        <h6>Top Künstler der letzten 30 Tage</h6>
-    </div>
+            <div class="w-full py-4" #scrollArea>
+                <virtual-scroller class="w-full h-64" #scroll [parentScroll]="scrollArea" [items]="($playlists | async)" [horizontal]="true" [scrollbarWidth]="0" [scrollbarHeight]="0">
+                    <div class="w-48 h-full mx-2 first:ml-window last:mr-window" *ngFor="let playlist of scroll.viewPortItems">
+                        <scngx-playlist-grid-item 
+                            [routerLink]="['/playlist', playlist.slug || playlist.id]"
+                            [item]="playlist">
+                        </scngx-playlist-grid-item>
+                    </div>
+                </virtual-scroller>
+            </div>
+        </div>
 
-    <div class="w-full my-row">
-        <h6>Meistgehört in 30 Tagen</h6>
-    </div>
+        <!-- Artists row -->
+        <div class="w-full my-row">
+            <div class="flex items-center px-window gap-4">
+                <h6 class="font-semi line-clamp-1 flex-grow">Top Künstler der letzten 30 Tage</h6>
+                <p>Alles anzeigen</p>
+            </div>
+
+            <div class="w-full py-4" #scrollArea>
+                <virtual-scroller class="w-full h-64" #scroll [parentScroll]="scrollArea" [items]="[]" [horizontal]="true" [scrollbarWidth]="0" [scrollbarHeight]="0">
+                    <div class="w-48 h-full mx-2 first:ml-window last:mr-window" *ngFor="let playlist of scroll.viewPortItems">
+                        
+                    </div>
+                </virtual-scroller>
+            </div>
+        </div>
+
+        <!-- Songs row -->
+        <div class="w-full my-row">
+            <div class="flex items-center px-window gap-4">
+                <h6 class="font-semi line-clamp-1 flex-grow">Meistgehörte Songs in 30 Tagen</h6>
+                <p>Alles anzeigen</p>
+            </div>
+
+            <div class="w-full py-4" #scrollArea>
+                <virtual-scroller class="w-full h-64" #scroll [parentScroll]="scrollArea" [items]="[]" [horizontal]="true" [scrollbarWidth]="0" [scrollbarHeight]="0">
+                    <div class="w-48 h-full mx-2 first:ml-window last:mr-window" *ngFor="let playlist of scroll.viewPortItems">
+                        
+                    </div>
+                </virtual-scroller>
+            </div>
+        </div>
+    </virtual-scroller>
 </section>
