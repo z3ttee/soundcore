@@ -1,9 +1,11 @@
 import { Artwork } from "../../artwork/entities/artwork.entity";
 import { User } from "../../user/entities/user.entity";
+import { SCDKResource, SCDKResourceType } from "../../utils/entities/resource";
 
 export type PlaylistPrivacy = "private" | "not_listed" | "public"
 export type PlaylistID = string;
-export class Playlist {
+export class Playlist implements SCDKResource {
+    public resourceType: SCDKResourceType;
 
     // General playlist metadata
     public id: PlaylistID;

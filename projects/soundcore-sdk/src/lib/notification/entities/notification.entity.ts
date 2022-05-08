@@ -1,6 +1,8 @@
 import { User } from "../../user/entities/user.entity";
+import { SCDKResource, SCDKResourceType } from "../../utils/entities/resource";
 
-export class Notification {
+export class Notification implements SCDKResource {
+    public resourceType: SCDKResourceType;
 
     /**
      * Id of the notification.

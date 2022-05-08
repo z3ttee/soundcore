@@ -2,8 +2,11 @@ import { Album } from "../../album/entities/album.entity";
 import { Artist } from "../../artist/entities/artist.entity";
 import { Artwork } from "../../artwork/entities/artwork.entity";
 import { Playlist } from "../../playlist/entities/playlist.entity";
+import { SCDKResource, SCDKResourceType } from "../../utils/entities/resource";
 
-export class Song {
+export class Song implements SCDKResource {
+    public resourceType: SCDKResourceType;
+    
     public id: string;
     public title: string;
     public duration: number;

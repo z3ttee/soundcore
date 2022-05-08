@@ -1,7 +1,7 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { Observable, Subject, takeUntil } from 'rxjs';
 import { SCNGXScreenService } from 'soundcore-ngx';
-import { Artwork } from "soundcore-sdk";
+import { Artwork, SCDKResource } from "soundcore-sdk";
 
 @Component({
   selector: 'app-list-view',
@@ -17,6 +17,7 @@ export class ListViewComponent implements OnInit, OnDestroy {
   @Input() public title: string;
   @Input() public artwork: Artwork;
   @Input() public isLoading: boolean = false;
+  @Input() public resource: SCDKResource;
 
   private $destroy: Subject<void> = new Subject();
   public $isTouch: Observable<boolean> = this.screenService.$isTouch.pipe(takeUntil(this.$destroy));

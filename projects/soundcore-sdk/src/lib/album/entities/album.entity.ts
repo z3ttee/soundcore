@@ -4,9 +4,12 @@ import { Distributor } from "../../distributor/entities/distributor.entity";
 import { Label } from "../../label/entities/label.entity";
 import { Publisher } from "../../publisher/entities/publisher.entity";
 import { Song } from "../../song/entities/song.entity";
+import { SCDKResource, SCDKResourceType } from "../../utils/entities/resource";
 
 export type AlbumID = string;
-export class Album {
+export class Album implements SCDKResource {
+    public resourceType: SCDKResourceType;
+
     public id: AlbumID;
     public title: string;
     public released: Date;

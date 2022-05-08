@@ -1,8 +1,10 @@
 import { Bucket } from "./bucket.entity";
+import { SCDKResource, SCDKResourceType } from "../../utils/entities/resource";
 
 export type MountStatus = "ok" | "indexing";
 
-export class Mount {
+export class Mount implements SCDKResource {
+    public resourceType: SCDKResourceType;
     
     public id: string;
     public path: string;
