@@ -5,4 +5,9 @@ export class User implements SCDKResource {
     public resourceType: SCDKResourceType;
     public username: string;
     public roles: string[];
+    public createdAt: Date;
+    public updatedAt: Date;
+
+    public friendsCount: number;
+    public playlistCount: number;
 }

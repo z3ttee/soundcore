@@ -5,6 +5,8 @@ import { RouterModule, Routes } from '@angular/router';
 import { SCDKProfileModule } from 'soundcore-sdk';
 import { Error404Module } from 'src/app/shared/error404/error404.module';
 import { ListViewModule } from 'src/app/components/resource-views/list-view/list-view.module';
+import { SCNGXPlaylistGridItemModule, SCNGXTooltipModule } from 'soundcore-ngx';
+import { VirtualScrollerModule } from 'ngx-virtual-scroller';
 
 const routes: Routes = [
   { path: "", redirectTo: "@me" },
@@ -19,11 +21,15 @@ const routes: Routes = [
   imports: [
     CommonModule,
     RouterModule.forChild(routes),
+    VirtualScrollerModule,
     
     Error404Module,
     ListViewModule,
 
-    SCDKProfileModule
+    SCNGXPlaylistGridItemModule,
+    SCNGXTooltipModule,
+
+    SCDKProfileModule,
   ]
 })
 export class ProfileModule { }
