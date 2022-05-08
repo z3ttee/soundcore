@@ -89,3 +89,11 @@ export * from "./lib/utils/gateway/gateway";
 export * from "./lib/profile/profile.module";
 export * from "./lib/profile/services/profile.service";
 
+/**
+ * Settings SDK
+ */
+export * from "./lib/settings/settings.module";
+export * from "./lib/settings/services/settings.service";
+export * from "./lib/settings/entities/settings.entity";
+
+
