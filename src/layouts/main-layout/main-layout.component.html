@@ -37,7 +37,7 @@
             <ul class="flex flex-col select-none">
                 <li [routerLink]="['/']" [routerLinkActiveOptions]="{exact: true}" routerLinkActive="text-accent" class="relative flex gap-4 px-window py-3 cursor-pointer hover:opacity-100 transition-all"><hero-icon [name]="'home'" [class]="'h-6 w-6'"></hero-icon><span>Startseite</span></li>
                 <li [routerLink]="['/library']" routerLinkActive="text-accent" class="relative flex gap-4 px-window py-3 cursor-pointer hover:opacity-100 transition-all"><hero-icon [name]="'bookmark-alt'" [class]="'h-6 w-6'"></hero-icon><span>Bibliothek</span></li>
-                <li [routerLink]="['/profile']" routerLinkActive="text-accent" class="relative flex gap-4 px-window py-3 cursor-pointer hover:opacity-100 transition-all"><hero-icon [name]="'user'" [class]="'h-6 w-6'"></hero-icon><span>Dein Profil</span></li>
+                <li [routerLink]="['/profile/@me']" [routerLinkActiveOptions]="{exact: true}" routerLinkActive="text-accent" class="relative flex gap-4 px-window py-3 cursor-pointer hover:opacity-100 transition-all"><hero-icon [name]="'user'" [class]="'h-6 w-6'"></hero-icon><span>Dein Profil</span></li>
             </ul>
         </div>
 
