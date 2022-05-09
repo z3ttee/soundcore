@@ -1,0 +1,45 @@
+<app-error404 *ngIf="!($loading | async) && !($artist | async)"></app-error404>
+
+<section class="w-full h-full py-window overflow-y-auto border" #pageScroll>
+    <virtual-scroller #pageScroll [parentScroll]="pageScroll" [enableUnequalChildrenSizes]="true">
+        <div class="px-window">
+            <app-list-view [resource]="($artist | async)" [title]="($artist | async)?.name" [artwork]="($artist | async)?.artwork" [isLoading]="($loading | async)">
+                <ng-container scngx-stats>
+                    <li class="text-font-secondary">
+                        <span>{{ ($artist | async)?.albumCount || 0 }} Alben</span>
+                    </li>
+                    <li class="text-font-secondary">
+                        <span>{{ ($artist | async)?.songCount || 0 }} Songs</span>
+                    </li>
+                    <li class="text-font-secondary">
+                        <span>{{ ($artist | async)?.streamCount || 0 }} Streams</span>
+                    </li>
+                </ng-container>
+        
+                <ng-container scngx-controls>
+                    <button class="w-14 flex items-center justify-center aspect-square bg-accent transition-all will-change-transform text-body rounded-full hover:scale-105 active:scale-[97%]">
+                        <img class="w-7 h-7 text-body ml-0.5" src="assets/icons/play.svg">
+                    </button>
+        
+                    <button class="flex items-center p-2 rounded-full" matRipple [matRippleCentered]="true">
+                        <hero-icon [name]="'dots-vertical'" [class]="'h-7 aspect-square'"></hero-icon>
+                    </button>
+                </ng-container>
+            </app-list-view>
+        </div>
+
+        <div class="flex items-start w-full px-window">
+            <div class="inline-block relative flex-grow">
+                <h6>Beliebte Songs</h6>
+
+                <div class="mt-4">
+                    <scngx-song-list [columns]="songListCols" [dataSource]="($list | async)?.$dataSource | async"></scngx-song-list>
+                </div>
+            </div>
+
+            <div class="">
+                <h6>Lieblingssongs</h6>
+            </div>
+        </div>
+    </virtual-scroller>
+</section>

@@ -57,6 +57,7 @@ export class PlaylistInfoComponent implements OnInit, OnDestroy {
       this.playlist = null;
 
       // Close down previously initialized list
+      // TODO: Check if playable list is not enqueued
       this.list?.release();
       this.list = null;
       // this.tracks = null;

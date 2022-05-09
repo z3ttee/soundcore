@@ -112,7 +112,7 @@ export class SCNGXSongListItemComponent implements OnInit, OnDestroy, AfterViewI
       this.$showCount.next((this.columns.count?.collapseAt || 0) < containerWidth && this.columns.count?.enabled)
       this.$showAlbum.next((this.columns.album?.collapseAt || 0) < containerWidth && this.columns.album?.enabled)
       this.$showDate.next((this.columns.date?.collapseAt || 0) < containerWidth && this.columns.date?.enabled)
-      this.$showDuration.next((this.columns.duration?.collapseAt || 0) < containerWidth && this.columns.date?.enabled)
+      this.$showDuration.next((this.columns.duration?.collapseAt || 0) < containerWidth && this.columns.duration?.enabled)
     }
   }
 

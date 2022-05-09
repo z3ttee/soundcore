@@ -15,7 +15,6 @@ export class SCNGXVirtualSongListComponent implements OnInit, OnDestroy, OnChang
   @Input() public parentScroll?: HTMLElement;
 
   @Input() public dataSource: SCNGXTrackListDataSourceV2;
-
   @Input() public usePadding: boolean = true;
   @Input() public columns: SCNGXSongColConfig = new SCNGXSongColConfig();
 
@@ -42,19 +41,21 @@ export class SCNGXVirtualSongListComponent implements OnInit, OnDestroy, OnChang
 
   public ngOnDestroy(): void {
     this._onMoreSubject.complete();
+
+    // TODO: Check if is enqueued
     this.dataSource.disconnect();
   }
 
   public emitOnContext() {
-
+    // TODO
   }
 
   public fetchMore(event: IPageInfo) {
     this._onMoreSubject.next(event);
   }
 
-  public entryTrackBy(index: number, complexItem: Song): string | number {
-    return complexItem?.id || index;
+  public entryTrackBy(index: number, complexItem: TrackDataSourceItem) {
+    return complexItem?.data?.id || index;
   }
 
 }

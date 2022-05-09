@@ -50,6 +50,9 @@ export * from "./lib/components/list/bullet-list/bullet-list.component";
 export * from "./lib/components/list/song-list-item/song-list-item.module";
 export * from "./lib/components/list/song-list-item/song-list-item.component";
 
+export * from "./lib/components/list/song-list/song-list.module";
+export * from "./lib/components/list/song-list/song-list.component";
+
 export * from "./lib/components/list/virtual-song-list/virtual-song-list.module";
 export * from "./lib/components/list/virtual-song-list/virtual-song-list.component";
 
