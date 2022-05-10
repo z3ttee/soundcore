@@ -1,4 +1,4 @@
-import {  Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
+import {  Component, ElementRef, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
 import { BehaviorSubject, Observable, of, Subject } from 'rxjs';
 import { SCNGXSongColConfig } from '../song-list-item/song-list-item.component';
 import { IPageInfo } from 'ngx-virtual-scroller';
@@ -75,15 +75,28 @@ export class SCNGXVirtualSongListComponent implements OnInit, OnDestroy, OnChang
   public readonly $maxHeight: Observable<number> = this._heightSubject.asObservable();
 
 
-  constructor() { }
+  constructor(
+    private readonly elementRef: ElementRef<HTMLDivElement>
+  ) { }
 
   public ngOnInit(): void {}
 
   public ngOnChanges(changes: SimpleChanges): void {
-      const prev = changes["dataSource"].previousValue as SCNGXTrackListDataSourceV2;
-      const current = changes["dataSource"].currentValue as SCNGXTrackListDataSourceV2;
+      const prev = changes["dataSource"]?.previousValue as SCNGXTrackListDataSourceV2;
+      const current = changes["dataSource"]?.currentValue as SCNGXTrackListDataSourceV2;
 
-      this.skeletonItems = new Array(this.skeletons || 0);
+      // Set skeleton items
+      if(this.showSkeleton) {
+        this.skeletonItems = new Array(this.skeletons || 0);
+        this._streamSubject.next(of(this.skeletonItems))
+      }
+
+      // Update container height
+      if(this.useMaxHeight) {
+        const container = this.elementRef.nativeElement.children[0];
+        const height = (this.itemHeight || 56) * (this.dataSource?.totalElements || this.skeletons)
+        container["style"]["height"] = `${height}px`;
+      }
 
       if(!!prev) {
         prev.disconnect();
@@ -91,7 +104,6 @@ export class SCNGXVirtualSongListComponent implements OnInit, OnDestroy, OnChang
 
       if(current) {
         this._streamSubject.next(current.connect(this._onMoreSubject.asObservable()));
-        // this._heightSubject.next()
       }
   }
 

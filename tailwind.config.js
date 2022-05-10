@@ -51,6 +51,9 @@ module.exports = {
       padding: ({ theme }) => ({
         row: theme("spacing.6"),
       }),
+      gap: theme => ({
+        row: theme("spacing.6")
+      }),
       minWidth: theme => ({
         ...theme("spacing")
       }),

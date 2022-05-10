@@ -1,20 +1,11 @@
 <div class="w-full max-h-full">
-    <virtual-scroller *ngIf="!showSkeleton" class="w-full h-full" #scroll [bufferAmount]="5" [items]="($streamObs | async) | async" [parentScroll]="parentScroll" (vsEnd)="fetchMore($event)">
+    <virtual-scroller class="w-full h-full" #scroll [bufferAmount]="5" [items]="($streamObs | async) | async" [parentScroll]="parentScroll" (vsEnd)="fetchMore($event)">
         <scngx-song-list-item 
             *ngFor="let item of scroll.viewPortItems; trackBy: entryTrackBy"
             [columns]="columns"
             [song]="item?.data" 
             [index]="item?.index"
             (onContext)="emitOnContext()">
-        </scngx-song-list-item>
-    </virtual-scroller>
-
-    <virtual-scroller *ngIf="showSkeleton" class="w-full h-full" #scroll [items]="skeletonItems" [parentScroll]="parentScroll">
-        <scngx-song-list-item 
-            *ngFor="let item of scroll.viewPortItems"
-            [columns]="columns"
-            [song]="item?.data" 
-            [index]="item?.index">
         </scngx-song-list-item>
     </virtual-scroller>
 </div>

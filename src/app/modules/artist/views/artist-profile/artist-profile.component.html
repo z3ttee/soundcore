@@ -29,17 +29,17 @@
             </app-list-view>
         </div>
 
-        <div class="flex items-start w-full px-window border">
-            <div class="inline-block relative flex-grow">
+        <div class="flex gap-row items-start w-full px-window flex-col lg:flex-row">
+            <div class="relative w-full lgflex-grow">
                 <h6 *ngIf="!($loading | async)">Beliebte Songs</h6>
                 <scngx-skeleton *ngIf="($loading | async)" [class]="'w-44 max-w-[90%] h-7'"></scngx-skeleton>
 
-                <div class="mt-4 h-64">
-                    <scngx-virtual-song-list [showSkeleton]="true" [skeletons]="5" [parentScroll]="pageScroll" [columns]="songListCols" [dataSource]="($list | async)?.$dataSource | async"></scngx-virtual-song-list>
+                <div class="mt-4">
+                    <scngx-virtual-song-list [useMaxHeight]="true" [showSkeleton]="($loading | async)" [skeletons]="5" [parentScroll]="pageScroll" [columns]="songListCols" [dataSource]="($list | async)?.$dataSource | async"></scngx-virtual-song-list>
                 </div>
             </div>
 
-            <div class="">
+            <div>
                 <h6>Lieblingssongs</h6>
             </div>
         </div>
