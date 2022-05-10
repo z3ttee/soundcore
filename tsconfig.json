@@ -18,6 +18,7 @@
     "importHelpers": true,
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
+    "stripInternal": true,
     "paths": {
       "soundcore-cdk": [
         "dist/soundcore-cdk/soundcore-cdk",

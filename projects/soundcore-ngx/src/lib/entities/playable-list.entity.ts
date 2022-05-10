@@ -1,8 +1,7 @@
 import { HttpClient, HttpErrorResponse } from "@angular/common/http";
-import { BehaviorSubject, firstValueFrom, Observable, Subject, takeUntil } from "rxjs";
+import { BehaviorSubject, firstValueFrom, Observable, takeUntil } from "rxjs";
 import { Album, Artist, Page, Playlist, Song } from "soundcore-sdk";
 import { SCNGXTrackListDataSourceV2 } from "../utils/datasource/datasourcev2";
-import { SCNGXLogger } from "../utils/logger/logger";
 import { SCNGXPlayableSource, SCNGXTrackID } from "./playable-source.entity";
 
 export interface SCNGXPlayableListUrls {
@@ -12,7 +11,7 @@ export interface SCNGXPlayableListUrls {
      * should return all ids of tracks included
      * in a playable list.
      */
-    tracksUrl: string;
+    listUrl: string;
 
     /**
      * URL that points to the endpoint which
@@ -20,7 +19,7 @@ export interface SCNGXPlayableListUrls {
      * included in a playable list. The data contains
      * information about title, artists, duration etc.
      */
-    detailsUrl: string;
+    metaUrl: string;
 
 }
 
@@ -53,9 +52,11 @@ export class SCNGXPlayableList extends SCNGXPlayableSource {
      * Only after this was performed, the dataSource becomes available.
      */
     public readonly $dataSource: Observable<SCNGXTrackListDataSourceV2> = this._dataSourceSubject.asObservable().pipe(takeUntil(this._destroySubject));
+    public readonly $onReleased: Observable<void> = this._destroySubject.asObservable();
 
     public readonly context: Playlist | Album | Artist;
     private tracks: SCNGXTrackID[] = [];
+    private _isLocked: boolean = false;
 
     constructor(
         private readonly httpClient: HttpClient,
@@ -74,6 +75,10 @@ export class SCNGXPlayableList extends SCNGXPlayableSource {
      * all resources.
      */
     public override release() {
+        if(this._isLocked) {
+            this.logger.warn("Releasing a list that was marked as locked is not recommended. A locked list means, the list is still in use elsewhere. Because its released now, the list might not be available anymore.")
+        }
+
         this._dataSourceSubject.next(null);
         this._dataSourceSubject.complete();
 
@@ -87,8 +92,8 @@ export class SCNGXPlayableList extends SCNGXPlayableSource {
      * to the tracksUrl endpoint.
      */
     private init() {
-        firstValueFrom(this.httpClient.get<Page<SCNGXTrackID>>(`${this.urls.tracksUrl}`).pipe(takeUntil(this._destroySubject))).then((page) => {
-            this.logger.log(`Successfully fetched track list from ${this.urls.tracksUrl}. Setting up dataSource for ui...`)
+        firstValueFrom(this.httpClient.get<Page<SCNGXTrackID>>(`${this.urls.listUrl}`).pipe(takeUntil(this._destroySubject))).then((page) => {
+            this.logger.log(`Successfully fetched track list from ${this.urls.listUrl}. Setting up dataSource for ui...`)
             
             this.tracks = page.elements;
             this.addAll(page.elements);
@@ -96,8 +101,7 @@ export class SCNGXPlayableList extends SCNGXPlayableSource {
             const dataSource = new SCNGXTrackListDataSourceV2(
                 this.httpClient, 
                 {
-                    url: this.urls.detailsUrl,
-                    pageSize: 50,
+                    url: this.urls.metaUrl,
                     totalElements: page.totalElements
                 },
                 this.tracks
@@ -108,6 +112,35 @@ export class SCNGXPlayableList extends SCNGXPlayableSource {
         }).finally(() => {
             this._readySubject.next(true);
         })
+    }
+
+    /**
+     * Lock the datasource.
+     * This will prevent the source from
+     * being disconnected when still in use.
+     */
+    public lock() {
+        this._dataSourceSubject.getValue()?.lock();
+        this._isLocked = true;
+    }
+
+    /**
+     * Unlock the datasource.
+     * This removes disconnect prevention
+     * and allows the source to be disconnected.
+     */
+    public unlock() {
+        this._dataSourceSubject.getValue()?.unlock();
+        this._isLocked = false;
+    }
+
+    /**
+     * Check if the source is locked.
+     * @returns True or False
+     */
+    public isLocked() {
+        console.log(this._isLocked)
+        return this._isLocked || this._dataSourceSubject.getValue()?.isLocked();
     }
 
 }

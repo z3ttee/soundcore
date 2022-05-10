@@ -7,7 +7,7 @@ import { Error404Module } from 'src/app/shared/error404/error404.module';
 import { ListViewModule } from "src/app/components/resource-views/list-view/list-view.module";
 import { HeroIconModule, dotsVertical } from 'ng-heroicon';
 import { MatRippleModule } from '@angular/material/core';
-import { SCNGXVirtualSongListModule, SCNGXSongListModule } from 'soundcore-ngx';
+import { SCNGXVirtualSongListModule, SCNGXSongListModule, SCNGXSkeletonModule } from 'soundcore-ngx';
 import { VirtualScrollerModule } from 'ngx-virtual-scroller';
 
 const routes: Routes = [
@@ -32,7 +32,8 @@ const routes: Routes = [
 
     SCDKArtistModule,
     SCNGXVirtualSongListModule,
-    SCNGXSongListModule
+    SCNGXSongListModule,
+    SCNGXSkeletonModule
   ]
 })
 export class ArtistModule { }

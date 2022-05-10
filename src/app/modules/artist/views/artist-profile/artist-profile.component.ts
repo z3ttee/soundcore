@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { BehaviorSubject, Observable, Subject, takeUntil } from 'rxjs';
-import { SCNGXPlayableList, SCNGXSongColConfig } from 'soundcore-ngx';
+import { PlayableListBuilder, SCNGXPlayableList, SCNGXSongColConfig } from 'soundcore-ngx';
 import { Artist, SCDKArtistService } from 'soundcore-sdk';
 import { environment } from 'src/environments/environment';
 
@@ -49,10 +49,10 @@ export class ArtistProfileComponent implements OnInit, OnDestroy {
         this._artistSubject.next(artist);
         this._loadingSubject.next(false);
 
-        this._listSubject.next(new SCNGXPlayableList(this.httpClient, {
-          detailsUrl: `${environment.api_base_uri}/v1/songs/byArtist/${artist.id}`,
-          tracksUrl: `${environment.api_base_uri}/v1/songs/byArtist/${artist.id}/ids`
-        }))
+        this._listSubject.next(PlayableListBuilder
+          .withClient(this.httpClient)
+          .metaUrl(`${environment.api_base_uri}/v1/songs/byArtist/${artist.id}/top`)
+          .build());
       })
     })
   }

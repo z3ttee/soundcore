@@ -3,8 +3,11 @@ import { BehaviorSubject, firstValueFrom, map, Observable, of, Subject, Subscrip
 import { Page, Pageable, Song } from "soundcore-sdk";
 import { IPageInfo } from 'ngx-virtual-scroller';
 import { SCNGXTrackID } from "../../entities/playable-source.entity";
+import { SCNGXLogger } from "../logger/logger";
 
 export type TrackListType = "byArtist" | "byPlaylist" | "byAlbum";
+
+export const SCNGX_DATASOURCE_PAGE_SIZE = 50;
 
 export interface TrackListDataSourceOptions {
     /**
@@ -13,11 +16,6 @@ export interface TrackListDataSourceOptions {
      * metadata of tracks.
      */
     url: string;
-
-    /**
-     * Size of page on every pagination request.
-     */
-    pageSize: number;
 
     /**
      * Maximum amount of retrievable elements.
@@ -32,6 +30,7 @@ export interface TrackDataSourceItem {
 }
 
 export class SCNGXTrackListDataSourceV2 {
+    private readonly logger: SCNGXLogger = new SCNGXLogger("DATASOURCE");
 
     private _destroy: Subject<void> = new Subject();
 
@@ -43,9 +42,11 @@ export class SCNGXTrackListDataSourceV2 {
 
     private readonly _dataStream = new BehaviorSubject<TrackDataSourceItem[]>(this._cachedData);
     private readonly _subscription = new Subscription();
+    private _isLocked: boolean = false;
     private _isConnected: boolean = false;
 
     public $stream: Observable<TrackDataSourceItem[]> = this._dataStream.asObservable().pipe(takeUntil(this._destroy));
+    public readonly totalElements = this.options.totalElements;
 
     constructor(
         private readonly httpClient: HttpClient,
@@ -94,10 +95,40 @@ export class SCNGXTrackListDataSourceV2 {
      * resources.
      */
     public disconnect(): void {
+        if(this._isLocked) {
+            this.logger.warn("Disconnecting a datasource that was marked as locked is not recommended. A locked datasource means, the source is still in use elsewhere. Because its disconencted now, the source might not be available anymore.")
+        }
+
         this._subscription.unsubscribe();
 
         this._destroy.next();
         this._destroy.complete();
+    }
+
+    /**
+     * Lock the datasource.
+     * This will prevent the source from
+     * being disconnected when still in use.
+     */
+    public lock() {
+        this._isLocked = true;
+    }
+
+    /**
+     * Unlock the datasource.
+     * This removes disconnect prevention
+     * and allows the source to be disconnected.
+     */
+    public unlock() {
+        this._isLocked = false;
+    }
+
+    /**
+     * Check if the source is locked.
+     * @returns True or False
+     */
+    public isLocked() {
+        return this._isLocked;
     }
 
     /**
@@ -106,7 +137,7 @@ export class SCNGXTrackListDataSourceV2 {
      */
     private _fetchPage(pageNr: number): Observable<Page<Song>> {
         // Check if page was already fetched or has invalid page settings.
-        if (pageNr < 0 || this.options.pageSize <= 0 || this._fetchedPages.has(pageNr) || this._pageFetchStatus[pageNr]) {
+        if (pageNr < 0 || this._fetchedPages.has(pageNr) || this._pageFetchStatus[pageNr]) {
             return of(Page.of([]));
         }
   
@@ -118,7 +149,7 @@ export class SCNGXTrackListDataSourceV2 {
         this._pageFetchStatus[pageNr] = true;
 
         // Build page settings
-        const pageable: Pageable = { page: pageNr, size: this.options.pageSize }
+        const pageable: Pageable = { page: pageNr, size: SCNGX_DATASOURCE_PAGE_SIZE }
 
         const subject: Subject<Page<Song>> = new Subject();
         // Execute request to the detailsUrl
@@ -128,7 +159,7 @@ export class SCNGXTrackListDataSourceV2 {
             this._fetchedPages.add(pageNr);
   
             // Take in the cachedData array (contains all the previously fetched items) and add the newly fetched items to it.
-            this._cachedData.splice(pageNr * this.options.pageSize, this.options.pageSize, ...Array.from({ length: page.elements.length }).map<TrackDataSourceItem>((_, i) => {
+            this._cachedData.splice(pageNr * SCNGX_DATASOURCE_PAGE_SIZE, SCNGX_DATASOURCE_PAGE_SIZE, ...Array.from({ length: page.elements.length }).map<TrackDataSourceItem>((_, i) => {
                 if(!page.elements[i]) return null;
                 const song = Object.assign(new Song(), page.elements[i]);
 
@@ -155,7 +186,7 @@ export class SCNGXTrackListDataSourceV2 {
      * @returns Page number
      */
     private getPageForIndex(index: number): number {
-        return Math.floor(index / this.options.pageSize);
+        return Math.floor(index / SCNGX_DATASOURCE_PAGE_SIZE);
     }
 
     /**
@@ -171,7 +202,7 @@ export class SCNGXTrackListDataSourceV2 {
     }
 
     private _getIndexForPageAndItemIndex(pageNr: number, index: number): number {
-        const amount = pageNr * this.options.pageSize;
+        const amount = pageNr * SCNGX_DATASOURCE_PAGE_SIZE;
         return amount + index;
     }
 

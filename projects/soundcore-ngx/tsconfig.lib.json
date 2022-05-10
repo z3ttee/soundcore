@@ -7,6 +7,7 @@
     "declarationMap": true,
     "inlineSources": true,
     "resolveJsonModule": true,
+    "stripInternal": true,
     "types": []
   },
   "exclude": [

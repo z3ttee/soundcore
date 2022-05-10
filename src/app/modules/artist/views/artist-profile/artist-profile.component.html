@@ -1,7 +1,8 @@
 <app-error404 *ngIf="!($loading | async) && !($artist | async)"></app-error404>
 
-<section class="w-full h-full py-window overflow-y-auto border" #pageScroll>
+<section class="w-full h-full py-window overflow-y-auto" #pageScroll>
     <virtual-scroller #pageScroll [parentScroll]="pageScroll" [enableUnequalChildrenSizes]="true">
+        
         <div class="px-window">
             <app-list-view [resource]="($artist | async)" [title]="($artist | async)?.name" [artwork]="($artist | async)?.artwork" [isLoading]="($loading | async)">
                 <ng-container scngx-stats>
@@ -28,12 +29,13 @@
             </app-list-view>
         </div>
 
-        <div class="flex items-start w-full px-window">
+        <div class="flex items-start w-full px-window border">
             <div class="inline-block relative flex-grow">
-                <h6>Beliebte Songs</h6>
+                <h6 *ngIf="!($loading | async)">Beliebte Songs</h6>
+                <scngx-skeleton *ngIf="($loading | async)" [class]="'w-44 max-w-[90%] h-7'"></scngx-skeleton>
 
-                <div class="mt-4">
-                    <scngx-song-list [columns]="songListCols" [dataSource]="($list | async)?.$dataSource | async"></scngx-song-list>
+                <div class="mt-4 h-64">
+                    <scngx-virtual-song-list [showSkeleton]="true" [skeletons]="5" [parentScroll]="pageScroll" [columns]="songListCols" [dataSource]="($list | async)?.$dataSource | async"></scngx-virtual-song-list>
                 </div>
             </div>
 
@@ -41,5 +43,6 @@
                 <h6>Lieblingssongs</h6>
             </div>
         </div>
+
     </virtual-scroller>
 </section>

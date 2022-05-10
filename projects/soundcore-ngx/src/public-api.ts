@@ -84,6 +84,7 @@ export * from "./lib/pipes/added-to-playlist/added-to-playlist.pipe";
 // export * from "./lib/utils/datasource/track-list.datasource";
 // export * from "./lib/utils/datasource/datasource";
 export * from "./lib/entities/playable-list.entity";
+export * from "./lib/utils/builder/playable-list.builder";
 export * from "./lib/utils/datasource/datasourcev2";
 
 // Notifications
