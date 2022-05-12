@@ -1,0 +1,10 @@
+<div class="w-full my-row">
+    <div class="flex items-center px-window gap-4 select-none" *ngIf="headline || route">
+        <h6 class="font-semi line-clamp-1 flex-grow" *ngIf="headline">Öffentliche Playlists</h6>
+        <p class="hover:underline cursor-pointer" [routerLink]="route" *ngIf="route">{{ routeText }}</p>
+    </div>
+
+    <div class="w-full py-4" #scrollArea>
+        <ng-content></ng-content>
+    </div>
+</div>

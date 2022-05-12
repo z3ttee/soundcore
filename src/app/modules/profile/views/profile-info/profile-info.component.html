@@ -6,11 +6,11 @@
             <app-list-view [resource]="($profile | async)" [artwork]="null" [isLoading]="($loading | async)" [title]="($profile | async)?.username">
 
                 <ng-container scngx-stats>
-                    <li class="text-font-secondary" scngxTooltip [scngxTooltipText]="($profile | async).createdAt | date:'dd.MM.yyyy'">
-                        Seit {{ ($profile | async).createdAt | date:"yyyy" }}
+                    <li class="text-font-secondary" scngxTooltip [scngxTooltipText]="($profile | async)?.createdAt | date:'dd.MM.yyyy'">
+                        Seit {{ ($profile | async)?.createdAt | date:"yyyy" }}
                     </li>
                     <li class="text-font-secondary">
-                        {{ ($profile | async).friendsCount || 0 }} Freunde
+                        {{ ($profile | async)?.friendsCount || 0 }} Freunde
                     </li>
                     <li class="text-font-secondary">
                         {{ ($playlists | async)?.length || 0 }} Öffentliche Playlists
@@ -27,14 +27,8 @@
         </div>
 
         <!-- Playlists row -->
-        <div class="w-full my-row">
-            <div class="flex items-center px-window gap-4">
-                <h6 class="font-semi line-clamp-1 flex-grow">Öffentliche Playlists</h6>
-                <p>Alles anzeigen</p>
-            </div>
-            
-
-            <div class="w-full py-4" #scrollArea>
+        <scngx-ui-row [route]="['./playlists']" [headline]="'Öffentliche Playlists'">
+            <div class="w-full" #scrollArea>
                 <virtual-scroller class="w-full h-64" #scroll [parentScroll]="scrollArea" [items]="($playlists | async)" [horizontal]="true" [scrollbarWidth]="0" [scrollbarHeight]="0">
                     <div class="w-48 h-full mx-2 first:ml-window last:mr-window" *ngFor="let playlist of scroll.viewPortItems">
                         <scngx-playlist-grid-item 
@@ -44,7 +38,7 @@
                     </div>
                 </virtual-scroller>
             </div>
-        </div>
+        </scngx-ui-row>
 
         <!-- Artists row -->
         <div class="w-full my-row">

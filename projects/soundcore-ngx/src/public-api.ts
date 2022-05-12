@@ -56,6 +56,9 @@ export * from "./lib/components/list/song-list/song-list.component";
 export * from "./lib/components/list/virtual-song-list/virtual-song-list.module";
 export * from "./lib/components/list/virtual-song-list/virtual-song-list.component";
 
+// Rows
+export * from "./lib/components/ui-row/ui-row.module";
+export * from "./lib/components/ui-row/ui-row.component";
 
 // Grids
 export * from "./lib/components/grids/vertical-grid/vertical-grid.module";
