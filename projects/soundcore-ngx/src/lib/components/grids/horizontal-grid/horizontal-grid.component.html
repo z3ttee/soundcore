@@ -1,0 +1,17 @@
+    <div #container class="horizontal_scroll block w-full overflow-hidden scroll-smooth relative">
+        <div class="absolute left-2 top-1/2 transform-gpu -translate-y-1/2 z-30 pointer-events-none max-h-full" *ngIf="!isTouch">
+            <button (click)="scrollPrev()" class="w-11 max-h-full aspect-square flex justify-center items-center border border-body-light border-opacity-80 bg-body rounded-full pointer-events-auto shadow-lg transform-gpu active:scale-[90%] transition-all will-change-transform" *ngIf="showPrev">
+                <hero-icon name="chevron-right" [class]="'h-6 w-6 transform-gpu rotate-180'"></hero-icon>
+            </button>
+        </div>
+
+        <div #scroller class="scroll-area grid grid-flow-col gap-4 scroll-smooth overflow-x-auto overflow-y-hidden px-window">
+            <ng-content></ng-content>
+        </div>
+
+        <div class="absolute right-2 top-1/2 transform-gpu -translate-y-1/2 z-30 pointer-events-none max-h-full" *ngIf="!isTouch">
+            <button (click)="scrollNext()" class="w-11 max-h-full aspect-square flex justify-center items-center border border-body-light border-opacity-80 bg-body rounded-full pointer-events-auto shadow-lg transform-gpu active:scale-[90%] transition-all will-change-transform" *ngIf="showNext">
+                <hero-icon name="chevron-right" [class]="'h-6 w-6'"></hero-icon>
+            </button>
+        </div>
+    </div>

@@ -70,6 +70,9 @@ export * from "./lib/components/ui-row/ui-row.component";
 export * from "./lib/components/grids/vertical-grid/vertical-grid.module";
 export * from "./lib/components/grids/vertical-grid/vertical-grid.component";
 
+export * from "./lib/components/grids/horizontal-grid/horizontal-grid.module";
+export * from "./lib/components/grids/horizontal-grid/horizontal-grid.component";
+
 // Image exports
 export * from "./lib/components/images/artwork/artwork.module";
 export * from "./lib/components/images/artwork/artwork.component";
@@ -82,7 +85,6 @@ export * from "./lib/components/progress/progressbar/progressbar.component";
 export * from "./lib/components/badges/explicit-badge/explicit-badge.module";
 export * from "./lib/components/badges/explicit-badge/explicit-badge.component";
 
-
 // Pipes
 export * from "./lib/pipes/song-duration/song-duration.module";
 export * from "./lib/pipes/song-duration/song-duration.pipe";
@@ -90,8 +92,6 @@ export * from "./lib/pipes/added-to-playlist/added-to-playlist.module";
 export * from "./lib/pipes/added-to-playlist/added-to-playlist.pipe";
 
 // Datasource
-// export * from "./lib/utils/datasource/track-list.datasource";
-// export * from "./lib/utils/datasource/datasource";
 export * from "./lib/entities/playable-list.entity";
 export * from "./lib/utils/builder/playable-list.builder";
 export * from "./lib/utils/datasource/datasourcev2";

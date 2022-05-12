@@ -1,12 +1,20 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-
-
+import { SCNGXHorizontalGridComponent } from './horizontal-grid.component';
+import { VirtualScrollerModule } from 'ngx-virtual-scroller';
+import { HeroIconModule, chevronRight } from 'ng-heroicon';
 
 @NgModule({
-  declarations: [],
+  declarations: [
+    SCNGXHorizontalGridComponent
+  ],
   imports: [
-    CommonModule
+    CommonModule,
+    VirtualScrollerModule,
+    HeroIconModule.withIcons({ chevronRight })
+  ],
+  exports: [
+    SCNGXHorizontalGridComponent
   ]
 })
-export class HorizontalGridModule { }
+export class SCNGXHorizontalGridModule { }
