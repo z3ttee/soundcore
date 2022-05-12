@@ -1,10 +1,11 @@
 <scngx-resource-grid-item>
     <scngx-artwork class="w-full aspect-square rounded overflow-hidden" [artwork]="item?.artwork" scngx-artwork></scngx-artwork>
 
-    <p class="font-bold line-clamp-2 break-words">{{ item?.title }}</p>
+    <p class="font-bold line-clamp-2">{{ item?.title }}</p>
     <div class="line-clamp-2 opacity-60">
         <ul>
-            <li class="text-sm">von <span class="text-sm">{{ item?.author?.username }}</span></li>
+            <li class="text-sm" *ngIf="useDate">{{ item?.released | date:"yyyy" }}</li>
+            <li class="text-sm" *ngIf="!useDate">von <span class="text-sm">{{ item?.artist?.name }}</span></li>
         </ul>
     </div>
 </scngx-resource-grid-item>

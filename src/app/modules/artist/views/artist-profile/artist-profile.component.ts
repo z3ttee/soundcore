@@ -3,7 +3,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { BehaviorSubject, Observable, Subject, takeUntil } from 'rxjs';
 import { PlayableListBuilder, SCNGXPlayableList, SCNGXSongColConfig } from 'soundcore-ngx';
-import { Artist, SCDKArtistService } from 'soundcore-sdk';
+import { Album, Artist, SCDKAlbumService, SCDKArtistService } from 'soundcore-sdk';
 import { environment } from 'src/environments/environment';
 
 @Component({
@@ -15,6 +15,7 @@ export class ArtistProfileComponent implements OnInit, OnDestroy {
 
   constructor(
     private readonly artistService: SCDKArtistService,
+    private readonly albumService: SCDKAlbumService,
     private readonly activatedRoute: ActivatedRoute,
     private readonly httpClient: HttpClient
   ) { }
@@ -22,10 +23,12 @@ export class ArtistProfileComponent implements OnInit, OnDestroy {
   private readonly _destroy: Subject<void> = new Subject();
   private readonly _loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject(false);
   private readonly _artistSubject: BehaviorSubject<Artist> = new BehaviorSubject(null);
+  private readonly _albumSubject: BehaviorSubject<Album[]> = new BehaviorSubject([]);
   private readonly _listSubject: BehaviorSubject<SCNGXPlayableList> = new BehaviorSubject(null);
 
   public readonly $loading: Observable<boolean> = this._loadingSubject.asObservable();
   public readonly $artist: Observable<Artist> = this._artistSubject.asObservable();
+  public readonly $albums: Observable<Album[]> = this._albumSubject.asObservable();
   public readonly $list: Observable<SCNGXPlayableList> = this._listSubject.asObservable();
 
   public readonly songListCols: SCNGXSongColConfig = {
@@ -41,6 +44,7 @@ export class ArtistProfileComponent implements OnInit, OnDestroy {
 
       this._loadingSubject.next(true);
       this._artistSubject.next(null);
+      this._albumSubject.next([]);
 
       // TODO: Check if playable list is not enqueued
       this._listSubject.getValue()?.release();
@@ -48,6 +52,10 @@ export class ArtistProfileComponent implements OnInit, OnDestroy {
       this.artistService.findById(artistId).pipe(takeUntil(this._destroy)).subscribe((artist) => {
         this._artistSubject.next(artist);
         this._loadingSubject.next(false);
+
+        this.albumService.findByArtist(artistId, { page: 0, size: 10 }).pipe(takeUntil(this._destroy)).subscribe((page) => {
+          this._albumSubject.next(page.elements);
+        });
 
         this._listSubject.next(PlayableListBuilder
           .withClient(this.httpClient)

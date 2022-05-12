@@ -44,5 +44,20 @@
             </div>
         </div>
 
+        <scngx-ui-row [headline]="'Alben'" [route]="['./albums']">
+            <div class="w-full" #scrollArea>
+                <virtual-scroller class="w-full h-64" #scroll [parentScroll]="scrollArea" [items]="($albums | async)" [horizontal]="true" [scrollbarWidth]="0" [scrollbarHeight]="0">
+                    <div class="w-48 h-full mx-2 first:ml-window last:mr-window" *ngFor="let album of scroll.viewPortItems">
+                        
+                        <scngx-album-grid-item 
+                            [item]="album" 
+                            [routerLink]="['/album', album.slug || album.id]">
+                        </scngx-album-grid-item>
+                        
+                    </div>
+                </virtual-scroller>
+            </div>
+        </scngx-ui-row>
+
     </virtual-scroller>
 </section>

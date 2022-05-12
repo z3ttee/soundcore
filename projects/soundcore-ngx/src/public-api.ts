@@ -28,15 +28,21 @@ export * from "./lib/components/navigation/tabbar/tab-item/tab-item.component";
 export * from "./lib/services/screen/screen.module";
 export * from "./lib/services/screen/screen.service";
 
-// Song grid item exports
+// Grid items
 export * from "./lib/components/grid/resource-grid-item/resource-grid-item.module";
 export * from "./lib/components/grid/resource-grid-item/resource-grid-item.component";
+
 export * from "./lib/components/grid/song-grid-item/song-grid-item.module";
 export * from "./lib/components/grid/song-grid-item/song-grid-item.component";
+
 export * from "./lib/components/grid/collection-grid-item/collection-grid-item.module";
 export * from "./lib/components/grid/collection-grid-item/collection-grid-item.component";
+
 export * from "./lib/components/grid/playlist-grid-item/playlist-grid-item.module";
 export * from "./lib/components/grid/playlist-grid-item/playlist-grid-item.component";
+
+export * from "./lib/components/grid/album-grid-item/album-grid-item.module";
+export * from "./lib/components/grid/album-grid-item/album-grid-item.component";
 
 // List exports
 export * from "./lib/components/list/nav-list-item/nav-list-item.module";
