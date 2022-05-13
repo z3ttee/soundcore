@@ -44,6 +44,7 @@
             </div>
         </div>
 
+        <!-- Albums -->
         <scngx-ui-row [headline]="'Alben'" [route]="['./albums']">
             
             <div class="w-full">
@@ -55,7 +56,37 @@
                             </scngx-album-grid-item>
                         </ng-container>
                 </scngx-horizontal-grid>
-        </div>
+            </div>
+        </scngx-ui-row>
+
+        <!-- Featured in playlists -->
+        <scngx-ui-row [headline]="'Enthalten in'" [route]="['./playlists']">
+            
+            <div class="w-full">
+                <scngx-horizontal-grid [items]="($featPlaylists | async)">
+                        <ng-container *ngFor="let item of ($featPlaylists | async)">
+                            <scngx-playlist-grid-item
+                                [item]="item"
+                                [routerLink]="['/playlist', item?.slug || item?.id]">
+                            </scngx-playlist-grid-item>
+                        </ng-container>
+                </scngx-horizontal-grid>
+            </div>
+        </scngx-ui-row>
+
+        <!-- Featured in album -->
+        <scngx-ui-row [headline]="'Alben mit ' + ($artist | async)?.name" [route]="['./playlists']">
+            
+            <div class="w-full">
+                <scngx-horizontal-grid [items]="($albums | async)">
+                        <ng-container *ngFor="let item of ($featAlbums | async)">
+                            <scngx-album-grid-item 
+                                [item]="item" 
+                                [routerLink]="['/album', item.slug || item.id]">
+                            </scngx-album-grid-item>
+                        </ng-container>
+                </scngx-horizontal-grid>
+            </div>
         </scngx-ui-row>
 
     </virtual-scroller>

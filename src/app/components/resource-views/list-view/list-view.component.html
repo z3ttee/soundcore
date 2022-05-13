@@ -4,7 +4,9 @@
         <!-- Playlist Cover -->
         <div class="block min-w-52 max-w-52 mx-auto aspect-square rounded overflow-hidden" [ngClass]="{'block min-w-60 max-w-60 border': ($isTouch | async)}">
             <scngx-skeleton *ngIf="isLoading" [class]="'w-full h-full rounded'"></scngx-skeleton>
-            <div *ngIf="!isLoading" class="w-full h-full bg-body-light rounded"></div>
+            <div *ngIf="!isLoading" class="w-full h-full bg-body-light rounded">
+                <scngx-artwork [artwork]="artwork"></scngx-artwork>
+            </div>
         </div>
 
         <!-- Playlist Title -->
