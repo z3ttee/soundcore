@@ -8,6 +8,7 @@ import { Component, Input, OnInit } from '@angular/core';
 export class SCNGXUiRowComponent implements OnInit {
 
   @Input() public headline: string;
+  @Input() public subtitle: string;
   @Input() public routeText: string = "Mehr anzeigen";
   @Input() public route: string | any[];
 
