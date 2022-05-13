@@ -1,10 +1,9 @@
 <div class="block w-full relative px-window pt-window">
-    <div class="absolute top-0 left-0 w-full h-full z-0" [style]="'background: linear-gradient(180deg, ' + artwork?.accentColor + 'ff 0%, ' + artwork?.accentColor + '00 100%);'"></div>
+    <div class="absolute top-0 left-0 w-full h-[80%] z-0" [style]="'background: linear-gradient(180deg, ' + accentColor+ 'ff 0%, ' + accentColor + '00 100%);'"></div>
 
     <div class="relative block items-end w-full z-10" [ngClass]="{'flex': !($isTouch | async)}">
-
         <!-- Playlist Cover -->
-        <div class="block min-w-52 max-w-52 mx-auto aspect-square rounded overflow-hidden" [ngClass]="{'block min-w-60 max-w-60 border': ($isTouch | async)}">
+        <div class="block min-w-52 max-w-52 mx-auto aspect-square rounded overflow-hidden shadow-xl" [ngClass]="{'block min-w-60 max-w-60 border': ($isTouch | async)}">
             <scngx-skeleton *ngIf="isLoading" [class]="'w-full h-full rounded'"></scngx-skeleton>
             <div *ngIf="!isLoading" class="w-full h-full bg-body-light rounded">
                 <scngx-artwork [artwork]="artwork"></scngx-artwork>
@@ -15,7 +14,7 @@
         <div class="block w-full p-4" [ngClass]="{'px-0 ': ($isTouch | async)}">
             <scngx-skeleton *ngIf="isLoading" [class]="'h-12 w-4/5 max-w-96'"></scngx-skeleton>
 
-            <h3 *ngIf="!isLoading" [ngClass]="{'text-xl': ($isTouch | async)}">
+            <h3 *ngIf="!isLoading" class="drop-shadow" [ngClass]="{'text-xl': ($isTouch | async)}">
                 {{ title }}
             </h3>
 
