@@ -1,7 +1,7 @@
 <app-error404 *ngIf="showError404" [title]="'Playlist nicht gefunden'"></app-error404>
 
 <div class="h-full w-full" #parentScroll>
-    <div class="p-window">
+    <div>
         <app-list-view [resource]="playlist" [title]="playlist?.title" [isLoading]="isLoadingPlaylist" [artwork]="playlist?.artwork">
             <ng-container scngx-stats>
                 <li class="text-font-secondary">

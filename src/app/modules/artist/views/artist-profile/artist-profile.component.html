@@ -1,9 +1,9 @@
 <app-error404 *ngIf="!($loading | async) && !($artist | async)"></app-error404>
 
-<section class="w-full h-full py-window overflow-y-auto" #pageScroll>
+<section class="w-full h-full pb-window overflow-y-auto" #pageScroll>
     <virtual-scroller #pageScroll [parentScroll]="pageScroll" [enableUnequalChildrenSizes]="true">
         
-        <div class="px-window">
+        <div>
             <app-list-view [resource]="($artist | async)" [title]="($artist | async)?.name" [artwork]="($artist | async)?.artwork" [isLoading]="($loading | async)">
                 <ng-container scngx-stats>
                     <li class="text-font-secondary">
