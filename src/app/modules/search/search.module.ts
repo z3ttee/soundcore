@@ -2,8 +2,11 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Routes } from '@angular/router';
 import { SearchIndexComponent } from './views/search-index/search-index.component';
-import { SCNGXScreenModule, SCNGXToolbarModule } from 'soundcore-ngx';
-import { SCDKSearchModule } from 'soundcore-sdk';
+import { SCNGXScreenModule, SCNGXToolbarModule, SCNGXUiRowModule } from 'soundcore-ngx';
+import { SCNGXHorizontalGridModule } from 'soundcore-ngx';
+import { SCNGXAlbumGridItemModule } from 'soundcore-ngx';
+import { SCNGXPlaylistGridItemModule } from 'soundcore-ngx';
+import { Error404Module } from 'src/app/shared/error404/error404.module';
 
 const routes: Routes = [
   { path: "", component: SearchIndexComponent }
@@ -16,11 +19,14 @@ const routes: Routes = [
   imports: [
     CommonModule,
     RouterModule.forChild(routes),
+    Error404Module,
 
     SCNGXScreenModule,
     SCNGXToolbarModule,
-
-    SCDKSearchModule
+    SCNGXUiRowModule,
+    SCNGXHorizontalGridModule,
+    SCNGXAlbumGridItemModule,
+    SCNGXPlaylistGridItemModule
   ]
 })
 export class SearchModule { }

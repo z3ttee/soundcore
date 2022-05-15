@@ -4,11 +4,12 @@ import { SCNGXBottomNavModule, SCNGXDialogModule, SCNGXDrawerModule, SCNGXProgre
 import { RouterModule } from "@angular/router";
 import { CommonModule } from "@angular/common";
 import { HeroIconModule, home, search, user, bookmarkAlt, chevronDown, plus } from "ng-heroicon";
-import { SCDKPlaylistModule } from "soundcore-sdk";
+import { SCDKPlaylistModule, SCDKSearchModule } from "soundcore-sdk";
 import { SCNGXPlaylistListItemModule } from "projects/soundcore-ngx/src/public-api";
 import {DragDropModule} from '@angular/cdk/drag-drop';
 import { ProfileBarModule } from "src/app/components/profile-bar/profile-bar.module";
 import { PlayerBarModule } from "src/app/components/player-bar/player-bar.module";
+import { ReactiveFormsModule } from "@angular/forms";
 
 @NgModule({
     declarations: [
@@ -17,6 +18,7 @@ import { PlayerBarModule } from "src/app/components/player-bar/player-bar.module
     imports: [
         CommonModule,
         RouterModule,
+        ReactiveFormsModule,
         DragDropModule,
         ProfileBarModule,
         PlayerBarModule,
@@ -28,6 +30,7 @@ import { PlayerBarModule } from "src/app/components/player-bar/player-bar.module
         SCNGXDialogModule,
 
         SCDKPlaylistModule,
+        SCDKSearchModule,
 
         HeroIconModule.withIcons({ home, search, user, bookmarkAlt, chevronDown, plus }, { defaultHostDisplay: 'inlineBlock', attachDefaultDimensionsIfNoneFound: true })
     ],

@@ -1,11 +1,12 @@
 import { CdkDragDrop } from "@angular/cdk/drag-drop";
 import { Location } from "@angular/common";
-import { Component, OnDestroy, OnInit, ViewContainerRef } from "@angular/core";
+import { Component, OnDestroy, OnInit } from "@angular/core";
+import { FormControl } from "@angular/forms";
 import { NavigationCancel, NavigationEnd, NavigationError, NavigationStart, Router } from "@angular/router";
 import { SCNGXPlaylistListItemComponent } from "projects/soundcore-ngx/src/public-api";
 import { filter, firstValueFrom, Subject, takeUntil } from "rxjs";
 import { SCNGXDialogService, SCNGXScreenService } from "soundcore-ngx";
-import { Playlist, SCDKPlaylistService } from "soundcore-sdk";
+import { Playlist, SCDKPlaylistService, SCDKSearchService } from "soundcore-sdk";
 import { AuthenticationService } from "src/sso/services/authentication.service";
 
 @Component({
@@ -13,7 +14,10 @@ import { AuthenticationService } from "src/sso/services/authentication.service";
 })
 export class AscMainLayoutComponent implements OnInit, OnDestroy {
 
-    private _destroy: Subject<void> = new Subject();
+    private readonly _destroy: Subject<void> = new Subject();
+
+    public readonly searchInputControl: FormControl = new FormControl("");
+
     public isNavigating: boolean = false;
 
     constructor(
@@ -21,6 +25,7 @@ export class AscMainLayoutComponent implements OnInit, OnDestroy {
         public readonly authService: AuthenticationService,
         public readonly playlistService: SCDKPlaylistService,
         private readonly dialogService: SCNGXDialogService,
+        private readonly searchService: SCDKSearchService,
         private readonly router: Router,
         private readonly _location: Location
     ) {}
@@ -30,12 +35,20 @@ export class AscMainLayoutComponent implements OnInit, OnDestroy {
             console.log(page)
         })
 
+        // Subscribe to router events to show a loader bar at the page top
+        // This indicates the user that the page is loading parts of the app
+        // that are needed for operation
         this.router.events.pipe(filter((event) => event instanceof NavigationStart || event instanceof NavigationEnd || event instanceof NavigationCancel || event instanceof NavigationError), takeUntil(this._destroy)).subscribe((event) => {
             if(event instanceof NavigationStart) {
                 this.isNavigating = true;
             } else {
                 this.isNavigating = false;
             }
+        })
+
+        // Subscribe to input changes and emit globally to handle query
+        this.searchInputControl.valueChanges.pipe(takeUntil(this._destroy)).subscribe((value) => {
+            this.searchService.emitMainInput(value);
         })
     }
 
@@ -57,7 +70,10 @@ export class AscMainLayoutComponent implements OnInit, OnDestroy {
     }
 
     public navigateToSearch() {
-        this.router.navigate(['/search'])
+        this.router.navigate(['/search']).then((value) => {
+            // Only emit, if the prev route was not already /search
+            if(value) this.searchService.emitMainInput(this.searchInputControl.value);
+        })
     }
 
     public openTestDialog() {

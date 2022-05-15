@@ -5,13 +5,51 @@
     </div>
 </scngx-toolbar>
 
-<section class="p-window" [ngClass]="{'pt-0': (screenService.$isTouch | async)}">
-    <div class="w-full">
-        <h6>Letzte Suchanfragen</h6>
+<app-error404 *ngIf="show404"></app-error404>
 
-    </div>
-    <div class="w-full">
-        <h6>Deine favorisierten Genre</h6>
+<section [ngClass]="{'pt-0': (screenService.$isTouch | async)}" *ngIf="!($result | async)">
+    <scngx-ui-row [headline]="'Letzte Suchanfragen'" *ngIf="($recently | async)?.length > 0">
 
-    </div>
+    </scngx-ui-row>
+
+    <scngx-ui-row [headline]="'Meistgehörte Genres'">
+
+    </scngx-ui-row>
+
+    <scngx-ui-row [headline]="'Alle Genres'">
+
+    </scngx-ui-row>
+</section>
+
+<section [ngClass]="{'pt-0': (screenService.$isTouch | async)}" *ngIf="($result | async)">
+
+    <!-- Albums -->
+    <scngx-ui-row [headline]="'Alben'" *ngIf="($result | async)?.albums?.elements?.length > 0">
+        <div class="w-full">
+            <scngx-horizontal-grid>
+                <ng-container *ngFor="let item of ($result | async)?.albums?.elements">
+                    <scngx-album-grid-item 
+                        [item]="item" 
+                        [useDate]="true"
+                        (click)="routeToResult(['/album', item.slug || item.id], item)">
+                    </scngx-album-grid-item>
+                </ng-container>
+            </scngx-horizontal-grid>
+        </div>
+    </scngx-ui-row>
+
+    <!-- Playlists -->
+    <scngx-ui-row [headline]="'Playlists'" *ngIf="($result | async)?.playlists?.elements?.length > 0">
+        <div class="w-full">
+            <scngx-horizontal-grid>
+                <ng-container *ngFor="let item of ($result | async)?.playlists?.elements">
+                    <scngx-playlist-grid-item 
+                        [item]="item"
+                        (click)="routeToResult(['/playlist', item.slug || item.id], item)">
+                    </scngx-playlist-grid-item>
+                </ng-container>
+            </scngx-horizontal-grid>
+        </div>
+    </scngx-ui-row>
+
 </section>

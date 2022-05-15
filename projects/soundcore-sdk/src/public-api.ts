@@ -55,6 +55,8 @@ export * from "./lib/artwork/entities/artwork.entity";
  */
 export * from "./lib/search/search.module";
 export * from "./lib/search/services/search.service";
+export * from "./lib/search/entities/search-result.model";
+export * from "./lib/search/entities/best-match.entity";
 
 /**
  * Export all utils

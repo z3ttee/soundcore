@@ -5,8 +5,8 @@
 export const environment = {
   production: false,
 
-  // api_base_uri: "http://localhost:3001",
-  api_base_uri: "https://api.tsalliance.eu/soundcore",
+  api_base_uri: "http://localhost:3001",
+  // api_base_uri: "https://api.tsalliance.eu/soundcore",
 
   keycloak_url: "https://sso.tsalliance.eu/",
   keycloak_realm: "tsalliance",
