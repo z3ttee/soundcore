@@ -1,9 +1,9 @@
 <app-error404 *ngIf="!($loading | async) && !($artist | async)"></app-error404>
 
-<section class="w-full h-full py-window overflow-y-auto" #pageScroll>
+<section class="w-full h-full pb-window overflow-y-auto" #pageScroll>
     <virtual-scroller #pageScroll [parentScroll]="pageScroll" [enableUnequalChildrenSizes]="true">
         
-        <div class="px-window">
+        <div>
             <app-list-view [resource]="($artist | async)" [title]="($artist | async)?.name" [artwork]="($artist | async)?.artwork" [isLoading]="($loading | async)">
                 <ng-container scngx-stats>
                     <li class="text-font-secondary">
@@ -44,18 +44,50 @@
             </div>
         </div>
 
-        <scngx-ui-row [headline]="'Alben'" [route]="['./albums']">
+        <!-- Albums -->
+        <scngx-ui-row [headline]="'Alben'" [route]="['./albums']" *ngIf="($albums | async)?.length > 0">
             
             <div class="w-full">
-                <scngx-horizontal-grid [items]="($albums | async)">
+                <scngx-horizontal-grid>
                         <ng-container *ngFor="let item of ($albums | async)">
+                            <scngx-album-grid-item 
+                                [item]="item" 
+                                [useDate]="true"
+                                [routerLink]="['/album', item.slug || item.id]">
+                            </scngx-album-grid-item>
+                        </ng-container>
+                </scngx-horizontal-grid>
+            </div>
+        </scngx-ui-row>
+
+        <!-- Featured in playlists -->
+        <scngx-ui-row [headline]="'Enthalten in'" [route]="['./playlists']" *ngIf="($featPlaylists | async)?.length > 0">
+            
+            <div class="w-full">
+                <scngx-horizontal-grid>
+                        <ng-container *ngFor="let item of ($featPlaylists | async)">
+                            <scngx-playlist-grid-item
+                                [item]="item"
+                                [routerLink]="['/playlist', item?.slug || item?.id]">
+                            </scngx-playlist-grid-item>
+                        </ng-container>
+                </scngx-horizontal-grid>
+            </div>
+        </scngx-ui-row>
+
+        <!-- Featured in album -->
+        <scngx-ui-row [headline]="'Alben mit ' + ($artist | async)?.name" [route]="['./playlists']" *ngIf="($featAlbums | async)?.length > 0">
+            
+            <div class="w-full">
+                <scngx-horizontal-grid>
+                        <ng-container *ngFor="let item of ($featAlbums | async)">
                             <scngx-album-grid-item 
                                 [item]="item" 
                                 [routerLink]="['/album', item.slug || item.id]">
                             </scngx-album-grid-item>
                         </ng-container>
                 </scngx-horizontal-grid>
-        </div>
+            </div>
         </scngx-ui-row>
 
     </virtual-scroller>

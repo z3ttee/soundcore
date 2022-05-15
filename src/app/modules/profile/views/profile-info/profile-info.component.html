@@ -1,6 +1,6 @@
 <app-error404 *ngIf="!($loading | async) && !($profile | async)"></app-error404>
 
-<section class="h-full w-full overflow-y-auto py-window" #parent>
+<section class="h-full w-full overflow-y-auto pb-window" #parent>
     <virtual-scroller #pageScroll [parentScroll]="parent" [enableUnequalChildrenSizes]="true">
         <div class="w-full px-window">
             <app-list-view [resource]="($profile | async)" [artwork]="null" [isLoading]="($loading | async)" [title]="($profile | async)?.name">
@@ -41,20 +41,11 @@
         </scngx-ui-row>
 
         <!-- Artists row -->
-        <div class="w-full my-row">
-            <div class="flex items-center px-window gap-4">
-                <h6 class="font-semi line-clamp-1 flex-grow">Top Künstler der letzten 30 Tage</h6>
-                <p>Alles anzeigen</p>
+        <scngx-ui-row [route]="['./playlists']" [headline]="'Top Künstler'" [subtitle]="'Der letzten 30 Tage'">
+            <div class="w-full" #scrollArea>
+                
             </div>
-
-            <div class="w-full py-4" #scrollArea>
-                <virtual-scroller class="w-full h-64" #scroll [parentScroll]="scrollArea" [items]="[]" [horizontal]="true" [scrollbarWidth]="0" [scrollbarHeight]="0">
-                    <div class="w-48 h-full mx-2 first:ml-window last:mr-window" *ngFor="let playlist of scroll.viewPortItems">
-                        
-                    </div>
-                </virtual-scroller>
-            </div>
-        </div>
+        </scngx-ui-row>
 
         <!-- Songs row -->
         <div class="w-full my-row">

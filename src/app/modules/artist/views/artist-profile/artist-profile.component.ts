@@ -3,7 +3,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { BehaviorSubject, Observable, Subject, takeUntil } from 'rxjs';
 import { PlayableListBuilder, SCNGXPlayableList, SCNGXSongColConfig } from 'soundcore-ngx';
-import { Album, Artist, SCDKAlbumService, SCDKArtistService } from 'soundcore-sdk';
+import { Album, Artist, Playlist, SCDKAlbumService, SCDKArtistService, SCDKPlaylistService } from 'soundcore-sdk';
 import { environment } from 'src/environments/environment';
 
 @Component({
@@ -16,6 +16,7 @@ export class ArtistProfileComponent implements OnInit, OnDestroy {
   constructor(
     private readonly artistService: SCDKArtistService,
     private readonly albumService: SCDKAlbumService,
+    private readonly playlistService: SCDKPlaylistService,
     private readonly activatedRoute: ActivatedRoute,
     private readonly httpClient: HttpClient
   ) { }
@@ -24,11 +25,16 @@ export class ArtistProfileComponent implements OnInit, OnDestroy {
   private readonly _loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject(false);
   private readonly _artistSubject: BehaviorSubject<Artist> = new BehaviorSubject(null);
   private readonly _albumSubject: BehaviorSubject<Album[]> = new BehaviorSubject([]);
+  private readonly _featAlbumsSubject: BehaviorSubject<Album[]> = new BehaviorSubject([]);
+  private readonly _featPlaylistSubject: BehaviorSubject<Playlist[]> = new BehaviorSubject([]);
   private readonly _listSubject: BehaviorSubject<SCNGXPlayableList> = new BehaviorSubject(null);
 
   public readonly $loading: Observable<boolean> = this._loadingSubject.asObservable();
   public readonly $artist: Observable<Artist> = this._artistSubject.asObservable();
   public readonly $albums: Observable<Album[]> = this._albumSubject.asObservable();
+  public readonly $featAlbums: Observable<Album[]> = this._featAlbumsSubject.asObservable();
+  public readonly $featPlaylists: Observable<Playlist[]> = this._featPlaylistSubject.asObservable();
+
   public readonly $list: Observable<SCNGXPlayableList> = this._listSubject.asObservable();
 
   public readonly songListCols: SCNGXSongColConfig = {
@@ -45,6 +51,8 @@ export class ArtistProfileComponent implements OnInit, OnDestroy {
       this._loadingSubject.next(true);
       this._artistSubject.next(null);
       this._albumSubject.next([]);
+      this._featAlbumsSubject.next([]);
+      this._featPlaylistSubject.next([]);
 
       // TODO: Check if playable list is not enqueued
       this._listSubject.getValue()?.release();
@@ -53,9 +61,17 @@ export class ArtistProfileComponent implements OnInit, OnDestroy {
         this._artistSubject.next(artist);
         this._loadingSubject.next(false);
 
-        this.albumService.findByArtist(artistId, { page: 0, size: 10 }).pipe(takeUntil(this._destroy)).subscribe((page) => {
-          this._albumSubject.next(page.elements);
+        this.albumService.findByArtist(artistId, { page: 0, size: 12 }).pipe(takeUntil(this._destroy)).subscribe((page) => {
+          this._albumSubject.next(page?.elements || []);
         });
+
+        this.playlistService.findByArtist(artistId, { page: 0, size: 12 }).pipe(takeUntil(this._destroy)).subscribe((page) => {
+          this._featPlaylistSubject.next(page?.elements || []);
+        });
+
+        this.albumService.findFeaturedByArtist(artistId, { page: 0, size: 12 }).pipe(takeUntil(this._destroy)).subscribe((page) => {
+          this._featAlbumsSubject.next(page?.elements || []);
+        })
 
         this._listSubject.next(PlayableListBuilder
           .withClient(this.httpClient)

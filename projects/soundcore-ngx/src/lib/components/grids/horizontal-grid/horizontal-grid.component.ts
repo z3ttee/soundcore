@@ -12,8 +12,6 @@ export class SCNGXHorizontalGridComponent implements OnInit, OnDestroy, AfterVie
 
   @ViewChild("scroller") public scrollerRef: ElementRef<HTMLDivElement>;
 
-  @Input() public items: any[];
-
   public showNext: boolean = false;
   public showPrev: boolean = false;
   public isTouch: boolean = false;

@@ -1,6 +1,5 @@
 <div class="w-full max-h-full">
-
-    <virtual-scroller class="w-full h-full" #scroll [bufferAmount]="5" [items]="($streamObs | async) | async" [parentScroll]="parentScroll" (vsEnd)="fetchMore($event)">
+    <virtual-scroller class="w-full h-full" #scroll [bufferAmount]="3" [items]="($streamObs | async) | async" [parentScroll]="parentScroll" (vsEnd)="fetchMore($event)">
         <scngx-song-list-item 
             *ngFor="let item of scroll.viewPortItems; trackBy: entryTrackBy"
             [columns]="columns"
