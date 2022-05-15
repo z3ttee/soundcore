@@ -1,8 +1,8 @@
 import { HttpClient } from "@angular/common/http";
 import { Inject, Injectable } from "@angular/core";
-import { BehaviorSubject, Observable, Subject } from "rxjs";
+import { BehaviorSubject, Observable } from "rxjs";
 import { SCDKOptions, SCDK_OPTIONS } from "../../scdk.module";
-import { SCDKSearchableEntity } from "../../utils/entities/searchable";
+import { SCDKResource } from "../../utils/entities/resource";
 import { ComplexSearchResult } from "../entities/search-result.model";
 
 @Injectable()
@@ -11,8 +11,8 @@ export class SCDKSearchService {
   private readonly _onMainInputSubject: BehaviorSubject<string> = new BehaviorSubject("");
   public readonly $onMainInput: Observable<string> = this._onMainInputSubject.asObservable();
 
-
-  private readonly _recentlySearchedSubject: BehaviorSubject<SCDKSearchableEntity[]> = new BehaviorSubject([])
+  private readonly _recentlySearchedSubject: BehaviorSubject<SCDKResource[]> = new BehaviorSubject([]);
+  public readonly $recentlySearched: Observable<SCDKResource[]> = this._recentlySearchedSubject.asObservable();
 
   constructor(
     private httpClient: HttpClient,
