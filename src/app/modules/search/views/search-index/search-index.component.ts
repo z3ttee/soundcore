@@ -1,4 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
+import { FormControl } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BehaviorSubject, debounceTime, Observable, Subject, takeUntil } from 'rxjs';
 import { SCNGXScreenService } from 'soundcore-ngx';
@@ -21,6 +22,7 @@ export class SearchIndexComponent implements OnInit, OnDestroy {
   public readonly $recently: Observable<SCDKResource[]> = this._recentlySubject.asObservable().pipe(takeUntil(this._destroy));
 
   public show404: boolean = false;
+  public readonly searchInputControl: FormControl = new FormControl("");
 
   constructor(
     private readonly router: Router,
@@ -30,10 +32,10 @@ export class SearchIndexComponent implements OnInit, OnDestroy {
   ) { }
 
   public ngOnInit(): void {
+
     this.searchService.$onMainInput.pipe(debounceTime(300), takeUntil(this._destroy)).subscribe((query) => {
       this._cancelQuery.next();
 
-      console.log(query)
       if(typeof query == "undefined" || query == null || query.replace(/\s/g, '') == "") {
         this._resultSubject.next(null);
         this.show404 = false;
@@ -49,6 +51,11 @@ export class SearchIndexComponent implements OnInit, OnDestroy {
 
     this.searchService.$recentlySearched.pipe(takeUntil(this._destroy)).subscribe((list) => {
       console.log(list)
+    })
+
+    // Push queries that were received from input on mobile devices.
+    this.searchInputControl.valueChanges.pipe(takeUntil(this._destroy)).subscribe((value) => {
+      this.searchService.emitMainInput(value);
     })
   }
 

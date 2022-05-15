@@ -7,6 +7,7 @@ import { SCNGXHorizontalGridModule } from 'soundcore-ngx';
 import { SCNGXAlbumGridItemModule } from 'soundcore-ngx';
 import { SCNGXPlaylistGridItemModule } from 'soundcore-ngx';
 import { Error404Module } from 'src/app/shared/error404/error404.module';
+import { ReactiveFormsModule } from '@angular/forms';
 
 const routes: Routes = [
   { path: "", component: SearchIndexComponent }
@@ -19,6 +20,7 @@ const routes: Routes = [
   imports: [
     CommonModule,
     RouterModule.forChild(routes),
+    ReactiveFormsModule,
     Error404Module,
 
     SCNGXScreenModule,
