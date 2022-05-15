@@ -7,7 +7,11 @@
 
 <app-error404 *ngIf="show404"></app-error404>
 
-<section [ngClass]="{'pt-0': (screenService.$isTouch | async)}" *ngIf="!($result | async)">
+<section *ngIf="query" class="px-window pt-window" [ngClass]="{'pt-0': (screenService.$isTouch | async)}">
+    <h5>Ergebnisse für "{{ query }}"</h5>
+</section>
+
+<section [ngClass]="{'pt-0': (screenService.$isTouch | async)}" *ngIf="!query">
     <scngx-ui-row [headline]="'Letzte Suchanfragen'" *ngIf="($recently | async)?.length > 0">
 
     </scngx-ui-row>
@@ -21,7 +25,7 @@
     </scngx-ui-row>
 </section>
 
-<section [ngClass]="{'pt-0': (screenService.$isTouch | async)}" *ngIf="($result | async)">
+<section [ngClass]="{'pt-0': (screenService.$isTouch | async)}" *ngIf="query">
 
     <!-- Albums -->
     <scngx-ui-row [headline]="'Alben'" *ngIf="($result | async)?.albums?.elements?.length > 0">

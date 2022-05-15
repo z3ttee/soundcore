@@ -22,6 +22,7 @@ export class SearchIndexComponent implements OnInit, OnDestroy {
   public readonly $recently: Observable<SCDKResource[]> = this._recentlySubject.asObservable().pipe(takeUntil(this._destroy));
 
   public show404: boolean = false;
+  public query: string = "";
   public readonly searchInputControl: FormControl = new FormControl("");
 
   constructor(
@@ -35,6 +36,7 @@ export class SearchIndexComponent implements OnInit, OnDestroy {
 
     this.searchService.$onMainInput.pipe(debounceTime(300), takeUntil(this._destroy)).subscribe((query) => {
       this._cancelQuery.next();
+      this.query = query;
 
       if(typeof query == "undefined" || query == null || query.replace(/\s/g, '') == "") {
         this._resultSubject.next(null);
