@@ -5,6 +5,7 @@ import { Playlist } from "../../playlist/entities/playlist.entity";
 import { SCDKResource, SCDKResourceType } from "../../utils/entities/resource";
 
 export class Song implements SCDKResource {
+    public slug: string;
     public resourceType: SCDKResourceType;
     
     public id: string;
