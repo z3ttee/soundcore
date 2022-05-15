@@ -9,7 +9,7 @@ export class Playlist implements SCDKResource {
 
     // General playlist metadata
     public id: PlaylistID;
-    public title: string;
+    public name: string;
     public description?: string;
     public privacy?: PlaylistPrivacy;
     // TODO: public collaborative: boolean;

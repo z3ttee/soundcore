@@ -38,7 +38,7 @@
     
             <div class="w-full">
                 <p class="line-clamp-1" [ngClass]="{'text-accent-dark drop-shadow-sm': isActive}">
-                    {{ song?.title }}
+                    {{ song?.name || "Unbekannter Titel" }}
                 </p>
                 <div class="line-clamp-1">
                     <ul class="">
@@ -59,7 +59,7 @@
     <!-- Song album -->
     <div class="max-w-44 min-w-44 px-2 text-right line-clamp-1 text-font text-opacity-70" *ngIf="($showAlbum | async)">
         <scngx-skeleton *ngIf="!song" [class]="'h-5 w-full'"></scngx-skeleton>
-        <span [routerLink]="['/album', song?.albums?.[0]?.slug || song?.albums?.[0]?.id]" class="text-sm text-font text-opacity-70 hover:underline cursor-pointer">{{ song?.albums?.[0]?.title }}</span>
+        <span [routerLink]="['/album', song?.albums?.[0]?.slug || song?.albums?.[0]?.id]" class="text-sm text-font text-opacity-70 hover:underline cursor-pointer">{{ song?.albums?.[0]?.name }}</span>
     </div>
 
     <!-- Date added to playlist -->

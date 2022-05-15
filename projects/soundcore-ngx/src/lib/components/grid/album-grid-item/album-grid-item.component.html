@@ -1,7 +1,7 @@
 <scngx-resource-grid-item>
     <scngx-artwork class="w-full aspect-square rounded overflow-hidden" [artwork]="item?.artwork" scngx-artwork></scngx-artwork>
 
-    <p class="font-bold line-clamp-2">{{ item?.title || "Unbekannter Titel" }}</p>
+    <p class="font-bold line-clamp-2">{{ item?.name || "Unbekannter Titel" }}</p>
     <div class="line-clamp-2 opacity-60">
         <ul>
             <li class="text-sm" *ngIf="useDate">{{ item?.released | date:"yyyy" }}</li>

@@ -75,7 +75,7 @@ export class AuthenticationService {
 
             const user = new User();
             user.id = profile.id;
-            user.username = profile.username;
+            user.name = profile.username;
             user.roles = this.keycloakService.getUserRoles();
 
             this._userSubject.next(user);

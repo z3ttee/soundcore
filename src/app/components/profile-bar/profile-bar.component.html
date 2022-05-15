@@ -4,7 +4,7 @@
     </div>
     <div class="w-full">
         <p class="text-sm text-font-secondary -mb-0.5">Angemeldet als</p>
-        <p class="font-semi">{{ user?.username }}</p>
+        <p class="font-semi">{{ user?.name || user?.id }}</p>
     </div>
     <div class="flex items-center justify-center min-w-10 max-w-10 h-10 rounded-full">
         <span class="transition-all will-change-transform inline-flex justify-center items-center" [ngClass]="{'transform-gpu rotate-180': showOverlay}"><hero-icon [name]="'chevron-down'" [class]="'h-5 w-5'"></hero-icon></span>

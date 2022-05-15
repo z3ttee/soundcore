@@ -5,6 +5,6 @@
         {{ (albumService.$collection | async) }}
     </div>
     <div *ngFor="let album of (albumService.$collection | async)">
-        {{ album.title }}
+        {{ album.name }}
     </div>
 </scngx-vertical-grid>

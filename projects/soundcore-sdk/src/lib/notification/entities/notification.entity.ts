@@ -12,7 +12,7 @@ export class Notification implements SCDKResource {
      /**
       * Title of the notification
       */
-     public title: string;
+     public name: string;
  
      /**
       * Message of the notification.

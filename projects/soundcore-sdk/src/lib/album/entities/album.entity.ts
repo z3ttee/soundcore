@@ -11,7 +11,7 @@ export class Album implements SCDKResource {
     public resourceType: SCDKResourceType;
 
     public id: AlbumID;
-    public title: string;
+    public name: string;
     public released: Date;
     public description: string;
     public slug: string;

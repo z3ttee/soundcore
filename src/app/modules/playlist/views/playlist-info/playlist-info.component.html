@@ -2,10 +2,10 @@
 
 <div class="h-full w-full" #parentScroll>
     <div class="p-window">
-        <app-list-view [resource]="playlist" [title]="playlist?.title" [isLoading]="isLoadingPlaylist" [artwork]="playlist?.artwork">
+        <app-list-view [resource]="playlist" [title]="playlist?.name" [isLoading]="isLoadingPlaylist" [artwork]="playlist?.artwork">
             <ng-container scngx-stats>
                 <li class="text-font-secondary">
-                    <span *ngIf="playlist?.author">by <span class="hover:underline cursor-pointer" [routerLink]="['/profile', playlist?.author?.slug || playlist?.author?.id]">{{ playlist?.author?.username }}</span></span>
+                    <span *ngIf="playlist?.author">by <span class="hover:underline cursor-pointer" [routerLink]="['/profile', playlist?.author?.slug || playlist?.author?.id]">{{ playlist?.author?.name }}</span></span>
                 </li>
                 <li class="text-font-secondary">
                     <span>{{ playlist?.songsCount }} {{ playlist?.songsCount != 1 ? 'Songs' : 'Song' }}</span>

@@ -3,7 +3,7 @@
 <section class="h-full w-full overflow-y-auto py-window" #parent>
     <virtual-scroller #pageScroll [parentScroll]="parent" [enableUnequalChildrenSizes]="true">
         <div class="w-full px-window">
-            <app-list-view [resource]="($profile | async)" [artwork]="null" [isLoading]="($loading | async)" [title]="($profile | async)?.username">
+            <app-list-view [resource]="($profile | async)" [artwork]="null" [isLoading]="($loading | async)" [title]="($profile | async)?.name">
 
                 <ng-container scngx-stats>
                     <li class="text-font-secondary" scngxTooltip [scngxTooltipText]="($profile | async)?.createdAt | date:'dd.MM.yyyy'">

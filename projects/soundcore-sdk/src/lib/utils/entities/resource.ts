@@ -5,5 +5,6 @@ export interface SCDKResource {
 
     id: string;
     resourceType: SCDKResourceType;
+    name: string;
 
 }

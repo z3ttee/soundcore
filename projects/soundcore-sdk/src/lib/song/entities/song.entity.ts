@@ -8,7 +8,7 @@ export class Song implements SCDKResource {
     public resourceType: SCDKResourceType;
     
     public id: string;
-    public title: string;
+    public name: string;
     public duration: number;
     public released: Date;
     public description: string;

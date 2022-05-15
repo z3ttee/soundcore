@@ -1,6 +1,6 @@
 <scngx-nav-list-item>
     <div class="flex items-center gap-4 py-2 text-inherit">
         <scngx-artwork class="min-w-8 max-w-8 h-8 rounded-sm overflow-hidden" [artwork]="playlist?.artwork"></scngx-artwork>
-        <p class="w-full text-inherit">{{ playlist.title }}</p>
+        <p class="w-full text-inherit">{{ playlist?.name || "Unbekannter Titel" }}</p>
     </div>
 </scngx-nav-list-item>

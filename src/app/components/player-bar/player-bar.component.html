@@ -13,7 +13,7 @@
             </div>
 
             <div class="w-full overflow-hidden">
-                <p class="line-clamp-1">{{ song?.title }}</p>
+                <p class="line-clamp-1">{{ song?.name || "Unbekannter Titel" }}</p>
                 <ul class="line-clamp-1 w-full">
                     <li *ngIf="song?.explicit" class="inline mr-2"><scngx-explicit-badge [extended]="false"></scngx-explicit-badge></li>
                     <li *ngFor="let artist of song?.artists; index as i" class="inline text-font text-opacity-70"><span class="text-sm hover:underline pointer-events-all cursor-pointer" [routerLink]="['/artist', artist.slug || artist.id]">{{ artist.name }}</span>{{ i + 1 < song.artists.length ? ", " : "" }}</li>
