@@ -1,11 +1,12 @@
 import { HttpClient } from "@angular/common/http";
 import { Inject, Injectable } from "@angular/core";
-import { BehaviorSubject, Observable } from "rxjs";
+import { BehaviorSubject, Observable, of, switchMap } from "rxjs";
 import { SCDKOptions, SCDK_OPTIONS } from "../../scdk.module";
 import { SCDKResource } from "../../utils/entities/resource";
 import { ComplexSearchResult } from "../entities/search-result.model";
 import { NgxIndexedDBService } from 'ngx-indexed-db';
-import { SC_SEARCHHISTORY_STORE } from "../../constants";
+import { SC_SEARCHHISTORY_SIZE, SC_SEARCHHISTORY_STORE } from "../../constants";
+import { SearchHistoryEntry } from "../entities/history-entry.entity";
 
 @Injectable()
 export class SCDKSearchService {
@@ -36,14 +37,37 @@ export class SCDKSearchService {
     const recentlySearch = this._recentlySearchedSubject.getValue();
     recentlySearch.push(resource);
 
-    this.dbService.add(SC_SEARCHHISTORY_STORE, resource, resource.id);
-    this._recentlySearchedSubject.next(Array.from(new Set(recentlySearch)));
+    this.clearHistoryOverflow().subscribe(() => {
+      this.dbService.add<SearchHistoryEntry>(SC_SEARCHHISTORY_STORE, new SearchHistoryEntry(resource)).subscribe(() => {
+        this._recentlySearchedSubject.next(Array.from(new Set(recentlySearch)));
+      });
+    });
   }
 
   private restoreRecentlySearched() {
-    this.dbService.getAll<SCDKResource>(SC_SEARCHHISTORY_STORE).subscribe((list) => {
-      this._recentlySearchedSubject.next(list);
+    this.clearHistoryOverflow().subscribe(() => {
+      this.dbService.getAll<SearchHistoryEntry>(SC_SEARCHHISTORY_STORE).subscribe((list) => {
+        this._recentlySearchedSubject.next(list.map((entry) => entry.resource));
+      })
     })
+  }
+
+  private clearHistoryOverflow(): Observable<any> {
+    return this.dbService.count(SC_SEARCHHISTORY_STORE).pipe(
+      switchMap((count) => {
+        if(count > SC_SEARCHHISTORY_SIZE) {
+          return this.dbService.getAll<SearchHistoryEntry>(SC_SEARCHHISTORY_STORE).pipe(switchMap((list) => {
+            list.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
+            const entry = list.splice(0, 1)[0];
+            
+            if(!entry) return of(true);
+            return this.dbService.delete(SC_SEARCHHISTORY_STORE, entry.id);
+          }))
+        } else {
+          return of(true);
+        }
+      })
+    );
   }
 
   /*public searchUser(query: string): Observable<SearchResponse<MeiliUser>> {

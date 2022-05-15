@@ -5,15 +5,22 @@
     </div>
 </scngx-toolbar>
 
+<!-- Show 404 page if no result -->
 <app-error404 *ngIf="show404"></app-error404>
 
+<!-- Show query to user -->
 <section *ngIf="query" class="px-window pt-window" [ngClass]="{'pt-0': (screenService.$isTouch | async)}">
     <h5>Ergebnisse für "{{ query }}"</h5>
 </section>
 
+<!-- Show "home" page for quick access -->
 <section [ngClass]="{'pt-0': (screenService.$isTouch | async)}" *ngIf="!query">
     <scngx-ui-row [headline]="'Letzte Suchanfragen'" *ngIf="($recently | async)?.length > 0">
-
+        <scngx-horizontal-grid>
+            <ng-container *ngFor="let item of ($recently | async)">
+                <!-- // TODO -->
+            </ng-container>
+        </scngx-horizontal-grid>
     </scngx-ui-row>
 
     <scngx-ui-row [headline]="'Meistgehörte Genres'">
@@ -25,8 +32,8 @@
     </scngx-ui-row>
 </section>
 
+<!-- Results page -->
 <section [ngClass]="{'pt-0': (screenService.$isTouch | async)}" *ngIf="query">
-
     <!-- Albums -->
     <scngx-ui-row [headline]="'Alben'" *ngIf="($result | async)?.albums?.elements?.length > 0">
         <div class="w-full">

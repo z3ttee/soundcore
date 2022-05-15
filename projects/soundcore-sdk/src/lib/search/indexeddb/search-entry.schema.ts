@@ -5,7 +5,7 @@ export const SearchEntrySchema = {
     store: SC_SEARCHHISTORY_STORE,
     storeConfig: {
         keyPath: "id",
-        autoIncrement: false
+        autoIncrement: true
     },
     storeSchema: [
         { name: "id", keypath: "id" },
