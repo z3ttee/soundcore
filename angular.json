@@ -179,7 +179,12 @@
       "projectType": "library",
       "root": "projects/soundcore-cdk",
       "sourceRoot": "projects/soundcore-cdk/src",
-      "prefix": "lib",
+      "prefix": "sccdk",
+      "schematics": {
+        "@schematics/angular:component": {
+          "style": "scss"
+        }
+      },
       "architect": {
         "build": {
           "builder": "@angular-devkit/build-angular:ng-packagr",
