@@ -57,6 +57,8 @@ export * from "./lib/search/search.module";
 export * from "./lib/search/services/search.service";
 export * from "./lib/search/entities/search-result.model";
 export * from "./lib/search/entities/best-match.entity";
+export * from "./lib/search/entities/history-entry.entity";
+
 
 /**
  * Export all utils
