@@ -37,11 +37,26 @@ export class SCDKSearchService {
     const recentlySearch = this._recentlySearchedSubject.getValue();
     recentlySearch.push(resource);
 
-    this.clearHistoryOverflow().subscribe(() => {
-      this.dbService.add<SearchHistoryEntry>(SC_SEARCHHISTORY_STORE, new SearchHistoryEntry(resource)).subscribe(() => {
-        this._recentlySearchedSubject.next(Array.from(new Set(recentlySearch)));
-      });
-    });
+    this.dbService.getByKey<SearchHistoryEntry>(SC_SEARCHHISTORY_STORE, resource.id).subscribe((exists) => {
+      if(!exists) {
+        // Add to history if item does not exist
+        this.clearHistoryOverflow().subscribe(() => {
+          this.dbService.add<SearchHistoryEntry>(SC_SEARCHHISTORY_STORE, new SearchHistoryEntry(resource)).subscribe(() => {
+            this._recentlySearchedSubject.next(Array.from(new Set(recentlySearch)));
+          });
+        });
+      } else {
+        // Change date to current date
+        const updated: SearchHistoryEntry = {
+          ...exists,
+          createdAt: new Date()
+        }
+
+        this.dbService.update(SC_SEARCHHISTORY_STORE, updated).subscribe();
+      }
+      
+    })
+    
   }
 
   private restoreRecentlySearched() {
