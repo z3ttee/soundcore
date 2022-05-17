@@ -44,6 +44,9 @@ export * from "./lib/components/grid/playlist-grid-item/playlist-grid-item.compo
 export * from "./lib/components/grid/album-grid-item/album-grid-item.module";
 export * from "./lib/components/grid/album-grid-item/album-grid-item.component";
 
+export * from "./lib/components/grid/artist-grid-item/artist-grid-item.module";
+export * from "./lib/components/grid/artist-grid-item/artist-grid-item.component";
+
 // List exports
 export * from "./lib/components/list/nav-list-item/nav-list-item.module";
 export * from "./lib/components/list/nav-list-item/nav-list-item.component";

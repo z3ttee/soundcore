@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Routes } from '@angular/router';
 import { SearchIndexComponent } from './views/search-index/search-index.component';
-import { SCNGXScreenModule, SCNGXToolbarModule, SCNGXUiRowModule } from 'soundcore-ngx';
+import { SCNGXArtistGridItemModule, SCNGXScreenModule, SCNGXToolbarModule, SCNGXUiRowModule } from 'soundcore-ngx';
 import { SCNGXHorizontalGridModule } from 'soundcore-ngx';
 import { SCNGXAlbumGridItemModule } from 'soundcore-ngx';
 import { SCNGXPlaylistGridItemModule } from 'soundcore-ngx';
@@ -28,7 +28,8 @@ const routes: Routes = [
     SCNGXUiRowModule,
     SCNGXHorizontalGridModule,
     SCNGXAlbumGridItemModule,
-    SCNGXPlaylistGridItemModule
+    SCNGXPlaylistGridItemModule,
+    SCNGXArtistGridItemModule
   ]
 })
 export class SearchModule { }

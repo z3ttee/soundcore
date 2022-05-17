@@ -34,6 +34,21 @@
 
 <!-- Results page -->
 <section [ngClass]="{'pt-0': (screenService.$isTouch | async)}" *ngIf="query">
+
+    <!-- Artists -->
+    <scngx-ui-row [headline]="'Künstler'" *ngIf="($result | async)?.albums?.elements?.length > 0">
+        <div class="w-full">
+            <scngx-horizontal-grid>
+                <ng-container *ngFor="let item of ($result | async)?.artists?.elements">
+                    <scngx-artist-grid-item 
+                        [item]="item"
+                        (click)="routeToResult(['/artist', item.slug || item.id], item)">
+                    </scngx-artist-grid-item>
+                </ng-container>
+            </scngx-horizontal-grid>
+        </div>
+    </scngx-ui-row>
+
     <!-- Albums -->
     <scngx-ui-row [headline]="'Alben'" *ngIf="($result | async)?.albums?.elements?.length > 0">
         <div class="w-full">
