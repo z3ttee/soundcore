@@ -1,0 +1,38 @@
+<div class="h-full w-full pb-window" #parentScroll>
+    <app-list-view [resource]="($album | async)" [isLoading]="($loading | async)">
+        <ng-container scngx-stats>
+            <li class="inline-flex items-center gap-1 text-font-secondary hover:underline cursor-pointer" *ngIf="($album | async)?.artist">
+                <div class="w-7 h-7 rounded-full overflow-hidden">
+                    <scngx-artwork [artwork]="($album | async)?.artwork"></scngx-artwork>
+                </div>
+                <span [routerLink]="['/artist', ($album | async)?.artist?.slug || ($album | async)?.artist?.id]">
+                    {{ ($album | async)?.artist?.name }}
+                </span>
+            </li>
+            <li class="text-font-secondary">
+                <span>{{ ($album | async)?.songsCount }} {{ ($album | async)?.songsCount != 1 ? 'Songs' : 'Song' }}</span>
+            </li>
+            <li class="text-font-secondary">
+                <span>{{ ($album | async)?.totalDuration| scngxSongDurationPipe }} min</span>
+            </li>
+        </ng-container>
+
+        <ng-container scngx-controls>
+            <button class="w-14 flex items-center justify-center aspect-square bg-accent transition-all will-change-transform text-body rounded-full hover:scale-105 active:scale-[97%]">
+                <img class="w-7 h-7 text-body ml-0.5" src="assets/icons/play.svg">
+            </button>
+
+            <button class="flex items-center p-2 rounded-full" matRipple [matRippleCentered]="true">
+                <hero-icon [name]="'heart'" [class]="'h-7 aspect-square'"></hero-icon>
+            </button>
+
+            <button class="flex items-center p-2 rounded-full" matRipple [matRippleCentered]="true">
+                <hero-icon [name]="'dots-vertical'" [class]="'h-7 aspect-square'"></hero-icon>
+            </button>
+        </ng-container>
+    </app-list-view>
+
+<div class="w-full px-window" *ngIf="!($loading | async)">
+    <scngx-virtual-song-list [columns]="columns" [dataSource]="(($list | async)?.$dataSource | async)" [parentScroll]="parentScroll"></scngx-virtual-song-list>
+</div>
+</div>
