@@ -30,7 +30,6 @@ export class AlbumInfoComponent implements OnInit, OnDestroy {
   public columns: SCNGXSongColConfig = {
     id: { enabled: true, collapseAt: 420 },
     count: { enabled: true, collapseAt: 560 },
-    date: { enabled: true, collapseAt: 900 },
     duration: { enabled: true, collapseAt: 0 }
   }
 
