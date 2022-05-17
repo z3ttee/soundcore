@@ -14,6 +14,7 @@ const routes: Routes = [
   ]},
   { path: "", component: AscMainLayoutComponent, canActivate: [KeycloakSSOGuard], children: [
     { path: "", canActivate: [KeycloakSSOGuard], loadChildren: () => import("./modules/home/home.module").then((m) => m.HomeModule) },
+    { path: "album", canActivate: [KeycloakSSOGuard], loadChildren: () => import("./modules/album/album.module").then((m) => m.AlbumModule) },
     { path: "artist", canActivate: [KeycloakSSOGuard], loadChildren: () => import("./modules/artist/artist.module").then((m) => m.ArtistModule) },
     { path: "playlist", canActivate: [KeycloakSSOGuard], loadChildren: () => import("./modules/playlist/playlist.module").then((m) => m.PlaylistModule) },
     { path: "library", canActivate: [KeycloakSSOGuard], loadChildren: () => import("./modules/library/library.module").then((m) => m.LibraryModule) },
