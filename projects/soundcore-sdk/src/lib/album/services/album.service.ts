@@ -35,11 +35,11 @@ export class SCDKAlbumService {
      * @param artistId Artist's id
      * @returns Page<Album>
      */
-    public findRecommendedByArtist(artistId: string, exceptAlbumIds: string[] = []): Observable<Page<Album>> {
+    public findRecommendedByArtist(artistId: string, seed: string[] = []): Observable<Page<Album>> {
         if(!artistId) return of(Page.of([]));
 
         const query = new URLSearchParams()
-        for(const except of exceptAlbumIds) {
+        for(const except of seed) {
             query.append("except", except);
         }
 

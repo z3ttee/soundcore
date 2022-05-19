@@ -32,7 +32,21 @@
         </ng-container>
     </app-list-view>
 
-<div class="w-full px-window" *ngIf="!($loading | async)">
-    <scngx-virtual-song-list [columns]="columns" [dataSource]="(($list | async)?.$dataSource | async)" [parentScroll]="parentScroll"></scngx-virtual-song-list>
-</div>
+    <div class="w-full px-window" *ngIf="!($loading | async)">
+        <scngx-virtual-song-list [useMaxHeight]="true" [columns]="columns" [dataSource]="(($list | async)?.$dataSource | async)" [parentScroll]="parentScroll"></scngx-virtual-song-list>
+    </div>
+
+    <scngx-ui-row [headline]="'Weitere Alben'" *ngIf="($featAlbums | async)?.length > 0">
+        <div class="w-full">
+            <scngx-horizontal-grid>
+                    <ng-container *ngFor="let item of ($featAlbums | async)">
+                        <scngx-album-grid-item 
+                            [item]="item" 
+                            [useDate]="true"
+                            [routerLink]="['/album', item.slug || item.id]">
+                        </scngx-album-grid-item>
+                    </ng-container>
+            </scngx-horizontal-grid>
+        </div>
+    </scngx-ui-row>
 </div>

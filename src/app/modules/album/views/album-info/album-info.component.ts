@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { BehaviorSubject, Observable, Subject, takeUntil } from 'rxjs';
 import { PlayableListBuilder, SCNGXPlayableList, SCNGXSongColConfig } from 'soundcore-ngx';
@@ -19,13 +19,17 @@ export class AlbumInfoComponent implements OnInit, OnDestroy {
   ) { }
 
   private readonly _destroy: Subject<void> = new Subject();
+  private readonly _cancel: Subject<void> = new Subject();
+
   private readonly _loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject(false);
   private readonly _albumSubject: BehaviorSubject<Album> = new BehaviorSubject(null);
   private readonly _listSubject: BehaviorSubject<SCNGXPlayableList> = new BehaviorSubject(null);
+  private readonly _featAlbumSubject: BehaviorSubject<Album[]> = new BehaviorSubject([]);
 
   public readonly $loading: Observable<boolean> = this._loadingSubject.asObservable();
   public readonly $album: Observable<Album> = this._albumSubject.asObservable();
   public readonly $list: Observable<SCNGXPlayableList> = this._listSubject.asObservable();
+  public readonly $featAlbums: Observable<Album[]> = this._featAlbumSubject.asObservable();
 
   public columns: SCNGXSongColConfig = {
     id: { enabled: true, collapseAt: 420 },
@@ -35,21 +39,27 @@ export class AlbumInfoComponent implements OnInit, OnDestroy {
 
   public ngOnInit(): void {
     this.activatedRoute.paramMap.pipe(takeUntil(this._destroy)).subscribe((paramMap) => {
+      this._cancel.next();
       const albumId = paramMap.get("albumId");
 
       this._albumSubject.next(null);
       this._loadingSubject.next(true);
+      this._albumSubject.next(null);
+      this._featAlbumSubject.next([]);
+      this._listSubject.next(null);
 
-      this.albumService.findById(albumId).pipe(takeUntil(this._destroy)).subscribe((album) => {
-        console.log(album);
+      this.albumService.findById(albumId).pipe(takeUntil(this._cancel)).subscribe((album) => {
         this._albumSubject.next(album);
-
         if(!album) return;
 
         this._listSubject.next(PlayableListBuilder
           .withClient(this.httpClient)
           .metaUrl(`${environment.api_base_uri}/v1/songs/byAlbum/${album.id}`)
           .build());
+
+        this.albumService.findRecommendedByArtist(album.artist?.id).pipe(takeUntil(this._cancel)).subscribe((page) => {
+          this._featAlbumSubject.next(page.elements);
+        })
 
         this._loadingSubject.next(false)
       })
@@ -59,6 +69,9 @@ export class AlbumInfoComponent implements OnInit, OnDestroy {
   public ngOnDestroy(): void {
       this._destroy.next();
       this._destroy.complete();
+
+      this._cancel.next();
+      this._cancel.complete();
   }
 
 }

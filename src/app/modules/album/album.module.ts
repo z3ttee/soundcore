@@ -4,9 +4,10 @@ import { AlbumInfoComponent } from './views/album-info/album-info.component';
 import { RouterModule, Routes } from '@angular/router';
 import { ListViewModule } from 'src/app/components/resource-views/list-view/list-view.module';
 import { SCDKAlbumModule } from 'soundcore-sdk';
-import { SCNGXSongDurationPipeModule, SCNGXVirtualSongListModule } from 'soundcore-ngx';
+import { SCNGXAlbumGridItemModule, SCNGXHorizontalGridModule, SCNGXSongDurationPipeModule, SCNGXUiRowModule, SCNGXVirtualSongListModule } from 'soundcore-ngx';
 import { HeroIconModule, heart, dotsVertical } from 'ng-heroicon';
 import { MatRippleModule } from '@angular/material/core';
+import { VirtualScrollerModule } from 'ngx-virtual-scroller';
 
 const routes: Routes = [
   { path: ":albumId", component: AlbumInfoComponent },
@@ -20,6 +21,7 @@ const routes: Routes = [
   imports: [
     CommonModule,
     RouterModule.forChild(routes),
+    VirtualScrollerModule,
     ListViewModule,
     HeroIconModule.withIcons({ heart, dotsVertical }),
 
@@ -28,7 +30,10 @@ const routes: Routes = [
     SCDKAlbumModule,
 
     SCNGXSongDurationPipeModule,
-    SCNGXVirtualSongListModule
+    SCNGXVirtualSongListModule,
+    SCNGXHorizontalGridModule,
+    SCNGXUiRowModule,
+    SCNGXAlbumGridItemModule
   ]
 })
 export class AlbumModule { }
