@@ -63,7 +63,32 @@
         </div>
 
         <hr class="bg-divider min-h-[3px] max-h-[3px] rounded-full appearance-none border-none w-[90%] mx-auto">
-        <app-profile-bar [user]="(authService.$user | async)"></app-profile-bar>
+        <app-profile-bar [user]="(authService.$user | async)">
+            <ul>
+                <li *ngIf="(authService.$isAdmin | async)" class="flex items-center cursor-pointer gap-4 p-2.5 transition-all bg-body-light bg-opacity-0 active:bg-opacity-80 rounded-sm" [ngClass]="{'hover:bg-opacity-50': !(screenService.$isTouch | async)}" [routerLink]="['/admin']">
+                    <hero-icon [name]="'shield-exclamation'" [class]="'h-5 w-5'"></hero-icon> 
+                    <span>Administration</span>
+                </li>
+
+                <hr *ngIf="(authService.$isAdmin | async)" class="appearance-none border-none bg-divider h-[2px] my-2">
+
+                <li class="flex items-center cursor-pointer gap-4 p-2.5 transition-all bg-body-light bg-opacity-0 active:bg-opacity-80 rounded-sm" [ngClass]="{'hover:bg-opacity-50': !(screenService.$isTouch | async)}" [routerLink]="['/notifications']">
+                    <hero-icon [name]="'bell'" [class]="'h-5 w-5'"></hero-icon> 
+                    <span>Benachrichtungen</span>
+                </li>
+                <li class="flex items-center cursor-pointer gap-4 p-2.5 transition-all bg-body-light bg-opacity-0 active:bg-opacity-80 rounded-sm" [ngClass]="{'hover:bg-opacity-50': !(screenService.$isTouch | async)}" [routerLink]="['/settings']">
+                    <hero-icon [name]="'cog'" [class]="'h-5 w-5'"></hero-icon> 
+                    <span>Einstellungen</span>
+                </li>
+
+                <hr class="appearance-none border-none bg-divider h-[2px] my-2">
+
+                <li class="flex items-center cursor-pointer gap-4 p-2.5 transition-all bg-error-light bg-opacity-0 active:bg-opacity-20 rounded-sm text-error-light" [ngClass]="{'hover:bg-opacity-10': !(screenService.$isTouch | async)}" (click)="authService.logout()">
+                    <hero-icon [name]="'logout'" [class]="'h-5 w-5'"></hero-icon> 
+                    <span>Abmelden</span>
+                </li>
+            </ul>
+        </app-profile-bar>
     </div>
 
     <!-- Page contents -->

@@ -3,7 +3,7 @@ import { AscMainLayoutComponent } from "./main-layout.component";
 import { SCNGXBottomNavModule, SCNGXDialogModule, SCNGXDrawerModule, SCNGXProgressbarModule } from "soundcore-ngx"
 import { RouterModule } from "@angular/router";
 import { CommonModule } from "@angular/common";
-import { HeroIconModule, home, search, user, bookmarkAlt, chevronDown, plus } from "ng-heroicon";
+import { HeroIconModule, home, search, user, bookmarkAlt, chevronDown, plus, shieldExclamation, bell, cog, logout } from "ng-heroicon";
 import { SCDKPlaylistModule, SCDKSearchModule } from "soundcore-sdk";
 import { SCNGXPlaylistListItemModule } from "projects/soundcore-ngx/src/public-api";
 import {DragDropModule} from '@angular/cdk/drag-drop';
@@ -32,7 +32,7 @@ import { ReactiveFormsModule } from "@angular/forms";
         SCDKPlaylistModule,
         SCDKSearchModule,
 
-        HeroIconModule.withIcons({ home, search, user, bookmarkAlt, chevronDown, plus }, { defaultHostDisplay: 'inlineBlock', attachDefaultDimensionsIfNoneFound: true })
+        HeroIconModule.withIcons({ home, search, user, bookmarkAlt, chevronDown, plus, shieldExclamation, bell, cog, logout }, { defaultHostDisplay: 'inlineBlock', attachDefaultDimensionsIfNoneFound: true })
     ],
     exports: [
         AscMainLayoutComponent
