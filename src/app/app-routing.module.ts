@@ -10,6 +10,8 @@ import { Error404Module } from './shared/error404/error404.module';
 
 const routes: Routes = [
   { path: "admin", component: AdminLayoutComponent, canActivate: [ KeycloakSSOGuard ], children: [
+    { path: "", canActivate: [KeycloakSSOGuard], loadChildren: () => import("./modules/home/home.module").then((m) => m.HomeModule) },
+    { path: "zones", canActivate: [KeycloakSSOGuard], loadChildren: () => import("./modules/zones/zones.module").then((m) => m.ZonesModule) },
     { path: "**", component: Error404Component }
   ]},
   { path: "", component: AscMainLayoutComponent, canActivate: [KeycloakSSOGuard], children: [
