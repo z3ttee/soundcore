@@ -4,8 +4,8 @@
     <p class="font-bold line-clamp-2">{{ item?.name || "Unbekannter Titel" }}</p>
     <div class="line-clamp-2 opacity-60">
         <ul>
-            <li class="text-sm" *ngIf="useDate">{{ item?.released | date:"yyyy" }}</li>
-            <li class="text-sm" *ngIf="!useDate">von <span class="text-sm">{{ item?.artist?.name }}</span></li>
+            <li class="text-sm" *ngIf="useDate">{{ item?.releasedAt | date:"yyyy" }}</li>
+            <li class="text-sm" *ngIf="!useDate">von <span class="text-sm">{{ item?.primaryArtist?.name }}</span></li>
         </ul>
     </div>
 </scngx-resource-grid-item>

@@ -57,7 +57,7 @@ export class AlbumInfoComponent implements OnInit, OnDestroy {
           .metaUrl(`${environment.api_base_uri}/v1/songs/byAlbum/${album.id}`)
           .build());
 
-        this.albumService.findRecommendedByArtist(album.artist?.id).pipe(takeUntil(this._cancel)).subscribe((page) => {
+        this.albumService.findRecommendedByArtist(album.primaryArtist?.id).pipe(takeUntil(this._cancel)).subscribe((page) => {
           this._featAlbumSubject.next(page.elements);
         })
 
