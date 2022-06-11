@@ -9,15 +9,13 @@ import { Album } from "../entities/album.entity";
 @Injectable()
 export class SCDKAlbumService {
 
-    private _collectionSubject: BehaviorSubject<Album[]> = new BehaviorSubject([]);
-    public $collection: Observable<Album[]> = this._collectionSubject.asObservable();
+    private readonly _collectionSubject: BehaviorSubject<Album[]> = new BehaviorSubject([]);
+    public readonly $collection: Observable<Album[]> = this._collectionSubject.asObservable();
 
     constructor(
         private httpClient: HttpClient,
         @Inject(SCDK_OPTIONS) private readonly options: SCDKOptions
-    ) {
-        console.log("album service init")
-    }
+    ) {}
 
     /**
      * Find album by its id.

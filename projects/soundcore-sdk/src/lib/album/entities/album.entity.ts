@@ -3,31 +3,29 @@ import { Artwork } from "../../artwork/entities/artwork.entity";
 import { Distributor } from "../../distributor/entities/distributor.entity";
 import { Label } from "../../label/entities/label.entity";
 import { Publisher } from "../../publisher/entities/publisher.entity";
-import { Song } from "../../song/entities/song.entity";
-import { SCDKResource, SCDKResourceType } from "../../utils/entities/resource";
+import { SCDKGeniusFlag, SCDKResource, SCDKResourceFlag, SCDKResourceType } from "../../utils/entities/resource";
 
-export type AlbumID = string;
 export class Album implements SCDKResource {
-    public resourceType: SCDKResourceType;
+    public resourceType: SCDKResourceType = "album";
 
-    public id: AlbumID;
-    public name: string;
-    public released: Date;
-    public description: string;
+    public id: string;
+    public flag: SCDKResourceFlag;
+    public geniusFlag: SCDKGeniusFlag;
     public slug: string;
+    public geniusId: string;
+    public name: string;
+    public releasedAt: Date;
+    public createdAt: Date;
+    public description: string;
 
-    public artist?: Artist;
-
-    public songs?: Song[];
+    public primaryArtist?: Artist;
     public artwork?: Artwork;
-    public banner?: Artwork;
-    public distributor?: Distributor;
-    public label?: Label;
-    public publisher?: Publisher;
 
-    public featuredArtists?: Artist[];
+    public distributors?: Distributor[];
+    public labels?: Label[];
+    public publishers?: Publisher[];
+
     public songsCount?: number;
     public totalDuration?: number;
-
     public liked?: boolean;
 }
