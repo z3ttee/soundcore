@@ -149,11 +149,11 @@ export class SCNGXTrackListDataSourceV2 {
         this._pageFetchStatus[pageNr] = true;
 
         // Build page settings
-        const pageable: Pageable = { page: pageNr, size: SCNGX_DATASOURCE_PAGE_SIZE }
+        const pageable: Pageable = new Pageable(pageNr, SCNGX_DATASOURCE_PAGE_SIZE);
 
         const subject: Subject<Page<Song>> = new Subject();
         // Execute request to the detailsUrl
-        firstValueFrom(this.httpClient.get<Page<Song>>(`${this.options.url}${Pageable.toQuery(pageable)}`)).then((page) => {
+        firstValueFrom(this.httpClient.get<Page<Song>>(`${this.options.url}${pageable.toQuery()}`)).then((page) => {
             // Add page to the fetchedPages list.
             // Only on success, because if it fails it can be refetched next time.
             this._fetchedPages.add(pageNr);

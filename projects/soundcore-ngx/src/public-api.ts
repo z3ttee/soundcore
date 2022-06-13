@@ -93,11 +93,16 @@ export * from "./lib/pipes/song-duration/song-duration.module";
 export * from "./lib/pipes/song-duration/song-duration.pipe";
 export * from "./lib/pipes/added-to-playlist/added-to-playlist.module";
 export * from "./lib/pipes/added-to-playlist/added-to-playlist.pipe";
+export * from "./lib/pipes/bucket-flag-pipe/bucket-flag-pipe.module";
+export * from "./lib/pipes/bucket-flag-pipe/bucket-flag-pipe.pipe";
+export * from "./lib/pipes/bytes-pipe/bytes-pipe.module";
+export * from "./lib/pipes/bytes-pipe/bytes-pipe.pipe";
 
 // Datasource
 export * from "./lib/entities/playable-list.entity";
 export * from "./lib/utils/builder/playable-list.builder";
 export * from "./lib/utils/datasource/datasourcev2";
+export * from "./lib/utils/datasource/datasource";
 
 // Notifications
 export * from "./lib/components/notification/notification-list-item/notification-list-item.module";

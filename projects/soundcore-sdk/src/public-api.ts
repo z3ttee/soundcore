@@ -3,6 +3,27 @@
  */
 export * from "./lib/scdk.module";
 
+// Pagination
+export * from "./lib/utils/page/page";
+export * from "./lib/utils/page/pageable";
+
+// Bucket Module
+export * from "./lib/bucket/bucket.module";
+export * from "./lib/bucket/services/bucket.service";
+export * from "./lib/bucket/entities/bucket.entity";
+
+
+
+
+
+
+
+
+
+
+
+
+
 /**
  * Export all artist sdk parts
  */
@@ -63,8 +84,6 @@ export * from "./lib/search/entities/history-entry.entity";
 /**
  * Export all utils
  */
-export * from "./lib/pagination/page";
-export * from "./lib/pagination/pageable";
 export * from "./lib/utils/entities/resource";
 
 /**
