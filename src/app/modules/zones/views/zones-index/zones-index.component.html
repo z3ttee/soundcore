@@ -8,7 +8,7 @@
     <virtual-scroller class="w-full mt-row" [parentScroll]="page" [items]="($items | async)" (vsEnd)="fetchMore($event)" #scroller>
         
         <!-- Bucket list item -->
-        <div class="flex items-center gap-4 p-4 rounded bg-body-light cursor-pointer transition-all active:bg-body-lighter" *ngFor="let bucket of scroller.viewPortItems" [routerLink]="[bucket.slug || bucket.id]">
+        <div class="flex items-center gap-4 my-2 p-4 rounded bg-body-light cursor-pointer transition-all active:bg-body-lighter" *ngFor="let bucket of scroller.viewPortItems" [routerLink]="[bucket.slug || bucket.id]">
             <!-- Bucket artwork -->
             <div class="min-w-36 max-w-36 aspect-square rounded bg-body bg-opacity-70"></div>
 
