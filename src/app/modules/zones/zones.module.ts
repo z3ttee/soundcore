@@ -6,14 +6,17 @@ import { SCDKBucketModule } from 'soundcore-sdk';
 import { VirtualScrollerModule } from 'ngx-virtual-scroller';
 import { chartPie, collection, HeroIconModule } from 'ng-heroicon';
 import { SCNGXBucketFlagPipeModule, SCNGXBytesPipeModule } from 'soundcore-ngx';
+import { ZoneInfoComponent } from './views/zone-info/zone-info.component';
 
 const routes: Routes = [
-  { path: "", component: ZonesIndexComponent }
+  { path: "", component: ZonesIndexComponent },
+  { path: ":zoneId", component: ZoneInfoComponent }
 ]
 
 @NgModule({
   declarations: [
-    ZonesIndexComponent
+    ZonesIndexComponent,
+    ZoneInfoComponent
   ],
   imports: [
     CommonModule,
