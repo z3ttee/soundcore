@@ -67,6 +67,13 @@ module.exports = {
         "divider": "linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.25) 50%, rgba(255,255,255,0) 100%);",
         "collection": "linear-gradient(130deg, rgba(255,191,80,0.7) -20%, rgba(166,150,121,0.5) 100%)"
       }),
+      gridTemplateColumns: {
+        autofit: "repeat(auto-fit, minmax(0, 1fr))"
+      },
+      scale: {
+        "97": "97%",
+        "99": "99%"
+      },
       keyframes: theme => ({
         skeleton: {
           "0%, 100%": { backgroundColor: theme("colors.body.light") },

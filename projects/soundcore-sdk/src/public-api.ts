@@ -12,7 +12,10 @@ export * from "./lib/bucket/bucket.module";
 export * from "./lib/bucket/services/bucket.service";
 export * from "./lib/bucket/entities/bucket.entity";
 
-
+// Mount Module
+export * from "./lib/mount/mount.module";
+export * from "./lib/mount/services/mount.service";
+export * from "./lib/mount/entities/mount.entity";
 
 
 

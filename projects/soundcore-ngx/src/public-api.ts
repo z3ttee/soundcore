@@ -1,6 +1,10 @@
 /*
  * Public API Surface of soundcore-ngx
  */
+// Infinitelist
+export * from "./lib/components/list/infinite-list/infinite-list.module";
+export * from "./lib/components/list/infinite-list/infinite-list.component";
+
 // Tooltip
 export * from "./lib/ui/tooltip/tooltip.module";
 export * from "./lib/ui/tooltip/directive/tooltip.directive";

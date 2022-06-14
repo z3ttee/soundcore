@@ -1,0 +1,3 @@
+<virtual-scroller class="w-full" [items]="(dataSource.$stream | async)" [parentScroll]="parentScroll" (vsEnd)="vsEnd($event)" (vsUpdate)="vsUpdate($event)">
+    <ng-content></ng-content>
+</virtual-scroller>

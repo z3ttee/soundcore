@@ -212,5 +212,8 @@
       }
     }
   },
-  "defaultProject": "soundcore"
+  "defaultProject": "soundcore",
+  "cli": {
+    "analytics": false
+  }
 }
