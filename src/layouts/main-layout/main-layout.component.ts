@@ -1,7 +1,7 @@
 import { CdkDragDrop } from "@angular/cdk/drag-drop";
 import { Location } from "@angular/common";
 import { Component, OnDestroy, OnInit } from "@angular/core";
-import { FormControl } from "@angular/forms";
+import { UntypedFormControl } from "@angular/forms";
 import { NavigationCancel, NavigationEnd, NavigationError, NavigationStart, Router } from "@angular/router";
 import { SCNGXPlaylistListItemComponent } from "projects/soundcore-ngx/src/public-api";
 import { filter, firstValueFrom, Subject, takeUntil } from "rxjs";
@@ -16,7 +16,7 @@ export class AscMainLayoutComponent implements OnInit, OnDestroy {
 
     private readonly _destroy: Subject<void> = new Subject();
 
-    public readonly searchInputControl: FormControl = new FormControl("");
+    public readonly searchInputControl: UntypedFormControl = new UntypedFormControl("");
 
     public isNavigating: boolean = false;
 

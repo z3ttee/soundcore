@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { FormControl } from '@angular/forms';
+import { UntypedFormControl } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BehaviorSubject, debounceTime, Observable, Subject, takeUntil } from 'rxjs';
 import { SCNGXScreenService } from 'soundcore-ngx';
@@ -28,7 +28,7 @@ export class SearchIndexComponent implements OnInit, OnDestroy {
 
   public show404: boolean = false;
   public query: string = "";
-  public readonly searchInputControl: FormControl = new FormControl("");
+  public readonly searchInputControl: UntypedFormControl = new UntypedFormControl("");
 
   public ngOnInit(): void {
 

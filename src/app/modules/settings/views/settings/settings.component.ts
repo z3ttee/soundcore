@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { FormControl, FormGroup } from '@angular/forms';
+import { UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 import { SCSDKSettingsService } from 'soundcore-sdk';
 import { Subject, takeUntil } from 'rxjs';
 import { AuthenticationService } from 'src/sso/services/authentication.service';
@@ -12,8 +12,8 @@ import { AuthenticationService } from 'src/sso/services/authentication.service';
 export class SettingsComponent implements OnInit, OnDestroy {
   private readonly _destroy: Subject<void> = new Subject();
 
-  public readonly audioFormGroup: FormGroup = new FormGroup({
-    audioFadingControl: new FormControl(true)
+  public readonly audioFormGroup: UntypedFormGroup = new UntypedFormGroup({
+    audioFadingControl: new UntypedFormControl(true)
   })
 
   constructor(
