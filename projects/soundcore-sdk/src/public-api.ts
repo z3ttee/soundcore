@@ -17,6 +17,10 @@ export * from "./lib/mount/mount.module";
 export * from "./lib/mount/services/mount.service";
 export * from "./lib/mount/entities/mount.entity";
 
+// File Module
+export * from "./lib/file/file.module";
+export * from "./lib/file/entities/file.entity";
+export * from "./lib/file/services/file.service";
 
 
 
