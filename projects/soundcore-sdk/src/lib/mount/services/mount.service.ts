@@ -5,6 +5,7 @@ import { Bucket } from "../../bucket/entities/bucket.entity";
 import { SCDKOptions, SCDK_OPTIONS } from "../../scdk.module";
 import { Page } from "../../utils/page/page";
 import { Pageable } from "../../utils/page/pageable";
+import { CreateResult } from "../../utils/results/creation.result";
 import { CreateMountDTO } from "../dtos/create-mount.dto";
 import { UpdateMountDTO } from "../dtos/update-mount.dto";
 import { Mount } from "../entities/mount.entity";
@@ -54,9 +55,9 @@ export class SCDKMountService {
      * @param createMountDto Data to create
      * @returns Mount
      */
-    public create(createMountDto: CreateMountDTO): Observable<Mount> {
+    public create(createMountDto: CreateMountDTO): Observable<CreateResult<Mount>> {
         if(!createMountDto) return of(null);
-        return this.httpClient.post<Mount>(`${this.options.api_base_uri}/v1/mounts`, createMountDto);
+        return this.httpClient.post<CreateResult<Mount>>(`${this.options.api_base_uri}/v1/mounts`, createMountDto);
     }
 
     /**

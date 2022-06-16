@@ -1,5 +1,4 @@
-
 export enum MountStatus {
-    OK = "ok",
-    BUSY = "busy"
+    OK = 0,
+    BUSY = 1
 }
