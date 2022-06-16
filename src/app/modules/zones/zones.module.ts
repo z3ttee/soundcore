@@ -9,10 +9,12 @@ import { SCNGXBucketFlagPipeModule, SCNGXBytesPipeModule, SCNGXInfiniteListModul
 import { ZoneInfoComponent } from './views/zone-info/zone-info.component';
 import { BucketListItemModule } from 'src/app/components/list-items/bucket-list-item/bucket-list-item.module';
 import { MountListItemModule } from 'src/app/components/list-items/mount-list-item/mount-list-item.module';
+import { KeycloakSSOGuard } from 'src/sso/guards/keycloak.guard';
 
 const routes: Routes = [
   { path: "", component: ZonesIndexComponent },
-  { path: ":zoneId", component: ZoneInfoComponent }
+  { path: ":zoneId", component: ZoneInfoComponent },
+  { path: ":zoneId/:mountId", canActivate: [KeycloakSSOGuard], loadChildren: () => import("../mounts/mounts.module").then((m) => m.MountsModule) },
 ]
 
 @NgModule({
