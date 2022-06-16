@@ -1,6 +1,15 @@
 /*
  * Public API Surface of soundcore-ngx
  */
+// Button
+export * from "./lib/components/buttons/btn/btn.module";
+export * from "./lib/components/buttons/btn/btn-base/btn.component";
+export * from "./lib/components/buttons/btn/btn-outlined/btn.component";
+export * from "./lib/components/buttons/btn/btn-text/btn.component";
+
+export * from "./lib/components/buttons/loading-btn/loading-btn.module";
+// export * from "./lib/components/buttons/loading-btn/loading-btn.component";
+
 // Infinitelist
 export * from "./lib/components/list/infinite-list/infinite-list.module";
 export * from "./lib/components/list/infinite-list/infinite-list.component";
