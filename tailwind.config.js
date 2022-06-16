@@ -22,7 +22,7 @@ module.exports = {
           tertiary: "#434343"
         },
         error: {
-          light: "#D25D5D",
+          light: "#cd6262",
           DEFAULT: "#c75151",
           dark: "#B94848"
         },
