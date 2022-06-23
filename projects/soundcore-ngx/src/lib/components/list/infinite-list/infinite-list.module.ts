@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SCNGXInfiniteListComponent } from './infinite-list.component';
-import { VirtualScrollerModule } from 'ngx-virtual-scroller';
+import { VirtualScrollerModule } from '@tsalliance/ngx-virtual-scroller';
 
 @NgModule({
   declarations: [

@@ -1,5 +1,5 @@
 import { Component, Input, OnInit, SimpleChanges } from '@angular/core';
-import { IPageInfo } from 'ngx-virtual-scroller';
+import { IPageInfo } from '@tsalliance/ngx-virtual-scroller';
 import { Observable, of, Subject } from 'rxjs';
 import { Song } from 'soundcore-sdk';
 import { SCNGXTrackListDataSourceV2, TrackDataSourceItem } from '../../../utils/datasource/datasourcev2';

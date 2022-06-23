@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { IPageInfo } from 'ngx-virtual-scroller';
+import { IPageInfo } from '@tsalliance/ngx-virtual-scroller';
 import { Subject } from 'rxjs';
 import { SCDKBucketService } from 'soundcore-sdk';
 import { environment } from 'src/environments/environment';

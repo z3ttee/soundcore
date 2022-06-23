@@ -1,7 +1,7 @@
 import { HttpClient } from "@angular/common/http";
 import { BehaviorSubject, firstValueFrom, map, Observable, of, Subject, Subscription, takeUntil } from "rxjs";
 import { Page, Pageable, Song } from "soundcore-sdk";
-import { IPageInfo } from 'ngx-virtual-scroller';
+import { IPageInfo } from '@tsalliance/ngx-virtual-scroller';
 import { SCNGXTrackID } from "../../entities/playable-source.entity";
 import { SCNGXLogger } from "../logger/logger";
 

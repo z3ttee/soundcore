@@ -43,7 +43,8 @@ module.exports = {
         }
       },
       spacing: {
-        window: "24px"
+        window: "24px",
+        box: "16px"
       },
       margin: ({ theme }) => ({
         row: theme("spacing.6"),

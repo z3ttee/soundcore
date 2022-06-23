@@ -1,7 +1,7 @@
 import { HttpClient } from "@angular/common/http";
 import { BehaviorSubject, firstValueFrom, Observable, Subject, Subscription, takeUntil } from "rxjs";
 import { Page, Pageable } from "soundcore-sdk";
-import { IPageInfo } from 'ngx-virtual-scroller';
+import { IPageInfo } from '@tsalliance/ngx-virtual-scroller';
 
 export interface InfiniteDataSourceOptions {
     pageSize: number;

@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
-import { IPageInfo } from 'ngx-virtual-scroller';
+import { IPageInfo } from '@tsalliance/ngx-virtual-scroller';
 import { Subject } from 'rxjs';
 import { InfiniteDataSource } from '../../../utils/datasource/datasource';
 

@@ -8,7 +8,7 @@ import { ListViewModule } from "src/app/components/resource-views/list-view/list
 import { HeroIconModule, dotsVertical } from 'ng-heroicon';
 import { MatRippleModule } from '@angular/material/core';
 import { SCNGXVirtualSongListModule, SCNGXSongListModule, SCNGXSkeletonModule, SCNGXUiRowModule, SCNGXAlbumGridItemModule, SCNGXHorizontalGridModule, SCNGXPlaylistGridItemModule } from 'soundcore-ngx';
-import { VirtualScrollerModule } from 'ngx-virtual-scroller';
+import { VirtualScrollerModule } from '@tsalliance/ngx-virtual-scroller';
 
 const routes: Routes = [
   { path: ":artistId", component: ArtistProfileComponent },

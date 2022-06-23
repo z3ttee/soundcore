@@ -8,7 +8,7 @@ import { MatRippleModule } from '@angular/material/core';
 import { ScrollingModule } from '@angular/cdk/scrolling';
 import { SCNGXSkeletonModule, SCNGXSongListItemModule, SCNGXVirtualSongListModule } from 'soundcore-ngx';
 import { ListViewModule } from 'src/app/components/resource-views/list-view/list-view.module';
-import { VirtualScrollerModule } from 'ngx-virtual-scroller';
+import { VirtualScrollerModule } from '@tsalliance/ngx-virtual-scroller';
 
 const routes: Routes = [
   { path: ":playlistId", component: PlaylistInfoComponent }

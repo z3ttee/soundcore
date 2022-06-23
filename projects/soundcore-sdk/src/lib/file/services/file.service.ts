@@ -32,9 +32,11 @@ export class SCDKFileService {
      */
     public findByMountId(mountId: string, pageable: Pageable): Observable<Page<File>> {
         if(!mountId) return of(Page.of([], 0, pageable.page));
-        return this.httpClient.get<Page<File>>(`${this.options.api_base_uri}/v1/files${pageable.toQuery()}`);
+        return this.httpClient.get<Page<File>>(`${this.findByMountIdBaseURL(mountId)}${pageable.toQuery()}`);
     }
 
-    
+    public findByMountIdBaseURL(mountId: string): string {
+        return `${this.options.api_base_uri}/v1/files/mount/${mountId}`;
+    }
 
 }

@@ -1,7 +1,7 @@
 import {  Component, ElementRef, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
 import { BehaviorSubject, Observable, of, Subject } from 'rxjs';
 import { SCNGXSongColConfig } from '../song-list-item/song-list-item.component';
-import { IPageInfo } from 'ngx-virtual-scroller';
+import { IPageInfo } from '@tsalliance/ngx-virtual-scroller';
 import { SCNGXTrackListDataSourceV2, SCNGX_DATASOURCE_PAGE_SIZE, TrackDataSourceItem } from '../../../utils/datasource/datasourcev2';
 
 @Component({

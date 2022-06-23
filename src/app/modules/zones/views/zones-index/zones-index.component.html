@@ -2,12 +2,19 @@
 
     <scngx-infinite-list class="w-full mt-row" [fetchUrl]="infiniteFetchUrl" [pageSize]="infinitePageSize" [parentScroll]="page" #list>
         <!-- Page Headline -->
-        <div class="w-full mb-row">
-            <h4>Speicherzonen</h4>
-            <p class="text-font text-opacity-80">Verwalte hier die einzelnen Speicherzonen.</p>
-        </div>
+        <ng-container scngx-content>
+            <div class="w-full mb-row">
+                <h4>Speicherzonen</h4>
+                <p class="text-font text-opacity-80">Verwalte hier die einzelnen Speicherzonen.</p>
+            </div>
+        </ng-container>
 
         <!-- List items -->
-        <app-bucket-list-item *ngFor="let bucket of list.viewPortItems" [routerLink]="[bucket.slug || bucket.id]" [bucket]="bucket"></app-bucket-list-item>
+        <ng-container scngx-list>
+            <h6 class="mt-row mb-2">Speicherzonen</h6>
+            <div class="flex flex-col gap-2 w-full" *ngIf="list.viewPortItems.length > 0">
+                <app-bucket-list-item *ngFor="let bucket of list.viewPortItems" [routerLink]="[bucket.slug || bucket.id]" [bucket]="bucket"></app-bucket-list-item>
+            </div>
+        </ng-container>
     </scngx-infinite-list>
 </section>

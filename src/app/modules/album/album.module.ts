@@ -7,7 +7,7 @@ import { SCDKAlbumModule } from 'soundcore-sdk';
 import { SCNGXAlbumGridItemModule, SCNGXHorizontalGridModule, SCNGXSongDurationPipeModule, SCNGXUiRowModule, SCNGXVirtualSongListModule } from 'soundcore-ngx';
 import { HeroIconModule, heart, dotsVertical } from 'ng-heroicon';
 import { MatRippleModule } from '@angular/material/core';
-import { VirtualScrollerModule } from 'ngx-virtual-scroller';
+import { VirtualScrollerModule } from '@tsalliance/ngx-virtual-scroller';
 
 const routes: Routes = [
   { path: ":albumId", component: AlbumInfoComponent },
