@@ -41,8 +41,9 @@
 
         <!-- List items -->
         <ng-container scngx-list>
-            <div class="w-full mt-row">
-                <h6>Mounts</h6>
+            <h6 class="mt-row mb-2">Mounts</h6>
+
+            <div class="flex flex-col gap-2 w-full">
                 <app-mount-list-item *ngFor="let mount of list.viewPortItems" [mount]="mount" [routerLink]="[mount.slug || mount.id]"></app-mount-list-item>
             </div>
         </ng-container>
