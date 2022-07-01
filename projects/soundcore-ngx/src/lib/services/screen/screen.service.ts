@@ -10,7 +10,7 @@ export class SCNGXScreenService implements OnDestroy {
     private screens: Record<string, number> = {};
 
     private destroy$ = new Subject<void>();
-    private $event = fromEvent(window, "resize").pipe(debounceTime(100), takeUntil(this.destroy$))
+    private $event = fromEvent(window, "resize").pipe(takeUntil(this.destroy$))
 
     private _isTouchSubject: BehaviorSubject<boolean> = new BehaviorSubject(this.isTouch());
     private _screenSubject: BehaviorSubject<SCNGXScreen> = new BehaviorSubject(this.getScreen());
@@ -40,8 +40,17 @@ export class SCNGXScreenService implements OnDestroy {
         this._screenSubject.next(this.getScreen())
 
         this.$event.pipe(takeUntil(this.destroy$)).subscribe(() => {
-            this._isTouchSubject.next(this.isTouch())
-            this._screenSubject.next(this.getScreen())
+            const currentScreen = this._screenSubject.getValue();
+            const screen = this.getScreen();
+            const isTouch = this.isTouch();
+
+            if(currentScreen?.name !== screen?.name){
+                this._screenSubject.next(screen);
+            }
+
+            if(this._isTouchSubject.getValue() !== isTouch) {
+                this._isTouchSubject.next(isTouch);
+            }
         })
     }
 
