@@ -31,8 +31,8 @@ export * from "./lib/components/navigation/bottom-nav/item-component/item-compon
 export * from "./lib/components/navigation/drawer/drawer.module";
 export * from "./lib/components/navigation/drawer/drawer.component";
 
-export * from "./lib/components/navigation/toolbar/toolbar.module";
-export * from "./lib/components/navigation/toolbar/toolbar.component";
+export * from "./lib/components/toolbar/toolbar.module";
+export * from "./lib/components/toolbar/toolbar.component";
 
 export * from "./lib/components/navigation/tabbar/tabbar.module";
 export * from "./lib/components/navigation/tabbar/tabbar.component";
