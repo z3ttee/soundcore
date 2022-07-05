@@ -1,8 +1,9 @@
+import { Platform } from "@angular/cdk/platform";
 import { Inject, Injectable, OnDestroy } from "@angular/core";
-import { BehaviorSubject, debounceTime, fromEvent, Observable, Subject, takeUntil } from "rxjs";
+import { BehaviorSubject, fromEvent, Observable, Subject, takeUntil } from "rxjs";
 
 import { SCNGXOptions, SCNGX_OPTIONS } from "../../scngx.module";
-import { SCNGXScreen } from "./screen.module";
+import { SCNGXScreen } from "./entities/screen.entity";
 
 @Injectable()
 export class SCNGXScreenService implements OnDestroy {
@@ -12,13 +13,14 @@ export class SCNGXScreenService implements OnDestroy {
     private destroy$ = new Subject<void>();
     private $event = fromEvent(window, "resize").pipe(takeUntil(this.destroy$))
 
-    private _isTouchSubject: BehaviorSubject<boolean> = new BehaviorSubject(this.isTouch());
+    private _isTouchSubject: BehaviorSubject<boolean> = new BehaviorSubject(this.isMobile());
     private _screenSubject: BehaviorSubject<SCNGXScreen> = new BehaviorSubject(this.getScreen());
 
     public $isTouch: Observable<boolean> = this._isTouchSubject.asObservable();
-    public $screen: Observable<any> = this._screenSubject.asObservable();
+    public $screen: Observable<SCNGXScreen> = this._screenSubject.asObservable();
 
     constructor(
+        private readonly platform: Platform,
         @Inject(SCNGX_OPTIONS) private readonly options: SCNGXOptions
     ) {
         if(!options) throw new Error("You need to initialize the SCNGX library first. This is done by adding SCNGXModule.register(...) to your imports in app.module.ts")
@@ -42,7 +44,7 @@ export class SCNGXScreenService implements OnDestroy {
         this.$event.pipe(takeUntil(this.destroy$)).subscribe(() => {
             const currentScreen = this._screenSubject.getValue();
             const screen = this.getScreen();
-            const isTouch = this.isTouch();
+            const isTouch = this.isMobile();
 
             if(currentScreen?.name !== screen?.name){
                 this._screenSubject.next(screen);
@@ -64,8 +66,8 @@ export class SCNGXScreenService implements OnDestroy {
     }
 
 
-    private isTouch(): boolean {       
-        return (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Windows Phone/i.test(navigator.userAgent))
+    public isMobile(): boolean {       
+        return this.platform.ANDROID || this.platform.IOS;
     }
 
     /**
@@ -85,13 +87,9 @@ export class SCNGXScreenService implements OnDestroy {
 
     private getScreen(): SCNGXScreen {
         const name = this.getBreakpointNameByWidth(window.innerWidth);
+        const breakpoint = this.findBreakpointByName(name);
 
-        return {
-            isTouch: this.isTouch(),
-            name,
-            height: window.innerHeight,
-            width: window.innerWidth
-        }
+        return new SCNGXScreen(name, this.isMobile(), breakpoint);
     }
 
 }
