@@ -2,6 +2,15 @@
  * Public API Surface of soundcore-ngx
  */
 
+// Screen
+export * from "./lib/services/screen/screen.module";
+export * from "./lib/services/screen/screen.service";
+export * from "./lib/services/screen/entities/screen.entity";
+
+// Drawer
+export * from "./lib/components/drawer/drawer.module";
+export * from "./lib/components/drawer/drawer.component";
+
 // Button
 export * from "./lib/components/buttons/btn/btn.module";
 export * from "./lib/components/buttons/btn/btn-base/btn.component";
@@ -10,6 +19,15 @@ export * from "./lib/components/buttons/btn/btn-text/btn.component";
 
 export * from "./lib/components/buttons/loading-btn/loading-btn.module";
 // export * from "./lib/components/buttons/loading-btn/loading-btn.component";
+
+// Dialog
+export * from "./lib/dialog/dialog.module";
+export * from "./lib/dialog/services/dialog.service";
+export * from "./lib/dialog/entities/dialog-ref.entity";
+export * from "./lib/dialog/entities/dialog-config.entity";
+export * from "./lib/dialog/components/backdrop/backdrop.component";
+export * from "./lib/dialog/components/dialog-section/dialog-section.component";
+
 
 // Infinitelist
 export * from "./lib/components/list/infinite-list/infinite-list.module";
@@ -28,8 +46,7 @@ export * from "./lib/components/navigation/bottom-nav/bottom-nav.module";
 export * from "./lib/components/navigation/bottom-nav/bottom-nav.component";
 export * from "./lib/components/navigation/bottom-nav/item-component/item-component.component";
 
-export * from "./lib/components/navigation/drawer/drawer.module";
-export * from "./lib/components/navigation/drawer/drawer.component";
+
 
 export * from "./lib/components/toolbar/toolbar.module";
 export * from "./lib/components/toolbar/toolbar.component";
@@ -123,6 +140,6 @@ export * from "./lib/components/notification/notification-list-item/notification
 export * from "./lib/components/notification/notification-list-item/notification-list-item.component";
 
 // Dialog
-export * from "./lib/ui/dialog/dialog.module";
-export * from "./lib/ui/dialog/services/dialog.service";
+// export * from "./lib/ui/dialog/dialog.module";
+// export * from "./lib/ui/dialog/services/dialog.service";
 export * from "./lib/ui/dialog/dialogs/template/dialog-template.component";

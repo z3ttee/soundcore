@@ -77,7 +77,8 @@ export class AscMainLayoutComponent implements OnInit, OnDestroy {
     }
 
     public openTestDialog() {
-        this.dialogService.confirm("Aktion bestätigen", "Du musst die Aktion bestätigen").afterClosed().subscribe(() => console.log("closed"))
+        // this.dialogService.confirm("Aktion bestätigen", "Du musst die Aktion bestätigen").afterClosed$.subscribe(() => console.log("closed"))
+        this.dialogService.confirm();
     }
 
 }

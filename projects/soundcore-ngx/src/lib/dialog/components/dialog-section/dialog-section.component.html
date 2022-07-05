@@ -1,0 +1,8 @@
+<div #dialogSection class="fixed flex items-center justify-center  top-0 left-0 w-full h-full overflow-hidden z-[1000000] pointer-events-none select-auto">
+    <div (click)="onBackdropClicked()" class="fixed top-0 left-0 w-full h-full bg-body-dark bg-opacity-0 pointer-events-none select-auto transition-all" [ngClass]="{'bg-opacity-40 pointer-events-none select-none': !!($current | async)}"></div>
+    
+    <div class="relative z-50 overflow-hidden pointer-events-none" [ngClass]="{'pointer-events-auto select-none': !!($current | async)}">
+        <button (click)="onBackdropClicked()" *ngIf="!!($current | async)">Close</button>
+        <ng-container #container></ng-container>
+    </div>
+</div>

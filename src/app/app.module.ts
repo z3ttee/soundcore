@@ -8,6 +8,7 @@ import { AuthModule } from 'src/sso/auth.module';
 import { SCNGXModule } from 'projects/soundcore-ngx/src/lib/scngx.module';
 import { SCDKModule } from 'soundcore-sdk';
 import { environment } from 'src/environments/environment';
+import { SCNGXDialogModule } from 'soundcore-ngx';
 
 @NgModule({
   declarations: [
@@ -19,6 +20,7 @@ import { environment } from 'src/environments/environment';
     BrowserAnimationsModule,
 
     AuthModule,
+    SCNGXDialogModule,
     SCDKModule.forRoot({
       api_base_uri: environment.api_base_uri
     }),
@@ -32,7 +34,8 @@ import { environment } from 'src/environments/environment';
           { name: "2xl", width: 1550 }
         ]
       }
-    })
+    }),
+    SCNGXDialogModule
   ],
   providers: [],
   bootstrap: [AppComponent]
