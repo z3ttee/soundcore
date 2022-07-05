@@ -4,18 +4,12 @@
 </div>
 
 <!-- Layout - Drawer -->
-<scngx-drawer #drawer [rail]="false" *ngIf="!(screenService.$isTouch | async)">
+<scngx-drawer #drawer *ngIf="!(screenService.$isTouch | async)">
     <!-- Drawer sections -->
     <div class="flex flex-col relative h-full" scngx-drawer>
 
-        <!--<div>
-            Test
-            <p>Is Rail? {{ drawer.rail }}</p>
-            <p>Is touch? {{ (screenService.$isTouch | async) }}</p>
-        </div>-->
-
         <div class="block p-window pb-0">
-            <div class="flex items-center w-full" [ngClass]="{'flex-col': drawer.rail}">
+            <div class="flex items-center w-full">
                 <div class="w-1/2">
                     <img src="assets/branding/soundcore_logo_full.svg" class="min-w-10 max-w-10 h-10 block cursor-pointer" [routerLink]="['/']">
                 </div>
@@ -26,7 +20,7 @@
                 </div>
             </div>
 
-            <div class="w-full mt-row" *ngIf="!drawer.rail">
+            <div class="w-full mt-row">
                 <input type="text" [formControl]="searchInputControl" placeholder="Suchen" class="outline-none appearance-none w-full bg-body-light border border-transparent focus:border-font focus:border-opacity-30 transition-colors rounded-full text-sm py-3 px-4 placeholder:font-semi placeholder:text-font-secondary" (click)="navigateToSearch()">
             </div>
         </div>
@@ -94,7 +88,6 @@
     <!-- Page contents -->
     <div class="h-full overflow-hidden relative" scngx-content>
         <router-outlet></router-outlet>
-
         <app-player-bar class="absolute left-0 bottom-0 w-full"></app-player-bar>
     </div>
 </scngx-drawer>
@@ -111,7 +104,6 @@
     <scngx-nav-item [label]="'Bibliothek'" [routerLink]="['/library']" routerLinkActive #rla2="routerLinkActive" [active]="rla2.isActive">
         <hero-icon [name]="'bookmark-alt'" [class]="'h-5 w-5 transition-all'"></hero-icon>
     </scngx-nav-item>
-
     <!-- Page contents -->
     <div class="h-full overflow-hidden relative" scngx-content>
         <router-outlet></router-outlet>
