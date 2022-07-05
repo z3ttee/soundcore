@@ -138,8 +138,3 @@ export * from "./lib/utils/datasource/datasource";
 // Notifications
 export * from "./lib/components/notification/notification-list-item/notification-list-item.module";
 export * from "./lib/components/notification/notification-list-item/notification-list-item.component";
-
-// Dialog
-// export * from "./lib/ui/dialog/dialog.module";
-// export * from "./lib/ui/dialog/services/dialog.service";
-export * from "./lib/ui/dialog/dialogs/template/dialog-template.component";
