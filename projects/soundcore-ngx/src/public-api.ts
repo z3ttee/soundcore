@@ -28,6 +28,11 @@ export * from "./lib/dialog/entities/dialog-config.entity";
 export * from "./lib/dialog/components/backdrop/backdrop.component";
 export * from "./lib/dialog/components/dialog-section/dialog-section.component";
 
+// UI Title
+export * from "./lib/components/ui-title/ui-title.module";
+export * from "./lib/components/ui-title/ui-title.component";
+
+
 
 // Infinitelist
 export * from "./lib/components/list/infinite-list/infinite-list.module";
