@@ -77,24 +77,12 @@
     <scngx-nav-item [label]="'Tasks'" [routerLink]="['./tasks']" routerLinkActive #rla2="routerLinkActive" [active]="rla2.isActive">
         <hero-icon name="lightning-bolt" [class]="'h-5 w-5 transition-all'"></hero-icon>
     </scngx-nav-item>
-    <scngx-nav-item [label]="'Konfiguration'" [routerLink]="['./settings']" routerLinkActive #rla3="routerLinkActive" [active]="rla3.isActive">
-        <hero-icon name="cog" [class]="'h-5 w-5 transition-all'"></hero-icon>
+    <scngx-nav-item [label]="'Mehr'" [routerLink]="['./more']" routerLinkActive #rla3="routerLinkActive" [active]="rla3.isActive">
+        <hero-icon name="dots-vertical" [class]="'h-5 w-5 transition-all'"></hero-icon>
     </scngx-nav-item>
 
     <!-- Page contents -->
-    <div class="flex flex-col items-start justify-start h-full w-full border overflow-hidden relative" scngx-content>
-        <div class="w-full border">
-            <scngx-toolbar>
-                <div class="flex items-center">
-                    <span class="p-2 rounded-full" [routerLink]="['/']">
-                        <hero-icon name="home" [class]="'h-6 w-6'"></hero-icon>
-                    </span>
-                </div>
-            </scngx-toolbar>
-        </div>
-
-        <div class="flex-grow w-full border overflow-hidden">
-            <router-outlet></router-outlet>
-        </div>
+    <div class="h-full w-full overflow-hidden relative" scngx-content>
+        <router-outlet></router-outlet>
     </div>
 </scngx-bottom-nav>
