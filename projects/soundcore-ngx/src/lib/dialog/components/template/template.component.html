@@ -1,0 +1,79 @@
+<!-- Container -->
+<div class="flex md:inline-flex flex-col flex-1 bg-body rounded min-w-full max-h-full overflow-hidden md:min-w-[500px] border border-body-light border-opacity-50 shadow-md">
+
+    <!-- Header -->
+    <div class="inline-flex w-full items-center justify-start p-4 py-3 pr-2 select-auto">
+        <div class="flex-grow line-clamp-1 pr-2">
+            <h6 class="font-bold text-white text-opacity-80">Dialog title</h6>
+        </div>
+        <div class="min-w-9 min-h-9 inline-flex items-center justify-center rounded-full cursor-pointer opacity-60" (click)="close()">
+            <hero-icon name="x" [class]="'h-5 w-5'"></hero-icon>
+        </div>
+    </div>
+
+    <!-- Content -->
+    <div class="p-4 select-auto min-h-28 overflow-y-auto">
+        <div class="inline-block">
+            Inhalt <br>
+            Inhalt <br>
+            Inhalt <br>
+            Inhalt <br>
+            Inhalt <br>
+            Inhalt <br>
+            Inhalt <br>
+            Inhalt <br>
+            Inhalt <br>
+            Inhalt <br>
+            Inhalt <br>
+            Inhalt <br>
+            Inhalt <br>
+            Inhalt <br>
+            Inhalt <br>
+            Inhalt <br>
+            Inhalt <br>
+            Inhalt <br>
+            Inhalt <br>
+            Inhalt <br>
+            Inhalt <br>
+            Inhalt <br>
+            Inhalt <br>
+            Inhalt <br>
+            Inhalt <br>
+            Inhalt <br>
+            Inhalt <br>
+            Inhalt <br>
+            Inhalt <br>
+            Inhalt <br>
+            Inhalt <br>
+            Inhalt <br>
+            Inhalt <br>
+            Inhalt <br>
+            Inhalt <br>
+            Inhalt <br>
+            Inhalt <br>
+            Inhalt <br>
+            Inhalt <br>
+            Inhalt <br>
+            Inhalt <br>
+            Inhalt <br>
+            Inhalt <br>
+            Inhalt <br>
+            Inhalt <br>
+            Inhalt <br>
+            Inhalt <br>
+            Inhalt <br>
+            Inhalt <br>
+            Inhalt <br>
+            Inhalt <br>
+            Inhalt <br>
+            Inhalt <br>
+            <ng-content select="[scngx-dialog-content]"></ng-content>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="inline-flex w-full items-center justify-end p-4 select-auto">
+        Footer
+        <ng-content select="[scngx-dialog-actions]"></ng-content>
+    </div>
+</div>

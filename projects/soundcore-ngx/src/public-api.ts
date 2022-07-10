@@ -25,7 +25,7 @@ export * from "./lib/dialog/dialog.module";
 export * from "./lib/dialog/services/dialog.service";
 export * from "./lib/dialog/entities/dialog-ref.entity";
 export * from "./lib/dialog/entities/dialog-config.entity";
-export * from "./lib/dialog/components/backdrop/backdrop.component";
+export * from "./lib/dialog/components/template/template.component";
 export * from "./lib/dialog/components/dialog-section/dialog-section.component";
 
 // UI Title

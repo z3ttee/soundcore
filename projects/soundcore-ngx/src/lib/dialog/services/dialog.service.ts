@@ -1,7 +1,7 @@
 import { ComponentType } from "@angular/cdk/portal";
 import { ApplicationRef, Injectable, Injector } from "@angular/core";
 import { BehaviorSubject, Observable } from "rxjs";
-import { BackdropComponent } from "../components/backdrop/backdrop.component";
+import { SCNGXDialogComponent } from "../components/template/template.component";
 import { DialogConfig } from "../entities/dialog-config.entity";
 import { DialogRef } from "../entities/dialog-ref.entity";
 import { Dialog } from "../entities/dialog.entity";
@@ -13,6 +13,7 @@ export class SCNGXDialogService {
     private readonly _current: BehaviorSubject<Dialog> = new BehaviorSubject(null);
 
     public $current: Observable<Dialog> = this._current.asObservable();
+    public $dialogs: Observable<Dialog[]> = this._stack.asObservable();
 
     constructor(
         private readonly appRef: ApplicationRef,
@@ -23,8 +24,8 @@ export class SCNGXDialogService {
         this._stack.subscribe(() => this._updateInternalStructure());
     }
 
-    public open<C, D, R>(component: ComponentType<C>, config?: DialogConfig<D>): DialogRef<C, D, R> {
-        const dialogRef = new DialogRef<C, D, R>(component, config);
+    public open<C, D, R>(component: ComponentType<C>, config?: DialogConfig<D>): DialogRef<D, R> {
+        const dialogRef = new DialogRef<D, R>(config);
 
         // Add event listener to the close event to automatically
         // remove the dialogRef from stack.
@@ -35,7 +36,7 @@ export class SCNGXDialogService {
 
         // Push the new dialog to the stack
         // and push the update.
-        const dialog = new Dialog(dialogRef);
+        const dialog = new Dialog(dialogRef, component);
         const stack = this._stack.getValue();
         stack.push(dialog);
         this._stack.next(stack);
@@ -46,7 +47,7 @@ export class SCNGXDialogService {
     }
 
     public confirm() {
-        this.open(BackdropComponent);
+        this.open(SCNGXDialogComponent);
     }
 
 

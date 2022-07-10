@@ -1,3 +1,4 @@
+import { ComponentType } from "@angular/cdk/portal";
 import { ComponentRef, ViewRef } from "@angular/core";
 import { DialogRef } from "./dialog-ref.entity";
 
@@ -6,12 +7,9 @@ export class Dialog<C = any, D = any, R = any> {
     private _componentRef: ComponentRef<C>;
 
     constructor(
-        public readonly ref: DialogRef<C, D, R>
-    ) {
-        this.ref.$afterClosed.subscribe(() => {
-            this._componentRef.destroy();
-        })
-    }
+        public readonly ref: DialogRef<D, R>,
+        public readonly component: ComponentType<C>
+    ) {}
 
     public get componentRef(): ComponentRef<C> {
         return this._componentRef;
