@@ -1,25 +1,25 @@
-import { Component, EventEmitter, OnDestroy, OnInit, Output } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { DialogRef } from '../../entities/dialog-ref.entity';
-import { SCNGXDialogService } from '../../services/dialog.service';
 
 @Component({
   selector: 'scngx-dialog',
   templateUrl: './template.component.html',
   styleUrls: ['./template.component.scss']
 })
-export class SCNGXDialogComponent implements OnInit, OnDestroy {
+export class SCNGXDialogComponent implements OnInit {
+
+  @Input() public title: string;
 
   constructor(
     private readonly dialogRef: DialogRef
   ) { }
 
-  @Output() public onDismiss: EventEmitter<void> = new EventEmitter();
+  public showClose: boolean = false;
 
-  ngOnInit(): void {
-    console.log(this.dialogRef.id);
-  }
-  ngOnDestroy(): void {
-    console.log("destroyed test dialog")
+  public ngOnInit(): void {
+    // Fix: NgHeroIcon throwing error saying
+    // nativeElement is undefined.
+    this.showClose = true;
   }
 
   public close(result?: any) {

@@ -1,7 +1,7 @@
 import { ComponentType } from "@angular/cdk/portal";
 import { ApplicationRef, Injectable, Injector } from "@angular/core";
 import { BehaviorSubject, Observable } from "rxjs";
-import { SCNGXDialogComponent } from "../components/template/template.component";
+import { DialogConfirmComponent } from "../components/dialog-confirm/dialog-confirm.component";
 import { DialogConfig } from "../entities/dialog-config.entity";
 import { DialogRef } from "../entities/dialog-ref.entity";
 import { Dialog } from "../entities/dialog.entity";
@@ -24,32 +24,40 @@ export class SCNGXDialogService {
         this._stack.subscribe(() => this._updateInternalStructure());
     }
 
-    public open<C, D, R>(component: ComponentType<C>, config?: DialogConfig<D>): DialogRef<D, R> {
-        const dialogRef = new DialogRef<D, R>(config);
+    public open<C, D, R>(component: ComponentType<C>, config?: DialogConfig<D>): DialogRef<D, R> {      
+        // Push the new dialog to the stack
+        // and push the update.
+        const dialog = new Dialog(component, config);
 
         // Add event listener to the close event to automatically
         // remove the dialogRef from stack.
-        dialogRef.$afterClosed.subscribe(() => {
+        dialog.ref.$afterClosed.subscribe((result) => {
             // Remove from stack
-            this._removeById(dialogRef.id);
+            this._removeById(dialog.ref.id);
         })
 
-        // Push the new dialog to the stack
-        // and push the update.
-        const dialog = new Dialog(dialogRef, component);
         const stack = this._stack.getValue();
         stack.push(dialog);
         this._stack.next(stack);
 
         // Return ref only
         // API consumer should not have access to viewRefs etc.
-        return dialogRef;
+        return dialog.ref;
     }
 
-    public confirm() {
-        this.open(SCNGXDialogComponent);
+    /**
+     * Open the built-in confirm dialog.
+     * @param message Message to be displayed
+     * @param title Title to be displayed
+     * @returns 
+     */
+    public confirm(message?: string, title?: string) {
+        return this.open<any, any, boolean>(DialogConfirmComponent, {
+            data: null,
+            title,
+            message,
+        });
     }
-
 
     public closeIndex(index: number, result?: any) {
         const dialogRef = this._stack[index];
@@ -59,7 +67,7 @@ export class SCNGXDialogService {
     }
 
     public closeAll() {
-
+        // TODO
     }
 
     public closeTop<R>(result?: R) {
@@ -78,11 +86,9 @@ export class SCNGXDialogService {
     private _removeById<C, D ,R>(id: string) {
         const dialog = this._stack.getValue().find((dialog: Dialog) => dialog.ref.id === id);
         if(typeof dialog == "undefined" || dialog == null) {
-            console.warn("no dialog with id found: ", id);
             return;
         }
 
-        console.log("removing dialog by id: ", id);
         this._stack.next(this._stack.getValue().filter((d) => d?.ref.id !== dialog?.ref?.id));
     }
 
@@ -95,7 +101,6 @@ export class SCNGXDialogService {
     private _updateInternalStructure() {
         const stack = this._stack.getValue();
         const dialogRef = stack[0];
-        console.log("setting current dialog to: ", dialogRef, stack);
         this._current.next(dialogRef);
     }
 

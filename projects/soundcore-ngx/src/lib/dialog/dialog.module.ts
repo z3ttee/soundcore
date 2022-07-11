@@ -5,19 +5,23 @@ import { SCNGXDialogSectionComponent } from './components/dialog-section/dialog-
 import { SCNGXDialogService } from './services/dialog.service';
 import { HeroIconModule, x } from 'ng-heroicon';
 import { DialogContainerComponent } from './components/dialog-container/dialog-container.component';
+import { DialogConfirmComponent } from './components/dialog-confirm/dialog-confirm.component';
+import { SCNGXButtonModule } from '../components/buttons/btn/btn.module';
 
 @NgModule({
   declarations: [
     SCNGXDialogComponent,
     SCNGXDialogSectionComponent,
-    DialogContainerComponent
+    DialogContainerComponent,
+    DialogConfirmComponent
   ],
   providers: [
     SCNGXDialogService
   ],
   imports: [
     CommonModule,
-    HeroIconModule.withIcons({ x })
+    HeroIconModule.withIcons({ x }),
+    SCNGXButtonModule
   ],
   exports: [
     SCNGXDialogComponent,

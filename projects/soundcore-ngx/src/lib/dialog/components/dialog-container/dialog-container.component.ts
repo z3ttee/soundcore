@@ -27,10 +27,11 @@ export class DialogContainerComponent implements OnInit, AfterViewInit {
             useValue: this.dialog.ref
           }
         ]
-      })
+      }),
     });
 
     this.dialog.setComponentRef(componentRef);
+    componentRef.changeDetectorRef.detectChanges();
   }
 
   public dismiss(result?: any) {

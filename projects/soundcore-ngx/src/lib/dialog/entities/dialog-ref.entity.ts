@@ -10,7 +10,7 @@ export class DialogRef<D = any, R = any> {
     public readonly $afterClosed: Observable<R> = this._afterClosedSubject.asObservable();
 
     constructor(
-        private readonly _config?: DialogConfig<D>
+        public readonly config?: DialogConfig
     ){}
 
     public close(result: R) {
