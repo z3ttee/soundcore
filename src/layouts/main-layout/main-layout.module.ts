@@ -10,6 +10,7 @@ import {DragDropModule} from '@angular/cdk/drag-drop';
 import { ProfileBarModule } from "src/app/components/profile-bar/profile-bar.module";
 import { PlayerBarModule } from "src/app/components/player-bar/player-bar.module";
 import { ReactiveFormsModule } from "@angular/forms";
+import { AppPlaylistCreateDialogModule } from "src/app/dialogs/playlist-create-dialog/playlist-create-dialog.module";
 
 @NgModule({
     declarations: [
@@ -31,6 +32,8 @@ import { ReactiveFormsModule } from "@angular/forms";
 
         SCDKPlaylistModule,
         SCDKSearchModule,
+
+        AppPlaylistCreateDialogModule,
 
         HeroIconModule.withIcons({ home, search, user, bookmarkAlt, chevronDown, plus, shieldExclamation, bell, cog, logout }, { defaultHostDisplay: 'inlineBlock', attachDefaultDimensionsIfNoneFound: true })
     ],

@@ -1,10 +1,11 @@
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpErrorResponse } from "@angular/common/http";
 import { Inject, Injectable } from "@angular/core";
-import { BehaviorSubject, catchError, Observable, of, Subject, tap } from "rxjs";
+import { BehaviorSubject, catchError, map, Observable, of, Subject, tap } from "rxjs";
 import { Page } from "../../pagination/page";
 import { Pageable } from "../../pagination/pageable";
 import { SCDKOptions, SCDK_OPTIONS } from "../../scdk.module";
 import { Song } from "../../song/entities/song.entity";
+import { Response } from "../../utils/entities/response";
 import { SCResourceMap } from "../../utils/structures/resource-map";
 import { CreatePlaylistDTO } from "../dtos/create-playlist.dto";
 import { UpdatePlaylistDTO } from "../dtos/update-playlist.dto";
@@ -107,16 +108,23 @@ export class SCDKPlaylistService {
      * @param createPlaylistDto Playlist data to create.
      * @returns Observable<Playlist>
      */
-    public createPlaylist(createPlaylistDto: CreatePlaylistDTO): Observable<Playlist> {
-        if(!createPlaylistDto) return null;
+    public createPlaylist(createPlaylistDto: CreatePlaylistDTO): Observable<Response<Playlist>> {
+        if(!createPlaylistDto) return of(null);
         return this.httpClient.post<Playlist>(`${this.options.api_base_uri}/v1/playlists`, createPlaylistDto).pipe(
-            catchError((err) => {
-                throw err;
+            catchError((err: HttpErrorResponse) => {
+                return of(err)
             }),
-            tap((playlist) => {
-                this._playlistsMap.set(playlist);
+            map((result: Playlist | HttpErrorResponse) => {
+
+                if(result instanceof HttpErrorResponse) {
+                    return new Response<Playlist>(null, result);
+                }
+
+                this._playlistsMap.set(result);
                 this._playlistsSubject.next(this._playlistsMap.items());
-                this._onEventSubject.next(new PlaylistEvent("added", playlist));
+                this._onEventSubject.next(new PlaylistEvent("added", result));
+
+                return new Response<Playlist>(result);
             })
         )
     }

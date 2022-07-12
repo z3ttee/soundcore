@@ -3,6 +3,10 @@
  */
 export * from "./lib/scdk.module";
 
+// Utils
+export * from "./lib/utils/entities/response";
+export * from "./lib/utils/error/api-error";
+
 // Pagination
 export * from "./lib/utils/page/page";
 export * from "./lib/utils/page/pageable";
@@ -21,6 +25,16 @@ export * from "./lib/mount/entities/mount.entity";
 export * from "./lib/file/file.module";
 export * from "./lib/file/entities/file.entity";
 export * from "./lib/file/services/file.service";
+
+// Playlist Module
+export * from "./lib/playlist/playlist.module";
+export * from "./lib/playlist/services/playlist.service";
+export * from "./lib/playlist/entities/playlist.entity";
+export * from "./lib/playlist/entities/playlist-item.entity";
+export * from "./lib/playlist/dtos/create-playlist.dto";
+export * from "./lib/playlist/dtos/update-playlist.dto";
+//export * from "./lib/playlist/events/playlist.event";
+//export * from "./lib/playlist/events/songs.event";
 
 
 
@@ -51,18 +65,6 @@ export * from "./lib/user/entities/user.entity";
 export * from "./lib/song/song.module";
 export * from "./lib/song/services/song.service";
 export * from "./lib/song/entities/song.entity";
-
-/**
- * Export all playlist sdk parts
- */
-export * from "./lib/playlist/playlist.module";
-export * from "./lib/playlist/services/playlist.service";
-export * from "./lib/playlist/entities/playlist.entity";
-export * from "./lib/playlist/entities/playlist-item.entity";
-export * from "./lib/playlist/dtos/create-playlist.dto";
-export * from "./lib/playlist/dtos/update-playlist.dto";
-export * from "./lib/playlist/events/playlist.event";
-export * from "./lib/playlist/events/songs.event";
 
 /**
  * Export all album sdk parts
