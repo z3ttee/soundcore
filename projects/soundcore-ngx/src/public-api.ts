@@ -32,30 +32,34 @@ export * from "./lib/dialog/components/dialog-section/dialog-section.component";
 export * from "./lib/components/ui-title/ui-title.module";
 export * from "./lib/components/ui-title/ui-title.component";
 
+// Forms
+export * from "./lib/components/forms/forms.module";
+export * from "./lib/components/forms/label/label.module";
 
+export * from "./lib/components/forms/label/label.component";
 
 // Infinitelist
 export * from "./lib/components/list/infinite-list/infinite-list.module";
 export * from "./lib/components/list/infinite-list/infinite-list.component";
 
-// Tooltip
-export * from "./lib/ui/tooltip/tooltip.module";
-export * from "./lib/ui/tooltip/directive/tooltip.directive";
-
 // Skeletons
 export * from "./lib/components/skeletons/skeleton/skeleton.module";
 export * from "./lib/components/skeletons/skeleton/skeleton.component";
+
+// Tooltip
+export * from "./lib/ui/tooltip/tooltip.module";
+export * from "./lib/ui/tooltip/directive/tooltip.directive";
 
 // Navigation
 export * from "./lib/components/navigation/bottom-nav/bottom-nav.module";
 export * from "./lib/components/navigation/bottom-nav/bottom-nav.component";
 export * from "./lib/components/navigation/bottom-nav/item-component/item-component.component";
 
-
-
+// Toolbar
 export * from "./lib/components/toolbar/toolbar.module";
 export * from "./lib/components/toolbar/toolbar.component";
 
+// Tabbar
 export * from "./lib/components/navigation/tabbar/tabbar.module";
 export * from "./lib/components/navigation/tabbar/tabbar.component";
 export * from "./lib/components/navigation/tabbar/tab-item/tab-item.component";

@@ -29,7 +29,8 @@ export function playerFactory() {
     exports: [
         LottieModule,
         LottieCacheModule
-    ]
+    ],
+    declarations: []
 })
 export class SCNGXModule {
 
