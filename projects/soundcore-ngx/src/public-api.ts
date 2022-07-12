@@ -18,7 +18,9 @@ export * from "./lib/components/buttons/btn/btn-outlined/btn.component";
 export * from "./lib/components/buttons/btn/btn-text/btn.component";
 
 export * from "./lib/components/buttons/loading-btn/loading-btn.module";
-// export * from "./lib/components/buttons/loading-btn/loading-btn.component";
+export * from "./lib/components/buttons/loading-btn/btn-base/btn.component";
+export * from "./lib/components/buttons/loading-btn/btn-outlined/btn.component";
+export * from "./lib/components/buttons/loading-btn/btn-text/btn.component";
 
 // Dialog
 export * from "./lib/dialog/dialog.module";

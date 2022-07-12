@@ -10,6 +10,7 @@ export class SCNGXBtnTextComponent implements OnInit {
   @Input() public appearance: "error" | "success" | "warn" | "info" | "default" = "default";
   @Input() public size: "sm" | "base" | "md" | "lg" | "xl" = "base";
   @Input() public fullWidth: boolean = false;
+  @Input() public disabled: boolean = false;
 
   constructor() { }
 
