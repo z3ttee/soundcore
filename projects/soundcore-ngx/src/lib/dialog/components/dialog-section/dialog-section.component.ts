@@ -1,7 +1,6 @@
 import { animate, style, transition, trigger } from '@angular/animations';
 import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, ViewChild, ViewContainerRef } from '@angular/core';
 import { Subject, takeUntil } from 'rxjs';
-import { Dialog } from '../../entities/dialog.entity';
 import { SCNGXDialogService } from '../../services/dialog.service';
 
 @Component({

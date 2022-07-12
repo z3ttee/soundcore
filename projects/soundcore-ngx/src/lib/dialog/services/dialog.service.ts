@@ -1,6 +1,6 @@
 import { ComponentType } from "@angular/cdk/portal";
-import { ApplicationRef, Injectable, Injector } from "@angular/core";
-import { BehaviorSubject, Observable } from "rxjs";
+import { Injectable } from "@angular/core";
+import { BehaviorSubject, map, Observable } from "rxjs";
 import { DialogConfirmComponent } from "../components/dialog-confirm/dialog-confirm.component";
 import { DialogConfig } from "../entities/dialog-config.entity";
 import { DialogRef } from "../entities/dialog-ref.entity";
@@ -10,19 +10,11 @@ import { Dialog } from "../entities/dialog.entity";
 export class SCNGXDialogService {
 
     private readonly _stack: BehaviorSubject<Dialog[]> = new BehaviorSubject([]);
-    private readonly _current: BehaviorSubject<Dialog> = new BehaviorSubject(null);
 
-    public $current: Observable<Dialog> = this._current.asObservable();
+    public $current: Observable<Dialog> = this._stack.asObservable().pipe(map((list) => list[list.length - 1]));
     public $dialogs: Observable<Dialog[]> = this._stack.asObservable();
 
-    constructor(
-        private readonly appRef: ApplicationRef,
-        private readonly injector: Injector
-    ) {
-        // Update to stack updates to update
-        // dialogs
-        this._stack.subscribe(() => this._updateInternalStructure());
-    }
+    constructor() {}
 
     public open<C, D, R>(component: ComponentType<C>, config?: DialogConfig<D>): DialogRef<D, R> {      
         // Push the new dialog to the stack
@@ -31,7 +23,7 @@ export class SCNGXDialogService {
 
         // Add event listener to the close event to automatically
         // remove the dialogRef from stack.
-        dialog.ref.$afterClosed.subscribe((result) => {
+        dialog.ref.$afterClosed.subscribe(() => {
             // Remove from stack
             this._removeById(dialog.ref.id);
         })
@@ -71,9 +63,11 @@ export class SCNGXDialogService {
     }
 
     public closeTop<R>(result?: R) {
-        const current = this._current.getValue();
-        if(typeof current == "undefined" || current == null) return;
-        current.ref.close(result);
+        const stack = this._stack.getValue();
+        const top = stack[stack.length - 1];
+
+        if(typeof top == "undefined" || top == null) return;
+        top.ref.close(result);
     }
 
 
@@ -90,18 +84,6 @@ export class SCNGXDialogService {
         }
 
         this._stack.next(this._stack.getValue().filter((d) => d?.ref.id !== dialog?.ref?.id));
-    }
-
-    /**
-     * Show the next dialog from stack.
-     * This pops the next dialog from stack and places
-     * it as the current dialog.
-     * NOTE: If there is currently a dialog open, it does not get closed.
-     */
-    private _updateInternalStructure() {
-        const stack = this._stack.getValue();
-        const dialogRef = stack[0];
-        this._current.next(dialogRef);
     }
 
 }
