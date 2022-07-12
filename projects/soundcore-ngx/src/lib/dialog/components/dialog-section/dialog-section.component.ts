@@ -1,5 +1,5 @@
 import { animate, style, transition, trigger } from '@angular/animations';
-import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, ViewChild, ViewContainerRef } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild, ViewContainerRef } from '@angular/core';
 import { Subject, takeUntil } from 'rxjs';
 import { SCNGXDialogService } from '../../services/dialog.service';
 
@@ -7,7 +7,6 @@ import { SCNGXDialogService } from '../../services/dialog.service';
   selector: 'scngx-dialog-section',
   templateUrl: './dialog-section.component.html',
   styleUrls: ['./dialog-section.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
   animations: [
     trigger('fadeIn', [
       transition(':enter', [
