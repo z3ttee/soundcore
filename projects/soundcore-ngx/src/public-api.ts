@@ -35,8 +35,12 @@ export * from "./lib/components/ui-title/ui-title.component";
 // Forms
 export * from "./lib/components/forms/forms.module";
 export * from "./lib/components/forms/label/label.module";
+export * from "./lib/components/forms/hint/hint.module";
+export * from "./lib/components/forms/text-input/text-input.module";
 
 export * from "./lib/components/forms/label/label.component";
+export * from "./lib/components/forms/hint/hint.component";
+export * from "./lib/components/forms/text-input/text-input.component";
 
 // Infinitelist
 export * from "./lib/components/list/infinite-list/infinite-list.module";
