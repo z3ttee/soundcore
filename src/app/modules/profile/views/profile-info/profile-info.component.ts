@@ -38,9 +38,8 @@ export class ProfileInfoComponent implements OnInit, OnDestroy {
         this._profileSubject.next(profile);
         this._loadingSubject.next(false);
 
-        this.playlistService.findByAuthor(profileId, { page: 0, size: 8 }).subscribe((page) => {
-          console.log(page)
-          this._playlistSubject.next(page.elements);
+        this.playlistService.findByAuthor(profileId, { page: 0, size: 8 }).subscribe((response) => {
+          this._playlistSubject.next(response.payload.elements);
         })
       })
     })

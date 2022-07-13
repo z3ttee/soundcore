@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { Playlist } from 'soundcore-sdk';
+import { Playlist, MeiliPlaylist } from 'soundcore-sdk';
 
 @Component({
   selector: 'scngx-playlist-grid-item',
@@ -8,7 +8,7 @@ import { Playlist } from 'soundcore-sdk';
 })
 export class SCDKPlaylistGridItemComponent implements OnInit {
 
-  @Input() public item: Playlist;
+  @Input() public item: Playlist | MeiliPlaylist;
 
   constructor() { }
 

@@ -1,11 +1,14 @@
-import { HttpClient, HttpErrorResponse } from "@angular/common/http";
+import { HttpClient } from "@angular/common/http";
 import { Inject, Injectable } from "@angular/core";
 import { BehaviorSubject, catchError, map, Observable, of, Subject, tap } from "rxjs";
+import { MeiliPlaylist } from "../../meilisearch/entities/meili-playlist.entity";
+import { ApiSearchResponse } from "../../meilisearch/search-response.entity";
 import { Page } from "../../pagination/page";
 import { Pageable } from "../../pagination/pageable";
 import { SCDKOptions, SCDK_OPTIONS } from "../../scdk.module";
 import { Song } from "../../song/entities/song.entity";
-import { Response } from "../../utils/entities/response";
+import { ApiResponse } from "../../utils/responses/api-response";
+import { apiResponse } from "../../utils/rxjs/operators/api-response";
 import { SCResourceMap } from "../../utils/structures/resource-map";
 import { CreatePlaylistDTO } from "../dtos/create-playlist.dto";
 import { UpdatePlaylistDTO } from "../dtos/update-playlist.dto";
@@ -45,9 +48,9 @@ export class SCDKPlaylistService {
      * @param playlistId Playlist's id.
      * @returns Observable<Playlist>
      */
-    public findById(playlistId: string): Observable<Playlist> {
-        if(!playlistId) return of(null);
-        return this.httpClient.get<Playlist>(`${this.options.api_base_uri}/v1/playlists/${playlistId}`);
+    public findById(playlistId: string): Observable<ApiResponse<Playlist>> {
+        if(!playlistId) return of(ApiResponse.withPayload());
+        return this.httpClient.get<Playlist>(`${this.options.api_base_uri}/v1/playlists/${playlistId}`).pipe(apiResponse());
     }
 
     /**
@@ -59,9 +62,9 @@ export class SCDKPlaylistService {
      * @param pageable Page settings
      * @returns Observable<Page<Playlist>>
      */
-    public findByAuthor(authorId: string, pageable: Pageable): Observable<Page<Playlist>> {
-        if(!authorId) return of(Page.of([]));
-        return this.httpClient.get<Page<Playlist>>(`${this.options.api_base_uri}/v1/playlists/byAuthor/${authorId}`)
+    public findByAuthor(authorId: string, pageable: Pageable): Observable<ApiResponse<Page<Playlist>>> {
+        if(!authorId) return of(ApiResponse.withPayload(Page.of([])));
+        return this.httpClient.get<Page<Playlist>>(`${this.options.api_base_uri}/v1/playlists/byAuthor/${authorId}${Pageable.toQuery(pageable)}`).pipe(apiResponse())
     }
 
     /**
@@ -70,10 +73,12 @@ export class SCDKPlaylistService {
      * So please consider adding a proper header to that request.
      * @returns Observable<Page<Playlist>>
      */
-    public findByCurrentUser(): Observable<Page<Playlist>> {
-        return this.httpClient.get<Page<Playlist>>(`${this.options.api_base_uri}/v1/playlists/@me`).pipe(tap((page) => {
-            if(!page) return;
-            for(const playlist of page.elements) {
+    public findByCurrentUser(): Observable<ApiResponse<Page<Playlist>>> {
+        return this.httpClient.get<Page<Playlist>>(`${this.options.api_base_uri}/v1/playlists/@me`).pipe(
+            apiResponse(),
+            tap((response) => {
+            if(!response.payload) return;
+            for(const playlist of response.payload.elements) {
                 this._playlistsMap.set(playlist);
             }
             
@@ -108,23 +113,16 @@ export class SCDKPlaylistService {
      * @param createPlaylistDto Playlist data to create.
      * @returns Observable<Playlist>
      */
-    public createPlaylist(createPlaylistDto: CreatePlaylistDTO): Observable<Response<Playlist>> {
-        if(!createPlaylistDto) return of(null);
+    public createPlaylist(createPlaylistDto: CreatePlaylistDTO): Observable<ApiResponse<Playlist>> {
+        if(!createPlaylistDto) return of(ApiResponse.withPayload());
         return this.httpClient.post<Playlist>(`${this.options.api_base_uri}/v1/playlists`, createPlaylistDto).pipe(
-            catchError((err: HttpErrorResponse) => {
-                return of(err)
-            }),
-            map((result: Playlist | HttpErrorResponse) => {
-
-                if(result instanceof HttpErrorResponse) {
-                    return new Response<Playlist>(null, result);
+            apiResponse(),
+            tap((response) => {
+                if(response.payload) {
+                    this._playlistsMap.set(response.payload);
+                    this._playlistsSubject.next(this._playlistsMap.items());
+                    this._onEventSubject.next(new PlaylistEvent("added", response.payload));
                 }
-
-                this._playlistsMap.set(result);
-                this._playlistsSubject.next(this._playlistsMap.items());
-                this._onEventSubject.next(new PlaylistEvent("added", result));
-
-                return new Response<Playlist>(result);
             })
         )
     }
@@ -135,12 +133,10 @@ export class SCDKPlaylistService {
      * @param playlistId Playlist's id.
      * @returns Observable<void>
      */
-    public deleteById(playlistId: string): Observable<void> {
-        if(!playlistId) return of();
-        return this.httpClient.delete<any>(`${this.options.api_base_uri}/v1/playlists/${playlistId}`).pipe(
-            catchError((err) => {
-                throw err;
-            }),
+    public deleteById(playlistId: string): Observable<ApiResponse<boolean>> {
+        if(!playlistId) return of(ApiResponse.withPayload(false));
+        return this.httpClient.delete<boolean>(`${this.options.api_base_uri}/v1/playlists/${playlistId}`).pipe(
+            apiResponse(),
             tap(() => {
                 const playlist = this._playlistsMap.remove(playlistId);
                 this._playlistsSubject.next(this._playlistsMap.items());
@@ -206,6 +202,8 @@ export class SCDKPlaylistService {
         return of(null);
     }
 
-
+    public searchPlaylist(query: string, pageable: Pageable): Observable<ApiResponse<ApiSearchResponse<MeiliPlaylist>>> {
+        return this.httpClient.get<ApiSearchResponse<MeiliPlaylist>>(`${this.options.api_base_uri}/v1/search/playlists/?q=${query}&${Pageable.toParams(pageable)}`).pipe(apiResponse());
+    }
 
 }

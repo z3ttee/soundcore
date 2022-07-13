@@ -16,8 +16,19 @@
         <div class="inline-block w-full">
             <mat-form-field appearance="outline" color="accent" class="w-full">
                 <mat-label>Beschreibung</mat-label>
-                <textarea matInput #description rows="3" minlength="0" maxlength="254"></textarea>
+                <textarea matInput #description formControlName="description" rows="3" minlength="0" maxlength="254"></textarea>
                 <mat-hint align="end"><span class="text-xs">{{description.value?.length || 0}}/254</span></mat-hint>
+            </mat-form-field>
+        </div>
+
+        <div class="inline-block w-full">
+            <mat-form-field appearance="outline" color="accent" class="w-full">
+                <mat-label>Sichtbarkeit</mat-label>
+                <mat-select formControlName="privacy">
+                    <mat-option value="public">Öffentlich</mat-option>
+                    <mat-option value="not_listed">Nicht gelistet</mat-option>
+                    <mat-option value="private">Privat</mat-option>
+                </mat-select>
             </mat-form-field>
         </div>
     </form>

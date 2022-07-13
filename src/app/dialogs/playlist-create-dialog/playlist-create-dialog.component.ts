@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, OnDestroy } from "@angular/core";
 import { FormControl, FormGroup, Validators } from "@angular/forms";
 import { Subject, takeUntil } from "rxjs";
 import { DialogRef } from "soundcore-ngx";
-import { Playlist, SCDKPlaylistService, Response } from "soundcore-sdk";
+import { Playlist, SCDKPlaylistService, ApiResponse, PlaylistPrivacy } from "soundcore-sdk";
 
 @Component({
     templateUrl: "./playlist-create-dialog.component.html",
@@ -25,6 +25,11 @@ export class AppPlaylistCreateDialog implements OnDestroy {
                 Validators.minLength(0),
                 Validators.maxLength(254)
             ]
+        }),
+        privacy: new FormControl<PlaylistPrivacy>(PlaylistPrivacy.PUBLIC, {
+            validators: [
+                Validators.required
+            ]
         })
     })
 
@@ -44,10 +49,9 @@ export class AppPlaylistCreateDialog implements OnDestroy {
         this.loading = true;
         this.playlistService.createPlaylist({
             title: this.form.get("title").value,
-            description: this.form.get("description").value
-        }).pipe(takeUntil(this._destroy)).subscribe((result: Response<Playlist>) => {
-            console.log(result);
-
+            description: this.form.get("description").value,
+            privacy: this.form.get("privacy").value
+        }).pipe(takeUntil(this._destroy)).subscribe((result: ApiResponse<Playlist>) => {
             this.loading = false;
 
             if(result.error) {

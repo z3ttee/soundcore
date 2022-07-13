@@ -65,17 +65,21 @@
     </scngx-ui-row>
 
     <!-- Playlists -->
-    <scngx-ui-row [headline]="'Playlists'" *ngIf="($result | async)?.playlists?.elements?.length > 0">
-        <div class="w-full">
-            <scngx-horizontal-grid>
-                <ng-container *ngFor="let item of ($result | async)?.playlists?.elements">
-                    <scngx-playlist-grid-item 
-                        [item]="item"
-                        (click)="routeToResult(['/playlist', item.slug || item.id], item)">
-                    </scngx-playlist-grid-item>
-                </ng-container>
-            </scngx-horizontal-grid>
-        </div>
-    </scngx-ui-row>
+    <ng-container *ngIf="($playlists | async) as playlists">
+        {{ playlists.processingTime }}ms
+        <scngx-ui-row [headline]="'Playlists'" *ngIf="playlists.hits.length > 0">
+            <div class="w-full">
+                <scngx-horizontal-grid>
+                    <ng-container *ngFor="let item of playlists.hits">
+                        <scngx-playlist-grid-item 
+                            [item]="item"
+                            (click)="routeToResult(['/playlist', item.slug || item.id], item)">
+                        </scngx-playlist-grid-item>
+                    </ng-container>
+                </scngx-horizontal-grid>
+            </div>
+        </scngx-ui-row>
+    </ng-container>
+    
 
 </section>

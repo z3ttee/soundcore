@@ -3,6 +3,10 @@ export class Pageable {
     public page?: number = 0;
 
     public static toQuery(pageable: Pageable): string {
+        return `?${this.toParams(pageable)}`;
+    }
+
+    public static toParams(pageable: Pageable): string {
         if(!pageable) pageable = new Pageable();
         if(!pageable.size) pageable.size = 30;
         if(!pageable.page) pageable.page = 0;
@@ -11,6 +15,6 @@ export class Pageable {
         searchParams.append("page", `${pageable.page}`);
         searchParams.append("size", `${pageable.size}`);
 
-        return `?${searchParams}`;
+        return `${searchParams}`;
     }
 }

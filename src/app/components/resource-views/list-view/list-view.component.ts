@@ -29,7 +29,7 @@ export class ListViewComponent implements OnInit, OnDestroy, OnChanges {
   public ngOnInit(): void {}
   public ngOnChanges(changes: SimpleChanges): void {
       const current: SCDKResource = changes["resource"]?.currentValue;
-      this.accentColor = current?.artwork?.accentColor || DEFAULT_ACCENT_COLOR;
+      this.accentColor = current?.artwork?.colors?.vibrant || DEFAULT_ACCENT_COLOR;
   }
   public ngOnDestroy(): void {
       this.$destroy.complete();

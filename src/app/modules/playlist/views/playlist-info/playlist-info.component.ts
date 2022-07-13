@@ -60,9 +60,9 @@ export class PlaylistInfoComponent implements OnInit, OnDestroy {
       this.release();
 
       // Trigger http request.
-      this._playlistSub = this.playlistService.findById(paramMap.get("playlistId")).subscribe((playlist) => {
+      this._playlistSub = this.playlistService.findById(paramMap.get("playlistId")).subscribe((response) => {
         // Update state
-        this.playlist = playlist;
+        this.playlist = response.payload;
 
         // Init playable list datasource
         this.list = PlayableListBuilder
@@ -70,7 +70,7 @@ export class PlaylistInfoComponent implements OnInit, OnDestroy {
           .metaUrl(`${environment.api_base_uri}/v1/songs/byPlaylist/${this.playlist.id}`)
           .build();
 
-        this.showError404 = !playlist;
+        this.showError404 = !response.payload;
         this.isLoadingPlaylist = false;
       })
     })

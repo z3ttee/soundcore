@@ -4,8 +4,14 @@
 export * from "./lib/scdk.module";
 
 // Utils
-export * from "./lib/utils/entities/response";
+export * from "./lib/utils/responses/api-response";
 export * from "./lib/utils/error/api-error";
+
+// Meilisearch
+export * from "./lib/meilisearch/entities/meili-user.entity";
+export * from "./lib/meilisearch/entities/meili-artwork.entity";
+export * from "./lib/meilisearch/entities/meili-playlist.entity";
+export * from "./lib/meilisearch/search-response.entity";
 
 // Pagination
 export * from "./lib/utils/page/page";
@@ -33,6 +39,7 @@ export * from "./lib/playlist/entities/playlist.entity";
 export * from "./lib/playlist/entities/playlist-item.entity";
 export * from "./lib/playlist/dtos/create-playlist.dto";
 export * from "./lib/playlist/dtos/update-playlist.dto";
+export * from "./lib/playlist/enums/playlist-privacy.enum";
 //export * from "./lib/playlist/events/playlist.event";
 //export * from "./lib/playlist/events/songs.event";
 

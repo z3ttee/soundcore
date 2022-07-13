@@ -29,6 +29,10 @@ body {
     @apply bg-body;
 }
 
+.cdk-global-overlay-wrapper, .cdk-overlay-container {
+    z-index: 9999999999999 !important;
+}
+
 /**
 []=============================[]
           Headlines

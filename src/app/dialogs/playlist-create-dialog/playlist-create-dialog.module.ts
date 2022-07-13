@@ -6,6 +6,7 @@ import { SCDKPlaylistModule } from 'soundcore-sdk';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
+import {MatSelectModule} from '@angular/material/select';
 
 @NgModule({
   declarations: [
@@ -21,8 +22,8 @@ import { MatInputModule } from '@angular/material/input';
     SCDKPlaylistModule,
 
     MatFormFieldModule,
-    MatInputModule
-    
+    MatInputModule,
+    MatSelectModule
   ]
 })
 export class AppPlaylistCreateDialogModule { }
