@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { SCDKNotificationService } from 'soundcore-sdk';
+import { Pageable, SCDKNotificationService } from 'soundcore-sdk';
 
 @Component({
   templateUrl: './notifications.component.html',
@@ -12,7 +12,7 @@ export class NotificationsComponent implements OnInit {
   ) { }
 
   public ngOnInit(): void {
-    this.notificationService.findByCurrentUser({ page: 0, size: 30 }).subscribe((page) => {
+    this.notificationService.findByCurrentUser(new Pageable(0, 30)).subscribe((page) => {
       console.log(page)
     })
   }

@@ -43,7 +43,10 @@ export * from "./lib/playlist/enums/playlist-privacy.enum";
 //export * from "./lib/playlist/events/playlist.event";
 //export * from "./lib/playlist/events/songs.event";
 
-
+// User Module
+export * from "./lib/user/user.module";
+export * from "./lib/user/entities/user.entity";
+export * from "./lib/user/services/user.service";
 
 
 
@@ -58,12 +61,6 @@ export * from "./lib/playlist/enums/playlist-privacy.enum";
 export * from "./lib/artist/artist.module";
 export * from "./lib/artist/services/artist.service";
 export * from "./lib/artist/entities/artist.entity";
-
-/**
- * Export all user sdk parts
- */
-export * from "./lib/user/user.module";
-export * from "./lib/user/entities/user.entity";
 
 
 /**

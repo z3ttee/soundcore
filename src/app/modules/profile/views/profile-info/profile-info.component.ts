@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { BehaviorSubject, catchError, Observable, of, Subject, takeUntil } from 'rxjs';
-import { Playlist, SCDKPlaylistService, SCDKProfileService, User } from 'soundcore-sdk';
+import { BehaviorSubject, Observable, Subject, takeUntil } from 'rxjs';
+import { Pageable, Playlist, SCDKPlaylistService, SCDKProfileService, SCDKUserService, User } from 'soundcore-sdk';
 
 @Component({
   selector: 'app-profile-info',
@@ -23,6 +23,7 @@ export class ProfileInfoComponent implements OnInit, OnDestroy {
   constructor(
     private readonly profileService: SCDKProfileService,
     private readonly playlistService: SCDKPlaylistService,
+    private readonly userService: SCDKUserService,
     private readonly activatedRoute: ActivatedRoute
   ) { }
 
@@ -32,13 +33,14 @@ export class ProfileInfoComponent implements OnInit, OnDestroy {
       this._loadingSubject.next(true);
 
       const profileId = paramMap.get("profileId");
-      const request = profileId == "@me" ? this.profileService.findByCurrentUser() : this.profileService.findByUserId(profileId);
+      const request = profileId == "@me" ? this.userService.findByCurrentUser() : this.profileService.findByUserId(profileId);
 
-      request.pipe(catchError((err) => of(null))).subscribe((profile) => {
-        this._profileSubject.next(profile);
+      request.subscribe((response) => {
+        // TODO: Catch error from response object
+        this._profileSubject.next(response.payload);
         this._loadingSubject.next(false);
 
-        this.playlistService.findByAuthor(profileId, { page: 0, size: 8 }).subscribe((response) => {
+        this.playlistService.findByAuthor(profileId, new Pageable(0, 8)).subscribe((response) => {
           this._playlistSubject.next(response.payload.elements);
         })
       })
