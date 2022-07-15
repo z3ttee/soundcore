@@ -1,9 +1,9 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { UntypedFormControl } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { BehaviorSubject, debounceTime, Observable, Subject, takeUntil } from 'rxjs';
 import { SCNGXScreenService } from 'soundcore-ngx';
-import { SCDKSearchService, ComplexSearchResult, SCDKResource, SCDKPlaylistService, ApiSearchResponse, MeiliPlaylist, Pageable, MeiliUser, SCDKUserService } from 'soundcore-sdk';
+import { MeiliArtist, SCDKSearchService, ComplexSearchResult, SCDKResource, SCDKPlaylistService, ApiSearchResponse, MeiliPlaylist, Pageable, MeiliUser, SCDKUserService, SCDKArtistService } from 'soundcore-sdk';
 
 @Component({
   selector: 'app-search-index',
@@ -17,6 +17,7 @@ export class SearchIndexComponent implements OnInit, OnDestroy {
     private readonly searchService: SCDKSearchService,
     private readonly playlistService: SCDKPlaylistService,
     private readonly userService: SCDKUserService,
+    private readonly artistService: SCDKArtistService,
     public readonly screenService: SCNGXScreenService
   ) { }
 
@@ -33,6 +34,7 @@ export class SearchIndexComponent implements OnInit, OnDestroy {
 
   public $playlists: BehaviorSubject<ApiSearchResponse<MeiliPlaylist>> = new BehaviorSubject(null);
   public $users: BehaviorSubject<ApiSearchResponse<MeiliUser>> = new BehaviorSubject(null);
+  public $artists: BehaviorSubject<ApiSearchResponse<MeiliArtist>> = new BehaviorSubject(null);
 
   public ngOnInit(): void {
 
@@ -46,15 +48,21 @@ export class SearchIndexComponent implements OnInit, OnDestroy {
         return
       }
 
+      // Search artists
+      this.artistService.searchArtist(query, new Pageable(0, 10)).pipe(takeUntil(this._cancelQuery)).subscribe((response) => {
+        this.$artists.next(response.payload);
+      })
+
+      // Search playlists
       this.playlistService.searchPlaylist(query, new Pageable(0, 10)).pipe(takeUntil(this._cancelQuery)).subscribe((response) => {
         this.$playlists.next(response.payload);
       })
 
+      // Search users
       this.userService.searchUser(query, new Pageable(0, 10)).pipe(takeUntil(this._cancelQuery)).subscribe((response) => {
-        console.log(response);
-
         this.$users.next(response.payload);
       })
+
     })
 
     // Push queries that were received from input on mobile devices.

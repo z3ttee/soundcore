@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { Album, Artist } from 'soundcore-sdk';
+import { Artist, MeiliArtist } from 'soundcore-sdk';
 
 @Component({
   selector: 'scngx-artist-grid-item',
@@ -11,7 +11,7 @@ export class SCNGXArtistGridItemComponent implements OnInit {
   /**
    * Artist data
    */
-  @Input() public item: Artist;
+  @Input() public item: Artist | MeiliArtist;
 
   constructor() { }
 

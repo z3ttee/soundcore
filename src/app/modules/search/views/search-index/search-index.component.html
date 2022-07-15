@@ -36,18 +36,20 @@
 <section [ngClass]="{'pt-0': (screenService.$isTouch | async)}" *ngIf="query">
 
     <!-- Artists -->
-    <scngx-ui-row [headline]="'Künstler'" *ngIf="($result | async)?.albums?.elements?.length > 0">
-        <div class="w-full">
-            <scngx-horizontal-grid>
-                <ng-container *ngFor="let item of ($result | async)?.artists?.elements">
-                    <scngx-artist-grid-item 
-                        [item]="item"
-                        (click)="routeToResult(['/artist', item.slug || item.id], item)">
-                    </scngx-artist-grid-item>
-                </ng-container>
-            </scngx-horizontal-grid>
-        </div>
-    </scngx-ui-row>
+    <ng-container *ngIf="($artists | async) as artists">
+        <scngx-ui-row [headline]="'Künstler'" *ngIf="artists.hits.length > 0">
+            <div class="w-full">
+                <scngx-horizontal-grid>
+                    <ng-container *ngFor="let item of artists.hits">
+                        <scngx-artist-grid-item 
+                            [item]="item"
+                            (click)="routeToResult(['/artist', item.slug || item.id], item)">
+                        </scngx-artist-grid-item>
+                    </ng-container>
+                </scngx-horizontal-grid>
+            </div>
+        </scngx-ui-row>
+    </ng-container>
 
     <!-- Albums -->
     <scngx-ui-row [headline]="'Alben'" *ngIf="($result | async)?.albums?.elements?.length > 0">

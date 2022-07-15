@@ -57,7 +57,8 @@ export class ArtistProfileComponent implements OnInit, OnDestroy {
       // TODO: Check if playable list is not enqueued
       this._listSubject.getValue()?.release();
 
-      this.artistService.findById(artistId).pipe(takeUntil(this._destroy)).subscribe((artist) => {
+      this.artistService.findById(artistId).pipe(takeUntil(this._destroy)).subscribe((response) => {
+        const artist = response.payload;
         this._artistSubject.next(artist);
         this._loadingSubject.next(false);
 
