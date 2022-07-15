@@ -66,7 +66,6 @@
 
     <!-- Playlists -->
     <ng-container *ngIf="($playlists | async) as playlists">
-        {{ playlists.processingTime }}ms
         <scngx-ui-row [headline]="'Playlists'" *ngIf="playlists.hits.length > 0">
             <div class="w-full">
                 <scngx-horizontal-grid>
@@ -75,6 +74,22 @@
                             [item]="item"
                             (click)="routeToResult(['/playlist', item.slug || item.id], item)">
                         </scngx-playlist-grid-item>
+                    </ng-container>
+                </scngx-horizontal-grid>
+            </div>
+        </scngx-ui-row>
+    </ng-container>
+
+    <!-- Users -->
+    <ng-container *ngIf="($users | async) as users">
+        <scngx-ui-row [headline]="'Profile'" *ngIf="users.hits.length > 0">
+            <div class="w-full">
+                <scngx-horizontal-grid>
+                    <ng-container *ngFor="let item of users.hits">
+                        <scngx-profile-grid-item 
+                            [item]="item"
+                            (click)="routeToResult(['/profile', item.slug || item.id], item)">
+                        </scngx-profile-grid-item>
                     </ng-container>
                 </scngx-horizontal-grid>
             </div>

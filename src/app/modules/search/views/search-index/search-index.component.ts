@@ -3,7 +3,7 @@ import { UntypedFormControl } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BehaviorSubject, debounceTime, Observable, Subject, takeUntil } from 'rxjs';
 import { SCNGXScreenService } from 'soundcore-ngx';
-import { SCDKSearchService, ComplexSearchResult, SCDKResource, SCDKPlaylistService, ApiSearchResponse, MeiliPlaylist, Pageable } from 'soundcore-sdk';
+import { SCDKSearchService, ComplexSearchResult, SCDKResource, SCDKPlaylistService, ApiSearchResponse, MeiliPlaylist, Pageable, MeiliUser, SCDKUserService } from 'soundcore-sdk';
 
 @Component({
   selector: 'app-search-index',
@@ -14,9 +14,9 @@ export class SearchIndexComponent implements OnInit, OnDestroy {
 
   constructor(
     private readonly router: Router,
-    private readonly activatedRoute: ActivatedRoute,
     private readonly searchService: SCDKSearchService,
     private readonly playlistService: SCDKPlaylistService,
+    private readonly userService: SCDKUserService,
     public readonly screenService: SCNGXScreenService
   ) { }
 
@@ -32,6 +32,7 @@ export class SearchIndexComponent implements OnInit, OnDestroy {
   public readonly searchInputControl: UntypedFormControl = new UntypedFormControl("");
 
   public $playlists: BehaviorSubject<ApiSearchResponse<MeiliPlaylist>> = new BehaviorSubject(null);
+  public $users: BehaviorSubject<ApiSearchResponse<MeiliUser>> = new BehaviorSubject(null);
 
   public ngOnInit(): void {
 
@@ -45,15 +46,14 @@ export class SearchIndexComponent implements OnInit, OnDestroy {
         return
       }
 
-      /*this.searchService.performComplexSearch(query).pipe(takeUntil(this._cancelQuery)).subscribe((result) => {
-        console.log(result)
-        this._resultSubject.next(result);
-        this.show404 = !result;
-      })*/
       this.playlistService.searchPlaylist(query, new Pageable(0, 10)).pipe(takeUntil(this._cancelQuery)).subscribe((response) => {
+        this.$playlists.next(response.payload);
+      })
+
+      this.userService.searchUser(query, new Pageable(0, 10)).pipe(takeUntil(this._cancelQuery)).subscribe((response) => {
         console.log(response);
 
-        this.$playlists.next(response.payload);
+        this.$users.next(response.payload);
       })
     })
 

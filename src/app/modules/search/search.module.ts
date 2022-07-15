@@ -8,6 +8,8 @@ import { SCNGXAlbumGridItemModule } from 'soundcore-ngx';
 import { SCNGXPlaylistGridItemModule } from 'soundcore-ngx';
 import { Error404Module } from 'src/app/shared/error404/error404.module';
 import { ReactiveFormsModule } from '@angular/forms';
+import { SCDKUserModule } from 'soundcore-sdk';
+import { SCNGXProfileGridItemModule } from 'projects/soundcore-ngx/src/lib/components/grid/profile-grid-item/profile-grid-item.module';
 
 const routes: Routes = [
   { path: "", component: SearchIndexComponent }
@@ -29,7 +31,10 @@ const routes: Routes = [
     SCNGXHorizontalGridModule,
     SCNGXAlbumGridItemModule,
     SCNGXPlaylistGridItemModule,
-    SCNGXArtistGridItemModule
+    SCNGXArtistGridItemModule,
+    SCNGXProfileGridItemModule,
+
+    SCDKUserModule
   ]
 })
 export class SearchModule { }
