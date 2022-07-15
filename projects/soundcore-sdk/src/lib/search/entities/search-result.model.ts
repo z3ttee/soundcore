@@ -3,11 +3,11 @@ import { Artist } from "../../artist/entities/artist.entity";
 import { Distributor } from "../../distributor/entities/distributor.entity";
 import { Genre } from "../../genre/entities/genre.entity";
 import { Label } from "../../label/entities/label.entity";
-import { Page } from "../../pagination/page";
 import { Playlist } from "../../playlist/entities/playlist.entity";
 import { Publisher } from "../../publisher/entities/publisher.entity";
 import { Song } from "../../song/entities/song.entity";
 import { User } from "../../user/entities/user.entity";
+import { Page } from "../../utils/page/page";
 import { SearchBestMatch } from "./best-match.entity";
 
 export class ComplexSearchResult {

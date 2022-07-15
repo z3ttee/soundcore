@@ -1,8 +1,8 @@
 import { HttpClient } from "@angular/common/http";
 import { Inject, Injectable } from "@angular/core";
 import { Observable, of } from "rxjs";
-import { Page } from "../../pagination/page";
-import { Pageable } from "../../pagination/pageable";
+import { Page } from "../../utils/page/page";
+import { Pageable } from "../../utils/page/pageable";
 import { SCDKOptions, SCDK_OPTIONS } from "../../scdk.module";
 import { Song } from "../entities/song.entity";
 
@@ -33,7 +33,7 @@ export class SCDKSongService {
      */
     public findSongsByGenreAndArtist(genreId: string, artistId: string, pageable: Pageable): Observable<Page<Song>> {
         if(!genreId || !artistId) return of(Page.of([]))
-        return this.httpClient.get<Page<Song>>(`${this.options.api_base_uri}/v1/songs/byGenre/${genreId}/byArtist/${artistId}${Pageable.toQuery(pageable)}`);
+        return this.httpClient.get<Page<Song>>(`${this.options.api_base_uri}/v1/songs/byGenre/${genreId}/byArtist/${artistId}${pageable.toQuery()}`);
     }
 
     /**
@@ -42,7 +42,7 @@ export class SCDKSongService {
      * @returns Observable<Page<Song>>
      */
     public findSongsByCollection(pageable: Pageable): Observable<Page<Song>> {
-        return this.httpClient.get<Page<Song>>(`${this.options.api_base_uri}/v1/songs/byCollection${Pageable.toQuery(pageable)}`)
+        return this.httpClient.get<Page<Song>>(`${this.options.api_base_uri}/v1/songs/byCollection${pageable.toQuery()}`)
     }
 
     /**
@@ -53,7 +53,7 @@ export class SCDKSongService {
      */
     public findSongsByCollectionAndArtist(artistId: string, pageable: Pageable): Observable<Page<Song>> {
         if(!artistId) return of(Page.of([]))
-        return this.httpClient.get<Page<Song>>(`${this.options.api_base_uri}/v1/songs/byCollection/byArtist/${artistId}${Pageable.toQuery(pageable)}`)
+        return this.httpClient.get<Page<Song>>(`${this.options.api_base_uri}/v1/songs/byCollection/byArtist/${artistId}${pageable.toQuery()}`)
     }
 
 }

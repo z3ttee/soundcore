@@ -8,6 +8,7 @@ import { SCNGXAlbumGridItemModule } from 'soundcore-ngx';
 import { SCNGXPlaylistGridItemModule } from 'soundcore-ngx';
 import { Error404Module } from 'src/app/shared/error404/error404.module';
 import { ReactiveFormsModule } from '@angular/forms';
+import { SCDKMeiliModule } from 'soundcore-sdk';
 
 const routes: Routes = [
   { path: "", component: SearchIndexComponent }

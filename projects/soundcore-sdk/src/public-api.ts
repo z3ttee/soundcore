@@ -11,7 +11,7 @@ export * from "./lib/utils/error/api-error";
 export * from "./lib/meilisearch/entities/meili-user.entity";
 export * from "./lib/meilisearch/entities/meili-artwork.entity";
 export * from "./lib/meilisearch/entities/meili-playlist.entity";
-export * from "./lib/meilisearch/search-response.entity";
+export * from "./lib/meilisearch/entities/search-response.entity";
 
 // Pagination
 export * from "./lib/utils/page/page";

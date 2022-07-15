@@ -77,7 +77,7 @@ export class TrackListDataSource extends DataSource<Song> {
         const pageable: Pageable = { page: pageNr, size: this.options.pageSize }
         console.log("fetching next page: ", pageable)
 
-        firstValueFrom(this.httpClient.get<Page<Song>>(`${this.options.apiBaseUri}/v1/songs/${this.options.type}/${this.options.resourceId}${Pageable.toQuery(pageable)}`)).then((page) => {
+        firstValueFrom(this.httpClient.get<Page<Song>>(`${this.options.apiBaseUri}/v1/songs/${this.options.type}/${this.options.resourceId}${pageable.toQuery()}`)).then((page) => {
             // Add page to the fetchedPages list.
             // Only on success, because if it fails it can be refetched next time.
             this._fetchedPages.add(pageNr);

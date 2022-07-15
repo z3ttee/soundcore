@@ -22,7 +22,7 @@ export class MountService {
 
     public async findMountsByBucketId(bucketId: string, pageable?: Pageable): Promise<Page<Mount>> {
         if(!bucketId) return Page.of([]);
-        return firstValueFrom(this.httpClient.get<Page<Mount>>(`${environment.api_base_uri}/v1/mounts/byBucket/${bucketId}${Pageable.toQuery(pageable)}`))
+        return firstValueFrom(this.httpClient.get<Page<Mount>>(`${environment.api_base_uri}/v1/mounts/byBucket/${bucketId}${pageable.toQuery()}`))
     }
 
     public async findById(mountId: string): Promise<Mount> {

@@ -1,9 +1,9 @@
 import { HttpClient } from "@angular/common/http";
 import { Inject, Injectable } from "@angular/core";
 import { BehaviorSubject, Observable, of } from "rxjs";
-import { Page } from "../../pagination/page";
-import { Pageable } from "../../pagination/pageable";
 import { SCDKOptions, SCDK_OPTIONS } from "../../scdk.module";
+import { Page } from "../../utils/page/page";
+import { Pageable } from "../../utils/page/pageable";
 import { Album } from "../entities/album.entity";
 
 @Injectable()
@@ -52,7 +52,7 @@ export class SCDKAlbumService {
      */
     public findByArtist(artistId: string, pageable: Pageable): Observable<Page<Album>> {
         if(!artistId) return of(Page.of([]));
-        return this.httpClient.get<Page<Album>>(`${this.options.api_base_uri}/v1/albums/byArtist/${artistId}${Pageable.toQuery(pageable)}`)
+        return this.httpClient.get<Page<Album>>(`${this.options.api_base_uri}/v1/albums/byArtist/${artistId}${pageable.toQuery()}`)
     }
 
     /**
@@ -64,7 +64,7 @@ export class SCDKAlbumService {
      */
     public findFeaturedByArtist(artistId: string, pageable: Pageable): Observable<Page<Album>> {
         if(!artistId) return of(Page.of([]));
-        return this.httpClient.get<Page<Album>>(`${this.options.api_base_uri}/v1/albums/byFeaturedArtist/${artistId}${Pageable.toQuery(pageable)}`)
+        return this.httpClient.get<Page<Album>>(`${this.options.api_base_uri}/v1/albums/byFeaturedArtist/${artistId}${pageable.toQuery()}`)
     }
 
 }

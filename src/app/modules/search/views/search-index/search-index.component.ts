@@ -3,7 +3,7 @@ import { UntypedFormControl } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BehaviorSubject, debounceTime, Observable, Subject, takeUntil } from 'rxjs';
 import { SCNGXScreenService } from 'soundcore-ngx';
-import { SCDKSearchService, ComplexSearchResult, SCDKResource, SCDKPlaylistService, ApiSearchResponse, MeiliPlaylist } from 'soundcore-sdk';
+import { SCDKSearchService, ComplexSearchResult, SCDKResource, SCDKPlaylistService, ApiSearchResponse, MeiliPlaylist, Pageable } from 'soundcore-sdk';
 
 @Component({
   selector: 'app-search-index',
@@ -50,7 +50,7 @@ export class SearchIndexComponent implements OnInit, OnDestroy {
         this._resultSubject.next(result);
         this.show404 = !result;
       })*/
-      this.playlistService.searchPlaylist(query, { page: 0, size: 10 }).pipe(takeUntil(this._cancelQuery)).subscribe((response) => {
+      this.playlistService.searchPlaylist(query, new Pageable(0, 10)).pipe(takeUntil(this._cancelQuery)).subscribe((response) => {
         console.log(response);
 
         this.$playlists.next(response.payload);

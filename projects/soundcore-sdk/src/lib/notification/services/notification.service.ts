@@ -1,9 +1,9 @@
 import { HttpClient } from "@angular/common/http";
 import { Inject, Injectable } from "@angular/core";
 import { BehaviorSubject, map, Observable, tap } from "rxjs";
-import { Page } from "../../pagination/page";
-import { Pageable } from "../../pagination/pageable";
 import { SCDKOptions, SCDK_OPTIONS } from "../../scdk.module";
+import { Page } from "../../utils/page/page";
+import { Pageable } from "../../utils/page/pageable";
 import { Notification } from "../entities/notification.entity";
 import { SCDKNotificationGateway } from "../gateway/notification.gateway";
 
@@ -27,7 +27,7 @@ export class SCDKNotificationService {
     }
 
     public findByCurrentUser(pageable: Pageable): Observable<Page<Notification>> {
-        return this.httpClient.get<Page<Notification>>(`${this.options.api_base_uri}/v1/notifications/@me${Pageable.toQuery(pageable)}`).pipe(tap((page) => {
+        return this.httpClient.get<Page<Notification>>(`${this.options.api_base_uri}/v1/notifications/@me${pageable.toQuery()}`).pipe(tap((page) => {
             this.addNotifications(page.elements);
         }))
     }

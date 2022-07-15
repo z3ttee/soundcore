@@ -31,7 +31,7 @@ export class SCDKBucketService {
      * @returns Observable<Page<Bucket>>
      */
     public find(pageable: Pageable): Observable<Page<Bucket>> {
-        return this.httpClient.get<Page<Bucket>>(`${this.options.api_base_uri}/v1/buckets${Pageable.toQuery(pageable)}`)
+        return this.httpClient.get<Page<Bucket>>(`${this.options.api_base_uri}/v1/buckets${pageable.toQuery()}`)
     }
 
 }

@@ -1,8 +1,8 @@
 import { HttpClient } from "@angular/common/http";
 import { Inject, Injectable } from "@angular/core";
 import { Observable, of } from "rxjs";
-import { Page } from "../../pagination/page";
-import { Pageable } from "../../pagination/pageable";
+import { Page } from "../../utils/page/page";
+import { Pageable } from "../../utils/page/pageable";
 import { SCDKOptions, SCDK_OPTIONS } from "../../scdk.module";
 import { Index } from "../entities/index.entity";
 
@@ -34,7 +34,7 @@ export class SCDKIndexService {
      */
     public findByMount(mountId: string, pageable: Pageable): Observable<Page<Index>> {
         if(!mountId) return of(Page.of([]));
-        return this.httpClient.get<Page<Index>>(`${this.options.api_base_uri}/v1/index/byMount/${mountId}${Pageable.toQuery(pageable)}`)
+        return this.httpClient.get<Page<Index>>(`${this.options.api_base_uri}/v1/index/byMount/${mountId}${pageable.toQuery()}`)
     }
 
     /*public async findReportByIndex(indexId: string): Promise<IndexReport> {
