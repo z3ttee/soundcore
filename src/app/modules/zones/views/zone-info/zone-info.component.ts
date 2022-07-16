@@ -59,6 +59,7 @@ export class ZoneInfoComponent implements OnInit, OnDestroy {
   }
 
   public openMountCreateDialog() {
+    console.log(this._zoneSubject.getValue());
     if(!this._zoneSubject.getValue()) return;
 
     this.dialog.open<any, MountCreateDialogOptions, Mount>(AppMountCreateDialog, {
@@ -66,7 +67,7 @@ export class ZoneInfoComponent implements OnInit, OnDestroy {
         bucketId: this._zoneSubject.getValue().id
       }
     }).$afterClosed.pipe(takeUntil(this._destroy)).subscribe((result) => {
-      this.dataSource.append(result);
+      if(result != null) this.dataSource.append(result);
     })
 
   }

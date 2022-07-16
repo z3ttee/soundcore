@@ -1,18 +1,20 @@
 import { ComponentType } from "@angular/cdk/portal";
 import { Injectable } from "@angular/core";
-import { BehaviorSubject, map, Observable } from "rxjs";
+import { BehaviorSubject, map, Observable, tap } from "rxjs";
 import { DialogConfirmComponent } from "../components/dialog-confirm/dialog-confirm.component";
 import { DialogConfig } from "../entities/dialog-config.entity";
 import { DialogRef } from "../entities/dialog-ref.entity";
 import { Dialog } from "../entities/dialog.entity";
 
-@Injectable()
+@Injectable({
+    providedIn: "root"
+})
 export class SCNGXDialogService {
 
     private readonly _stack: BehaviorSubject<Dialog[]> = new BehaviorSubject([]);
 
-    public $current: Observable<Dialog> = this._stack.asObservable().pipe(map((list) => list[list.length - 1]));
     public $dialogs: Observable<Dialog[]> = this._stack.asObservable();
+    public $current: Observable<Dialog> = this.$dialogs.pipe(map((list) => list[list.length - 1]));
 
     constructor() {}
 

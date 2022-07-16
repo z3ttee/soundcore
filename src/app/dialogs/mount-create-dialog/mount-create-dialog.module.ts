@@ -23,7 +23,9 @@ import {MatSelectModule} from '@angular/material/select';
 
     MatFormFieldModule,
     MatInputModule,
-    MatSelectModule
+    MatSelectModule,
+
+    SCDKMountModule
   ],
   exports: [
     SCNGXDialogModule

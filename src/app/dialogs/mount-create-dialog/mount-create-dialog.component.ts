@@ -43,6 +43,10 @@ export class AppMountCreateDialog implements OnDestroy {
     ) {}
 
     public async submit() {
+        console.log("submitting")
+        console.log(this.dialogRef.config.data)
+        // return;
+
         if(this.loading) return;
         this.form.markAllAsTouched();
         if(this.form.invalid) return;

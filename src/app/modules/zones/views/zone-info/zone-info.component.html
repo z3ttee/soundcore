@@ -33,7 +33,7 @@
                 <div class="p-4 rounded-sm bg-body-light border border-body-lighter shadow-md" *ngIf="!($loading | async)">
                     <h6>Aktionen</h6>
                     <ul class="flex flex-col items-start w-full gap-2 mt-4">
-                        <scngx-btn><hero-icon [class]="'h-5 w-5'" name="plus"></hero-icon> Mount hinzufügen</scngx-btn>
+                        <scngx-btn (click)="openMountCreateDialog()"><hero-icon [class]="'h-5 w-5'" name="plus"></hero-icon> Mount hinzufügen</scngx-btn>
                     </ul>
                 </div>
             </div>

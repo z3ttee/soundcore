@@ -11,7 +11,9 @@ import { CreateMountDTO } from "../dtos/create-mount.dto";
 import { UpdateMountDTO } from "../dtos/update-mount.dto";
 import { Mount } from "../entities/mount.entity";
 
-@Injectable()
+@Injectable({
+    providedIn: "root"
+})
 export class SCDKMountService {
 
     constructor(
