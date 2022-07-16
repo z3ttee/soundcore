@@ -1,8 +1,8 @@
-import { Component, OnDestroy, OnInit } from "@angular/core";
+import { Component, OnDestroy } from "@angular/core";
 import { FormControl, FormGroup, Validators } from "@angular/forms";
 import { Subject, takeUntil } from "rxjs";
 import { DialogRef } from "soundcore-ngx";
-import { ApiResponse, SCDKMountService, Mount, CreateResult, UpdateMountDTO, CreateMountDTO } from "soundcore-sdk";
+import { ApiResponse, SCDKMountService, Mount, CreateResult } from "soundcore-sdk";
 
 export interface MountCreateDialogOptions {
     bucketId?: string;
@@ -13,7 +13,7 @@ export interface MountCreateDialogOptions {
 @Component({
     templateUrl: "./mount-create-dialog.component.html"
 })
-export class AppMountCreateDialog implements OnDestroy, OnInit {
+export class AppMountCreateDialog implements OnDestroy {
 
     constructor(
         public readonly dialogRef: DialogRef<MountCreateDialogOptions, Mount>,
@@ -30,28 +30,18 @@ export class AppMountCreateDialog implements OnDestroy, OnInit {
                 Validators.maxLength(32)
             ]
         }),
-        directory: new FormControl(null),
+        directory: new FormControl(null, {
+            validators: [
+                Validators.minLength(1),
+                Validators.maxLength(4095)
+            ]
+        }),
         setAsDefault: new FormControl(this.dialogRef.config.data?.data?.isDefault),
         doScan: new FormControl(false)
     })
 
     public loading: boolean = false;
     public errorMessage: string;
-
-    public ngOnInit(): void {
-        if(this.dialogRef.config.data?.mode == "edit") {
-            this.form.get("directory").setValidators([
-                Validators.minLength(1),
-                Validators.maxLength(4095)
-            ])
-        } else {
-            this.form.get("directory").setValidators([
-                Validators.required,
-                Validators.minLength(1),
-                Validators.maxLength(4095)
-            ])
-        }
-    }
 
     public async submit() {
         if(this.loading) return;

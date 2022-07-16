@@ -1,7 +1,7 @@
 export const environment = {
   production: true,
   
-  api_base_uri: "https://api.tsalliance.eu/soundcore",
+  api_base_uri: "https://api.tsalliance.eu/soundcore@next",
 
   keycloak_url: "https://sso.tsalliance.eu/",
   keycloak_realm: "tsalliance",
