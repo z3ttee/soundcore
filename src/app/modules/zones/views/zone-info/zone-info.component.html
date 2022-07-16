@@ -1,6 +1,6 @@
 <section class="w-full h-full overflow-y-auto p-window select-none" #page>
 
-    <scngx-infinite-list class="w-full mt-row" [fetchUrl]="infiniteFetchUrl" [pageSize]="infinitePageSize" [parentScroll]="page" #list>
+    <scngx-infinite-list class="w-full mt-row" [dataSource]="dataSource" [parentScroll]="page" #list>
         <ng-container scngx-content>
             <!-- Title Row -->
             <div class="w-full mb-row">
@@ -21,19 +21,19 @@
                     </ul>
                 </div>
 
-                <scngx-skeleton [class]="'h-32 w-full'" *ngIf="($loading | async)"></scngx-skeleton>
+                <!--<scngx-skeleton [class]="'h-32 w-full'" *ngIf="($loading | async)"></scngx-skeleton>
                 <div class="p-4 rounded-sm bg-body-light border border-body-lighter shadow-md" *ngIf="!($loading | async)">
                     <h6>Status</h6>
                     <ul class="flex flex-col items-start w-full gap-2 mt-4">
                         <li class="inline-flex items-center gap-2 opacity-80"><span class="w-2 h-2 rounded-full bg-success-light"></span><span class="text-xs">{{ ($zone | async)?.flag | scngxBucketFlagPipe }}</span></li>
                     </ul>
-                </div>
+                </div>-->
 
                 <scngx-skeleton [class]="'h-32 w-full'" *ngIf="($loading | async)"></scngx-skeleton>
                 <div class="p-4 rounded-sm bg-body-light border border-body-lighter shadow-md" *ngIf="!($loading | async)">
                     <h6>Aktionen</h6>
                     <ul class="flex flex-col items-start w-full gap-2 mt-4">
-                        <button class="inline-flex items-center gap-2 py-2 px-4 rounded-sm bg-body bg-opacity-50 active:bg-opacity-100 active:scale-97 transform-gpu will-change-transform transition-all"><hero-icon [class]="'h-5 w-5'" name="plus"></hero-icon> Mount hinzufügen</button>
+                        <scngx-btn><hero-icon [class]="'h-5 w-5'" name="plus"></hero-icon> Mount hinzufügen</scngx-btn>
                     </ul>
                 </div>
             </div>

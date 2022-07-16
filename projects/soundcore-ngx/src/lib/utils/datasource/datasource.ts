@@ -2,6 +2,7 @@ import { HttpClient } from "@angular/common/http";
 import { BehaviorSubject, firstValueFrom, Observable, Subject, Subscription, takeUntil } from "rxjs";
 import { Page, Pageable } from "soundcore-sdk";
 import { IPageInfo } from '@tsalliance/ngx-virtual-scroller';
+import { v4 as uuidv4 } from "uuid";
 
 export interface InfiniteDataSourceOptions {
     pageSize: number;
@@ -15,6 +16,7 @@ export interface InfiniteDataSourceOptions {
  */
 export class InfiniteDataSource<T> {
 
+    public readonly id: string = uuidv4();
     private _destroy: Subject<void> = new Subject();
 
     private _cachedData = Array.from<T>([]);
@@ -66,11 +68,31 @@ export class InfiniteDataSource<T> {
     }
 
     /**
+     * EXPERIMENTAL Append an element to the dataStream
+     * @param element Element to add
+     * @returns Index the element got in the dataStream
+     */
+    public append(element: T): number {
+        // Add to stream
+        this._cachedData.push(element);
+        const index = this._cachedData.length - 1;
+
+        // Increment totalElements by 1
+        this._totalElements += 1;
+
+        // Update stream
+        this._dataStream.next(this._cachedData);
+
+        return index;
+    }
+
+    /**
      * Fetch a page of content based on the requested page.
      * @param pageNr Page to fetch
      */
     private _fetchPage(pageNr: number) {
         const pageable: Pageable = new Pageable(pageNr, this.options.pageSize);
+        if(this._totalElements > 0 && this._totalElements <= this._dataStream.getValue().length) return;
 
         // Check if page was already fetched or has invalid page settings.
         if (pageNr < 0 || this.options.pageSize <= 0 || this._fetchedPages.has(pageNr) || this._pageFetchStatus[pageNr]) {

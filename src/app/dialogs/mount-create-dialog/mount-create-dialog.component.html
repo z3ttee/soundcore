@@ -1,0 +1,34 @@
+<scngx-dialog title="Playlist erstellen">
+    <form class="py-2" scngx-dialog-content [formGroup]="form">
+        <div class="block w-full p-4 rounded-sm bg-error bg-opacity-30 border border-error-dark" *ngIf="errorMessage">
+            <p class="text-font">{{ errorMessage }}</p>
+        </div>
+
+        <div class="inline-block w-full my-row">
+            <mat-form-field appearance="outline" color="accent" class="w-full">
+                <mat-label>Name des Mounts</mat-label>
+                <input matInput #title formControlName="title" maxlength="32" minlength="3">
+                <mat-hint align="end"><span class="text-xs">{{title.value?.length || 0}}/32</span></mat-hint>
+                <mat-error *ngIf="form.hasError('required', ['title'])"><span class="text-xs">Bitte gib einen Titel an</span></mat-error>
+                <mat-error *ngIf="form.hasError('minLength', ['title']) || form.hasError('maxLength', ['title'])"><span class="text-xs">Bitte gib min. 3 und max. 32 Zeichen ein.</span></mat-error>
+            </mat-form-field>
+        </div>
+
+        <div class="inline-block w-full">
+            <mat-form-field appearance="outline" color="accent" class="w-full">
+                <mat-label>Ordnerpfad</mat-label>
+                <input matInput #directory formControlName="directory" maxlength="4095" minlength="1">
+                <mat-error *ngIf="form.hasError('required', ['directory'])"><span class="text-xs">Bitte gib einen Ordnerpfad an</span></mat-error>
+                <mat-error *ngIf="form.hasError('minLength', ['directory']) || form.hasError('maxLength', ['directory'])"><span class="text-xs">Bitte gib min. 1 und max. 4095 Zeichen ein.</span></mat-error>
+            </mat-form-field>
+        </div>
+
+        <div class="inline-block w-full">
+            
+        </div>
+    </form>
+    <div scngx-dialog-footer>
+        <scngx-btn-text (click)="dialogRef.close(null)">Abbrechen</scngx-btn-text>
+        <scngx-lbtn-outlined appearance="success" [loading]="loading" (click)="submit()" [disabled]="form.invalid">Erstellen</scngx-lbtn-outlined>
+    </div>
+</scngx-dialog>

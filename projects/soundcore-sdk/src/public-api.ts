@@ -6,6 +6,7 @@ export * from "./lib/scdk.module";
 // Utils
 export * from "./lib/utils/responses/api-response";
 export * from "./lib/utils/error/api-error";
+export * from "./lib/utils/results/creation.result";
 
 // Meilisearch
 export * from "./lib/meilisearch/entities/meili-user.entity";
@@ -27,6 +28,7 @@ export * from "./lib/bucket/entities/bucket.entity";
 export * from "./lib/mount/mount.module";
 export * from "./lib/mount/services/mount.service";
 export * from "./lib/mount/entities/mount.entity";
+export * from "./lib/mount/enums/mount-status.enum";
 
 // File Module
 export * from "./lib/file/file.module";

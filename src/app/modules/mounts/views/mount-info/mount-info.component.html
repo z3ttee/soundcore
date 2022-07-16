@@ -1,7 +1,7 @@
 <section class="w-full h-full select-none" #parent>
     <app-error404 *ngIf="!($loading | async) && !($mount | async)"></app-error404>
 
-    <scngx-infinite-list class="w-full h-full" [fetchUrl]="infiniteFetchUrl" [pageSize]="infinitePageSize" [parentScroll]="parent" #list>
+    <scngx-infinite-list class="w-full h-full" [dataSource]="dataSource" [parentScroll]="parent" #list>
         <ng-container scngx-content>
             <div class="w-full p-window" #page *ngIf="($loading | async) || !!($mount | async)">
 
@@ -28,7 +28,10 @@
                         <h6>Status</h6>
                         <ul class="flex flex-col items-start w-full gap-2 mt-4">
                             <li class="inline-flex items-center gap-2 opacity-80" *ngIf="($mount | async)?.isDefault"><hero-icon [class]="'h-5 w-5 fill-warn text-warn'" name="star"></hero-icon><span>Als Standard festgelegt</span></li>
-                            <li class="inline-flex items-center gap-2 opacity-80"><div class="inline-flex items-center justify-center w-5 h-5 text-center"><div class="w-2 h-2 rounded-full bg-success"></div></div><span>{{ ($mount | async)?.status }}</span></li>
+                            <li class="inline-flex items-center gap-2 opacity-80">
+                                <scngx-status-indicator size="md" [appearance]="($mount | async)?.status == 0 ? 'success' : 'warn'"></scngx-status-indicator>
+                                <span>{{ ($mount | async)?.status | scngxMountStatusPipe }}</span>
+                            </li>
                         </ul>
                     </div>
         

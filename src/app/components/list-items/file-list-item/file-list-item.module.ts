@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { chartPie, collection, HeroIconModule } from 'ng-heroicon';
-import { SCNGXBucketFlagPipeModule, SCNGXBytesPipeModule } from 'soundcore-ngx';
+import { chartPie, HeroIconModule } from 'ng-heroicon';
+import { SCNGXBytesPipeModule, SCNGXFileFlagPipeModule, SCNGXStatusIndicatorModule } from 'soundcore-ngx';
 import { FileListItemComponent } from './file-list-item.component';
 
 @NgModule({
@@ -10,10 +10,11 @@ import { FileListItemComponent } from './file-list-item.component';
   ],
   imports: [
     CommonModule,
-    HeroIconModule.withIcons({ collection, chartPie }),
+    HeroIconModule.withIcons({ chartPie }),
 
     SCNGXBytesPipeModule,
-    SCNGXBucketFlagPipeModule
+    SCNGXFileFlagPipeModule,
+    SCNGXStatusIndicatorModule
   ],
   exports: [
     FileListItemComponent

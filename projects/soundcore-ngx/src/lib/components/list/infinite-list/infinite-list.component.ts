@@ -1,5 +1,4 @@
-import { HttpClient } from '@angular/common/http';
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
 import { IPageInfo } from '@tsalliance/ngx-virtual-scroller';
 import { Subject } from 'rxjs';
 import { InfiniteDataSource } from '../../../utils/datasource/datasource';
@@ -9,27 +8,32 @@ import { InfiniteDataSource } from '../../../utils/datasource/datasource';
   templateUrl: './infinite-list.component.html',
   styleUrls: ['./infinite-list.component.scss']
 })
-export class SCNGXInfiniteListComponent implements OnInit, OnDestroy {
-  private _more: Subject<IPageInfo> = new Subject();
+export class SCNGXInfiniteListComponent implements OnInit, OnDestroy, OnChanges {
+  private readonly _more: Subject<IPageInfo> = new Subject();
 
-  @Input() public fetchUrl: string;
-  @Input() public pageSize: number = 30;
   @Input() public parentScroll: HTMLElement;
+  @Input() public dataSource: InfiniteDataSource<any>
 
   public viewPortItems: any[] = [];
-  public dataSource: InfiniteDataSource<any>;
 
-  constructor(
-    private readonly httpClient: HttpClient
-  ) { }
+  constructor() { }
 
   public ngOnInit(): void {
-    this.dataSource = new InfiniteDataSource(this.httpClient, {
-      pageSize: this.pageSize,
-      url: this.fetchUrl
-    });
-
     this.dataSource?.connect(this._more.asObservable());
+  }
+
+  public ngOnChanges(changes: SimpleChanges): void {
+      const previous = changes["dataSource"].previousValue as InfiniteDataSource<any>;
+      const current = changes["dataSource"].currentValue as InfiniteDataSource<any>;
+
+      console.log(previous, current)
+      console.log(previous?.id != current?.id);
+
+
+      if(previous?.id != current?.id) {
+        previous?.disconnect();
+        current?.connect(this._more.asObservable());
+      }
   }
 
   public ngOnDestroy(): void {

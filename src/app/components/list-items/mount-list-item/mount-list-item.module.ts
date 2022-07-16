@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MountListItemComponent } from './mount-list-item.component';
 import { chartPie, collection, HeroIconModule } from 'ng-heroicon';
-import { SCNGXBucketFlagPipeModule, SCNGXBytesPipeModule } from 'soundcore-ngx';
+import { SCNGXMountStatusPipeModule, SCNGXBytesPipeModule, SCNGXStatusIndicatorModule } from 'soundcore-ngx';
 
 @NgModule({
   declarations: [
@@ -13,7 +13,8 @@ import { SCNGXBucketFlagPipeModule, SCNGXBytesPipeModule } from 'soundcore-ngx';
     HeroIconModule.withIcons({ collection, chartPie }),
 
     SCNGXBytesPipeModule,
-    SCNGXBucketFlagPipeModule
+    SCNGXMountStatusPipeModule,
+    SCNGXStatusIndicatorModule
   ],
   exports: [
     MountListItemComponent

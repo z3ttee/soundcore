@@ -134,6 +134,9 @@ export * from "./lib/components/progress/progressbar/progressbar.component";
 export * from "./lib/components/badges/explicit-badge/explicit-badge.module";
 export * from "./lib/components/badges/explicit-badge/explicit-badge.component";
 
+export * from "./lib/components/badges/status-indicator/status-indicator.module";
+export * from "./lib/components/badges/status-indicator/status-indicator.component";
+
 // Pipes
 export * from "./lib/pipes/song-duration/song-duration.module";
 export * from "./lib/pipes/song-duration/song-duration.pipe";
@@ -143,6 +146,10 @@ export * from "./lib/pipes/bucket-flag-pipe/bucket-flag-pipe.module";
 export * from "./lib/pipes/bucket-flag-pipe/bucket-flag-pipe.pipe";
 export * from "./lib/pipes/bytes-pipe/bytes-pipe.module";
 export * from "./lib/pipes/bytes-pipe/bytes-pipe.pipe";
+export * from "./lib/pipes/file-flag-pipe/file-flag-pipe.module";
+export * from "./lib/pipes/file-flag-pipe/file-flag-pipe.pipe";
+export * from "./lib/pipes/mount-status-pipe/mount-status-pipe.module";
+export * from "./lib/pipes/mount-status-pipe/mount-status-pipe.pipe";
 
 // Datasource
 export * from "./lib/entities/playable-list.entity";

@@ -1,11 +1,12 @@
 import { HttpClient } from "@angular/common/http";
 import { Inject, Injectable } from "@angular/core";
 import { catchError, map, Observable, of } from "rxjs";
-import { Bucket } from "../../bucket/entities/bucket.entity";
 import { SCDKOptions, SCDK_OPTIONS } from "../../scdk.module";
 import { Page } from "../../utils/page/page";
 import { Pageable } from "../../utils/page/pageable";
+import { ApiResponse } from "../../utils/responses/api-response";
 import { CreateResult } from "../../utils/results/creation.result";
+import { apiResponse } from "../../utils/rxjs/operators/api-response";
 import { CreateMountDTO } from "../dtos/create-mount.dto";
 import { UpdateMountDTO } from "../dtos/update-mount.dto";
 import { Mount } from "../entities/mount.entity";
@@ -55,9 +56,9 @@ export class SCDKMountService {
      * @param createMountDto Data to create
      * @returns Mount
      */
-    public create(createMountDto: CreateMountDTO): Observable<CreateResult<Mount>> {
-        if(!createMountDto) return of(null);
-        return this.httpClient.post<CreateResult<Mount>>(`${this.options.api_base_uri}/v1/mounts`, createMountDto);
+    public create(createMountDto: CreateMountDTO): Observable<ApiResponse<CreateResult<Mount>>> {
+        if(!createMountDto) return of(ApiResponse.withPayload(null));
+        return this.httpClient.post<CreateResult<Mount>>(`${this.options.api_base_uri}/v1/mounts`, createMountDto).pipe(apiResponse());
     }
 
     /**

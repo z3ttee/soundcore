@@ -1,7 +1,10 @@
-import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { BehaviorSubject, map, Subject, switchMap, takeUntil, tap } from 'rxjs';
-import { Bucket, SCDKBucketService, SCDKMountService } from 'soundcore-sdk';
+import { BehaviorSubject, Subject, takeUntil } from 'rxjs';
+import { InfiniteDataSource, SCNGXDialogService } from 'soundcore-ngx';
+import { Bucket, Mount, SCDKBucketService, SCDKMountService } from 'soundcore-sdk';
+import { AppMountCreateDialog, MountCreateDialogOptions } from 'src/app/dialogs/mount-create-dialog/mount-create-dialog.component';
 import { environment } from 'src/environments/environment';
 
 @Component({
@@ -13,7 +16,9 @@ export class ZoneInfoComponent implements OnInit, OnDestroy {
   constructor(
     private readonly zoneService: SCDKBucketService,
     private readonly mountService: SCDKMountService,
-    private readonly activatedRoute: ActivatedRoute
+    private readonly activatedRoute: ActivatedRoute,
+    private readonly dialog: SCNGXDialogService,
+    private readonly httpClient: HttpClient
   ) { }
 
   private readonly _destroy: Subject<void> = new Subject();
@@ -25,12 +30,17 @@ export class ZoneInfoComponent implements OnInit, OnDestroy {
   public infiniteFetchUrl: string = "";
   public readonly infinitePageSize: number = 30;
 
+  public dataSource: InfiniteDataSource<Mount>;
+
   public ngOnInit(): void {
     // Observe route params changes and get new zoneId
     this.activatedRoute.paramMap.pipe(takeUntil(this._destroy)).subscribe((params) => {
       const zoneId = params.get("zoneId");
 
-      this.infiniteFetchUrl = `${environment.api_base_uri}/v1/mounts/bucket/${zoneId}`;
+      this.dataSource = new InfiniteDataSource(this.httpClient, {
+        pageSize: 30,
+        url: `${environment.api_base_uri}/v1/mounts/bucket/${zoneId}`
+      });
 
       // Set loading state
       this.$loading.next(true);
@@ -39,8 +49,6 @@ export class ZoneInfoComponent implements OnInit, OnDestroy {
       this.zoneService.findById(zoneId).pipe(takeUntil(this._destroy)).subscribe((zone) => {
         this._zoneSubject.next(zone);
         this.$loading.next(false);
-
-        
       });
     })
   }
@@ -50,25 +58,16 @@ export class ZoneInfoComponent implements OnInit, OnDestroy {
       this._destroy.complete();
   }
 
+  public openMountCreateDialog() {
+    if(!this._zoneSubject.getValue()) return;
 
-  public vsEnd() {
-    console.log("end")
+    this.dialog.open<any, MountCreateDialogOptions, Mount>(AppMountCreateDialog, {
+      data: {
+        bucketId: this._zoneSubject.getValue().id
+      }
+    }).$afterClosed.pipe(takeUntil(this._destroy)).subscribe((result) => {
+      this.dataSource.append(result);
+    })
 
   }
-
-  public vsStart() {
-    console.log("start")
-    
-  }
-
-  public vsUpdate() {
-      console.log("update")
-  }
-
-  public vsChange() {
-    console.log("change")
-  }
-
-
-
 }

@@ -28,7 +28,6 @@ import { AppPlaylistCreateDialogModule } from "src/app/dialogs/playlist-create-d
         SCNGXBottomNavModule,
         SCNGXPlaylistListItemModule,
         SCNGXProgressbarModule,
-        SCNGXDialogModule,
 
         SCDKPlaylistModule,
         SCDKSearchModule,

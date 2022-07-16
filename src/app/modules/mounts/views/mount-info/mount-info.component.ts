@@ -11,7 +11,7 @@ import { File, Mount, SCDKFileService, SCDKMountService } from 'soundcore-sdk';
   templateUrl: './mount-info.component.html',
   styleUrls: ['./mount-info.component.scss']
 })
-export class MountInfoComponent implements OnInit, OnDestroy, AfterViewInit {
+export class MountInfoComponent implements OnInit, OnDestroy {
 
   constructor(
     private readonly mountService: SCDKMountService,
@@ -24,16 +24,11 @@ export class MountInfoComponent implements OnInit, OnDestroy, AfterViewInit {
   
   private readonly _destroy: Subject<void> = new Subject();
   private readonly _mountSubject: BehaviorSubject<Mount> = new BehaviorSubject(null);
-  private _more: Subject<IPageInfo> = new Subject();
 
   public readonly $loading: BehaviorSubject<boolean> = new BehaviorSubject(false);
   public readonly $mount: Observable<Mount> = this._mountSubject.asObservable();
 
-  public infiniteFetchUrl: string = "";
-  public readonly infinitePageSize: number = 30;
   public dataSource: InfiniteDataSource<File>;
-
-  public items: number[] = Array.from({length: 1000}).map((_, i) => i);
 
   public ngOnInit(): void {
     this.activatedRoute.paramMap.pipe(takeUntil(this._destroy)).subscribe((params) => {
@@ -44,15 +39,10 @@ export class MountInfoComponent implements OnInit, OnDestroy, AfterViewInit {
       this._mountSubject.next(null);
       this.$loading.next(true);
 
-      // Set infinite list fetchUrl
-      this.infiniteFetchUrl = this.fileService.findByMountIdBaseURL(mountId);
-
       this.dataSource = new InfiniteDataSource(this.httpClient, {
-        pageSize: this.infinitePageSize,
-        url: this.infiniteFetchUrl
+        pageSize: 30,
+        url: this.fileService.findByMountIdBaseURL(mountId)
       });
-
-      this.dataSource?.connect(this._more.asObservable());
 
       // Find mount and update state
       this.mountService.findById(mountId).pipe(takeUntil(this._destroy)).subscribe((mount) => {
@@ -62,26 +52,9 @@ export class MountInfoComponent implements OnInit, OnDestroy, AfterViewInit {
     })
   }
 
-  public ngAfterViewInit(): void {
-    const element = this.containerRef?.nativeElement;
-    if(!element) return;
-    
-    const observer = new IntersectionObserver((entries) => {
-      console.log(entries)
-    },{
-      root: document
-    })
-
-    observer.observe(element);
-  }
-
   public ngOnDestroy(): void {
       this._destroy.next();
       this._destroy.complete();
-  }
-
-  public vsEnd(info: IPageInfo) {
-    this._more.next(info);
   }
 
 }

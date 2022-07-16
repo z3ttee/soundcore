@@ -4,12 +4,13 @@ import { RouterModule, Routes } from '@angular/router';
 import { ZonesIndexComponent } from './views/zones-index/zones-index.component';
 import { SCDKBucketModule, SCDKMountModule } from 'soundcore-sdk';
 import { chartPie, collection, HeroIconModule, plus } from 'ng-heroicon';
-import { SCNGXBucketFlagPipeModule, SCNGXBytesPipeModule, SCNGXInfiniteListModule, SCNGXSkeletonModule, SCNGXUiTitleModule } from 'soundcore-ngx';
+import { SCNGXButtonModule, SCNGXBytesPipeModule, SCNGXInfiniteListModule, SCNGXSkeletonModule, SCNGXUiTitleModule } from 'soundcore-ngx';
 import { ZoneInfoComponent } from './views/zone-info/zone-info.component';
 import { BucketListItemModule } from 'src/app/components/list-items/bucket-list-item/bucket-list-item.module';
 import { MountListItemModule } from 'src/app/components/list-items/mount-list-item/mount-list-item.module';
 import { KeycloakSSOGuard } from 'src/sso/guards/keycloak.guard';
 import { VirtualScrollerModule } from '@tsalliance/ngx-virtual-scroller';
+import { AppMountCreateDialogModule } from 'src/app/dialogs/mount-create-dialog/mount-create-dialog.module';
 
 const routes: Routes = [
   { path: "", component: ZonesIndexComponent },
@@ -33,12 +34,14 @@ const routes: Routes = [
     
     SCNGXSkeletonModule,
     SCNGXInfiniteListModule,
-    SCNGXBucketFlagPipeModule,
     SCNGXBytesPipeModule,
     SCNGXUiTitleModule,
+    SCNGXButtonModule,
 
     BucketListItemModule,
-    MountListItemModule
+    MountListItemModule,
+
+    AppMountCreateDialogModule
   ]
 })
 export class ZonesModule { }

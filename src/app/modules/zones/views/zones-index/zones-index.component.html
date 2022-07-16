@@ -1,6 +1,6 @@
 <section class="p-window h-full w-full overflow-y-auto" #page>
 
-    <scngx-infinite-list class="w-full mt-row" [fetchUrl]="infiniteFetchUrl" [pageSize]="infinitePageSize" [parentScroll]="page" #list>
+    <scngx-infinite-list class="w-full mt-row" [dataSource]="dataSource" [parentScroll]="page" #list>
         <!-- Page Headline -->
         <ng-container scngx-content>
             <scngx-ui-title [subtitle]="'Verwalte hier die einzelnen Speicherzonen.'">Speicherzonen</scngx-ui-title>

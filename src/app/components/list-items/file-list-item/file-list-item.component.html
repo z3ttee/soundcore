@@ -1,19 +1,17 @@
 <div class="select-none p-4 rounded bg-body-light bg-opacity-60 cursor-pointer transition-all active:bg-opacity-80 active:scale-99 transform-gpu will-change-transform">
-        
-    <!-- File artwork 
-    <div class="min-w-36 max-w-36 aspect-square rounded bg-body bg-opacity-70"></div>-->
-
     <!-- Bucket description -->
     <div class="w-full">
         <h6 class="cursor-text select-text">{{ file.name }}</h6>
 
-        <ul class="flex flex-col items-start w-full gap-2 my-4">
-            <li class="inline-flex items-center gap-2 opacity-80"><hero-icon [class]="'h-5 w-5'" name="collection"></hero-icon><span class="text-sm">{{ file.filesCount }} file{{ file.filesCount != 1 ? 's' : '' }}</span></li>
+        <ul class="flex flex-wrap items-center justify-start w-full gap-row my-4">
             <li class="inline-flex items-center gap-2 opacity-80"><hero-icon [class]="'h-5 w-5'" name="chart-pie"></hero-icon><span class="text-sm">{{ file.size | scngxBytesPipe:"mb" }}</span></li>
+            <li class="inline-flex items-center gap-2 opacity-80">
+                <scngx-status-indicator size="md" [appearance]="indicatorAppearance"></scngx-status-indicator>
+                <span class="text-xs">{{ file.flag | scngxFileFlagPipe }}</span>
+            </li>
         </ul>
 
-        <ul class="flex flex-col items-start w-full gap-2">
-            <li class="inline-flex items-center gap-2 opacity-80"><span class="w-2 h-2 rounded-full bg-success-light"></span><span class="text-xs">{{ file.status }}</span></li>
+        <ul class="flex flex-wrap items-start w-full gap-2">
         </ul>
     </div>
 </div>

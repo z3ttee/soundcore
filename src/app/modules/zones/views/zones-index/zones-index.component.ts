@@ -2,7 +2,8 @@ import { HttpClient } from '@angular/common/http';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { IPageInfo } from '@tsalliance/ngx-virtual-scroller';
 import { Subject } from 'rxjs';
-import { SCDKBucketService } from 'soundcore-sdk';
+import { InfiniteDataSource } from 'soundcore-ngx';
+import { Bucket, SCDKBucketService } from 'soundcore-sdk';
 import { environment } from 'src/environments/environment';
 
 @Component({
@@ -19,9 +20,11 @@ export class ZonesIndexComponent implements OnInit, OnDestroy {
 
   private readonly _destroy: Subject<void> = new Subject();
   private readonly _fetchMore: Subject<IPageInfo> = new Subject();
-  
-  public readonly infiniteFetchUrl: string = `${environment.api_base_uri}/v1/buckets`;
-  public readonly infinitePageSize: number = 30;
+
+  public readonly dataSource: InfiniteDataSource<Bucket> = new InfiniteDataSource(this.httpClient, {
+    pageSize: 30,
+    url: `${environment.api_base_uri}/v1/buckets`
+  });
 
   public ngOnInit(): void {}
   public ngOnDestroy(): void {
