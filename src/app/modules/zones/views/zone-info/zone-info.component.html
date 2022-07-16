@@ -1,50 +1,55 @@
-<section class="w-full h-full overflow-y-auto p-window select-none" #page>
+<section class="w-full h-full select-none" #page>
+    <app-error404 *ngIf="!($loading | async) && !($zone | async)"></app-error404>
 
-    <scngx-infinite-list class="w-full mt-row" [dataSource]="dataSource" [parentScroll]="page" #list>
+    <scngx-infinite-list class="w-full h-full" [dataSource]="dataSource" [parentScroll]="page" #list>
         <ng-container scngx-content>
-            <!-- Title Row -->
-            <div class="w-full mb-row">
-                <p class="uppercase text-sm text-font-secondary">Speicherzone</p>
-                <scngx-skeleton [class]="'h-10 w-96 mt-1'" *ngIf="($loading | async)"></scngx-skeleton>
-                <h4 class="cursor-text select-text" *ngIf="!($loading | async)">{{ ($zone | async)?.name }}</h4>
-            </div>
-
-            <!-- Stats Row -->
-            <div class="grid grid-cols-1 md:grid-cols-autofit gap-4 my-row">
-
-                <scngx-skeleton [class]="'h-32 w-full'" *ngIf="($loading | async)"></scngx-skeleton>
-                <div class="p-4 rounded-sm bg-body-light border border-body-lighter shadow-md" *ngIf="!($loading | async)">
-                    <h6>Statistiken</h6>
-                    <ul class="flex flex-col items-start w-full gap-2 mt-4">
-                        <li class="inline-flex items-center gap-2 opacity-80"><hero-icon [class]="'h-5 w-5'" name="collection"></hero-icon><span class="text-sm">{{ ($zone | async)?.mountsCount }} Mount{{ ($zone | async)?.mountsCount != 1 ? 's' : '' }}</span></li>
-                        <li class="inline-flex items-center gap-2 opacity-80"><hero-icon [class]="'h-5 w-5'" name="chart-pie"></hero-icon><span class="text-sm">{{ ($zone | async)?.usedSpace | scngxBytesPipe:"gb" }}</span></li>
-                    </ul>
+            <div class="w-full p-window pb-0" #page *ngIf="($loading | async) || !!($zone | async)">
+                <!-- Title Row -->
+                <div class="w-full mb-row">
+                    <p class="uppercase text-sm text-font-secondary">Speicherzone</p>
+                    <scngx-skeleton [class]="'h-10 w-96 mt-1'" *ngIf="($loading | async)"></scngx-skeleton>
+                    <h4 class="cursor-text select-text" *ngIf="!($loading | async)">{{ ($zone | async)?.name }}</h4>
                 </div>
 
-                <!--<scngx-skeleton [class]="'h-32 w-full'" *ngIf="($loading | async)"></scngx-skeleton>
-                <div class="p-4 rounded-sm bg-body-light border border-body-lighter shadow-md" *ngIf="!($loading | async)">
-                    <h6>Status</h6>
-                    <ul class="flex flex-col items-start w-full gap-2 mt-4">
-                        <li class="inline-flex items-center gap-2 opacity-80"><span class="w-2 h-2 rounded-full bg-success-light"></span><span class="text-xs">{{ ($zone | async)?.flag | scngxBucketFlagPipe }}</span></li>
-                    </ul>
-                </div>-->
+                <!-- Stats Row -->
+                <div class="grid grid-cols-1 md:grid-cols-autofit gap-4 my-row">
 
-                <scngx-skeleton [class]="'h-32 w-full'" *ngIf="($loading | async)"></scngx-skeleton>
-                <div class="p-4 rounded-sm bg-body-light border border-body-lighter shadow-md" *ngIf="!($loading | async)">
-                    <h6>Aktionen</h6>
-                    <ul class="flex flex-col items-start w-full gap-2 mt-4">
-                        <scngx-btn (click)="openMountCreateDialog()"><hero-icon [class]="'h-5 w-5'" name="plus"></hero-icon> Mount hinzufügen</scngx-btn>
-                    </ul>
+                    <scngx-skeleton [class]="'h-32 w-full'" *ngIf="($loading | async)"></scngx-skeleton>
+                    <div class="p-4 rounded-sm bg-body-light border border-body-lighter shadow-md" *ngIf="!($loading | async)">
+                        <h6>Statistiken</h6>
+                        <ul class="flex flex-col items-start w-full gap-2 mt-4">
+                            <li class="inline-flex items-center gap-2 opacity-80"><hero-icon [class]="'h-5 w-5'" name="collection"></hero-icon><span class="text-sm">{{ ($zone | async)?.mountsCount }} Mount{{ ($zone | async)?.mountsCount != 1 ? 's' : '' }}</span></li>
+                            <li class="inline-flex items-center gap-2 opacity-80"><hero-icon [class]="'h-5 w-5'" name="chart-pie"></hero-icon><span class="text-sm">{{ ($zone | async)?.usedSpace | scngxBytesPipe:"gb" }}</span></li>
+                        </ul>
+                    </div>
+
+                    <!--<scngx-skeleton [class]="'h-32 w-full'" *ngIf="($loading | async)"></scngx-skeleton>
+                    <div class="p-4 rounded-sm bg-body-light border border-body-lighter shadow-md" *ngIf="!($loading | async)">
+                        <h6>Status</h6>
+                        <ul class="flex flex-col items-start w-full gap-2 mt-4">
+                            <li class="inline-flex items-center gap-2 opacity-80"><span class="w-2 h-2 rounded-full bg-success-light"></span><span class="text-xs">{{ ($zone | async)?.flag | scngxBucketFlagPipe }}</span></li>
+                        </ul>
+                    </div>-->
+
+                    <scngx-skeleton [class]="'h-32 w-full'" *ngIf="($loading | async)"></scngx-skeleton>
+                    <div class="p-4 rounded-sm bg-body-light border border-body-lighter shadow-md" *ngIf="!($loading | async)">
+                        <h6>Aktionen</h6>
+                        <ul class="flex flex-col items-start w-full gap-2 mt-4">
+                            <scngx-btn (click)="openMountCreateDialog()"><hero-icon [class]="'h-5 w-5'" name="plus"></hero-icon> Mount hinzufügen</scngx-btn>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </ng-container>
 
         <!-- List items -->
-        <ng-container scngx-list>
-            <h6 class="mt-row mb-2">Mounts</h6>
+        <ng-container scngx-list *ngIf="($zone | async)">
+            <div class="p-window">
+                <h6>Mounts</h6>
 
-            <div class="flex flex-col gap-2 w-full">
-                <app-mount-list-item *ngFor="let mount of list.viewPortItems" [mount]="mount" [routerLink]="[mount.slug || mount.id]"></app-mount-list-item>
+                <div class="flex flex-col gap-2 w-full mt-2">
+                    <app-mount-list-item *ngFor="let mount of list.viewPortItems" [mount]="mount" [routerLink]="[mount.slug || mount.id]"></app-mount-list-item>
+                </div>
             </div>
         </ng-container>
     </scngx-infinite-list>

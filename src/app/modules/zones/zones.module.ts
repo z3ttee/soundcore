@@ -11,6 +11,7 @@ import { MountListItemModule } from 'src/app/components/list-items/mount-list-it
 import { KeycloakSSOGuard } from 'src/sso/guards/keycloak.guard';
 import { VirtualScrollerModule } from '@tsalliance/ngx-virtual-scroller';
 import { AppMountCreateDialogModule } from 'src/app/dialogs/mount-create-dialog/mount-create-dialog.module';
+import { Error404Module } from 'src/app/shared/error404/error404.module';
 
 const routes: Routes = [
   { path: "", component: ZonesIndexComponent },
@@ -41,7 +42,8 @@ const routes: Routes = [
     BucketListItemModule,
     MountListItemModule,
 
-    AppMountCreateDialogModule
+    AppMountCreateDialogModule,
+    Error404Module
   ]
 })
 export class ZonesModule { }

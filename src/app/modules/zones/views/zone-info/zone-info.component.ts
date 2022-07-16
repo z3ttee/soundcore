@@ -3,7 +3,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { BehaviorSubject, Subject, takeUntil } from 'rxjs';
 import { InfiniteDataSource, SCNGXDialogService } from 'soundcore-ngx';
-import { Bucket, Mount, SCDKBucketService, SCDKMountService } from 'soundcore-sdk';
+import { Bucket, Mount, SCDKBucketService } from 'soundcore-sdk';
 import { AppMountCreateDialog, MountCreateDialogOptions } from 'src/app/dialogs/mount-create-dialog/mount-create-dialog.component';
 import { environment } from 'src/environments/environment';
 
@@ -15,7 +15,6 @@ export class ZoneInfoComponent implements OnInit, OnDestroy {
 
   constructor(
     private readonly zoneService: SCDKBucketService,
-    private readonly mountService: SCDKMountService,
     private readonly activatedRoute: ActivatedRoute,
     private readonly dialog: SCNGXDialogService,
     private readonly httpClient: HttpClient
@@ -59,7 +58,6 @@ export class ZoneInfoComponent implements OnInit, OnDestroy {
   }
 
   public openMountCreateDialog() {
-    console.log(this._zoneSubject.getValue());
     if(!this._zoneSubject.getValue()) return;
 
     this.dialog.open<any, MountCreateDialogOptions, Mount>(AppMountCreateDialog, {

@@ -1,57 +1,85 @@
-import { Component, OnDestroy } from "@angular/core";
+import { Component, OnDestroy, OnInit } from "@angular/core";
 import { FormControl, FormGroup, Validators } from "@angular/forms";
 import { Subject, takeUntil } from "rxjs";
 import { DialogRef } from "soundcore-ngx";
-import { ApiResponse, SCDKMountService, Mount, CreateResult } from "soundcore-sdk";
+import { ApiResponse, SCDKMountService, Mount, CreateResult, UpdateMountDTO, CreateMountDTO } from "soundcore-sdk";
 
 export interface MountCreateDialogOptions {
-    bucketId: string;
+    bucketId?: string;
+    mode?: "create" | "edit";
+    data?: Mount;
 }
 
 @Component({
     templateUrl: "./mount-create-dialog.component.html"
 })
-export class AppMountCreateDialog implements OnDestroy {
-
-    private readonly _destroy: Subject<void> = new Subject();
-
-    public readonly form: FormGroup = new FormGroup({
-        name: new FormControl<string>("", {
-            validators: [
-                Validators.required,
-                Validators.minLength(3),
-                Validators.maxLength(32)
-            ]
-        }),
-        directory: new FormControl(null, {
-            validators: [
-                Validators.required,
-                Validators.minLength(1),
-                Validators.maxLength(4095)
-            ]
-        }),
-        setAsDefault: new FormControl(false),
-        doScan: new FormControl(true)
-    })
-
-    public loading: boolean = false;
-    public errorMessage: string;
+export class AppMountCreateDialog implements OnDestroy, OnInit {
 
     constructor(
         public readonly dialogRef: DialogRef<MountCreateDialogOptions, Mount>,
         private readonly mountService: SCDKMountService,
     ) {}
 
-    public async submit() {
-        console.log("submitting")
-        console.log(this.dialogRef.config.data)
-        // return;
+    private readonly _destroy: Subject<void> = new Subject();
 
+    public readonly form: FormGroup = new FormGroup({
+        name: new FormControl<string>(this.dialogRef.config.data?.data?.name, {
+            validators: [
+                Validators.required,
+                Validators.minLength(3),
+                Validators.maxLength(32)
+            ]
+        }),
+        directory: new FormControl(null),
+        setAsDefault: new FormControl(this.dialogRef.config.data?.data?.isDefault),
+        doScan: new FormControl(false)
+    })
+
+    public loading: boolean = false;
+    public errorMessage: string;
+
+    public ngOnInit(): void {
+        if(this.dialogRef.config.data?.mode == "edit") {
+            this.form.get("directory").setValidators([
+                Validators.minLength(1),
+                Validators.maxLength(4095)
+            ])
+        } else {
+            this.form.get("directory").setValidators([
+                Validators.required,
+                Validators.minLength(1),
+                Validators.maxLength(4095)
+            ])
+        }
+    }
+
+    public async submit() {
         if(this.loading) return;
         this.form.markAllAsTouched();
         if(this.form.invalid) return;
 
         this.loading = true;
+
+
+        // Handle editor mode == "edit"
+        if(this.dialogRef.config.data.mode == "edit") {
+            this.mountService.update(this.dialogRef.config.data.data?.id, {
+                name: this.form.get("name").value,
+                setAsDefault: this.form.get("setAsDefault").value,
+                doScan: this.form.get("doScan").value
+            }).pipe((takeUntil(this._destroy))).subscribe((response) => {
+                this.loading = false;
+                if(response.error) {
+                    this.errorMessage = response.message;
+                    return;
+                }
+
+                this.dialogRef.close(response.payload);
+            })
+            return;
+        }
+
+        // Handle editor mode == "create"
         this.mountService.create({
             name: this.form.get("name").value,
             bucketId: this.dialogRef.config.data.bucketId,
@@ -66,7 +94,11 @@ export class AppMountCreateDialog implements OnDestroy {
                 return;
             }
 
-            this.dialogRef.close(response.payload.data);
+            if(!response.payload.existed) {
+                this.dialogRef.close(response.payload.data);
+            } else {
+                this.dialogRef.close(null);
+            }
         })
     }
 

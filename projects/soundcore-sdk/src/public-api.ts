@@ -29,6 +29,8 @@ export * from "./lib/mount/mount.module";
 export * from "./lib/mount/services/mount.service";
 export * from "./lib/mount/entities/mount.entity";
 export * from "./lib/mount/enums/mount-status.enum";
+export * from "./lib/mount/dtos/create-mount.dto";
+export * from "./lib/mount/dtos/update-mount.dto";
 
 // File Module
 export * from "./lib/file/file.module";

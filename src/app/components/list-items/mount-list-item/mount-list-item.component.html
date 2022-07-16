@@ -7,7 +7,7 @@
         <h6 class="cursor-text select-text">{{ mount.name }}</h6>
 
         <ul class="flex flex-col items-start w-full gap-2 my-4">
-            <li class="inline-flex items-center gap-2 opacity-80"><hero-icon [class]="'h-5 w-5'" name="collection"></hero-icon><span class="text-sm">{{ mount.filesCount }} Mount{{ mount.filesCount != 1 ? 's' : '' }}</span></li>
+            <li class="inline-flex items-center gap-2 opacity-80"><hero-icon [class]="'h-5 w-5'" name="collection"></hero-icon><span class="text-sm">{{ mount.filesCount || 0 }} Datei{{ mount.filesCount != 1 ? 'en' : '' }}</span></li>
             <li class="inline-flex items-center gap-2 opacity-80"><hero-icon [class]="'h-5 w-5'" name="chart-pie"></hero-icon><span class="text-sm">{{ mount.usedSpace | scngxBytesPipe:"gb" }}</span></li>
             <li class="inline-flex items-center gap-2 opacity-80">
                 <scngx-status-indicator size="md" [appearance]="indicatorAppearance"></scngx-status-indicator>

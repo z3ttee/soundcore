@@ -69,9 +69,9 @@ export class SCDKMountService {
      * @param updateMountDto Updated data
      * @returns Mount
      */
-     public update(mountId: string, updateMountDto: UpdateMountDTO): Observable<Mount> {
+    public update(mountId: string, updateMountDto: UpdateMountDTO): Observable<ApiResponse<Mount>> {
         if(!updateMountDto) return of(null);
-        return this.httpClient.put<Mount>(`${this.options.api_base_uri}/v1/mounts/${mountId}`, updateMountDto);
+        return this.httpClient.put<Mount>(`${this.options.api_base_uri}/v1/mounts/${mountId}`, updateMountDto).pipe(apiResponse());
     }
 
     /**
@@ -79,14 +79,9 @@ export class SCDKMountService {
      * @param mountId Mount id to delete
      * @returns True if deleted. Otherwise false.
      */
-    public deleteById(mountId: string): Observable<boolean> {
-        if(!mountId) return of(false);
-        return this.httpClient.delete<any>(`${this.options.api_base_uri}/v1/mounts/${mountId}`).pipe(
-            catchError((err) => {
-                return of(!!err);
-            }),
-            map((val) => !!val)
-        );
+    public deleteById(mountId: string): Observable<ApiResponse<boolean>> {
+        if(!mountId) return of(ApiResponse.withPayload(false));
+        return this.httpClient.delete<boolean>(`${this.options.api_base_uri}/v1/mounts/${mountId}`).pipe(apiResponse());
     }
 
 }

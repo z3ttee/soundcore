@@ -13,7 +13,7 @@ export class DialogRef<D = any, R = any> {
         public readonly config?: DialogConfig<D>
     ){}
 
-    public close(result: R) {
+    public close(result?: R) {
         this._afterClosedSubject.next(result);
     }
 

@@ -1,7 +1,7 @@
 <section class="w-full h-full select-none" #parent>
     <app-error404 *ngIf="!($loading | async) && !($mount | async)"></app-error404>
 
-    <scngx-infinite-list class="w-full h-full" [dataSource]="dataSource" [parentScroll]="parent" #list>
+    <scngx-infinite-list class="w-full h-full py-window" [dataSource]="dataSource" [parentScroll]="parent" #list>
         <ng-container scngx-content>
             <div class="w-full p-window" #page *ngIf="($loading | async) || !!($mount | async)">
 
@@ -19,7 +19,7 @@
                         <ul class="flex flex-col items-start w-full gap-2 mt-4">
                             <li class="inline-flex items-center gap-2 opacity-80"><hero-icon [class]="'h-5 w-5'" name="collection"></hero-icon><span class="text-sm">{{ ($mount | async)?.filesCount || 0 }} Datei{{ ($mount | async)?.filesCount != 1 ? 'en' : '' }}</span></li>
                             <li class="inline-flex items-center gap-2 opacity-80"><hero-icon [class]="'h-5 w-5'" name="chart-pie"></hero-icon><span class="text-sm">{{ ($mount | async)?.usedSpace | scngxBytesPipe:"gb" }}</span></li>
-                            <li class="inline-flex items-center gap-2 opacity-80"><hero-icon [class]="'h-5 w-5'" name="refresh"></hero-icon><span class="text-sm">{{ ($mount | async)?.lastScannedAt | date:"dd.MM.yyyy 'um' HH:mm 'Uhr'" }}</span></li>
+                            <li class="inline-flex items-center gap-2 opacity-80"><hero-icon [class]="'h-5 w-5'" name="refresh"></hero-icon><span class="text-sm">{{ ($mount | async)?.lastScannedAt ? (($mount | async)?.lastScannedAt | date:"dd.MM.yyyy 'um' HH:mm 'Uhr'") : "Nie" }}</span></li>
                         </ul>
                     </div>
         
@@ -39,9 +39,8 @@
                     <div class="p-4 rounded-sm bg-body-light border border-body-lighter shadow-md" *ngIf="!($loading | async)">
                         <h6>Aktionen</h6>
                         <ul class="flex flex-wrap items-start w-full gap-2 mt-4">
-                            <scngx-btn><hero-icon [class]="'h-5 w-5'" name="pencil"></hero-icon>Mount bearbeiten</scngx-btn>
-                            <scngx-btn *ngIf="!($mount | async)?.isDefault"><hero-icon [class]="'h-5 w-5'" name="star"></hero-icon></scngx-btn>
-                            <scngx-btn-outlined appearance="error"><hero-icon [class]="'h-5 w-5'" name="trash"></hero-icon>Mount löschen</scngx-btn-outlined>
+                            <scngx-btn (click)="openMountEditorDialog()"><hero-icon [class]="'h-5 w-5'" name="pencil"></hero-icon>Mount bearbeiten</scngx-btn>
+                            <scngx-lbtn-outlined appearance="error" [loading]="($deleting | async)" (click)="deleteMount()"><hero-icon [class]="'h-5 w-5 align-middle'" name="trash"></hero-icon><span class="align-middle">Mount löschen</span></scngx-lbtn-outlined>
                         </ul>
                     </div>
                 </div>
@@ -51,8 +50,10 @@
         <ng-container scngx-list>
             <h6 class="mt-row mb-2 px-window">Dateien</h6>
 
-            <div class="flex flex-col gap-2 w-full px-window" *ngIf="list.viewPortItems.length > 0">
-                <app-file-list-item *ngFor="let file of list.viewPortItems" [file]="file" [routerLink]="[file.slug || file.id]"></app-file-list-item>
+            <div class="w-full px-window pb-window" *ngIf="list.viewPortItems.length > 0">
+                <div class="w-full my-2" *ngFor="let file of list.viewPortItems">
+                    <app-file-list-item  [file]="file" [routerLink]="[file.slug || file.id]"></app-file-list-item>
+                </div>
             </div>
         </ng-container>
         
