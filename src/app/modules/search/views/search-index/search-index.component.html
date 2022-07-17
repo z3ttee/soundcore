@@ -15,12 +15,18 @@
 
 <!-- Show "home" page for quick access -->
 <section [ngClass]="{'pt-0': (screenService.$isTouch | async)}" *ngIf="!query">
+
     <scngx-ui-row [headline]="'Letzte Suchanfragen'" *ngIf="($recently | async)?.length > 0">
-        <scngx-horizontal-grid>
-            <ng-container *ngFor="let item of ($recently | async)">
-                <!-- // TODO -->
-            </ng-container>
-        </scngx-horizontal-grid>
+        <div class="w-full">
+            <scngx-horizontal-grid>
+                <ng-container *ngFor="let item of ($recently | async)">
+                    <scngx-artist-grid-item *ngIf="item.resourceType == 'artist'" [item]="$any(item)" (click)="routeToResult(['/artist', item.slug || item.id], item)"></scngx-artist-grid-item>
+                    <scngx-album-grid-item *ngIf="item.resourceType == 'album'" [item]="$any(item)" (click)="routeToResult(['/album', item.slug || item.id], item)"></scngx-album-grid-item>
+                    <scngx-playlist-grid-item *ngIf="item.resourceType == 'playlist'" [item]="$any(item)" (click)="routeToResult(['/playlist', item.slug || item.id], item)"></scngx-playlist-grid-item>
+                    <scngx-profile-grid-item *ngIf="item.resourceType == 'user'" [item]="$any(item)" (click)="routeToResult(['/profile', item.slug || item.id], item)"></scngx-profile-grid-item>
+                </ng-container>
+            </scngx-horizontal-grid>
+        </div>
     </scngx-ui-row>
 
     <scngx-ui-row [headline]="'Meistgehörte Genres'">
@@ -28,7 +34,7 @@
     </scngx-ui-row>
 
     <scngx-ui-row [headline]="'Alle Genres'">
-
+        
     </scngx-ui-row>
 </section>
 
@@ -83,7 +89,7 @@
         </scngx-ui-row>
     </ng-container>
 
-    <!-- Users -->
+    <!-- Profiles -->
     <ng-container *ngIf="($users | async) as users">
         <scngx-ui-row [headline]="'Profile'" *ngIf="users.hits.length > 0">
             <div class="w-full">

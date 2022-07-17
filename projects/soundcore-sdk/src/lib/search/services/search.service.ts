@@ -3,12 +3,13 @@ import { Inject, Injectable } from "@angular/core";
 import { BehaviorSubject, Observable, of, switchMap } from "rxjs";
 import { SCDKOptions, SCDK_OPTIONS } from "../../scdk.module";
 import { SCDKResource } from "../../utils/entities/resource";
-import { ComplexSearchResult } from "../entities/search-result.model";
 import { NgxIndexedDBService } from 'ngx-indexed-db';
 import { SC_SEARCHHISTORY_SIZE, SC_SEARCHHISTORY_STORE } from "../../constants";
 import { SearchHistoryEntry } from "../entities/history-entry.entity";
 
-@Injectable()
+@Injectable({
+  providedIn: "root"
+})
 export class SCDKSearchService {
 
   private readonly _onMainInputSubject: BehaviorSubject<string> = new BehaviorSubject("");
@@ -23,10 +24,6 @@ export class SCDKSearchService {
     @Inject(SCDK_OPTIONS) private readonly options: SCDKOptions
   ) {
     this.restoreRecentlySearched();
-  }
-
-  public performComplexSearch(query: string): Observable<ComplexSearchResult> {
-    return this.httpClient.get<ComplexSearchResult>(`${this.options.api_base_uri}/v1/search/?q=${query.toLowerCase()}`);
   }
 
   public emitMainInput(query: string): void {
@@ -54,7 +51,6 @@ export class SCDKSearchService {
 
         this.dbService.update(SC_SEARCHHISTORY_STORE, updated).subscribe();
       }
-      
     })
     
   }
@@ -62,7 +58,10 @@ export class SCDKSearchService {
   private restoreRecentlySearched() {
     this.clearHistoryOverflow().subscribe(() => {
       this.dbService.getAll<SearchHistoryEntry>(SC_SEARCHHISTORY_STORE).subscribe((list) => {
-        this._recentlySearchedSubject.next(list.map((entry) => entry.resource));
+        this._recentlySearchedSubject.next(
+          list.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+          .map((entry) => entry.resource)
+        );
       })
     })
   }
@@ -85,19 +84,4 @@ export class SCDKSearchService {
     );
   }
 
-  /*public searchUser(query: string): Observable<SearchResponse<MeiliUser>> {
-    return this.httpClient.get<SearchResponse<MeiliUser>>(`${this.options.api_base_uri}/v1/search/users/?q=${query.toLowerCase()}`);
-  }
-
-  public searchArtist(query: string): Observable<SearchResponse<MeiliArtist>> {
-    return this.httpClient.get<SearchResponse<MeiliArtist>>(`${this.options.api_base_uri}/v1/search/artists/?q=${query.toLowerCase()}`);
-  }
-
-  public searchAlbum(query: string): Observable<SearchResponse<MeiliAlbum>> {
-    return this.httpClient.get<SearchResponse<MeiliAlbum>>(`${this.options.api_base_uri}/v1/search/albums/?q=${query.toLowerCase()}`);
-  }
-  
-  public searchSong(query: string): Observable<SearchResponse<MeiliSong>> {
-    return this.httpClient.get<SearchResponse<MeiliSong>>(`${this.options.api_base_uri}/v1/search/songs/?q=${query.toLowerCase()}`);
-  }*/
 }
