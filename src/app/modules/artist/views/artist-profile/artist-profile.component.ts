@@ -62,16 +62,16 @@ export class ArtistProfileComponent implements OnInit, OnDestroy {
         this._artistSubject.next(artist);
         this._loadingSubject.next(false);
 
-        this.albumService.findByArtist(artistId, new Pageable(0, 12)).pipe(takeUntil(this._destroy)).subscribe((page) => {
-          this._albumSubject.next(page?.elements || []);
+        this.albumService.findByArtist(artistId, new Pageable(0, 12)).pipe(takeUntil(this._destroy)).subscribe((response) => {
+          this._albumSubject.next(response.payload?.elements || []);
         });
 
         this.playlistService.findByArtist(artistId, new Pageable(0, 12)).pipe(takeUntil(this._destroy)).subscribe((page) => {
           this._featPlaylistSubject.next(page?.elements || []);
         });
 
-        this.albumService.findFeaturedByArtist(artistId, new Pageable(0, 12)).pipe(takeUntil(this._destroy)).subscribe((page) => {
-          this._featAlbumsSubject.next(page?.elements || []);
+        this.albumService.findFeaturedByArtist(artistId, new Pageable(0, 12)).pipe(takeUntil(this._destroy)).subscribe((response) => {
+          this._featAlbumsSubject.next(response.payload?.elements || []);
         })
 
         this._listSubject.next(PlayableListBuilder

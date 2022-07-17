@@ -52,19 +52,20 @@
     </ng-container>
 
     <!-- Albums -->
-    <scngx-ui-row [headline]="'Alben'" *ngIf="($result | async)?.albums?.elements?.length > 0">
-        <div class="w-full">
-            <scngx-horizontal-grid>
-                <ng-container *ngFor="let item of ($result | async)?.albums?.elements">
-                    <scngx-album-grid-item 
-                        [item]="item" 
-                        [useDate]="true"
-                        (click)="routeToResult(['/album', item.slug || item.id], item)">
-                    </scngx-album-grid-item>
-                </ng-container>
-            </scngx-horizontal-grid>
-        </div>
-    </scngx-ui-row>
+    <ng-container *ngIf="($albums | async) as albums">
+        <scngx-ui-row [headline]="'Alben'" *ngIf="albums.hits.length > 0">
+            <div class="w-full">
+                <scngx-horizontal-grid>
+                    <ng-container *ngFor="let item of albums.hits">
+                        <scngx-album-grid-item 
+                            [item]="item"
+                            (click)="routeToResult(['/album', item.slug || item.id], item)">
+                        </scngx-album-grid-item>
+                    </ng-container>
+                </scngx-horizontal-grid>
+            </div>
+        </scngx-ui-row>
+    </ng-container>
 
     <!-- Playlists -->
     <ng-container *ngIf="($playlists | async) as playlists">

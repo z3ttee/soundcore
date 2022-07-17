@@ -3,7 +3,7 @@ import { UntypedFormControl } from '@angular/forms';
 import { Router } from '@angular/router';
 import { BehaviorSubject, debounceTime, Observable, Subject, takeUntil } from 'rxjs';
 import { SCNGXScreenService } from 'soundcore-ngx';
-import { MeiliArtist, SCDKSearchService, ComplexSearchResult, SCDKResource, SCDKPlaylistService, ApiSearchResponse, MeiliPlaylist, Pageable, MeiliUser, SCDKUserService, SCDKArtistService } from 'soundcore-sdk';
+import { MeiliAlbum, MeiliArtist, SCDKSearchService, ComplexSearchResult, SCDKResource, SCDKPlaylistService, ApiSearchResponse, MeiliPlaylist, Pageable, MeiliUser, SCDKUserService, SCDKArtistService, SCDKAlbumService } from 'soundcore-sdk';
 
 @Component({
   selector: 'app-search-index',
@@ -15,9 +15,12 @@ export class SearchIndexComponent implements OnInit, OnDestroy {
   constructor(
     private readonly router: Router,
     private readonly searchService: SCDKSearchService,
+
     private readonly playlistService: SCDKPlaylistService,
     private readonly userService: SCDKUserService,
     private readonly artistService: SCDKArtistService,
+    private readonly albumService: SCDKAlbumService,
+
     public readonly screenService: SCNGXScreenService
   ) { }
 
@@ -25,7 +28,6 @@ export class SearchIndexComponent implements OnInit, OnDestroy {
   private readonly _cancelQuery: Subject<void> = new Subject();
 
   private readonly _resultSubject: BehaviorSubject<ComplexSearchResult> = new BehaviorSubject(null);
-  public readonly $result: Observable<ComplexSearchResult> = this._resultSubject.asObservable().pipe(takeUntil(this._destroy));
   public readonly $recently: Observable<SCDKResource[]> = this.searchService.$recentlySearched.pipe(takeUntil(this._destroy));
 
   public show404: boolean = false;
@@ -35,6 +37,7 @@ export class SearchIndexComponent implements OnInit, OnDestroy {
   public $playlists: BehaviorSubject<ApiSearchResponse<MeiliPlaylist>> = new BehaviorSubject(null);
   public $users: BehaviorSubject<ApiSearchResponse<MeiliUser>> = new BehaviorSubject(null);
   public $artists: BehaviorSubject<ApiSearchResponse<MeiliArtist>> = new BehaviorSubject(null);
+  public $albums: BehaviorSubject<ApiSearchResponse<MeiliAlbum>> = new BehaviorSubject(null);
 
   public ngOnInit(): void {
 
@@ -51,6 +54,11 @@ export class SearchIndexComponent implements OnInit, OnDestroy {
       // Search artists
       this.artistService.searchArtist(query, new Pageable(0, 10)).pipe(takeUntil(this._cancelQuery)).subscribe((response) => {
         this.$artists.next(response.payload);
+      })
+
+      // Search albums
+      this.albumService.searchAlbum(query, new Pageable(0, 10)).pipe(takeUntil(this._cancelQuery)).subscribe((response) => {
+        this.$albums.next(response.payload);
       })
 
       // Search playlists

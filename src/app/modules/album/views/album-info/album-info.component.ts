@@ -48,7 +48,8 @@ export class AlbumInfoComponent implements OnInit, OnDestroy {
       this._featAlbumSubject.next([]);
       this._listSubject.next(null);
 
-      this.albumService.findById(albumId).pipe(takeUntil(this._cancel)).subscribe((album) => {
+      this.albumService.findById(albumId).pipe(takeUntil(this._cancel)).subscribe((response) => {
+        const album = response.payload;
         this._albumSubject.next(album);
         if(!album) return;
 
@@ -57,8 +58,8 @@ export class AlbumInfoComponent implements OnInit, OnDestroy {
           .metaUrl(`${environment.api_base_uri}/v1/songs/byAlbum/${album.id}`)
           .build());
 
-        this.albumService.findRecommendedByArtist(album.primaryArtist?.id).pipe(takeUntil(this._cancel)).subscribe((page) => {
-          this._featAlbumSubject.next(page.elements);
+        this.albumService.findRecommendedByArtist(album.primaryArtist?.id).pipe(takeUntil(this._cancel)).subscribe((response) => {
+          this._featAlbumSubject.next(response.payload.elements);
         })
 
         this._loadingSubject.next(false)

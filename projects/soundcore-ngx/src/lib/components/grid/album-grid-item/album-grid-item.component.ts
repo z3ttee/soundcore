@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { Album } from 'soundcore-sdk';
+import { Album, MeiliAlbum } from 'soundcore-sdk';
 
 @Component({
   selector: 'scngx-album-grid-item',
@@ -11,7 +11,7 @@ export class SCNGXAlbumGridItemComponent implements OnInit {
   /**
    * Album data
    */
-  @Input() public item: Album;
+  @Input() public item: Album | MeiliAlbum;
 
   /**
    * Show release date instead of primary artist's name.
