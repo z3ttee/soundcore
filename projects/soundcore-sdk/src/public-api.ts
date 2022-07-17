@@ -15,6 +15,8 @@ export * from "./lib/meilisearch/entities/meili-playlist.entity";
 export * from "./lib/meilisearch/entities/search-response.entity";
 export * from "./lib/meilisearch/entities/meili-artist.entity";
 export * from "./lib/meilisearch/entities/meili-album.entity";
+export * from "./lib/meilisearch/entities/meili-song.entity";
+export * from "./lib/meilisearch/entities/meili-genre.entity";
 
 // Pagination
 export * from "./lib/utils/page/page";

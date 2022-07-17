@@ -16,9 +16,10 @@ export class Song implements SCDKResource {
     public explicit: boolean;
 
     public artwork: Artwork;
-    public artists: Artist[];
-    public albums: Album[];
+    public primaryArtist: Artist;
+    public featuredArtists: Artist[];
     public playlists: Playlist[];
+    public album: Album;
 
     public streamCount: number;
     public liked: boolean;

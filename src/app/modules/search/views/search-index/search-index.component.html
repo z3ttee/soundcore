@@ -28,6 +28,7 @@
                                 <scngx-album-grid-item *ngIf="item.resourceType == 'album'" [item]="$any(item)" (click)="routeToResult(['/album', item.slug || item.id], item)"></scngx-album-grid-item>
                                 <scngx-playlist-grid-item *ngIf="item.resourceType == 'playlist'" [item]="$any(item)" (click)="routeToResult(['/playlist', item.slug || item.id], item)"></scngx-playlist-grid-item>
                                 <scngx-profile-grid-item *ngIf="item.resourceType == 'user'" [item]="$any(item)" (click)="routeToResult(['/profile', item.slug || item.id], item)"></scngx-profile-grid-item>
+                                <scngx-song-grid-item *ngIf="item.resourceType == 'song'" [item]="$any(item)" (click)="routeToResult(['/song', item.slug || item.id], item)"></scngx-song-grid-item>
                             </ng-container>
                         </scngx-horizontal-grid>
                     </div>
@@ -40,6 +41,22 @@
 
             <!-- Results page -->
             <section [ngClass]="{'pt-0': (screenService.$isTouch | async)}" *ngIf="query">
+
+                <!-- Songs -->
+                <ng-container *ngIf="($songs | async) as songs">
+                    <scngx-ui-row [headline]="'Songs'" *ngIf="songs.hits.length > 0">
+                        <div class="w-full">
+                            <scngx-horizontal-grid>
+                                <ng-container *ngFor="let item of songs.hits">
+                                    <scngx-song-grid-item 
+                                        [item]="item"
+                                        (click)="routeToResult(['/song', item.slug || item.id], item)">
+                                    </scngx-song-grid-item>
+                                </ng-container>
+                            </scngx-horizontal-grid>
+                        </div>
+                    </scngx-ui-row>
+                </ng-container>
 
                 <!-- Artists -->
                 <ng-container *ngIf="($artists | async) as artists">

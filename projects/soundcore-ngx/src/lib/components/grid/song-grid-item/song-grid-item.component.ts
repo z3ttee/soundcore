@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
+import { Song, MeiliSong } from 'soundcore-sdk';
 
 @Component({
   selector: 'scngx-song-grid-item',
@@ -6,6 +7,8 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./song-grid-item.component.scss']
 })
 export class SCDKSongGridItemComponent implements OnInit {
+
+  @Input() public item: Song | MeiliSong;
 
   constructor() { }
 

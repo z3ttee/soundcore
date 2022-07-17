@@ -4,7 +4,7 @@ import { UntypedFormControl } from '@angular/forms';
 import { Router } from '@angular/router';
 import { BehaviorSubject, debounceTime, Observable, Subject, takeUntil } from 'rxjs';
 import { InfiniteDataSource, SCNGXScreenService } from 'soundcore-ngx';
-import { SCDKGenreService, MeiliAlbum, MeiliArtist, SCDKSearchService, ComplexSearchResult, SCDKResource, SCDKPlaylistService, ApiSearchResponse, MeiliPlaylist, Pageable, MeiliUser, SCDKUserService, SCDKArtistService, SCDKAlbumService, Genre } from 'soundcore-sdk';
+import { SCDKGenreService, MeiliAlbum, MeiliArtist, SCDKSearchService, ComplexSearchResult, SCDKResource, SCDKPlaylistService, ApiSearchResponse, MeiliPlaylist, Pageable, MeiliUser, SCDKUserService, SCDKArtistService, SCDKAlbumService, Genre, MeiliSong, SCDKSongService } from 'soundcore-sdk';
 
 @Component({
   selector: 'app-search-index',
@@ -23,6 +23,7 @@ export class SearchIndexComponent implements OnInit, OnDestroy {
     private readonly artistService: SCDKArtistService,
     private readonly albumService: SCDKAlbumService,
     private readonly genreService: SCDKGenreService,
+    private readonly songService: SCDKSongService,
 
     public readonly screenService: SCNGXScreenService
   ) { }
@@ -41,6 +42,7 @@ export class SearchIndexComponent implements OnInit, OnDestroy {
   public $users: BehaviorSubject<ApiSearchResponse<MeiliUser>> = new BehaviorSubject(null);
   public $artists: BehaviorSubject<ApiSearchResponse<MeiliArtist>> = new BehaviorSubject(null);
   public $albums: BehaviorSubject<ApiSearchResponse<MeiliAlbum>> = new BehaviorSubject(null);
+  public $songs: BehaviorSubject<ApiSearchResponse<MeiliSong>> = new BehaviorSubject(null);
 
   public dataSource: InfiniteDataSource<Genre> = new InfiniteDataSource(this.httpClient, {
     pageSize: 30,
@@ -57,6 +59,11 @@ export class SearchIndexComponent implements OnInit, OnDestroy {
         this.show404 = false;
         return
       }
+
+      // Search songs
+      this.songService.searchSongs(query, new Pageable(0, 10)).pipe(takeUntil(this._cancelQuery)).subscribe((response) => {
+        this.$songs.next(response.payload);
+      })
 
       // Search artists
       this.artistService.searchArtist(query, new Pageable(0, 10)).pipe(takeUntil(this._cancelQuery)).subscribe((response) => {
