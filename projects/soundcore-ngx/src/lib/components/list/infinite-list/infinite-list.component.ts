@@ -12,7 +12,8 @@ export class SCNGXInfiniteListComponent implements OnInit, OnDestroy, OnChanges 
   private readonly _more: Subject<IPageInfo> = new Subject();
 
   @Input() public parentScroll: HTMLElement;
-  @Input() public dataSource: InfiniteDataSource<any>
+  @Input() public dataSource: InfiniteDataSource<any>;
+  @Input() public enableUnequalChildrenSizes: boolean;
 
   public viewPortItems: any[] = [];
 

@@ -54,11 +54,9 @@ export * from "./lib/user/user.module";
 export * from "./lib/user/entities/user.entity";
 export * from "./lib/user/services/user.service";
 
-
-
-
-
-
+// Genre Module
+export * from "./lib/genre/services/genre.service";
+export * from "./lib/genre/entities/genre.entity";
 
 
 /**

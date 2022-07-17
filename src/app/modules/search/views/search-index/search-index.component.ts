@@ -1,9 +1,10 @@
+import { HttpClient } from '@angular/common/http';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { UntypedFormControl } from '@angular/forms';
 import { Router } from '@angular/router';
 import { BehaviorSubject, debounceTime, Observable, Subject, takeUntil } from 'rxjs';
-import { SCNGXScreenService } from 'soundcore-ngx';
-import { MeiliAlbum, MeiliArtist, SCDKSearchService, ComplexSearchResult, SCDKResource, SCDKPlaylistService, ApiSearchResponse, MeiliPlaylist, Pageable, MeiliUser, SCDKUserService, SCDKArtistService, SCDKAlbumService } from 'soundcore-sdk';
+import { InfiniteDataSource, SCNGXScreenService } from 'soundcore-ngx';
+import { SCDKGenreService, MeiliAlbum, MeiliArtist, SCDKSearchService, ComplexSearchResult, SCDKResource, SCDKPlaylistService, ApiSearchResponse, MeiliPlaylist, Pageable, MeiliUser, SCDKUserService, SCDKArtistService, SCDKAlbumService, Genre } from 'soundcore-sdk';
 
 @Component({
   selector: 'app-search-index',
@@ -13,6 +14,7 @@ import { MeiliAlbum, MeiliArtist, SCDKSearchService, ComplexSearchResult, SCDKRe
 export class SearchIndexComponent implements OnInit, OnDestroy {
 
   constructor(
+    private readonly httpClient: HttpClient,
     private readonly router: Router,
     private readonly searchService: SCDKSearchService,
 
@@ -20,6 +22,7 @@ export class SearchIndexComponent implements OnInit, OnDestroy {
     private readonly userService: SCDKUserService,
     private readonly artistService: SCDKArtistService,
     private readonly albumService: SCDKAlbumService,
+    private readonly genreService: SCDKGenreService,
 
     public readonly screenService: SCNGXScreenService
   ) { }
@@ -39,8 +42,12 @@ export class SearchIndexComponent implements OnInit, OnDestroy {
   public $artists: BehaviorSubject<ApiSearchResponse<MeiliArtist>> = new BehaviorSubject(null);
   public $albums: BehaviorSubject<ApiSearchResponse<MeiliAlbum>> = new BehaviorSubject(null);
 
-  public ngOnInit(): void {
+  public dataSource: InfiniteDataSource<Genre> = new InfiniteDataSource(this.httpClient, {
+    pageSize: 30,
+    url: this.genreService.buildFindAllUrl()
+  });
 
+  public ngOnInit(): void {
     this.searchService.$onMainInput.pipe(debounceTime(300), takeUntil(this._destroy)).subscribe((query) => {
       this._cancelQuery.next();
       this.query = query;

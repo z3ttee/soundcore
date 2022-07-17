@@ -5,6 +5,8 @@ import { Page } from "../../utils/page/page";
 import { Pageable } from "../../utils/page/pageable";
 import { SCDKOptions, SCDK_OPTIONS } from "../../scdk.module";
 import { Genre } from "../entities/genre.entity";
+import { ApiResponse } from "../../utils/responses/api-response";
+import { apiResponse } from "../../utils/rxjs/operators/api-response";
 
 @Injectable({
     providedIn: "root"
@@ -21,9 +23,9 @@ export class SCDKGenreService {
      * @param genreId Genre's id.
      * @returns Observable<Genre>
      */
-    public findById(genreId: string): Observable<Genre> {
-        if(!genreId) of(null);
-        return this.httpClient.get<Genre>(`${this.options.api_base_uri}/v1/genres/${genreId}`)
+    public findById(genreId: string): Observable<ApiResponse<Genre>> {
+        if(!genreId) of(ApiResponse.withPayload(null));
+        return this.httpClient.get<Genre>(`${this.options.api_base_uri}/v1/genres/${genreId}`).pipe(apiResponse())
     }
 
     /**
@@ -33,9 +35,22 @@ export class SCDKGenreService {
      * @param pageable Page settings
      * @returns Observable<Page<Genre>>
      */
-    public findByArtist(artistId: string, pageable: Pageable): Observable<Page<Genre>> {
-        if(!artistId) return of(Page.of([]))
-        return this.httpClient.get<Page<Genre>>(`${this.options.api_base_uri}/v1/genres/byArtist/${artistId}${pageable.toQuery()}`)
+    public findByArtist(artistId: string, pageable: Pageable): Observable<ApiResponse<Page<Genre>>> {
+        if(!artistId) return of(ApiResponse.withPayload(Page.of([])))
+        return this.httpClient.get<Page<Genre>>(`${this.options.api_base_uri}/v1/genres/byArtist/${artistId}${pageable.toQuery()}`).pipe(apiResponse())
+    }
+
+    /**
+     * Find a page of genres
+     * @param pageable Page settings
+     * @returns Page<Genre>
+     */
+    public findAll(pageable: Pageable): Observable<ApiResponse<Page<Genre>>> {
+        return this.httpClient.get<Page<Genre>>(`${this.buildFindAllUrl()}${pageable.toQuery()}`).pipe(apiResponse())
+    }
+
+    public buildFindAllUrl() {
+        return`${this.options.api_base_uri}/v1/genres`
     }
 
 }

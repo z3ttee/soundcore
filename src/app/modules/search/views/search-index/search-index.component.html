@@ -1,109 +1,125 @@
-<!-- Toolbar (touch devices only) -->
-<scngx-toolbar [showNavigation]="false" [transparent]="true" *ngIf="(screenService.$isTouch | async)">
-    <div class="flex items-center">
-        <input type="text" [formControl]="searchInputControl" placeholder="Suchen" class="outline-none appearance-none w-full bg-body-light border border-transparent focus:border-font focus:border-opacity-30 transition-colors rounded-full py-4 px-5 placeholder:font-semi placeholder:text-font-secondary" >
-    </div>
-</scngx-toolbar>
+<section class="h-full w-full overflow-hidden" #page>
+    <scngx-infinite-list class="w-full h-full" [dataSource]="dataSource" [parentScroll]="page" #list>
+        <div class="w-full" scngx-content>
+            <!-- Toolbar (touch devices only) -->
+            <scngx-toolbar [showNavigation]="false" [transparent]="true" *ngIf="(screenService.$isTouch | async)">
+                <div class="flex items-center">
+                    <input type="text" [formControl]="searchInputControl" placeholder="Suchen" class="outline-none appearance-none w-full bg-body-light border border-transparent focus:border-font focus:border-opacity-30 transition-colors rounded-full py-4 px-5 placeholder:font-semi placeholder:text-font-secondary" >
+                </div>
+            </scngx-toolbar>
 
-<!-- Show 404 page if no result -->
-<app-error404 *ngIf="show404"></app-error404>
+            <!-- Show 404 page if no result -->
+            <app-error404 *ngIf="show404"></app-error404>
 
-<!-- Show query to user -->
-<section *ngIf="query" class="px-window pt-window" [ngClass]="{'pt-0': (screenService.$isTouch | async)}">
-    <h5>Ergebnisse für "{{ query }}"</h5>
-</section>
+            <!-- Show query to user -->
+            <section *ngIf="query" class="px-window pt-window" [ngClass]="{'pt-0': (screenService.$isTouch | async)}">
+                <h5>Ergebnisse für "{{ query }}"</h5>
+            </section>
 
-<!-- Show "home" page for quick access -->
-<section [ngClass]="{'pt-0': (screenService.$isTouch | async)}" *ngIf="!query">
+            <!-- Show "home" page for quick access -->
 
-    <scngx-ui-row [headline]="'Letzte Suchanfragen'" *ngIf="($recently | async)?.length > 0">
-        <div class="w-full">
-            <scngx-horizontal-grid>
-                <ng-container *ngFor="let item of ($recently | async)">
-                    <scngx-artist-grid-item *ngIf="item.resourceType == 'artist'" [item]="$any(item)" (click)="routeToResult(['/artist', item.slug || item.id], item)"></scngx-artist-grid-item>
-                    <scngx-album-grid-item *ngIf="item.resourceType == 'album'" [item]="$any(item)" (click)="routeToResult(['/album', item.slug || item.id], item)"></scngx-album-grid-item>
-                    <scngx-playlist-grid-item *ngIf="item.resourceType == 'playlist'" [item]="$any(item)" (click)="routeToResult(['/playlist', item.slug || item.id], item)"></scngx-playlist-grid-item>
-                    <scngx-profile-grid-item *ngIf="item.resourceType == 'user'" [item]="$any(item)" (click)="routeToResult(['/profile', item.slug || item.id], item)"></scngx-profile-grid-item>
+            <section [ngClass]="{'pt-0': (screenService.$isTouch | async)}" *ngIf="!query">
+
+                <scngx-ui-row [headline]="'Letzte Suchanfragen'" *ngIf="($recently | async)?.length > 0">
+                    <div class="w-full">
+                        <scngx-horizontal-grid>
+                            <ng-container *ngFor="let item of ($recently | async)">
+                                <scngx-artist-grid-item *ngIf="item.resourceType == 'artist'" [item]="$any(item)" (click)="routeToResult(['/artist', item.slug || item.id], item)"></scngx-artist-grid-item>
+                                <scngx-album-grid-item *ngIf="item.resourceType == 'album'" [item]="$any(item)" (click)="routeToResult(['/album', item.slug || item.id], item)"></scngx-album-grid-item>
+                                <scngx-playlist-grid-item *ngIf="item.resourceType == 'playlist'" [item]="$any(item)" (click)="routeToResult(['/playlist', item.slug || item.id], item)"></scngx-playlist-grid-item>
+                                <scngx-profile-grid-item *ngIf="item.resourceType == 'user'" [item]="$any(item)" (click)="routeToResult(['/profile', item.slug || item.id], item)"></scngx-profile-grid-item>
+                            </ng-container>
+                        </scngx-horizontal-grid>
+                    </div>
+                </scngx-ui-row>
+
+                <scngx-ui-row [headline]="'Meistgehörte Genres'">
+
+                </scngx-ui-row>
+            </section>
+
+            <!-- Results page -->
+            <section [ngClass]="{'pt-0': (screenService.$isTouch | async)}" *ngIf="query">
+
+                <!-- Artists -->
+                <ng-container *ngIf="($artists | async) as artists">
+                    <scngx-ui-row [headline]="'Künstler'" *ngIf="artists.hits.length > 0">
+                        <div class="w-full">
+                            <scngx-horizontal-grid>
+                                <ng-container *ngFor="let item of artists.hits">
+                                    <scngx-artist-grid-item 
+                                        [item]="item"
+                                        (click)="routeToResult(['/artist', item.slug || item.id], item)">
+                                    </scngx-artist-grid-item>
+                                </ng-container>
+                            </scngx-horizontal-grid>
+                        </div>
+                    </scngx-ui-row>
                 </ng-container>
-            </scngx-horizontal-grid>
+
+                <!-- Albums -->
+                <ng-container *ngIf="($albums | async) as albums">
+                    <scngx-ui-row [headline]="'Alben'" *ngIf="albums.hits.length > 0">
+                        <div class="w-full">
+                            <scngx-horizontal-grid>
+                                <ng-container *ngFor="let item of albums.hits">
+                                    <scngx-album-grid-item 
+                                        [item]="item"
+                                        (click)="routeToResult(['/album', item.slug || item.id], item)">
+                                    </scngx-album-grid-item>
+                                </ng-container>
+                            </scngx-horizontal-grid>
+                        </div>
+                    </scngx-ui-row>
+                </ng-container>
+
+                <!-- Playlists -->
+                <ng-container *ngIf="($playlists | async) as playlists">
+                    <scngx-ui-row [headline]="'Playlists'" *ngIf="playlists.hits.length > 0">
+                        <div class="w-full">
+                            <scngx-horizontal-grid>
+                                <ng-container *ngFor="let item of playlists.hits">
+                                    <scngx-playlist-grid-item 
+                                        [item]="item"
+                                        (click)="routeToResult(['/playlist', item.slug || item.id], item)">
+                                    </scngx-playlist-grid-item>
+                                </ng-container>
+                            </scngx-horizontal-grid>
+                        </div>
+                    </scngx-ui-row>
+                </ng-container>
+
+                <!-- Profiles -->
+                <ng-container *ngIf="($users | async) as users">
+                    <scngx-ui-row [headline]="'Profile'" *ngIf="users.hits.length > 0">
+                        <div class="w-full">
+                            <scngx-horizontal-grid>
+                                <ng-container *ngFor="let item of users.hits">
+                                    <scngx-profile-grid-item 
+                                        [item]="item"
+                                        (click)="routeToResult(['/profile', item.slug || item.id], item)">
+                                    </scngx-profile-grid-item>
+                                </ng-container>
+                            </scngx-horizontal-grid>
+                        </div>
+                    </scngx-ui-row>
+                </ng-container>
+            </section>
         </div>
-    </scngx-ui-row>
 
-    <scngx-ui-row [headline]="'Meistgehörte Genres'">
+        <ng-container scngx-list *ngIf="!query">
+            <h6 class="px-window mb-4">Alle Genres</h6>
 
-    </scngx-ui-row>
-
-    <scngx-ui-row [headline]="'Alle Genres'">
-        
-    </scngx-ui-row>
+            <div class="px-window grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div *ngFor="let item of list.viewPortItems" class="flex items-center justify-center text-center p-4 rounded transition-all cursor-pointer bg-body-light bg-opacity-60 border border-body-light border-opacity-0 transform-gpu will-change-transform hover:border-opacity-100 hover:bg-opacity-40 active:bg-opacity-20 active:scale-[98%]">
+                    {{ item.name }}
+                </div>
+            </div>
+            
+        </ng-container>
+    </scngx-infinite-list>
 </section>
 
-<!-- Results page -->
-<section [ngClass]="{'pt-0': (screenService.$isTouch | async)}" *ngIf="query">
 
-    <!-- Artists -->
-    <ng-container *ngIf="($artists | async) as artists">
-        <scngx-ui-row [headline]="'Künstler'" *ngIf="artists.hits.length > 0">
-            <div class="w-full">
-                <scngx-horizontal-grid>
-                    <ng-container *ngFor="let item of artists.hits">
-                        <scngx-artist-grid-item 
-                            [item]="item"
-                            (click)="routeToResult(['/artist', item.slug || item.id], item)">
-                        </scngx-artist-grid-item>
-                    </ng-container>
-                </scngx-horizontal-grid>
-            </div>
-        </scngx-ui-row>
-    </ng-container>
 
-    <!-- Albums -->
-    <ng-container *ngIf="($albums | async) as albums">
-        <scngx-ui-row [headline]="'Alben'" *ngIf="albums.hits.length > 0">
-            <div class="w-full">
-                <scngx-horizontal-grid>
-                    <ng-container *ngFor="let item of albums.hits">
-                        <scngx-album-grid-item 
-                            [item]="item"
-                            (click)="routeToResult(['/album', item.slug || item.id], item)">
-                        </scngx-album-grid-item>
-                    </ng-container>
-                </scngx-horizontal-grid>
-            </div>
-        </scngx-ui-row>
-    </ng-container>
 
-    <!-- Playlists -->
-    <ng-container *ngIf="($playlists | async) as playlists">
-        <scngx-ui-row [headline]="'Playlists'" *ngIf="playlists.hits.length > 0">
-            <div class="w-full">
-                <scngx-horizontal-grid>
-                    <ng-container *ngFor="let item of playlists.hits">
-                        <scngx-playlist-grid-item 
-                            [item]="item"
-                            (click)="routeToResult(['/playlist', item.slug || item.id], item)">
-                        </scngx-playlist-grid-item>
-                    </ng-container>
-                </scngx-horizontal-grid>
-            </div>
-        </scngx-ui-row>
-    </ng-container>
-
-    <!-- Profiles -->
-    <ng-container *ngIf="($users | async) as users">
-        <scngx-ui-row [headline]="'Profile'" *ngIf="users.hits.length > 0">
-            <div class="w-full">
-                <scngx-horizontal-grid>
-                    <ng-container *ngFor="let item of users.hits">
-                        <scngx-profile-grid-item 
-                            [item]="item"
-                            (click)="routeToResult(['/profile', item.slug || item.id], item)">
-                        </scngx-profile-grid-item>
-                    </ng-container>
-                </scngx-horizontal-grid>
-            </div>
-        </scngx-ui-row>
-    </ng-container>
-    
-
-</section>
