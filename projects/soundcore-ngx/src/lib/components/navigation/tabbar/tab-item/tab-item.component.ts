@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { SCNGXScreenService } from '../../../../services/screen/screen.service';
+import { SCCDKScreenService } from 'soundcore-cdk';
 
 export interface SCNGXTabItemRoute {
   commands: any[];
@@ -16,7 +16,7 @@ export class SCNGXTabItemComponent implements OnInit {
   @Input() public route: SCNGXTabItemRoute;
 
   constructor(
-    public readonly screenService: SCNGXScreenService
+    public readonly screenService: SCCDKScreenService
   ) { }
 
   ngOnInit(): void {

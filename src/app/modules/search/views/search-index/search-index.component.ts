@@ -3,7 +3,8 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { UntypedFormControl } from '@angular/forms';
 import { Router } from '@angular/router';
 import { BehaviorSubject, debounceTime, Observable, Subject, takeUntil } from 'rxjs';
-import { InfiniteDataSource, SCNGXScreenService } from 'soundcore-ngx';
+import { SCCDKScreenService } from 'soundcore-cdk';
+import { InfiniteDataSource } from 'soundcore-ngx';
 import { SCDKGenreService, MeiliAlbum, MeiliArtist, SCDKSearchService, ComplexSearchResult, SCDKResource, SCDKPlaylistService, ApiSearchResponse, MeiliPlaylist, Pageable, MeiliUser, SCDKUserService, SCDKArtistService, SCDKAlbumService, Genre, MeiliSong, SCDKSongService } from 'soundcore-sdk';
 
 @Component({
@@ -25,7 +26,7 @@ export class SearchIndexComponent implements OnInit, OnDestroy {
     private readonly genreService: SCDKGenreService,
     private readonly songService: SCDKSongService,
 
-    public readonly screenService: SCNGXScreenService
+    public readonly screenService: SCCDKScreenService
   ) { }
 
   private readonly _destroy: Subject<void> = new Subject();

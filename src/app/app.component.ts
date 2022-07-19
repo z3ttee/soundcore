@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { NavigationCancel, NavigationEnd, NavigationError, NavigationStart, Router } from '@angular/router';
 import { BehaviorSubject, combineLatest, filter, map, Observable, Subject, takeUntil } from 'rxjs';
-import { SCNGXScreenService } from 'soundcore-ngx';
+import { SCCDKScreenService } from 'soundcore-cdk';
 import { AuthenticationService } from 'src/sso/services/authentication.service';
 
 @Component({
@@ -12,7 +12,7 @@ import { AuthenticationService } from 'src/sso/services/authentication.service';
 export class AppComponent {
 
   constructor(
-      public readonly screenService: SCNGXScreenService,
+      public readonly screenService: SCCDKScreenService,
       public readonly authService: AuthenticationService,
       private readonly router: Router
   ) {}

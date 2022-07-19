@@ -1,7 +1,7 @@
-import { AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
-import { ActivatedRoute, NavigationStart, Router } from '@angular/router';
+import { AfterViewInit, Component, Input, OnInit } from '@angular/core';
+import { NavigationStart, Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
-import { SCNGXScreenService } from '../../services/screen/screen.service';
+import { SCCDKScreenService } from 'soundcore-cdk';
 
 export type SCNGXDrawerMode = "push" | "over";
 
@@ -21,8 +21,7 @@ export class SCNGXDrawerComponent implements OnInit, AfterViewInit {
   @Input() public toggleOnNavigation: boolean = true;
 
   constructor(
-    private readonly screenService: SCNGXScreenService,
-    private readonly activatedRoute: ActivatedRoute,
+    private readonly screenService: SCCDKScreenService,
     private readonly router: Router
   ) { }
 

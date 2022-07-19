@@ -9,6 +9,7 @@ import { SCNGXModule } from 'projects/soundcore-ngx/src/lib/scngx.module';
 import { SCDKModule } from 'soundcore-sdk';
 import { environment } from 'src/environments/environment';
 import { SCNGXDialogModule } from 'soundcore-ngx';
+import { SCCDKModule, SCCDKScreenModule } from 'soundcore-cdk';
 
 @NgModule({
   declarations: [
@@ -25,16 +26,19 @@ import { SCNGXDialogModule } from 'soundcore-ngx';
       api_base_uri: environment.api_base_uri
     }),
     SCNGXModule.register({
-      screen: {
-        screens: [
-          { name: "sm", width: 540 },
-          { name: "md", width: 780 },
-          { name: "lg", width: 1000 },
-          { name: "xl", width: 1200 },
-          { name: "2xl", width: 1550 }
-        ]
+      cdk: {
+        screen: {
+          screens: [
+            { name: "sm", width: 540 },
+            { name: "md", width: 780 },
+            { name: "lg", width: 1000 },
+            { name: "xl", width: 1200 },
+            { name: "2xl", width: 1550 }
+          ]
+        }
       }
     }),
+    SCCDKScreenModule,
     SCNGXDialogModule
   ],
   providers: [],

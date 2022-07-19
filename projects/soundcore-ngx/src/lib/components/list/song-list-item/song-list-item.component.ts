@@ -1,9 +1,9 @@
 import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, EventEmitter, Input, NgZone, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { AnimationOptions } from 'ngx-lottie';
 import { BehaviorSubject, fromEvent, Observable, Subject, takeUntil } from 'rxjs';
+import { SCCDKScreenService } from 'soundcore-cdk';
 import { Song } from 'soundcore-sdk';
 import audio_wave_anim from "../../../assets/lottie/audio_wave.json"
-import { SCNGXScreenService } from '../../../services/screen/screen.service';
 
 export class SCNGXSongCol {
   public enabled: boolean = true;
@@ -28,7 +28,7 @@ export class SCNGXSongColConfig {
 export class SCNGXSongListItemComponent implements OnInit, OnDestroy, AfterViewInit {
 
   constructor(
-    private readonly screenService: SCNGXScreenService,
+    private readonly screenService: SCCDKScreenService,
     private readonly elementRef: ElementRef,
     private readonly zone: NgZone
   ) { }

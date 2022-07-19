@@ -1,4 +1,4 @@
-export class SCNGXScreen {
+export class SCCDKScreen {
 
     constructor(
         public readonly name: string,

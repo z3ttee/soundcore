@@ -2,11 +2,6 @@
  * Public API Surface of soundcore-ngx
  */
 
-// Screen
-export * from "./lib/services/screen/screen.module";
-export * from "./lib/services/screen/screen.service";
-export * from "./lib/services/screen/entities/screen.entity";
-
 // Drawer
 export * from "./lib/components/drawer/drawer.module";
 export * from "./lib/components/drawer/drawer.component";
@@ -69,10 +64,6 @@ export * from "./lib/components/toolbar/toolbar.component";
 export * from "./lib/components/navigation/tabbar/tabbar.module";
 export * from "./lib/components/navigation/tabbar/tabbar.component";
 export * from "./lib/components/navigation/tabbar/tab-item/tab-item.component";
-
-// Service exports
-export * from "./lib/services/screen/screen.module";
-export * from "./lib/services/screen/screen.service";
 
 // Grid items
 export * from "./lib/components/grid/resource-grid-item/resource-grid-item.module";

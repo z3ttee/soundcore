@@ -3,7 +3,8 @@ import { NgModule } from "@angular/core";
 import { MatRippleModule } from "@angular/material/core";
 import { RouterModule, Routes } from "@angular/router";
 import { bell, HeroIconModule } from "ng-heroicon";
-import { SCNGXLabelModule, SCNGXScreenModule, SCNGXToolbarModule, SCNGXTooltipModule } from "soundcore-ngx";
+import { SCCDKContextMenuModule } from "soundcore-cdk";
+import { SCNGXLabelModule, SCNGXToolbarModule, SCNGXTooltipModule } from "soundcore-ngx";
 import { HomeComponent } from './views/home/home.component';
 
 const routes: Routes = [
@@ -14,14 +15,14 @@ const routes: Routes = [
     imports: [
         CommonModule,
         RouterModule.forChild(routes),
-        SCNGXScreenModule,
         SCNGXTooltipModule,
         SCNGXToolbarModule,
 
         HeroIconModule.withIcons({ bell }),
         MatRippleModule,
 
-        SCNGXLabelModule
+        SCNGXLabelModule,
+        SCCDKContextMenuModule
     ],
     declarations: [
       HomeComponent

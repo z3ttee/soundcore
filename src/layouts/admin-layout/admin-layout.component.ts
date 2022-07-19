@@ -2,7 +2,7 @@ import { Location } from "@angular/common";
 import { Component, OnDestroy, OnInit } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
 import { Subject } from "rxjs";
-import { SCNGXScreenService } from "soundcore-ngx";
+import { SCCDKScreenService } from "soundcore-cdk";
 import { AuthenticationService } from "src/sso/services/authentication.service";
 
 @Component({
@@ -15,7 +15,7 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
     public isNavigating: boolean = false;
 
     constructor(
-        public readonly screenService: SCNGXScreenService,
+        public readonly screenService: SCCDKScreenService,
         public readonly authService: AuthenticationService,
         public readonly activatedRoute: ActivatedRoute,
         private readonly router: Router,

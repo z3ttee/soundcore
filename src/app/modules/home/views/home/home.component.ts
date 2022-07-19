@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { SCNGXScreenService } from 'soundcore-ngx';
+import { SCCDKScreenService } from 'soundcore-cdk';
 
 @Component({
   templateUrl: './home.component.html',
@@ -8,7 +8,7 @@ import { SCNGXScreenService } from 'soundcore-ngx';
 export class HomeComponent implements OnInit {
 
   constructor(
-    private readonly screenService: SCNGXScreenService
+    private readonly screenService: SCCDKScreenService
   ) { }
 
   public greeting: string = "Guten Tag";

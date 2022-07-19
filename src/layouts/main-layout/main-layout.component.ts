@@ -5,7 +5,8 @@ import { UntypedFormControl } from "@angular/forms";
 import { NavigationCancel, NavigationEnd, NavigationError, NavigationStart, Router } from "@angular/router";
 import { SCNGXPlaylistListItemComponent } from "projects/soundcore-ngx/src/public-api";
 import { filter, firstValueFrom, Subject, takeUntil } from "rxjs";
-import { SCNGXDialogService, SCNGXScreenService } from "soundcore-ngx";
+import { SCCDKScreenService } from "soundcore-cdk";
+import { SCNGXDialogService } from "soundcore-ngx";
 import { Playlist, SCDKPlaylistService, SCDKSearchService } from "soundcore-sdk";
 import { AppPlaylistCreateDialog } from "src/app/dialogs/playlist-create-dialog/playlist-create-dialog.component";
 import { AuthenticationService } from "src/sso/services/authentication.service";
@@ -22,7 +23,7 @@ export class AscMainLayoutComponent implements OnInit, OnDestroy {
     public isNavigating: boolean = false;
 
     constructor(
-        public readonly screenService: SCNGXScreenService,
+        public readonly screenService: SCCDKScreenService,
         public readonly authService: AuthenticationService,
         public readonly playlistService: SCDKPlaylistService,
         private readonly dialogService: SCNGXDialogService,

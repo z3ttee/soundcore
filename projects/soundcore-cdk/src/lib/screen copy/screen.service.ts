@@ -1,12 +1,12 @@
 import { Platform } from "@angular/cdk/platform";
 import { Inject, Injectable, OnDestroy } from "@angular/core";
 import { BehaviorSubject, fromEvent, Observable, Subject, takeUntil } from "rxjs";
+import { SCCDKOptions, SCCDK_OPTIONS } from "../sccdk.module";
 
-import { SCNGXOptions, SCNGX_OPTIONS } from "../../scngx.module";
-import { SCNGXScreen } from "./entities/screen.entity";
+import { SCCDKScreen } from "./entities/screen.entity";
 
 @Injectable()
-export class SCNGXScreenService implements OnDestroy {
+export class SCCDKScreenService implements OnDestroy {
 
     private screens: Record<string, number> = {};
 
@@ -14,16 +14,16 @@ export class SCNGXScreenService implements OnDestroy {
     private $event = fromEvent(window, "resize").pipe(takeUntil(this.destroy$))
 
     private _isTouchSubject: BehaviorSubject<boolean> = new BehaviorSubject(this.isMobile());
-    private _screenSubject: BehaviorSubject<SCNGXScreen> = new BehaviorSubject(this.getScreen());
+    private _screenSubject: BehaviorSubject<SCCDKScreen> = new BehaviorSubject(this.getScreen());
 
     public $isTouch: Observable<boolean> = this._isTouchSubject.asObservable();
-    public $screen: Observable<SCNGXScreen> = this._screenSubject.asObservable();
+    public $screen: Observable<SCCDKScreen> = this._screenSubject.asObservable();
 
     constructor(
         private readonly platform: Platform,
-        @Inject(SCNGX_OPTIONS) private readonly options: SCNGXOptions
+        @Inject(SCCDK_OPTIONS) private readonly options: SCCDKOptions
     ) {
-        if(!options) throw new Error("You need to initialize the SCNGX library first. This is done by adding SCNGXModule.register(...) to your imports in app.module.ts")
+        if(!options) throw new Error("You need to initialize the SCCDK library first. This is done by adding SCCDKModule.register(...) to your imports in app.module.ts")
 
         const screens = this.options.screen.screens.sort((a, b) => b.width - a.width);
         for(const screen of screens) {
@@ -85,11 +85,11 @@ export class SCNGXScreenService implements OnDestroy {
         return Object.keys(this.screens)[Object.keys(this.screens).length - 1];
     }
 
-    private getScreen(): SCNGXScreen {
+    private getScreen(): SCCDKScreen {
         const name = this.getBreakpointNameByWidth(window.innerWidth);
         const breakpoint = this.findBreakpointByName(name);
 
-        return new SCNGXScreen(name, this.isMobile(), breakpoint);
+        return new SCCDKScreen(name, this.isMobile(), breakpoint);
     }
 
 }

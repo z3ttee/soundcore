@@ -1,6 +1,6 @@
-import { AfterViewInit, Component, ContentChild, ElementRef, Input, OnDestroy, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { debounceTime, fromEvent, Subject, takeUntil } from 'rxjs';
-import { SCNGXScreenService } from '../../../services/screen/screen.service';
+import { SCCDKScreenService } from 'soundcore-cdk';
 
 @Component({
   selector: 'scngx-horizontal-grid',
@@ -19,7 +19,7 @@ export class SCNGXHorizontalGridComponent implements OnInit, OnDestroy, AfterVie
   private observer: ResizeObserver;
 
   constructor(
-    private readonly screenService: SCNGXScreenService,
+    private readonly screenService: SCCDKScreenService,
     private readonly elementRef: ElementRef<HTMLElement>
   ) { }
 

@@ -1,6 +1,6 @@
 import { Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
 import { Observable, Subject, takeUntil } from 'rxjs';
-import { SCNGXScreenService } from 'soundcore-ngx';
+import { SCCDKScreenService } from 'soundcore-cdk';
 import { Artwork, SCDKResource } from "soundcore-sdk";
 
 const DEFAULT_ACCENT_COLOR = "#cccccc";
@@ -13,7 +13,7 @@ const DEFAULT_ACCENT_COLOR = "#cccccc";
 export class ListViewComponent implements OnInit, OnDestroy, OnChanges {
 
   constructor(
-    public readonly screenService: SCNGXScreenService
+    public readonly screenService: SCCDKScreenService
   ) { }
 
   @Input() public title: string;

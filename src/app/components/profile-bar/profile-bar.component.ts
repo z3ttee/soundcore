@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { SCNGXScreenService } from 'soundcore-ngx';
+import { SCCDKScreenService } from 'soundcore-cdk';
 import { User } from 'soundcore-sdk';
 import { AuthenticationService } from 'src/sso/services/authentication.service';
 
@@ -16,7 +16,7 @@ export class ProfileBarComponent implements OnInit {
 
   constructor(
     public readonly authService: AuthenticationService,
-    public readonly screenService: SCNGXScreenService
+    public readonly screenService: SCCDKScreenService
   ) { }
 
   public ngOnInit(): void {}

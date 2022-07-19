@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { SCNGXTabbarComponent } from './tabbar.component';
 import { SCNGXTabItemComponent } from './tab-item/tab-item.component';
 import { RouterModule } from '@angular/router';
-import { SCNGXScreenModule } from "../../../services/screen/screen.module"
 
 @NgModule({
   declarations: [
@@ -12,8 +11,7 @@ import { SCNGXScreenModule } from "../../../services/screen/screen.module"
   ],
   imports: [
     CommonModule,
-    RouterModule,
-    SCNGXScreenModule
+    RouterModule
   ],
   exports: [
     SCNGXTabbarComponent,
