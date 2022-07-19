@@ -2,7 +2,8 @@ import { Overlay, OverlayRef } from "@angular/cdk/overlay";
 import { TemplatePortal } from "@angular/cdk/portal";
 import { Injectable, TemplateRef, ViewContainerRef } from "@angular/core";
 import { MatBottomSheet, MatBottomSheetRef } from "@angular/material/bottom-sheet";
-import { combineLatest, filter, fromEvent, map } from "rxjs";
+import { combineLatest, filter, fromEvent, map, take } from "rxjs";
+import { SCCDKScreenService } from "../../screen copy/screen.service";
 
 @Injectable({
     providedIn: "root"
@@ -13,8 +14,9 @@ export class SCCDKContextService {
     private bottomSheetRef?: MatBottomSheetRef;
 
     constructor(
-        private overlay: Overlay,
-        private bottomSheet: MatBottomSheet
+        private readonly screen: SCCDKScreenService,
+        private readonly overlay: Overlay,
+        private readonly bottomSheet: MatBottomSheet
     ) {
         combineLatest([
             fromEvent<PointerEvent>(document, 'click')
@@ -37,12 +39,12 @@ export class SCCDKContextService {
 
         await this.close();
 
-        // this.deviceService.$breakpoint.pipe(take(1)).subscribe((breakpoint) => {
-            /*if(!breakpoint.isDesktop) {
+        this.screen.$isTouch.pipe(take(1)).subscribe((isTouch) => {
+            if(isTouch) {
                 // Show bottom sheet on mobile devices
                 this.bottomSheetRef = this.bottomSheet.open(template, { viewContainerRef, closeOnNavigation: true, data: contextData, panelClass: ["bg-transparent", "shadow-none"] })
                 return;
-            }*/
+            }
 
             // Show context menu on desktop devices
             const positionStrategy = this.overlay.position().flexibleConnectedTo({ x: event.x, y: event.y }).withPositions([
@@ -58,7 +60,7 @@ export class SCCDKContextService {
             this.overlayRef.attach(new TemplatePortal(template, viewContainerRef, {
                 $implicit: contextData
             }));
-        // })
+        })
     }
 
     public async close() {

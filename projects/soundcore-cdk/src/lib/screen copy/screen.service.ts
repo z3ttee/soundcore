@@ -5,7 +5,9 @@ import { SCCDKOptions, SCCDK_OPTIONS } from "../sccdk.module";
 
 import { SCCDKScreen } from "./entities/screen.entity";
 
-@Injectable()
+@Injectable({
+    providedIn: "root"
+})
 export class SCCDKScreenService implements OnDestroy {
 
     private screens: Record<string, number> = {};

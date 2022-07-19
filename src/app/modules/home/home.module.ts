@@ -22,7 +22,6 @@ const routes: Routes = [
         MatRippleModule,
 
         SCNGXLabelModule,
-        SCCDKContextMenuModule
     ],
     declarations: [
       HomeComponent

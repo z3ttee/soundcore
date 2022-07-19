@@ -8,7 +8,6 @@ import { SCCDKScreenService } from 'soundcore-cdk';
 export class HomeComponent implements OnInit {
 
   constructor(
-    private readonly screenService: SCCDKScreenService
   ) { }
 
   public greeting: string = "Guten Tag";
