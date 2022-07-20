@@ -1,6 +1,6 @@
 import { ModuleWithProviders, NgModule } from "@angular/core";
-import { SCCDKScreenConfig } from "./screen copy/screen.config";
-import { SCCDKScreenModule } from "./screen copy/screen.module";
+import { SCCDKScreenConfig } from "./screen/screen.config";
+import { SCCDKScreenModule } from "./screen/screen.module";
 
 export const SCCDK_OPTIONS = "sccdk-options";
 export interface SCCDKOptions {

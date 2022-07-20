@@ -4,12 +4,16 @@ import { SCCDKContextMenuDirective } from './directive/context-menu.directive';
 import { OverlayModule } from '@angular/cdk/overlay';
 import {MatBottomSheetModule} from '@angular/material/bottom-sheet';
 import { SCCDKContextService } from './services/context-menu.service';
-import { SCCDKContextMenuContainerComponent } from './components/context-menu-container/context-menu-container.component';
+import { SCCDKContextMenuItemComponent } from './components/context-menu-item/context-menu-item.component';
+import { SCCDKContextMenuComponent } from './components/context-menu/context-menu.component';
+import { SCCDKContextMenuCategoryComponent } from './components/context-menu-category/context-menu-category.component';
 
 @NgModule({
   declarations: [
     SCCDKContextMenuDirective,
-    SCCDKContextMenuContainerComponent
+    SCCDKContextMenuItemComponent,
+    SCCDKContextMenuComponent,
+    SCCDKContextMenuCategoryComponent
   ],
   imports: [
     CommonModule,
@@ -21,7 +25,9 @@ import { SCCDKContextMenuContainerComponent } from './components/context-menu-co
   ],
   exports: [
     SCCDKContextMenuDirective,
-    SCCDKContextMenuContainerComponent
+    SCCDKContextMenuComponent,
+    SCCDKContextMenuItemComponent,
+    SCCDKContextMenuCategoryComponent
   ]
 })
 export class SCCDKContextMenuModule { }

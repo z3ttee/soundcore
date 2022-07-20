@@ -1,0 +1,18 @@
+:host {
+    .context-menu-item-wrapper {
+        .context-menu-item-container {
+            display: flex;
+            align-items: center;
+            justify-items: start;
+            will-change: auto;
+            transform: scaleX(1.0) scaleY(1.0);
+        }
+
+        &:active {
+            .context-menu-item-container {
+                transform: scaleX(0.95) scaleY(0.95);
+            }
+        }
+    }
+    
+}
