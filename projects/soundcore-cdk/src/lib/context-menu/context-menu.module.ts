@@ -6,12 +6,14 @@ import {MatBottomSheetModule} from '@angular/material/bottom-sheet';
 import { SCCDKContextService } from './services/context-menu.service';
 import { SCCDKContextMenuItemComponent } from './components/context-menu-item/context-menu-item.component';
 import { SCCDKContextMenuComponent } from './components/context-menu/context-menu.component';
+import { SCCDKContextMenuCategoryComponent } from './components/context-menu-category/context-menu-category.component';
 
 @NgModule({
   declarations: [
     SCCDKContextMenuDirective,
     SCCDKContextMenuItemComponent,
-    SCCDKContextMenuComponent
+    SCCDKContextMenuComponent,
+    SCCDKContextMenuCategoryComponent
   ],
   imports: [
     CommonModule,
@@ -24,7 +26,8 @@ import { SCCDKContextMenuComponent } from './components/context-menu/context-men
   exports: [
     SCCDKContextMenuDirective,
     SCCDKContextMenuComponent,
-    SCCDKContextMenuItemComponent
+    SCCDKContextMenuItemComponent,
+    SCCDKContextMenuCategoryComponent
   ]
 })
 export class SCCDKContextMenuModule { }

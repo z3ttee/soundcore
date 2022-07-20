@@ -15,6 +15,7 @@ export * from "./lib/context-menu/context-menu.module";
 export * from "./lib/context-menu/directive/context-menu.directive";
 export * from "./lib/context-menu/components/context-menu/context-menu.component";
 export * from "./lib/context-menu/components/context-menu-item/context-menu-item.component";
+export * from "./lib/context-menu/components/context-menu-category/context-menu-category.component";
 
 // Overlay
 export * from "./lib/overlay/overlay.module";
