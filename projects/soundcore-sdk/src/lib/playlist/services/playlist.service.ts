@@ -152,12 +152,10 @@ export class SCDKPlaylistService {
      * @param songs Songs to add to the playlist.
      * @returns Observable<Playlist>
      */
-    public addSongs(playlistId: string, songs: Song[]): Observable<Playlist> {
-        if(!playlistId) return of(null);
-        return this.httpClient.put<Playlist>(`${this.options.api_base_uri}/v1/playlists/${playlistId}/songs/add`, songs.map((song) => song?.id)).pipe(
-            catchError((err) => {
-                throw err;
-            }),
+    public addSongs(playlistId: string, songs: Song[]): Observable<ApiResponse<Playlist>> {
+        if(!playlistId) return of(ApiResponse.withPayload(null));
+        return this.httpClient.put<Playlist>(`${this.options.api_base_uri}/v1/playlists/${playlistId}/addSongs`, songs.map((song) => song?.id)).pipe(
+            apiResponse(),
             tap(() => {
                 const playlist = this._playlistsMap.get(playlistId);
                 this._onSongsEventSubject.next(new PlaylistSongsEvent("added", playlist, songs));

@@ -69,9 +69,6 @@ export * from "./lib/components/navigation/tabbar/tab-item/tab-item.component";
 export * from "./lib/components/grid/resource-grid-item/resource-grid-item.module";
 export * from "./lib/components/grid/resource-grid-item/resource-grid-item.component";
 
-export * from "./lib/components/grid/song-grid-item/song-grid-item.module";
-export * from "./lib/components/grid/song-grid-item/song-grid-item.component";
-
 export * from "./lib/components/grid/collection-grid-item/collection-grid-item.module";
 export * from "./lib/components/grid/collection-grid-item/collection-grid-item.component";
 
@@ -141,6 +138,8 @@ export * from "./lib/pipes/file-flag-pipe/file-flag-pipe.module";
 export * from "./lib/pipes/file-flag-pipe/file-flag-pipe.pipe";
 export * from "./lib/pipes/mount-status-pipe/mount-status-pipe.module";
 export * from "./lib/pipes/mount-status-pipe/mount-status-pipe.pipe";
+export * from "./lib/pipes/resource-type-pipe/resource-type-pipe.module";
+export * from "./lib/pipes/resource-type-pipe/resource-type-pipe.pipe";
 
 // Datasource
 export * from "./lib/entities/playable-list.entity";
