@@ -1,5 +1,5 @@
 import { NgModule } from "@angular/core";
-import { SCCDKScreenService } from "soundcore-cdk";
+import { SCCDKScreenService } from "./screen.service";
 
 @NgModule({
     providers: [
