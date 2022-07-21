@@ -1,6 +1,4 @@
 import { NgModule } from '@angular/core';
 
-@NgModule({
-  declarations: []
-})
+@NgModule({})
 export class SCDKPlaylistModule { }

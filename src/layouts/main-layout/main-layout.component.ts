@@ -7,7 +7,7 @@ import { SCNGXPlaylistListItemComponent } from "projects/soundcore-ngx/src/publi
 import { filter, firstValueFrom, Subject, takeUntil } from "rxjs";
 import { SCCDKScreenService } from "soundcore-cdk";
 import { SCNGXDialogService } from "soundcore-ngx";
-import { Playlist, SCDKSearchService } from "soundcore-sdk";
+import { Playlist, SCDKPlaylistService, SCDKSearchService } from "soundcore-sdk";
 import { AppPlaylistCreateDialog } from "src/app/dialogs/playlist-create-dialog/playlist-create-dialog.component";
 import { AuthenticationService } from "src/sso/services/authentication.service";
 
@@ -25,6 +25,7 @@ export class AscMainLayoutComponent implements OnInit, OnDestroy {
     constructor(
         public readonly screenService: SCCDKScreenService,
         public readonly authService: AuthenticationService,
+        public readonly playlistService: SCDKPlaylistService,
         private readonly dialogService: SCNGXDialogService,
         private readonly searchService: SCDKSearchService,
         private readonly router: Router,
@@ -73,10 +74,8 @@ export class AscMainLayoutComponent implements OnInit, OnDestroy {
         })
     }
 
-    public openTestDialog() {       
-        this.dialogService.open(AppPlaylistCreateDialog, {}).$afterClosed.pipe(takeUntil(this._destroy)).subscribe((playlist) => {
-            console.log(playlist);
-        })
+    public openCreatePlaylistDialog() {       
+        this.dialogService.open(AppPlaylistCreateDialog, {}).$afterClosed.pipe(takeUntil(this._destroy));
     }
 
 }

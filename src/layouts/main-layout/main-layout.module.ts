@@ -1,6 +1,6 @@
 import { NgModule } from "@angular/core";
 import { AscMainLayoutComponent } from "./main-layout.component";
-import { SCNGXBottomNavModule, SCNGXDialogModule, SCNGXDrawerModule, SCNGXProgressbarModule } from "soundcore-ngx"
+import { SCNGXBottomNavModule, SCNGXDrawerModule, SCNGXProgressbarModule } from "soundcore-ngx"
 import { RouterModule } from "@angular/router";
 import { CommonModule } from "@angular/common";
 import { HeroIconModule, home, search, user, bookmarkAlt, chevronDown, plus, shieldExclamation, bell, cog, logout } from "ng-heroicon";
