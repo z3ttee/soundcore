@@ -7,7 +7,7 @@ import { SCNGXPlaylistListItemComponent } from "projects/soundcore-ngx/src/publi
 import { filter, firstValueFrom, Subject, takeUntil } from "rxjs";
 import { SCCDKScreenService } from "soundcore-cdk";
 import { SCNGXDialogService } from "soundcore-ngx";
-import { Playlist, SCDKPlaylistService, SCDKSearchService } from "soundcore-sdk";
+import { Playlist, SCDKSearchService } from "soundcore-sdk";
 import { AppPlaylistCreateDialog } from "src/app/dialogs/playlist-create-dialog/playlist-create-dialog.component";
 import { AuthenticationService } from "src/sso/services/authentication.service";
 
@@ -25,7 +25,6 @@ export class AscMainLayoutComponent implements OnInit, OnDestroy {
     constructor(
         public readonly screenService: SCCDKScreenService,
         public readonly authService: AuthenticationService,
-        public readonly playlistService: SCDKPlaylistService,
         private readonly dialogService: SCNGXDialogService,
         private readonly searchService: SCDKSearchService,
         private readonly router: Router,
@@ -33,10 +32,6 @@ export class AscMainLayoutComponent implements OnInit, OnDestroy {
     ) {}
 
     public ngOnInit(): void {
-        firstValueFrom(this.playlistService.findByCurrentUser()).then((page) => {
-            console.log(page)
-        })
-
         // Subscribe to router events to show a loader bar at the page top
         // This indicates the user that the page is loading parts of the app
         // that are needed for operation
@@ -60,7 +55,7 @@ export class AscMainLayoutComponent implements OnInit, OnDestroy {
     }
 
     public onPlaylistItemDrop(event: CdkDragDrop<SCNGXPlaylistListItemComponent, Playlist>) {
-        this.playlistService.movePosition(event.previousIndex, event.currentIndex);
+        // this.playlistService.movePosition(event.previousIndex, event.currentIndex);
     }
 
     public navigateBack() {

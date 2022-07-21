@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { BehaviorSubject, Observable, Subject, takeUntil } from 'rxjs';
-import { Pageable, Playlist, SCDKPlaylistService, SCDKProfileService, SCDKUserService, User } from 'soundcore-sdk';
+import { Pageable, Playlist, SCDKProfileService, SCDKUserService, User } from 'soundcore-sdk';
 
 @Component({
   selector: 'app-profile-info',
@@ -22,7 +22,6 @@ export class ProfileInfoComponent implements OnInit, OnDestroy {
 
   constructor(
     private readonly profileService: SCDKProfileService,
-    private readonly playlistService: SCDKPlaylistService,
     private readonly userService: SCDKUserService,
     private readonly activatedRoute: ActivatedRoute
   ) { }
@@ -40,9 +39,9 @@ export class ProfileInfoComponent implements OnInit, OnDestroy {
         this._profileSubject.next(response.payload);
         this._loadingSubject.next(false);
 
-        this.playlistService.findByAuthor(profileId, new Pageable(0, 8)).subscribe((response) => {
+        /*this.playlistService.findByAuthor(profileId, new Pageable(0, 8)).subscribe((response) => {
           this._playlistSubject.next(response.payload.elements);
-        })
+        })*/
       })
     })
   }

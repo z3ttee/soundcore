@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { SCDKPlaylistService } from 'soundcore-sdk';
 
 @Component({
   selector: 'app-library-playlists',
@@ -9,7 +8,6 @@ import { SCDKPlaylistService } from 'soundcore-sdk';
 export class LibraryPlaylistsComponent implements OnInit {
 
   constructor(
-    public readonly playlistService: SCDKPlaylistService
   ) { }
 
   ngOnInit(): void {

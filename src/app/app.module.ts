@@ -9,7 +9,7 @@ import { SCNGXModule } from 'projects/soundcore-ngx/src/lib/scngx.module';
 import { SCDKModule } from 'soundcore-sdk';
 import { environment } from 'src/environments/environment';
 import { SCNGXDialogModule } from 'soundcore-ngx';
-import { SCCDKModule, SCCDKScreenModule } from 'soundcore-cdk';
+import { SCCDKScreenModule } from 'soundcore-cdk';
 import { HttpClientModule } from '@angular/common/http';
 
 @NgModule({

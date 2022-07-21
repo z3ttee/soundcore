@@ -50,7 +50,7 @@
             </li>
 
             <div cdkDropList class="list" (cdkDropListDropped)="onPlaylistItemDrop($event)">
-                <div *ngFor="let playlist of (playlistService.$playlists | async)" cdkDrag cdkDragLockAxis="y" cdkDragBoundary=".list">
+                <div *ngFor="let playlist of []" cdkDrag cdkDragLockAxis="y" cdkDragBoundary=".list">
                     <scngx-playlist-list-item class="cursor-pointer" [playlist]="playlist" [routerLink]="['/playlist', playlist.slug || playlist.id]" routerLinkActive="text-accent"></scngx-playlist-list-item>
                 </div>
             </div>
