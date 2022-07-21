@@ -1,7 +1,8 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { Observable, Subject, takeUntil } from 'rxjs';
 import { SCNGXDialogService } from 'soundcore-ngx';
-import { MeiliSong, Playlist, Song } from 'soundcore-sdk';
+import { MeiliSong, Playlist, PlaylistAddSongFailReason, SCDKPlaylistService, Song } from 'soundcore-sdk';
 import { AppPlaylistChooseDialog } from 'src/app/dialogs/playlist-choose-dialog/playlist-choose-dialog.component';
 import { AuthenticationService } from 'src/sso/services/authentication.service';
 
@@ -16,7 +17,9 @@ export class SongContextMenuComponent implements OnInit, OnDestroy {
 
   constructor(
     private readonly authService: AuthenticationService,
-    private readonly dialog: SCNGXDialogService
+    private readonly playlistService: SCDKPlaylistService,
+    private readonly dialog: SCNGXDialogService,
+    private readonly snackbar: MatSnackBar
   ) { }
 
   private readonly _destroy: Subject<void> = new Subject();
@@ -30,9 +33,43 @@ export class SongContextMenuComponent implements OnInit, OnDestroy {
 
   public openChoosePlaylistDialog() {
     this.dialog.open<any, any, Playlist>(AppPlaylistChooseDialog).$afterClosed.subscribe((playlist) => {
-      const song = this.song;
+      if(typeof playlist === "undefined" || playlist == null || typeof this.song === "undefined" || this.song == null) return;
+      this.addSong(playlist.id, false);
+    })
+  }
 
-      console.log("add song ", song, "to playlist", playlist);
+  public openForceAddSongDialog(playlistId: string) {
+    this.dialog.confirm("Der Song befindet sich bereits in der Playlist. Möchtest du ihn dennoch hinzufügen?", "Bereits hinzugefügt").$afterClosed.subscribe((confirmed) => {
+      if(!confirmed) return;
+      this.addSong(playlistId, true);
+    })
+  }
+
+  private addSong(playlistId: string, force: boolean = false) {
+    const song = this.song;
+
+    this.playlistService.addSongToPlaylist(playlistId, {
+      targetSongId: song.id,
+      force
+    }).subscribe((response) => {
+      if(response.error || (response.payload?.failed && response.payload?.failReason == PlaylistAddSongFailReason.ERROR)) {
+        this.snackbar.open(`Song konnte nicht zur Playlist hinzugefügt werden.`, null, { duration: 5000 });
+        console.error(response.error);
+        return;
+      }
+
+      const result = response.payload;
+      if(result.failed) {
+        if(result.failReason == PlaylistAddSongFailReason.NOT_FOUND) {
+          this.snackbar.open(`Dieser Song existiert nicht.`, null, { duration: 5000 });
+        }
+        if(result.failReason == PlaylistAddSongFailReason.DUPLICATE && !force) {
+          this.openForceAddSongDialog(playlistId);
+        }
+        return;
+      }
+
+      this.snackbar.open(`Song wurde zur Playlist hinzugefügt.`, null, { duration: 5000 });
     })
   }
 

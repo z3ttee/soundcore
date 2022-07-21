@@ -4,6 +4,7 @@ import { SongContextMenuComponent } from './song-context-menu.component';
 import { SCCDKContextMenuModule } from 'soundcore-cdk';
 import { HeroIconModule, viewGridAdd, collection } from 'ng-heroicon';
 import { AppPlaylistChooseDialogModule } from 'src/app/dialogs/playlist-choose-dialog/playlist-choose-dialog.module';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 @NgModule({
   declarations: [
@@ -14,7 +15,8 @@ import { AppPlaylistChooseDialogModule } from 'src/app/dialogs/playlist-choose-d
     HeroIconModule.withIcons({ viewGridAdd, collection }),
     SCCDKContextMenuModule,
 
-    AppPlaylistChooseDialogModule
+    AppPlaylistChooseDialogModule,
+    MatSnackBarModule
   ],
   exports: [
     SongContextMenuComponent,

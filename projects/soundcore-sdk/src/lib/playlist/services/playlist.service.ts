@@ -8,7 +8,9 @@ import { Page } from '../../utils/page/page';
 import { Pageable } from '../../utils/page/pageable';
 import { ApiResponse } from '../../utils/responses/api-response';
 import { apiResponse } from '../../utils/rxjs/operators/api-response';
+import { AddSongDTO } from '../dtos/add-song.dto';
 import { CreatePlaylistDTO } from '../dtos/create-playlist.dto';
+import { PlaylistItemAddResult } from '../entities/playlist-item-added.entity';
 import { Playlist } from '../entities/playlist.entity';
 
 @Injectable({
@@ -48,6 +50,22 @@ export class SCDKPlaylistService {
     return this.httpClient.post<Playlist>(`${this.options.api_base_uri}/v1/playlists`, createPlaylistDto).pipe(
       apiResponse(),
       tap((response) => this.addToLocalLibrary(response.payload))
+    );
+  }
+
+  /**
+   * Add a song to a playlist
+   * @param playlistId Playlist's id
+   * @param addSongDto Body data
+   * @returns PlaylistItemAddResult
+   */
+  public addSongToPlaylist(playlistId: string, addSongDto: AddSongDTO): Observable<ApiResponse<PlaylistItemAddResult>> {
+    return this.httpClient.put<PlaylistItemAddResult>(`${this.options.api_base_uri}/v1/playlists/${playlistId}/addSong`, addSongDto).pipe(
+      apiResponse(),
+      tap((response) => {
+        if(response.error) return;
+        // TODO: Create observable on which a notification will be pushed that the song has been added.
+      })
     );
   }
 

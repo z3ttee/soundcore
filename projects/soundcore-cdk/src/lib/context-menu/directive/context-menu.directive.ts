@@ -10,6 +10,7 @@ export class SCCDKContextMenuDirective implements OnInit, OnDestroy {
     private embeddedView: EmbeddedViewRef<any>;
 
     @Input() public sccdkContext: TemplateRef<any>;
+    @Input() public sccdkContextData: any;
 
     constructor(
         private readonly contextMenuService: SCCDKContextService,
@@ -37,7 +38,7 @@ export class SCCDKContextMenuDirective implements OnInit, OnDestroy {
 
     @HostListener("contextmenu", ['$event'])
     public onContext(event: PointerEvent) {
-        this.contextMenuService.open(event, this.sccdkContext, this.viewContainerRef);
+        this.contextMenuService.open(event, this.sccdkContext, this.viewContainerRef, this.sccdkContextData);
     }
 
 }
