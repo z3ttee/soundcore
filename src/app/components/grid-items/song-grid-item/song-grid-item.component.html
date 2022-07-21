@@ -1,4 +1,4 @@
-<scngx-resource-grid-item [sccdkContext]="contextMenu">
+<scngx-resource-grid-item>
     <scngx-artwork class="w-full aspect-square rounded overflow-hidden" [artwork]="item?.artwork" scngx-artwork></scngx-artwork>
 
     <p class="font-bold line-clamp-2 break-words">{{ item?.name || "Unbekannter Titel" }}</p>
@@ -11,7 +11,3 @@
         </ul>
     </div>
 </scngx-resource-grid-item>
-
-<ng-template #contextMenu>
-    <app-song-context-menu [song]="item"></app-song-context-menu>
-</ng-template>
