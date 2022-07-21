@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { SongContextMenuComponent } from './song-context-menu.component';
 import { SCCDKContextMenuModule } from 'soundcore-cdk';
 import { HeroIconModule, viewGridAdd, collection } from 'ng-heroicon';
-import { AppPlaylistChooseDialogModule } from 'src/app/dialogs/playlist-choose-dialog/playlist-create-dialog.module';
+import { AppPlaylistChooseDialogModule } from 'src/app/dialogs/playlist-choose-dialog/playlist-choose-dialog.module';
 
 @NgModule({
   declarations: [

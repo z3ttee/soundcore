@@ -3,7 +3,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Subject, Subscription, takeUntil } from 'rxjs';
 import { SCNGXSongColConfig, SCNGXPlayableList, PlayableListBuilder } from 'soundcore-ngx';
-import { Playlist, SCDKPlaylistService } from 'soundcore-sdk';
+import { Playlist } from 'soundcore-sdk';
 import { environment } from 'src/environments/environment';
 
 @Component({
@@ -36,7 +36,6 @@ export class PlaylistInfoComponent implements OnInit, OnDestroy {
   constructor(
     private readonly httpClient: HttpClient,
     private readonly activatedRoute: ActivatedRoute,
-    private readonly playlistService: SCDKPlaylistService
   ) {
     for(let i = 0; i < 100000; i++) {
       this.items.push(i);
@@ -60,7 +59,7 @@ export class PlaylistInfoComponent implements OnInit, OnDestroy {
       this.release();
 
       // Trigger http request.
-      this._playlistSub = this.playlistService.findById(paramMap.get("playlistId")).subscribe((response) => {
+      /*this._playlistSub = this.playlistService.findById(paramMap.get("playlistId")).subscribe((response) => {
         // Update state
         this.playlist = response.payload;
 
@@ -72,7 +71,7 @@ export class PlaylistInfoComponent implements OnInit, OnDestroy {
 
         this.showError404 = !response.payload;
         this.isLoadingPlaylist = false;
-      })
+      })*/
     })
 
     // Cancel ongoing http request.

@@ -3,7 +3,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { BehaviorSubject, Observable, Subject, takeUntil } from 'rxjs';
 import { PlayableListBuilder, SCNGXPlayableList, SCNGXSongColConfig } from 'soundcore-ngx';
-import { Album, Artist, Pageable, Playlist, SCDKAlbumService, SCDKArtistService, SCDKPlaylistService } from 'soundcore-sdk';
+import { Album, Artist, Pageable, Playlist, SCDKAlbumService, SCDKArtistService } from 'soundcore-sdk';
 import { environment } from 'src/environments/environment';
 
 @Component({
@@ -16,7 +16,6 @@ export class ArtistProfileComponent implements OnInit, OnDestroy {
   constructor(
     private readonly artistService: SCDKArtistService,
     private readonly albumService: SCDKAlbumService,
-    private readonly playlistService: SCDKPlaylistService,
     private readonly activatedRoute: ActivatedRoute,
     private readonly httpClient: HttpClient
   ) { }
@@ -66,9 +65,9 @@ export class ArtistProfileComponent implements OnInit, OnDestroy {
           this._albumSubject.next(response.payload?.elements || []);
         });
 
-        this.playlistService.findByArtist(artistId, new Pageable(0, 12)).pipe(takeUntil(this._destroy)).subscribe((page) => {
+        /*this.playlistService.findByArtist(artistId, new Pageable(0, 12)).pipe(takeUntil(this._destroy)).subscribe((page) => {
           this._featPlaylistSubject.next(page?.elements || []);
-        });
+        });*/
 
         this.albumService.findFeaturedByArtist(artistId, new Pageable(0, 12)).pipe(takeUntil(this._destroy)).subscribe((response) => {
           this._featAlbumsSubject.next(response.payload?.elements || []);

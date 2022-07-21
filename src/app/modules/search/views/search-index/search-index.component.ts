@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 import { BehaviorSubject, debounceTime, Observable, Subject, takeUntil } from 'rxjs';
 import { SCCDKScreenService } from 'soundcore-cdk';
 import { InfiniteDataSource } from 'soundcore-ngx';
-import { SCDKGenreService, MeiliAlbum, MeiliArtist, SCDKSearchService, ComplexSearchResult, SCDKResource, SCDKPlaylistService, ApiSearchResponse, MeiliPlaylist, Pageable, MeiliUser, SCDKUserService, SCDKArtistService, SCDKAlbumService, Genre, MeiliSong, SCDKSongService } from 'soundcore-sdk';
+import { SCDKGenreService, MeiliAlbum, MeiliArtist, SCDKSearchService, ComplexSearchResult, SCDKResource, ApiSearchResponse, MeiliPlaylist, Pageable, MeiliUser, SCDKUserService, SCDKArtistService, SCDKAlbumService, Genre, MeiliSong, SCDKSongService } from 'soundcore-sdk';
 
 @Component({
   selector: 'app-search-index',
@@ -19,7 +19,6 @@ export class SearchIndexComponent implements OnInit, OnDestroy {
     private readonly router: Router,
     private readonly searchService: SCDKSearchService,
 
-    private readonly playlistService: SCDKPlaylistService,
     private readonly userService: SCDKUserService,
     private readonly artistService: SCDKArtistService,
     private readonly albumService: SCDKAlbumService,
@@ -77,9 +76,9 @@ export class SearchIndexComponent implements OnInit, OnDestroy {
       })
 
       // Search playlists
-      this.playlistService.searchPlaylist(query, new Pageable(0, 10)).pipe(takeUntil(this._cancelQuery)).subscribe((response) => {
+      /*this.playlistService.searchPlaylist(query, new Pageable(0, 10)).pipe(takeUntil(this._cancelQuery)).subscribe((response) => {
         this.$playlists.next(response.payload);
-      })
+      })*/
 
       // Search users
       this.userService.searchUser(query, new Pageable(0, 10)).pipe(takeUntil(this._cancelQuery)).subscribe((response) => {

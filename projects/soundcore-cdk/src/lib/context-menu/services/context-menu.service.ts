@@ -3,7 +3,7 @@ import { TemplatePortal } from "@angular/cdk/portal";
 import { Injectable, TemplateRef, ViewContainerRef } from "@angular/core";
 import { MatBottomSheet, MatBottomSheetRef } from "@angular/material/bottom-sheet";
 import { combineLatest, filter, fromEvent, map, take } from "rxjs";
-import { SCCDKScreenService } from "../../screen copy/screen.service";
+import { SCCDKScreenService } from "../../screen/screen.service";
 
 @Injectable({
     providedIn: "root"

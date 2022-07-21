@@ -2,7 +2,7 @@ import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { Observable, Subject, takeUntil } from 'rxjs';
 import { SCNGXDialogService } from 'soundcore-ngx';
 import { MeiliSong, Playlist, Song } from 'soundcore-sdk';
-import { AppPlaylistChooseDialog } from 'src/app/dialogs/playlist-choose-dialog/playlist-create-dialog.component';
+import { AppPlaylistChooseDialog } from 'src/app/dialogs/playlist-choose-dialog/playlist-choose-dialog.component';
 import { AuthenticationService } from 'src/sso/services/authentication.service';
 
 @Component({

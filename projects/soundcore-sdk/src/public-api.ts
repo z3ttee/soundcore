@@ -41,15 +41,12 @@ export * from "./lib/file/entities/file.entity";
 export * from "./lib/file/services/file.service";
 
 // Playlist Module
-export * from "./lib/playlist/playlist.module";
-export * from "./lib/playlist/services/playlist.service";
+
 export * from "./lib/playlist/entities/playlist.entity";
 export * from "./lib/playlist/entities/playlist-item.entity";
 export * from "./lib/playlist/dtos/create-playlist.dto";
 export * from "./lib/playlist/dtos/update-playlist.dto";
 export * from "./lib/playlist/enums/playlist-privacy.enum";
-//export * from "./lib/playlist/events/playlist.event";
-//export * from "./lib/playlist/events/songs.event";
 
 // User Module
 export * from "./lib/user/user.module";
