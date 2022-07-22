@@ -4,7 +4,10 @@
             <p class="text-font">{{ errorMessage }}</p>
         </div>
 
-        <scngx-btn-outlined class="w-full" [fullWidth]="true">Playlist erstellen</scngx-btn-outlined>
+        <scngx-btn-outlined (click)="openCreatePlaylistDialog()" class="w-full" size="md" [fullWidth]="true">
+            <hero-icon name="plus" [class]="'h-5 w-5'"></hero-icon>
+            <span>Playlist erstellen</span>
+        </scngx-btn-outlined>
 
         <!-- Playlist list -->
         <app-generic-resource-list-item 

@@ -1,7 +1,8 @@
 import { ChangeDetectionStrategy, Component, OnDestroy } from "@angular/core";
 import { Subject, takeUntil } from "rxjs";
-import { DialogRef } from "soundcore-ngx";
+import { DialogRef, SCNGXDialogService } from "soundcore-ngx";
 import { Playlist, SCDKPlaylistService } from "soundcore-sdk";
+import { AppPlaylistCreateDialog } from "../playlist-create-dialog/playlist-create-dialog.component";
 
 @Component({
     templateUrl: "./playlist-choose-dialog.component.html",
@@ -16,6 +17,7 @@ export class AppPlaylistChooseDialog implements OnDestroy {
 
     constructor(
         public readonly dialogRef: DialogRef<any, Playlist>,
+        private readonly dialog: SCNGXDialogService,
         private readonly playlistService: SCDKPlaylistService
     ) {}
 
@@ -28,6 +30,14 @@ export class AppPlaylistChooseDialog implements OnDestroy {
 
     public choosePlaylist(playlist: Playlist) {
         this.dialogRef.close(playlist);
+    }
+
+    public openCreatePlaylistDialog() {
+        this.dialog.open<any, any, Playlist>(AppPlaylistCreateDialog).$afterClosed.pipe(takeUntil(this._destroy)).subscribe((playlist) => {
+            if(typeof playlist === "undefined" || playlist == null) return;
+
+            this.dialogRef.close(playlist);
+        })
     }
 
 }
