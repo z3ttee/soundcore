@@ -3,7 +3,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Subject, Subscription, takeUntil } from 'rxjs';
 import { SCNGXSongColConfig, SCNGXPlayableList, PlayableListBuilder } from 'soundcore-ngx';
-import { Playlist } from 'soundcore-sdk';
+import { Playlist, SCDKPlaylistService } from 'soundcore-sdk';
 import { environment } from 'src/environments/environment';
 
 @Component({
@@ -34,6 +34,7 @@ export class PlaylistInfoComponent implements OnInit, OnDestroy {
   }
 
   constructor(
+    private readonly playlistService: SCDKPlaylistService,
     private readonly httpClient: HttpClient,
     private readonly activatedRoute: ActivatedRoute,
   ) {
@@ -59,19 +60,20 @@ export class PlaylistInfoComponent implements OnInit, OnDestroy {
       this.release();
 
       // Trigger http request.
-      /*this._playlistSub = this.playlistService.findById(paramMap.get("playlistId")).subscribe((response) => {
+      this._playlistSub = this.playlistService.findById(paramMap.get("playlistId")).subscribe((response) => {
         // Update state
         this.playlist = response.payload;
 
         // Init playable list datasource
         this.list = PlayableListBuilder
           .withClient(this.httpClient)
-          .metaUrl(`${environment.api_base_uri}/v1/songs/byPlaylist/${this.playlist.id}`)
+          .listUrl(`${environment.api_base_uri}/v1/tracklist/playlist/${this.playlist.id}`)
+          .metaUrl(`${environment.api_base_uri}/v1/tracklist/playlist/${this.playlist.id}/meta`)
           .build();
 
         this.showError404 = !response.payload;
         this.isLoadingPlaylist = false;
-      })*/
+      })
     })
 
     // Cancel ongoing http request.

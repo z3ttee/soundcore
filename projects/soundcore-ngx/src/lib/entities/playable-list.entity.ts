@@ -1,27 +1,8 @@
 import { HttpClient, HttpErrorResponse } from "@angular/common/http";
 import { BehaviorSubject, firstValueFrom, Observable, takeUntil } from "rxjs";
-import { Album, Artist, Page, Playlist, Song } from "soundcore-sdk";
+import { Album, Artist, Page, Playlist, Song, SCDKTracklist } from "soundcore-sdk";
 import { SCNGXTrackListDataSourceV2 } from "../utils/datasource/datasourcev2";
 import { SCNGXPlayableSource, SCNGXTrackID } from "./playable-source.entity";
-
-export interface SCNGXPlayableListUrls {
-
-    /**
-     * URL that points to the endpoint which
-     * should return all ids of tracks included
-     * in a playable list.
-     */
-    listUrl: string;
-
-    /**
-     * URL that points to the endpoint which
-     * should return all the detailed data of tracks
-     * included in a playable list. The data contains
-     * information about title, artists, duration etc.
-     */
-    metaUrl: string;
-
-}
 
 export class SCNGXPlayableList extends SCNGXPlayableSource {
 
@@ -60,7 +41,7 @@ export class SCNGXPlayableList extends SCNGXPlayableSource {
 
     constructor(
         private readonly httpClient: HttpClient,
-        private readonly urls: SCNGXPlayableListUrls
+        private readonly url: string
     ) {
         super();
         this.init();
@@ -92,17 +73,19 @@ export class SCNGXPlayableList extends SCNGXPlayableSource {
      * to the tracksUrl endpoint.
      */
     private init() {
-        firstValueFrom(this.httpClient.get<Page<SCNGXTrackID>>(`${this.urls.listUrl}`).pipe(takeUntil(this._destroySubject))).then((page) => {
-            this.logger.log(`Successfully fetched track list from ${this.urls.listUrl}. Setting up dataSource for ui...`)
+        firstValueFrom(this.httpClient.get<SCDKTracklist>(`${this.url}`).pipe(takeUntil(this._destroySubject))).then((tracklist) => {
+            this.logger.log(`Successfully fetched track list from ${this.url}. Setting up dataSource for ui...`)
+
+            console.log(tracklist)
             
-            this.tracks = page.elements;
-            this.addAll(page.elements);
+            this.tracks = tracklist.items;
+            this.addAll(tracklist.items);
 
             const dataSource = new SCNGXTrackListDataSourceV2(
                 this.httpClient, 
                 {
-                    url: this.urls.metaUrl,
-                    totalElements: page.totalElements
+                    url: tracklist.metadataLocation,
+                    totalElements: tracklist.size
                 },
                 this.tracks
             );

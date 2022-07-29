@@ -60,10 +60,7 @@ export class PlayableListBuilder {
         // Create new list
         const list = new SCNGXPlayableList(
             this.httpClient,
-            {
-                listUrl: this._listUrl,
-                metaUrl: this._metaUrl
-            }
+            this._listUrl
         );
 
         // Subscribe to onRelease observable.

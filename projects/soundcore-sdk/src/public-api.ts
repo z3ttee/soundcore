@@ -3,6 +3,9 @@
  */
 export * from "./lib/scdk.module";
 
+// Tracklist
+export * from "./lib/song/entities/tracklist.entity";
+
 // Utils
 export * from "./lib/utils/responses/api-response";
 export * from "./lib/utils/error/api-error";

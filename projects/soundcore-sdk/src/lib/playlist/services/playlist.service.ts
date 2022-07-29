@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, tap } from 'rxjs';
+import { BehaviorSubject, Observable, of, tap } from 'rxjs';
 import { MeiliPlaylist } from '../../meilisearch/entities/meili-playlist.entity';
 import { ApiSearchResponse } from '../../meilisearch/entities/search-response.entity';
 import { SCDKOptions, SCDK_OPTIONS } from '../../scdk.module';
@@ -26,6 +26,16 @@ export class SCDKPlaylistService {
     @Inject(SCDK_OPTIONS) private readonly options: SCDKOptions
   ) {
     this.fetchPlaylistLibrary();
+  }
+
+  /**
+   * Find a playlist by its id.
+   * @param playlistId Playlist's id
+   * @returns Playlist
+   */
+  public findById(playlistId: string): Observable<ApiResponse<Playlist>> {
+    if(!playlistId) return of(ApiResponse.withPayload(null));
+    return this.httpClient.get<Playlist>(`${this.options.api_base_uri}/v1/playlists/${playlistId}`).pipe(apiResponse());
   }
 
   /**
