@@ -2,7 +2,9 @@ import {  Component, ElementRef, Input, OnChanges, OnDestroy, OnInit, SimpleChan
 import { BehaviorSubject, Observable, of, Subject } from 'rxjs';
 import { SCNGXSongColConfig } from '../song-list-item/song-list-item.component';
 import { IPageInfo } from '@tsalliance/ngx-virtual-scroller';
-import { SCNGXTrackListDataSourceV2, SCNGX_DATASOURCE_PAGE_SIZE, TrackDataSourceItem } from '../../../utils/datasource/datasourcev2';
+import { SCNGXTracklistDatasource } from '../../../utils/datasource/tracklist-datasource';
+import { DatasourceItem, SCNGX_DATASOURCE_PAGE_SIZE } from '../../../utils/datasource/datasource';
+import { Song } from 'soundcore-sdk';
 
 @Component({
   selector: 'scngx-virtual-song-list',
@@ -21,7 +23,7 @@ export class SCNGXVirtualSongListComponent implements OnInit, OnDestroy, OnChang
   /**
    * Datasource to be used
    */
-  @Input() public dataSource: SCNGXTrackListDataSourceV2;
+  @Input() public dataSource: SCNGXTracklistDatasource;
   @Input() public usePadding: boolean = true;
 
   /**
@@ -58,14 +60,14 @@ export class SCNGXVirtualSongListComponent implements OnInit, OnDestroy, OnChang
   
   public skeletonItems: any[] = new Array(this.skeletons || 0);
   private readonly _onMoreSubject: Subject<IPageInfo> = new Subject();
-  private readonly _streamSubject: BehaviorSubject<Observable<TrackDataSourceItem[]>> = new BehaviorSubject(of([]));
+  private readonly _streamSubject: BehaviorSubject<Observable<DatasourceItem<Song>[]>> = new BehaviorSubject(of([]));
   private readonly _heightSubject: BehaviorSubject<number> = new BehaviorSubject(0);
 
   /**
    * Stream observable that emits the current dataStream
    * (Yes its messy I know, will be subject to change)
    */
-  public readonly $streamObs: Observable<Observable<TrackDataSourceItem[]>> = this._streamSubject.asObservable();
+  public readonly $streamObs: Observable<Observable<DatasourceItem<Song>[]>> = this._streamSubject.asObservable();
 
   /**
    * Observable that emits the maximum possible height of the list.
@@ -82,8 +84,8 @@ export class SCNGXVirtualSongListComponent implements OnInit, OnDestroy, OnChang
   public ngOnInit(): void {}
 
   public ngOnChanges(changes: SimpleChanges): void {
-      const prev = changes["dataSource"]?.previousValue as SCNGXTrackListDataSourceV2;
-      const current = changes["dataSource"]?.currentValue as SCNGXTrackListDataSourceV2;
+      const prev = changes["dataSource"]?.previousValue as SCNGXTracklistDatasource;
+      const current = changes["dataSource"]?.currentValue as SCNGXTracklistDatasource;
 
       // Set skeleton items
       if(this.showSkeleton) {
@@ -119,7 +121,7 @@ export class SCNGXVirtualSongListComponent implements OnInit, OnDestroy, OnChang
     this._onMoreSubject.next(event);
   }
 
-  public entryTrackBy(index: number, complexItem: TrackDataSourceItem) {
+  public entryTrackBy(index: number, complexItem: DatasourceItem<Song>) {
     return complexItem?.data?.id || index;
   }
 

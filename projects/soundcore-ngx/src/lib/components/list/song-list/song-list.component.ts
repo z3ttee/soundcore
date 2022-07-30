@@ -1,8 +1,9 @@
 import { Component, Input, OnInit, SimpleChanges } from '@angular/core';
 import { IPageInfo } from '@tsalliance/ngx-virtual-scroller';
-import { Observable, of, Subject } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import { Song } from 'soundcore-sdk';
-import { SCNGXTrackListDataSourceV2, TrackDataSourceItem } from '../../../utils/datasource/datasourcev2';
+import { DatasourceItem } from '../../../utils/datasource/datasource';
+import { SCNGXTracklistDatasource } from '../../../utils/datasource/tracklist-datasource';
 import { SCNGXSongColConfig } from '../song-list-item/song-list-item.component';
 
 @Component({
@@ -12,11 +13,11 @@ import { SCNGXSongColConfig } from '../song-list-item/song-list-item.component';
 })
 export class SCNGXSongListComponent implements OnInit {
 
-  @Input() public dataSource: SCNGXTrackListDataSourceV2;
+  @Input() public dataSource: SCNGXTracklistDatasource;
   @Input() public usePadding: boolean = true;
   @Input() public columns: SCNGXSongColConfig = new SCNGXSongColConfig();
   
-  public $stream: Observable<TrackDataSourceItem[]>;
+  public $stream: Observable<DatasourceItem<Song>[]>;
   private _onMoreSubject: Subject<IPageInfo> = new Subject();
 
   constructor() { }
@@ -25,8 +26,8 @@ export class SCNGXSongListComponent implements OnInit {
   }
 
   public ngOnChanges(changes: SimpleChanges): void {
-    const prev = changes["dataSource"].previousValue as SCNGXTrackListDataSourceV2;
-    const current = changes["dataSource"].currentValue as SCNGXTrackListDataSourceV2;
+    const prev = changes["dataSource"].previousValue as SCNGXTracklistDatasource;
+    const current = changes["dataSource"].currentValue as SCNGXTracklistDatasource;
 
     if(!!prev) {
       prev.disconnect();
@@ -42,7 +43,7 @@ public ngOnDestroy(): void {
   this.dataSource.disconnect();
 }
 
-public entryTrackBy(index: number, complexItem: TrackDataSourceItem) {
+public entryTrackBy(index: number, complexItem: DatasourceItem<Song>) {
   return complexItem?.data?.id || index;
 }
 

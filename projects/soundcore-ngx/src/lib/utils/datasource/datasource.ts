@@ -1,55 +1,72 @@
 import { HttpClient } from "@angular/common/http";
-import { BehaviorSubject, firstValueFrom, Observable, Subject, Subscription, takeUntil } from "rxjs";
-import { Page, Pageable } from "soundcore-sdk";
+import { BehaviorSubject, Observable, of, Subject, Subscription, switchMap, takeUntil } from "rxjs";
+import { ApiResponse, Page, Pageable } from "soundcore-sdk";
 import { IPageInfo } from '@tsalliance/ngx-virtual-scroller';
 import { v4 as uuidv4 } from "uuid";
+import { apiResponse } from "soundcore-sdk";
 
-export interface InfiniteDataSourceOptions {
-    pageSize: number;
+export const SCNGX_DATASOURCE_PAGE_SIZE = 50;
+export interface DatasourceOptions {
+    /**
+     * URL that points to the detailed tracks endpoint.
+     * Endpoint should be the one which actually returns the
+     * metadata of tracks.
+     */
     url: string;
+
+    /**
+     * Maximum amount of retrievable elements.
+     * Used for pagination.
+     */
+    size: number;
+
+    /**
+     * Page size
+     */
+    pageSize?: number;
 }
 
-/**
- * Datasource class to handle
- * infinite scroll fetching more
- * easily
- */
-export class InfiniteDataSource<T> {
+export interface DatasourceItem<T> {
+    index: number;
+    data: T;
+}
 
+export abstract class BaseDatasource<T> {
     public readonly id: string = uuidv4();
-    private _destroy: Subject<void> = new Subject();
+    protected readonly _destroy: Subject<void> = new Subject();
 
-    private _cachedData = Array.from<T>([]);
-    private _fetchedPages = new Set<number>();
-    private _pageFetchStatus: boolean[] = [];
+    protected readonly _cachedData = Array.from<DatasourceItem<T>>([]);
+    protected readonly _fetchedPages = new Set<number>();
+    protected readonly _pageFetchStatus: boolean[] = [];
 
-    private readonly _dataStream = new BehaviorSubject<T[]>(this._cachedData);
+    protected readonly _dataStream = new BehaviorSubject<DatasourceItem<T>[]>(this._cachedData);
     private readonly _subscription = new Subscription();
     private _isConnected: boolean = false;
     private _totalElements: number = 0;
 
-    public $stream: Observable<T[]> = this._dataStream.asObservable().pipe(takeUntil(this._destroy));
+    public readonly $stream: Observable<DatasourceItem<T>[]> = this._dataStream.asObservable().pipe(takeUntil(this._destroy));
 
     constructor(
-        private readonly httpClient: HttpClient,
-        private readonly options: InfiniteDataSourceOptions
+        protected readonly httpClient: HttpClient,
+        protected readonly options: DatasourceOptions
     ) {}
 
-    public connect($onMore: Observable<IPageInfo>): Observable<T[]> {
+    public connect($onMore: Observable<IPageInfo>): Observable<DatasourceItem<T>[]> {
         if(this._isConnected) return this._dataStream;
 
         this._subscription.add(
             $onMore.subscribe(page => {
-                const startPage = this._getPageForIndex(page.startIndex);
-                const endPage = this._getPageForIndex(page.endIndex);
+                const startPage = this.getPageForIndex(page.startIndex);
+                const endPage = this.getPageForIndex(page.endIndex);
     
                 for (let i = startPage; i <= endPage; i++) {
-                    this._fetchPage(i);
+                    this.fetchPage(i).subscribe();
                 }
             }),
         );
 
-        this._fetchPage(0);
+        // Fetch initial page
+        this.fetchPage(0).subscribe();
   
         this._isConnected = true;
         return this._dataStream;
@@ -73,8 +90,13 @@ export class InfiniteDataSource<T> {
      * @returns Index the element got in the dataStream
      */
     public append(element: T): number {
+        const newElement: DatasourceItem<T> = {
+            data: element,
+            index: this._cachedData.length - 1
+        }
+
         // Add to stream
-        this._cachedData.push(element);
+        this._cachedData.push(newElement);
         const index = this._cachedData.length - 1;
 
         // Increment totalElements by 1
@@ -90,32 +112,70 @@ export class InfiniteDataSource<T> {
      * Fetch a page of content based on the requested page.
      * @param pageNr Page to fetch
      */
-    private _fetchPage(pageNr: number) {
-        const pageable: Pageable = new Pageable(pageNr, this.options.pageSize);
-        if(this._totalElements > 0 && this._totalElements <= this._dataStream.getValue().length) return;
+    protected fetchPage(pageNr: number): Observable<DatasourceItem<T>[]> {
+        const pageable: Pageable = new Pageable(pageNr, (this.options.pageSize || SCNGX_DATASOURCE_PAGE_SIZE));
+        if(this._totalElements > 0 && this._totalElements <= this._dataStream.getValue().length) return of([]);
 
         // Check if page was already fetched or has invalid page settings.
-        if (pageNr < 0 || this.options.pageSize <= 0 || this._fetchedPages.has(pageNr) || this._pageFetchStatus[pageNr]) {
-            return;
+        if (pageNr < 0 || pageable.size <= 0 || this._fetchedPages.has(pageNr) || this._pageFetchStatus[pageNr]) {
+            return of([]);
         }
   
         this._pageFetchStatus[pageNr] = true;
-        firstValueFrom(this.httpClient.get<Page<T>>(`${this.options.url}${pageable.toQuery()}`)).then((page) => {
+
+        return this.httpClient.get<Page<T>>(`${this.options.url}${pageable.toQuery()}`).pipe(
+            apiResponse(),
+            switchMap((response: ApiResponse<Page<T>>): Observable<DatasourceItem<T>[]> => {
+                // Page is not being fetched as the request is over
+                // at this point.
+                this._pageFetchStatus[pageNr] = false;
+
+                if(response.error) {
+                    return of([]);
+                }
+
+                const page = response.payload;
+                // Add page to the fetchedPages list.
+                // Only on success, because if it fails it can be refetched next time.
+                this._fetchedPages.add(pageNr);
+                this._totalElements = page.totalElements;
+    
+                // Take in the cachedData array (contains all the previously fetched items) and add the newly fetched items to it.
+                this._cachedData.splice(pageNr * pageable.size, pageable.size, ...Array.from({ length: page.elements.length }).map<DatasourceItem<T>>((_, i) => {
+                    if(!page.elements[i]) return null;
+                    const element = Object.assign({}, page.elements[i]);
+                    return {
+                        data: element,
+                        index: this.getIndexForPageAndItemIndex(pageNr, i)
+                    };
+                }));
+    
+                // Push updated data array
+                this._dataStream.next(this._cachedData);
+
+                return of(this._cachedData);
+            })
+        );
+
+        /*return firstValueFrom(this.httpClient.get<Page<T>>(`${this.options.url}${pageable.toQuery()}`)).then((page) => {
             // Add page to the fetchedPages list.
             // Only on success, because if it fails it can be refetched next time.
             this._fetchedPages.add(pageNr);
             this._totalElements = page.totalElements;
   
             // Take in the cachedData array (contains all the previously fetched items) and add the newly fetched items to it.
-            this._cachedData.splice(pageNr * this.options.pageSize, this.options.pageSize, ...Array.from({ length: page.elements.length }).map<T>((_, i) => {
+            this._cachedData.splice(pageNr * pageable.size, pageable.size, ...Array.from({ length: page.elements.length }).map<DatasourceItem<T>>((_, i) => {
                 if(!page.elements[i]) return null;
                 const element = Object.assign({}, page.elements[i]);
-                return element;
+                return {
+                    data: element,
+                    index: this.getIndexForPageAndItemIndex(pageNr, i)
+                };
             }));
   
             // Push updated data array
             this._dataStream.next(this._cachedData);
-        }).finally(() => this._pageFetchStatus[pageNr] = false);
+        }).finally(() => this._pageFetchStatus[pageNr] = false);*/
     }
 
     /**
@@ -123,18 +183,13 @@ export class InfiniteDataSource<T> {
      * @param index Index in the list to calculate its page
      * @returns Page number
      */
-    private _getPageForIndex(index: number): number {
-        return Math.floor(index / this.options.pageSize);
+    protected getPageForIndex(index: number): number {
+        return Math.floor(index / (this.options.pageSize || SCNGX_DATASOURCE_PAGE_SIZE));
     }
 
-    /**
-     * Make a request to fetch the complete list of track ids for
-     * a playable list. Additionally this will deliver the maximum
-     * size of items as side effect which is used to virtualize the list.
-     * @returns Page<PlaylistItem>
-     */
-    private fetchInitialPage(): Observable<Page<T>> {
-        return this.httpClient.get<Page<T>>(`${this.options.url}${Pageable.queryOf(0, this.options.pageSize)}`);
+    protected getIndexForPageAndItemIndex(pageNr: number, index: number): number {
+        const amount = pageNr * SCNGX_DATASOURCE_PAGE_SIZE;
+        return amount + index;
     }
-
 }
+

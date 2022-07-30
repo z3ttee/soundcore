@@ -10,6 +10,7 @@ export * from "./lib/song/entities/tracklist.entity";
 export * from "./lib/utils/responses/api-response";
 export * from "./lib/utils/error/api-error";
 export * from "./lib/utils/results/creation.result";
+export * from "./lib/utils/rxjs/operators/api-response";
 
 // Meilisearch
 export * from "./lib/meilisearch/entities/meili-user.entity";

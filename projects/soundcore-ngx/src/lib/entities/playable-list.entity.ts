@@ -1,7 +1,8 @@
 import { HttpClient, HttpErrorResponse } from "@angular/common/http";
 import { BehaviorSubject, firstValueFrom, Observable, takeUntil } from "rxjs";
-import { Album, Artist, Page, Playlist, Song, SCDKTracklist } from "soundcore-sdk";
-import { SCNGXTrackListDataSourceV2 } from "../utils/datasource/datasourcev2";
+import { Album, Artist, Playlist, Song, SCDKTracklist } from "soundcore-sdk";
+import { SCNGX_DATASOURCE_PAGE_SIZE } from "../utils/datasource/datasource";
+import { SCNGXTracklistDatasource } from "../utils/datasource/tracklist-datasource";
 import { SCNGXPlayableSource, SCNGXTrackID } from "./playable-source.entity";
 
 export class SCNGXPlayableList extends SCNGXPlayableSource {
@@ -25,14 +26,14 @@ export class SCNGXPlayableList extends SCNGXPlayableSource {
     /**
      * Subject used to emit new values to $dataSource observable
      */
-    private readonly _dataSourceSubject: BehaviorSubject<SCNGXTrackListDataSourceV2> = new BehaviorSubject(null);
+    private readonly _dataSourceSubject: BehaviorSubject<SCNGXTracklistDatasource> = new BehaviorSubject(null);
 
     /**
      * Observable that emits current dataSource object. The only reason to use an observable here is
      * because of the playable list design. On initialization, the list makes a request to the tracksUrl endpoint.
      * Only after this was performed, the dataSource becomes available.
      */
-    public readonly $dataSource: Observable<SCNGXTrackListDataSourceV2> = this._dataSourceSubject.asObservable().pipe(takeUntil(this._destroySubject));
+    public readonly $dataSource: Observable<SCNGXTracklistDatasource> = this._dataSourceSubject.asObservable().pipe(takeUntil(this._destroySubject));
     public readonly $onReleased: Observable<void> = this._destroySubject.asObservable();
 
     public readonly context: Playlist | Album | Artist;
@@ -41,14 +42,15 @@ export class SCNGXPlayableList extends SCNGXPlayableSource {
 
     constructor(
         private readonly httpClient: HttpClient,
-        private readonly url: string
+        private readonly url: string,
+        private readonly pageSize: number = SCNGX_DATASOURCE_PAGE_SIZE
     ) {
         super();
         this.init();
     }
 
     protected findByTrack(track: SCNGXTrackID): Observable<Song> {
-        return this._dataSourceSubject.getValue().findByTrack(track);
+        return this._dataSourceSubject.getValue().findSongById(track.id);
     }
 
     /**
@@ -81,11 +83,14 @@ export class SCNGXPlayableList extends SCNGXPlayableSource {
             this.tracks = tracklist.items;
             this.addAll(tracklist.items);
 
-            const dataSource = new SCNGXTrackListDataSourceV2(
+
+
+            const dataSource = new SCNGXTracklistDatasource(
                 this.httpClient, 
                 {
                     url: tracklist.metadataLocation,
-                    totalElements: tracklist.size
+                    size: tracklist.size,
+                    pageSize: this.pageSize
                 },
                 this.tracks
             );

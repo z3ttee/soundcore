@@ -1,7 +1,7 @@
 import { Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
 import { IPageInfo } from '@tsalliance/ngx-virtual-scroller';
 import { Subject } from 'rxjs';
-import { InfiniteDataSource } from '../../../utils/datasource/datasource';
+import { SCNGXInfiniteDataSource } from '../../../utils/datasource/infinite-datasource';
 
 @Component({
   selector: 'scngx-infinite-list',
@@ -12,7 +12,7 @@ export class SCNGXInfiniteListComponent implements OnInit, OnDestroy, OnChanges 
   private readonly _more: Subject<IPageInfo> = new Subject();
 
   @Input() public parentScroll: HTMLElement;
-  @Input() public dataSource: InfiniteDataSource<any>;
+  @Input() public dataSource: SCNGXInfiniteDataSource<any>;
   @Input() public enableUnequalChildrenSizes: boolean;
 
   public viewPortItems: any[] = [];
@@ -24,8 +24,8 @@ export class SCNGXInfiniteListComponent implements OnInit, OnDestroy, OnChanges 
   }
 
   public ngOnChanges(changes: SimpleChanges): void {
-      const previous = changes["dataSource"].previousValue as InfiniteDataSource<any>;
-      const current = changes["dataSource"].currentValue as InfiniteDataSource<any>;
+      const previous = changes["dataSource"].previousValue as SCNGXInfiniteDataSource<any>;
+      const current = changes["dataSource"].currentValue as SCNGXInfiniteDataSource<any>;
 
       console.log(previous, current)
       console.log(previous?.id != current?.id);

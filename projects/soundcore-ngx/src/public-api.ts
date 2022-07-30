@@ -144,8 +144,9 @@ export * from "./lib/pipes/resource-type-pipe/resource-type-pipe.pipe";
 // Datasource
 export * from "./lib/entities/playable-list.entity";
 export * from "./lib/utils/builder/playable-list.builder";
-export * from "./lib/utils/datasource/datasourcev2";
 export * from "./lib/utils/datasource/datasource";
+export * from "./lib/utils/datasource/infinite-datasource";
+export * from "./lib/utils/datasource/tracklist-datasource";
 
 // Notifications
 export * from "./lib/components/notification/notification-list-item/notification-list-item.module";
