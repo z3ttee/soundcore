@@ -18,8 +18,6 @@ export class SCNGXTracklistDatasource extends BaseDatasource<Song> {
 
     private _isLocked: boolean = false;
 
-    public readonly totalElements = this.options.size;
-
     /**
      * Find song metadata by track value.
      * @param track 

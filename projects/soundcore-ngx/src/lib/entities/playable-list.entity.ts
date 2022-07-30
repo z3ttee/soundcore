@@ -89,7 +89,6 @@ export class SCNGXPlayableList extends SCNGXPlayableSource {
                 this.httpClient, 
                 {
                     url: tracklist.metadataLocation,
-                    size: tracklist.size,
                     pageSize: this.pageSize
                 },
                 this.tracks

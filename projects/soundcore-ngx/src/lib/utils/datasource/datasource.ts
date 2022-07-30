@@ -15,12 +15,6 @@ export interface DatasourceOptions {
     url: string;
 
     /**
-     * Maximum amount of retrievable elements.
-     * Used for pagination.
-     */
-    size: number;
-
-    /**
      * Page size
      */
     pageSize?: number;
@@ -45,6 +39,10 @@ export abstract class BaseDatasource<T> {
     private _totalElements: number = 0;
 
     public readonly $stream: Observable<DatasourceItem<T>[]> = this._dataStream.asObservable().pipe(takeUntil(this._destroy));
+
+    public get size(): number {
+        return this._totalElements;
+    }
 
     constructor(
         protected readonly httpClient: HttpClient,
