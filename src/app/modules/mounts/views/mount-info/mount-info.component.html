@@ -52,7 +52,7 @@
 
             <div class="w-full px-window pb-window" *ngIf="list.viewPortItems.length > 0">
                 <div class="w-full my-2" *ngFor="let file of list.viewPortItems">
-                    <app-file-list-item  [file]="file" [routerLink]="[file.slug || file.id]"></app-file-list-item>
+                    <app-file-list-item  [file]="file.data" [routerLink]="[file.data.slug || file.data.id]"></app-file-list-item>
                 </div>
             </div>
         </ng-container>

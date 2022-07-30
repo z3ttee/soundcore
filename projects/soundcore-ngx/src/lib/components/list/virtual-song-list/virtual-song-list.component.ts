@@ -96,7 +96,7 @@ export class SCNGXVirtualSongListComponent implements OnInit, OnDestroy, OnChang
       // Update container height
       if(this.useMaxHeight) {
         const container = this.elementRef.nativeElement.children[0];
-        const height = (this.itemHeight || 56) * (this.dataSource?.totalElements || this.skeletons)
+        const height = (this.itemHeight || 56) * (this.dataSource?.size || this.skeletons)
         container["style"]["height"] = `${height}px`;
       }
 

@@ -1,10 +1,9 @@
 import { HttpClient } from '@angular/common/http';
-import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
-import { IPageInfo } from '@tsalliance/ngx-virtual-scroller';
 import { BehaviorSubject, Observable, Subject, takeUntil } from 'rxjs';
-import { InfiniteDataSource, SCNGXDialogService } from 'soundcore-ngx';
+import { SCNGXDialogService, SCNGXInfiniteDataSource } from 'soundcore-ngx';
 import { File, Mount, SCDKFileService, SCDKMountService } from 'soundcore-sdk';
 import { AppMountCreateDialog, MountCreateDialogOptions } from 'src/app/dialogs/mount-create-dialog/mount-create-dialog.component';
 
@@ -34,7 +33,7 @@ export class MountInfoComponent implements OnInit, OnDestroy {
   public readonly $deleting: BehaviorSubject<boolean> = new BehaviorSubject(false);
   public readonly $mount: Observable<Mount> = this._mountSubject.asObservable();
 
-  public dataSource: InfiniteDataSource<File>;
+  public dataSource: SCNGXInfiniteDataSource<File>;
 
   public ngOnInit(): void {
     this.activatedRoute.paramMap.pipe(takeUntil(this._destroy)).subscribe((params) => {
@@ -45,8 +44,7 @@ export class MountInfoComponent implements OnInit, OnDestroy {
       this._mountSubject.next(null);
       this.$loading.next(true);
 
-      this.dataSource = new InfiniteDataSource(this.httpClient, {
-        pageSize: 30,
+      this.dataSource = new SCNGXInfiniteDataSource(this.httpClient, {
         url: this.fileService.findByMountIdBaseURL(mountId)
       });
 

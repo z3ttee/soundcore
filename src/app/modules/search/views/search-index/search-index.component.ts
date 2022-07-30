@@ -4,7 +4,7 @@ import { UntypedFormControl } from '@angular/forms';
 import { Router } from '@angular/router';
 import { BehaviorSubject, debounceTime, Observable, Subject, takeUntil } from 'rxjs';
 import { SCCDKScreenService } from 'soundcore-cdk';
-import { InfiniteDataSource } from 'soundcore-ngx';
+import { SCNGXInfiniteDataSource } from 'soundcore-ngx';
 import { SCDKGenreService, MeiliAlbum, MeiliArtist, SCDKSearchService, ComplexSearchResult, SCDKResource, ApiSearchResponse, MeiliPlaylist, Pageable, MeiliUser, SCDKUserService, SCDKArtistService, SCDKAlbumService, Genre, MeiliSong, SCDKSongService, SCDKPlaylistService } from 'soundcore-sdk';
 
 @Component({
@@ -45,8 +45,7 @@ export class SearchIndexComponent implements OnInit, OnDestroy {
   public $albums: BehaviorSubject<ApiSearchResponse<MeiliAlbum>> = new BehaviorSubject(null);
   public $songs: BehaviorSubject<ApiSearchResponse<MeiliSong>> = new BehaviorSubject(null);
 
-  public dataSource: InfiniteDataSource<Genre> = new InfiniteDataSource(this.httpClient, {
-    pageSize: 30,
+  public dataSource: SCNGXInfiniteDataSource<Genre> = new SCNGXInfiniteDataSource(this.httpClient, {
     url: this.genreService.buildFindAllUrl()
   });
 

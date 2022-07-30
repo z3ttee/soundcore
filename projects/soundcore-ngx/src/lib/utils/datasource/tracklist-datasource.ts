@@ -44,6 +44,7 @@ export class SCNGXTracklistDatasource extends BaseDatasource<Song> {
     public override disconnect(): void {
         if(this._isLocked) {
             this.logger.warn("Disconnecting a datasource that was marked as locked is not recommended. A locked datasource means, the source is still in use elsewhere. Because its disconencted now, the source might not be available anymore.")
+            return;
         }
 
         super.disconnect();

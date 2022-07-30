@@ -10,7 +10,7 @@
         <ng-container scngx-list>
             <h6 class="mt-row mb-2">Speicherzonen</h6>
             <div class="flex flex-col gap-2 w-full" *ngIf="list.viewPortItems.length > 0">
-                <app-bucket-list-item *ngFor="let bucket of list.viewPortItems" [routerLink]="[bucket.slug || bucket.id]" [bucket]="bucket"></app-bucket-list-item>
+                <app-bucket-list-item *ngFor="let bucket of list.viewPortItems" [routerLink]="[bucket.data.slug || bucket.data.id]" [bucket]="bucket.data"></app-bucket-list-item>
             </div>
         </ng-container>
     </scngx-infinite-list>
