@@ -49,9 +49,11 @@
                             <scngx-horizontal-grid>
                                 <ng-container *ngFor="let item of songs.hits">
                                     <song-grid-item 
-                                        [item]="item"
-                                        [sccdkContext]="songContextMenu"
-                                        (click)="routeToResult(['/song', item.slug || item.id], item)">
+                                        [item]="$any(item)"
+                                        [sccdkContext]="songContextMenu" 
+                                        [sccdkContextData]="item" 
+                                        (click)="routeToResult(['/song', item.slug || item.id], item)"
+                                        *ngIf="item.resourceType == 'song'">
                                     </song-grid-item>
                                 </ng-container>
                             </scngx-horizontal-grid>

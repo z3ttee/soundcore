@@ -66,9 +66,8 @@ export class PlaylistInfoComponent implements OnInit, OnDestroy {
 
         // Init playable list datasource
         this.list = PlayableListBuilder
-          .withClient(this.httpClient)
-          .listUrl(`${environment.api_base_uri}/v1/tracklist/playlist/${this.playlist.id}`)
-          .metaUrl(`${environment.api_base_uri}/v1/tracklist/playlist/${this.playlist.id}/meta`)
+          .forPlaylist(this.httpClient)
+          .useUrl(`${environment.api_base_uri}/v1/tracklist/playlist/${this.playlist.id}`)
           .build();
 
         this.showError404 = !response.payload;

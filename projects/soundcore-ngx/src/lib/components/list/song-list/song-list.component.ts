@@ -1,9 +1,9 @@
 import { Component, Input, OnInit, SimpleChanges } from '@angular/core';
 import { IPageInfo } from '@tsalliance/ngx-virtual-scroller';
 import { Observable, Subject } from 'rxjs';
-import { Song } from 'soundcore-sdk';
+import { PlaylistItem, Song } from 'soundcore-sdk';
 import { DatasourceItem } from '../../../utils/datasource/datasource';
-import { SCNGXTracklistDatasource } from '../../../utils/datasource/tracklist-datasource';
+import { BaseTracklistDatasource, SCNGXTracklistDatasource } from '../../../utils/datasource/tracklist-datasource';
 import { SCNGXSongColConfig } from '../song-list-item/song-list-item.component';
 
 @Component({
@@ -13,11 +13,11 @@ import { SCNGXSongColConfig } from '../song-list-item/song-list-item.component';
 })
 export class SCNGXSongListComponent implements OnInit {
 
-  @Input() public dataSource: SCNGXTracklistDatasource;
+  @Input() public dataSource: BaseTracklistDatasource<any>;
   @Input() public usePadding: boolean = true;
   @Input() public columns: SCNGXSongColConfig = new SCNGXSongColConfig();
   
-  public $stream: Observable<DatasourceItem<Song>[]>;
+  public $stream: Observable<DatasourceItem<PlaylistItem | Song>[]>;
   private _onMoreSubject: Subject<IPageInfo> = new Subject();
 
   constructor() { }

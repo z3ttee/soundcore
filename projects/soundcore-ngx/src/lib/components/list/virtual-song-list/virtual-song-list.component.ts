@@ -2,9 +2,9 @@ import {  Component, ElementRef, Input, OnChanges, OnDestroy, OnInit, SimpleChan
 import { BehaviorSubject, Observable, of, Subject } from 'rxjs';
 import { SCNGXSongColConfig } from '../song-list-item/song-list-item.component';
 import { IPageInfo } from '@tsalliance/ngx-virtual-scroller';
-import { SCNGXTracklistDatasource } from '../../../utils/datasource/tracklist-datasource';
+import { BaseTracklistDatasource, SCNGXTracklistDatasource } from '../../../utils/datasource/tracklist-datasource';
 import { DatasourceItem, SCNGX_DATASOURCE_PAGE_SIZE } from '../../../utils/datasource/datasource';
-import { Song } from 'soundcore-sdk';
+import { PlaylistItem, Song } from 'soundcore-sdk';
 
 @Component({
   selector: 'scngx-virtual-song-list',
@@ -23,7 +23,7 @@ export class SCNGXVirtualSongListComponent implements OnInit, OnDestroy, OnChang
   /**
    * Datasource to be used
    */
-  @Input() public dataSource: SCNGXTracklistDatasource;
+  @Input() public dataSource: BaseTracklistDatasource<any>;
   @Input() public usePadding: boolean = true;
 
   /**
@@ -60,14 +60,14 @@ export class SCNGXVirtualSongListComponent implements OnInit, OnDestroy, OnChang
   
   public skeletonItems: any[] = new Array(this.skeletons || 0);
   private readonly _onMoreSubject: Subject<IPageInfo> = new Subject();
-  private readonly _streamSubject: BehaviorSubject<Observable<DatasourceItem<Song>[]>> = new BehaviorSubject(of([]));
+  private readonly _streamSubject: BehaviorSubject<Observable<DatasourceItem<PlaylistItem | Song>[]>> = new BehaviorSubject(of([]));
   private readonly _heightSubject: BehaviorSubject<number> = new BehaviorSubject(0);
 
   /**
    * Stream observable that emits the current dataStream
    * (Yes its messy I know, will be subject to change)
    */
-  public readonly $streamObs: Observable<Observable<DatasourceItem<Song>[]>> = this._streamSubject.asObservable();
+  public readonly $streamObs: Observable<Observable<DatasourceItem<PlaylistItem | Song>[]>> = this._streamSubject.asObservable();
 
   /**
    * Observable that emits the maximum possible height of the list.

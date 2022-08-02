@@ -1,40 +1,20 @@
 import { HttpClient } from "@angular/common/http";
 import { map, Observable, takeUntil } from "rxjs";
-import { Song } from "soundcore-sdk";
-import { SCNGXTrackID } from "../../entities/playable-source.entity";
+import { Song, } from "soundcore-sdk";
 import { SCNGXLogger } from "../logger/logger";
 import { BaseDatasource, DatasourceOptions } from "./datasource";
 
-export class SCNGXTracklistDatasource extends BaseDatasource<Song> {
+export abstract class BaseTracklistDatasource<T> extends BaseDatasource<T> {
     private readonly logger: SCNGXLogger = new SCNGXLogger("DATASOURCE");
 
     constructor(
         httpClient: HttpClient,
         options: DatasourceOptions,
-        private readonly tracks: SCNGXTrackID[]
     ) {
         super(httpClient, options);
     }
 
     private _isLocked: boolean = false;
-
-    /**
-     * Find song metadata by track value.
-     * @param track 
-     * @returns 
-     */
-    public findSongById(trackId: string): Observable<Song> {
-        // TODO: Known issue: If the page is already in process of fetching, null will be returned (see _fetchPage()).
-        /*const item = this._cachedMap.get(trackId);
-        if(item) return of(item.data);*/
-
-        const pageNr = this.getPageForTrack(trackId);
-
-        return this.fetchPage(pageNr).pipe(
-            map((items) => items.find((item) => item.data.id == trackId)?.data),
-            takeUntil(this._destroy)
-        );
-    }
 
     /**
      * Disconnect the datasource.
@@ -80,12 +60,61 @@ export class SCNGXTracklistDatasource extends BaseDatasource<Song> {
      * Get the calculated page number of a track value.
      * This is usefull if the page containing a specific track
      * is needed, but has not been fetched yet.
+     * @param itemId Track data
+     * @returns Page number
+     */
+    protected abstract getPageForItem(itemId: string | number): number;
+
+    /**
+     * Find song metadata by track value.
+     * @param itemId 
+     * @returns 
+     */
+    public abstract findItemById(itemId: string | number): Observable<T>;
+}
+
+/**
+ * Class used for tracklists as seen on artist, 
+ * album and collection page
+ */
+export class SCNGXTracklistDatasource extends BaseTracklistDatasource<Song> {
+    
+    constructor(
+        httpClient: HttpClient,
+        options: DatasourceOptions,
+        private readonly tracklistItems: Song[]
+    ) {
+        super(httpClient, options);
+    }
+
+
+    /**
+     * Find song metadata by track value.
+     * @param track 
+     * @returns 
+     */
+    public findItemById(itemId: string): Observable<Song> {
+        // TODO: Known issue: If the page is already in process of fetching, null will be returned (see _fetchPage()).
+        /*const item = this._cachedMap.get(trackId);
+        if(item) return of(item.data);*/
+
+        const pageNr = this.getPageForItem(itemId);
+
+        return this.fetchPage(pageNr).pipe(
+            map((items) => items.find((item) => item.data.id == itemId)?.data),
+            takeUntil(this._destroy)
+        );   
+    }
+
+    /**
+     * Get the calculated page number of a track value.
+     * This is usefull if the page containing a specific track
+     * is needed, but has not been fetched yet.
      * @param trackId Track data
      * @returns Page number
      */
-    private getPageForTrack(trackId: string): number {
-        const index = this.tracks.findIndex((t) => t.id == trackId);
+    protected getPageForItem(trackId: string): number {
+        const index = this.tracklistItems.findIndex((t) => t.id == trackId);
         return this.getPageForIndex(index);
     }
-
 }

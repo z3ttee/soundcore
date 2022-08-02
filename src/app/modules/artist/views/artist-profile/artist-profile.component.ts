@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { BehaviorSubject, Observable, Subject, takeUntil } from 'rxjs';
-import { PlayableListBuilder, SCNGXPlayableList, SCNGXSongColConfig } from 'soundcore-ngx';
+import { PlayableListBuilder, SCNGXSongColConfig, SCNGXPlayableTracklist } from 'soundcore-ngx';
 import { Album, Artist, Pageable, Playlist, SCDKAlbumService, SCDKArtistService } from 'soundcore-sdk';
 import { environment } from 'src/environments/environment';
 
@@ -26,7 +26,7 @@ export class ArtistProfileComponent implements OnInit, OnDestroy {
   private readonly _albumSubject: BehaviorSubject<Album[]> = new BehaviorSubject([]);
   private readonly _featAlbumsSubject: BehaviorSubject<Album[]> = new BehaviorSubject([]);
   private readonly _featPlaylistSubject: BehaviorSubject<Playlist[]> = new BehaviorSubject([]);
-  private readonly _listSubject: BehaviorSubject<SCNGXPlayableList> = new BehaviorSubject(null);
+  private readonly _listSubject: BehaviorSubject<SCNGXPlayableTracklist> = new BehaviorSubject(null);
 
   public readonly $loading: Observable<boolean> = this._loadingSubject.asObservable();
   public readonly $artist: Observable<Artist> = this._artistSubject.asObservable();
@@ -34,7 +34,7 @@ export class ArtistProfileComponent implements OnInit, OnDestroy {
   public readonly $featAlbums: Observable<Album[]> = this._featAlbumsSubject.asObservable();
   public readonly $featPlaylists: Observable<Playlist[]> = this._featPlaylistSubject.asObservable();
 
-  public readonly $list: Observable<SCNGXPlayableList> = this._listSubject.asObservable();
+  public readonly $list: Observable<SCNGXPlayableTracklist> = this._listSubject.asObservable();
 
   public readonly songListCols: SCNGXSongColConfig = {
     id: { enabled: true, collapseAt: 420 },
@@ -74,8 +74,8 @@ export class ArtistProfileComponent implements OnInit, OnDestroy {
         })
 
         this._listSubject.next(PlayableListBuilder
-          .withClient(this.httpClient)
-          .metaUrl(`${environment.api_base_uri}/v1/songs/byArtist/${artist.id}/top`)
+          .forTracklist(this.httpClient)
+          .useUrl(`${environment.api_base_uri}/v1/songs/byArtist/${artist.id}`)
           .build());
       })
     })

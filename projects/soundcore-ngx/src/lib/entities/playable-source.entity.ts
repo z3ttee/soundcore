@@ -4,16 +4,12 @@ import { v4 as uuidv4 } from "uuid";
 import { SCNGXLogger } from "../utils/logger/logger";
 import { Queue } from "../utils/queue/queue.util";
 
-export class SCNGXTrackID {
-    public id: string;
-}
-
 export class SCNGXTrack {
-    public id: string;
+    public id: string | number;
     public $data: Observable<Song>;
 }
 
-export abstract class SCNGXPlayableSource {
+export abstract class SCNGXPlayableSource<T> {
     protected readonly logger: SCNGXLogger = new SCNGXLogger("PlaylistService");
 
     /**
@@ -29,14 +25,14 @@ export abstract class SCNGXPlayableSource {
     /**
      * Internal queue.
      */
-    private readonly queue: Queue<SCNGXTrackID> = new Queue();
+    protected readonly queue: Queue<T> = new Queue();
 
     /**
      * Function to return the song that the source should play.
      * If the source is not dequeued, this function will be called again once
      * the queue asks the source for a new song.
      */
-    public next(): SCNGXTrack {
+    /*public next(): SCNGXTrack {
         const trackId = this.queue.dequeue();
         
         const track = new SCNGXTrack();
@@ -44,38 +40,31 @@ export abstract class SCNGXPlayableSource {
         track.$data = this.findByTrack(trackId)
         
         return track;
-    }
+    }*/
+    public abstract next(): SCNGXTrack;
 
     /**
      * Find metadata for a track. Should be returned as observable to allow async fetch operations.
      * @param track Track ID
      */
-    protected abstract findByTrack(track: SCNGXTrackID): Observable<Song>;
+    protected abstract findByItemId(itemId: string | number): Observable<Song>;
 
     /**
      * Add a track to the internal queue.
      * @param track Track to add.
      */
-    protected add(track: SCNGXTrackID): number {
-        return this.queue.enqueue(track);
-    }
-
-     /**
-     * Add a track to the internal queue.
-     * @param track Track to add.
-     */
-    protected addAll(tracks: SCNGXTrackID[]) {
-        return this.queue.enqueueAll(tracks);
+    protected add(itemId: string | number, item: T): number {
+        return this.queue.enqueue(itemId, item);
     }
 
     /**
      * Remove a track from the internal queue.
      * @param track Track to remove.
      */
-    protected remove(track: SCNGXTrackID): SCNGXTrackID {
+    protected remove(track: string | number): T {
         const index = this.queue.findPosition(track);
         if(index == -1) return null;
-        return this.queue.dequeueAt(index);
+        return this.queue.dequeueAt(index)?.data;
     }
 
     /**
