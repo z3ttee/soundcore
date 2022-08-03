@@ -99,6 +99,9 @@ export * from "./lib/components/list/song-list/song-list.component";
 export * from "./lib/components/list/virtual-song-list/virtual-song-list.module";
 export * from "./lib/components/list/virtual-song-list/virtual-song-list.component";
 
+export * from "./lib/components/list/virtual-playlist/virtual-playlist.module";
+export * from "./lib/components/list/virtual-playlist/virtual-playlist.component";
+
 // Rows
 export * from "./lib/components/ui-row/ui-row.module";
 export * from "./lib/components/ui-row/ui-row.component";
@@ -144,6 +147,7 @@ export * from "./lib/pipes/resource-type-pipe/resource-type-pipe.pipe";
 // Datasource
 export * from "./lib/utils/datasource/datasource";
 export * from "./lib/utils/datasource/infinite-datasource";
+export * from "./lib/utils/datasource/playlist-datasource";
 export * from "./lib/utils/datasource/tracklist-datasource";
 
 // Playable lists

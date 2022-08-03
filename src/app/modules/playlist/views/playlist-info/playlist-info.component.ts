@@ -70,6 +70,10 @@ export class PlaylistInfoComponent implements OnInit, OnDestroy {
           .useUrl(`${environment.api_base_uri}/v1/tracklist/playlist/${this.playlist.id}`)
           .build();
 
+          this.list.$dataSource.subscribe((datasource) => {
+            console.log(datasource)
+          })
+
         this.showError404 = !response.payload;
         this.isLoadingPlaylist = false;
       })

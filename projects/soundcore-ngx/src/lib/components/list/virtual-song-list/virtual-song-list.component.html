@@ -1,15 +1,15 @@
 <div class="w-full max-h-full">
     <virtual-scroller class="w-full h-full" #scroll [bufferAmount]="3" [items]="($streamObs | async) | async" [parentScroll]="parentScroll" (vsEnd)="fetchMore($event)">
         
-        <div *ngFor="let item of scroll.viewPortItems; trackBy: entryTrackBy">
+        <!--<div *ngFor="let item of scroll.viewPortItems; trackBy: entryTrackBy">
             {{ item | json }}
-        </div>
-        <!--<scngx-song-list-item 
+        </div>-->
+        <scngx-song-list-item 
             *ngFor="let item of scroll.viewPortItems; trackBy: entryTrackBy"
             [columns]="columns"
             [song]="item?.data.song" 
             [index]="item?.index"
             (onContext)="emitOnContext()">
-        </scngx-song-list-item>-->
+        </scngx-song-list-item>
     </virtual-scroller>
 </div>

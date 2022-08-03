@@ -1,5 +1,5 @@
 import { HttpClient, HttpErrorResponse } from "@angular/common/http";
-import { BehaviorSubject, firstValueFrom, Observable, takeUntil } from "rxjs";
+import { BehaviorSubject, firstValueFrom, map, Observable, takeUntil } from "rxjs";
 import { Album, Artist, Playlist, Song, SCDKTracklist, PlaylistItem } from "soundcore-sdk";
 import { SCNGX_DATASOURCE_PAGE_SIZE } from "../utils/datasource/datasource";
 import { SCNGXPlaylistDatasource } from "../utils/datasource/playlist-datasource";
@@ -26,14 +26,14 @@ export abstract class BasePlayableList<T> extends SCNGXPlayableSource<T> {
     /**
      * Subject used to emit new values to $dataSource observable
      */
-    protected readonly _dataSourceSubject: BehaviorSubject<BaseTracklistDatasource<any>> = new BehaviorSubject(null);
+    protected readonly _dataSourceSubject: BehaviorSubject<BaseTracklistDatasource<T>> = new BehaviorSubject(null);
 
     /**
      * Observable that emits current dataSource object. The only reason to use an observable here is
      * because of the playable list design. On initialization, the list makes a request to the tracksUrl endpoint.
      * Only after this was performed, the dataSource becomes available.
      */
-    public readonly $dataSource: Observable<BaseTracklistDatasource<any>> = this._dataSourceSubject.asObservable().pipe(takeUntil(this._destroySubject));
+    public readonly $dataSource: Observable<BaseTracklistDatasource<T>> = this._dataSourceSubject.asObservable().pipe(takeUntil(this._destroySubject));
     public readonly $onReleased: Observable<void> = this._destroySubject.asObservable();
 
     public readonly context: Playlist | Album | Artist;
@@ -122,7 +122,7 @@ export class SCNGXPlayableList extends BasePlayableList<PlaylistItem> {
 
     protected findByItemId(itemId: string | number): Observable<Song> {
         // Find the item by looking it up via the connected datasource
-        return this._dataSourceSubject.getValue().findItemById(itemId);
+        return this._dataSourceSubject.getValue().findItemById(itemId).pipe(map((item) => item?.song));
     }
 
     protected initialize() {
