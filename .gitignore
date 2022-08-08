@@ -1,43 +1,38 @@
-# See http://help.github.com/ignore-files/ for more about ignoring files.
-.vscode/
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
-# Compiled output
-/dist
-/tmp
-/out-tsc
-/bazel-out
+# NestJS
+dist/
 
-# Node
-/node_modules
-npm-debug.log
-yarn-error.log
+# Next.js
+.next/
+out/
+build
 
-# IDEs and editors
-.idea/
-.project
-.classpath
-.c9/
-*.launch
-.settings/
-*.sublime-workspace
+# dependencies
+node_modules
+.pnp
+.pnp.js
 
-# Visual Studio Code
-.vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
-.history/*
+# testing
+coverage
 
-# Miscellaneous
-/.angular/cache
-.sass-cache/
-/connect.lock
-/coverage
-/libpeerconnection.log
-testem.log
-/typings
-
-# System files
+# misc
 .DS_Store
-Thumbs.db
+*.pem
+*.tsbuildinfo
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# local env files
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.dev
+
+# turbo
+.turbo

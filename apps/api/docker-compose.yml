@@ -1,0 +1,38 @@
+version: '3.9'
+services:
+  db:
+    image: mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3306:3306"
+
+  phpmyadmin:
+    image: phpmyadmin
+    restart: always
+    depends_on:
+      - db
+    ports:
+      - "8080:80"
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+
+  redis:
+    image: redis
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - "./databases/redis:/data"
+
+  meilisearch:
+    image: getmeili/meilisearch:v0.28
+    restart: always
+    ports:
+      - "7700:7700"
+    environment:
+      - MEILI_MASTER_KEY=super_secret_master_key
+    volumes:
+      - "./databases/meilisearch:/meili_data"
+    entrypoint: ["meilisearch", "--env=development", "--enable-auto-batching", "--debounce-duration-sec=1", "--max-documents-per-batch=30"]
