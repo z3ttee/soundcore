@@ -1,5 +1,6 @@
 import { DynamicModule, Module } from '@nestjs/common';
 import { RedisOptions } from 'ioredis';
+import { SoundcoreRedisService } from './services/redis.service';
 import { createRedisConnection, createRedisConnectionProvider, createRedisOptionsProvider } from './utils';
 
 @Module({})
@@ -14,7 +15,8 @@ export class SoundcoreRedisModule {
       module: SoundcoreRedisModule,
       providers: [
         redisOptionsProvider,
-        redisConnectionProvider
+        redisConnectionProvider,
+        SoundcoreRedisService
       ],
       exports: [
         redisOptionsProvider,
