@@ -1,3 +1,3 @@
-# `tsconfig`
+# Soundcore TSConfig
 
-These are base shared `tsconfig.json`s from which all other `tsconfig.json`'s inherit from.
+This package contains basic `tsconfig` files from which all other `tsconfig.json` files inherit from.
