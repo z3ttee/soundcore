@@ -1,2 +1,2 @@
 
-export const EVENT_HEALTH_UPDATE = "soundcore:health:update";
+export const EVENT_HEALTH_UPDATE = "soundcoreHealthUpdate";

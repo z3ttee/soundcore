@@ -33,6 +33,7 @@ import { AppService } from './app.service';
 import { PipesModule } from '@tsalliance/utilities';
 import { HostnameModule } from './hostname/hostname.module';
 import { CronModule } from './cron/cron.module';
+import { HealthModule } from './health/health.module';
 
 @Module({
   imports: [
@@ -85,6 +86,7 @@ import { CronModule } from './cron/cron.module';
       }
     }),
     EventEmitterModule.forRoot({ global: true, ignoreErrors: true }),
+    HealthModule,
     ArtistModule,
     BucketModule,
     AlbumModule,
