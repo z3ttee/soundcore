@@ -35,7 +35,7 @@ export class SoundcoreRedisService {
                     try {
                         parsedJSON = JSON.parse(payload);
                     } catch (err: any) {
-                        this._logger.error(`Could not parse json from message: ${err.message}`);
+                        this._logger.error(`Could not parse json of message on channel '${channel}': ${err.message}`, payload);
                     }
 
                     subscriber.handler.value(channel, parsedJSON);

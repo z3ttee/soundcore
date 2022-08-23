@@ -38,3 +38,19 @@ export class AppService {
   constructor(private readonly redis: Redis) {}
 }
 ```
+
+## Subscribe
+Redis is known for its ability for Pub/Sub. To make subscribing to messages and channels more comfortable, a new decorator has been introduced: `@RedisSubscribe(channel: string, expectJSON: boolean)`. This is a method decorator and takes in 2 parameters. The first one specifies the channel to which the client should listen. The second parameter defines, wether the client should parse the JSON string to an actual JSON object or not. Please see the following example on how to use the decorator:
+
+```javascript
+import { RedisSubscribe } from "@soundcore/redis";
+
+@RedisSubscribe("test", true)
+public handleSubscribe(channel: string, payload: any) {
+  console.log(channel, payload);
+}
+
+```
+
+The example above would subscribe on the channel called "test" and parse the received messages to an JSON object. Please make sure that on these channels, only json strings
+are sent. Otherwise it would cause parsing errors and the payload object may become a nullish value.
