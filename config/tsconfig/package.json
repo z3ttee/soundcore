@@ -1,10 +1,11 @@
 {
-  "name": "tsconfig",
+  "name": "@soundcore/tsconfig",
   "version": "0.0.0",
   "private": true,
   "main": "index.js",
   "files": [
     "base.json",
-    "nextjs.json"
+    "nextjs.json",
+    "nestjs.json"
   ]
 }

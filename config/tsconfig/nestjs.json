@@ -3,6 +3,7 @@
   "display": "NestJS",
   "extends": "./base.json",
   "compilerOptions": {
+    "outDir": "./dist",
     "target": "ES6",
     "module": "commonjs",
     "declaration": true,
