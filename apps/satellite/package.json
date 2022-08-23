@@ -16,11 +16,12 @@
     "@nestjs/core": "^9.0.0",
     "@nestjs/microservices": "^9.0.8",
     "@nestjs/platform-express": "^9.0.0",
+    "@soundcore/constants": "*",
+    "@soundcore/redis": "*",
     "ioredis": "^5.2.2",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
-    "rxjs": "^7.2.0",
-    "@soundcore/constants": "*"
+    "rxjs": "^7.2.0"
   },
   "devDependencies": {
     "@nestjs/cli": "^9.0.0",
@@ -31,8 +32,8 @@
     "@types/node": "^16.0.0",
     "@types/supertest": "^2.0.11",
     "@types/workerpool": "^6.1.0",
-    "@typescript-eslint/eslint-plugin": "^5.0.0",
-    "@typescript-eslint/parser": "^5.0.0",
+    "@soundcore/tsconfig": "*",
+    "@soundcore/eslint-config-nestjs": "*",
     "eslint": "^8.0.1",
     "source-map-support": "^0.5.20",
     "supertest": "^6.1.3",

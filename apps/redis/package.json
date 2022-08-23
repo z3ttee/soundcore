@@ -1,6 +1,6 @@
 {
   "name": "@soundcore/redis",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "",
   "author": "z3ttee",
   "private": false,
@@ -25,6 +25,7 @@
     "@typescript-eslint/eslint-plugin": "^5.0.0",
     "@typescript-eslint/parser": "^5.0.0",
     "@soundcore/tsconfig": "*",
+    "@soundcore/eslint-config-nestjs": "*",
     "eslint": "^8.0.1",
     "source-map-support": "^0.5.20",
     "ts-loader": "^9.2.3",

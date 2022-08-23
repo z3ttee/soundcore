@@ -24,12 +24,15 @@
     "@nestjs/event-emitter": "^1.3.0",
     "@nestjs/jwt": "^9.0.0",
     "@nestjs/mapped-types": "^1.1.0",
+    "@nestjs/microservices": "^9.0.11",
     "@nestjs/platform-express": "^9.0.8",
     "@nestjs/platform-socket.io": "^9.0.8",
     "@nestjs/schedule": "^2.1.0",
     "@nestjs/typeorm": "^9.0.0",
     "@nestjs/websockets": "^9.0.8",
     "@tsalliance/utilities": "^1.19.0",
+    "@soundcore/constants": "*",
+    "@soundcore/redis": "*",
     "axios": "^0.27.2",
     "bull": "^4.8.5",
     "class-transformer": "^0.5.1",
@@ -69,14 +72,13 @@
     "@types/node": "^18.6.4",
     "@types/sharp": "^0.30.4",
     "@types/sqlstring": "^2.3.0",
-    "@typescript-eslint/eslint-plugin": "^5.32.0",
-    "@typescript-eslint/parser": "^5.32.0",
+    "@soundcore/tsconfig": "*",
+    "@soundcore/eslint-config-nestjs": "*",
     "eslint": "^8.21.0",
     "source-map-support": "^0.5.21",
     "ts-loader": "^9.3.1",
     "ts-node": "^10.9.1",
     "tsconfig-paths": "^4.1.0",
-    "typescript": "^4.7.4",
-    "tsconfig": "*"
+    "typescript": "^4.7.4"
   }
 }
