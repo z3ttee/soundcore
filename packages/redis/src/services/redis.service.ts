@@ -28,6 +28,7 @@ export class SoundcoreRedisService {
             // Subscribe to messages
             this.redis.on("message", (channel, payload) => {
                 const subscriber = subscribers.get(channel);
+                if(typeof subscriber === "undefined" || subscriber == null) return;
 
                 if(subscriber.expectJson) {
                     let parsedJSON = {};

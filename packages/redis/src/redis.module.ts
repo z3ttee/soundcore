@@ -13,6 +13,7 @@ export class SoundcoreRedisModule {
 
     return {
       module: SoundcoreRedisModule,
+      global: true,
       providers: [
         redisOptionsProvider,
         redisConnectionProvider,
