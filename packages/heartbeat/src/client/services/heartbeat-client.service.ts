@@ -18,9 +18,7 @@ export class HeartbeatClientService {
 
     private initialize() {
         this._interval = setInterval(() => {
-            console.log("sending heartbeat");
-
-            const heartbeat = new Heartbeat("defsoft");
+            const heartbeat = new Heartbeat("defsoft", this.options.staticPayload || undefined);
             this.redisPub.publish(HEARTBEAT_MESSAGE_CHANNEL, JSON.stringify(heartbeat));
         }, this.options.interval || HEARTBEAT_INTERVAL);
     }

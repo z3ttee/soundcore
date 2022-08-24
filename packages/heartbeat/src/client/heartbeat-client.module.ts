@@ -21,6 +21,16 @@ export interface HeartbeatClientOptions {
      * @default 10000
      */
     interval?: number
+
+    /**
+     * Define static data that should
+     * be send as additional payload with the
+     * heartbeat packet. On the server side, you can then
+     * handle the heartbeat packet's additional payload inside
+     * a method decorated with @OnHeartbeat()
+     * @default null
+     */
+    staticPayload?: any;
 }
 
 @Module({})

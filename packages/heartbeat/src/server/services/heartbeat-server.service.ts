@@ -1,7 +1,8 @@
 import { Inject, Injectable, Logger } from "@nestjs/common";
 import { RedisSub } from "@soundcore/redis";
-import { HEARTBEAT_MESSAGE_CHANNEL, HEARTBEAT_OPTIONS, HEARTBEAT_TIMEOUT } from "../../constants";
+import { HEARTBEAT_HANDLERS, HEARTBEAT_MESSAGE_CHANNEL, HEARTBEAT_OPTIONS, HEARTBEAT_TIMEOUT } from "../../constants";
 import { Heartbeat, ServiceStatus } from "../../shared/entities/heartbeat.entity";
+import { HeartbeatHandler, HeartbeatHandlerTarget } from "../decorators/heartbeat.decorator";
 import { HeartbeatOptions } from "../heartbeat-server.module";
 
 @Injectable()
@@ -43,6 +44,19 @@ export class HeartbeatServerService {
         });
     }
 
+    private callAllHeartbeatHandlers(heartbeat: Heartbeat) {
+        // Get metadata and registered subscribers
+        const handlers: HeartbeatHandler[] = Reflect.get(HeartbeatHandlerTarget, HEARTBEAT_HANDLERS) || [];
+
+        for(const handler of handlers) {
+            this.callHeartbeatHandler(handler, heartbeat);
+        }
+    }
+
+    private async callHeartbeatHandler(handler: HeartbeatHandler, heartbeat: Heartbeat) {
+        handler.value(heartbeat)
+    }
+
     private parseHeartbeatPacket(rawPayload: string): Heartbeat {
         try {
             return JSON.parse(rawPayload);
@@ -67,6 +81,9 @@ export class HeartbeatServerService {
 
         // Create latency report
         this.createLatencyStats(heartbeat, latency);
+
+        // Execute registered handlers
+        this.callAllHeartbeatHandlers(heartbeat);
     }
 
     private createHeartbeatTimeout(heartbeat: Heartbeat, latency: number): NodeJS.Timeout {

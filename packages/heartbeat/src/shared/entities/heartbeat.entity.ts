@@ -6,10 +6,11 @@ export enum ServiceStatus {
 
 }
 
-export class Heartbeat {
+export class Heartbeat<T = any> {
 
     constructor(
         public readonly from: string,
+        public readonly staticPayload?: T,
         public readonly sentAt: number = Date.now()
     ) {}
 

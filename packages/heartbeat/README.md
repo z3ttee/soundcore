@@ -39,6 +39,23 @@ export class AppService {
 }
 ```
 
+## Static Payload
+If you want to send some static data via the heartbeat packet, you can do that be defining an object
+on the `staticPayload` property when registering the `HeartbeatClientModule`.
+The data defined there will then be sent at every heartbeat.
+
+On the server side you can catch the heartbeat packet after it was processed by registering a handler
+using the `@OnHeartbeat()` decorator. Please see the following example:
+
+```javascript
+import { Heartbeat, OnHeartbeat } from "@soundcore/heartbeat";
+
+@OnHeartbeat()
+public handleHeartbeat(heartbeat: Heartbeat) {
+  // Handle payload
+}
+```
+
 ## Subscribe
 Redis is known for its ability for Pub/Sub. To make subscribing to messages and channels more comfortable, a new decorator has been introduced: `@RedisSubscribe(channel: string, expectJSON: boolean)`. This is a method decorator and takes in 2 parameters. The first one specifies the channel to which the client should listen. The second parameter defines, wether the client should parse the JSON string to an actual JSON object or not. Please see the following example on how to use the decorator:
 
