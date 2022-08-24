@@ -39,6 +39,35 @@ export class AppService {
 }
 ```
 
+You can choose between 3 redis connections: One that is just for subscribing, publishing and a default one.
+To inject just the connection to subscribe to messages, please do the following:
+
+```
+import { Injectable } from '@nestjs/common';
+import { RedisSub } from "@soundcore/redis";
+
+@Injectable()
+export class AppService {
+  constructor(private readonly redis: RedisSub) {}
+}
+```
+
+And the same thing happens for publishing messages:
+
+```
+import { Injectable } from '@nestjs/common';
+import { RedisPub } from "@soundcore/redis";
+
+@Injectable()
+export class AppService {
+  constructor(private readonly redis: RedisPub) {}
+}
+```
+
+This is done to prevent, that there is only one connection for developers to use. Because of the nature of redis,
+if a connection goes into subscribtion mode, no messages can be published anymore. If you do not care about Pub/Sub,
+then stick to the default `Redis` injection token shown in the first example of this section.
+
 ## Subscribe
 Redis is known for its ability for Pub/Sub. To make subscribing to messages and channels more comfortable, a new decorator has been introduced: `@RedisSubscribe(channel: string, expectJSON: boolean)`. This is a method decorator and takes in 2 parameters. The first one specifies the channel to which the client should listen. The second parameter defines, wether the client should parse the JSON string to an actual JSON object or not. Please see the following example on how to use the decorator:
 

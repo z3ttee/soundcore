@@ -1,14 +1,14 @@
 import { Injectable, Logger } from "@nestjs/common";
-import Redis from "ioredis";
 import { REDIS_SUBSCRIBE_CHANNELS } from "../constants";
 import { Subscriber, RedisTarget } from "../decorators/subscribe.decorator";
+import { RedisSub } from "../entities";
 
 @Injectable()
 export class SoundcoreRedisService {
     private readonly _logger: Logger = new Logger("SoundcoreRedis");
 
     constructor(
-        private readonly redis: Redis,
+        private readonly redisSub: RedisSub,
     ) {
         this.registerSubscribers();
     }
@@ -18,7 +18,7 @@ export class SoundcoreRedisService {
         const subscribers: Map<string, Subscriber> = Reflect.get(RedisTarget, REDIS_SUBSCRIBE_CHANNELS) || new Map();
         const channels = subscribers.keys();
 
-        this.redis.subscribe(...channels, (err, count) => {
+        this.redisSub.subscribe(...channels, (err, count) => {
             // Handle subscribe errors
             if(err) {
                 this._logger.error(`Failed to subscribe to some channels: ${err.message}`, err.stack);
@@ -26,7 +26,7 @@ export class SoundcoreRedisService {
             }
 
             // Subscribe to messages
-            this.redis.on("message", (channel, payload) => {
+            this.redisSub.on("message", (channel, payload) => {
                 const subscriber = subscribers.get(channel);
                 if(typeof subscriber === "undefined" || subscriber == null) return;
 
