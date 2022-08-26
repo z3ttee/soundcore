@@ -13,7 +13,6 @@ import { MountScanProcessDTO } from '../dtos/mount-scan.dto';
 import { Random } from '@tsalliance/utilities';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateResult } from '../../utils/results/creation.result';
-import { RedlockError } from '../../exceptions/redlock.exception';
 import { FileSystemService } from '../../filesystem/services/filesystem.service';
 
 @Injectable()
