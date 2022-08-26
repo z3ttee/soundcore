@@ -16,7 +16,9 @@ export class SoundcoreRedisService {
     private registerSubscribers() {
         // Get metadata and registered subscribers
         const subscribers: Map<string, Subscriber> = Reflect.get(RedisTarget, REDIS_SUBSCRIBE_CHANNELS) || new Map();
-        const channels = subscribers.keys();
+        const channels = Array.from(subscribers.keys());
+
+        if(channels.length <= 0) return;
 
         this.redisSub.subscribe(...channels, (err, count) => {
             // Handle subscribe errors
