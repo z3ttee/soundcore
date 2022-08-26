@@ -34,6 +34,7 @@ import { PipesModule } from '@tsalliance/utilities';
 import { HostnameModule } from './hostname/hostname.module';
 import { CronModule } from './cron/cron.module';
 import { HealthModule } from './health/health.module';
+import { HeartbeatServerModule } from "@soundcore/heartbeat";
 
 @Module({
   imports: [
@@ -114,7 +115,15 @@ import { HealthModule } from './health/health.module';
     MountModule,
     FileModule,
     IndexerModule,
-    HostnameModule
+    HostnameModule,
+    HeartbeatServerModule.forRoot({
+      redis: {
+        host: process.env.REDIS_HOST,
+        port: parseInt(process.env.REDIS_PORT),
+        password: process.env.REDIS_AUTH_PASS,
+        maxRetriesPerRequest: null,
+      }
+    })
   ],
   controllers: [
     AppController

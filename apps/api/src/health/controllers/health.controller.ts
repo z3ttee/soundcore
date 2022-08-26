@@ -1,25 +1,21 @@
-import { Controller, Get } from "@nestjs/common";
-import { Ctx, EventPattern, MessagePattern, Payload, RedisContext } from "@nestjs/microservices";
-import { EVENT_HEALTH_UPDATE } from "@soundcore/constants";
-import { Public } from "../../authentication/decorators/public.decorator";
+import { Controller, Get, Param } from "@nestjs/common";
+import { HealthService } from "../services/health.service";
 
 @Controller("health")
 export class HealthController {
 
-    @Public(true)
+    constructor(
+        private readonly service: HealthService
+    ) {}
+
     @Get()
-    public async getHealth() {
-        return {
-            status: "running"
-        }
+    public async findHealthOverview() {
+        return this.service.findHealthOverview();
     }
 
-    @EventPattern(EVENT_HEALTH_UPDATE)
-    @MessagePattern(EVENT_HEALTH_UPDATE)
-    public handleHealthUpdate(@Payload() payload: any, @Ctx() context: RedisContext) {
-        // console.log(payload, context);
-
-        console.log("received update", payload)
+    @Get(":clientId")
+    public async findHealthByClientId(@Param("clientId") clientId: string) {
+        return this.service.findHealthByClientId(clientId);
     }
     
 }

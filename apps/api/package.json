@@ -33,6 +33,7 @@
     "@tsalliance/utilities": "^1.19.0",
     "@soundcore/constants": "*",
     "@soundcore/redis": "*",
+    "@soundcore/heartbeat": "*",
     "axios": "^0.27.2",
     "bull": "^4.8.5",
     "class-transformer": "^0.5.1",
