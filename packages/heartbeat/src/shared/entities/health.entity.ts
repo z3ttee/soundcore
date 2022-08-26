@@ -7,7 +7,8 @@ export class Health {
         public readonly clientId: string,
         public status: ClientStatus,
         public network: Latency,
-        public heartbeat: HeartbeatReport
+        public heartbeat: HeartbeatReport,
+        public onlineSince?: number
     ) {}
 
 }

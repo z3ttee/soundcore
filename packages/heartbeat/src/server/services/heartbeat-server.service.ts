@@ -137,8 +137,7 @@ export class HeartbeatServerService {
             // Do not update online status, as it is done
             // at the end of this method.
             health.network = new Latency(latency, avgLatency);
-            health.heartbeat = new HeartbeatReport(health.heartbeat.amount + 1);
-            
+            health.heartbeat = new HeartbeatReport((health.heartbeat?.amount || 0) + 1);
         } else {
             // Otherwise create new report
             this._healths.set(clientId, new Health(
@@ -164,6 +163,7 @@ export class HeartbeatServerService {
         if(typeof health === "undefined" || health == null || health.status === status) return;
 
         health.status = status;
+        health.onlineSince = health.onlineSince ? health.onlineSince : Date.now();
         this._logger.log(`Client '${clientId}' switched status to ${status === ClientStatus.ONLINE ? 'ONLINE' : 'OFFLINE'}`);
     }
 
