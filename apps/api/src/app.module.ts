@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { ArtistModule } from './artist/artist.module';
@@ -35,17 +34,12 @@ import { HostnameModule } from './hostname/hostname.module';
 import { CronModule } from './cron/cron.module';
 import { HealthModule } from './health/health.module';
 import { HeartbeatServerModule } from "@soundcore/heartbeat";
+import { ConfigModule } from '@soundcore/config';
 
 @Module({
   imports: [
     EventEmitterModule.forRoot(),
-    ConfigModule.forRoot({
-      isGlobal: true,
-      envFilePath: [
-        ".env.dev",
-        ".env"
-      ]
-    }),
+    ConfigModule,
     FileSystemModule.forRoot(),
     TypeOrmModule.forRoot({
       type: "mysql",

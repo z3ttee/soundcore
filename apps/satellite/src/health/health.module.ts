@@ -1,7 +1,6 @@
 import { Module } from "@nestjs/common";
 import { ClientsModule, Transport } from "@nestjs/microservices";
 import { HEALTH_SERVICE } from "@soundcore/constants";
-import { ZoneModule } from "../zone/zone.module";
 import { HealthService } from "./services/health.service";
 
 @Module({
@@ -9,7 +8,6 @@ import { HealthService } from "./services/health.service";
         HealthService,
     ],
     imports: [
-        ZoneModule,
         ClientsModule.register([
             { name: HEALTH_SERVICE, transport: Transport.REDIS, options: {
                 host: process.env.REDIS_HOST || "localhost",

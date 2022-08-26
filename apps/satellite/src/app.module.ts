@@ -1,17 +1,14 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { HealthModule } from './health/health.module';
 import { WorkerModule } from './worker/worker.module';
-import { ZoneModule } from './zone/zone.module';
 import { redisConnectionOptions } from './main';
 import { HeartbeatClientModule } from "@soundcore/heartbeat";
+import { ConfigModule } from '@soundcore/config';
 
 @Module({
   imports: [
-    HealthModule,
-    ZoneModule,
-    WorkerModule,
+    ConfigModule,
     HeartbeatClientModule.forRootAsync({
       useFactory: () => {
         return {
@@ -24,7 +21,8 @@ import { HeartbeatClientModule } from "@soundcore/heartbeat";
           }
         }
       }
-    })
+    }),
+    WorkerModule,
   ],
   controllers: [
     AppController
