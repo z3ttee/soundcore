@@ -1,7 +1,7 @@
-import { DynamicModule, Module } from "@nestjs/common";
+import { DynamicModule, FactoryProvider, Module, ModuleMetadata } from "@nestjs/common";
 import { SoundcoreRedisModule } from "@soundcore/redis";
 import { RedisOptions } from "ioredis";
-import { createHeartbeatServiceProviders } from "../shared/utils";
+import { createHeartbeatServiceProviders, createHeartbeatServiceProvidersAsync } from "../shared/utils";
 import { HeartbeatClientService } from "./services/heartbeat-client.service";
 
 export interface HeartbeatClientOptions {
@@ -33,21 +33,53 @@ export interface HeartbeatClientOptions {
     staticPayload?: any;
 }
 
+export interface HeartbeatClientAsyncOptions extends Pick<ModuleMetadata, "imports">, Pick<FactoryProvider, "inject"> {
+    useFactory: (...args: any[]) => Promise<HeartbeatClientOptions> | HeartbeatClientOptions;
+}
+
 @Module({})
 export class HeartbeatClientModule {
 
     public static forRoot(options: HeartbeatClientOptions): DynamicModule {
-
-        const heartbeatOptionsProvider = createHeartbeatServiceProviders<HeartbeatClientOptions>(options);
+        const heartbeatOptionsProvider = createHeartbeatServiceProviders(options);
 
         return {
             module: HeartbeatClientModule,
+            global: true,
             imports: [
                 SoundcoreRedisModule.forRoot(options.redis)
             ],
             providers: [
                 HeartbeatClientService,
                 heartbeatOptionsProvider
+            ],
+            exports: [
+                SoundcoreRedisModule,
+                heartbeatOptionsProvider
+            ]
+        }
+    }
+
+    public static async forRootAsync(asyncOptions: HeartbeatClientAsyncOptions): Promise<DynamicModule> {
+        const heartbeatOptionsProvider = createHeartbeatServiceProvidersAsync(asyncOptions);
+
+        return {
+            module: HeartbeatClientModule,
+            global: true,
+            imports: [
+                ...(asyncOptions.imports || []),
+                SoundcoreRedisModule.forRootAsync({
+                    useFactory: async (...args) => {
+                        const options: HeartbeatClientOptions = await asyncOptions.useFactory(args);
+                        return options.redis;
+                    },
+                    imports: asyncOptions.imports,
+                    inject: asyncOptions.inject
+                })
+            ],
+            providers: [
+                heartbeatOptionsProvider,
+                HeartbeatClientService
             ],
             exports: [
                 SoundcoreRedisModule,

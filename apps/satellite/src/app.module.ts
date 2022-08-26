@@ -4,16 +4,26 @@ import { AppService } from './app.service';
 import { HealthModule } from './health/health.module';
 import { WorkerModule } from './worker/worker.module';
 import { ZoneModule } from './zone/zone.module';
-import { SoundcoreRedisModule } from "@soundcore/redis";
 import { redisConnectionOptions } from './main';
+import { HeartbeatClientModule } from "@soundcore/heartbeat";
 
 @Module({
   imports: [
     HealthModule,
     ZoneModule,
     WorkerModule,
-    SoundcoreRedisModule.forRoot({
-      ...redisConnectionOptions
+    HeartbeatClientModule.forRootAsync({
+      useFactory: () => {
+        return {
+          identifier: "defsoft",
+          redis: {
+            ...redisConnectionOptions
+          },
+          staticPayload: {
+            test: true
+          }
+        }
+      }
     })
   ],
   controllers: [

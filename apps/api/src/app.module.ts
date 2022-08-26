@@ -116,12 +116,16 @@ import { HeartbeatServerModule } from "@soundcore/heartbeat";
     FileModule,
     IndexerModule,
     HostnameModule,
-    HeartbeatServerModule.forRoot({
-      redis: {
-        host: process.env.REDIS_HOST,
-        port: parseInt(process.env.REDIS_PORT),
-        password: process.env.REDIS_AUTH_PASS,
-        maxRetriesPerRequest: null,
+    HeartbeatServerModule.forRootAsync({
+      useFactory: () => {
+        return {
+          redis: {
+            host: process.env.REDIS_HOST,
+            port: parseInt(process.env.REDIS_PORT),
+            password: process.env.REDIS_AUTH_PASS,
+            maxRetriesPerRequest: null,
+          }
+        }
       }
     })
   ],
