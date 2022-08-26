@@ -1,5 +1,5 @@
 
-export enum ServiceStatus {
+export enum ClientStatus {
 
     ONLINE = 0,
     OFFLINE = 1
@@ -9,9 +9,18 @@ export enum ServiceStatus {
 export class Heartbeat<T = any> {
 
     constructor(
-        public readonly from: string,
+        public readonly clientId: string,
         public readonly staticPayload?: T,
         public readonly sentAt: number = Date.now()
+    ) {}
+
+}
+
+export class HeartbeatReport {
+
+    constructor(
+        public readonly amount: number,
+        public readonly lastHeartbeatAt: number = Date.now()
     ) {}
 
 }

@@ -26,6 +26,7 @@ export class HeartbeatServerModule {
 
         return {
             module: HeartbeatServerModule,
+            global: true,
             imports: [
                 SoundcoreRedisModule.forRoot(options.redis)
             ],
@@ -35,6 +36,7 @@ export class HeartbeatServerModule {
             ],
             exports: [
                 SoundcoreRedisModule,
+                HeartbeatServerService,
                 heartbeatOptionsProvider
             ]
         }

@@ -1,8 +1,10 @@
 import { Inject, Injectable, Logger } from "@nestjs/common";
 import { RedisSub } from "@soundcore/redis";
 import { HEARTBEAT_HANDLERS, HEARTBEAT_MESSAGE_CHANNEL, HEARTBEAT_OPTIONS, HEARTBEAT_TIMEOUT } from "../../constants";
-import { Heartbeat, ServiceStatus } from "../../shared/entities/heartbeat.entity";
+import { Heartbeat, ClientStatus, HeartbeatReport } from "../../shared/entities/heartbeat.entity";
+import { Latency } from "../../shared/entities/latency.entity";
 import { HeartbeatHandler, HeartbeatHandlerTarget } from "../decorators/heartbeat.decorator";
+import { Health } from "../../shared/entities/health.entity";
 import { HeartbeatOptions } from "../heartbeat-server.module";
 
 @Injectable()
@@ -10,14 +12,41 @@ export class HeartbeatServerService {
     private readonly _logger: Logger = new Logger("Heartbeat");
     private readonly _timeouts: Map<string, NodeJS.Timeout> = new Map();
 
-    private readonly _latencyStats: Map<string, number> = new Map();
-    private readonly _status: Map<string, ServiceStatus> = new Map();
+    private readonly _healths: Map<string, Health> = new Map();
     
     constructor(
         private readonly redisSub: RedisSub,
         @Inject(HEARTBEAT_OPTIONS) private readonly options: HeartbeatOptions
     ) {
         this.initialize();
+    }
+
+    /**
+     * Find the current health report of a client.
+     * This report contains information on online-status, network latency etc.
+     * @param clientId Client's identifier
+     * @returns Health
+     */
+    public async findHealthReportByClientId(clientId: string): Promise<Health> {
+        return this._healths.get(clientId);
+    }
+
+    /**
+     * Check if a client was registered already.
+     * @param clientId Client's identifier
+     * @returns True or False
+     */
+    public async existsClientId(clientId: string): Promise<boolean> {
+        return this._healths.has(clientId);
+    }
+
+    /**
+     * Find a list of health reports of all currently 
+     * registered clients.
+     * @returns Health[]
+     */
+    public async findAllHealthReports(): Promise<Health[]> {
+        return Array.from(this._healths.values());
     }
 
     private initialize() {
@@ -66,21 +95,20 @@ export class HeartbeatServerService {
         }
     }
 
-    private handleHeartbeatPacket(receivedAt: number, heartbeat: Heartbeat) {
+    private async handleHeartbeatPacket(receivedAt: number, heartbeat: Heartbeat) {
         // Drop packet if sender is unknown
-        if(typeof heartbeat.from === "undefined" || heartbeat.from == null) return null;
+        if(typeof heartbeat.clientId === "undefined" || heartbeat.clientId == null) return null;
 
         // Calculate latency, if there is no sentAt date, set latency to -1
         let latency: number = -1;
         if(typeof heartbeat.sentAt !== "undefined" && heartbeat.sentAt != null && Number.isInteger(heartbeat.sentAt) && heartbeat.sentAt < Date.now()) latency = receivedAt - heartbeat.sentAt; 
 
         // Reset timeout
-        const timeout = this._timeouts.get(heartbeat.from) || this._timeouts.set(heartbeat.from, this.createHeartbeatTimeout(heartbeat, latency)).get(heartbeat.from);
+        const timeout = this._timeouts.get(heartbeat.clientId) || this._timeouts.set(heartbeat.clientId, this.createHeartbeatTimeout(heartbeat, latency)).get(heartbeat.clientId);
         timeout.refresh();
-        this.setServiceStatus(heartbeat.from, ServiceStatus.ONLINE);
 
-        // Create latency report
-        this.createLatencyStats(heartbeat, latency);
+        // Create health report
+        await this.setClientHealth(heartbeat.clientId, heartbeat, latency);
 
         // Execute registered handlers
         this.callAllHeartbeatHandlers(heartbeat);
@@ -90,30 +118,54 @@ export class HeartbeatServerService {
         const timeoutMs = (this.options.timeout || HEARTBEAT_TIMEOUT) + (latency > 0 ? latency : 0);
         
         const timeout = setTimeout(() => {
-            this._logger.warn(`Did not receive a heartbeat packet from client '${heartbeat.from}' during the last ${Number((timeoutMs)/1000).toFixed(2)}s.`);
-            this.setServiceStatus(heartbeat.from, ServiceStatus.OFFLINE);
+            this._logger.warn(`Did not receive a heartbeat packet from client '${heartbeat.clientId}' during the last ${Number((timeoutMs)/1000).toFixed(2)}s.`);
+            this.setClientStatus(heartbeat.clientId, ClientStatus.OFFLINE);
         }, timeoutMs);
 
         return timeout;
     }
 
-    private createLatencyStats(heartbeat: Heartbeat, latency: number) {
-        const previousAverage = this._latencyStats.get(heartbeat.from);
+    private async setClientHealth(clientId: string, heartbeat: Heartbeat, latency: number) {
+        // Check if health report exists
+        // for clientId
+        if(this._healths.has(clientId)) {
+            // If exists, update properties
+            const health = this._healths.get(clientId);
+            const avgLatency = Number((((health.network.lastLatency || 0) + latency) / 2).toFixed(2));
 
-        if(latency < 0 || typeof previousAverage === "undefined" || previousAverage == null) {
-            return this._latencyStats.set(heartbeat.from, latency).get(heartbeat.from);
+            // Update network and heartbeat report
+            // Do not update online status, as it is done
+            // at the end of this method.
+            health.network = new Latency(latency, avgLatency);
+            health.heartbeat = new HeartbeatReport(health.heartbeat.amount + 1);
+            
+        } else {
+            // Otherwise create new report
+            this._healths.set(clientId, new Health(
+                clientId, 
+                null, 
+                new Latency(latency, latency), 
+                new HeartbeatReport(1)
+            ));
         }
 
-        return this._latencyStats.set(heartbeat.from, Number(((previousAverage + latency) / 2).toFixed(2))).get(heartbeat.from);
+        // Initiate client status update and set
+        // client to ONLINE
+        await this.setClientStatus(clientId, ClientStatus.ONLINE);
     }
 
-    private setServiceStatus(from: string, status: ServiceStatus) {
-        const currentStatus = this._status.get(from);
-        this._status.set(from, status);
+    /**
+     * Set the online status of a client
+     * @param clientId Client's identifier
+     * @param status Client's updated status
+     */
+    private async setClientStatus(clientId: string, status: ClientStatus) {
+        const health = await this.findHealthReportByClientId(clientId);
+        if(typeof health === "undefined" || health == null || health.status === status) return;
 
-        if(currentStatus !== status) {
-            this._logger.log(`Client '${from}' switched status to ${status === ServiceStatus.ONLINE ? 'ONLINE' : 'OFFLINE'}`);
-        }
+        health.status = status;
+        this._logger.log(`Client '${clientId}' switched status to ${status === ClientStatus.ONLINE ? 'ONLINE' : 'OFFLINE'}`);
     }
 
+    
 }
