@@ -18,7 +18,7 @@
     "@nestjs/platform-express": "^9.0.0",
     "@soundcore/constants": "*",
     "@soundcore/heartbeat": "*",
-    "@soundcore/config": "*",
+    "@soundcore/common": "*",
     "@soundcore/redis": "*",
     "ioredis": "^5.2.2",
     "reflect-metadata": "^0.1.13",

@@ -32,7 +32,7 @@
     "@tsalliance/utilities": "^1.19.0",
     "@soundcore/constants": "*",
     "@soundcore/redis": "*",
-    "@soundcore/config": "*",
+    "@soundcore/common": "*",
     "@soundcore/heartbeat": "*",
     "axios": "^0.27.2",
     "bull": "^4.8.5",
