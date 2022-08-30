@@ -5,7 +5,7 @@ import { Heartbeat, ClientStatus, HeartbeatReport } from "../../shared/entities/
 import { Latency } from "../../shared/entities/latency.entity";
 import { HeartbeatHandler, HeartbeatHandlerTarget } from "../decorators/heartbeat.decorator";
 import { Health } from "../../shared/entities/health.entity";
-import { HeartbeatOptions } from "../heartbeat-server.module";
+import { HeartbeatServerOptions } from "../heartbeat-server.module";
 
 @Injectable()
 export class HeartbeatServerService {
@@ -16,7 +16,7 @@ export class HeartbeatServerService {
     
     constructor(
         private readonly redisSub: RedisSub,
-        @Inject(HEARTBEAT_OPTIONS) private readonly options: HeartbeatOptions
+        @Inject(HEARTBEAT_OPTIONS) private readonly options: HeartbeatServerOptions
     ) {
         this.initialize();
     }

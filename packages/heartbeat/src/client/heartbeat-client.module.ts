@@ -31,6 +31,11 @@ export interface HeartbeatClientOptions {
      * @default null
      */
     staticPayload?: any;
+
+    /**
+     * 
+     */
+    dynamicPayload?: () => Promise<any> | any;
 }
 
 export interface HeartbeatClientAsyncOptions extends Pick<ModuleMetadata, "imports">, Pick<FactoryProvider, "inject"> {

@@ -17,10 +17,24 @@ export class HeartbeatClientService {
     }
 
     private initialize() {
+        this.sendHeartbeat();
+
         this._interval = setInterval(() => {
-            const heartbeat = new Heartbeat("defsoft", this.options.staticPayload || undefined);
-            this.redis.publish(HEARTBEAT_MESSAGE_CHANNEL, JSON.stringify(heartbeat));
+            this.sendHeartbeat();
         }, this.options.interval || HEARTBEAT_INTERVAL);
+    }
+
+    private async sendHeartbeat() {
+        const dynamicPayload = await this.options.dynamicPayload();
+        const staticPayload = this.options.staticPayload;
+
+        const payload = {
+            ...staticPayload,
+            ...dynamicPayload
+        }
+
+        const heartbeat = new Heartbeat("defsoft", payload);
+        this.redis.publish(HEARTBEAT_MESSAGE_CHANNEL, JSON.stringify(heartbeat));
     }
 
 }

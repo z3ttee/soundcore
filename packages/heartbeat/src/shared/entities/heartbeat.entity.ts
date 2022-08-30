@@ -1,3 +1,4 @@
+import { ClientInfo } from "./client.entity";
 
 export enum ClientStatus {
 
@@ -10,7 +11,8 @@ export class Heartbeat<T = any> {
 
     constructor(
         public readonly clientId: string,
-        public readonly staticPayload?: T,
+        public readonly info?: ClientInfo,
+        public readonly payload?: T,
         public readonly sentAt: number = Date.now()
     ) {}
 

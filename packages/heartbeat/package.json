@@ -13,11 +13,13 @@
   "files": [
     "dist/**/*"
   ],
-  "dependencies": {
+  "peerDependencies": {
     "@soundcore/redis": "*",
     "@nestjs/common": "^9.0.0",
     "@nestjs/core": "^9.0.0",
-    "ioredis": "^5.2.2",
+    "ioredis": "^5.2.2"
+  },
+  "dependencies": {
     "reflect-metadata": "^0.1.13"
   },
   "devDependencies": {
