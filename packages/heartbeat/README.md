@@ -56,6 +56,35 @@ public handleHeartbeat(heartbeat: Heartbeat) {
 }
 ```
 
+## Dynamic Payload
+If you have some dynamic data that may change over time, you can use `dynamicPayload` property. Here you can define
+a function that returns an object containing your dynamic data. Please have a look at an example:
+```javascript
+@Module({
+  imports: [
+    HeartbeatClientModule.forRootAsync({
+      useFactory: async () => {
+        return {
+          staticPayload: {
+            // ...
+          },
+          dynamicPayload: async () => {
+            return {
+              clientUrl: await getUrl()
+              // ...
+            }
+          },
+        }
+      }
+    })
+  ]
+})
+export class AppModule {}
+```
+As you can see, here we get the applications url asynchronously and send it with the payload.
+So for example inside the server application we could then use that information to call the
+REST endpoints of the client.
+
 ## Subscribe
 Redis is known for its ability for Pub/Sub. To make subscribing to messages and channels more comfortable, a new decorator has been introduced: `@RedisSubscribe(channel: string, expectJSON: boolean)`. This is a method decorator and takes in 2 parameters. The first one specifies the channel to which the client should listen. The second parameter defines, wether the client should parse the JSON string to an actual JSON object or not. Please see the following example on how to use the decorator:
 
