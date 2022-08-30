@@ -1,20 +1,17 @@
 import { Logger, VersioningType } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
+import { createBootstrap } from "@soundcore/bootstrap";
 
-async function bootstrap() {
-  const app = await NestFactory.create(AppModule, { cors: true, abortOnError: false });
-  app.enableVersioning({ type: VersioningType.URI, defaultVersion: "1" });
-  app.enableCors();
-
-  const config = app.get(ConfigService);
-  const port = config.get<number>("PORT") || 3001
-  const logger = new Logger("Bootstrap");
-  
-  await app.listen(port).then(() => {
-    logger.log(`Soundcore API now listening for requests on port ${port}`);
+const logger = new Logger("Bootstrap");
+createBootstrap(AppModule)
+  .useOptions({ cors: true, abortOnError: false })
+  .enableCors()
+  .enableVersioning({ type: VersioningType.URI, defaultVersion: "1" })
+  .useHost(process.env.BIND_ADDRESS || "0.0.0.0")
+  .usePort(Number(process.env.PORT) || 3002)
+  .bootstrap().then((app) => {
+    app.getUrl().then((url) => {
+      logger.log(`Soundcore Satellite Service now listening for requests on url '${url}'.`);
+    });
   });
-}
 
-bootstrap();

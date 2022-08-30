@@ -17,9 +17,12 @@ is my largest so far!
 Other prerequisites will be installed and configured by running `install.sh`.
 
 ## Architecture
-The overall service consists of two types of applications. One is the ``REST-API`` (API) and the other one is the ``indexing-service`` (Indexer).
-The API is used for the front end to communicate with the service. Whereas the Indexer's responsibility is to scan mounted directories for new files
-to be added to the library.
+This project contains some kind of microservice architecture. You may have noticed that for the backend, there are two types of applications: Rest API and a Satellite Node.
+Satellite Nodes are applications that's only focus is processing and serving audio files and artwork images. All applications rely on REDIS under the hood to communicate their
+online status and network information, so that the main API has info on where to serve audio files and images from.
+
+## Network Configuration
+TODO: Bind Address, SSL
 
 ## Meilisearch installation
 ```

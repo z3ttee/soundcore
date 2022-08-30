@@ -20,4 +20,9 @@ export class HealthService {
         return new HealthReport(reports);
     }
 
+    @OnHeartbeat()
+    public onHeartbeat(heartbeat: Heartbeat) {
+        console.log(heartbeat);
+    }
+
 }

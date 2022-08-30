@@ -4,21 +4,28 @@ import { AppService } from './app.service';
 import { WorkerModule } from './worker/worker.module';
 import { redisConnectionOptions } from './main';
 import { HeartbeatClientModule } from "@soundcore/heartbeat";
-import { ConfigModule } from '@soundcore/config';
+import { ConfigModule } from '@soundcore/common';
+import { getUrl } from '@soundcore/bootstrap';
 
 @Module({
   imports: [
     ConfigModule,
     HeartbeatClientModule.forRootAsync({
-      useFactory: () => {
+      useFactory: async () => {
         return {
           identifier: "defsoft",
           redis: {
             ...redisConnectionOptions
           },
           staticPayload: {
-            test: true
-          }
+            test: true,
+            
+          },
+          dynamicPayload: async () => {
+            return {
+              clientUrl: await getUrl()
+            }
+          },
         }
       }
     }),

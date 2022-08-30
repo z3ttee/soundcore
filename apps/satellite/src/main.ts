@@ -1,8 +1,7 @@
 import { Logger, VersioningType } from '@nestjs/common';
-import { NestFactory } from '@nestjs/core';
-import { MicroserviceOptions, Transport } from '@nestjs/microservices';
+import { Transport } from '@nestjs/microservices';
+import { createBootstrap } from "@soundcore/bootstrap";
 import { AppModule } from './app.module';
-import { ConfigService } from '@nestjs/config';
 
 export const redisConnectionOptions = {
   host: process.env.REDIS_HOST || "localhost",
@@ -10,32 +9,26 @@ export const redisConnectionOptions = {
   password: process.env.REDIS_AUTH_PASSWORD || undefined
 }
 
-async function bootstrap() {
-  const app = await NestFactory.create(AppModule, { cors: true, abortOnError: false });
-  app.enableVersioning({ type: VersioningType.URI, defaultVersion: "1" });
-  app.enableCors();
-
-  app.connectMicroservice<MicroserviceOptions>({
-    transport: Transport.REDIS,
+const logger = new Logger("Bootstrap");
+createBootstrap(AppModule)
+  .useOptions({ cors: true, abortOnError: false })
+  .enableCors()
+  .enableVersioning({ type: VersioningType.URI, defaultVersion: "1" })
+  .useHost(process.env.BIND_ADDRESS)
+  .usePort(Number(process.env.PORT))
+  .addMicroservice({
     options: {
-      ...redisConnectionOptions
+      transport: Transport.REDIS,
+      options: {
+        ...redisConnectionOptions
+      }
+    },
+    hybridOptions: {
+      inheritAppConfig: true
     }
-  }, {
-    inheritAppConfig: true
   })
-
-  const config = app.get(ConfigService);
-  const port = config.get<number>("PORT") || 3003
-  const logger = new Logger("Bootstrap");
-  
-  // Start connected microservices 
-  await app.startAllMicroservices().then(async (app) => {
-    // Listen to port on http
-    await app.listen(port).then(() => {
-      logger.log(`Soundcore Satellite Service now listening for requests on port ${port} and via microservices protocol.`);
+  .bootstrap().then((app) => {
+    app.getUrl().then((url) => {
+      logger.log(`Soundcore Satellite Service now listening for requests on url '${url}' and via microservices protocol.`);
     });
   });
-  
-}
-
-bootstrap();

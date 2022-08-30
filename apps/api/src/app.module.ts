@@ -34,7 +34,7 @@ import { HostnameModule } from './hostname/hostname.module';
 import { CronModule } from './cron/cron.module';
 import { HealthModule } from './health/health.module';
 import { HeartbeatServerModule } from "@soundcore/heartbeat";
-import { ConfigModule } from '@soundcore/config';
+import { ConfigModule } from '@soundcore/common';
 
 @Module({
   imports: [

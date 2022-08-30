@@ -13,9 +13,11 @@
   "files": [
     "dist/**/*"
   ],
-  "dependencies": {
+  "peerDependencies": {
     "@nestjs/common": "^9.0.0",
-    "@nestjs/config": "2.2.0",
+    "@nestjs/config": "2.2.0"
+  },
+  "dependencies": {
     "reflect-metadata": "^0.1.13"
   },
   "devDependencies": {

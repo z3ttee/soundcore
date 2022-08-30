@@ -13,17 +13,17 @@
   "files": [
     "dist/**/*"
   ],
-  "dependencies": {
+  "peerDependencies": {
     "@nestjs/common": "^9.0.0",
     "@nestjs/core": "^9.0.0",
-    "ioredis": "^5.2.2",
+    "ioredis": "^5.2.2"
+  },
+  "dependencies": {
     "reflect-metadata": "^0.1.13"
   },
   "devDependencies": {
     "@nestjs/cli": "^9.0.0",
     "@types/node": "^16.0.0",
-    "@typescript-eslint/eslint-plugin": "^5.0.0",
-    "@typescript-eslint/parser": "^5.0.0",
     "@soundcore/tsconfig": "*",
     "@soundcore/eslint-config-nestjs": "*",
     "eslint": "^8.0.1",
