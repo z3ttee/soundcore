@@ -35,6 +35,7 @@ import { CronModule } from './cron/cron.module';
 import { HealthModule } from './health/health.module';
 import { HeartbeatServerModule } from "@soundcore/heartbeat";
 import { ConfigModule } from '@soundcore/common';
+import { DiscoveryModule } from './discovery/discovery.module';
 
 @Module({
   imports: [
@@ -121,7 +122,8 @@ import { ConfigModule } from '@soundcore/common';
           }
         }
       }
-    })
+    }),
+    DiscoveryModule
   ],
   controllers: [
     AppController
