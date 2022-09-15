@@ -19,9 +19,8 @@
     "turbo": "latest"
   },
   "engines": {
-    "npm": ">=7.0.0",
     "node": ">=14.0.0"
   },
   "dependencies": {},
-  "packageManager": "npm@8.5.4"
+  "packageManager": "yarn@1.22.19"
 }

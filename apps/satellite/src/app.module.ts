@@ -17,10 +17,6 @@ import { getUrl } from '@soundcore/bootstrap';
           redis: {
             ...redisConnectionOptions
           },
-          staticPayload: {
-            test: true,
-            
-          },
           dynamicPayload: async () => {
             return {
               clientUrl: await getUrl()

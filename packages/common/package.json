@@ -22,8 +22,8 @@
   },
   "devDependencies": {
     "@types/node": "^16.0.0",
-    "@soundcore/tsconfig": "*",
-    "@soundcore/eslint-config-nestjs": "*",
+    "tsconfig": "*",
+    "eslint-config-nestjs": "*",
     "eslint": "^8.0.1",
     "source-map-support": "^0.5.20",
     "ts-loader": "^9.2.3",

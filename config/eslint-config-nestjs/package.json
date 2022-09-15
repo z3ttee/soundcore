@@ -1,5 +1,5 @@
 {
-  "name": "@soundcore/eslint-config-nestjs",
+  "name": "eslint-config-nestjs",
   "version": "0.0.1",
   "main": "index.js",
   "license": "MIT",

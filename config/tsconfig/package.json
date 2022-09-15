@@ -1,9 +1,15 @@
 {
-  "name": "@soundcore/tsconfig",
+  "name": "tsconfig",
   "version": "0.0.0",
   "private": true,
   "main": "index.js",
   "files": [
     "*.json"
-  ]
+  ],
+  "exports": {
+    ".": "./base.json",
+    "./nextjs": "./nextjs.json",
+    "./nestjs": "./nestjs.json",
+    "./react-library": "./react-library.json"
+  }
 }

@@ -1,5 +1,5 @@
 {
-  "extends": "@soundcore/tsconfig/nestjs.json",
+  "extends": "tsconfig/nestjs",
   "compilerOptions": {
     "outDir": "./dist"
   },
