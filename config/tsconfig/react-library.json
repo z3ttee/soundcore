@@ -1,11 +1,16 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
   "display": "React Library",
-  "extends": "./base.json",
   "compilerOptions": {
-    "jsx": "react-jsx",
-    "lib": ["ES2015"],
+    "jsx": "react",
+    "lib": ["ES6", "DOM", "ES2016", "ES2017"],
     "module": "ESNext",
-    "target": "es6"
+    "target": "ES5",
+    "declaration": true,
+    "declarationDir": "./dist",
+    "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "sourceMap": true
   }
 }

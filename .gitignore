@@ -9,7 +9,6 @@ out/
 build
 
 storybook-static
-.storybook
 
 # dependencies
 node_modules
