@@ -16,7 +16,7 @@
   ],
   "license": "MIT",
   "scripts": {
-    "build": "yarn clean && concurrently \"tsup src/index.tsx --format esm,cjs --dts --external react\" \"yarn build-tailwind\" \"yarn build-storybook\"",
+    "build": "yarn clean && concurrently \"tsup src/index.tsx --format esm,cjs --dts --external react\" \"yarn build-tailwind\"",
     "dev": "concurrently \"tsup src/index.tsx --format esm,cjs --dts --external react --watch\" \"yarn tailwind\"",
     "clean": "rimraf ./dist",
     "storybook": "start-storybook -p 6006",
