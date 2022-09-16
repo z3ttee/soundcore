@@ -27,16 +27,26 @@ module.exports = {
           dark: "#BBBBBB"
         }
       },
-      padding: {
-        window: "16px",
-        box: "12px"
-      }
+      margin: ({ theme }) => ({
+        row: theme("spacing.6"),
+        box: "16px",
+        window: "24px",
+      }),
+      padding: ({ theme }) => ({
+        row: theme("spacing.6"),
+        box: "16px",
+        window: "24px",
+      }),
+      gap: theme => ({
+        row: theme("spacing.6")
+      }),
     },
     fontSize: {
       xxs: ['0.65rem', { lineHeight: '1rem' }],
       xs: ['0.8rem', { lineHeight: '1rem' }],
       sm: ['0.9rem', { lineHeight: '1.1rem' }],
       base: ['0.98rem', { lineHeight: '1.25rem' }],
+      md: ["18px", { lineHeight: "2rem" }],
       lg: ['1rem', { lineHeight: '1.75rem' }],
       xl: ['1.25rem', { lineHeight: '1.75rem' }],
       '2xl': ['1.5rem', { lineHeight: '2rem' }],

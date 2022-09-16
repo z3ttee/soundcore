@@ -17,6 +17,11 @@
     @apply text-white box-border font-normal text-base;
 }
 
+html,
+body {
+    @apply bg-body w-full h-full;
+}
+
 /**
 []=============================[]
           Scrollbars
