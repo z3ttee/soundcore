@@ -6,6 +6,11 @@
       "outputs": ["dist/**", ".next/**"],
       "cache": false
     },
+    "build-api": {
+      "dependsOn": ["^build-api"],
+      "outputs": ["dist/**", ".next/**"],
+      "cache": false
+    },
     "lint": {
       "outputs": []
     },
