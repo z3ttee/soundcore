@@ -55,8 +55,9 @@ module.exports = {
       '5xl': ['3rem', { lineHeight: '4rem' }]
     },
     fontWeight: {
-      light: '300',
+      light: '400',
       normal: '500',
+      semi: '600',
       bold: '700'
     }
   },
