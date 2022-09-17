@@ -14,5 +14,9 @@
     "src/**/*.test.ts",
     "src/**/*.test.tsx",
     "src/**/*.test.js"
-  ]
+  ],
+  "compilerOptions": {
+    "declaration": true,
+    "declarationDir": "./dist",
+  }
 }

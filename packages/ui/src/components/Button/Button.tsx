@@ -8,10 +8,20 @@ export interface ButtonProps extends Pick<PropsWithChildren, "children"> {
     startIcon?: React.ReactNode;
     disabled?: boolean;
     className?: string;
+    onClick?: (event: React.MouseEvent) => void;
 }
 
 export default function Button(props: ButtonProps) {
-    const { children, startIcon, variant = "contained", align = "left", disabled = false, size = "md", className } = props;
+    const { 
+        children, 
+        startIcon, 
+        variant = "contained", 
+        align = "left", 
+        disabled = false, 
+        size = "md", 
+        className, 
+        onClick = () => {} 
+    } = props;
 
     const alignClassName = 
         align === "center" ? "justify-center" : 
@@ -31,7 +41,7 @@ export default function Button(props: ButtonProps) {
     const disabledClassNames = disabled ? "transform-none active:scale-100 cursor-not-allowed bg-neutral-700 opacity-30" : "";
 
     return (
-        <button disabled={disabled} className={`inline-flex rounded-sm text-sm font-normal text-white items-center transform-gpu ${!disabled ? 'active:scale-95' : ''} transition-all will-change-transform ${alignClassName} ${variantClassNames} ${disabledClassNames} ${className} ${sizeClassNames}`}>
+        <button onClick={onClick} disabled={disabled} className={`inline-flex gap-2 rounded text-sm font-normal text-white items-center transform-gpu ${!disabled ? 'active:scale-95' : ''} transition-all will-change-transform ${alignClassName} ${variantClassNames} ${disabledClassNames} ${className} ${sizeClassNames}`}>
             {startIcon}
             {children}
         </button>

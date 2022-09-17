@@ -1,6 +1,7 @@
 import { GetServerSideProps } from "next";
 import { getProviders, signIn, ClientSafeProvider, getSession, getCsrfToken } from "next-auth/react";
 import Image from "next/image";
+import { Button } from "@soundcore/ui";
 
 interface SignInProps {
   provider: ClientSafeProvider;
@@ -25,10 +26,13 @@ export default function SignIn(props: SignInProps) {
             </div>
 
             <div className="flex flex-col items-center gap-1 py-row">
-              <button className="flex items-center bg-body-dark border border-opacity-0 border-body-light active:bg-opacity-40 hover:border-opacity-100 p-3 rounded-md gap-3 w-full justify-center transition-all" onClick={() => signIn(provider.id)}>
-                <Image alt="" src="/images/branding/tsalliance_logo.svg" width={18} height={18} className="border" />
-                <p className="text-sm">Mit TSAlliance anmelden</p>
-              </button>
+              <Button 
+                className="w-full" 
+                startIcon={<Image alt="" src="/images/branding/tsalliance_logo.svg" width={18} height={18} />}
+                align="center"
+                onClick={() => signIn(provider.id)}>
+                Mit TSAlliance anmelden
+              </Button>
             </div>
           </div>
 

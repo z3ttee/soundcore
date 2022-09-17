@@ -6,8 +6,6 @@
     "lib": ["ES6", "DOM", "ES2016", "ES2017"],
     "module": "ESNext",
     "target": "ES5",
-    "declaration": true,
-    "declarationDir": "./dist",
     "moduleResolution": "node",
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,

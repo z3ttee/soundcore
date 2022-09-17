@@ -20,7 +20,7 @@
     "build": "rimraf ./dist && rollup -c",
     "storybook": "start-storybook -p 6006",
     "storybook:build": "build-storybook",
-    "dev": "concurrently \"rollup -c --watch\" \"yarn storybook\"",
+    "dev": "rollup -c --watch",
     "tailwind": "tailwindcss -i ./src/styles/styles.css -o ./dist/styles.css --watch",
     "tailwind:build": "tailwindcss -i ./src/styles/styles.css -o ./dist/styles.css"
   },
