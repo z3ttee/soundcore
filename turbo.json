@@ -4,12 +4,12 @@
     "build": {
       "dependsOn": ["^build"],
       "outputs": ["dist/**", ".next/**"],
-      "cache": false
+      "cache": true
     },
     "build-api": {
       "dependsOn": ["^build-api"],
       "outputs": ["dist/**", ".next/**"],
-      "cache": false
+      "cache": true
     },
     "lint": {
       "outputs": []
