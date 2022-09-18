@@ -34,7 +34,7 @@ export default function Button(props: ButtonProps) {
         `bg-body-lighter bg-opacity-0 hover:bg-opacity-30 active:bg-opacity-60`;
 
     const sizeClassNames = 
-        size === "sm" ? `py-1.5 px-2 text-xs` : 
+        size === "sm" ? `py-1.5 px-2` : 
         size === "lg" ? `py-3 px-8` : 
         `py-2.5 px-4`;
 

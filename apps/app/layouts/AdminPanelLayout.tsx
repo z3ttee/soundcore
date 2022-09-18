@@ -1,5 +1,4 @@
-import { Button, Drawer, DrawerHeader, DrawerLink } from "@soundcore/ui";
-import Link from "next/link";
+import { Drawer, DrawerHeader, DrawerLink } from "@soundcore/ui";
 import { useRouter } from "next/router";
 import { PropsWithChildren } from "react";
 
@@ -18,7 +17,7 @@ export default function AdminPanelLayout(props: PropsWithChildren<any>) {
             </div>
 
             {/** Navigation */}
-            <div className='p-box'>
+            <div className='flex flex-col gap-1 p-box'>
                 <DrawerLink href="/admin" exact>Dashboard</DrawerLink>
                 <DrawerLink href="/admin/zones">Speicherzonen</DrawerLink>
                 <DrawerLink href="/admin/tasks">Tasks</DrawerLink>
