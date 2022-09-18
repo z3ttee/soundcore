@@ -10,16 +10,34 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        accent: {
-          light: "#99daf7",
-          DEFAULT: "#6dcaf3",
-          dark: "#49bdf0"
-        },
         body: {
           lighter: "#3d3d3d",
           light: "#2d2d2d",
           DEFAULT: "#191919",
           dark: "#000000"
+        },
+        accent: {
+          DEFAULT: "#ffbf50"
+        },
+        error: {
+          light: "#cd6262",
+          DEFAULT: "#c75151",
+          dark: "#B94848"
+        },
+        warn: {
+          light: "#FBC06E",
+          DEFAULT: "#f0ad4e",
+          dark: "#DE9939"
+        },
+        success: {
+          light: "#66A55B",
+          DEFAULT: "#538d4a",
+          dark: "#497E40"
+        },
+        info: {
+          light: "#378FC2",
+          DEFAULT: "#277cad",
+          dark: "#23719E"
         },
         white: {
           light: colors.white,
