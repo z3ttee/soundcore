@@ -1,11 +1,18 @@
 import '../styles/globals.scss'
-import type { AppProps } from 'next/app'
-import { SessionProvider } from "next-auth/react"
+import type { AppContext, AppProps } from 'next/app'
+import { getSession, SessionProvider } from "next-auth/react"
 import Head from 'next/head';
 import AdminPanelLayout from '../layouts/AdminPanelLayout';
 import MainLayout from '../layouts/MainLayout';
+import { wrapper } from '../store/store';
+import { setAuthenticated, setSession } from '../store/authSlice';
+import App from 'next/app';
+import { Session } from 'next-auth';
 
-interface MyAppProps extends AppProps {}
+interface MyAppInitialPageProps {
+  session?: Session;
+}
+interface MyAppProps extends AppProps<MyAppInitialPageProps> {}
 
 function MyApp(props: MyAppProps) {
   const { 
@@ -13,6 +20,7 @@ function MyApp(props: MyAppProps) {
     pageProps, 
     router
   } = props;
+  const { session } = pageProps;
 
   // Fix type errors
   const PageComponent = Component as any;
@@ -36,17 +44,32 @@ function MyApp(props: MyAppProps) {
   }
 
   return (
-    <SessionProvider>
+    <SessionProvider session={session}>
       <Head>
         <title>Soundcore :: Web Player</title>
         <meta name="description" content="Official TSAlliance private music streaming service" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       
-      {findLayout(<PageComponent {...pageProps} />)}
+        {findLayout(<PageComponent {...pageProps} />)}
       
     </SessionProvider>
   );
 }
+
+MyApp.getInitialProps = wrapper.getInitialAppProps((store) => async (context: AppContext) => {
+  const appProps = await App.getInitialProps(context);
+  const session = await getSession({ req: context.ctx.req });
+
+  store.dispatch(setAuthenticated(!!session));
+  store.dispatch(setSession(session));
+
+  return {
+    pageProps: {
+      ...appProps,
+      session
+    } as MyAppInitialPageProps
+  }
+});
 
 export default MyApp;

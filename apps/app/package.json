@@ -9,11 +9,15 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@floating-ui/react-dom": "^1.0.0",
+    "@reduxjs/toolkit": "^1.8.5",
     "@soundcore/ui": "*",
     "next": "12.3.0",
     "next-auth": "^4.10.3",
+    "next-redux-wrapper": "^8.0.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
+    "react-redux": "^8.0.2",
     "sass": "^1.54.9"
   },
   "devDependencies": {
