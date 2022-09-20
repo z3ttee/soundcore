@@ -3,9 +3,10 @@ import KeycloakProvider from "next-auth/providers/keycloak";
 
 export default NextAuth({
     callbacks: {
-        session(params) {
+        session: async (params) => {
             const { session, token, user } = params;
             // Return type of session will be return type of useSession() hook
+
             return session;
         }
     },

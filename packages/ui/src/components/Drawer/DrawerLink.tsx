@@ -9,7 +9,7 @@ export default function DrawerNavigationLink(props: PropsWithChildren<NavLinkPro
         <NavLink 
             href={href} 
             exact={exact} 
-            className='block w-full py-2.5 px-4 rounded-sm bg-body-light bg-opacity-0 hover:bg-opacity-30 transition-all' 
+            className='block w-full py-2.5 px-4 rounded-sm bg-body-light bg-opacity-0 hover:bg-opacity-30 active:bg-opacity-40 transition-all select-none' 
             activeClassName='text-accent'>
             {children}
         </NavLink>

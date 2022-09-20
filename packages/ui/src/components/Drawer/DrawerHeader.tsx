@@ -13,7 +13,7 @@ export default function DrawerHeader(props: DrawerHeaderProps) {
         title,
         logoImageUrl, 
         logoAltText,
-        logoWidthPx = 32,
+        logoWidthPx = 35,
         logoHeightPx = logoWidthPx
     } = props;
 

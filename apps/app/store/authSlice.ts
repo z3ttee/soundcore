@@ -1,7 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { Session } from "next-auth";
 import { HYDRATE } from "next-redux-wrapper";
-import { AppState } from "./store";
 
 export interface AuthState {
     authenticated: boolean;
@@ -40,11 +39,11 @@ export const authSlice = createSlice({
     extraReducers: {
         [HYDRATE]: (state, action) => ({
             ...state,
-            ...action.payload.authState
+            ...action.payload.auth
         })
     }
 });
 
 export const { setAuthenticated, setSession } = authSlice.actions;
-export const selectAuthState = (state: AppState) => state.auth.authenticated;
+export const selectAuthState = (state) => state.auth.authenticated;
 export default authSlice;

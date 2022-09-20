@@ -1,22 +1,66 @@
-import { Drawer, DrawerLink, DrawerHeader } from "@soundcore/ui";
-import { useSession } from "next-auth/react";
+import { Drawer, DrawerLink, DrawerHeader, DrawerProfile, Divider } from "@soundcore/ui";
+import { signIn } from "next-auth/react";
+import { useRouter } from "next/router";
 import { PropsWithChildren } from "react";
+import { connect, useSelector } from "react-redux";
+import { AppState } from "../store/store";
 
-export default function MainLayout(props: PropsWithChildren<any>) {
+function MainLayout(props: PropsWithChildren<any>) {
     const { children } = props;
-    const { data } = useSession();
+    const router = useRouter();
+
+    const username = useSelector((state: AppState) => state.auth?.session?.user?.name);
+    const avatarUrl = useSelector((state: AppState) => state.auth?.session?.user?.image);
+
+    const profileDestinationPath = `/profile/${username}`;
 
     return (
         <Drawer content={children}>
-            {/** Title bar inside Drawer */}
-            <DrawerHeader title="Soundcore" logoImageUrl="/images/branding/soundcore_logo.svg" logoAltText="Soundcore Logo" />
+            <div className="flex flex-col flex-1 h-full w-full overflow-hidden">
+                {/** Title bar inside Drawer */}
+                <DrawerHeader title="Soundcore" logoImageUrl="/images/branding/soundcore_logo.svg" logoAltText="Soundcore Logo" />
 
-            {/** Navigation */}
-            <div className='flex flex-col gap-1 p-box'>
-                <DrawerLink href="/" exact>Startseite</DrawerLink>
-                <DrawerLink href="/library">Bibliothek</DrawerLink>
-                <DrawerLink href={`/profile/${data?.user?.name}`}>Dein Profil</DrawerLink>
+                <Divider variant="fade" />
+
+                {/** Navigation */}
+                <div className='flex flex-col gap-1 p-box py-window'>
+                    <DrawerLink href="/" exact>Startseite</DrawerLink>
+                    <DrawerLink href="/library">Bibliothek</DrawerLink>
+                    <DrawerLink href={profileDestinationPath}>Dein Profil</DrawerLink>
+                </div>
+
+                <Divider variant="fade" />
+
+                {/** Show playlists */}
+                <div className="flex-grow overflow-x-hidden overflow-y-auto">
+                    <div className="flex flex-col px-box py-window gap-1">
+                        <DrawerLink href="/playlist/1" exact>Playlist 1</DrawerLink>
+                        <DrawerLink href="/playlist/2" exact>Playlist 2</DrawerLink>
+                        <DrawerLink href="/playlist/3" exact>Playlist 3</DrawerLink>
+                        <DrawerLink href="/playlist/4" exact>Playlist 4</DrawerLink>
+                        <DrawerLink href="/playlist/5" exact>Playlist 5</DrawerLink>
+                        <DrawerLink href="/playlist/6" exact>Playlist 6</DrawerLink>
+                    </div>
+                </div>
+
+                <Divider variant="fade" />
+
+                {/** Profile section */}
+                <div className="px-box py-window">
+                    <DrawerProfile username={username} avatarUrl={avatarUrl} onSignInClicked={() => signIn()}>
+                        <li>Item 1</li>
+                    </DrawerProfile>
+                </div>
             </div>
         </Drawer>
     );
 }
+
+function mapStateToProps(state, props) {
+    return {
+        ...state,
+        ...props
+    }
+}
+
+export default connect(mapStateToProps)(MainLayout);

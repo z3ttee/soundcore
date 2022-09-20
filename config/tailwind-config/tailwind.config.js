@@ -43,7 +43,7 @@ module.exports = {
           light: colors.white,
           DEFAULT: "#CCCCCC",
           dark: "#BBBBBB"
-        }
+        },
       },
       margin: ({ theme }) => ({
         row: theme("spacing.6"),
@@ -58,6 +58,9 @@ module.exports = {
       gap: theme => ({
         row: theme("spacing.6")
       }),
+      backgroundImage: {
+        divider: `linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.25) 50%, rgba(255,255,255,0) 100%);`,
+      }
     },
     fontSize: {
       xxs: ['0.65rem', { lineHeight: '1rem' }],

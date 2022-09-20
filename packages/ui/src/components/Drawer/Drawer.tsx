@@ -11,7 +11,7 @@ export default function Drawer(props: PropsWithChildren<DrawerProps>) {
     return (
         <div className="flex flex-row h-full flex-1">
             {/** Drawer container */}
-            <div className="absolute md:static md:w-[90px] lg:w-[280px] transform-gpu -translate-x-full md:-translate-x-0 bg-body-dark overflow-y-auto overflow-x-hidden">
+            <div className="absolute md:static md:w-[90px] lg:w-[280px] transform-gpu -translate-x-full md:-translate-x-0 bg-body-dark overflow-hidden">
                 <div className='relative h-full w-full'>
                     {children}
                 </div>
