@@ -9,6 +9,7 @@ import { setAuthenticated, setSession } from '../store/authSlice';
 import App from 'next/app';
 import { Session } from 'next-auth';
 import { Provider } from 'react-redux';
+import BlankLayout from '../layouts/BlankLayout';
 
 interface MyAppInitialPageProps {
   session?: Session;
@@ -30,18 +31,12 @@ function MyApp(props: MyAppProps) {
   const findLayout = (page) => {
     // If pathname starts with /admin, then show admin panel layout
     if(router.pathname.startsWith("/admin")) {
-      return (<>
-        <AdminPanelLayout>
-          {page}
-        </AdminPanelLayout>
-      </>);
+      return <AdminPanelLayout>{page}</AdminPanelLayout>;
+    } else if(router.pathname.startsWith("/auth")) {
+      return <BlankLayout>{page}</BlankLayout>;
     } else {
       // Otherwhise show main layout
-      return (<>
-        <MainLayout>
-          {page}
-        </MainLayout>
-      </>)
+      return <MainLayout>{page}</MainLayout>;
     }
   }
 
