@@ -1,7 +1,11 @@
 import { PropsWithChildren } from "react";
 import { connect } from "react-redux";
 
-function BlankLayout(props: PropsWithChildren<any>) {
+export interface LayoutProps {
+    loading?: boolean;
+}
+
+function BlankLayout(props: PropsWithChildren<LayoutProps>) {
     const { children } = props;
 
     return (

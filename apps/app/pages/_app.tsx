@@ -4,16 +4,16 @@ import { getSession, SessionProvider } from "next-auth/react"
 import Head from 'next/head';
 import AdminPanelLayout from '../layouts/AdminPanelLayout';
 import MainLayout from '../layouts/MainLayout';
-import { AppStore, wrapper } from '../store/store';
-import { setAuthenticated, setSession } from '../store/authSlice';
+import { wrapper } from '../store/store';
+import { setSession } from '../store/authSlice';
 import App from 'next/app';
 import { Session } from 'next-auth';
-import { Provider } from 'react-redux';
 import BlankLayout from '../layouts/BlankLayout';
+import { useEffect, useState } from 'react';
+import { useStore } from 'react-redux';
 
 interface MyAppInitialPageProps {
   session?: Session;
-  store?: AppStore;
 }
 interface MyAppProps extends AppProps<MyAppInitialPageProps> {}
 
@@ -23,12 +23,14 @@ function MyApp(props: MyAppProps) {
     pageProps, 
     router
   } = props;
-  const { session, store } = pageProps;
+  const { session } = pageProps;
+  const store = useStore();
 
   // Fix type errors
   const PageComponent = Component as any;
 
-  const findLayout = (page) => {
+  // Get layout of the current page
+  const findLayout = (page, loading) => {
     // If pathname starts with /admin, then show admin panel layout
     if(router.pathname.startsWith("/admin")) {
       return <AdminPanelLayout>{page}</AdminPanelLayout>;
@@ -36,10 +38,30 @@ function MyApp(props: MyAppProps) {
       return <BlankLayout>{page}</BlankLayout>;
     } else {
       // Otherwhise show main layout
-      return <MainLayout>{page}</MainLayout>;
+      return <MainLayout loading={loading}>{page}</MainLayout>;
     }
   }
 
+  // Handle loading state on page transitions
+  const [loading, setLoading] = useState(false);
+  useEffect(() => {
+    // Define event handlers
+    const handleRoutingStarted = (url) => (url !== router.asPath) && setLoading(true);
+    const handleRoutingCompleted = (url) => (url === router.asPath) && setLoading(false);
+
+    // Register event listeners
+    router.events.on("routeChangeStart", (url) => handleRoutingStarted(url));
+    router.events.on("routeChangeError", (url) => handleRoutingCompleted(url));
+    router.events.on("routeChangeComplete", (url) => handleRoutingCompleted(url));
+
+    // Unregister event listeners
+    return () => {
+      router.events.off("routeChangeStart", handleRoutingStarted);
+      router.events.off("routeChangeError", handleRoutingCompleted);
+      router.events.off("routeChangeComplete", handleRoutingCompleted);
+    }
+  });
+  
   return (
     <SessionProvider session={session}>
       <Head>
@@ -48,7 +70,7 @@ function MyApp(props: MyAppProps) {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       
-      {findLayout(<PageComponent {...pageProps} />)}
+      {findLayout(<PageComponent {...pageProps} />, loading)}
       
     </SessionProvider>
   );
@@ -58,7 +80,6 @@ MyApp.getInitialProps = wrapper.getInitialAppProps((store) => async (context: Ap
   const appProps = await App.getInitialProps(context);
   const session = await getSession({ req: context.ctx.req });
 
-  await store.dispatch(setAuthenticated(!!session));
   await store.dispatch(setSession(session));
   
   return {

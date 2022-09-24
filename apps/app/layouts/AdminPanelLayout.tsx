@@ -1,13 +1,12 @@
 import { Drawer, DrawerHeader, DrawerLink } from "@soundcore/ui";
-import { useRouter } from "next/router";
 import { PropsWithChildren } from "react";
+import { LayoutProps } from "./BlankLayout";
 
-export default function AdminPanelLayout(props: PropsWithChildren<any>) {
-    const { children } = props;
-    const router = useRouter();
+export default function AdminPanelLayout(props: PropsWithChildren<LayoutProps>) {
+    const { children, loading } = props;
 
     return (
-        <Drawer content={children}>
+        <Drawer content={children} showLoader={loading}>
             {/** Title bar inside Drawer */}
             <DrawerHeader title="Soundcore ACP" logoImageUrl="/images/branding/soundcore_logo.svg" logoAltText="Soundcore Logo" />
 

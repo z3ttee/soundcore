@@ -1,21 +1,20 @@
 import { Drawer, DrawerLink, DrawerHeader, DrawerProfile, Divider } from "@soundcore/ui";
 import { signIn } from "next-auth/react";
-import { useRouter } from "next/router";
 import { PropsWithChildren } from "react";
 import { connect, useSelector } from "react-redux";
 import { AppState } from "../store/store";
+import { LayoutProps } from "./BlankLayout";
 
-function MainLayout(props: PropsWithChildren<any>) {
-    const { children } = props;
-    const router = useRouter();
+function MainLayout(props: PropsWithChildren<LayoutProps>) {
+    const { children, loading } = props;
 
     const profile = useSelector((state: AppState) => state.auth.session?.profile);
     const avatarUrl = "";
 
-    const profileDestinationPath = `/profile/${profile}`;
+    const profileDestinationPath = `/profile/${profile?.slug}`;
 
     return (
-        <Drawer content={children}>
+        <Drawer content={children} showLoader={loading}>
             <div className="flex flex-col flex-1 h-full w-full overflow-hidden">
                 {/** Title bar inside Drawer */}
                 <DrawerHeader title="Soundcore" logoImageUrl="/images/branding/soundcore_logo.svg" logoAltText="Soundcore Logo" />
