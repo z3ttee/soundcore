@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import NextAuth from "next-auth"
 import { JWT } from "next-auth/jwt";
 import { Profile } from "../../../entities/Profile";
@@ -12,7 +12,11 @@ function buildKeycloakWellKnownURL() {
 }
 
 function buildKeycloakProtocolBaseURL() {
-    return `${buildKeycloakRealmURL()}/openid-connect`;
+    return `${buildKeycloakRealmURL()}/protocol/openid-connect`;
+}
+
+function buildKeycloakAccessTokenURL() {
+    return `${buildKeycloakProtocolBaseURL()}/token`;
 }
 
 /**
@@ -21,13 +25,13 @@ function buildKeycloakProtocolBaseURL() {
  * returns the old token and an error property
  * @param  {JWT} token
  */
-async function refreshAccessToken(token: JWT) {
+async function refreshAccessToken(token: JWT): Promise<JWT> {
     try {
       if (Date.now() > token.refresh_token_expires_at) throw Error;
 
       const details = {
         client_id: process.env.KEYCLOAK_CLIENT_ID,
-        client_secret: process.env.KEYCLOAK_CLIENT_SECRET,
+        client_secret: process.env.KEYCLOAK_SECRET,
         grant_type: ['refresh_token'],
         refresh_token: token.refresh_token,
       };
@@ -40,7 +44,8 @@ async function refreshAccessToken(token: JWT) {
       });
 
       const formData = formBody.join('&');
-      const url = `${process.env.KEYCLOAK_BASE_URL}/token`;
+      const url = `${buildKeycloakAccessTokenURL()}`;
+
       const response = await fetch(url, {
         method: 'POST',
         headers: {
@@ -51,19 +56,19 @@ async function refreshAccessToken(token: JWT) {
 
       const refreshedTokens = await response.json();
       if (!response.ok) throw refreshedTokens;
+
       return {
         ...token,
-        accessToken: refreshedTokens.access_token,
-        accessTokenExpired: Date.now() + (refreshedTokens.expires_in - 15) * 1000,
-        refreshToken: refreshedTokens.refresh_token ?? token.refresh_token,
-        refreshTokenExpired:
-          Date.now() + (refreshedTokens.refresh_expires_in - 15) * 1000,
+        access_token: refreshedTokens.access_token,
+        access_token_expires_at: Date.now() + (refreshedTokens.expires_in - 15) * 1000,
+        refresh_token: refreshedTokens.refresh_token ?? token.refresh_token,
+        refresh_token_expires_at: Date.now() + (refreshedTokens.refresh_expires_in - 15) * 1000,
       };
     } catch (error) {
-      return {
-        ...token,
-        error: 'RefreshAccessTokenError',
-      };
+        return {
+            ...token,
+            error: 'RefreshAccessTokenError',
+        };
     }
   };
 
@@ -125,8 +130,12 @@ export default NextAuth({
                 session.user.name = profile?.name || session.user.preferred_username;
 
                 return session;
-            }).catch((error) => {
-                console.log(error);
+            }).catch((error: AxiosError) => {
+                if(error.isAxiosError) {
+                    console.error(error.response?.data);
+                } else {
+                    console.error(error);
+                }
                 return session;
             })
         },
@@ -146,7 +155,9 @@ export default NextAuth({
             }
 
             // Return previous token if the access token has not expired yet
-            if (Date.now() < token.access_token_expires_at) return token;
+            if (Date.now() < token.access_token_expires_at) {
+                return token;
+            }
 
             // Otherwise return refreshed access token
             return refreshAccessToken(token);

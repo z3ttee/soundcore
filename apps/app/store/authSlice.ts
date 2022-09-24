@@ -2,29 +2,20 @@ import { createSlice } from "@reduxjs/toolkit";
 import { Session } from "next-auth";
 import { HYDRATE } from "next-redux-wrapper";
 
+export const AUTH_SLICE_NAME = "auth";
+
 export interface AuthState {
-    authenticated: boolean;
     session?: Session;
 }
 
 const initialState: AuthState = {
-    authenticated: false,
     session: undefined,
 }
 
 export const authSlice = createSlice({
-    name: "auth",
+    name: AUTH_SLICE_NAME,
     initialState,
     reducers: {
-
-        /**
-         * Change the authenticated state
-         * @param state Current state obj
-         * @param action Action containing the payload
-         */
-        setAuthenticated: (state, action) => {
-            state.authenticated = action.payload;
-        },
 
         /**
          * Set current session in state
@@ -39,11 +30,10 @@ export const authSlice = createSlice({
     extraReducers: {
         [HYDRATE]: (state, action) => ({
             ...state,
-            ...action.payload.auth
+            ...action.payload[AUTH_SLICE_NAME]
         })
     }
 });
 
-export const { setAuthenticated, setSession } = authSlice.actions;
-export const selectAuthState = (state) => state.auth.authenticated;
+export const { setSession } = authSlice.actions;
 export default authSlice;

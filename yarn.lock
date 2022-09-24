@@ -6786,7 +6786,7 @@ escodegen@^2.0.0:
   optionalDependencies:
     source-map "~0.6.1"
 
-eslint-config-next@12.3.0, eslint-config-next@^12.0.8:
+eslint-config-next@^12.0.8:
   version "12.3.0"
   resolved "https://registry.yarnpkg.com/eslint-config-next/-/eslint-config-next-12.3.0.tgz#d887ab2d143fe1a2b308e9321e932a613e610800"
   integrity sha512-guHSkNyKnTBB8HU35COgAMeMV0E026BiYRYvyEVVaTOeFcnU3i1EI8/Da0Rl7H3Sgua5FEvoA0vYd2s8kdIUXg==

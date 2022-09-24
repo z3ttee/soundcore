@@ -9,10 +9,10 @@ function MainLayout(props: PropsWithChildren<any>) {
     const { children } = props;
     const router = useRouter();
 
-    const username = useSelector((state: AppState) => state.auth?.session?.user?.name);
-    const avatarUrl = useSelector((state: AppState) => state.auth?.session?.user?.image);
+    const profile = useSelector((state: AppState) => state.auth.session?.profile);
+    const avatarUrl = "";
 
-    const profileDestinationPath = `/profile/${username}`;
+    const profileDestinationPath = `/profile/${profile}`;
 
     return (
         <Drawer content={children}>
@@ -47,7 +47,7 @@ function MainLayout(props: PropsWithChildren<any>) {
 
                 {/** Profile section */}
                 <div className="px-box py-window">
-                    <DrawerProfile username={username} avatarUrl={avatarUrl} onSignInClicked={() => signIn()}>
+                    <DrawerProfile username={profile?.name} avatarUrl={avatarUrl} onSignInClicked={() => signIn()}>
                         <li>Item 1</li>
                     </DrawerProfile>
                 </div>
