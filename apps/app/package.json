@@ -12,6 +12,7 @@
     "@floating-ui/react-dom": "^1.0.0",
     "@reduxjs/toolkit": "^1.8.5",
     "@soundcore/ui": "*",
+    "axios": "^0.27.2",
     "next": "12.3.0",
     "next-auth": "^4.10.3",
     "next-redux-wrapper": "^8.0.0",
@@ -21,6 +22,7 @@
     "sass": "^1.54.9"
   },
   "devDependencies": {
+    "@types/axios": "^0.14.0",
     "@types/node": "18.7.18",
     "@types/react": "18.0.20",
     "@types/react-dom": "18.0.6",
