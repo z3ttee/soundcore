@@ -29,7 +29,7 @@ async function refreshAccessToken(token: JWT) {
         client_id: process.env.KEYCLOAK_CLIENT_ID,
         client_secret: process.env.KEYCLOAK_CLIENT_SECRET,
         grant_type: ['refresh_token'],
-        refresh_token: token.refreshToken,
+        refresh_token: token.refresh_token,
       };
 
       const formBody: string[] = [];
@@ -55,7 +55,7 @@ async function refreshAccessToken(token: JWT) {
         ...token,
         accessToken: refreshedTokens.access_token,
         accessTokenExpired: Date.now() + (refreshedTokens.expires_in - 15) * 1000,
-        refreshToken: refreshedTokens.refresh_token ?? token.refreshToken,
+        refreshToken: refreshedTokens.refresh_token ?? token.refresh_token,
         refreshTokenExpired:
           Date.now() + (refreshedTokens.refresh_expires_in - 15) * 1000,
       };
