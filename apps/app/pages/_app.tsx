@@ -1,6 +1,6 @@
 import '../styles/globals.scss'
 import type { AppContext, AppProps } from 'next/app'
-import { getSession, SessionProvider } from "next-auth/react"
+import { getSession, SessionProvider, signIn } from "next-auth/react"
 import Head from 'next/head';
 import AdminPanelLayout from '../layouts/AdminPanelLayout';
 import MainLayout from '../layouts/MainLayout';
@@ -63,6 +63,14 @@ function MyApp(props: MyAppProps) {
       router.events.off("routeChangeComplete", handleRoutingCompleted);
     }
   });
+
+  // Handle refresh error and redirect user to signin
+  useEffect(() => {
+    if (session?.error === "RefreshAccessTokenError") {
+      console.log(session.error)
+      //signIn();
+    }
+  }, [session]);
   
   return (
     <SessionProvider session={session}>
@@ -86,7 +94,7 @@ MyApp.getInitialProps = wrapper.getInitialAppProps((store) => async (context: Ap
   const session = await getSession({ req: context.ctx.req });
   await store.dispatch(setSession(session));
 
-  const playlists = await PlaylistService.withToken(store.getState().auth.session?.access_token).findPlaylistsByCurrentUser();
+  const playlists = await PlaylistService.withToken(store.getState().auth.session?.accessToken).findPlaylistsByCurrentUser();
   await store.dispatch(setPlaylists(playlists?.elements || []));
 
   return {
