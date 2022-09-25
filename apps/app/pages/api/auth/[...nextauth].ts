@@ -3,6 +3,8 @@ import NextAuth from "next-auth"
 import { JWT } from "next-auth/jwt";
 import { Profile } from "../../../entities/Profile";
 
+const OIDC_SCOPES = "openid email profile offline_access";
+
 function buildKeycloakRealmURL() {
     return `${process.env.KEYCLOAK_URL}/realms/${process.env.KEYCLOAK_REALM}`;
 }
@@ -34,6 +36,7 @@ async function refreshAccessToken(token: JWT): Promise<JWT> {
         client_secret: process.env.KEYCLOAK_SECRET,
         grant_type: ['refresh_token'],
         refresh_token: token.refresh_token,
+        scope: OIDC_SCOPES,
       };
 
       const formBody: string[] = [];
@@ -85,7 +88,7 @@ export default NextAuth({
             wellKnown: `${buildKeycloakWellKnownURL()}`,
             authorization: {
                 params: {
-                    scope: 'openid email profile',
+                    scope: OIDC_SCOPES,
                     response_type: "code"
                 },
                 url: `${buildKeycloakProtocolBaseURL()}/auth`
@@ -132,7 +135,8 @@ export default NextAuth({
                 return session;
             }).catch((error: AxiosError) => {
                 if(error.isAxiosError) {
-                    console.error(error.response?.data);
+                    const data = error.response?.data;
+                    console.error(`Could not fetch profile for user: ${data["message"]}`);
                 } else {
                     console.error(error);
                 }
@@ -147,13 +151,13 @@ export default NextAuth({
             // over to session callback
             if(account && user) {
                 token.access_token = account.access_token;
-                token.access_token_expires_at = account.expires_at;
+                token.access_token_expires_at = Date.now() + (account.expires_at - 15);
                 token.refresh_token = account.refresh_token;
                 token.refresh_token_expires_at = Date.now() + (account.refresh_expires_in - 15) * 1000;
                 token.user = user;
                 token.name = user.preferred_username;
             }
-
+            
             // Return previous token if the access token has not expired yet
             if (Date.now() < token.access_token_expires_at) {
                 return token;
