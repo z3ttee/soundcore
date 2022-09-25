@@ -60,10 +60,12 @@ async function refreshAccessToken(token: JWT): Promise<JWT> {
       const refreshedTokens = await response.json();
       if (!response.ok) throw refreshedTokens;
 
+      console.log(refreshedTokens)
+
       return {
         ...token,
         access_token: refreshedTokens.access_token,
-        access_token_expires_at: Date.now() + (refreshedTokens.expires_in - 15) * 1000,
+        access_token_expires_at: Date.now() + (refreshedTokens.expires_in - 15),
         refresh_token: refreshedTokens.refresh_token ?? token.refresh_token,
         refresh_token_expires_at: Date.now() + (refreshedTokens.refresh_expires_in - 15) * 1000,
       };
@@ -150,6 +152,8 @@ export default NextAuth({
             // jwt function will be called before handing token
             // over to session callback
             if(account && user) {
+                console.log("Account access token expires at: ", account.expires_at)
+
                 token.access_token = account.access_token;
                 token.access_token_expires_at = Date.now() + (account.expires_at - 15);
                 token.refresh_token = account.refresh_token;
@@ -158,10 +162,13 @@ export default NextAuth({
                 token.name = user.preferred_username;
             }
             
+            console.log(token.access_token_expires_at)
+
             // Return previous token if the access token has not expired yet
             if (Date.now() < token.access_token_expires_at) {
                 return token;
             }
+
 
             // Otherwise return refreshed access token
             return refreshAccessToken(token);

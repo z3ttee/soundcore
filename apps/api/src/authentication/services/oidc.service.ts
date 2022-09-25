@@ -53,7 +53,6 @@ export class OIDCService {
     }
 
     public async verifyAccessToken(tokenValue: string): Promise<void> {
-
         const token = this.jwtService.decode(tokenValue, { complete: true });
         const kid = token?.["header"]?.["kid"];
         const alg = token?.["header"]?.["alg"];
@@ -69,7 +68,10 @@ export class OIDCService {
         const pemEncodedcert = `-----BEGIN CERTIFICATE-----\n${derEncodedCert}\n-----END CERTIFICATE-----`;
         const publicKey = crypto.createPublicKey(pemEncodedcert).export({ type: "pkcs1", format: "pem" });
 
+        console.log(token);
+
         const decoded = this.jwtService.verify(tokenValue, {
+            publicKey,
             secret: publicKey,
             algorithms: [alg]
         })
