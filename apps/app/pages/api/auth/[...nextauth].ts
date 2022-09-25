@@ -2,6 +2,7 @@ import axios, { AxiosError } from "axios";
 import NextAuth from "next-auth"
 import { JWT } from "next-auth/jwt";
 import { Profile } from "../../../entities/Profile";
+import logger, { info } from "../../../lib/logging/logger";
 
 const OIDC_SCOPES = "openid email profile offline_access";
 
@@ -36,7 +37,6 @@ async function refreshAccessToken(token: JWT): Promise<JWT> {
         client_secret: process.env.KEYCLOAK_SECRET,
         grant_type: ['refresh_token'],
         refresh_token: token.refresh_token,
-        scope: OIDC_SCOPES,
       };
 
       const formBody: string[] = [];
@@ -127,7 +127,7 @@ export default NextAuth({
 
             return await axios.get(`${process.env.API_BASE}/v1/profiles/@me`, {
                 headers: {
-                    "Authorization": `Bearer ${token.access_token}`
+                    "Authorization": `Bearer ${session.access_token}`
                 }
             }).then((response) => {
                 const profile = response.data as Profile;
@@ -138,9 +138,9 @@ export default NextAuth({
             }).catch((error: AxiosError) => {
                 if(error.isAxiosError) {
                     const data = error.response?.data;
-                    console.error(`Could not fetch profile for user: ${data["message"]}`);
+                    logger.error(`Could not fetch profile for user: ${data["message"]}`, error.stack);
                 } else {
-                    console.error(error);
+                    logger.error(`Could not fetch profile for user: ${error.message}`, error);
                 }
                 return session;
             })
@@ -161,14 +161,13 @@ export default NextAuth({
                 token.user = user;
                 token.name = user.preferred_username;
             }
-            
-            console.log(token.access_token_expires_at)
 
+            info(token.access_token_expires_at);
+            
             // Return previous token if the access token has not expired yet
             if (Date.now() < token.access_token_expires_at) {
                 return token;
             }
-
 
             // Otherwise return refreshed access token
             return refreshAccessToken(token);
