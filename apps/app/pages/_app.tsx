@@ -11,6 +11,8 @@ import { Session } from 'next-auth';
 import BlankLayout from '../layouts/BlankLayout';
 import { useEffect, useState } from 'react';
 import { useStore } from 'react-redux';
+import { PlaylistService } from '../features/playlist/services/PlaylistService';
+import { setPlaylists } from '../store/playlist/playlistSlice';
 
 interface MyAppInitialPageProps {
   session?: Session;
@@ -77,11 +79,16 @@ function MyApp(props: MyAppProps) {
 }
 
 MyApp.getInitialProps = wrapper.getInitialAppProps((store) => async (context: AppContext) => {
+  // Get initial default props from next
   const appProps = await App.getInitialProps(context);
-  const session = await getSession({ req: context.ctx.req });
 
+  // Create session state
+  const session = await getSession({ req: context.ctx.req });
   await store.dispatch(setSession(session));
-  
+
+  const playlists = await PlaylistService.withToken(store.getState().auth.session?.access_token).findPlaylistsByCurrentUser();
+  await store.dispatch(setPlaylists(playlists.elements));
+
   return {
     pageProps: {
       ...appProps,

@@ -12,6 +12,7 @@ function MainLayout(props: PropsWithChildren<LayoutProps>) {
     const avatarUrl = "";
 
     const profileDestinationPath = `/profile/${profile?.slug}`;
+    const playlists = useSelector((state: AppState) => state.playlist.list);
 
     return (
         <Drawer content={children} showLoader={loading}>
@@ -33,6 +34,10 @@ function MainLayout(props: PropsWithChildren<LayoutProps>) {
                 {/** Show playlists */}
                 <div className="flex-grow overflow-x-hidden overflow-y-auto">
                     <div className="flex flex-col px-box py-window gap-1">
+                        {Object.values(playlists).map((playlist, index) => (
+                            <DrawerLink key={`drawer-playlist-item-${index}`} href="/playlist/1" exact>{playlist.id}</DrawerLink>
+                        ))}
+
                         <DrawerLink href="/playlist/1" exact>Playlist 1</DrawerLink>
                         <DrawerLink href="/playlist/2" exact>Playlist 2</DrawerLink>
                         <DrawerLink href="/playlist/3" exact>Playlist 3</DrawerLink>

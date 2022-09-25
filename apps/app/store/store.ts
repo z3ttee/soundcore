@@ -1,10 +1,12 @@
 import { configureStore, ThunkAction, Action as ReduxAction } from "@reduxjs/toolkit";
 import authSlice from "./authSlice";
 import { createWrapper } from "next-redux-wrapper";
+import playlistSlice from "./playlist/playlistSlice";
 
 const makeStore = () => configureStore({
     reducer: {
         [authSlice.name]: authSlice.reducer,
+        [playlistSlice.name]: playlistSlice.reducer
     },
     devTools: true
 });
