@@ -52,7 +52,8 @@ function MainLayout(props: PropsWithChildren<LayoutProps>) {
                 {/** Profile section */}
                 <div className="px-box py-window">
                     <DrawerProfile username={profile?.name} avatarUrl={avatarUrl} onSignInClicked={() => signIn()}>
-                        <li>Item 1</li>
+                        <DrawerLink href="/admin">Administration</DrawerLink>
+                        <DrawerLink href="/settings">Einstellungen</DrawerLink>
                     </DrawerProfile>
                 </div>
             </div>

@@ -87,7 +87,7 @@ MyApp.getInitialProps = wrapper.getInitialAppProps((store) => async (context: Ap
   await store.dispatch(setSession(session));
 
   const playlists = await PlaylistService.withToken(store.getState().auth.session?.access_token).findPlaylistsByCurrentUser();
-  await store.dispatch(setPlaylists(playlists.elements));
+  await store.dispatch(setPlaylists(playlists?.elements || []));
 
   return {
     pageProps: {

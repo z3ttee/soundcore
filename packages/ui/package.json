@@ -30,6 +30,8 @@
     "react-dom": ">=18.0.0"
   },
   "dependencies": {
+    "@floating-ui/react-dom": "^1.0.0",
+    "@floating-ui/react-dom-interactions": "^0.10.1",
     "next": "12.2.5"
   },
   "devDependencies": {

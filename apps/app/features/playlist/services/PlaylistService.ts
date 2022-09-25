@@ -16,10 +16,12 @@ export class PlaylistService {
             }
         }).then((response) => {
             return response.json().then((result) => {
-                console.log(result);
                 return result;
             });
-        });
+        }).catch((error) => {
+            console.error(error.message);
+            return null;
+        })
     }
 
 }
