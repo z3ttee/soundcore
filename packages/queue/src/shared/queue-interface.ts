@@ -4,13 +4,18 @@ import { EventCallback } from "../queue/events/events";
 export abstract class BaseQueue<T, EN> {
 
     private readonly _events: Map<EN, EventCallback[]> = new Map();
+    private _debounceMs: number = 0;
 
     private readonly _queueSubject: BehaviorSubject<T[]> = new BehaviorSubject([]);
     protected readonly $queue: Observable<T[]> = this._queueSubject.asObservable().pipe(debounceTime(this.debounceMs || 0));
 
-    constructor(
-        private readonly debounceMs: number = 0
-    ) {}
+    constructor(_debounceMs: number = 0) {
+        this._debounceMs = _debounceMs;
+    }
+
+    protected get debounceMs(): number {
+        return this._debounceMs;
+    }
 
     protected get eventRegistry(): Map<EN, EventCallback[]> {
         return this._events;
@@ -22,6 +27,11 @@ export abstract class BaseQueue<T, EN> {
 
     public get size(): number {
         return this._queueSubject.getValue().length;
+    }
+
+    public setDebounceMs(val: number) {
+        if(!val) val = 0;
+        this._debounceMs = val;
     }
 
     /**

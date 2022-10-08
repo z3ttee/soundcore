@@ -17,8 +17,8 @@ export class MountQueueService {
         private readonly events: EventEmitter2,
         private readonly queue: WorkerQueue<Mount>
     ) {
-        this.queue.on("waiting", async (size: number) => {
-            this.logger.debug(`Queue size: ${size}`);
+        this.queue.on("waiting", async () => {
+            this.logger.verbose(`Received jobs concerning scanning for new files. Distributing among workers...`);
         });
 
         this.queue.on("drained", async () => {
@@ -43,9 +43,9 @@ export class MountQueueService {
         });
 
         // Progress
-        this.queue.on("progress", async (job: WorkerJobRef<Mount>, progress: number) => {
-            console.log("Mount " + job.payload.id + " posted progress: " + progress);
-            this.gateway.sendMountUpdateEvent(job.payload, progress);
+        this.queue.on("progress", async (job: WorkerJobRef<Mount>) => {
+            this.logger.debug(`Received progress update from mount ${job.payload.name}: ${job.progress}`);
+            this.gateway.sendMountUpdateEvent(job.payload, job.progress);
         });
 
         // Failed

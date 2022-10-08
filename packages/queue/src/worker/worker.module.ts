@@ -1,4 +1,5 @@
 import { DynamicModule, FactoryProvider, Module, ModuleMetadata } from "@nestjs/common";
+import { WORKERQUEUE_FEATURE_OPTIONS } from "../constants";
 import { QueueModule, QueueOptions } from "../queue/queue.module";
 import { WorkerQueue } from "./entities/worker-queue.entity";
 import { WorkerService } from "./services/worker.service";
@@ -66,13 +67,14 @@ export class WorkerQueueModule {
             ],
             providers: [
                 {
-                    provide: WorkerService,
-                    useValue: new WorkerService(options, queue)
+                    provide: WORKERQUEUE_FEATURE_OPTIONS,
+                    useValue: options
                 },
                 {
                     provide: WorkerQueue,
                     useValue: queue
-                }
+                },
+                WorkerService
             ],
             exports: [
                 WorkerQueue

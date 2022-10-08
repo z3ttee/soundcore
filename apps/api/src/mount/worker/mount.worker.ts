@@ -55,7 +55,7 @@ export default async function (job: WorkerJobRef<Mount>): Promise<MountScanResul
 async function scanMount(job: WorkerJobRef<Mount>, exclude: File[]): Promise<MountScanResultDTO> {
     return new Promise(async (resolve, reject) => {
         // Update progress
-        updateProgress(job, 0.66);
+        updateProgress(job, 0.33);
 
         const mount = job.payload;
         const startTime = Date.now();
@@ -96,6 +96,7 @@ async function scanMount(job: WorkerJobRef<Mount>, exclude: File[]): Promise<Mou
         // Listen for END event.
         // This will be triggered when matching process is done.
         globs.on("end", () => { 
+            updateProgress(job, 0.99);
             resolve(new MountScanResultDTO(files, Date.now() - startTime));
         })
 

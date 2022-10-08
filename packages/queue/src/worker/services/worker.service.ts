@@ -1,21 +1,36 @@
-import { Injectable } from "@nestjs/common";
+import { Inject, Injectable } from "@nestjs/common";
 import workerpool from "workerpool";
-import { WorkerQueueOptions } from "../worker.module";
+import { WorkerQueueModuleOptions, WorkerQueueOptions } from "../worker.module";
 import { WorkerQueue } from "../entities/worker-queue.entity";
 import { Worker } from "../entities/worker.entity";
 import { WorkerExecutionEvent } from "../events/worker.event";
 import path from "path";
+import { WORKERQUEUE_FEATURE_OPTIONS, WORKERQUEUE_MODULE_OPTIONS } from "../../constants";
 
 @Injectable()
 export class WorkerService {
 
+    private readonly _options: WorkerQueueOptions;
+
     private readonly _pool: workerpool.WorkerPool;
-    private readonly _worker = new Worker(path.resolve(this._options.script));
+    private readonly _worker: Worker;
 
     constructor(
-        private readonly _options: WorkerQueueOptions,
+        @Inject(WORKERQUEUE_FEATURE_OPTIONS) options: WorkerQueueOptions,
+        @Inject(WORKERQUEUE_MODULE_OPTIONS) private readonly _moduleOptions: WorkerQueueModuleOptions,
         private readonly queue: WorkerQueue,
     ) {
+        // Replace default options with overwrites
+        this._options = {
+            ...(this._moduleOptions.defaultQueueOptions || {}),
+            ...options
+        }
+
+        this.queue.setDebounceMs(this._options.debounceMs);
+
+        // Create worker
+        this._worker = new Worker(path.resolve(this._options.script));
+
         // Create worker pool
         this._pool = workerpool.pool(path.resolve(__dirname, "..", "worker.js"), {
             workerType: this._options.workerType || "thread",
