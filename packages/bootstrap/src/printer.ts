@@ -3,7 +3,7 @@ import fs from "node:fs";
 
 export class Printer {
 
-    public static async printLogo() {
+    public static async printLogo(): Promise<void> {
         return new Promise((resolve) => {
             const logofilepath = path.resolve(__dirname, "..", "assets", "logo_ascii.txt");
 
@@ -13,7 +13,8 @@ export class Printer {
                 fs.readFile(logofilepath, (err, data) => {
                     if(err) return;
                     console.log(`\n${data.toString("ascii")}\n`);
-                    console.log(`(c) 2022-${year > 2022 ? year : ''} TSAlliance | Starting application with TSAlliance NestJS Bootstrapper\n`);
+                    console.log(`(c) 2022${year > 2022 ? '-' + year : ''} TSAlliance | Starting application with TSAlliance NestJS Bootstrapper\n`);
+                    resolve();
                 })
             }
         })
