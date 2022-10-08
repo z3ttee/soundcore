@@ -20,13 +20,22 @@ class Bootstrapper {
   private _enableCors: boolean = false;
   private _port: number = 3002;
   private _host: string = "0.0.0.0";
+  private _withBuildInfo: boolean = false;
+  private _buildInfoFilepath: string = "./buildinfo.json";
 
   constructor(
+    protected readonly appName: string,
     protected readonly module: any
   ) {}
 
   public useOptions(options: NestApplicationOptions): Bootstrapper {
     this._options = options;
+    return this;
+  }
+
+  public withBuildInfo(filepath: string = "./buildinfo.json"): Bootstrapper {
+    this._withBuildInfo = true;
+    this._buildInfoFilepath = filepath;
     return this;
   }
 
@@ -57,6 +66,8 @@ class Bootstrapper {
   
   public async bootstrap(): Promise<INestApplication> {
     await Printer.printLogo();
+    if(this._withBuildInfo) await Printer.printBootstrapInfo(this.appName, this._buildInfoFilepath);
+    await Printer.printCopyright();
     
     // Build httpsOptions. This will lookup cert and privkey
     // files. If the do not exist, the service will not support https.
@@ -91,8 +102,8 @@ class Bootstrapper {
   }
 }
 
-export function createBootstrap(module: any): Bootstrapper {
-  return new Bootstrapper(module);
+export function createBootstrap(appName: string, module: any): Bootstrapper {
+  return new Bootstrapper(appName, module);
 }
 
 export async function getUrl(): Promise<string> {
