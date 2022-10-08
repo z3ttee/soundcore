@@ -6,10 +6,11 @@ import path from "path";
 import { FileDTO } from "../dtos/file.dto";
 import { MountScanResultDTO } from "../dtos/scan-result.dto";
 import { File } from "../../file/entities/file.entity";
-import { DBWorker } from "../../utils/workers/worker.util";
-import { WorkerFailedEvent, WorkerJob, WorkerJobRef, WorkerProgressEvent } from "@soundcore/nest-queue";
+import { WorkerFailedEvent, WorkerJobRef, WorkerProgressEvent } from "@soundcore/nest-queue";
 
 import workerpool from "workerpool";
+import Database from "../../utils/database/database-worker-client";
+import { FileSystemService } from "../../filesystem/services/filesystem.service";
 
 const logger = new Logger("MountWorker");
 
@@ -24,24 +25,22 @@ export default async function (job: WorkerJobRef<Mount>): Promise<MountScanResul
         throw new Error("Invalid mount: null");
     }
 
-    return DBWorker.instance().then((worker) => {
-        return worker.establishConnection().then((dataSource) => {
-            const repository = dataSource.getRepository(File);
-            const fileSystem = worker.getFileSystem();
+    return Database.connect().then((dataSource) => {
+        const repository = dataSource.getRepository(File);
+        const fileSystem = new FileSystemService();
 
-            return repository.find({ where: { mount: { id: mount.id }, }, select: ["name", "directory"]}).then((existingFiles) => {
-                const mountDirectory = fileSystem.resolveMountPath(mount);
+        return repository.find({ where: { mount: { id: mount.id }, }, select: ["name", "directory"]}).then((existingFiles) => {
+            const mountDirectory = fileSystem.resolveMountPath(mount);
 
-                // Create directory if it does not exist.
-                if(!fs.existsSync(mountDirectory)) {
-                    logger.warn(`Could not find directory '${mountDirectory}'. Creating it...`);
-                    fs.mkdirSync(mountDirectory, { recursive: true });
-                    logger.verbose(`Created directory '${mountDirectory}'.`);
-                }
+            // Create directory if it does not exist.
+            if(!fs.existsSync(mountDirectory)) {
+                logger.warn(`Could not find directory '${mountDirectory}'. Creating it...`);
+                fs.mkdirSync(mountDirectory, { recursive: true });
+                logger.verbose(`Created directory '${mountDirectory}'.`);
+            }
     
-                // Execute scan
-                return scanMount(job, existingFiles);
-            })
+            // Execute scan
+            return scanMount(job, existingFiles);
         });
     });
 }

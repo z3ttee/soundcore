@@ -10,7 +10,6 @@ import { AlbumService } from "../../album/album.service";
 import { ArtworkService } from "../../artwork/services/artwork.service";
 import { Artwork } from "../../artwork/entities/artwork.entity";
 import { Logger } from "@nestjs/common";
-import { DBWorker } from "../../utils/workers/worker.util";
 import { FileService } from "../../file/services/file.service";
 import { EventEmitter2 } from "@nestjs/event-emitter";
 import { File, FileFlag } from "../../file/entities/file.entity";
@@ -21,6 +20,9 @@ import { MeiliArtistService } from "../../meilisearch/services/meili-artist.serv
 import { MeiliAlbumService } from "../../meilisearch/services/meili-album.service";
 import { MeiliSongService } from "../../meilisearch/services/meili-song.service";
 import { CreateResult } from "../../utils/results/creation.result";
+import Database from "../../utils/database/database-worker-client";
+import { FileSystemService } from "../../filesystem/services/filesystem.service";
+import Meilisearch from "../../utils/database/meilisearch-worker-client";
 
 const logger = new Logger("IndexerWorker");
 
@@ -30,11 +32,9 @@ export default function (job: Job<IndexerProcessDTO>, dc: DoneCallback) {
     const mode = job.data.mode || IndexerProcessMode.SCAN;
     const filepath = path.join(mount.directory, file.directory, file.name);
 
-    DBWorker.instance().then((worker) => {
-        worker.establishConnection().then((dataSource) => {
-            const meiliClient = worker.meiliClient();
-            const fileSystem = worker.getFileSystem();
-
+    Database.connect().then((dataSource) => {
+        Meilisearch.connect().then((meiliClient) => {
+            const fileSystem = new FileSystemService();
             const eventEmitter = new EventEmitter2();
 
             const songRepo = dataSource.getRepository(Song);

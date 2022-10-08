@@ -8,6 +8,7 @@ import { Artwork } from "../../artwork/entities/artwork.entity";
 import { ArtworkService } from "../../artwork/services/artwork.service";
 import { Distributor } from "../../distributor/entities/distributor.entity";
 import { DistributorService } from "../../distributor/services/distributor.service";
+import { FileSystemService } from "../../filesystem/services/filesystem.service";
 import { Genre } from "../../genre/entities/genre.entity";
 import { GenreService } from "../../genre/services/genre.service";
 import { Label } from "../../label/entities/label.entity";
@@ -22,18 +23,17 @@ import { Publisher } from "../../publisher/entities/publisher.entity";
 import { PublisherService } from "../../publisher/services/publisher.service";
 import { Song } from "../../song/entities/song.entity";
 import { SongService } from "../../song/song.service";
+import Database from "../../utils/database/database-worker-client";
+import Meilisearch from "../../utils/database/meilisearch-worker-client";
 import { GeniusFlag, Resource } from "../../utils/entities/resource";
-import { DBWorker } from "../../utils/workers/worker.util";
 import { GeniusProcessDTO, GeniusProcessType } from "../dtos/genius-process.dto";
 import { GeniusClientService } from "../services/genius-client.service";
 
 export default function (job: Job<GeniusProcessDTO>, dc: DoneCallback) {
 
-    DBWorker.instance().then((worker) => {
-        worker.establishConnection().then(async (dataSource) => {
-            const fileSystem = worker.getFileSystem();
-            const meiliClient = worker.meiliClient();
-
+    Database.connect().then((dataSource) => {
+        Meilisearch.connect().then(async (meiliClient) => {
+            const fileSystem = new FileSystemService();
             const eventEmitter = new EventEmitter2();
 
             // Build services
