@@ -18,9 +18,14 @@ export class WorkerService {
     ) {
         // Create worker pool
         this._pool = workerpool.pool(path.resolve(__dirname, "..", "worker.js"), {
-            workerType: this._options.workerType || "auto",
+            workerType: this._options.workerType || "thread",
             minWorkers: 1,
-            maxWorkers: this._options.concurrent || 1
+            maxWorkers: this._options.concurrent || 1,
+            forkOpts: {
+                env: {
+                    ...process.env
+                }
+            }
         });
         
         // Listen to events
@@ -43,8 +48,11 @@ export class WorkerService {
 
                 // Dequeue item from the queue
                 const job = await this.queue.dequeue();
+                const env = {
+                    ...process.env
+                }
 
-                this._pool.exec("default", [ this._worker, job ], {
+                this._pool.exec("default", [ env, this._worker, job ], {
                     on: (event: WorkerExecutionEvent) => {
                         this.queue.fireEvent(event.name, event.job, event.error);
                     }

@@ -1,6 +1,7 @@
 import path from "path";
 import { WorkerJob, WorkerJobRef } from "./entities/worker-job.entity";
 import { Worker } from "./entities/worker.entity";
+import { WorkerEnv } from "./entities/worker.env.entity";
 import { WorkerCompletedEvent } from "./events/workerCompleted.event";
 import { WorkerFailedEvent } from "./events/workerFailed.event";
 import { WorkerStartedEvent } from "./events/workerStarted.event";
@@ -8,7 +9,16 @@ import { WorkerStartedEvent } from "./events/workerStarted.event";
 const workerpool = require('workerpool');
 
 // // a deliberately inefficient implementation of the fibonacci sequence
-async function executeScript(worker: Worker, jobData: WorkerJob) {   
+async function executeScript(env: WorkerEnv, worker: Worker, jobData: WorkerJob) {   
+
+    // Modify process env with the env
+    // of parent (docs say, the env is copied, but tests
+    // showed that the modified env by ConfigModule is not copied)
+    process.env = {
+        ...process.env,
+        ...env
+    }
+
     // Build execution function
     const execute = async (job: WorkerJob) => {
         const script = path.resolve(worker.script);
