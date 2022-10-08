@@ -11,7 +11,7 @@ export class WorkerService {
 
     constructor(
         private readonly options: WorkerQueueOptions,
-        private readonly queue: WorkerQueue
+        private readonly queue: WorkerQueue,
     ) {
         // Create worker pool
         this._pool = workerpool.pool(this.options.script, {

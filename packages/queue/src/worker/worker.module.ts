@@ -1,14 +1,11 @@
 import { DynamicModule, FactoryProvider, Module, ModuleMetadata } from "@nestjs/common";
 import { QueueModule, QueueOptions } from "../queue/queue.module";
+import { WorkerQueue } from "./entities/worker-queue.entity";
 import { WorkerService } from "./services/worker.service";
 import { createRedisOptionsProviderAsync } from "./utils";
 
+
 export interface WorkerQueueOptions extends QueueOptions {
-    /**
-     * Path to the javascript script file that contains the
-     * worker's code.
-     */
-    script: string;
 
     /**
      * Define how many milliseconds the queue waits before
@@ -18,20 +15,29 @@ export interface WorkerQueueOptions extends QueueOptions {
     waitBetweenMs?: number;
 
     /**
+     * @default thread
+     */
+    workerType?: "auto" | "process" | "thread";
+
+    /**
+     * Path to the javascript script file that contains the
+     * worker's code.
+     */
+    script: string;
+
+    /**
      * Define how many workers are processed simultaneously.
      * @default 1
      */
     concurrent?: number;
-
-    /**
-     * @default thread
-     */
-    workerType?: "auto" | "process" | "thread";
 }
 
 export interface WorkerQueueModuleOptions {
-    defaultWorkerOptions?: WorkerOptions;
-    defaultQueueOptions?: WorkerQueueOptions;
+    defaultQueueOptions?: {} 
+        & Pick<WorkerQueueOptions, "concurrent"> 
+        & Pick<WorkerQueueOptions, "waitBetweenMs"> 
+        & Pick<WorkerQueueOptions, "workerType"> 
+        & Pick<WorkerQueueOptions, "debounceMs">;
 }
 
 export interface WorkerQueueAsyncOptions extends Pick<ModuleMetadata, 'imports'>, Pick<FactoryProvider, 'inject'> {
@@ -59,17 +65,25 @@ export class WorkerQueueModule {
     }
 
     public static forFeature(options: WorkerQueueOptions): DynamicModule {
+        const queue = new WorkerQueue(options);
+
         return {
             module: WorkerQueueModule,
             imports: [
-                QueueModule.forFeature(options)
+                
             ],
             providers: [
-                WorkerService
+                {
+                    provide: WorkerService,
+                    useValue: new WorkerService(options, queue)
+                },
+                {
+                    provide: WorkerQueue,
+                    useValue: queue
+                }
             ],
             exports: [
-                QueueModule,
-                WorkerService
+                WorkerQueue
             ]
         }
     }

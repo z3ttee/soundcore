@@ -7,7 +7,7 @@
     "*.json"
   ],
   "exports": {
-    ".": "./base.json",
+    "./base": "./base.json",
     "./nextjs": "./nextjs.json",
     "./nestjs": "./nestjs.json",
     "./react-library": "./react-library.json"

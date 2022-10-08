@@ -1,5 +1,6 @@
 import { QueueEvent, QueueEventName } from "../../queue/events/events";
 import { BaseQueue } from "../../shared/queue-interface";
+import { WorkerQueueOptions } from "../worker.module";
 import { Worker } from "./worker.entity";
 
 type WorkerStartedEvent<T> = (worker: Worker<T>) => Promise<void> | void;
@@ -17,8 +18,18 @@ export type WorkerEvent<T, EN = WorkerEventName, R = any, E = Error> =
 
 export class WorkerQueue extends BaseQueue<Worker, WorkerEventName, WorkerEvent<Worker, WorkerEventName>> {
 
-    constructor(debounceMs: number = 0) {
-        super(debounceMs);
+    constructor(private readonly _options: WorkerQueueOptions) {
+        super(_options.debounceMs || 0);
+
+        this.$queue.subscribe((queue) => {
+            if(queue.length > 0) {
+                const handler: QueueEvent<"waiting"> = this.eventRegistry.get("waiting") as QueueEvent<"waiting">;
+                if(typeof handler !== "undefined" && handler != null) handler(queue.length);
+            } else {
+                const handler: QueueEvent<"drained"> = this.eventRegistry.get("drained") as QueueEvent<"drained">;
+                if(typeof handler !== "undefined" && handler != null) handler();
+            }  
+        })
     }
 
 
