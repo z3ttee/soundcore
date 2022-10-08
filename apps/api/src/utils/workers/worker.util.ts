@@ -43,6 +43,8 @@ export class DBWorker {
      */
     private createMeiliInstance() {
         if(!this._meili) {
+            console.log(process.env.MEILISEARCH_HOST);
+
             this._meili = new MeiliSearch({
                 host: `${process.env.MEILISEARCH_HOST}:${process.env.MEILISEARCH_PORT}`,
                 headers: {

@@ -11,14 +11,14 @@ in the following example:
 ```
 
 ## Worker Queue Events
-started: (job: WorkerJob<T>) => Promise<void> | void
-completed: (job: WorkerJob<T>, result: R) => Promise<void> | void;
-failed: (job: WorkerJob<T>, error: E) => Promise<void> | void;
-progress: (job: WorkerJob<T>, progress: number) => Promise<void> | void;
+started: (job: WorkerJob<T, R>) => Promise<void> | void
+completed: (job: WorkerJob<T, R>, result: R) => Promise<void> | void;
+failed: (job: WorkerJobRef<T>, error: E) => Promise<void> | void;
+progress: (job: WorkerJobRef<T>, progress: number) => Promise<void> | void;
 
 ## Creating a worker and emit progress
 ```javascript
-export default function (job: WorkerJob<any>) {
+export default function (job: WorkerJobRef<any>) {
     workerpool.workerEmit(new WorkerProgressEvent(job, 0.3));
 }
 ```

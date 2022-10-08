@@ -1,5 +1,5 @@
 import path from "path";
-import { WorkerJob } from "./entities/worker-job.entity";
+import { WorkerJob, WorkerJobRef } from "./entities/worker-job.entity";
 import { Worker } from "./entities/worker.entity";
 import { WorkerCompletedEvent } from "./events/workerCompleted.event";
 import { WorkerFailedEvent } from "./events/workerFailed.event";
@@ -12,7 +12,7 @@ async function executeScript(worker: Worker, jobData: WorkerJob) {
     // Build execution function
     const execute = async (job: WorkerJob) => {
         const script = path.resolve(worker.script);
-        const workerFunction: (job: WorkerJob) => any = require(script)?.default;
+        const workerFunction: (job: WorkerJobRef) => any = require(script)?.default;
 
         // Throw error if script file does not have a valid default export
         if(typeof workerFunction !== "function") {
@@ -23,7 +23,7 @@ async function executeScript(worker: Worker, jobData: WorkerJob) {
         workerpool.workerEmit(new WorkerStartedEvent(job));
 
         // Execute function
-        return await workerFunction(job);
+        return await workerFunction(WorkerJobRef.fromJob(job));
     }
         
     try {
@@ -35,10 +35,10 @@ async function executeScript(worker: Worker, jobData: WorkerJob) {
             workerpool.workerEmit(new WorkerCompletedEvent(jobData));
         }).catch((error: Error) => {
             // Catch error and fire failed event
-            workerpool.workerEmit(new WorkerFailedEvent(jobData, error));
+            workerpool.workerEmit(new WorkerFailedEvent(WorkerJobRef.fromJob(jobData), error));
         });
     } catch (error) {
-        workerpool.workerEmit(new WorkerFailedEvent(jobData, error as Error ));
+        workerpool.workerEmit(new WorkerFailedEvent(WorkerJobRef.fromJob(jobData), error as Error ));
     }
 
 }

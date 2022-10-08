@@ -149,8 +149,6 @@ export class MountService {
         const mount = await this.resolveMount(idOrObject);
         const priority = mount.filesCount;
 
-        console.log("adding mount");
-
         this.queue.enqueue(mount);
 
         // this.queue.enqueue(new WorkerJ)

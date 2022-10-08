@@ -1,6 +1,6 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { EventEmitter2 } from "@nestjs/event-emitter";
-import { WorkerJob, WorkerQueue } from "@soundcore/nest-queue";
+import { WorkerJob, WorkerJobRef, WorkerQueue } from "@soundcore/nest-queue";
 import { EVENT_FILES_FOUND } from "../../constants";
 import { FilesFoundEvent } from "../../events/files-found.event";
 import { Mount } from "../entities/mount.entity";
@@ -43,13 +43,13 @@ export class MountQueueService {
         });
 
         // Progress
-        this.queue.on("progress", async (job: WorkerJob<Mount>, progress: number) => {
+        this.queue.on("progress", async (job: WorkerJobRef<Mount>, progress: number) => {
             console.log("Mount " + job.payload.id + " posted progress: " + progress);
             this.gateway.sendMountUpdateEvent(job.payload, progress);
         });
 
         // Failed
-        this.queue.on("failed", async (job: WorkerJob<Mount>, error: Error) => {
+        this.queue.on("failed", async (job: WorkerJobRef<Mount>, error: Error) => {
             this.logger.error(`Failed scanning mount ${job.payload.name}: ${error.message}`, error.stack);
         });
     }

@@ -156,8 +156,6 @@ export class FileSystemService {
      */
     private readOrCreateInstanceId(): string {
         const filepath = path.join(this.getInstanceDir(), SC_IDFILE_NAME);
-
-        console.log(filepath);
         let instanceId: string;
 
         // If instanceId file does not already exist:

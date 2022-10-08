@@ -1,6 +1,6 @@
 import { BaseQueue } from "../../shared/queue-interface";
 import { WorkerQueueOptions } from "../worker.module";
-import { WorkerJob } from "./worker-job.entity";
+import { WorkerJob, WorkerJobRef } from "./worker-job.entity";
 
 export type WorkerEventName = "waiting" | "drained" | "started" | "completed" | "failed" | "progress";
 
@@ -20,11 +20,12 @@ export class WorkerQueue<T = any> extends BaseQueue<WorkerJob<T>, WorkerEventNam
         })
     }
 
-    public async fireEvent(eventName: WorkerEventName, job: WorkerJob, ...args) {
+    public async fireEvent(eventName: WorkerEventName, job: WorkerJob | WorkerJobRef, ...args) {
         const eventHandlers = this.eventRegistry.get(eventName);
         if(typeof eventHandlers === "undefined" || eventHandlers == null) return;
         
-        eventHandlers.forEach((handler) => handler(job, ...args));
+        const jobData: WorkerJob = job["isRef"] ? WorkerJob.fromRef(job as WorkerJobRef) : job as WorkerJob;
+        eventHandlers.forEach((handler) => handler(jobData, ...args));
     }
 
     public override enqueue(payload: any): Promise<number> {
