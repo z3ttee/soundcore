@@ -2,6 +2,7 @@ import { INestApplication, NestApplicationOptions, NestHybridApplicationOptions,
 import { NestFactory } from "@nestjs/core";
 import { MicroserviceOptions } from '@nestjs/microservices';
 import { BehaviorSubject, filter, firstValueFrom, map } from "rxjs";
+import { Printer } from "./printer";
 import { buildHttpsOptions } from "./ssl";
 
 const appUrlSubject: BehaviorSubject<string> = new BehaviorSubject(null);
@@ -55,6 +56,8 @@ class Bootstrapper {
   }
   
   public async bootstrap(): Promise<INestApplication> {
+    await Printer.printLogo();
+    
     // Build httpsOptions. This will lookup cert and privkey
     // files. If the do not exist, the service will not support https.
     const httpsOptions = await buildHttpsOptions();
