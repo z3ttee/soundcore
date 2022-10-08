@@ -143,14 +143,15 @@ export abstract class MeiliService<T = any> {
      * or filterableAttributes).
      */
     private _init() {
-        this.client().createIndex(this._indexUid, { primaryKey: "id" }).then(() => {
-            this.client().index<T>(this._indexUid).updateFilterableAttributes(this._options.filterableAttributes || [])
-            this.client().index<T>(this._indexUid).updateSearchableAttributes(this._options.searchableAttributes || ["*"])
-        }).catch((error: MeiliSearchError) => {
-            this._logger.error(`Error occured while initializing Index on meilisearch: ${error.message}`, error.stack);
-        }).finally(() => {
-            this._initializedSubject.next(true);
-        });
+        // TODO
+        // this.client().createIndex(this._indexUid, { primaryKey: "id" }).then(() => {
+        //     this.client().index<T>(this._indexUid).updateFilterableAttributes(this._options.filterableAttributes || [])
+        //     this.client().index<T>(this._indexUid).updateSearchableAttributes(this._options.searchableAttributes || ["*"])
+        // }).catch((error: MeiliSearchError) => {
+        //     this._logger.error(`Error occured while initializing Index on meilisearch: ${error.message}`, error.stack);
+        // }).finally(() => {
+        //     this._initializedSubject.next(true);
+        // });
     }
 
 }

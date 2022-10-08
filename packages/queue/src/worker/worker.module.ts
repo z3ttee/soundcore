@@ -8,13 +8,6 @@ import { createRedisOptionsProviderAsync } from "./utils";
 export interface WorkerQueueOptions extends QueueOptions {
 
     /**
-     * Define how many milliseconds the queue waits before
-     * processing the next item from the queue.
-     * @default 0
-     */
-    waitBetweenMs?: number;
-
-    /**
      * @default thread
      */
     workerType?: "auto" | "process" | "thread";
@@ -35,7 +28,6 @@ export interface WorkerQueueOptions extends QueueOptions {
 export interface WorkerQueueModuleOptions {
     defaultQueueOptions?: {} 
         & Pick<WorkerQueueOptions, "concurrent"> 
-        & Pick<WorkerQueueOptions, "waitBetweenMs"> 
         & Pick<WorkerQueueOptions, "workerType"> 
         & Pick<WorkerQueueOptions, "debounceMs">;
 }

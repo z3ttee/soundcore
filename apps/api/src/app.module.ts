@@ -36,6 +36,7 @@ import { HealthModule } from './health/health.module';
 import { HeartbeatServerModule } from "@soundcore/heartbeat";
 import { ConfigModule } from '@soundcore/common';
 import { DiscoveryModule } from './discovery/discovery.module';
+import { WorkerQueueModule } from '@soundcore/nest-queue';
 
 @Module({
   imports: [
@@ -63,6 +64,15 @@ import { DiscoveryModule } from './discovery/discovery.module';
     }),
     PipesModule,
     CronModule,
+    WorkerQueueModule.forRootAsync({
+      useFactory: () => ({
+        defaultQueueOptions: {
+          concurrent: 1,
+          workerType: "thread",
+          debounceMs: 500
+        }
+      })
+    }),
     BullModule.forRoot({
       redis: {
         host: process.env.REDIS_HOST,

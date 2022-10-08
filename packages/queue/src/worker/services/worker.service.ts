@@ -3,48 +3,54 @@ import workerpool from "workerpool";
 import { WorkerQueueOptions } from "../worker.module";
 import { WorkerQueue } from "../entities/worker-queue.entity";
 import { Worker } from "../entities/worker.entity";
+import { WorkerExecutionEvent } from "../events/worker.event";
+import path from "path";
 
 @Injectable()
 export class WorkerService {
 
     private readonly _pool: workerpool.WorkerPool;
+    private readonly _worker = new Worker(path.resolve(this._options.script));
 
     constructor(
-        private readonly options: WorkerQueueOptions,
+        private readonly _options: WorkerQueueOptions,
         private readonly queue: WorkerQueue,
     ) {
         // Create worker pool
-        this._pool = workerpool.pool(this.options.script, {
-            workerType: this.options.workerType || "thread",
+        this._pool = workerpool.pool(path.resolve(__dirname, "..", "worker.js"), {
+            workerType: this._options.workerType || "auto",
             minWorkers: 1,
-            maxWorkers: this.options.concurrent || 1
+            maxWorkers: this._options.concurrent || 1
         });
         
         // Listen to events
-        this.queue.on("waiting", (size: number) => {
-            console.log("worker queue size: ", size);
+        this.queue.on("waiting", () => {
+            this.offerNewItemToWorkers();
         });
+    }
 
-        this.queue.on("drained", () => {
-            console.log("queue empty");
-        });
+    private async offerNewItemToWorkers() {
+        const stats = this._pool.stats();
 
-        this.queue.on("started", (worker: Worker) => {
-            console.log("Worker with id " + worker.id + " started with next item.");
-        });
+        // Only continue, if there are idle workers
+        // and if there are no pending tasks
+        if(stats.idleWorkers > 0 && stats.pendingTasks <= 0) {
+            // For every idle worker, offer them
+            // a new task via pool proxy
+            for(let i = 0; i < stats.idleWorkers; i++) {
+                // Break the loop, if the queue is empty
+                if(this.queue.size <= 0) break;
 
-        this.queue.on("completed", (worker: Worker, result: any) => {
-            console.log("Worker with id " + worker.id + " completed task. Result: " + JSON.stringify(result));
-        });
+                // Dequeue item from the queue
+                const job = await this.queue.dequeue();
 
-        this.queue.on("progress", (worker: Worker, progress: number) => {
-            console.log("Worker with id " + worker.id + " posted progress: " + progress);
-        });
-
-        this.queue.on("failed", (worker: Worker, error: Error) => {
-            console.log("Worker with id " + worker.id + " reported an error: " + error.message);
-            console.error(error);
-        });
+                this._pool.exec("default", [ this._worker, job ], {
+                    on: (event: WorkerExecutionEvent) => {
+                        this.queue.fireEvent(event.name, event.job, event.error);
+                    }
+                });
+            }
+        }
     }
 
     

@@ -6,7 +6,8 @@ import { Queue } from 'bull';
 import { Page, Pageable } from 'nestjs-pager';
 import path from 'path';
 import { Repository } from 'typeorm';
-import { EVENT_FILE_FOUND, EVENT_FILE_PROCESSED, QUEUE_FILE_NAME } from '../../constants';
+import { EVENT_FILES_FOUND, EVENT_FILE_PROCESSED, QUEUE_FILE_NAME } from '../../constants';
+import { FilesFoundEvent } from '../../events/files-found.event';
 import { FileDTO } from '../../mount/dtos/file.dto';
 import { Mount } from '../../mount/entities/mount.entity';
 import { Song } from '../../song/entities/song.entity';
@@ -39,9 +40,12 @@ export class FileService {
      * @param file Found file data
      * @param workerOptions Worker options
      */
-    @OnEvent(EVENT_FILE_FOUND)
-    public handleFileFoundEvent(file: FileDTO) {
-        return this.processFile(file);
+    @OnEvent(EVENT_FILES_FOUND)
+    public handleFilesFoundEvent(event: FilesFoundEvent) {
+        // TODO: Use batching
+        for(const file of event.files) {
+            this.processFile(file);
+        }
     }
 
     public async findById(fileId: string): Promise<File> {

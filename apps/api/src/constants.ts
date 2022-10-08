@@ -20,7 +20,7 @@ export const TYPEORM_CONNECTION_INDEXER = "indexer-connection"
 export const TYPEORM_CONNECTION_GENERAL = "default"
 
 // Internal events
-export const EVENT_FILE_FOUND = "file-found-event"
+export const EVENT_FILES_FOUND = "files-found-event"
 export const EVENT_FILE_PROCESSED = "file-processed-event"
 export const EVENT_METADATA_CREATED = "metadata-created-event"
 export const EVENT_ARTIST_CHANGED = "artist-changed-event"

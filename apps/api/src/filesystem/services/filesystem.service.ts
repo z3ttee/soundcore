@@ -156,6 +156,8 @@ export class FileSystemService {
      */
     private readOrCreateInstanceId(): string {
         const filepath = path.join(this.getInstanceDir(), SC_IDFILE_NAME);
+
+        console.log(filepath);
         let instanceId: string;
 
         // If instanceId file does not already exist:
@@ -165,6 +167,7 @@ export class FileSystemService {
         if(!fs.existsSync(filepath)) {
             this._logger.warn(`Could not find file ${SC_IDFILE_NAME}. Creating new instance id.`);
             instanceId = Random.randomString(36);
+            fs.mkdirSync(path.dirname(filepath), { recursive: true });
             fs.writeFileSync(filepath, instanceId, { encoding: "utf-8" });
             return instanceId;
         } else {

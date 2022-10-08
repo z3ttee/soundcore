@@ -1,19 +1,16 @@
-import { InjectQueue } from '@nestjs/bull';
 import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
-import Bull, { Queue } from 'bull';
 import { Page, Pageable } from 'nestjs-pager';
 import path from 'path';
 import { Repository } from 'typeorm';
 import { Bucket } from '../../bucket/entities/bucket.entity';
-import { QUEUE_MOUNTSCAN_NAME } from '../../constants';
 import { CreateMountDTO } from '../dtos/create-mount.dto';
 import { UpdateMountDTO } from '../dtos/update-mount.dto';
 import { Mount } from '../entities/mount.entity';
-import { MountScanProcessDTO } from '../dtos/mount-scan.dto';
 import { Random } from '@tsalliance/utilities';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateResult } from '../../utils/results/creation.result';
 import { FileSystemService } from '../../filesystem/services/filesystem.service';
+import { Worker, WorkerQueue } from '@soundcore/nest-queue';
 
 @Injectable()
 export class MountService {
@@ -22,7 +19,8 @@ export class MountService {
     constructor(
         @InjectRepository(Mount) private readonly repository: Repository<Mount>,
         private readonly fileSystem: FileSystemService,
-        @InjectQueue(QUEUE_MOUNTSCAN_NAME) private readonly queue: Queue<MountScanProcessDTO>
+        private readonly queue: WorkerQueue
+        // @InjectQueue(QUEUE_MOUNTSCAN_NAME) private readonly queue: Queue<MountScanProcessDTO>
     ) { }
 
     /**
@@ -147,14 +145,20 @@ export class MountService {
      * @param idOrObject Mount ID or Object
      * @returns Job<Mount>
      */
-    public async rescanMount(idOrObject: string | Mount): Promise<Bull.Job<MountScanProcessDTO>> {
+    public async rescanMount(idOrObject: string | Mount): Promise<any> {
         const mount = await this.resolveMount(idOrObject);
         const priority = mount.filesCount;
 
-        return this.queue.add(new MountScanProcessDTO(mount), { priority }).then((job) => {
-            this.logger.debug(`Added mount '${mount.name} #${job.id}' to scanner queue.`);
-            return job;
-        });
+        console.log("adding mount");
+
+        this.queue.enqueue(mount);
+
+        // this.queue.enqueue(new WorkerJ)
+
+        // return this.queue.add(new MountScanProcessDTO(mount), { priority }).then((job) => {
+        //     this.logger.debug(`Added mount '${mount.name} #${job.id}' to scanner queue.`);
+        //     return job;
+        // });
     }
 
     /**

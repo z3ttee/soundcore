@@ -9,3 +9,17 @@ in the following example:
 ```javascript
 
 ```
+
+## Worker Queue Events
+started: (job: WorkerJob<T>) => Promise<void> | void
+completed: (job: WorkerJob<T>, result: R) => Promise<void> | void;
+failed: (job: WorkerJob<T>, error: E) => Promise<void> | void;
+progress: (job: WorkerJob<T>, progress: number) => Promise<void> | void;
+
+## Creating a worker and emit progress
+```javascript
+export default function (job: WorkerJob<any>) {
+    workerpool.workerEmit(new WorkerProgressEvent(job, 0.3));
+}
+```
+

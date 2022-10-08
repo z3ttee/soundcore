@@ -1,36 +1,35 @@
-import { QueueEvent, QueueEventName } from "../../queue/events/events";
 import { BaseQueue } from "../../shared/queue-interface";
 import { WorkerQueueOptions } from "../worker.module";
-import { Worker } from "./worker.entity";
+import { WorkerJob } from "./worker-job.entity";
 
-type WorkerStartedEvent<T> = (worker: Worker<T>) => Promise<void> | void;
-type WorkerCompletedEvent<T, R = any> = (worker: Worker<T>, result: R) => Promise<void> | void;
-type WorkerFailedEvent<T, E = Error> = (worker: Worker<T>, error: E) => Promise<void> | void;
-type WorkerProgressEvent<T> = (worker: Worker<T>, progress: number) => Promise<void> | void;
+export type WorkerEventName = "waiting" | "drained" | "started" | "completed" | "failed" | "progress";
 
-export type WorkerEventName = QueueEventName | "started" | "completed" | "failed" | "progress";
-export type WorkerEvent<T, EN = WorkerEventName, R = any, E = Error> = 
-    EN extends QueueEventName ? QueueEvent<QueueEventName> :
-    EN extends "started" ? WorkerStartedEvent<T> :
-    EN extends "completed" ? WorkerCompletedEvent<T, R> :
-    EN extends "failed" ? WorkerFailedEvent<T, E> :
-    EN extends "progress" ? WorkerProgressEvent<T> : Promise<never> | never;
-
-export class WorkerQueue extends BaseQueue<Worker, WorkerEventName, WorkerEvent<Worker, WorkerEventName>> {
+export class WorkerQueue<T = any> extends BaseQueue<WorkerJob<T>, WorkerEventName> {
 
     constructor(private readonly _options: WorkerQueueOptions) {
         super(_options.debounceMs || 0);
 
         this.$queue.subscribe((queue) => {
             if(queue.length > 0) {
-                const handler: QueueEvent<"waiting"> = this.eventRegistry.get("waiting") as QueueEvent<"waiting">;
-                if(typeof handler !== "undefined" && handler != null) handler(queue.length);
+                const handlers = this.eventRegistry.get("waiting");
+                if(typeof handlers !== "undefined" && handlers != null) handlers.forEach((handler) => handler(queue.length));
             } else {
-                const handler: QueueEvent<"drained"> = this.eventRegistry.get("drained") as QueueEvent<"drained">;
-                if(typeof handler !== "undefined" && handler != null) handler();
+                const handlers = this.eventRegistry.get("drained");
+                if(typeof handlers !== "undefined" && handlers != null) handlers.forEach((handler) => handler(queue.length));
             }  
         })
     }
 
+    public async fireEvent(eventName: WorkerEventName, job: WorkerJob, ...args) {
+        const eventHandlers = this.eventRegistry.get(eventName);
+        if(typeof eventHandlers === "undefined" || eventHandlers == null) return;
+        
+        eventHandlers.forEach((handler) => handler(job, ...args));
+    }
+
+    public override enqueue(payload: any): Promise<number> {
+        const job = new WorkerJob<T>(payload);
+        return super.enqueue(job);
+    }
 
 }
