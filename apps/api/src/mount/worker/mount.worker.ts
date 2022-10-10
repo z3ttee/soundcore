@@ -11,6 +11,7 @@ import { WorkerFailedEvent, WorkerJobRef, WorkerProgressEvent } from "@soundcore
 import workerpool from "workerpool";
 import Database from "../../utils/database/database-worker-client";
 import { FileSystemService } from "../../filesystem/services/filesystem.service";
+import Debug from "../../utils/debug";
 
 const logger = new Logger("MountWorker");
 
@@ -36,7 +37,6 @@ export default async function (job: WorkerJobRef<Mount>): Promise<MountScanResul
             if(!fs.existsSync(mountDirectory)) {
                 logger.warn(`Could not find directory '${mountDirectory}'. Creating it...`);
                 fs.mkdirSync(mountDirectory, { recursive: true });
-                logger.verbose(`Created directory '${mountDirectory}'.`);
             }
     
             // Execute scan
@@ -67,14 +67,12 @@ async function scanMount(job: WorkerJobRef<Mount>, exclude: File[]): Promise<Mou
         // If there are files to exclude,
         // build the filter list.
         if(exclude.length > 0) {
-            logger.debug(`[${mount.name}] Building exclude list using ${exclude.length} files...`);
+            if(Debug.isDebug) logger.debug(`[${mount.name}] Building exclude list using ${exclude.length} files...`);
             for(let i = 0; i < exclude.length; i++) {
                 excludeList.push(path.join(exclude[i].directory, exclude[i].name));
             }
-            logger.debug(`[${mount.name}] Building exclude list took ${Date.now()-startTime}ms.`);
+            if(Debug.isDebug) logger.debug(`[${mount.name}] Building exclude list took ${Date.now()-startTime}ms.`);
         }
-
-        logger.log(`Scanning directory '${mount.directory}' on mount '${mount.name}'. PID: ${process.pid}`);
 
         // Execute scan
         const files: FileDTO[] = [];

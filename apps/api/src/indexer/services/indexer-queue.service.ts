@@ -6,6 +6,7 @@ import { EVENT_FILES_PROCESSED, EVENT_METADATA_CREATED } from "../../constants";
 import { FilesProcessedEvent } from "../../events/files-processed.event";
 import { File } from "../../file/entities/file.entity";
 import { Mount } from "../../mount/entities/mount.entity";
+import Debug from "../../utils/debug";
 import { IndexerProcessDTO } from "../dtos/indexer-process.dto";
 import { IndexerResultDTO } from "../dtos/indexer-result.dto";
 
@@ -26,11 +27,12 @@ export class IndexerQueueService {
             const { result, payload: { files } } = job;
             const { entries, timeTookMs } = result;
 
-            // TODO: Disable this loop in production mode
-            for(const entry of entries) {
-                this.logger.debug(`Successfully read metadata of file ${entry.filepath}. Took ${entry.timeTookMs}ms.`);
+            if(Debug.isDebug) {
+                for(const entry of entries) {
+                    this.logger.debug(`Successfully read metadata of file ${entry.filepath}. Took ${entry.timeTookMs}ms.`);
+                }
             }
-
+            
             // Print out results & stats
             const skippedFiles = files.length - entries.length;
             this.logger.verbose(`Successfully read metadata of ${entries.length} files.${skippedFiles > 0 ? ` Skipped ${skippedFiles} files.` : ''} Took ${timeTookMs}ms`);
@@ -39,7 +41,10 @@ export class IndexerQueueService {
 
         this.queue.on("progress", (job: WorkerJobRef<IndexerProcessDTO>) => {
             const { progress } = job;
-            this.logger.debug(`Analyzing files: ${progress}`);
+
+            if(Debug.isDebug) {
+                this.logger.debug(`Analyzing files: ${progress}`);
+            }
         });
     }
 

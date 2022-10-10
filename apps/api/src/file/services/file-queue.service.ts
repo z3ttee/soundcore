@@ -8,7 +8,6 @@ import { FileDTO } from "../../mount/dtos/file.dto";
 import { Mount } from "../../mount/entities/mount.entity";
 import { FileProcessResultDTO } from "../dto/file-process-result.dto";
 import { FileProcessDTO } from "../dto/file-process.dto";
-import { File } from "../entities/file.entity";
 
 @Injectable()
 export class FileQueueService {
@@ -18,7 +17,6 @@ export class FileQueueService {
         private readonly queue: WorkerQueue<FileProcessDTO>,
         private readonly eventEmitter: EventEmitter2,
     ) {
-
         this.queue.on("failed", (job: WorkerJobRef<FileProcessDTO>, error: Error) => {
             this.logger.error(`Could not process batch of files for mount '${job.payload.mount.name}': ${error?.message}`, error?.stack);
         })

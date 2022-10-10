@@ -1,9 +1,11 @@
+import path from "node:path";
+import Debug from "../../utils/debug";
+
 import { Injectable, Logger } from "@nestjs/common";
 import { EventEmitter2 } from "@nestjs/event-emitter";
 import { WorkerJob, WorkerJobRef, WorkerQueue } from "@soundcore/nest-queue";
 import { EVENT_FILES_FOUND } from "../../constants";
 import { FilesFoundEvent } from "../../events/files-found.event";
-import { File } from "../../file/entities/file.entity";
 import { MountScanResultDTO } from "../dtos/scan-result.dto";
 import { Mount } from "../entities/mount.entity";
 import { MountGateway } from "../gateway/mount.gateway";
@@ -28,7 +30,7 @@ export class MountQueueService {
         });
 
         this.queue.on("started", async (job: WorkerJob<Mount>) => {
-            this.logger.verbose(`Now scanning mount ${job.payload.name}`);
+            this.logger.verbose(`Now scanning directory ${path.resolve(job.payload.directory)}`);
         });
 
         // Completed
@@ -42,12 +44,14 @@ export class MountQueueService {
                 this.events.emit(EVENT_FILES_FOUND, new FilesFoundEvent(job.payload, files));
             }
 
-            this.logger.verbose(`Scanned mount ${job.payload.name}. Found ${files.length} files in total. Took ${job.result?.timeMs}ms.`);
+            this.logger.verbose(`Scanned directory ${path.resolve(job.payload.directory)}. Found ${files.length} files in total. Took ${job.result?.timeMs}ms.`);
         });
 
         // Progress
         this.queue.on("progress", async (job: WorkerJobRef<Mount>) => {
-            this.logger.debug(`Received progress update from mount ${job.payload.name}: ${job.progress}`);
+            if(Debug.isDebug) {
+                this.logger.debug(`Received progress update from mount ${job.payload.name}: ${job.progress}`);
+            }
             this.gateway.sendMountUpdateEvent(job.payload, job.progress);
         });
 
@@ -56,9 +60,4 @@ export class MountQueueService {
             this.logger.error(`Failed scanning mount ${job.payload.name}: ${error.message}`, error.stack);
         });
     }
-
-    // protected async onJobStalled(job: Job<MountScanProcessDTO>) {
-    //     // this.logger.warn(`Scanning mount ${job.data.mount.name} did not send any updates. Marking job as stalled.`);
-    // }
-
 }

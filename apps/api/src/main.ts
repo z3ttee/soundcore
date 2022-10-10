@@ -1,6 +1,7 @@
 import { Logger, VersioningType } from '@nestjs/common';
 import { AppModule } from './app.module';
 import { createBootstrap } from "@soundcore/bootstrap";
+import Debug from './utils/debug';
 
 const logger = new Logger("Bootstrap");
 createBootstrap("Soundcore @NEXT", AppModule)

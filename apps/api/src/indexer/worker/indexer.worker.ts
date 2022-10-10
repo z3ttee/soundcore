@@ -75,92 +75,109 @@ export default function (job: WorkerJobRef<IndexerProcessDTO>): Promise<IndexerR
                         return null;
                     });
 
-                    // Skip this file if no id3 tags read
-                    // TODO: Skip following parts and create song entity only containing filename as title
-                    if(!id3TagsDto) continue;
-
-                    // Prevent errors from being thrown
-                    const songTitle = id3TagsDto.title.trim();
-                    const id3Artists = id3TagsDto.artists || [];
-    
-                    // Create all artists found in id3tags if they do not already exist in database.
-                    const featuredArtistsResults: CreateResult<Artist>[] = await Promise.all(id3Artists.map(async (artist) => (await artistService.createIfNotExists({
-                        name: artist.name
-                    }).catch((error: Error) => {
-                        logger.warn(`Could not create featured artists found on file ${filepath}: ${error?.message}`);
-                        return null;
-                    }))).filter((item) => !!item));
-
-                    // First artist in artists array becomes primary artist
-                    // as they are listed first most of the times (can be changed later
-                    // by admins)
-                    const primaryArtistResult = featuredArtistsResults.length > 0 ? featuredArtistsResults.splice(0, 1)[0] : null;
-                    const primaryArtist = primaryArtistResult?.data;
-
-                    // Create album which was found on id3tags
+                    // Prepare variable.
+                    let songResult: CreateResult<Song> = null;
+                    const createdArtists: Artist[] = [];
                     let albumResult: CreateResult<Album> = null;
-                    if(id3TagsDto.album) {
-                        // Create album found in id3tags if not exists.
-                        albumResult = await albumService.createIfNotExists({
-                            name: id3TagsDto.album,
-                            primaryArtist: primaryArtist
+
+                    // Create a song from the file but without using id3 tags, if none exist
+                    if(!id3TagsDto) {
+                        // Create song if not exists.
+                        songResult = await songService.createIfNotExists({
+                            duration: 0,
+                            name: file.name,
+                            file: file,
                         }).catch((error: Error) => {
-                            logger.warn(`Failed creating album found on file ${filepath}: ${error?.message}`);
+                            logger.warn(`Could not create song from file ${filepath}: ${error?.message}`);
                             return null;
                         });
-                    }
-
-                    // Create song if not exists.
-                    const songResult: CreateResult<Song> = await songService.createIfNotExists({
-                        duration: id3TagsDto.duration || 0,
-                        name: songTitle,
-                        file: file,
-                        album: albumResult?.data,
-                        order: id3TagsDto.orderNr,
-                        primaryArtist: primaryArtist,
-                        featuredArtists: featuredArtistsResults.map((result) => result.data)
-                    }).catch((error: Error) => {
-                        logger.warn(`Could not create song from file ${filepath}: ${error?.message}`);
-                        return null;
-                    });
-
-                    // Skip current file if no song was created
-                    if(!songResult) {
-                        continue;
-                    }
-
-                    // Check if song existed in database
-                    if(songResult.existed) {
-                        // logger.warn(`Found a duplicate song file '${filepath}'. Is a duplicate of: ${song.name} by ${song.primaryArtist.name} of album ${song.album.name}`);
-                        // reportError(new Error("Duplicate song file detected."), FileFlag.DUPLICATE, true);
-                        logger.warn(`File ${filepath} could be a potential duplicate. Marking as such. User action is required.`);
-
-                        // TODO: Add database call to update flag on file
-                        continue;
                     } else {
-                        // Update the file's relation to the created song.
-                        await fileService.setSong(file, songResult.data);
-                    }
-    
-                    // Create artwork if a similar one does not already exist.
-                    const artwork: Artwork = await artworkService.createForSongIfNotExists(songResult.data, true, id3TagsDto.cover).catch((error: Error) => {
-                        logger.warn(`Could not create artwork found on file ${filepath}: ${error?.message}`);
-                        return null;
-                    });
-                    songService.setArtwork(songResult.data, artwork);
-                    
-                    // Clear circular structure
-                    file.song = null;
+                        // Create song from id3 tags
 
-                    const createdArtists: Artist[] = [];
-                    // Check if primaryArtist was newly created.
-                    if(!primaryArtistResult?.existed) {
-                        createdArtists.push(primaryArtist);
+                        // Prevent errors from being thrown
+                        const songTitle = id3TagsDto.title.trim();
+                        const id3Artists = id3TagsDto.artists || [];
+        
+                        // Create all artists found in id3tags if they do not already exist in database.
+                        const featuredArtistsResults: CreateResult<Artist>[] = await Promise.all(id3Artists.map(async (artist) => (await artistService.createIfNotExists({
+                            name: artist.name
+                        }).catch((error: Error) => {
+                            logger.warn(`Could not create featured artists found on file ${filepath}: ${error?.message}`);
+                            return null;
+                        }))).filter((item) => !!item));
+
+                        // First artist in artists array becomes primary artist
+                        // as they are listed first most of the times (can be changed later
+                        // by admins)
+                        const primaryArtistResult = featuredArtistsResults.length > 0 ? featuredArtistsResults.splice(0, 1)[0] : null;
+                        const primaryArtist = primaryArtistResult?.data;
+
+                        // Create album which was found on id3tags
+                        if(id3TagsDto.album) {
+                            // Create album found in id3tags if not exists.
+                            albumResult = await albumService.createIfNotExists({
+                                name: id3TagsDto.album,
+                                primaryArtist: primaryArtist
+                            }).catch((error: Error) => {
+                                logger.warn(`Failed creating album found on file ${filepath}: ${error?.message}`);
+                                return null;
+                            });
+                        }
+
+                        // Create song if not exists.
+                        songResult = await songService.createIfNotExists({
+                            duration: id3TagsDto.duration || 0,
+                            name: songTitle,
+                            file: file,
+                            album: albumResult?.data,
+                            order: id3TagsDto.orderNr,
+                            primaryArtist: primaryArtist,
+                            featuredArtists: featuredArtistsResults.map((result) => result.data)
+                        }).catch((error: Error) => {
+                            logger.warn(`Could not create song from file ${filepath}: ${error?.message}`);
+                            return null;
+                        });
+
+                        // Skip current file if no song was created
+                        if(!!songResult) {
+                            // Check if song existed in database
+                            if(songResult.existed) {
+                                // logger.warn(`Found a duplicate song file '${filepath}'. Is a duplicate of: ${song.name} by ${song.primaryArtist.name} of album ${song.album.name}`);
+                                // reportError(new Error("Duplicate song file detected."), FileFlag.DUPLICATE, true);
+                                logger.warn(`File ${filepath} could be a potential duplicate. Marking as such. User action is required.`);
+
+                                // TODO: Add database call to update flag on file
+                                continue;
+                            } else {
+                                // Update the file's relation to the created song.
+                                await fileService.setSong(file, songResult.data);
+                            }
+            
+                            // Create artwork if a similar one does not already exist.
+                            const artwork: Artwork = await artworkService.createForSongIfNotExists(songResult.data, true, id3TagsDto.cover).catch((error: Error) => {
+                                logger.warn(`Could not create artwork found on file ${filepath}: ${error?.message}`);
+                                return null;
+                            });
+                            songService.setArtwork(songResult.data, artwork);
+                            
+                            // Clear circular structure
+                            file.song = null;
+                            
+                            // Check if primaryArtist was newly created.
+                            if(!primaryArtistResult?.existed) {
+                                createdArtists.push(primaryArtist);
+                            }
+
+                            // Add artists to array, that were newly created.
+                            for(const featuredResult of featuredArtistsResults) {
+                                if(!featuredResult?.existed) createdArtists.push(featuredResult?.data);
+                            }
+                        }
                     }
 
-                    // Add artists to array, that were newly created.
-                    for(const featuredResult of featuredArtistsResults) {
-                        if(!featuredResult?.existed) createdArtists.push(featuredResult?.data);
+                    // Skip if there is no song data
+                    if(!songResult?.data) {
+                        continue;
                     }
 
                     // Prepare result and push to results array
@@ -168,7 +185,7 @@ export default function (job: WorkerJobRef<IndexerProcessDTO>): Promise<IndexerR
                     entries.push(new IndexerResultEntry(
                         filepath, 
                         timeTookMs, 
-                        songResult.data,
+                        songResult?.data,
                         albumResult.data,
                         createdArtists
                     ));
