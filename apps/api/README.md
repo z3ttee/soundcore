@@ -41,11 +41,8 @@ proxy_set_header Connection "upgrade";
 Also Keycloak needs to be configured when using with Docker behind nginx proxy. Run following docker run command:
 docker run -p 8888:8080 --env KEYCLOAK_USER="..." --env KEYCLOAK_PASSWORD="..." --env PROXY_ADDRESS_FORWARDING=true --restart=always jboss/keycloak
 
-## Fix common issues
-#### CSP
-Sometimes it may occur that the frontend won't load and the console will print a CSP related error. In that case please check the 
-Content-Security-Policy Header in your keycloak realm's setting. (Under Realm Settings > Security Defenses).
-Make sure that the content matches the domains you are using. An example could look like this (to include subdomains):
-```
-frame-src *.tsalliance.eu; frame-ancestors *.tsalliance.eu ; object-src 'none';
-```
+
+
+## Known Issues 
+### Windows
+1. Checking for last modified date of mount directories may not work (due to the nature of mstat on directory stat)

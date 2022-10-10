@@ -21,7 +21,7 @@ export const TYPEORM_CONNECTION_GENERAL = "default"
 
 // Internal events
 export const EVENT_FILES_FOUND = "files-found-event"
-export const EVENT_FILE_PROCESSED = "file-processed-event"
+export const EVENT_FILES_PROCESSED = "files-processed-event"
 export const EVENT_METADATA_CREATED = "metadata-created-event"
 export const EVENT_ARTIST_CHANGED = "artist-changed-event"
 export const EVENT_ALBUM_CHANGED = "album-changed-event"

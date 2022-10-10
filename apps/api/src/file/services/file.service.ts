@@ -1,18 +1,11 @@
-import { InjectQueue } from '@nestjs/bull';
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
-import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Queue } from 'bull';
 import { Page, Pageable } from 'nestjs-pager';
-import path from 'path';
 import { Repository } from 'typeorm';
-import { EVENT_FILES_FOUND, EVENT_FILE_PROCESSED, QUEUE_FILE_NAME } from '../../constants';
-import { FilesFoundEvent } from '../../events/files-found.event';
-import { FileDTO } from '../../mount/dtos/file.dto';
 import { Mount } from '../../mount/entities/mount.entity';
 import { Song } from '../../song/entities/song.entity';
 import { CreateResult } from '../../utils/results/creation.result';
-import { FileProcessDTO, FileProcessMode } from '../dto/file-process.dto';
+import { CreateFileDTO } from '../dto/create-file.dto';
 import { File, FileFlag } from '../entities/file.entity';
 
 @Injectable()
@@ -20,33 +13,8 @@ export class FileService {
     private readonly logger: Logger = new Logger(FileService.name);
 
     constructor(
-        @InjectRepository(File) private readonly repository: Repository<File>,
-        private readonly eventEmitter: EventEmitter2,
-        @InjectQueue(QUEUE_FILE_NAME) private readonly queue?: Queue<FileProcessDTO>
-    ) {
-        this.queue?.on("failed", (job, err) => {
-            const filepath = path.join(job.data.file.mount.directory, job.data.file.directory, job.data.file.filename);
-            this.logger.error(`Could not process file '${filepath}': ${err.message}`, err.stack);
-        })
-        this.queue?.on("completed", (job, result: File) => {
-            this.eventEmitter.emit(EVENT_FILE_PROCESSED, result);
-        })
-    }
-
-    /**
-     * Handle file found event.
-     * This event is emitted by the mount service, after a new 
-     * file was found.
-     * @param file Found file data
-     * @param workerOptions Worker options
-     */
-    @OnEvent(EVENT_FILES_FOUND)
-    public handleFilesFoundEvent(event: FilesFoundEvent) {
-        // TODO: Use batching
-        for(const file of event.files) {
-            this.processFile(file);
-        }
-    }
+        @InjectRepository(File) private readonly repository: Repository<File>
+    ) {}
 
     public async findById(fileId: string): Promise<File> {
         return this.repository.createQueryBuilder("file")
@@ -119,16 +87,17 @@ export class FileService {
      * Find or create a file entry by the given data.
      * This will return the file and a boolean, indicating if the
      * file already existed.
-     * @param fileDto Info about the file
+     * @param createFileDto Info about the file
      * @returns [File, boolean]
      */
-    public async findOrCreateFile(fileDto: FileDTO): Promise<CreateResult<File>> {
-        const existingFile = await this.findByNameAndDirectory(fileDto.filename, fileDto.mount, fileDto.directory);
+    public async findOrCreateFile(createFileDto: CreateFileDTO): Promise<CreateResult<File>> {
+        const { fileDto, mount } = createFileDto;
+        const existingFile = await this.findByNameAndDirectory(fileDto.filename, mount, fileDto.directory);
         if(existingFile) return new CreateResult(existingFile, true);
 
         const file = this.repository.create();
         file.flag = FileFlag.OK;
-        file.mount = fileDto.mount;
+        file.mount = mount;
         file.directory = fileDto.directory;
         file.name = fileDto.filename;
         file.size = fileDto.size || 0;
@@ -141,11 +110,25 @@ export class FileService {
                 if(result.identifiers.length > 0) {
                     return new CreateResult(file, false);
                 }
-                return this.findByNameAndDirectory(fileDto.filename, fileDto.mount, fileDto.directory).then((file) => new CreateResult(file, true));
+                return this.findByNameAndDirectory(fileDto.filename, mount, fileDto.directory).then((file) => new CreateResult(file, true));
             }).catch((error) => {
                 this.logger.error(`Could not create database entry for file: ${error.message}`, error.stack);
                 return null
             })
+    }
+
+    public async createFiles(files: File[]): Promise<File[]> {
+        return this.repository.createQueryBuilder()
+            .insert()
+            .values(files)
+            .orIgnore()
+            .execute().then(async (result) => {
+                // Make db request to fetch affected rows
+                return this.repository.findBy(result.identifiers);
+            }).catch((error: Error) => {
+                this.logger.error(`Failed creating database entries for files batch: ${error.message}`, error.stack);
+                return [];
+            });
     }
 
     /**
@@ -159,16 +142,6 @@ export class FileService {
         }
 
         return idOrObject;
-    }
-
-    /**
-     * Trigger the processing of a file. This will add the file
-     * to a queue. The queue's processor creates all needed database entries, metadata etc.
-     * @param fileDto Data to feed into the Queue (Processor)
-     */
-    private async processFile(file: FileDTO, mode: FileProcessMode = FileProcessMode.SCAN) {
-        const processDto = new FileProcessDTO(file, mode);
-        return this.queue.add(processDto);
     }
 
 }

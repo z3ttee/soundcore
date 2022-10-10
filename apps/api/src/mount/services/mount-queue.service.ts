@@ -3,6 +3,8 @@ import { EventEmitter2 } from "@nestjs/event-emitter";
 import { WorkerJob, WorkerJobRef, WorkerQueue } from "@soundcore/nest-queue";
 import { EVENT_FILES_FOUND } from "../../constants";
 import { FilesFoundEvent } from "../../events/files-found.event";
+import { File } from "../../file/entities/file.entity";
+import { MountScanResultDTO } from "../dtos/scan-result.dto";
 import { Mount } from "../entities/mount.entity";
 import { MountGateway } from "../gateway/mount.gateway";
 import { MountService } from "./mount.service";
@@ -30,16 +32,17 @@ export class MountQueueService {
         });
 
         // Completed
-        this.queue.on("completed", async (job: WorkerJob<Mount>) => {
+        this.queue.on("completed", async (job: WorkerJob<Mount, MountScanResultDTO>) => {
             this.gateway.sendMountUpdateEvent(job.payload, null);
             this.mountService.updateLastScanned(job.payload);
 
             const files = job.result?.files || [];
+
             if(files.length > 0) {
                 this.events.emit(EVENT_FILES_FOUND, new FilesFoundEvent(job.payload, files));
             }
 
-            this.logger.verbose(`Scanned mount ${job.payload.name}. Took ${job.result?.timeMs}ms.`);
+            this.logger.verbose(`Scanned mount ${job.payload.name}. Found ${files.length} files in total. Took ${job.result?.timeMs}ms.`);
         });
 
         // Progress

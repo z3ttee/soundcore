@@ -47,7 +47,7 @@ export default function (job: Job<IndexerProcessDTO>, dc: DoneCallback) {
             const artistService = new ArtistService(new MeiliArtistService(meiliClient), eventEmitter, artistRepo);
             const albumService = new AlbumService(albumRepo, eventEmitter, new MeiliAlbumService(meiliClient));
             const artworkService = new ArtworkService(artworkRepo, fileSystem);
-            const fileService = new FileService(fileRepo, eventEmitter, null);
+            const fileService = new FileService(fileRepo);
     
             // Check if file is accessible by the process
             fs.access(filepath, (err) => {

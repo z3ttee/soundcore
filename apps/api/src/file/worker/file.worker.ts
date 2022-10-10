@@ -1,77 +1,83 @@
+import path from "node:path";
+import fs from "node:fs";
+
 import { Logger } from "@nestjs/common";
-import { DoneCallback, Job } from "bull";
-import path from "path";
-import fs from "fs";
-import { FileProcessDTO, FileProcessMode } from "../dto/file-process.dto";
+import { FileProcessDTO } from "../dto/file-process.dto";
 import { File } from "../entities/file.entity";
-import { FileService } from "../services/file.service";
-import { EventEmitter2 } from "@nestjs/event-emitter";
+import { WorkerJobRef, WorkerProgressEvent } from "@soundcore/nest-queue";
+import workerpool from "workerpool";
 import Database from "../../utils/database/database-worker-client";
+import { FileService } from "../services/file.service";
+import { FileProcessResultDTO } from "../dto/file-process-result.dto";
 
 const logger = new Logger("FileWorker")
+const BATCH_SIZE = 100;
 
-// TODO: Add a version checker. So if there are enqueued tasks, but the version
-// changes, it can cause unexpected behaviour
-
-export default function (job: Job<FileProcessDTO>, cb: DoneCallback) {    
-    const startTime = Date.now();
-
-    const mode = job.data.mode;
-    const file = job.data.file;
-    const mount = job.data.file.mount;
-    const filepath = path.join(mount.directory, file.directory || ".", file.filename);
-
-    // Get file stats
-    fs.stat(filepath, (err, stat) => {
-        file.size = stat?.size || 0;
-
-        if(err) {
-            logger.warn(`Could not get filesystem information for file '${filepath}': ${err.message}`);
-        }
-
-        Database.connect().then((dataSource) => {
-            const service = new FileService(dataSource.getRepository(File), new EventEmitter2(), null);
-
-            // TODO: Use ffprobe to check file codec_type = "audio" and codec_name = "mp3"
-            service.findOrCreateFile(file).then((result) => {
-                if(result.existed && mode == FileProcessMode.SCAN) {
-                    // logger.warn(`Worker received file that was scanned already and is now tried to be rescanned using a wrong processing mode (${mode} (SCAN), expected: ${FileProcessMode.RESCAN} (RESCAN)). This usually means, the previous step on scanning the directory did not filter out all existing files. A reason for this can be unusual file path names, that are incorrectly escaped by the underlying glob library. There is no fix available besides renaming the file's path and filtering out possible illegal characters.`)
-                    reportError(job, null, cb);
-                    return;
-                }
-                logger.verbose(`Started processing file '${filepath}'`);
+export default async function (job: WorkerJobRef<FileProcessDTO>): Promise<FileProcessResultDTO> {
+    return Database.connect().then(async (dataSource) => {
+        const service = new FileService(dataSource.getRepository(File));
+        
+        const { mount, files } = job.payload;
+        const startTime = Date.now();
     
-                reportSuccess(startTime, job, result.data, cb);
-            }).catch((error) => {
-                reportError(job, error, cb);
+        const results: File[] = [];
+        let length = files.length;
+        let currentBatch = 0;
+        const batches = Math.round(length / BATCH_SIZE);
+    
+        // Split arrays in batches of BATCH_SIZE entries
+        while (length) {
+            currentBatch++;
+
+            // If there are no BATCH_SIZE entries left, use current length
+            const size = length >= BATCH_SIZE ? BATCH_SIZE : length;
+            const batch = files.splice(0, size);
+            const batchResults: File[] = [];
+            
+            // Process batch by looping through every entry
+            let batchLength = batch.length;
+            while (batchLength > 0) {
+                batchLength--;
+
+                // Note: The batch is processed in reverse order,
+                // because the length is decremented
+                const fileDto = batch[batchLength];
+                const filepath = path.join(mount.directory, fileDto.directory || ".", fileDto.filename);
+
+                try {
+                    // Get file stats
+                    const stats = fs.statSync(filepath, { throwIfNoEntry: true });
+                    if(!stats) logger.warn(`Could not get file stats for '${filepath}'.`);
+
+                    // Create file entity
+                    const file = new File();
+                    file.name = fileDto.filename;
+                    file.directory = fileDto.directory;
+                    file.mount = mount;
+                    file.size = stats?.size || 0;
+
+                    batchResults.push(file);
+                    logger.debug(`Analyzed file ${filepath}`);
+                } catch (error) {
+                    logger.warn(`Skipping file file ${filepath} because it could not be analyzed: ${error["message"] || error}`);
+                    continue;
+                }
+            }
+
+            // Create database entries
+            await service.createFiles(batchResults).then((result) => {
+                job.progress = Math.round(currentBatch / batches);
+                workerpool.workerEmit(new WorkerProgressEvent(job));
+                results.push(...result);
+            }).catch((error: Error) => {
+                logger.error(`Error occured whilst processing batch ${currentBatch}: ${error.message}`, error.stack);
             });
-        });
+    
+            // Decrement length to process next batch
+            length -= size;
+        }
+    
+        const timeTookMs = Date.now() - startTime;
+        return new FileProcessResultDTO(mount, results, timeTookMs);
     });
-}
-
-/**
- * Report success by calling the DoneCallback.
- * @param startTime Time in ms when the job was started.
- * @param job Job data
- * @param result Result to be passed to DoneCallback
- * @param cb DoneCallback
- */
-function reportSuccess(startTime: number, job: Job<FileProcessDTO>, result: File, cb: DoneCallback) {
-    const file = job.data.file;
-    const filepath = path.join(file.mount.directory, file.directory, file.filename);
-
-    logger.verbose(`Processed file '${filepath}' in ${Date.now()-startTime}ms.`);
-    cb(null, result);
-}
-
-/**
- * Report the error to the log.
- * This will create log entries as well as execute the DoneCallback
- * passing in the error and null as the job's result.
- * @param job Job where the error occured
- * @param error Error that has occured
- * @param cb DoneCallback
- */
- function reportError(job: Job<FileProcessDTO>, error: Error, cb: DoneCallback) {
-    cb(error, null);
 }

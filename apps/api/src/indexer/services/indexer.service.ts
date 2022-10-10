@@ -3,7 +3,8 @@ import { Injectable, Logger } from "@nestjs/common";
 import { EventEmitter2, OnEvent } from "@nestjs/event-emitter";
 import { Queue } from "bull";
 import path from "path";
-import { EVENT_FILE_PROCESSED, EVENT_METADATA_CREATED, QUEUE_INDEXER_NAME } from "../../constants";
+import { EVENT_FILES_PROCESSED, EVENT_METADATA_CREATED, QUEUE_INDEXER_NAME } from "../../constants";
+import { FilesProcessedEvent } from "../../events/files-processed.event";
 import { File } from "../../file/entities/file.entity";
 import { IndexerProcessDTO, IndexerProcessMode } from "../dtos/indexer-process.dto";
 import { IndexerResultDTO } from "../dtos/indexer-result.dto";
@@ -37,9 +38,14 @@ export class IndexerService {
      * successfully by the fileService.
      * @param payload File object
      */
-    @OnEvent(EVENT_FILE_PROCESSED)
-    public handleFileProcessedEvent(payload: File) {
-        return this.addToQueue(payload);
+    @OnEvent(EVENT_FILES_PROCESSED)
+    public handleFileProcessedEvent(event: FilesProcessedEvent) {
+        // TODO: Implement batching mechanism
+        // for(const file of event.files) {
+        //     this.addToQueue(file);
+        // }
+
+        console.log("received event " + EVENT_FILES_PROCESSED);
     }
 
     private async addToQueue(file: File, mode: IndexerProcessMode = IndexerProcessMode.SCAN) {

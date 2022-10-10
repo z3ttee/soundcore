@@ -14,8 +14,6 @@ class MeilisearchImpl {
 
     public async connect(): Promise<MeiliSearch> {
         if(!this._client) {
-            console.log(process.env.MEILISEARCH_HOST);
-
             this._client = new MeiliSearch({
                 host: `${process.env.MEILISEARCH_HOST}:${process.env.MEILISEARCH_PORT}`,
                 headers: {

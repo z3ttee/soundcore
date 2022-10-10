@@ -1,6 +1,6 @@
 import { DynamicModule, FactoryProvider, Module, ModuleMetadata } from "@nestjs/common";
 import { WORKERQUEUE_FEATURE_OPTIONS } from "../constants";
-import { QueueModule, QueueOptions } from "../queue/queue.module";
+import { QueueOptions } from "../queue/queue.module";
 import { WorkerQueue } from "./entities/worker-queue.entity";
 import { WorkerService } from "./services/worker.service";
 import { createRedisOptionsProviderAsync } from "./utils";
@@ -58,8 +58,6 @@ export class WorkerQueueModule {
     }
 
     public static forFeature(options: WorkerQueueOptions): DynamicModule {
-        const queue = new WorkerQueue(options);
-
         return {
             module: WorkerQueueModule,
             imports: [
@@ -72,7 +70,9 @@ export class WorkerQueueModule {
                 },
                 {
                     provide: WorkerQueue,
-                    useValue: queue
+                    useFactory: () => {
+                        return new WorkerQueue(options);
+                    }
                 },
                 WorkerService
             ],

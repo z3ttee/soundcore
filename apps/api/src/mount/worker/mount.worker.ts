@@ -88,8 +88,7 @@ async function scanMount(job: WorkerJobRef<Mount>, exclude: File[]): Promise<Mou
             const file = new FileDTO();
             file.directory = path.dirname(match);
             file.filename = path.basename(match);
-            file.mount = mount;
-
+            
             files.push(file);
         })
 

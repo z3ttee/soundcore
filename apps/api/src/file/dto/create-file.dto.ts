@@ -1,9 +1,11 @@
 import { FileDTO } from "../../mount/dtos/file.dto";
 import { Mount } from "../../mount/entities/mount.entity";
 
-export class FileProcessDTO {
+export class CreateFileDTO {
+
     constructor(
-        public readonly mount: Mount,
-        public readonly files: FileDTO[]
+        public readonly fileDto: FileDTO,
+        public readonly mount: Mount
     ) {}
+
 }
