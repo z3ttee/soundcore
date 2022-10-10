@@ -29,6 +29,4 @@ class MeilisearchImpl {
 
 
 const Meilisearch = new MeilisearchImpl();
-Object.freeze(Meilisearch);
-
 export default Meilisearch;

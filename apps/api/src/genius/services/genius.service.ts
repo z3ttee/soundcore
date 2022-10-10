@@ -20,13 +20,15 @@ export class GeniusService {
     
     @OnEvent(EVENT_METADATA_CREATED)
     public async handleMetadataCreatedEvent(payload: IndexerResultDTO) {
-        if(payload?.createdSong) this.createSongLookupJob(payload.createdSong);
-        if(payload?.createdAlbum) this.createAlbumLookupJob(payload.createdAlbum);
-        if(payload?.createdArtists && payload.createdArtists.length > 0) {
-            for(const artist of payload.createdArtists) {
-                this.createArtistLookupJob(artist);
-            }
-        }
+        // if(payload?.createdSong) this.createSongLookupJob(payload.createdSong);
+        // if(payload?.createdAlbum) this.createAlbumLookupJob(payload.createdAlbum);
+        // if(payload?.createdArtists && payload.createdArtists.length > 0) {
+        //     for(const artist of payload.createdArtists) {
+        //         this.createArtistLookupJob(artist);
+        //     }
+        // }
+
+        this.logger.debug(`Received event ${EVENT_METADATA_CREATED}`);
     }
 
     @OnEvent(EVENT_ARTIST_CHANGED)

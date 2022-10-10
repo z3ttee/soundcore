@@ -395,6 +395,7 @@ export class SongService {
      * @returns ID3TagsDTO
      */
     public async readID3TagsFromFile(filepath: string): Promise<ID3TagsDTO> {
+        // TODO: Check mime type for mp3
         const id3Tags = NodeID3.read(fs.readFileSync(filepath));
 
         // Get duration in seconds

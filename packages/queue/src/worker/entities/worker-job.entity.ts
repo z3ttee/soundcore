@@ -6,7 +6,7 @@ export class WorkerJobRef<T = any> {
     constructor(
         public readonly id: string,
         public readonly payload: T,
-        public progress: number = 0.0
+        public progress: number = 0
     ) {}
 
     public static fromJob<T>(job: WorkerJob<T, any>) {
@@ -18,10 +18,10 @@ export class WorkerJob<T = any, R = any> {
 
     public readonly id: string;
     public readonly payload: T;
-    public progress: number = 0.0;
+    public progress: number = 0;
     public result: R = undefined;
 
-    constructor(payload: T, id?: string, progress?: number) {
+    constructor(payload: T, id?: string, progress = 0) {
         this.id = id || uuidv4();
         this.payload = payload;
         this.progress = progress;
@@ -32,7 +32,7 @@ export class WorkerJob<T = any, R = any> {
     }
 
     public static withPayload<T, R>(payload: T): WorkerJob<T, R> {
-        return new WorkerJob(payload, uuidv4(), 0.0);
+        return new WorkerJob(payload, uuidv4(), 0);
     }
 }
 

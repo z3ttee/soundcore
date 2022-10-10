@@ -1,4 +1,5 @@
 import { File } from "../../file/entities/file.entity";
+import { Mount } from "../../mount/entities/mount.entity";
 
 export enum IndexerProcessMode {
     SCAN = 0,
@@ -8,8 +9,8 @@ export enum IndexerProcessMode {
 export class IndexerProcessDTO {
 
     constructor(
-        public readonly file: File,
-        public readonly mode: IndexerProcessMode = IndexerProcessMode.SCAN
+        public readonly files: File[],
+        public readonly mount: Mount
     ) {}
 
 }

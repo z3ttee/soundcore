@@ -12,7 +12,7 @@ createBootstrap("Soundcore @NEXT", AppModule)
   .withBuildInfo()
   .bootstrap().then((app) => {
     app.getUrl().then((url) => {
-      logger.log(`Soundcore Satellite Service now listening for requests on url '${url}'.`);
+      logger.log(`Soundcore Service now listening for requests on url '${url}'.`);
     });
   });
 

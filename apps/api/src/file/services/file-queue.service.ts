@@ -26,7 +26,7 @@ export class FileQueueService {
         this.queue.on("completed", (job: WorkerJob<FileProcessDTO, FileProcessResultDTO>) => {
             const { mount, timeTookMs = 0, filesProcessed = [] } = job.result;
             this.logger.verbose(`Created database entries for ${filesProcessed.length} files in mount ${mount.name}. Took ${timeTookMs}ms.`);
-            this.eventEmitter.emit(EVENT_FILES_PROCESSED, new FilesProcessedEvent(filesProcessed));
+            this.eventEmitter.emit(EVENT_FILES_PROCESSED, new FilesProcessedEvent(filesProcessed, mount));
         })
 
         this.queue.on("progress", (job: WorkerJobRef<FileProcessDTO>) => {

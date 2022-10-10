@@ -1,28 +1,23 @@
-import { BullModule } from '@nestjs/bull';
-import { Module } from '@nestjs/common';
 import path from 'path';
-import { QUEUE_INDEXER_NAME } from '../constants';
+import { Module } from '@nestjs/common';
+import { WorkerQueueModule } from '@soundcore/nest-queue';
 import { IndexerService } from './services/indexer.service';
+import { IndexerQueueService } from './services/indexer-queue.service';
 
 @Module({
     providers: [
-        IndexerService
+        IndexerService,
+        IndexerQueueService
     ],
     imports: [
-        BullModule.registerQueue({
-            name: QUEUE_INDEXER_NAME,
-            processors: [
-                { path: path.join(__dirname, "worker", "indexer.worker.js"), concurrency: parseInt(process.env.MAX_FILE_WORKERS) || 4 }
-            ],
-            defaultJobOptions: {
-                removeOnComplete: true,
-                attempts: 5,  // 5 attempts max on failure
-                backoff: 5000 // 5s delay between attempts
-            }
+        WorkerQueueModule.forFeature({
+            script: path.join(__dirname, "worker", "indexer.worker.js"),
+            concurrent: 2
         })
     ],
     exports: [
-        IndexerService
+        IndexerService,
+        IndexerQueueService
     ]
 })
 export class IndexerModule {}
