@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 import { SCSDKSettingsService } from 'soundcore-sdk';
 import { Subject, takeUntil } from 'rxjs';
-import { AuthenticationService } from 'src/sso/services/authentication.service';
+import { SSOService } from '@soundcore/sso';
 
 @Component({
   selector: 'app-settings',
@@ -18,7 +18,7 @@ export class SettingsComponent implements OnInit, OnDestroy {
 
   constructor(
     private readonly settingsService: SCSDKSettingsService,
-    public readonly authService: AuthenticationService
+    public readonly authService: SSOService
   ) { }
 
   public ngOnInit(): void {

@@ -39,6 +39,7 @@
     "soundcore-cdk": "file:dist/soundcore-cdk",
     "soundcore-ngx": "file:dist/soundcore-ngx",
     "soundcore-sdk": "file:dist/soundcore-sdk",
+    "@soundcore/sso": "*",
     "tslib": "^2.3.0",
     "uuid": "^8.3.2",
     "zone.js": "~0.11.4"

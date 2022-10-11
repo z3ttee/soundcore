@@ -4,13 +4,13 @@ import { BrowserModule } from '@angular/platform-browser';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { AuthModule } from 'src/sso/auth.module';
 import { SCNGXModule } from 'projects/soundcore-ngx/src/lib/scngx.module';
 import { SCDKModule } from 'soundcore-sdk';
 import { environment } from 'src/environments/environment';
 import { SCNGXDialogModule } from 'soundcore-ngx';
 import { SCCDKScreenModule } from 'soundcore-cdk';
 import { HttpClientModule } from '@angular/common/http';
+import { SSOModule } from "@soundcore/sso";
 
 @NgModule({
   declarations: [
@@ -21,8 +21,20 @@ import { HttpClientModule } from '@angular/common/http';
     AppRoutingModule,
     BrowserAnimationsModule,
     HttpClientModule,
-
-    AuthModule,
+    SSOModule.forRoot({
+      baseUrl: environment.keycloak_url,
+      realm: environment.keycloak_realm,
+      clientId: environment.keycloak_client_id,
+      initOptions: {
+        onLoad: 'check-sso',
+        silentCheckSsoRedirectUri: window.location.origin + '/assets/silent-check-sso.html'
+      },
+      loadUserProfileAtStartUp: true,
+      roleMapping: {
+        admin: environment.admin_role,
+        mod: environment.mod_role
+      }
+    }),
     SCNGXDialogModule,
     SCDKModule.forRoot({
       api_base_uri: environment.api_base_uri

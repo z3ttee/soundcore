@@ -1,8 +1,8 @@
 import { Component } from '@angular/core';
 import { NavigationCancel, NavigationEnd, NavigationError, NavigationStart, Router } from '@angular/router';
+import { SSOService } from '@soundcore/sso';
 import { BehaviorSubject, combineLatest, filter, map, Observable, Subject, takeUntil } from 'rxjs';
 import { SCCDKScreenService } from 'soundcore-cdk';
-import { AuthenticationService } from 'src/sso/services/authentication.service';
 
 @Component({
   selector: 'app-root',
@@ -13,7 +13,7 @@ export class AppComponent {
 
   constructor(
       public readonly screenService: SCCDKScreenService,
-      public readonly authService: AuthenticationService,
+      public readonly authService: SSOService,
       private readonly router: Router
   ) {}
 
