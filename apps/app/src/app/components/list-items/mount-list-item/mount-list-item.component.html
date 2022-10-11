@@ -1,0 +1,18 @@
+<div class="select-none flex items-center gap-4 p-4 rounded bg-body-light bg-opacity-60 cursor-pointer transition-all active:bg-opacity-80 active:scale-99 transform-gpu will-change-transform">
+    <!-- Bucket artwork -->
+    <div class="min-w-36 max-w-36 aspect-square rounded bg-body bg-opacity-70"></div>
+
+    <!-- Bucket description -->
+    <div class="w-full">
+        <h6 class="cursor-text select-text">{{ mount.name }}</h6>
+
+        <ul class="flex flex-col items-start w-full gap-2 my-4">
+            <li class="inline-flex items-center gap-2 opacity-80"><hero-icon [class]="'h-5 w-5'" name="collection"></hero-icon><span class="text-sm">{{ mount.filesCount || 0 }} Datei{{ mount.filesCount != 1 ? 'en' : '' }}</span></li>
+            <li class="inline-flex items-center gap-2 opacity-80"><hero-icon [class]="'h-5 w-5'" name="chart-pie"></hero-icon><span class="text-sm">{{ mount.usedSpace | scngxBytesPipe:"gb" }}</span></li>
+            <li class="inline-flex items-center gap-2 opacity-80">
+                <scngx-status-indicator size="md" [appearance]="indicatorAppearance"></scngx-status-indicator>
+                <span class="text-xs">{{ mount.status | scngxMountStatusPipe }}</span>
+            </li>
+        </ul>
+    </div>
+</div>

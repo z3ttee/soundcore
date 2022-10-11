@@ -2,6 +2,7 @@
 
 # NestJS
 dist/
+.angular/
 
 # Next.js
 .next/

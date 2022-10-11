@@ -1,0 +1,19 @@
+<scngx-toolbar [showNavigation]="false" [transparent]="true">
+    <div class="flex items-center">
+        <h6>Bibliothek</h6>
+    </div>
+</scngx-toolbar>
+
+<section class="p-window pt-0">
+    <div class="block w-full mb-row">
+        <scngx-tabbar>
+            <scngx-tab-item [route]="{ commands: ['./'], exact: true }">Playlists</scngx-tab-item>
+            <scngx-tab-item [route]="{ commands: ['./albums']}">Alben</scngx-tab-item>
+            <scngx-tab-item [route]="{ commands: ['./artists']}">Künstler</scngx-tab-item>
+        </scngx-tabbar>
+    </div>
+
+    <div class="block w-full">
+        <router-outlet></router-outlet>
+    </div>
+</section>

@@ -1,5 +1,8 @@
+/* To learn more about this file see: https://angular.io/config/tsconfig. */
 {
-  "extends": "tsconfig/nextjs",
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
-  "exclude": ["node_modules"]
+  "extends": "tsconfig/angular",
+  "compileOnSave": false,
+  "compilerOptions": {
+    "baseUrl": "./",
+  },
 }
