@@ -3,7 +3,13 @@
   "version": "0.0.0",
   "scripts": {
     "start": "ng serve",
-    "build": "ng build",
+    "build:sdk:watch": "ng build --watch soundcore-sdk",
+    "build:cdk:watch": "ng build --watch soundcore-cdk",
+    "build:ngx:watch": "ng build --watch soundcore-ngx",
+    "build:sdk": "ng build soundcore-sdk",
+    "build:cdk": "ng build soundcore-cdk",
+    "build:ngx": "ng build soundcore-ngx",
+    "build": "npm run build:sdk && npm run build:cdk && npm run build:ngx && ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },
@@ -15,15 +21,11 @@
     "@angular/compiler": "^14.1.0",
     "@angular/core": "^14.1.0",
     "@angular/forms": "^14.1.0",
-    "@angular/material": "^14.2.4",
+    "@angular/material": "^14.1.0",
     "@angular/platform-browser": "^14.1.0",
     "@angular/platform-browser-dynamic": "^14.1.0",
     "@angular/router": "^14.1.0",
     "@floating-ui/dom": "^0.4.5",
-    "@soundcore/cdk": "*",
-    "@soundcore/ngx": "*",
-    "@soundcore/sdk": "*",
-    "@soundcore/sso": "*",
     "@tailwindcss/line-clamp": "^0.3.1",
     "@tsalliance/ngx-virtual-scroller": "^14.0.1",
     "keycloak-angular": "^9.1.0",
@@ -34,6 +36,9 @@
     "ngx-lottie": "^8.1.1",
     "rxjs": "~7.5.0",
     "socket.io-client": "^4.4.1",
+    "soundcore-cdk": "file:dist/soundcore-cdk",
+    "soundcore-ngx": "file:dist/soundcore-ngx",
+    "soundcore-sdk": "file:dist/soundcore-sdk",
     "tslib": "^2.3.0",
     "uuid": "^8.3.2",
     "zone.js": "~0.11.4"
@@ -57,6 +62,5 @@
     "postcss": "^8.4.12",
     "tailwindcss": "^3.0.23",
     "typescript": "~4.7.3"
-  },
-  "packageManager": "yarn@1.22.19"
+  }
 }

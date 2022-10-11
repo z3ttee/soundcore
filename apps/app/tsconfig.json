@@ -1,8 +1,49 @@
 /* To learn more about this file see: https://angular.io/config/tsconfig. */
 {
-  "extends": "tsconfig/angular",
   "compileOnSave": false,
   "compilerOptions": {
     "baseUrl": "./",
+    "outDir": "./dist/out-tsc",
+    "forceConsistentCasingInFileNames": true,
+    "strict": false,
+    "noImplicitOverride": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "sourceMap": true,
+    "declaration": false,
+    "downlevelIteration": true,
+    "experimentalDecorators": true,
+    "moduleResolution": "node",
+    "importHelpers": true,
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
+    "stripInternal": true,
+    "paths": {
+      "soundcore-cdk": [
+        "dist/soundcore-cdk/soundcore-cdk",
+        "dist/soundcore-cdk"
+      ],
+      "soundcore-ngx": [
+        "dist/soundcore-ngx/soundcore-ngx",
+        "dist/soundcore-ngx"
+      ],
+      "soundcore-sdk": [
+        "dist/soundcore-sdk/soundcore-sdk",
+        "dist/soundcore-sdk"
+      ]
+    },
+    "target": "es2020",
+    "module": "es2020",
+    "lib": [
+      "es2020",
+      "dom"
+    ]
   },
+  "angularCompilerOptions": {
+    "enableI18nLegacyMessageIdFormat": false,
+    "strictInjectionParameters": true,
+    "strictInputAccessModifiers": true,
+    "strictTemplates": true
+  }
 }

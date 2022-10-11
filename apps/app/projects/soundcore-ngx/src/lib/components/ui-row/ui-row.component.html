@@ -1,0 +1,13 @@
+<div class="w-full my-row">
+    <div class="flex items-center px-window gap-4 select-none" *ngIf="headline || route">
+        <div class="flex-grow" *ngIf="headline">
+            <h6 class="font-semi line-clamp-1" *ngIf="headline">{{ headline }}</h6>
+            <p class="font-semi text-sm text-font text-opacity-70 line-clamp-1" *ngIf="subtitle">{{ subtitle }}</p>
+        </div>
+        <p class="hover:underline cursor-pointer" [routerLink]="route" *ngIf="route">{{ routeText }}</p>
+    </div>
+
+    <div class="w-full py-4" #scrollArea>
+        <ng-content></ng-content>
+    </div>
+</div>

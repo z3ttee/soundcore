@@ -265,7 +265,7 @@
   dependencies:
     tslib "^2.3.0"
 
-"@angular/material@^14.2.4":
+"@angular/material@^14.1.0":
   version "14.2.4"
   resolved "https://registry.yarnpkg.com/@angular/material/-/material-14.2.4.tgz#9a6902fbe06a93abcfa2152ea2300d09fed06305"
   integrity sha512-vS7dyrnr2YpZPjFFmnSZ9W0dFpBQ5cWf4CH5AI0/KfbCGC+2ybkFZ61oMNBf1xXdoyf4Ob16Dm3xerKWFwJ4sQ==
@@ -9460,6 +9460,21 @@ socks@^2.6.2:
   dependencies:
     ip "^2.0.0"
     smart-buffer "^4.2.0"
+
+"soundcore-cdk@file:apps/app/dist/soundcore-cdk":
+  version "0.0.1"
+  dependencies:
+    tslib "^2.3.0"
+
+"soundcore-ngx@file:apps/app/dist/soundcore-ngx":
+  version "0.0.1"
+  dependencies:
+    tslib "^2.3.0"
+
+"soundcore-sdk@file:apps/app/dist/soundcore-sdk":
+  version "0.0.1"
+  dependencies:
+    tslib "^2.3.0"
 
 "source-map-js@>=0.6.2 <2.0.0", source-map-js@^1.0.2:
   version "1.0.2"

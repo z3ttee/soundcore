@@ -1,0 +1,15 @@
+<div class="relative inline-block w-full border border-red-800">
+    <virtual-scroller class="relative inline-block w-full border border-green-800" #scroll [bufferAmount]="3" [items]="$datasource | async" [parentScroll]="parentScroll" (vsEnd)="fetchMore($event)">
+        
+        <div *ngFor="let item of scroll.viewPortItems; trackBy: entryTrackBy">
+            {{ item | json }}
+        </div>
+
+        <scngx-song-list-item 
+            *ngFor="let item of scroll.viewPortItems; trackBy: entryTrackBy"
+            [columns]="columns"
+            [song]="item?.song" 
+            [index]="item?.index">
+        </scngx-song-list-item>
+    </virtual-scroller>
+</div>

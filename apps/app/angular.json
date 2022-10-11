@@ -107,11 +107,113 @@
           }
         }
       }
+    },
+    "soundcore-sdk": {
+      "projectType": "library",
+      "root": "projects/soundcore-sdk",
+      "sourceRoot": "projects/soundcore-sdk/src",
+      "prefix": "scdk",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:ng-packagr",
+          "options": {
+            "project": "projects/soundcore-sdk/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/soundcore-sdk/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/soundcore-sdk/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "projects/soundcore-sdk/src/test.ts",
+            "tsConfig": "projects/soundcore-sdk/tsconfig.spec.json",
+            "karmaConfig": "projects/soundcore-sdk/karma.conf.js"
+          }
+        }
+      }
+    },
+    "soundcore-ngx": {
+      "projectType": "library",
+      "root": "projects/soundcore-ngx",
+      "sourceRoot": "projects/soundcore-ngx/src",
+      "prefix": "scngx",
+      "schematics": {
+        "@schematics/angular:component": {
+          "style": "scss"
+        }
+      },
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:ng-packagr",
+          "options": {
+            "project": "projects/soundcore-ngx/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/soundcore-ngx/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/soundcore-ngx/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "projects/soundcore-ngx/src/test.ts",
+            "tsConfig": "projects/soundcore-ngx/tsconfig.spec.json",
+            "karmaConfig": "projects/soundcore-ngx/karma.conf.js"
+          }
+        }
+      }
+    },
+    "soundcore-cdk": {
+      "projectType": "library",
+      "root": "projects/soundcore-cdk",
+      "sourceRoot": "projects/soundcore-cdk/src",
+      "prefix": "sccdk",
+      "schematics": {
+        "@schematics/angular:component": {
+          "style": "scss"
+        }
+      },
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:ng-packagr",
+          "options": {
+            "project": "projects/soundcore-cdk/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/soundcore-cdk/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/soundcore-cdk/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "projects/soundcore-cdk/src/test.ts",
+            "tsConfig": "projects/soundcore-cdk/tsconfig.spec.json",
+            "karmaConfig": "projects/soundcore-cdk/karma.conf.js"
+          }
+        }
+      }
     }
   },
   "defaultProject": "soundcore",
   "cli": {
-    "analytics": false,
-    "packageManager": "yarn"
+    "analytics": false
   }
 }

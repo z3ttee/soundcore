@@ -1,0 +1,8 @@
+<div class="flex relative items-center w-full h-[4px] rounded-full overflow-hidden" [ngClass]="{'bg-body-light': !transparent}">
+    <div class="inline-block bg-accent h-full rounded-full transition-all duration-1000 ease-linear will-change-auto" [style]="'width: ' + (calculatedProgress) + '%;'" *ngIf="mode == 'determinate'"></div>
+
+    <div class="w-full h-full relative" *ngIf="mode == 'indeterminate'">
+        <div class="absolute bg-accent h-full animate-progressInc"></div>
+        <div class="absolute bg-accent h-full animate-progressDec"></div>
+    </div>
+</div>
