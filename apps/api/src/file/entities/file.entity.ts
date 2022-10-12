@@ -4,38 +4,40 @@ import { Song } from "../../song/entities/song.entity";
 
 export enum FileFlag {
     OK = 0,
-    CORRUPT = 1,
-    DELETED = 2,
-    PROCESSING = 3,
-    FAILED_SONG_CREATION = 4,
-    DUPLICATE = 5
+    PENDING_ANALYSIS = 1,
+    DUPLICATE = 2
 }
 
 @Entity()
+@Index("UQ-files-on-mount", ["pathHash", "mount"], { unique: true })
 export class File {
 
     @PrimaryGeneratedColumn("uuid")
     public id: string;
 
-    @Index({ unique: false })
-    @Column()
+    @Column({ nullable: false, length: 256, type: "varchar" })
     public name: string;
 
-    @Index({ unique: false })
-    @Column({ length: 255, collation: "utf8mb4_0900_as_ci" })
+    @Column({ type: "varchar", length: 4097, collation: "utf8mb4_0900_as_ci" })
     public directory: string;
 
-    @Column({ nullable: true, default: 0 })
+    @Column({ nullable: false })
+    public pathHash: string;
+
+    @Column({ nullable: false, default: 0 })
     public size: number;
 
-    @Column({ type: "tinyint", nullable: true, default: 0 })
+    @Column()
+    public mimetype: string;
+
+    @Column({ type: "tinyint", nullable: false, default: 1 })
     public flag: FileFlag
 
     @OneToOne(() => Song, { onDelete: "SET NULL" })
     @JoinColumn()
     public song: Song;
 
-    @ManyToOne(() => Mount)
+    @ManyToOne(() => Mount, { onDelete: "CASCADE", nullable: false })
     public mount: Mount;
 
 }

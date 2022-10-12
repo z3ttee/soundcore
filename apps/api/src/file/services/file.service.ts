@@ -117,6 +117,12 @@ export class FileService {
             })
     }
 
+    /**
+     * Save file objects to database. If they exist, insertion
+     * will be ignored.
+     * @param files 
+     * @returns 
+     */
     public async createFiles(files: File[]): Promise<File[]> {
         return this.repository.createQueryBuilder()
             .insert()
@@ -125,6 +131,7 @@ export class FileService {
             .execute().then(async (result) => {
                 // Make db request to fetch affected rows
                 return this.repository.findBy(result.identifiers);
+                // return [];
             }).catch((error: Error) => {
                 this.logger.error(`Failed creating database entries for files batch: ${error.message}`, error.stack);
                 return [];

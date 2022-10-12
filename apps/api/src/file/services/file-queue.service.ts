@@ -6,6 +6,7 @@ import { FilesFoundEvent } from "../../events/files-found.event";
 import { FilesProcessedEvent } from "../../events/files-processed.event";
 import { FileDTO } from "../../mount/dtos/file.dto";
 import { Mount } from "../../mount/entities/mount.entity";
+import Debug from "../../utils/debug";
 import { FileProcessResultDTO } from "../dto/file-process-result.dto";
 import { FileProcessDTO } from "../dto/file-process.dto";
 
@@ -21,14 +22,29 @@ export class FileQueueService {
             this.logger.error(`Could not process batch of files for mount '${job.payload.mount.name}': ${error?.message}`, error?.stack);
         })
 
+        this.queue.on("started", (job: WorkerJob<FileProcessDTO, FileProcessResultDTO>) => {
+            const { payload } = job;
+            const { mount } = payload;
+
+            this.logger.verbose(`Creating database entries for files on mount '${mount.name}'`);
+        })
+
         this.queue.on("completed", (job: WorkerJob<FileProcessDTO, FileProcessResultDTO>) => {
             const { mount, timeTookMs = 0, filesProcessed = [] } = job.result;
-            this.logger.verbose(`Created database entries for ${filesProcessed.length} files in mount ${mount.name}. Took ${timeTookMs}ms.`);
-            this.eventEmitter.emit(EVENT_FILES_PROCESSED, new FilesProcessedEvent(filesProcessed, mount));
+
+            if(filesProcessed.length > 0) {
+                this.logger.verbose(`Created database entries for ${filesProcessed.length} files on mount '${mount.name}'. Took ${timeTookMs}ms.`);
+                this.eventEmitter.emit(EVENT_FILES_PROCESSED, new FilesProcessedEvent(filesProcessed, mount));
+                return;
+            }
+            
+            this.logger.verbose(`No new files were created on mount '${mount.name}'. Took ${timeTookMs}ms.`);
         })
 
         this.queue.on("progress", (job: WorkerJobRef<FileProcessDTO>) => {
-            this.logger.debug(`Processing files on mount ${job.payload.mount.name}: ${job.progress}`);
+            if(Debug.isDebug) {
+                this.logger.debug(`Progress on mount ${job.payload.mount.name}: ${job.progress}%`);
+            }
         })
     }
 

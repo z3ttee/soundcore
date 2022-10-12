@@ -1,5 +1,6 @@
 import path from "node:path";
 import fs from "node:fs";
+import crypto from "node:crypto";
 
 import { Logger } from "@nestjs/common";
 import { FileProcessDTO } from "../dto/file-process.dto";
@@ -56,18 +57,28 @@ export default async function (job: WorkerJobRef<FileProcessDTO>): Promise<FileP
                     file.mount = mount;
                     file.size = stats?.size || 0;
 
+                    // Calculate hash consisting of information
+                    // that make the file unique
+                    const pathToHash = `${mount.id}:${file.name}:${file.directory}:${file.size}`;
+                    file.pathHash = crypto.createHash("md5").update(pathToHash, "binary").digest("hex");
+
                     batchResults.push(file);
-                    logger.debug(`Analyzed file ${filepath}`);
                 } catch (error) {
                     logger.warn(`Skipping file file ${filepath} because it could not be analyzed: ${error["message"] || error}`);
                     continue;
                 }
             }
 
+
             // Create database entries
             await service.createFiles(batchResults).then((result) => {
-                job.progress = Math.round(currentBatch / batches);
+                // Update job progress
+                job.progress = Math.round((currentBatch / batches) * 100);
+
+                // Emit progress update
                 workerpool.workerEmit(new WorkerProgressEvent(job));
+
+                // Add created files to result
                 results.push(...result);
             }).catch((error: Error) => {
                 logger.error(`Error occured whilst processing batch ${currentBatch}: ${error.message}`, error.stack);

@@ -3,7 +3,7 @@ import path from "node:path";
 
 import { ArtistService } from "../../artist/artist.service";
 import { SongService } from "../../song/song.service";
-import { IndexerProcessDTO, IndexerProcessMode } from "../dtos/indexer-process.dto";
+import { IndexerProcessDTO } from "../dtos/indexer-process.dto";
 
 import { Artist } from "../../artist/entities/artist.entity";
 import { AlbumService } from "../../album/album.service";
@@ -12,7 +12,7 @@ import { Artwork } from "../../artwork/entities/artwork.entity";
 import { Logger } from "@nestjs/common";
 import { FileService } from "../../file/services/file.service";
 import { EventEmitter2 } from "@nestjs/event-emitter";
-import { File, FileFlag } from "../../file/entities/file.entity";
+import { File } from "../../file/entities/file.entity";
 import { IndexerResultDTO, IndexerResultEntry } from "../dtos/indexer-result.dto";
 import { Song } from "../../song/entities/song.entity";
 import { Album } from "../../album/entities/album.entity";
@@ -25,8 +25,9 @@ import { FileSystemService } from "../../filesystem/services/filesystem.service"
 import Meilisearch from "../../utils/database/meilisearch-worker-client";
 import { WorkerJobRef } from "@soundcore/nest-queue";
 import { ID3TagsDTO } from "../../song/dtos/id3-tags.dto";
+import Debug from "../../utils/debug";
 
-const logger = new Logger("IndexerWorker");
+const logger = new Logger("IndexWorker");
 
 export default function (job: WorkerJobRef<IndexerProcessDTO>): Promise<IndexerResultDTO> {
     const { files, mount } = job.payload;
@@ -52,12 +53,16 @@ export default function (job: WorkerJobRef<IndexerProcessDTO>): Promise<IndexerR
 
             return new Promise(async (resolve) => {
                 const entries: IndexerResultEntry[] = [];
-                
+
                 for(const file of files) {
                     const fileReadStartTime = Date.now();
 
                     // Build filepath
                     const filepath = path.resolve(path.join(mount.directory, file.directory, file.name));
+
+                    if(Debug.isDebug) {
+                        logger.debug(`Analyzing ID3-Tags of file ${filepath}...`);
+                    }
 
                     // Check if file can be accessed
                     const canAccessFile: boolean = await fs.access(filepath).then(() => true).catch((error: Error) => {
@@ -138,7 +143,7 @@ export default function (job: WorkerJobRef<IndexerProcessDTO>): Promise<IndexerR
                         });
 
                         // Skip current file if no song was created
-                        if(!!songResult) {
+                        if(songResult) {
                             // Check if song existed in database
                             if(songResult.existed) {
                                 // logger.warn(`Found a duplicate song file '${filepath}'. Is a duplicate of: ${song.name} by ${song.primaryArtist.name} of album ${song.album.name}`);
@@ -178,6 +183,9 @@ export default function (job: WorkerJobRef<IndexerProcessDTO>): Promise<IndexerR
                     if(!songResult?.data) {
                         continue;
                     }
+
+                    // Ed Sheeran/Bad Habits (feat. Tion Wayne & Central Cee) [Fumez The Engineer Remix]
+                    // Ed Sheeran/Bad Habits (feat. Tion Wayne & Central Cee) [Fumez The Engineer Remix]
 
                     // Prepare result and push to results array
                     const timeTookMs = Date.now() - fileReadStartTime;

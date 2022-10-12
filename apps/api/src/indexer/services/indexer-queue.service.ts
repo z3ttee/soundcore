@@ -25,7 +25,7 @@ export class IndexerQueueService {
 
         this.queue.on("completed", (job: WorkerJob<IndexerProcessDTO, IndexerResultDTO>) => {
             const { result, payload: { files } } = job;
-            const { entries, timeTookMs } = result;
+            const { entries, timeTookMs } = result || {};
 
             if(Debug.isDebug) {
                 for(const entry of entries) {
