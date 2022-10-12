@@ -126,8 +126,6 @@ export class ArtistService {
         artist.description = createArtistDto.description;
         artist.geniusId = createArtistDto.geniusId;
 
-        console.log(createArtistDto.name)
-
         return this.repository.createQueryBuilder()
             .insert()
             .values(artist)

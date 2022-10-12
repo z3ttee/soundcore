@@ -55,7 +55,6 @@ export default function (job: WorkerJobRef<IndexerProcessDTO>): Promise<IndexerR
                 
                 for(const file of files) {
                     const fileReadStartTime = Date.now();
-                    console.log(`has file mount data? `, (file.mount));
 
                     // Build filepath
                     const filepath = path.resolve(path.join(mount.directory, file.directory, file.name));

@@ -68,8 +68,6 @@ export class OIDCService {
         const pemEncodedcert = `-----BEGIN CERTIFICATE-----\n${derEncodedCert}\n-----END CERTIFICATE-----`;
         const publicKey = crypto.createPublicKey(pemEncodedcert).export({ type: "pkcs1", format: "pem" });
 
-        console.log(token);
-
         const decoded = this.jwtService.verify(tokenValue, {
             publicKey,
             secret: publicKey,
