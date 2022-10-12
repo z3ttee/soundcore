@@ -8,7 +8,7 @@
   "scripts": {
     "start": "nest start",
     "dev": "nest start --watch",
-    "build-api": "nest build && npm run bundle",
+    "build:api": "nest build && npm run bundle",
     "bundle": "node bundle/bundle-packagejson.js && node bundle/bundle-env.js && node bundle/bundle-info.js",
     "bundle:pm2": "npm run build && node ./bundle/bundle-pm2.js",
     "bundle:docker": "npm run build && docker builder prune --all --force && docker build -t z3ttee/soundcore:latest .",

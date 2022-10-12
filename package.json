@@ -8,8 +8,8 @@
       "packages/*"
   ],
   "scripts": {
-    "build-api": "turbo run build-api",
-    "build": "turbo run build",
+    "build:api": "turbo run build:api",
+    "build:app": "turbo run build:app",
     "dev": "turbo run dev --parallel",
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\""
