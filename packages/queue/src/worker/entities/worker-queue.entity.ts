@@ -25,7 +25,16 @@ export class WorkerQueue<T = any> extends BaseQueue<WorkerJob<T>, WorkerEventNam
         if(typeof eventHandlers === "undefined" || eventHandlers == null) return;
         
         const jobData: WorkerJob = job["isRef"] ? WorkerJob.fromRef(job as WorkerJobRef) : job as WorkerJob;
-        eventHandlers.forEach((handler) => handler(jobData, ...args));
+
+        try {
+            if(typeof args === "undefined" || args == null) {
+                eventHandlers.forEach((handler) => handler(jobData));
+            } else {
+                eventHandlers.forEach((handler) => handler(jobData, ...args));
+            }
+        } catch (error) {
+            console.error(error);
+        }
     }
 
     public override enqueue(payload: any): Promise<number> {
