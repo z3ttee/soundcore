@@ -10,4 +10,8 @@ This monorepo contains all project files to build the Soundcore application.
 ## Packages
 - [@soundcore/redis](/packages/redis/README.md)
 - [@soundcore/constants](/packages/constants/README.md)
+- [@soundcore/cdk](/packages/soundcore-cdk/README.md)
+- [@soundcore/sdk](/packages/soundcore-sdk/README.md)
+- [@soundcore/ngx](/packages/soundcore-ngx/README.md)
+- [@soundcore/sso](/packages/soundcore-sso/README.md)
 
