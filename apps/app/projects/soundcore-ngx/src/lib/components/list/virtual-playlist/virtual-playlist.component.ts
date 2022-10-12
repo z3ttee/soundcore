@@ -1,7 +1,7 @@
 import { Component, Input, OnInit, SimpleChanges } from '@angular/core';
 import { IPageInfo } from '@tsalliance/ngx-virtual-scroller';
 import { BehaviorSubject, Observable, of, Subject } from 'rxjs';
-import { PlaylistItem } from 'soundcore-sdk';
+import { PlaylistItem } from '@soundcore/sdk';
 import { DatasourceItem, SCNGX_DATASOURCE_PAGE_SIZE } from '../../../utils/datasource/datasource';
 import { SCNGXPlaylistDatasource } from '../../../utils/datasource/playlist-datasource';
 import { SCNGXSongColConfig } from '../song-list-item/song-list-item.component';

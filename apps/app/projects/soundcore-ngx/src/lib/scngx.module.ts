@@ -2,7 +2,7 @@ import { ModuleWithProviders, NgModule } from "@angular/core";
 import { LottieModule, LottieCacheModule  } from 'ngx-lottie';
 import { SCNGXScrollModule } from "./services/scroll/scroll.module";
 import { HeroIconModule } from "ng-heroicon";
-import { SCCDKModule, SCCDKOptions, SCCDK_OPTIONS } from "soundcore-cdk";
+import { SCCDKModule, SCCDKOptions, SCCDK_OPTIONS } from "@soundcore/cdk";
 
 export const SCNGX_OPTIONS = "scngx-options";
 export interface SCNGXOptions {

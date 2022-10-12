@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { Song, MeiliSong } from 'soundcore-sdk';
+import { Song, MeiliSong } from '@soundcore/sdk';
 
 @Component({
   selector: 'song-grid-item',

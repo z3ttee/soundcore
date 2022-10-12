@@ -3,7 +3,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { BehaviorSubject, Subject, takeUntil } from 'rxjs';
 import { SCNGXDialogService, SCNGXInfiniteDataSource } from 'soundcore-ngx';
-import { Bucket, Mount, SCDKBucketService } from 'soundcore-sdk';
+import { Bucket, Mount, SCDKBucketService } from '@soundcore/sdk';
 import { AppMountCreateDialog, MountCreateDialogOptions } from 'src/app/dialogs/mount-create-dialog/mount-create-dialog.component';
 import { environment } from 'src/environments/environment';
 

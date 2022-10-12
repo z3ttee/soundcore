@@ -8,7 +8,7 @@ import { SCNGXAlbumGridItemModule } from 'soundcore-ngx';
 import { SCNGXPlaylistGridItemModule } from 'soundcore-ngx';
 import { Error404Module } from 'src/app/shared/error404/error404.module';
 import { ReactiveFormsModule } from '@angular/forms';
-import { SCDKAlbumModule, SCDKArtistModule, SCDKUserModule } from 'soundcore-sdk';
+import { SCDKAlbumModule, SCDKArtistModule, SCDKUserModule } from '@soundcore/sdk';
 import { SCNGXProfileGridItemModule } from 'projects/soundcore-ngx/src/lib/components/grid/profile-grid-item/profile-grid-item.module';
 import { SongContextMenuModule } from 'src/app/components/menus/song-context-menu/song-context-menu.module';
 import { SongGridItemModule } from 'src/app/components/grid-items/song-grid-item/song-grid-item.module';

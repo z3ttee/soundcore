@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { MountStatus } from 'soundcore-sdk';
+import { MountStatus } from '@soundcore/sdk';
 
 @Pipe({
   name: 'scngxMountStatusPipe'

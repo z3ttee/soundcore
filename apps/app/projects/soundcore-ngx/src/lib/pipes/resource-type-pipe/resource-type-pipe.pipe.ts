@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { SCDKResourceType } from 'soundcore-sdk';
+import { SCDKResourceType } from '@soundcore/sdk';
 
 @Pipe({
   name: 'scngxResourceTypePipe'

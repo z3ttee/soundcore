@@ -1,6 +1,6 @@
 import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { debounceTime, fromEvent, Subject, takeUntil } from 'rxjs';
-import { SCCDKScreenService } from 'soundcore-cdk';
+import { SCCDKScreenService } from '@soundcore/cdk';
 
 @Component({
   selector: 'scngx-horizontal-grid',

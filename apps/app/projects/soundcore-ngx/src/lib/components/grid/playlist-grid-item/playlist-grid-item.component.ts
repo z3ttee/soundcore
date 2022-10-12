@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { Playlist, MeiliPlaylist } from 'soundcore-sdk';
+import { Playlist, MeiliPlaylist } from '@soundcore/sdk';
 
 @Component({
   selector: 'scngx-playlist-grid-item',

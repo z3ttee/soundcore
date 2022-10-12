@@ -1,7 +1,7 @@
 import { AfterViewInit, Component, Input, OnInit } from '@angular/core';
 import { NavigationStart, Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
-import { SCCDKScreenService } from 'soundcore-cdk';
+import { SCCDKScreenService } from '@soundcore/cdk';
 
 export type SCNGXDrawerMode = "push" | "over";
 

@@ -3,7 +3,7 @@ import { NgModule } from "@angular/core";
 import { MatRippleModule } from "@angular/material/core";
 import { RouterModule, Routes } from "@angular/router";
 import { bell, HeroIconModule } from "ng-heroicon";
-import { SCCDKContextMenuModule } from "soundcore-cdk";
+import { SCCDKContextMenuModule } from "@soundcore/cdk";
 import { SCNGXLabelModule, SCNGXToolbarModule, SCNGXTooltipModule } from "soundcore-ngx";
 import { HomeComponent } from './views/home/home.component';
 

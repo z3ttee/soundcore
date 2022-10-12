@@ -1,5 +1,5 @@
 import { Observable, of } from "rxjs";
-import { Song } from "soundcore-sdk";
+import { Song } from "@soundcore/sdk";
 import { SCNGXPlayableSource } from "./playable-source.entity";
 
 export class SCNGXPlayableSong extends SCNGXPlayableSource {

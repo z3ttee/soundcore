@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { Playlist } from 'soundcore-sdk';
+import { Playlist } from '@soundcore/sdk';
 
 @Component({
   selector: 'scngx-playlist-list-item',

@@ -1,8 +1,8 @@
 import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, EventEmitter, Input, NgZone, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { AnimationOptions } from 'ngx-lottie';
 import { BehaviorSubject, fromEvent, Observable, Subject, takeUntil } from 'rxjs';
-import { SCCDKScreenService } from 'soundcore-cdk';
-import { Song } from 'soundcore-sdk';
+import { SCCDKScreenService } from '@soundcore/cdk';
+import { Song } from '@soundcore/sdk';
 import audio_wave_anim from "../../../assets/lottie/audio_wave.json"
 
 export class SCNGXSongCol {

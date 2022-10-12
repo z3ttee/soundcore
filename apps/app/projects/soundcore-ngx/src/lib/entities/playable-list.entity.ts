@@ -1,6 +1,6 @@
 import { HttpClient, HttpErrorResponse } from "@angular/common/http";
 import { BehaviorSubject, firstValueFrom, map, Observable, takeUntil } from "rxjs";
-import { Album, Artist, Playlist, Song, SCDKTracklist, PlaylistItem } from "soundcore-sdk";
+import { Album, Artist, Playlist, Song, SCDKTracklist, PlaylistItem } from "@soundcore/sdk";
 import { SCNGX_DATASOURCE_PAGE_SIZE } from "../utils/datasource/datasource";
 import { SCNGXPlaylistDatasource } from "../utils/datasource/playlist-datasource";
 import { BaseTracklistDatasource } from "../utils/datasource/tracklist-datasource";

@@ -6,9 +6,9 @@ import { NavigationCancel, NavigationEnd, NavigationError, NavigationStart, Rout
 import { SSOService } from "@soundcore/sso";
 import { SCNGXPlaylistListItemComponent } from "projects/soundcore-ngx/src/public-api";
 import { filter, Subject, takeUntil } from "rxjs";
-import { SCCDKScreenService } from "soundcore-cdk";
+import { SCCDKScreenService } from "@soundcore/cdk";
 import { SCNGXDialogService } from "soundcore-ngx";
-import { Playlist, SCDKPlaylistService, SCDKSearchService } from "soundcore-sdk";
+import { Playlist, SCDKPlaylistService, SCDKSearchService } from "@soundcore/sdk";
 import { AppPlaylistCreateDialog } from "src/app/dialogs/playlist-create-dialog/playlist-create-dialog.component";
 
 @Component({

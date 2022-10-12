@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { SCCDKScreenService } from 'soundcore-cdk';
+import { SCCDKScreenService } from '@soundcore/cdk';
 
 export interface SCNGXTabItemRoute {
   commands: any[];

@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { NavigationCancel, NavigationEnd, NavigationError, NavigationStart, Router } from '@angular/router';
 import { SSOService } from '@soundcore/sso';
 import { BehaviorSubject, combineLatest, filter, map, Observable, Subject, takeUntil } from 'rxjs';
-import { SCCDKScreenService } from 'soundcore-cdk';
+import { SCCDKScreenService } from '@soundcore/cdk';
 
 @Component({
   selector: 'app-root',

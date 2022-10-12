@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Pageable, SCDKNotificationService } from 'soundcore-sdk';
+import { Pageable, SCDKNotificationService } from '@soundcore/sdk';
 
 @Component({
   templateUrl: './notifications.component.html',

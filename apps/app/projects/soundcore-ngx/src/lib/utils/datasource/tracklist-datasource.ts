@@ -1,6 +1,6 @@
 import { HttpClient } from "@angular/common/http";
 import { map, Observable, takeUntil } from "rxjs";
-import { Song, } from "soundcore-sdk";
+import { Song, } from "@soundcore/sdk";
 import { SCNGXLogger } from "../logger/logger";
 import { BaseDatasource, DatasourceOptions } from "./datasource";
 

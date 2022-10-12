@@ -1,9 +1,9 @@
 import { HttpClient } from "@angular/common/http";
 import { BehaviorSubject, Observable, of, Subject, Subscription, switchMap, takeUntil } from "rxjs";
-import { ApiResponse, Page, Pageable } from "soundcore-sdk";
+import { ApiResponse, Page, Pageable } from "@soundcore/sdk";
 import { IPageInfo } from '@tsalliance/ngx-virtual-scroller';
 import { v4 as uuidv4 } from "uuid";
-import { apiResponse } from "soundcore-sdk";
+import { apiResponse } from "@soundcore/sdk";
 
 export const SCNGX_DATASOURCE_PAGE_SIZE = 50;
 export interface DatasourceOptions {

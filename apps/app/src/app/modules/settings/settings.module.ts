@@ -1,7 +1,7 @@
 import { CommonModule } from "@angular/common";
 import { NgModule } from "@angular/core";
 import { RouterModule, Routes } from "@angular/router";
-import { SCSDKSettingsModule } from "soundcore-sdk";
+import { SCSDKSettingsModule } from "@soundcore/sdk";
 
 import { SettingsComponent } from './views/settings/settings.component';
 import {MatCheckboxModule} from '@angular/material/checkbox';

@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { Artist, MeiliArtist } from 'soundcore-sdk';
+import { Artist, MeiliArtist } from '@soundcore/sdk';
 
 @Component({
   selector: 'scngx-artist-grid-item',

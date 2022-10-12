@@ -1,6 +1,6 @@
 import { HttpClient } from "@angular/common/http";
 import { map, Observable, takeUntil } from "rxjs";
-import { PlaylistItem } from "soundcore-sdk";
+import { PlaylistItem } from "@soundcore/sdk";
 import { DatasourceOptions } from "./datasource";
 import { BaseTracklistDatasource } from "./tracklist-datasource";
 

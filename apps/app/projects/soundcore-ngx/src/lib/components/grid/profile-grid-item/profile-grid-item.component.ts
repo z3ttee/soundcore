@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { User, MeiliUser } from 'soundcore-sdk';
+import { User, MeiliUser } from '@soundcore/sdk';
 
 @Component({
   selector: 'scngx-profile-grid-item',

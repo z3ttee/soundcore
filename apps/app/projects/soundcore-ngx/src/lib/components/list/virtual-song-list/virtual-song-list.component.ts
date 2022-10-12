@@ -4,7 +4,7 @@ import { SCNGXSongColConfig } from '../song-list-item/song-list-item.component';
 import { IPageInfo } from '@tsalliance/ngx-virtual-scroller';
 import { BaseTracklistDatasource, SCNGXTracklistDatasource } from '../../../utils/datasource/tracklist-datasource';
 import { DatasourceItem, SCNGX_DATASOURCE_PAGE_SIZE } from '../../../utils/datasource/datasource';
-import { PlaylistItem, Song } from 'soundcore-sdk';
+import { PlaylistItem, Song } from '@soundcore/sdk';
 
 @Component({
   selector: 'scngx-virtual-song-list',

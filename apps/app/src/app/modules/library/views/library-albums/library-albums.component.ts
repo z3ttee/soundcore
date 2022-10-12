@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { SCDKAlbumService } from 'soundcore-sdk';
+import { SCDKAlbumService } from '@soundcore/sdk';
 
 @Component({
   selector: 'app-library-albums',

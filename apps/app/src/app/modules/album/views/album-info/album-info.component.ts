@@ -3,7 +3,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { BehaviorSubject, Observable, Subject, takeUntil } from 'rxjs';
 import { PlayableListBuilder, SCNGXPlayableList, SCNGXPlayableTracklist, SCNGXSongColConfig } from 'soundcore-ngx';
-import { Album, SCDKAlbumService } from 'soundcore-sdk';
+import { Album, SCDKAlbumService } from '@soundcore/sdk';
 import { environment } from 'src/environments/environment';
 
 @Component({

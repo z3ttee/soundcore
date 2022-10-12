@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
-import { Bucket } from "soundcore-sdk";
+import { Bucket } from "@soundcore/sdk";
 
 @Component({
   selector: 'app-bucket-list-item',

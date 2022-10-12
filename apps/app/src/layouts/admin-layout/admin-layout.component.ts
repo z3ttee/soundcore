@@ -3,7 +3,7 @@ import { Component, OnDestroy, OnInit } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
 import { SSOService } from "@soundcore/sso";
 import { Subject } from "rxjs";
-import { SCCDKScreenService } from "soundcore-cdk";
+import { SCCDKScreenService } from "@soundcore/cdk";
 
 @Component({
     templateUrl: "./admin-layout.component.html"

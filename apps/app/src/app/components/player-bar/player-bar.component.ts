@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, ElementRef, OnDestroy, OnInit } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { Song } from 'soundcore-sdk';
+import { Song } from '@soundcore/sdk';
 
 @Component({
   selector: 'app-player-bar',

@@ -9461,17 +9461,7 @@ socks@^2.6.2:
     ip "^2.0.0"
     smart-buffer "^4.2.0"
 
-"soundcore-cdk@file:apps/app/dist/soundcore-cdk":
-  version "0.0.1"
-  dependencies:
-    tslib "^2.3.0"
-
 "soundcore-ngx@file:apps/app/dist/soundcore-ngx":
-  version "0.0.1"
-  dependencies:
-    tslib "^2.3.0"
-
-"soundcore-sdk@file:apps/app/dist/soundcore-sdk":
   version "0.0.1"
   dependencies:
     tslib "^2.3.0"

@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { Album, MeiliAlbum } from 'soundcore-sdk';
+import { Album, MeiliAlbum } from '@soundcore/sdk';
 
 @Component({
   selector: 'scngx-album-grid-item',

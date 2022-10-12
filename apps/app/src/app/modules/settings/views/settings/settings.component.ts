@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { UntypedFormControl, UntypedFormGroup } from '@angular/forms';
-import { SCSDKSettingsService } from 'soundcore-sdk';
+import { SCSDKSettingsService } from '@soundcore/sdk';
 import { Subject, takeUntil } from 'rxjs';
 import { SSOService } from '@soundcore/sso';
 

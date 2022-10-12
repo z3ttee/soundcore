@@ -5,10 +5,10 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { SCNGXModule } from 'projects/soundcore-ngx/src/lib/scngx.module';
-import { SCDKModule } from 'soundcore-sdk';
+import { SCDKModule } from '@soundcore/sdk';
 import { environment } from 'src/environments/environment';
 import { SCNGXDialogModule } from 'soundcore-ngx';
-import { SCCDKScreenModule } from 'soundcore-cdk';
+import { SCCDKScreenModule } from '@soundcore/cdk';
 import { HttpClientModule } from '@angular/common/http';
 import { SSOModule } from "@soundcore/sso";
 

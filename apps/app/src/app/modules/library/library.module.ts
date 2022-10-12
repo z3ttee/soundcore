@@ -7,7 +7,7 @@ import { LibraryAlbumsComponent } from './views/library-albums/library-albums.co
 import { LibraryArtistsComponent } from './views/library-artists/library-artists.component';
 import { Error404Module } from 'src/app/shared/error404/error404.module';
 import { SCNGXCollectionGridItemModule, SCNGXPlaylistGridItemModule, SCNGXResourceGridItemModule, SCNGXTabbarModule, SCNGXToolbarModule, SCNGXVerticalGridModule } from 'soundcore-ngx';
-import { SCDKAlbumModule } from 'soundcore-sdk';
+import { SCDKAlbumModule } from '@soundcore/sdk';
 
 const routes: Routes = [
   { path: "", component: LibraryIndexComponent, children: [

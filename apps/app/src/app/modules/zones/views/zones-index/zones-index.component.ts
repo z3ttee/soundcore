@@ -3,7 +3,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { IPageInfo } from '@tsalliance/ngx-virtual-scroller';
 import { Subject } from 'rxjs';
 import { SCNGXInfiniteDataSource } from 'soundcore-ngx';
-import { Bucket, SCDKBucketService } from 'soundcore-sdk';
+import { Bucket, SCDKBucketService } from '@soundcore/sdk';
 import { environment } from 'src/environments/environment';
 
 @Component({

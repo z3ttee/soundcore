@@ -1,7 +1,7 @@
 import { CollectionViewer, DataSource } from "@angular/cdk/collections";
 import { HttpClient } from "@angular/common/http";
 import { BehaviorSubject, firstValueFrom, Observable, of, Subscription } from "rxjs";
-import { Page, Pageable, PlaylistItem, Song } from "soundcore-sdk";
+import { Page, Pageable, PlaylistItem, Song } from "@soundcore/sdk";
 
 export interface TrackListDataSourceOptions {
   type: TrackListType;

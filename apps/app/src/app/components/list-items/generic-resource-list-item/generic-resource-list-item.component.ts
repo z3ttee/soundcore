@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { Album, Artist, Playlist } from 'soundcore-sdk';
+import { Album, Artist, Playlist } from '@soundcore/sdk';
 
 @Component({
   selector: 'app-generic-resource-list-item',

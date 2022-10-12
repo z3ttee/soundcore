@@ -1,6 +1,6 @@
 import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { StatusIndicatorAppearance } from 'soundcore-ngx';
-import { Mount, MountStatus } from "soundcore-sdk";
+import { Mount, MountStatus } from "@soundcore/sdk";
 
 @Component({
   selector: 'app-mount-list-item',

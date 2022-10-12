@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, OnDestroy } from "@angular/core";
 import { FormControl, FormGroup, Validators } from "@angular/forms";
 import { Subject, takeUntil } from "rxjs";
 import { DialogRef } from "soundcore-ngx";
-import { Playlist, ApiResponse, PlaylistPrivacy, SCDKPlaylistService } from "soundcore-sdk";
+import { Playlist, ApiResponse, PlaylistPrivacy, SCDKPlaylistService } from "@soundcore/sdk";
 
 @Component({
     templateUrl: "./playlist-create-dialog.component.html",

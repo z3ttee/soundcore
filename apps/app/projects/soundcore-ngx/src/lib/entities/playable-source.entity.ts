@@ -1,5 +1,5 @@
 import { Observable, Subject } from "rxjs";
-import { Song } from "soundcore-sdk";
+import { Song } from "@soundcore/sdk";
 import { v4 as uuidv4 } from "uuid";
 import { SCNGXLogger } from "../utils/logger/logger";
 import { Queue } from "../utils/queue/queue.util";

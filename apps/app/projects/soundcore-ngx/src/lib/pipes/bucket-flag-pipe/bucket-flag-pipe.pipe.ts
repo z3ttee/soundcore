@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { SCDKResourceFlag } from 'soundcore-sdk';
+import { SCDKResourceFlag } from '@soundcore/sdk';
 
 @Pipe({
   name: 'scngxBucketFlagPipe'

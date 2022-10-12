@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Routes } from '@angular/router';
 import { MountInfoComponent } from './views/mount-info/mount-info.component';
-import { SCDKFileModule, SCDKMountModule } from 'soundcore-sdk';
+import { SCDKFileModule, SCDKMountModule } from '@soundcore/sdk';
 import { SCNGXButtonModule, SCNGXBytesPipeModule, SCNGXInfiniteListModule, SCNGXLoadingBtnModule, SCNGXMountStatusPipeModule, SCNGXSkeletonModule, SCNGXStatusIndicatorModule } from 'soundcore-ngx';
 import { chartPie, collection, HeroIconModule, pencil, plus, refresh, star, trash } from 'ng-heroicon';
 import { Error404Module } from 'src/app/shared/error404/error404.module';

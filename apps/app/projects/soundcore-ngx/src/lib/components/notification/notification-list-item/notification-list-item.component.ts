@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
-import { Notification } from 'soundcore-sdk';
+import { Notification } from '@soundcore/sdk';
 
 @Component({
   selector: 'scngx-notification-list-item',

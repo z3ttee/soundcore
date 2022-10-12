@@ -1,6 +1,6 @@
 import { AfterViewInit, Component, ElementRef, Input, OnChanges, OnInit, SimpleChanges, ViewChild } from '@angular/core';
 import { BehaviorSubject, firstValueFrom, Observable } from 'rxjs';
-import { Artwork, SCDKArtworkService } from 'soundcore-sdk';
+import { Artwork, SCDKArtworkService } from '@soundcore/sdk';
 
 @Component({
   selector: 'scngx-artwork',
