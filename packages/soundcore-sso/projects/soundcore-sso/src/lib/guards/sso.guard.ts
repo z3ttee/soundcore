@@ -27,7 +27,7 @@ export class SSOGuard extends KeycloakAuthGuard {
       const requiredRoles: string = route?.data["roles"] || [];
       const userRoles = this.keycloak.getUserRoles(true);
       const hasOneOfRequiredRoles = userRoles.filter((role) => requiredRoles.includes(role?.toLowerCase())).length > 0;
-      if(!hasOneOfRequiredRoles) {
+      if(requiredRoles?.length > 0 && !hasOneOfRequiredRoles) {
         return this.router.createUrlTree(["/"]);
       }
 
