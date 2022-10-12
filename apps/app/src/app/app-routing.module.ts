@@ -9,7 +9,7 @@ import { Error404Component } from './shared/error404/error404.component';
 import { Error404Module } from './shared/error404/error404.module';
 
 const routes: Routes = [
-  { path: "admin", component: AdminLayoutComponent, canActivate: [ SSOGuard ], children: [
+  { path: "admin", component: AdminLayoutComponent, canActivate: [ SSOGuard ], data: { roles: ["admin"] }, children: [
     { path: "", redirectTo: "/admin/zones", pathMatch: "full" },
     { path: "zones", canActivate: [SSOGuard], loadChildren: () => import("./modules/zones/zones.module").then((m) => m.ZonesModule) },
     { path: "more", canActivate: [SSOGuard], loadChildren: () => import("./modules/admin-more/admin-more.module").then((m) => m.AdminMoreModule) },
