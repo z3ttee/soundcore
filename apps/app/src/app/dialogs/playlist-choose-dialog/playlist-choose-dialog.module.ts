@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { SCNGXArtworkModule, SCNGXButtonModule, SCNGXDialogModule, SCNGXLoadingBtnModule } from 'soundcore-ngx';
+import { SCNGXArtworkModule, SCNGXButtonModule, SCNGXDialogModule, SCNGXLoadingBtnModule } from '@soundcore/ngx';
 import { AppPlaylistChooseDialog } from './playlist-choose-dialog.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { VirtualScrollerModule } from '@tsalliance/ngx-virtual-scroller';

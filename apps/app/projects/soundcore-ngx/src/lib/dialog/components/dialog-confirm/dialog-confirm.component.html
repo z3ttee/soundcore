@@ -1,9 +1,0 @@
-<scngx-dialog [title]="dialogRef.config.title || 'Aktion bestätigen'">
-    <div scngx-dialog-content>
-        {{ dialogRef.config.message || "Bitte bestätige die Aktion, bevor du fortfahren kannst." }}
-    </div>
-    <div scngx-dialog-footer>
-        <scngx-btn-text (click)="dialogRef.close(false)">Abbrechen</scngx-btn-text>
-        <scngx-btn (click)="confirm()">Bestätigen</scngx-btn>
-    </div>
-</scngx-dialog>

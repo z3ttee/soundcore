@@ -1,6 +1,25 @@
 {
   "name": "@soundcore/ngx",
   "version": "0.0.0",
+  "module": "./dist/fesm2015/soundcore-ngx.mjs",
+  "es2020": "./dist/fesm2020/soundcore-ngx.mjs",
+  "esm2020": "./dist/esm2020/soundcore-ngx.mjs",
+  "fesm2020": "./dist/fesm2020/soundcore-ngx.mjs",
+  "fesm2015": "./dist/fesm2015/soundcore-ngx.mjs",
+  "typings": "./dist/index.d.ts",
+  "exports": {
+    "./package.json": {
+      "default": "./dist/package.json"
+    },
+    ".": {
+      "types": "./dist/index.d.ts",
+      "esm2020": "./dist/esm2020/soundcore-ngx.mjs",
+      "es2020": "./dist/fesm2020/soundcore-ngx.mjs",
+      "es2015": "./dist/fesm2015/soundcore-ngx.mjs",
+      "node": "./dist/fesm2015/soundcore-ngx.mjs",
+      "default": "./dist/fesm2020/soundcore-ngx.mjs"
+    }
+  },
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
@@ -20,6 +39,7 @@
     "@angular/router": "^14.2.0",
     "@soundcore/cdk": "*",
     "@soundcore/sdk": "*",
+    "@soundcore/tailwind": "*",
     "rxjs": "~7.5.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.11.4",

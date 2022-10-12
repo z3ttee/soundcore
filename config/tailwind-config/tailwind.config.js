@@ -1,11 +1,7 @@
-const colors = require("tailwindcss/colors");
-
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
-    `src/**/*.{js,ts,jsx,tsx}`,
-    // include packages if not transpiling
-    // "../../packages/**/*.{js,ts,jsx,tsx}",
+    "./src/**/*.{html,ts}"
   ],
   theme: {
     extend: {
@@ -18,6 +14,11 @@ module.exports = {
         },
         accent: {
           DEFAULT: "#ffbf50"
+        },
+        font: {
+          secondary: "#7b7b7b",
+          DEFAULT: "#d4d4d4",
+          tertiary: "#434343"
         },
         error: {
           light: "#cd6262",
@@ -38,49 +39,94 @@ module.exports = {
           light: "#378FC2",
           DEFAULT: "#277cad",
           dark: "#23719E"
-        },
-        white: {
-          light: colors.white,
-          DEFAULT: "#CCCCCC",
-          dark: "#BBBBBB"
-        },
+        }
+      },
+      spacing: {
+        window: "24px",
+        box: "16px"
       },
       margin: ({ theme }) => ({
         row: theme("spacing.6"),
-        box: "16px",
-        window: "24px",
       }),
       padding: ({ theme }) => ({
         row: theme("spacing.6"),
-        box: "16px",
-        window: "24px",
       }),
       gap: theme => ({
         row: theme("spacing.6")
       }),
-      backgroundImage: {
-        divider: `linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.25) 50%, rgba(255,255,255,0) 100%);`,
+      minWidth: theme => ({
+        ...theme("spacing")
+      }),
+      minHeight: theme => ({
+        ...theme("spacing")
+      }),
+      maxWidth: theme => ({
+        ...theme("spacing")
+      }),
+      backgroundImage: theme => ({
+        "divider": "linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.25) 50%, rgba(255,255,255,0) 100%);",
+        "collection": "linear-gradient(130deg, rgba(255,191,80,0.7) -20%, rgba(166,150,121,0.5) 100%)"
+      }),
+      gridTemplateColumns: {
+        autofit: "repeat(auto-fit, minmax(0, 1fr))"
+      },
+      scale: {
+        "97": "97%",
+        "99": "99%"
+      },
+      keyframes: theme => ({
+        skeleton: {
+          "0%, 100%": { backgroundColor: theme("colors.body.light") },
+          "50%": { backgroundColor: theme("colors.body.lighter") }
+        },
+        progressInc: {
+          "0%": { left: "-5%", width: "5%" },
+          "100%": { left: "130%", width: "100%" }
+        },
+        progressDec: {
+          "0%": { left: "-80%", width: "80%" },
+          "100%": { left: "110%", width: "10%" }
+        }
+      }),
+      animation: {
+        skeleton: "skeleton 2s ease-in-out infinite",
+        progressInc: "progressInc 2s infinite",
+        progressDec: "progressDec 2s 0.45s infinite"
       }
     },
+    screens: {
+      'sm': '540px', // >= Tablet
+      'md': '780px', // >= Laptop
+      'lg': '1000px', // >= Desktop
+      'xl': '1200px', // >= Bigger Desktop
+      '2xl': '1550px'
+    },
     fontSize: {
-      xxs: ['0.65rem', { lineHeight: '1rem' }],
-      xs: ['0.8rem', { lineHeight: '1rem' }],
-      sm: ['0.9rem', { lineHeight: '1.1rem' }],
-      base: ['0.98rem', { lineHeight: '1.25rem' }],
+      xs: ["10px", { lineHeight: "0.96rem" }],
+      sm: ["12px", { lineHeight: "1.1rem" }],
+      base: ["14px", { lineHeight: "1.5rem" }],
       md: ["18px", { lineHeight: "2rem" }],
-      lg: ['1rem', { lineHeight: '1.75rem' }],
-      xl: ['1.25rem', { lineHeight: '1.75rem' }],
-      '2xl': ['1.5rem', { lineHeight: '2rem' }],
-      '3xl': ['1.875rem', { lineHeight: '2.5rem' }],
-      '4xl': ['2.25rem', { lineHeight: '3rem' }],
-      '5xl': ['3rem', { lineHeight: '4rem' }]
+      lg: ["24px", { lineHeight: "2.2rem" }],
+      xl: ["31px", { lineHeight: "2.8rem" }],
+      "2xl": ["39px", { lineHeight: "3.5rem" }],
+      "3xl": ["48px", { lineHeight: "4.3rem" }],
+      "4xl": ["56px", { lineHeight: "5.0rem" }],
     },
     fontWeight: {
-      light: '400',
-      normal: '500',
-      semi: '600',
-      bold: '700'
+      light: 400,
+      normal: 500,
+      semi: 600,
+      bold: 700
+    },
+    borderRadius: {
+      none: "0",
+      sm: "4px",
+      DEFAULT: "8px",
+      md: "12px",
+      full: "9999px"
     }
   },
-  plugins: [],
-};
+  plugins: [
+    require("@tailwindcss/line-clamp")
+  ]
+}

@@ -1,6 +1,7 @@
 /*
  * Public API Surface of soundcore-ngx
  */
+export { SCNGXModule } from "./lib/scngx.module";
 
 // Drawer
 export * from "./lib/components/drawer/drawer.module";
@@ -96,6 +97,9 @@ export * from "./lib/components/list/song-list-item/song-list-item.component";
 export * from "./lib/components/list/song-list/song-list.module";
 export * from "./lib/components/list/song-list/song-list.component";
 
+export * from "./lib/components/list/playlist-list-item/playlist-list-item.module";
+export * from "./lib/components/list/playlist-list-item/playlist-list-item.component";
+
 export * from "./lib/components/list/virtual-song-list/virtual-song-list.module";
 export * from "./lib/components/list/virtual-song-list/virtual-song-list.component";
 
@@ -112,6 +116,9 @@ export * from "./lib/components/grids/vertical-grid/vertical-grid.component";
 
 export * from "./lib/components/grids/horizontal-grid/horizontal-grid.module";
 export * from "./lib/components/grids/horizontal-grid/horizontal-grid.component";
+
+export * from "./lib/components/grid/profile-grid-item/profile-grid-item.module";
+export * from "./lib/components/grid/profile-grid-item/profile-grid-item.component";
 
 // Image exports
 export * from "./lib/components/images/artwork/artwork.module";

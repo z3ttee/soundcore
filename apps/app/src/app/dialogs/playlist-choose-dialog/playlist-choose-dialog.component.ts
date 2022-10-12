@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, OnDestroy } from "@angular/core";
 import { Subject, takeUntil } from "rxjs";
-import { DialogRef, SCNGXDialogService } from "soundcore-ngx";
+import { DialogRef, SCNGXDialogService } from "@soundcore/ngx";
 import { Playlist, SCDKPlaylistService } from "@soundcore/sdk";
 import { AppPlaylistCreateDialog } from "../playlist-create-dialog/playlist-create-dialog.component";
 

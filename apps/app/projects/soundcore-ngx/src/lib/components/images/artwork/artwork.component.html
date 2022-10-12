@@ -1,3 +1,0 @@
-<div class="inline-block w-full h-full overflow-hidden bg-body-light" [ngClass]="{'animate-pulse': isLoading}">
-    <img #image [src]="($src | async)" class="w-full h-full object-cover opacity-0 appearance-none" [ngClass]="{'opacity-100': canShow}" (error)="onError()" (load)="onLoad()">
-</div>

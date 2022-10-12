@@ -4,10 +4,9 @@ import { Component, OnDestroy, OnInit } from "@angular/core";
 import { UntypedFormControl } from "@angular/forms";
 import { NavigationCancel, NavigationEnd, NavigationError, NavigationStart, Router } from "@angular/router";
 import { SSOService } from "@soundcore/sso";
-import { SCNGXPlaylistListItemComponent } from "projects/soundcore-ngx/src/public-api";
 import { filter, Subject, takeUntil } from "rxjs";
 import { SCCDKScreenService } from "@soundcore/cdk";
-import { SCNGXDialogService } from "soundcore-ngx";
+import { SCNGXPlaylistListItemComponent, SCNGXDialogService } from "@soundcore/ngx";
 import { Playlist, SCDKPlaylistService, SCDKSearchService } from "@soundcore/sdk";
 import { AppPlaylistCreateDialog } from "src/app/dialogs/playlist-create-dialog/playlist-create-dialog.component";
 

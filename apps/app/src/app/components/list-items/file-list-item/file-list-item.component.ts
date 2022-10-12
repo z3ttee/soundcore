@@ -1,6 +1,6 @@
 import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { File, FileFlag } from '@soundcore/sdk';
-import { StatusIndicatorAppearance } from "soundcore-ngx";
+import { StatusIndicatorAppearance } from "@soundcore/ngx";
 
 @Component({
   selector: 'app-file-list-item',

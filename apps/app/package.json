@@ -1,15 +1,9 @@
 {
-  "name": "soundcore",
+  "name": "@soundcore/app",
   "version": "0.0.0",
   "scripts": {
     "start": "ng serve",
-    "build:sdk:watch": "ng build --watch soundcore-sdk",
-    "build:cdk:watch": "ng build --watch soundcore-cdk",
-    "build:ngx:watch": "ng build --watch soundcore-ngx",
-    "build:sdk": "ng build soundcore-sdk",
-    "build:cdk": "ng build soundcore-cdk",
-    "build:ngx": "ng build soundcore-ngx",
-    "build": "npm run build:sdk && npm run build:cdk && npm run build:ngx && ng build",
+    "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },
@@ -36,9 +30,9 @@
     "ngx-lottie": "^8.1.1",
     "rxjs": "~7.5.0",
     "socket.io-client": "^4.4.1",
-    "soundcore-ngx": "file:dist/soundcore-ngx",
     "@soundcore/cdk": "*",
     "@soundcore/sdk": "*",
+    "@soundcore/tailwind": "*",
     "@soundcore/ngx": "*",
     "@soundcore/sso": "*",
     "tslib": "^2.3.0",

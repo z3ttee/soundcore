@@ -4,7 +4,7 @@ import { UntypedFormControl } from '@angular/forms';
 import { Router } from '@angular/router';
 import { BehaviorSubject, debounceTime, Observable, Subject, takeUntil } from 'rxjs';
 import { SCCDKScreenService } from '@soundcore/cdk';
-import { SCNGXInfiniteDataSource } from 'soundcore-ngx';
+import { SCNGXInfiniteDataSource } from '@soundcore/ngx';
 import { SCDKGenreService, MeiliAlbum, MeiliArtist, SCDKSearchService, ComplexSearchResult, SCDKResource, ApiSearchResponse, MeiliPlaylist, Pageable, MeiliUser, SCDKUserService, SCDKArtistService, SCDKAlbumService, Genre, MeiliSong, SCDKSongService, SCDKPlaylistService } from '@soundcore/sdk';
 
 @Component({

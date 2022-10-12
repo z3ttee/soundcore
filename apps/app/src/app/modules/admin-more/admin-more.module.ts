@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Routes } from '@angular/router';
 import { AdminMoreComponent } from './views/admin-more/admin-more.component';
 import { HeroIconModule, cog, logout } from 'ng-heroicon';
-import { SCNGXButtonModule, SCNGXUiTitleModule } from 'soundcore-ngx';
+import { SCNGXButtonModule, SCNGXUiTitleModule } from '@soundcore/ngx';
 
 const routes: Routes = [
   { path: "", component: AdminMoreComponent }

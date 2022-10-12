@@ -112,42 +112,6 @@
           }
         }
       }
-    },
-    "soundcore-ngx": {
-      "projectType": "library",
-      "root": "projects/soundcore-ngx",
-      "sourceRoot": "projects/soundcore-ngx/src",
-      "prefix": "scngx",
-      "schematics": {
-        "@schematics/angular:component": {
-          "style": "scss"
-        }
-      },
-      "architect": {
-        "build": {
-          "builder": "@angular-devkit/build-angular:ng-packagr",
-          "options": {
-            "project": "projects/soundcore-ngx/ng-package.json"
-          },
-          "configurations": {
-            "production": {
-              "tsConfig": "projects/soundcore-ngx/tsconfig.lib.prod.json"
-            },
-            "development": {
-              "tsConfig": "projects/soundcore-ngx/tsconfig.lib.json"
-            }
-          },
-          "defaultConfiguration": "production"
-        },
-        "test": {
-          "builder": "@angular-devkit/build-angular:karma",
-          "options": {
-            "main": "projects/soundcore-ngx/src/test.ts",
-            "tsConfig": "projects/soundcore-ngx/tsconfig.spec.json",
-            "karmaConfig": "projects/soundcore-ngx/karma.conf.js"
-          }
-        }
-      }
     }
   },
   "cli": {
