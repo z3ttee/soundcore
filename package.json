@@ -3,9 +3,9 @@
   "version": "0.0.0",
   "private": true,
   "workspaces": [
-    "apps/*",
-    "config/*",
-    "packages/*"
+      "apps/*",
+      "config/*",
+      "packages/*"
   ],
   "scripts": {
     "build-api": "turbo run build-api",

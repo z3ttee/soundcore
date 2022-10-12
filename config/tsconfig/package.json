@@ -8,6 +8,7 @@
   ],
   "exports": {
     "./base": "./base.json",
+    "./angular": "./angular.json",
     "./nextjs": "./nextjs.json",
     "./nestjs": "./nestjs.json",
     "./react-library": "./react-library.json"

@@ -1,0 +1,5 @@
+<button class="p-2.5 px-4 rounded-sm bg-opacity-0 hover:bg-opacity-20 active:bg-opacity-70 active:scale-97 transform-gpu will-change-transform transition-all select-none" [ngClass]="{'w-full': fullWidth, 'cursor-not-allowed': disabled, 'p-2 px-3': size == 'sm', 'px-6': size == 'md', 'p-3 px-9': size == 'lg', 'p-4 px-10': size == 'xl', 'bg-body-dark border-body-dark': appearance == 'default', 'bg-success': appearance == 'success', 'bg-error': appearance == 'error', 'bg-warn': appearance == 'warn', 'bg-info': appearance == 'info'}">
+    <div class="flex gap-2 items-center" [ngClass]="{'text-sm': size == 'sm', 'text-md': size == 'xl'}">
+        <ng-content></ng-content>
+    </div>
+</button>

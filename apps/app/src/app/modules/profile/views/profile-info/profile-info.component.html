@@ -1,0 +1,55 @@
+<app-error404 *ngIf="!($loading | async) && !($profile | async)"></app-error404>
+
+<section class="h-full w-full overflow-y-auto pb-window" #parent>
+    <virtual-scroller #pageScroll [parentScroll]="parent" [enableUnequalChildrenSizes]="true">
+        <app-list-view [resource]="($profile | async)" [artwork]="null" [isLoading]="($loading | async)" [title]="($profile | async)?.name">
+
+            <ng-container scngx-stats>
+                <li class="text-font-secondary" scngxTooltip [scngxTooltipText]="($profile | async)?.createdAt | date:'dd.MM.yyyy'">
+                    Seit {{ ($profile | async)?.createdAt | date:"yyyy" }}
+                </li>
+                <li class="text-font-secondary">
+                    {{ ($profile | async)?.friendsCount || 0 }} Freunde
+                </li>
+                <li class="text-font-secondary">
+                    {{ ($playlists | async)?.length || 0 }} Öffentliche Playlists
+                </li>
+            </ng-container>
+        
+            <ng-container scngx-controls>
+                <button class="p-2 px-6 bg-body-light bg-opacity-10 border-2 border-body-light rounded-sm hover:bg-opacity-25 active:bg-opacity-50 transition-all">
+                    Freund hinzufügen
+                </button>
+            </ng-container>
+        
+            </app-list-view>
+
+        <!-- Playlists row -->
+        <scngx-ui-row [route]="['./playlists']" [headline]="'Öffentliche Playlists'">
+            <div class="w-full" #scrollArea>
+                <virtual-scroller class="w-full h-64" #scroll [parentScroll]="scrollArea" [items]="($playlists | async)" [horizontal]="true" [scrollbarWidth]="0" [scrollbarHeight]="0">
+                    <div class="w-48 h-full mx-2 first:ml-window last:mr-window" *ngFor="let playlist of scroll.viewPortItems">
+                        <scngx-playlist-grid-item 
+                            [routerLink]="['/playlist', playlist.slug || playlist.id]"
+                            [item]="playlist">
+                        </scngx-playlist-grid-item>
+                    </div>
+                </virtual-scroller>
+            </div>
+        </scngx-ui-row>
+
+        <!-- Artists row -->
+        <scngx-ui-row [route]="['./playlists']" [headline]="'Top Künstler'" [subtitle]="'Der letzten 30 Tage'">
+            <div class="w-full" #scrollArea>
+                
+            </div>
+        </scngx-ui-row>
+
+        <!-- Songs row -->
+        <scngx-ui-row [route]="['./playlists']" [headline]="'Meistgehörte Songs'" [subtitle]="'Der letzten 30 Tage'">
+            <div class="w-full" #scrollArea>
+                
+            </div>
+        </scngx-ui-row>
+    </virtual-scroller>
+</section>

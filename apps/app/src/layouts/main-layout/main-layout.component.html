@@ -1,0 +1,112 @@
+<!-- Navigation status loading bar -->
+<div class="fixed w-full top-0 left-0 z-[1000000000000000000]" *ngIf="isNavigating">
+    <scngx-progressbar [transparent]="true"></scngx-progressbar>
+</div>
+
+<!-- Layout - Drawer -->
+<scngx-drawer #drawer *ngIf="!(screenService.$isTouch | async)">
+    <!-- Drawer sections -->
+    <div class="flex flex-col relative h-full" scngx-drawer>
+
+        <div class="block p-window pb-0">
+            <div class="flex items-center w-full">
+                <div class="w-1/2">
+                    <img src="assets/branding/soundcore_logo_full.svg" class="min-w-10 max-w-10 h-10 block cursor-pointer" [routerLink]="['/']">
+                </div>
+
+                <div class="w-1/2 text-right">
+                    <button (click)="navigateBack()" class="inline-flex items-center justify-center bg-body-light rounded-full w-9 h-9 mr-1.5 transform-gpu transition-all will-change-transform active:scale-95"><hero-icon [name]="'chevron-down'" [class]="'h-5 w-5 transform-gpu rotate-90'"></hero-icon></button>
+                    <button (click)="navigateNext()" class="inline-flex items-center justify-center bg-body-light rounded-full w-9 h-9 transform-gpu transition-all will-change-transform active:scale-95"><hero-icon [name]="'chevron-down'" [class]="'h-5 w-5 transform-gpu -rotate-90'"></hero-icon></button>
+                </div>
+            </div>
+
+            <div class="w-full mt-row">
+                <input type="text" [formControl]="searchInputControl" placeholder="Suchen" class="outline-none appearance-none w-full bg-body-light border border-transparent focus:border-font focus:border-opacity-30 transition-colors rounded-full text-sm py-3 px-4 placeholder:font-semi placeholder:text-font-secondary" (click)="navigateToSearch()">
+            </div>
+        </div>
+
+        <hr class="my-row bg-divider min-h-[3px] max-h-[3px] rounded-full appearance-none border-none w-[90%] mx-auto">
+
+        <div class="block">
+            <ul class="flex flex-col select-none">
+                <li [routerLink]="['/']" [routerLinkActiveOptions]="{exact: true}" routerLinkActive="text-accent" class="relative flex gap-4 px-window py-3 cursor-pointer hover:opacity-100 transition-all"><hero-icon [name]="'home'" [class]="'h-6 w-6'"></hero-icon><span>Startseite</span></li>
+                <li [routerLink]="['/library']" routerLinkActive="text-accent" class="relative flex gap-4 px-window py-3 cursor-pointer hover:opacity-100 transition-all"><hero-icon [name]="'bookmark-alt'" [class]="'h-6 w-6'"></hero-icon><span>Bibliothek</span></li>
+                <li [routerLink]="['/profile/@me']" [routerLinkActiveOptions]="{exact: true}" routerLinkActive="text-accent" class="relative flex gap-4 px-window py-3 cursor-pointer hover:opacity-100 transition-all"><hero-icon [name]="'user'" [class]="'h-6 w-6'"></hero-icon><span>Dein Profil</span></li>
+            </ul>
+        </div>
+
+        <hr class="mt-row bg-divider min-h-[3px] max-h-[3px] rounded-full appearance-none border-none w-[90%] mx-auto">
+
+        <div class="block h-full overflow-hidden overflow-y-scroll py-row">
+            <li (click)="openCreatePlaylistDialog()" class="relative flex gap-4 px-window py-3 cursor-pointer hover:opacity-100 transition-all"><hero-icon [name]="'plus'" [class]="'ml-1.5 h-6 w-6'"></hero-icon><span>Playlist erstellen</span></li>
+
+            <li [routerLink]="['/collection']" routerLinkActive="text-accent" class="relative flex items-center gap-4 px-window py-3 cursor-pointer hover:opacity-100 transition-all">
+                <div class="inline-block min-w-8 max-w-8 h-8 rounded-sm overflow-hidden">
+                    <img src="assets/img/collection_cover.png"> 
+                </div>
+                <div class="w-full line-clamp-1">
+                    Lieblingssongs
+                </div>
+            </li>
+
+            <div cdkDropList class="list" (cdkDropListDropped)="onPlaylistItemDrop($event)">
+                <div *ngFor="let playlist of (playlistService.$library | async)" cdkDrag cdkDragLockAxis="y" cdkDragBoundary=".list">
+                    <scngx-playlist-list-item class="cursor-pointer" [playlist]="playlist" [routerLink]="['/playlist', playlist.slug || playlist.id]" routerLinkActive="text-accent"></scngx-playlist-list-item>
+                </div>
+            </div>
+        </div>
+
+        <hr class="bg-divider min-h-[3px] max-h-[3px] rounded-full appearance-none border-none w-[90%] mx-auto">
+        <app-profile-bar [user]="(authService.$user | async)">
+            <ul>
+                <li *ngIf="(authService.$isAdmin | async)" class="flex items-center cursor-pointer gap-4 p-2.5 transition-all bg-body-light bg-opacity-0 active:bg-opacity-80 rounded-sm" [ngClass]="{'hover:bg-opacity-50': !(screenService.$isTouch | async)}" [routerLink]="['/admin']">
+                    <hero-icon [name]="'shield-exclamation'" [class]="'h-5 w-5'"></hero-icon> 
+                    <span>Administration</span>
+                </li>
+
+                <hr *ngIf="(authService.$isAdmin | async)" class="appearance-none border-none bg-divider h-[2px] my-2">
+
+                <li class="flex items-center cursor-pointer gap-4 p-2.5 transition-all bg-body-light bg-opacity-0 active:bg-opacity-80 rounded-sm" [ngClass]="{'hover:bg-opacity-50': !(screenService.$isTouch | async)}" [routerLink]="['/notifications']">
+                    <hero-icon [name]="'bell'" [class]="'h-5 w-5'"></hero-icon> 
+                    <span>Benachrichtungen</span>
+                </li>
+                <li class="flex items-center cursor-pointer gap-4 p-2.5 transition-all bg-body-light bg-opacity-0 active:bg-opacity-80 rounded-sm" [ngClass]="{'hover:bg-opacity-50': !(screenService.$isTouch | async)}" [routerLink]="['/settings']">
+                    <hero-icon [name]="'cog'" [class]="'h-5 w-5'"></hero-icon> 
+                    <span>Einstellungen</span>
+                </li>
+
+                <hr class="appearance-none border-none bg-divider h-[2px] my-2">
+
+                <li class="flex items-center cursor-pointer gap-4 p-2.5 transition-all bg-error-light bg-opacity-0 active:bg-opacity-20 rounded-sm text-error-light" [ngClass]="{'hover:bg-opacity-10': !(screenService.$isTouch | async)}" (click)="authService.logout()">
+                    <hero-icon [name]="'logout'" [class]="'h-5 w-5'"></hero-icon> 
+                    <span>Abmelden</span>
+                </li>
+            </ul>
+        </app-profile-bar>
+    </div>
+
+    <!-- Page contents -->
+    <div class="h-full overflow-hidden relative" scngx-content>
+        <router-outlet></router-outlet>
+        <app-player-bar class="absolute left-0 bottom-0 w-full"></app-player-bar>
+    </div>
+</scngx-drawer>
+
+<!-- Layout - Mobile -->
+<scngx-bottom-nav *ngIf="(screenService.$isTouch | async)">
+    <!-- Bottom navigation items -->
+    <scngx-nav-item [label]="'Home'" [routerLink]="['/']" [routerLinkActiveOptions]="{exact: true}" routerLinkActive #rla="routerLinkActive" [active]="rla.isActive">
+        <hero-icon [name]="'home'" [class]="'h-5 w-5 transition-all'"></hero-icon>
+    </scngx-nav-item>
+    <scngx-nav-item [label]="'Suchen'" [routerLink]="['/search']" routerLinkActive #rla1="routerLinkActive" [active]="rla1.isActive">
+        <hero-icon [name]="'search'" [class]="'h-5 w-5 transition-all'"></hero-icon>
+    </scngx-nav-item>
+    <scngx-nav-item [label]="'Bibliothek'" [routerLink]="['/library']" routerLinkActive #rla2="routerLinkActive" [active]="rla2.isActive">
+        <hero-icon [name]="'bookmark-alt'" [class]="'h-5 w-5 transition-all'"></hero-icon>
+    </scngx-nav-item>
+    <!-- Page contents -->
+    <div class="h-full overflow-hidden relative" scngx-content>
+        <router-outlet></router-outlet>
+        <app-player-bar class="absolute left-0 bottom-0 w-full"></app-player-bar>
+    </div>
+</scngx-bottom-nav>
