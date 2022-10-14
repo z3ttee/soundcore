@@ -46,6 +46,10 @@ export class IndexerQueueService {
                 this.logger.debug(`Analyzing files: ${progress}`);
             }
         });
+
+        this.queue.on("started", (job: WorkerJob<IndexerProcessDTO, IndexerResultDTO>) => {
+            this.logger.verbose(`Starting analyzing id3 tags of ${job.payload.files.length} files on mount '${job.payload.mount.name}'`);
+        })
     }
 
     /**

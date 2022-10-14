@@ -7,6 +7,7 @@ import { MountGateway } from './gateway/mount.gateway';
 import { Mount } from './entities/mount.entity';
 import { MountQueueService } from './services/mount-queue.service';
 import { WorkerQueueModule } from '@soundcore/nest-queue';
+import { MountRegistryService } from './services/mount-registry.service';
 
 @Module({
   controllers: [
@@ -15,7 +16,8 @@ import { WorkerQueueModule } from '@soundcore/nest-queue';
   providers: [
     MountService,
     MountGateway,
-    MountQueueService
+    MountQueueService,
+    MountRegistryService
   ],
   imports: [
     TypeOrmModule.forFeature([ Mount ]),
@@ -25,7 +27,8 @@ import { WorkerQueueModule } from '@soundcore/nest-queue';
     })
   ],
   exports: [
-    MountService
+    MountService,
+    MountRegistryService
   ]
 })
 export class MountModule implements OnModuleInit {

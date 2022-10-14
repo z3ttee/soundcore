@@ -5,6 +5,7 @@ import { Client, Issuer } from "openid-client";
 import { OIDCConfig } from "../config/oidc.config";
 import { OIDC_OPTIONS } from "../oidc.constants";
 import crypto from "node:crypto";
+import { OIDCUser } from "../entities/oidc-user.entity";
 
 @Injectable()
 export class OIDCService {
@@ -52,7 +53,7 @@ export class OIDCService {
         return this._client?.issuer?.metadata?.jwks_uri;
     }
 
-    public async verifyAccessToken(tokenValue: string): Promise<void> {
+    public async verifyAccessToken(tokenValue: string): Promise<OIDCUser> {
         const token = this.jwtService.decode(tokenValue, { complete: true });
         const kid = token?.["header"]?.["kid"];
         const alg = token?.["header"]?.["alg"];
@@ -68,11 +69,11 @@ export class OIDCService {
         const pemEncodedcert = `-----BEGIN CERTIFICATE-----\n${derEncodedCert}\n-----END CERTIFICATE-----`;
         const publicKey = crypto.createPublicKey(pemEncodedcert).export({ type: "pkcs1", format: "pem" });
 
-        const decoded = this.jwtService.verify(tokenValue, {
+        const decoded: OIDCUser = this.jwtService.verify(tokenValue, {
             publicKey,
             secret: publicKey,
             algorithms: [alg]
-        })
+        });
 
         return decoded;
     }

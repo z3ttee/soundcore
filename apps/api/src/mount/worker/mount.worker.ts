@@ -9,19 +9,16 @@ import { WorkerJobRef, WorkerProgressEvent } from "@soundcore/nest-queue";
 
 import workerpool from "workerpool";
 import { FileSystemService } from "../../filesystem/services/filesystem.service";
-import Debug from "../../utils/debug";
+import { MountRegistryService } from "../services/mount-registry.service";
+import { MountRegistry } from "../entities/mount-registry.entity";
 
 const logger = new Logger("MountWorker");
+const filesystem = new FileSystemService();
+const registryService = new MountRegistryService(filesystem);
 
 export const MOUNT_STEP_MKDIR = "CREATE_DIRECTORY";
 export const MOUNT_STEP_PREPARE = "PREPARING_SCAN";
 export const MOUNT_STEP_SCAN = "SCANNING";
-
-class Registry {
-    constructor(
-        public files: string[] = []
-    ) {}
-}
 
 /**
  * Algorithm Overview
@@ -38,8 +35,7 @@ export default async function (job: WorkerJobRef<Mount>): Promise<MountScanResul
         throw new Error("Invalid mount: null");
     }
 
-    const fileSystem = new FileSystemService();
-    const mountDirectory = fileSystem.resolveMountPath(mount);
+    const mountDirectory = filesystem.resolveMountPath(mount);
 
     // Create directory if it does not exist.
     if(!fs.existsSync(mountDirectory)) {
@@ -69,7 +65,7 @@ async function scanMount(job: WorkerJobRef<Mount>): Promise<MountScanResultDTO> 
         const startTime = Date.now();
 
         // Read registry
-        const registry: Registry = await readFileRegistry(directory);
+        const registry: MountRegistry = await registryService.readRegistry(mount);
 
         // Execute scan
         const files: FileDTO[] = [];
@@ -102,7 +98,7 @@ async function scanMount(job: WorkerJobRef<Mount>): Promise<MountScanResultDTO> 
 
             // Update registry file entries
             registry.files = matches;
-            saveFileRegistry(directory, registry).finally(() => {
+            registryService.saveRegistry(registry).finally(() => {
                 resolve(new MountScanResultDTO(files, matches.length, Date.now() - startTime));
             });
         })
@@ -123,47 +119,4 @@ function updateProgress(job: WorkerJobRef, progress: number) {
     job.progress = progress;
     workerpool.workerEmit(new WorkerProgressEvent(job));
 }
-
-function getRegistryFilepath(cwd: string): string {
-    return path.resolve(path.join(cwd, ".registry"));
-}
-
-async function readFileRegistry(cwd: string) {
-    return new Promise<Registry>(async (resolve, reject) => {
-        const registryFilepath: string = getRegistryFilepath(cwd);
-
-        if(Debug.isDebug) {
-            logger.debug(`Reading registry file ${registryFilepath}`);
-        }
-
-        if(!fs.existsSync(registryFilepath)) {
-            saveFileRegistry(cwd, new Registry()).then((registry) => resolve(registry)).catch((error) => reject(error));
-            return;
-        }
-
-        const buffer = fs.readFileSync(registryFilepath);
-        const registry: Registry = Object.assign(new Registry(), JSON.parse(buffer.toString()));
-        resolve(registry);
-    }).catch((error: Error) => {
-        logger.warn(`Could not read registry for mount. This means looking up files cannot be optimized: ${error.message}`);
-        return new Registry();
-    })
-}
   
-async function saveFileRegistry(cwd: string, registry: Registry): Promise<Registry> {
-    const registryFilepath: string = getRegistryFilepath(cwd);
-
-    return new Promise<Registry>((resolve, reject) => {
-        if(Debug.isDebug) {
-            logger.debug(`Saving registry file ${registryFilepath}...`);
-        }
-
-        fs.writeFile(registryFilepath, JSON.stringify(registry), (err) => {
-            if(err) reject(err);
-            resolve(registry);
-        })
-    }).catch((error: Error) => {
-        logger.warn(`Could not write file registry. This is not an error but informs about a failed optimisation attempt when looking up files: ${error.message}`);
-        throw error;
-    });
-}

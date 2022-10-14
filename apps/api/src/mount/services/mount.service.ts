@@ -10,7 +10,7 @@ import { Random } from '@tsalliance/utilities';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateResult } from '../../utils/results/creation.result';
 import { FileSystemService } from '../../filesystem/services/filesystem.service';
-import { Worker, WorkerQueue } from '@soundcore/nest-queue';
+import { WorkerQueue } from '@soundcore/nest-queue';
 
 @Injectable()
 export class MountService {
@@ -20,7 +20,6 @@ export class MountService {
         @InjectRepository(Mount) private readonly repository: Repository<Mount>,
         private readonly fileSystem: FileSystemService,
         private readonly queue: WorkerQueue
-        // @InjectQueue(QUEUE_MOUNTSCAN_NAME) private readonly queue: Queue<MountScanProcessDTO>
     ) { }
 
     /**

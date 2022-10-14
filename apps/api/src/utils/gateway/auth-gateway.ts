@@ -1,3 +1,4 @@
+import { ForbiddenException } from "@nestjs/common";
 import { OnGatewayConnection, OnGatewayDisconnect, WebSocketServer } from "@nestjs/websockets";
 import { Server, Socket } from "socket.io";
 import { OIDCUser } from "../../authentication/entities/oidc-user.entity";
@@ -39,28 +40,27 @@ export abstract class AuthGateway implements OnGatewayConnection, OnGatewayDisco
     ) {}
     
     public handleConnection(socket: Socket) {
-        const token = socket.handshake.headers.authorization.slice("Bearer ".length);
+        const tokenValue = socket.handshake?.headers?.authorization?.slice("Bearer ".length);
 
-        this.oidcService.client().introspect(token).then((introspect) => {
-            if(!introspect.active) {
-                socket.disconnect();
-                return
-            }
+        this.oidcService.verifyAccessToken(tokenValue).then(async (token) => {
+            const roles = token?.["realm_access"]?.["roles"] || [];
+            const canAccessGateway = await this.canAccessGateway(roles);
+            if(!canAccessGateway) throw new ForbiddenException("User not allowed to access this gateway");
 
-            this.userService.findOrCreateByKeycloakUserInstance(introspect as unknown as OIDCUser).then((user) => {
+            return this.userService.findOrCreateByKeycloakUserInstance(token).then(async (user) => {
                 this.sockets.set(socket.id, socket);
                 this.userToSocket.set(user.id, socket.id);
                 this.authenticatedSockets.set(socket.id, user);
-                this.onConnect(socket, user);
-            }).catch((error) => {
-                console.error(error)
-                socket.disconnect();
-            })
+
+                this.onConnect(socket, user)
+            });
         }).catch((error: Error) => {
-            console.error(error);
             socket.disconnect();
-        })
-        
+
+            if(!(error instanceof ForbiddenException)) {
+                console.error(error)
+            }
+        });
     }
 
     public handleDisconnect(socket: Socket) {
@@ -92,6 +92,15 @@ export abstract class AuthGateway implements OnGatewayConnection, OnGatewayDisco
         return this.sockets.get(socketId);
     }
 
-    protected onConnect(socket: Socket, user: User) {/** */}
-    protected onDisconnect(socket: Socket, user: User) {/** */}
+    /**
+     * Handle connection events.
+     * Return true if the user is allowed to access the gateway
+     * @param socket Socket
+     * @param user User
+     */
+    protected abstract canAccessGateway(roles: string[]): Promise<boolean>;
+
+    protected onConnect(socket: Socket, user: User): Promise<void> { /** Do nothing */ return; };
+    protected onDisconnect(socket: Socket, user: User): Promise<void> { /** Do nothing */ return; };
+
 }

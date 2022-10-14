@@ -86,6 +86,15 @@ export class FileSystemService {
     }
 
     /**
+     * Get full filepath to a mount's registry file
+     * @param mount Mount object
+     * @returns Absolute Filepath
+     */
+    public resolveMountRegistryPath(mount: Mount): string {
+        return path.resolve(this.resolveMountPath(mount), ".sc-registry");
+    }
+
+    /**
      * Get filepath to an artwork file.
      * @param artwork Artwork database entry
      * @returns Absolute filepath
