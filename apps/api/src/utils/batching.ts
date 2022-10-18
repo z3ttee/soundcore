@@ -48,18 +48,20 @@ export class Batching<I = any, R = I> {
     
             // If there are no BATCH_SIZE entries left, use current length
             const list = this.list ?? [];
-            let size = list.length >= this.batchSize ? this.batchSize : list.length;
-    
             const result: R[] = [];
     
             // These are used to give some stats to the progress handler
-            const batches = Math.round(size / this.batchSize);
             let currentBatch = 0;
+            let length = list.length;
+
+            // Get amount of batches to process (used for stats and progress)
+            const batches = Math.round(list.length / this.batchSize);
     
-            while(size) {
+            while(length) {
                 currentBatch++;
 
                 // Get batch from list
+                const size = length >= this.batchSize ? this.batchSize : length;
                 const batch = list.splice(0, size);
     
                 // Build executer
@@ -84,8 +86,8 @@ export class Batching<I = any, R = I> {
                     this._progressHandler(batches, currentBatch);
                 }
     
-                // Decrement size, so that the while loop actually ends
-                --size;
+                // Decrement length to process next batch
+                length -= size;
             }
     
             // At the end, execute result handler
