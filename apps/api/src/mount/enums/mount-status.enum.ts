@@ -1,4 +1,6 @@
 export enum MountStatus {
-    OK = 0,
-    BUSY = 1
+    UP = 0,
+    ENQUEUED = 1,
+    SCANNING = 2,
+    INDEXING = 3
 }

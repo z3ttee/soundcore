@@ -11,6 +11,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { CreateResult } from '../../utils/results/creation.result';
 import { FileSystemService } from '../../filesystem/services/filesystem.service';
 import { WorkerQueue } from '@soundcore/nest-queue';
+import { MountRegistryService } from './mount-registry.service';
+import { MountStatus } from '../enums/mount-status.enum';
 
 @Injectable()
 export class MountService {
@@ -19,6 +21,7 @@ export class MountService {
     constructor(
         @InjectRepository(Mount) private readonly repository: Repository<Mount>,
         private readonly fileSystem: FileSystemService,
+        private readonly mountRegistryService: MountRegistryService,
         private readonly queue: WorkerQueue
     ) { }
 
@@ -144,18 +147,26 @@ export class MountService {
      * @param idOrObject Mount ID or Object
      * @returns Job<Mount>
      */
-    public async rescanMount(idOrObject: string | Mount): Promise<any> {
+    public async rescanMount(idOrObject: string | Mount): Promise<number> {
         const mount = await this.resolveMount(idOrObject);
-        const priority = mount.filesCount;
+        if(!mount) throw new NotFoundException("Mount not found");
 
-        this.queue.enqueue(mount);
+        return this.mountRegistryService.resetRegistryOf(mount).then(() => {
+            return this.queue.enqueue(mount);
+        });
+    }
 
-        // this.queue.enqueue(new WorkerJ)
+    /**
+     * Trigger scan for a mount. This will create a new job and add it
+     * to the directory scan queue.
+     * @param idOrObject Mount ID or Object
+     * @returns Job<Mount>
+     */
+    private async rescanMountInternal(idOrObject: string | Mount): Promise<number> {
+        const mount = await this.resolveMount(idOrObject);
+        if(!mount) throw new NotFoundException("Mount not found");
 
-        // return this.queue.add(new MountScanProcessDTO(mount), { priority }).then((job) => {
-        //     this.logger.debug(`Added mount '${mount.name} #${job.id}' to scanner queue.`);
-        //     return job;
-        // });
+        return this.queue.enqueue(mount);
     }
 
     /**
@@ -230,6 +241,16 @@ export class MountService {
             if(updateMountDto.doScan) this.rescanMount(mount);
             return result;
         });
+    }
+
+    public async setMountStatus(idOrObject: string | Mount, status: MountStatus): Promise<Mount> {
+        const mount = await this.resolveMount(idOrObject);
+        if(!mount) throw new NotFoundException("Mount not found");
+
+        mount.status = status;
+        return this.repository.update(mount.id, {
+            status: status
+        }).then(() => mount);
     }
 
     /**
@@ -308,7 +329,7 @@ export class MountService {
             fetchedElements += page.size;
 
             for(const mount of page.elements) {
-                this.rescanMount(mount);
+                this.rescanMountInternal(mount);
             }
         }
     }
@@ -354,7 +375,9 @@ export class MountService {
         const mount = await this.resolveMount(idOrObject);
         mount.lastScannedAt = new Date();
 
-        return this.repository.save(mount);
+        return this.repository.update(mount.id, {
+            lastScannedAt: mount.lastScannedAt
+        }).then(() => mount);
     }
 
 }

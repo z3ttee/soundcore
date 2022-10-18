@@ -67,10 +67,13 @@ export abstract class AuthGateway implements OnGatewayConnection, OnGatewayDisco
         const socketId: string = socket.id
         const user = this.getUserBySocketId(socketId);
 
-        this.userToSocket.delete(user.id);
         this.authenticatedSockets.delete(socketId);
         this.sockets.delete(socketId);
-        this.onDisconnect(socket, user);
+
+        if(user) {
+            this.userToSocket.delete(user.id);
+            this.onDisconnect(socket, user);
+        }
     }
 
     private getSocketById(socketId: string) {

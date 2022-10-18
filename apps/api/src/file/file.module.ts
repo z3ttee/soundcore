@@ -21,6 +21,7 @@ import { FileService } from './services/file.service';
     TypeOrmModule.forFeature([ File ]),
     WorkerQueueModule.forFeature({
       script: path.join(__dirname, "worker", "file.worker.js"),
+      concurrent: 4
     })
   ],
   exports: [

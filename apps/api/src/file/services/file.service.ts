@@ -1,7 +1,7 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Page, Pageable } from 'nestjs-pager';
-import { Repository } from 'typeorm';
+import { Repository, UpdateResult } from 'typeorm';
 import { Mount } from '../../mount/entities/mount.entity';
 import { Song } from '../../song/entities/song.entity';
 import { CreateResult } from '../../utils/results/creation.result';
@@ -83,6 +83,14 @@ export class FileService {
         return this.repository.save(file);
     }
 
+    public async setFlags(files: File[], flag: FileFlag): Promise<UpdateResult> {
+        return this.repository.createQueryBuilder()
+            .update()
+            .set({ flag })
+            .whereInIds(files)
+            .execute();
+    }
+
     /**
      * Find or create a file entry by the given data.
      * This will return the file and a boolean, indicating if the
@@ -131,7 +139,6 @@ export class FileService {
             .execute().then(async (result) => {
                 // Make db request to fetch affected rows
                 return this.repository.findBy(result.identifiers);
-                // return [];
             }).catch((error: Error) => {
                 this.logger.error(`Failed creating database entries for files batch: ${error.message}`, error.stack);
                 return [];

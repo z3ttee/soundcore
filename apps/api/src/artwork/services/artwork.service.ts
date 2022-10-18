@@ -156,10 +156,14 @@ export class ArtworkService {
      * @param fromSource (Optional) Filepath or buffer. If not set, no artwork will be written during creation.
      * @returns Artwork
      */
-     public async createForSongIfNotExists(song: Song, waitForLock = false, fromSource?: string | Buffer): Promise<Artwork> {
-        const primaryArtistName = song.primaryArtist?.name || Random.randomString(8);      
-        const featuredArtistNames = song.featuredArtists.map((artist) => artist.name).join(" ") || "";
-        return this.createIfNotExists({ name: `${song.name} ${primaryArtistName} ${featuredArtistNames}`, type: ArtworkType.SONG, fromSource })
+    public async createForSongIfNotExists(song: Song, waitForLock = false, fromSource?: string | Buffer): Promise<Artwork> {
+        return this.createIfNotExists({ name: `${ArtworkService.createSongCoverNameSchema(song.name, song.primaryArtist, song.featuredArtists)}`, type: ArtworkType.SONG, fromSource })
+    }
+
+    public static createSongCoverNameSchema(title: string, primaryArtist: Artist, featuredArtists: Artist[]): string {
+        const primaryArtistName = primaryArtist?.name || Random.randomString(8);      
+        const featuredArtistNames = featuredArtists.map((artist) => artist.name).join(" ") || "";
+        return `${title} ${primaryArtistName} ${featuredArtistNames}`;
     }
 
     /**

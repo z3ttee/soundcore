@@ -59,7 +59,7 @@ export default async function (job: WorkerJobRef<FileProcessDTO>): Promise<FileP
 
                     // Calculate hash consisting of information
                     // that make the file unique
-                    const pathToHash = `${mount.id}:${file.name}:${file.directory}:${file.size}`;
+                    const pathToHash = `${mount.id}:${file.directory}:${file.name}:${file.size}`;
                     file.pathHash = crypto.createHash("md5").update(pathToHash, "binary").digest("hex");
 
                     batchResults.push(file);

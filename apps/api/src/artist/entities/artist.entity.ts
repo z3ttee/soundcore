@@ -34,8 +34,7 @@ export class Artist implements Resource, Syncable {
     @Column({ nullable: true, type: "text" })
     public description: string;
 
-    @Index({ unique: true })
-    @Column({ nullable: false })
+    @Column({ nullable: false, unique: true })
     public name: string;
 
     @CreateDateColumn()

@@ -2,14 +2,15 @@ import path from "node:path";
 import Debug from "../../utils/debug";
 
 import { Injectable, Logger } from "@nestjs/common";
-import { EventEmitter2 } from "@nestjs/event-emitter";
+import { EventEmitter2, OnEvent } from "@nestjs/event-emitter";
 import { WorkerJob, WorkerJobRef, WorkerQueue } from "@soundcore/nest-queue";
 import { EVENT_FILES_FOUND } from "../../constants";
 import { FilesFoundEvent } from "../../events/files-found.event";
 import { MountScanResultDTO } from "../dtos/scan-result.dto";
 import { Mount } from "../entities/mount.entity";
-import { MountGateway } from "../gateway/mount.gateway";
 import { MountService } from "./mount.service";
+import { AdminGateway } from "../../gateway/gateways/admin-gateway.gateway";
+import { MountStatus } from "../enums/mount-status.enum";
 
 @Injectable()
 export class MountQueueService {
@@ -17,7 +18,7 @@ export class MountQueueService {
 
     constructor(
         private readonly mountService: MountService,
-        private readonly gateway: MountGateway,
+        private readonly adminGateway: AdminGateway,
         private readonly events: EventEmitter2,
         private readonly queue: WorkerQueue<Mount>
     ) {
@@ -35,6 +36,10 @@ export class MountQueueService {
 
         this.queue.on("started", async (job: WorkerJob<Mount>) => {
             const { payload } = job;
+
+            // Update status
+            this.mountService.setMountStatus(payload, MountStatus.SCANNING);
+
             this.logger.verbose(`Looking for files on mount '${payload.name}'...`);
         });
 
@@ -42,7 +47,8 @@ export class MountQueueService {
         this.queue.on("completed", async (job: WorkerJob<Mount, MountScanResultDTO>) => {
             const { payload, result } = job;
 
-            this.gateway.sendMountUpdateEvent(job.payload, null);
+            this.mountService.setMountStatus(job.payload, MountStatus.UP);
+            this.adminGateway.sendMountStatusUpdate(job.payload, null);
             this.mountService.updateLastScanned(job.payload);
 
             const files = result?.files || [];
@@ -59,12 +65,15 @@ export class MountQueueService {
             if(Debug.isDebug) {
                 this.logger.debug(`Received progress update from mount ${job.payload.name}: ${job.progress}`);
             }
-            this.gateway.sendMountUpdateEvent(job.payload, job.progress);
+
+            this.mountService.setMountStatus(job.payload, MountStatus.SCANNING);
+            this.adminGateway.sendMountStatusUpdate(job.payload, job.progress);
         });
 
         // Failed
         this.queue.on("failed", async (job: WorkerJobRef<Mount>, error: Error) => {
             this.logger.error(`Failed looking for files on mount ${job.payload.name}: ${error.message}`, error.stack);
+            this.mountService.setMountStatus(job.payload, MountStatus.UP);
         });
     }
 }

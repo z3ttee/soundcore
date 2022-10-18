@@ -40,7 +40,9 @@ import { WorkerQueueModule } from '@soundcore/nest-queue';
 
 @Module({
   imports: [
-    EventEmitterModule.forRoot(),
+    EventEmitterModule.forRoot({
+      global: true
+    }),
     ConfigModule,
     FileSystemModule.forRoot(),
     TypeOrmModule.forRoot({

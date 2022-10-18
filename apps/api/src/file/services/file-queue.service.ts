@@ -22,6 +22,10 @@ export class FileQueueService {
             this.logger.error(`Could not process batch of files for mount '${job.payload.mount.name}': ${error?.message}`, error?.stack);
         })
 
+        // this.eventEmitter.on(EVENT_FILES_FOUND, (event: FilesFoundEvent) => {
+        //     console.log(event);
+        // })
+
         this.queue.on("started", (job: WorkerJob<FileProcessDTO, FileProcessResultDTO>) => {
             const { payload } = job;
             const { mount } = payload;

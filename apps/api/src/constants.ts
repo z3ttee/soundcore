@@ -22,10 +22,12 @@ export const TYPEORM_CONNECTION_GENERAL = "default"
 // Internal events
 export const EVENT_FILES_FOUND = "files-found-event"
 export const EVENT_FILES_PROCESSED = "files-processed-event"
-export const EVENT_METADATA_CREATED = "metadata-created-event"
-export const EVENT_ARTIST_CHANGED = "artist-changed-event"
-export const EVENT_ALBUM_CHANGED = "album-changed-event"
+export const EVENT_SONGS_CHANGED = "songs-changed-event"
+export const EVENT_ALBUMS_CHANGED = "albums-changed-event"
+export const EVENT_ARTISTS_CHANGED = "artists-changed-event"
+export const EVENT_PLAYLISTS_CHANGED = "playlists-changed-event"
 
+export const EVENT_METADATA_CREATED = "metadata-created-event"
 
 // TypeORM
 export const TYPEORM_ENTITY_GLOB = path.join(process.cwd(), "**/*.entity{ .ts,.js}");

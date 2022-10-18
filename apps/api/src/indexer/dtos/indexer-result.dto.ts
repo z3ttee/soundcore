@@ -6,6 +6,7 @@ export class IndexerResultDTO {
 
     constructor(
         public readonly entries: IndexerResultEntry[],
+        public readonly createdResources: IndexerCreatedResources,
         public readonly timeTookMs: number
     ) {}
 
@@ -15,11 +16,17 @@ export class IndexerResultEntry {
 
     constructor(
         public readonly filepath: string,
-        public readonly timeTookMs: number,
+        public readonly timeTookMs: number
+    ) {}
 
-        public readonly createdSong: Song,
-        public readonly createdAlbum: Album = null,
-        public readonly createdArtists: Artist[] = [],
+}
+
+export class IndexerCreatedResources {
+
+    constructor(
+        public readonly songs: Song[] = [],
+        public readonly albums: Album[] = [],
+        public readonly artists: Artist[] = [],
     ) {}
 
 }

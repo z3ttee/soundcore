@@ -19,10 +19,11 @@ import { Syncable, SyncFlag } from "../../meilisearch/interfaces/syncable.interf
 export class Song implements Resource, Syncable {
     public resourceType: ResourceType = "song";
 
-    @Column({ nullable: true, default: null})
+    @Column({ nullable: true, default: null })
     public lastSyncedAt: Date;
 
-    @Column({ default: 0 })
+    // Default: 0 == AWAITING
+    @Column({ default: 0, type: "tinyint" })
     public lastSyncFlag: SyncFlag;
 
     @PrimaryGeneratedColumn("uuid")
@@ -129,6 +130,7 @@ export class Song implements Resource, Syncable {
     @BeforeUpdate() 
     public onBeforeUpdate() {
         if(!this.slug) Slug.create(this.name);
+        this.lastSyncFlag = SyncFlag.AWAITING;
     }
 
 }

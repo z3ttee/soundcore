@@ -28,5 +28,5 @@ class MeilisearchImpl {
 }
 
 
-const Meilisearch = new MeilisearchImpl();
-export default Meilisearch;
+const MeiliClient = new MeilisearchImpl();
+export default MeiliClient;

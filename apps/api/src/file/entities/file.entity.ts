@@ -3,9 +3,9 @@ import { Mount } from "../../mount/entities/mount.entity";
 import { Song } from "../../song/entities/song.entity";
 
 export enum FileFlag {
-    OK = 0,
-    PENDING_ANALYSIS = 1,
-    DUPLICATE = 2
+    PENDING_ANALYSIS = 0,
+    OK = 1,
+    POTENTIAL_DUPLICATE = 2
 }
 
 @Entity()
@@ -30,7 +30,7 @@ export class File {
     @Column()
     public mimetype: string;
 
-    @Column({ type: "tinyint", nullable: false, default: 1 })
+    @Column({ type: "tinyint", nullable: false, default: 0 })
     public flag: FileFlag
 
     @OneToOne(() => Song, { onDelete: "SET NULL" })

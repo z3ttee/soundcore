@@ -16,7 +16,7 @@ import path from "path";
 
 import { FileFlag } from "../file/entities/file.entity";
 import { InjectRepository } from "@nestjs/typeorm";
-import { In, Repository } from "typeorm";
+import { In, Repository, UpdateResult } from "typeorm";
 import { MeiliSongService } from "../meilisearch/services/meili-song.service";
 import { SyncFlag } from "../meilisearch/interfaces/syncable.interface";
 import { CreateResult } from "../utils/results/creation.result";
@@ -363,6 +363,21 @@ export class SongService {
     }
 
     /**
+     * Update the last synced attributes on songs.
+     * This will update the lastSyncedAt and lastSyncedFlag attributes.
+     * @param songs List of songs which should be affected by the change
+     * @param flag Flag to set for all songs
+     * @returns UpdateResult
+     */
+    public async setLastSyncedDetails(songs: Song[], flag: SyncFlag): Promise<UpdateResult> {
+        return this.repository.createQueryBuilder()
+            .update()
+            .set({ lastSyncedAt: new Date(), lastSyncFlag: flag })
+            .whereInIds(songs)
+            .execute();
+    }
+
+    /**
      * Synchronize the corresponding document on meilisearch.
      * @param resource Song data
      * @returns Song
@@ -423,10 +438,11 @@ export class SongService {
 
         // Build result DTO
         const result: ID3TagsDTO = {
+            filepath,
             title: id3Tags.title?.trim() || path.basename(filepath).replace(/\.[^/.]+$/, "").trim(),
             duration: durationInSeconds,
             artists: artists.map((name) => ({
-                name
+                name: name?.trim()
             })),
             album: id3Tags.album?.trim(),
             cover: artworkBuffer,

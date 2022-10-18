@@ -42,23 +42,22 @@ export abstract class MeiliService<T = any> {
      * @returns {Task} Task
      */
     protected async sync(documents: T[], timeOutMs: number = MEILI_DEFAULT_TIMEOUT_MS): Promise<Task> {
-        // return this.index().then((index) => {
-        //     return index.addDocuments(documents).then((enqueuedTask) => {
-        //         return this.client().waitForTask(enqueuedTask.taskUid, {
-        //             timeOutMs,
-        //             intervalMs: MEILI_DEFAULT_INTERVAL_MS
-        //         });
-        //     }).catch((error: MeiliSearchError) => {
-        //         if(!(error instanceof MeiliSearchTimeOutError)) {
-        //             this._logger.warn(`Timed out while waiting for task completion: ${error.message}`);
-        //             throw error;
-        //         } else {
-        //             this._logger.error(`Failed creating document: ${error.message}`, error.stack);
-        //             throw new InternalServerErrorException(`Synchronisation failed: ${error.message}`);
-        //         }
-        //     });
-        // });
-        return null;
+        return this.index().then((index) => {
+            return index.addDocuments(documents).then((enqueuedTask) => {
+                return this.client().waitForTask(enqueuedTask.taskUid, {
+                    timeOutMs,
+                    intervalMs: MEILI_DEFAULT_INTERVAL_MS
+                });
+            }).catch((error: MeiliSearchError) => {
+                if(!(error instanceof MeiliSearchTimeOutError)) {
+                    this._logger.warn(`Timed out while waiting for task completion: ${error.message}`);
+                    throw error;
+                } else {
+                    this._logger.error(`Failed creating document: ${error.message}`, error.stack);
+                    throw new InternalServerErrorException(`Synchronisation failed: ${error.message}`);
+                }
+            });
+        });
     }
 
     /**
@@ -143,15 +142,14 @@ export abstract class MeiliService<T = any> {
      * or filterableAttributes).
      */
     private _init() {
-        // TODO
-        // this.client().createIndex(this._indexUid, { primaryKey: "id" }).then(() => {
-        //     this.client().index<T>(this._indexUid).updateFilterableAttributes(this._options.filterableAttributes || [])
-        //     this.client().index<T>(this._indexUid).updateSearchableAttributes(this._options.searchableAttributes || ["*"])
-        // }).catch((error: MeiliSearchError) => {
-        //     this._logger.error(`Error occured while initializing Index on meilisearch: ${error.message}`, error.stack);
-        // }).finally(() => {
-        //     this._initializedSubject.next(true);
-        // });
+        this.client().createIndex(this._indexUid, { primaryKey: "id" }).then(() => {
+            this.client().index<T>(this._indexUid).updateFilterableAttributes(this._options.filterableAttributes || [])
+            this.client().index<T>(this._indexUid).updateSearchableAttributes(this._options.searchableAttributes || ["*"])
+        }).catch((error: MeiliSearchError) => {
+            this._logger.error(`Error occured while initializing Index on meilisearch: ${error.message}`, error.stack);
+        }).finally(() => {
+            this._initializedSubject.next(true);
+        });
     }
 
 }

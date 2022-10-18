@@ -4,7 +4,7 @@ import { OnEvent } from '@nestjs/event-emitter';
 import { Queue } from 'bull';
 import { Album } from '../../album/entities/album.entity';
 import { Artist } from '../../artist/entities/artist.entity';
-import { EVENT_ARTIST_CHANGED, EVENT_METADATA_CREATED, QUEUE_GENIUS_NAME } from '../../constants';
+import { EVENT_ARTISTS_CHANGED, EVENT_METADATA_CREATED, QUEUE_GENIUS_NAME } from '../../constants';
 import { ArtistChangedEvent } from '../../events/artist-changed.event';
 import { IndexerResultDTO } from '../../indexer/dtos/indexer-result.dto';
 import { Song } from '../../song/entities/song.entity';
@@ -31,9 +31,9 @@ export class GeniusService {
         this.logger.debug(`Received event ${EVENT_METADATA_CREATED}`);
     }
 
-    @OnEvent(EVENT_ARTIST_CHANGED)
+    @OnEvent(EVENT_ARTISTS_CHANGED)
     public async handleArtistChangedEvent(payload: ArtistChangedEvent) {
-        this.createArtistLookupJob(payload.data)
+        // this.createArtistLookupJob(payload.data)
     }
 
     public async createSongLookupJob(song: Song) {

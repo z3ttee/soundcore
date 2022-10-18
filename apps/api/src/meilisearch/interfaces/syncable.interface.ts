@@ -1,7 +1,8 @@
 
 export enum SyncFlag {
-    OK = 0,
-    ERROR = 1
+    AWAITING = 0,
+    OK = 1,
+    ERROR = 2
 }
 
 // TODO: Create cronjob that periodically checks for sync errors. If there occured errors (SyncFlag = 1), then sync again

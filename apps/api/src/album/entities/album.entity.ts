@@ -54,8 +54,7 @@ export class Album implements Resource, Syncable {
     @JoinColumn()
     public primaryArtist: Artist;
 
-    @ManyToMany(() => Song)
-    @JoinTable({ name: "song2album" })
+    @OneToMany(() => Song, (song) => song.album)
     public songs: Song[];
 
     @ManyToOne(() => Artwork, { onDelete: "SET NULL" })

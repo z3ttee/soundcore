@@ -6,6 +6,7 @@ import { In, Repository, SelectQueryBuilder } from 'typeorm';
 import { SyncFlag } from '../meilisearch/interfaces/syncable.interface';
 import { MeiliArtistService } from '../meilisearch/services/meili-artist.service';
 import { GeniusFlag, ResourceFlag } from '../utils/entities/resource';
+import { CreationBatchResult } from '../utils/results/creation-batch.result';
 import { CreateResult } from '../utils/results/creation.result';
 import { CreateArtistDTO } from './dtos/create-artist.dto';
 import { UpdateArtistDTO } from './dtos/update-artist.dto';
@@ -140,6 +141,31 @@ export class ArtistService {
                 return null
             })
     }
+
+    // public async createBatchIfNotExists(artists: (Artist | { name: string })[]): Promise<CreationBatchResult<Artist>> {
+    //     if(artists.length <= 0) throw new Error("Artists cannot be empty for batched insert.");
+
+    //     const builder = this.repository.createQueryBuilder()
+    //         .insert()
+    //         .values(artists)
+    //         .orIgnore();
+
+    //     return builder.execute().then(async (result) => {
+    //             const all = await this.repository.findBy(artists as { name: string }[]);
+    //             const existed: Artist[] = [];
+    //             const created: Artist[] = [];
+
+    //             for(const artist of all) {
+    //                 if(result.identifiers.includes({ id: artist.id })) {
+    //                     created.push(artist);
+    //                 } else {
+    //                     existed.push(artist);
+    //                 }
+    //             }
+
+    //             return new CreationBatchResult(created, existed);
+    //         });
+    // }
 
     /**
      * Update an artist by its id.

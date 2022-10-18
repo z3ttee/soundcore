@@ -4,12 +4,13 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Page, Pageable } from 'nestjs-pager';
 import { In, Repository, SelectQueryBuilder } from 'typeorm';
 import { Artist } from '../artist/entities/artist.entity';
-import { EVENT_ALBUM_CHANGED } from '../constants';
+import { EVENT_ALBUMS_CHANGED } from '../constants';
 import { AlbumChangedEvent } from '../events/album-changed.event';
 import { SyncFlag } from '../meilisearch/interfaces/syncable.interface';
 import { MeiliAlbumService } from '../meilisearch/services/meili-album.service';
 import { User } from '../user/entities/user.entity';
 import { GeniusFlag, ResourceFlag } from '../utils/entities/resource';
+import { CreationBatchResult } from '../utils/results/creation-batch.result';
 import { CreateResult } from '../utils/results/creation.result';
 import { CreateAlbumDTO } from './dto/create-album.dto';
 import { UpdateAlbumDTO } from './dto/update-album.dto';
@@ -239,7 +240,7 @@ export class AlbumService {
         
         return this.save(album).then((result) => {
             // Emit changed event to proceed with automatic genius lookup
-            if(updateAlbumDto.lookupGenius) this.eventEmitter.emit(EVENT_ALBUM_CHANGED, new AlbumChangedEvent(result));
+            if(updateAlbumDto.lookupGenius) this.eventEmitter.emit(EVENT_ALBUMS_CHANGED, album);
             return result;
         })
     }

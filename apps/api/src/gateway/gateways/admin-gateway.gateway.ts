@@ -3,12 +3,21 @@ import { Mount } from "../../mount/entities/mount.entity";
 import { AuthGateway } from "../../utils/gateway/auth-gateway";
 
 import { GATEWAY_MOUNT_UPDATE } from "@soundcore/constants";
-import { MountUpdateEvent } from "../events/mount-update.event";
+import { UserService } from "../../user/user.service";
+import { OIDCService } from "../../authentication/services/oidc.service";
+import { MountStatusUpdateEvent } from "../events/mount-status-update.event";
 
 @WebSocketGateway({
-    namespace: "admin"
-})
+    cors: {
+      origin: "*"
+    },
+    path: "/admin"
+  })
 export class AdminGateway extends AuthGateway {
+
+  constructor(userService: UserService, oidcService: OIDCService) {
+    super(userService, oidcService);
+  }
   
     /**
      * This will send an update event to all
@@ -17,8 +26,8 @@ export class AdminGateway extends AuthGateway {
      * @param progress Optional progress.
      * @returns boolean
      */
-    public async sendMountUpdate(mount: Mount, progress?: number) {
-        return this.server.sockets.emit(GATEWAY_MOUNT_UPDATE, new MountUpdateEvent(mount, progress));
+    public async sendMountStatusUpdate(mount: Mount, progress?: number) {
+        return this.server.sockets.emit(GATEWAY_MOUNT_UPDATE, new MountStatusUpdateEvent(mount.id, mount.status, progress));
     }
 
     protected async canAccessGateway(roles: string[]): Promise<boolean> {

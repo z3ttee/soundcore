@@ -13,7 +13,7 @@ export const NOTIFICATION_EVENT_PUSH = "notification:push";
   path: "/notifications"
 })
 export class NotificationGateway extends AuthGateway {
-
+  
   constructor(userService: UserService, oidcService: OIDCService) {
     super(userService, oidcService);
   }
@@ -27,6 +27,10 @@ export class NotificationGateway extends AuthGateway {
         socket?.emit(NOTIFICATION_EVENT_PUSH, notification);
       }
     }
+  }
+
+  protected async canAccessGateway(roles: string[]): Promise<boolean> {
+    return true;
   }
   
 }

@@ -54,7 +54,22 @@ export class MountRegistryService {
             this.logger.warn(`Could not write file registry. This is not an error but informs about a failed optimisation attempt when looking up files: ${error.message}`);
             return registry;
         })
+    }
 
+    public async resetRegistry(registry: MountRegistry): Promise<MountRegistry> {
+        if(Debug.isDebug) {
+            this.logger.debug(`Resetting registry file ${registry.filepath}...`);
+        }
+
+        registry.files = [];
+        return this.saveRegistry(registry);
+    }
+
+    public async resetRegistryOf(mount: Mount) {
+        const filepath = this.filesystem.resolveMountRegistryPath(mount);
+        const registry = new MountRegistry(filepath);
+
+        return this.saveRegistry(registry);
     }
 
 }

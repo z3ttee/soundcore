@@ -1,5 +1,6 @@
 import fs from "node:fs/promises";
 import path from "node:path";
+import workerpool from "workerpool";
 
 import { ArtistService } from "../../artist/artist.service";
 import { SongService } from "../../song/song.service";
@@ -12,8 +13,8 @@ import { Artwork } from "../../artwork/entities/artwork.entity";
 import { Logger } from "@nestjs/common";
 import { FileService } from "../../file/services/file.service";
 import { EventEmitter2 } from "@nestjs/event-emitter";
-import { File } from "../../file/entities/file.entity";
-import { IndexerResultDTO, IndexerResultEntry } from "../dtos/indexer-result.dto";
+import { File, FileFlag } from "../../file/entities/file.entity";
+import { IndexerCreatedResources, IndexerResultDTO, IndexerResultEntry } from "../dtos/indexer-result.dto";
 import { Song } from "../../song/entities/song.entity";
 import { Album } from "../../album/entities/album.entity";
 import { MeiliArtistService } from "../../meilisearch/services/meili-artist.service";
@@ -22,18 +23,27 @@ import { MeiliSongService } from "../../meilisearch/services/meili-song.service"
 import { CreateResult } from "../../utils/results/creation.result";
 import Database from "../../utils/database/database-worker-client";
 import { FileSystemService } from "../../filesystem/services/filesystem.service";
-import Meilisearch from "../../utils/database/meilisearch-worker-client";
-import { WorkerJobRef } from "@soundcore/nest-queue";
+import MeiliClient from "../../utils/database/meilisearch-worker-client";
+import { WorkerJobRef, WorkerProgressEvent } from "@soundcore/nest-queue";
 import { ID3TagsDTO } from "../../song/dtos/id3-tags.dto";
 import Debug from "../../utils/debug";
+import { Batching } from "../../utils/batching";
 
 const logger = new Logger("IndexWorker");
+const BATCH_SIZE = 100;
+
+class BatchResult {
+    constructor(
+        public readonly entries: IndexerResultEntry[],
+        public readonly resources: IndexerCreatedResources
+    ) {}
+}
 
 export default function (job: WorkerJobRef<IndexerProcessDTO>): Promise<IndexerResultDTO> {
     const { files, mount } = job.payload;
 
     return Database.connect().then((dataSource) => {
-        return Meilisearch.connect().then((meiliClient) => {
+        return MeiliClient.connect().then((meiliClient) => {
             const startTimeMs = Date.now();
 
             const fileSystem = new FileSystemService();
@@ -51,13 +61,17 @@ export default function (job: WorkerJobRef<IndexerProcessDTO>): Promise<IndexerR
             const artworkService = new ArtworkService(artworkRepo, fileSystem);
             const fileService = new FileService(fileRepo);
 
-            return new Promise(async (resolve) => {
+            const createdResources: IndexerCreatedResources = new IndexerCreatedResources();
+
+            return Batching.of<File, IndexerResultEntry>(files, BATCH_SIZE).do(async (batch) => {
                 const entries: IndexerResultEntry[] = [];
 
-                for(const file of files) {
-                    const fileReadStartTime = Date.now();
+                const successFiles: File[] = [];
+                const duplicates: File[] = [];
 
-                    // Build filepath
+                // TODO: Work out how this can be batched. Currently this approach is spamming the database
+                for(const file of batch) {
+                    const fileReadStartTime = Date.now();
                     const filepath = path.resolve(path.join(mount.directory, file.directory, file.name));
 
                     if(Debug.isDebug) {
@@ -69,7 +83,6 @@ export default function (job: WorkerJobRef<IndexerProcessDTO>): Promise<IndexerR
                         logger.warn(`Failed accessing file ${filepath}: ${error?.message}`);
                         return false;
                     });
-
                     // Skip this file if not accessable
                     if(!canAccessFile) continue;
 
@@ -81,7 +94,6 @@ export default function (job: WorkerJobRef<IndexerProcessDTO>): Promise<IndexerR
 
                     // Prepare variable.
                     let songResult: CreateResult<Song> = null;
-                    const createdArtists: Artist[] = [];
                     let albumResult: CreateResult<Album> = null;
 
                     // Create a song from the file but without using id3 tags, if none exist
@@ -95,6 +107,8 @@ export default function (job: WorkerJobRef<IndexerProcessDTO>): Promise<IndexerR
                             logger.warn(`Could not create song from file ${filepath}: ${error?.message}`);
                             return null;
                         });
+
+                        createdResources.songs.push(songResult.data);
                     } else {
                         // Create song from id3 tags
 
@@ -150,7 +164,9 @@ export default function (job: WorkerJobRef<IndexerProcessDTO>): Promise<IndexerR
                                 // reportError(new Error("Duplicate song file detected."), FileFlag.DUPLICATE, true);
                                 logger.warn(`File ${filepath} could be a potential duplicate. Marking as such. User action is required.`);
 
-                                // TODO: Add database call to update flag on file
+                                // Push to duplicates
+                                duplicates.push(file);
+
                                 continue;
                             } else {
                                 // Update the file's relation to the created song.
@@ -169,13 +185,20 @@ export default function (job: WorkerJobRef<IndexerProcessDTO>): Promise<IndexerR
                             
                             // Check if primaryArtist was newly created.
                             if(!primaryArtistResult?.existed) {
-                                createdArtists.push(primaryArtist);
+                                createdResources.artists.push(primaryArtist);
                             }
 
                             // Add artists to array, that were newly created.
                             for(const featuredResult of featuredArtistsResults) {
-                                if(!featuredResult?.existed) createdArtists.push(featuredResult?.data);
+                                if(!featuredResult?.existed) createdResources.artists.push(featuredResult?.data);
                             }
+
+                            if(!albumResult?.existed) {
+                                createdResources.albums.push(albumResult.data);
+                            }
+
+                            // Add resources to list
+                            createdResources.songs.push(songResult.data);
                         }
                     }
 
@@ -184,23 +207,35 @@ export default function (job: WorkerJobRef<IndexerProcessDTO>): Promise<IndexerR
                         continue;
                     }
 
-                    // Ed Sheeran/Bad Habits (feat. Tion Wayne & Central Cee) [Fumez The Engineer Remix]
-                    // Ed Sheeran/Bad Habits (feat. Tion Wayne & Central Cee) [Fumez The Engineer Remix]
+                    // Add to success array so the file flag can be changed later
+                    successFiles.push(file);
 
                     // Prepare result and push to results array
                     const timeTookMs = Date.now() - fileReadStartTime;
-                    entries.push(new IndexerResultEntry(
-                        filepath, 
-                        timeTookMs, 
-                        songResult?.data,
-                        albumResult.data,
-                        createdArtists
-                    ));
+                    entries.push(new IndexerResultEntry(filepath, timeTookMs));
                 }
 
-                // Return complete result of the worker
+                // Set flag for duplicate files
+                await fileService.setFlags(duplicates, FileFlag.POTENTIAL_DUPLICATE);
+                await fileService.setFlags(successFiles, FileFlag.OK);
+
+                return entries;
+            }).progress((batches, current) => {
+                const progress = Math.round((current / batches) * 100);
+
+                job.progress = progress;
+                workerpool.workerEmit(new WorkerProgressEvent(job));
+
+                if(Debug.isDebug) {
+                    logger.debug(`Analyzing ID3 Tags of files on mount '${mount.name}'... ${progress}%`);
+                }
+            }).catch((batchNr, error) => {
+                logger.warn(`An error occured while processing batch #${batchNr}: ${error.message}`);
+            })
+            .start()
+            .then((result) => {
                 const timeTookMs = Date.now() - startTimeMs;
-                resolve(new IndexerResultDTO(entries, timeTookMs));
+                return new IndexerResultDTO(result, createdResources, timeTookMs);
             });
         });
     });

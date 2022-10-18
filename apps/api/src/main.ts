@@ -1,7 +1,6 @@
 import { Logger, VersioningType } from '@nestjs/common';
 import { AppModule } from './app.module';
 import { createBootstrap } from "@soundcore/bootstrap";
-import Debug from './utils/debug';
 
 const logger = new Logger("Bootstrap");
 createBootstrap("Soundcore @NEXT", AppModule)
@@ -13,7 +12,7 @@ createBootstrap("Soundcore @NEXT", AppModule)
   .withBuildInfo()
   .bootstrap().then((app) => {
     app.getUrl().then((url) => {
-      logger.log(`Soundcore Service now listening for requests on url '${url}'.`);
+      logger.log(`Soundcore Service now listening for requests on url '${url}'.`);      
     });
   });
 

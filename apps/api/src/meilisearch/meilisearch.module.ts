@@ -1,5 +1,8 @@
+import path from 'path';
+
 import { DynamicModule, Logger, Module } from '@nestjs/common';
 import { ScheduleModule } from '@nestjs/schedule';
+import { WorkerQueueModule } from '@soundcore/nest-queue';
 import MeiliSearch, { Config } from 'meilisearch';
 import { MeiliAlbumService } from './services/meili-album.service';
 import { MeiliArtistService } from './services/meili-artist.service';
@@ -9,6 +12,7 @@ import { MeiliPlaylistService } from './services/meili-playlist.service';
 import { MeiliPublisherService } from './services/meili-publisher.service';
 import { MeiliSongService } from './services/meili-song.service';
 import { MeiliUserService } from './services/meili-user.service';
+import { MeiliQueueService } from './services/meili-queue.service';
 
 @Module({
     
@@ -28,7 +32,12 @@ export class MeilisearchModule {
             module: MeilisearchModule,
             global: true,
             imports: [
-                ScheduleModule
+                ScheduleModule,
+                WorkerQueueModule.forFeature({
+                    script: path.resolve(__dirname, "worker", "meilisearch.worker.js"),
+                    workerType: "thread",
+                    concurrent: 20
+                })
             ],
             providers: [
                 {
@@ -42,7 +51,8 @@ export class MeilisearchModule {
                 MeiliSongService,
                 MeiliLabelService,
                 MeiliPublisherService,
-                MeiliDistributorService
+                MeiliDistributorService,
+                MeiliQueueService
             ],
             exports: [
                 MeiliSearch,
@@ -53,7 +63,8 @@ export class MeilisearchModule {
                 MeiliSongService,
                 MeiliLabelService,
                 MeiliPublisherService,
-                MeiliDistributorService
+                MeiliDistributorService,
+                MeiliQueueService
             ]
         }
     }

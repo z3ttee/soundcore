@@ -24,7 +24,7 @@ import { PublisherService } from "../../publisher/services/publisher.service";
 import { Song } from "../../song/entities/song.entity";
 import { SongService } from "../../song/song.service";
 import Database from "../../utils/database/database-worker-client";
-import Meilisearch from "../../utils/database/meilisearch-worker-client";
+import MeiliClient from "../../utils/database/meilisearch-worker-client";
 import { GeniusFlag, Resource } from "../../utils/entities/resource";
 import { GeniusProcessDTO, GeniusProcessType } from "../dtos/genius-process.dto";
 import { GeniusClientService } from "../services/genius-client.service";
@@ -32,7 +32,7 @@ import { GeniusClientService } from "../services/genius-client.service";
 export default function (job: Job<GeniusProcessDTO>, dc: DoneCallback) {
 
     Database.connect().then((dataSource) => {
-        Meilisearch.connect().then(async (meiliClient) => {
+        MeiliClient.connect().then(async (meiliClient) => {
             const fileSystem = new FileSystemService();
             const eventEmitter = new EventEmitter2();
 
