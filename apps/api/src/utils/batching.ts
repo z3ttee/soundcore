@@ -61,7 +61,9 @@ export class Batching<I = any, R = I> {
                 currentBatch++;
 
                 // Get batch from list
-                const size = length >= this.batchSize ? this.batchSize : length;
+                const size = length >= this.batchSize ? this.batchSize : length;                
+                if(size <= 0) break;
+                
                 const batch = list.splice(0, size);
     
                 // Build executer
