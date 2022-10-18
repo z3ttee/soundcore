@@ -10,6 +10,7 @@ import { FileListItemModule } from 'src/app/components/list-items/file-list-item
 import { VirtualScrollerModule } from '@tsalliance/ngx-virtual-scroller';
 import { AppMountCreateDialogModule } from 'src/app/dialogs/mount-create-dialog/mount-create-dialog.module';
 import {MatSnackBarModule} from '@angular/material/snack-bar';
+import { UiScrollModule } from 'ngx-ui-scroll';
 
 const routes: Routes = [
   { path: "", component: MountInfoComponent },
@@ -40,7 +41,9 @@ const routes: Routes = [
 
     AppMountCreateDialogModule,
 
-    MatSnackBarModule
+    MatSnackBarModule,
+
+    UiScrollModule
   ]
 })
 export class MountsModule { }

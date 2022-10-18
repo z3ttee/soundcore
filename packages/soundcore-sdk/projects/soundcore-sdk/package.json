@@ -5,6 +5,7 @@
     "@angular/common": "^14.2.0",
     "@angular/core": "^14.2.0",
     "ngx-indexed-db": "^11.0.0",
+    "@soundcore/constants": "*",
     "@soundcore/sso": "*",
     "uuid": "^9.0.0"
   },

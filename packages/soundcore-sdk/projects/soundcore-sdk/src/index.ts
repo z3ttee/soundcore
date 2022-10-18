@@ -3,6 +3,20 @@
  */
 export * from "./lib/scdk.module";
 
+// Gateways
+export * from "./lib/gateway";
+
+
+
+
+
+
+
+
+
+
+
+
 // Tracklist
 export * from "./lib/song/entities/tracklist.entity";
 

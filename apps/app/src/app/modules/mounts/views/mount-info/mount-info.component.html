@@ -1,7 +1,11 @@
-<section class="w-full h-full select-none" #parent>
+<section class="w-full h-full select-none viewport" #parent>
     <app-error404 *ngIf="!($loading | async) && !($mount | async)"></app-error404>
 
-    <scngx-infinite-list class="w-full h-full py-window" [dataSource]="dataSource" [parentScroll]="parent" #list>
+    <div *uiScroll="let item of datasource">
+        <b>{{item.text}}</b>
+    </div>
+
+    <!--<scngx-infinite-list class="w-full h-full py-window" [dataSource]="dataSource" [parentScroll]="parent" #list>
         <ng-container scngx-content>
             <div class="w-full p-window" #page *ngIf="($loading | async) || !!($mount | async)">
 
@@ -57,6 +61,6 @@
             </div>
         </ng-container>
         
-    </scngx-infinite-list>
+    </scngx-infinite-list>-->
 
 </section>

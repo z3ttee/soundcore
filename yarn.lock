@@ -7493,6 +7493,13 @@ ngx-lottie@^8.1.1:
     "@scarf/scarf" "^1.1.1"
     tslib "^2.3.0"
 
+ngx-ui-scroll@^3.0.1:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/ngx-ui-scroll/-/ngx-ui-scroll-3.0.1.tgz#01feba01f3794f6dd3e821e9b2b83a28e878e745"
+  integrity sha512-Ls/LSkPlAwBfiOzpYG0rkHXj2VLQbrcnRq0Je9Lyuse+yS6fS58R8lSroG67lVwEegzvkATeMktagqhu7vCZbw==
+  dependencies:
+    tslib "^2.3.1"
+
 nice-napi@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/nice-napi/-/nice-napi-1.0.2.tgz#dc0ab5a1eac20ce548802fc5686eaa6bc654927b"
@@ -10361,6 +10368,13 @@ void-elements@^2.0.0:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/void-elements/-/void-elements-2.0.1.tgz#c066afb582bb1cb4128d60ea92392e94d5e9dbec"
   integrity sha512-qZKX4RnBzH2ugr8Lxa7x+0V6XD9Sb/ouARtiasEQCHB1EVU4NXtmHsDDrx1dO4ne5fc3J6EW05BP1Dl0z0iung==
+
+vscroll@^1.5.3:
+  version "1.5.3"
+  resolved "https://registry.yarnpkg.com/vscroll/-/vscroll-1.5.3.tgz#cca4759e6ed98efe3b63f880db5a37c3892447f6"
+  integrity sha512-ukVWehRz85PBIn4h5gQei2kNK1g3wPWMJGZVXGZ7l3ppTU//jh9dgdpRybpdtm7MGcCDkdFfKmbkW0U33dH/hg==
+  dependencies:
+    tslib "^2.3.1"
 
 watchpack@^2.4.0:
   version "2.4.0"

@@ -22,13 +22,8 @@ export class MountListItemComponent implements OnInit, OnChanges {
   }
 
   private init() {
-    if(this.mount.status == MountStatus.OK) {
+    if(this.mount.status == MountStatus.UP) {
       this.indicatorAppearance = "success";
-      return;
-    }
-
-    if(this.mount.status == MountStatus.BUSY) {
-      this.indicatorAppearance = "warn";
       return;
     }
 

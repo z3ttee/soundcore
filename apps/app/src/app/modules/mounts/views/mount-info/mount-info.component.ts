@@ -6,6 +6,7 @@ import { BehaviorSubject, Observable, Subject, takeUntil } from 'rxjs';
 import { SCNGXDialogService, SCNGXInfiniteDataSource } from '@soundcore/ngx';
 import { File, Mount, SCDKFileService, SCDKMountService } from '@soundcore/sdk';
 import { AppMountCreateDialog, MountCreateDialogOptions } from 'src/app/dialogs/mount-create-dialog/mount-create-dialog.component';
+import { IDatasource } from 'ngx-ui-scroll';
 
 @Component({
   selector: 'app-mount-info',
@@ -35,9 +36,25 @@ export class MountInfoComponent implements OnInit, OnDestroy {
 
   public dataSource: SCNGXInfiniteDataSource<File>;
 
+  datasource: IDatasource;
+
   public ngOnInit(): void {
     this.activatedRoute.paramMap.pipe(takeUntil(this._destroy)).subscribe((params) => {
       const mountId = params.get("mountId");
+
+      let page = -1;
+
+      this.datasource = {
+        get: (index, count, success) => {
+          const url = `${this.fileService.findByMountIdBaseURL(mountId)}?page=${++page}&`;
+    
+          // const data = [];
+          // for (let i = index; i <= index + count - 1; i++) {
+          //   data.push({ text: 'item #' + i });
+          // }
+          // success(data);
+        }
+      };
 
       // Reset and set state
       // to loading.

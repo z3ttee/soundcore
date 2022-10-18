@@ -3,7 +3,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { BehaviorSubject, Subject, takeUntil } from 'rxjs';
 import { SCNGXDialogService, SCNGXInfiniteDataSource } from '@soundcore/ngx';
-import { Bucket, Mount, SCDKBucketService } from '@soundcore/sdk';
+import { Bucket, Mount, SCDKBucketService, SCSDKAdminGateway } from '@soundcore/sdk';
 import { AppMountCreateDialog, MountCreateDialogOptions } from 'src/app/dialogs/mount-create-dialog/mount-create-dialog.component';
 import { environment } from 'src/environments/environment';
 
@@ -17,7 +17,8 @@ export class ZoneInfoComponent implements OnInit, OnDestroy {
     private readonly zoneService: SCDKBucketService,
     private readonly activatedRoute: ActivatedRoute,
     private readonly dialog: SCNGXDialogService,
-    private readonly httpClient: HttpClient
+    private readonly httpClient: HttpClient,
+    private readonly adminGateway: SCSDKAdminGateway
   ) { }
 
   private readonly _destroy: Subject<void> = new Subject();
