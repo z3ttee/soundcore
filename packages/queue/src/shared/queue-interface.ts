@@ -1,4 +1,4 @@
-import { BehaviorSubject, debounceTime, Observable } from "rxjs";
+import { BehaviorSubject, debounceTime, Observable, Subject, switchMap } from "rxjs";
 import { EventCallback } from "../queue/events/events";
 
 export abstract class BaseQueue<T, EN> {
@@ -6,8 +6,12 @@ export abstract class BaseQueue<T, EN> {
     private readonly _events: Map<EN, EventCallback[]> = new Map();
     private _debounceMs: number = 0;
 
+    private readonly _debounceSubject: Subject<void> = new Subject();
     private readonly _queueSubject: BehaviorSubject<T[]> = new BehaviorSubject([]);
-    protected readonly $queue: Observable<T[]> = this._queueSubject.asObservable().pipe(debounceTime(this.debounceMs || 0));
+    protected readonly $queue: Observable<T[]> = this._debounceSubject.asObservable().pipe(
+        debounceTime(this.debounceMs || 0),
+        switchMap(() => this._queueSubject.asObservable())
+    );
 
     constructor(_debounceMs: number = 0) {
         this._debounceMs = _debounceMs;
@@ -44,6 +48,7 @@ export abstract class BaseQueue<T, EN> {
         const position = queue.push(item);
 
         this._queueSubject.next(queue);
+        this._debounceSubject.next();
         return position;
     }
 
