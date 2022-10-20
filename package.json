@@ -3,13 +3,14 @@
   "version": "0.0.0",
   "private": true,
   "workspaces": [
-      "apps/*",
-      "config/*",
-      "packages/*"
+    "apps/*",
+    "config/*",
+    "packages/*"
   ],
   "scripts": {
     "build:api": "turbo run build:api",
     "build:app": "turbo run build:app",
+    "dockerize:api": "turbo run dockerize:api && docker build --tag z3ttee/soundcore:latest .",
     "dev": "turbo run dev --parallel",
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\""
@@ -22,6 +23,5 @@
   "engines": {
     "node": ">=14.0.0"
   },
-  "dependencies": {},
-  "packageManager": "yarn@1.22.19"
+  "packageManager": "yarn@3.2.4"
 }
