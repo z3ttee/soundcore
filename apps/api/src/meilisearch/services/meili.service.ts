@@ -1,4 +1,5 @@
 import { InternalServerErrorException, Logger } from "@nestjs/common";
+import { Environment } from "@soundcore/common";
 import MeiliSearch, { Index, MeiliSearchError, MeiliSearchTimeOutError, SearchParams, Task } from "meilisearch";
 import { BehaviorSubject, filter, firstValueFrom, Observable } from "rxjs";
 import { Syncable, SyncFlag } from "../interfaces/syncable.interface";
@@ -142,14 +143,22 @@ export abstract class MeiliService<T = any> {
      * or filterableAttributes).
      */
     private _init() {
-        this.client().createIndex(this._indexUid, { primaryKey: "id" }).then(() => {
-            this.client().index<T>(this._indexUid).updateFilterableAttributes(this._options.filterableAttributes || [])
-            this.client().index<T>(this._indexUid).updateSearchableAttributes(this._options.searchableAttributes || ["*"])
-        }).catch((error: MeiliSearchError) => {
-            this._logger.error(`Error occured while initializing Index on meilisearch: ${error.message}`, error.stack);
-        }).finally(() => {
+        if(!this.client()) {
+            if(Environment.isDebug) {
+                this._logger.debug(`Tried accessing meiliclient, but client is null. Maybe the module was disabled?`);
+            }
+
             this._initializedSubject.next(true);
-        });
+        } else {
+            this.client().createIndex(this._indexUid, { primaryKey: "id" }).then(() => {
+                this.client().index<T>(this._indexUid).updateFilterableAttributes(this._options.filterableAttributes || [])
+                this.client().index<T>(this._indexUid).updateSearchableAttributes(this._options.searchableAttributes || ["*"])
+            }).catch((error: MeiliSearchError) => {
+                this._logger.error(`Error occured while initializing Index on meilisearch: ${error.message}`, error.stack);
+            }).finally(() => {
+                this._initializedSubject.next(true);
+            });
+        }
     }
 
 }
