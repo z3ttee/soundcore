@@ -1,0 +1,9 @@
+node_modules/
+dist/
+.env
+.env.dev
+
+packages/soundcore-*
+apps/app
+config/tailwind-config
+config/eslint-config-custom
