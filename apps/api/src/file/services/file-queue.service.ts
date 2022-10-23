@@ -6,7 +6,7 @@ import { FilesFoundEvent } from "../../events/files-found.event";
 import { FilesProcessedEvent } from "../../events/files-processed.event";
 import { FileDTO } from "../../mount/dtos/file.dto";
 import { Mount } from "../../mount/entities/mount.entity";
-import Debug from "../../utils/debug";
+import Debug from "../../utils/environment";
 import { FileProcessResultDTO } from "../dto/file-process-result.dto";
 import { FileProcessDTO } from "../dto/file-process.dto";
 

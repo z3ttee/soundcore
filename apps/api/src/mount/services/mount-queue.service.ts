@@ -1,5 +1,5 @@
 import path from "node:path";
-import Debug from "../../utils/debug";
+import Debug from "../../utils/environment";
 
 import { Injectable, Logger } from "@nestjs/common";
 import { EventEmitter2, OnEvent } from "@nestjs/event-emitter";

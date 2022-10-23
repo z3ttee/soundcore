@@ -1,4 +1,4 @@
-import Debug from "../../utils/debug";
+import Debug from "../../utils/environment";
 import { Injectable, Logger } from "@nestjs/common";
 import { EventEmitter2, OnEvent } from "@nestjs/event-emitter";
 import { WorkerJob, WorkerJobRef, WorkerQueue } from "@soundcore/nest-queue";

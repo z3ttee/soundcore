@@ -6,7 +6,7 @@ import { Artist } from "../../artist/entities/artist.entity";
 import { EVENT_ALBUMS_CHANGED, EVENT_ARTISTS_CHANGED, EVENT_PLAYLISTS_CHANGED, EVENT_SONGS_CHANGED } from "../../constants";
 import { Playlist } from "../../playlist/entities/playlist.entity";
 import { Song } from "../../song/entities/song.entity";
-import Debug from "../../utils/debug";
+import Debug from "../../utils/environment";
 import { MeiliSyncResultDTO } from "../dtos/meili-sync-result.dto";
 import { MeiliJob, MeiliJobType } from "../entities/meili-job.entity";
 

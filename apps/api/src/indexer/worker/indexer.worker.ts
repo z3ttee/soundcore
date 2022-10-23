@@ -26,7 +26,7 @@ import { FileSystemService } from "../../filesystem/services/filesystem.service"
 import MeiliClient from "../../utils/database/meilisearch-worker-client";
 import { WorkerJobRef, WorkerProgressEvent } from "@soundcore/nest-queue";
 import { ID3TagsDTO } from "../../song/dtos/id3-tags.dto";
-import Debug from "../../utils/debug";
+import Debug from "../../utils/environment";
 import { Batching } from "../../utils/batching";
 
 const logger = new Logger("IndexWorker");

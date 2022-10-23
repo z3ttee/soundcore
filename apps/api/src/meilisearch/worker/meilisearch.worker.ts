@@ -15,7 +15,7 @@ import MeiliSearch, { TaskStatus } from "meilisearch";
 import Database from "../../utils/database/database-worker-client";
 import { SongService } from "../../song/song.service";
 import { SyncFlag } from "../interfaces/syncable.interface";
-import Debug from "../../utils/debug";
+import Debug from "../../utils/environment";
 
 const logger = new Logger("MeiliSync");
 
