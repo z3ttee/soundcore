@@ -2,7 +2,7 @@
 class EnvironmentImpl {
 
     public isDebug: boolean = process.env.DEBUG == "true";
-    public isDockerized: boolean = process.env.IS_DOCKERIZED == "true";
+    public isDockerized: boolean = process.env.DOCKERIZED == "true";
 
 }
 

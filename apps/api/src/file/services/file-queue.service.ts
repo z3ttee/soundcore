@@ -6,7 +6,7 @@ import { FilesFoundEvent } from "../../events/files-found.event";
 import { FilesProcessedEvent } from "../../events/files-processed.event";
 import { FileDTO } from "../../mount/dtos/file.dto";
 import { Mount } from "../../mount/entities/mount.entity";
-import Debug from "../../utils/environment";
+import { Environment } from "@soundcore/common";
 import { FileProcessResultDTO } from "../dto/file-process-result.dto";
 import { FileProcessDTO } from "../dto/file-process.dto";
 
@@ -46,7 +46,7 @@ export class FileQueueService {
         })
 
         this.queue.on("progress", (job: WorkerJobRef<FileProcessDTO>) => {
-            if(Debug.isDebug) {
+            if(Environment.isDebug) {
                 this.logger.debug(`Progress on mount ${job.payload.mount.name}: ${job.progress}%`);
             }
         })

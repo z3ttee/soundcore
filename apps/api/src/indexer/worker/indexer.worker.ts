@@ -26,8 +26,8 @@ import { FileSystemService } from "../../filesystem/services/filesystem.service"
 import MeiliClient from "../../utils/database/meilisearch-worker-client";
 import { WorkerJobRef, WorkerProgressEvent } from "@soundcore/nest-queue";
 import { ID3TagsDTO } from "../../song/dtos/id3-tags.dto";
-import Debug from "../../utils/environment";
-import { Batching } from "../../utils/batching";
+import { Environment } from "@soundcore/common";
+import { Batch } from "@soundcore/common";
 
 const logger = new Logger("IndexWorker");
 const BATCH_SIZE = 100;
@@ -63,7 +63,7 @@ export default function (job: WorkerJobRef<IndexerProcessDTO>): Promise<IndexerR
 
             const createdResources: IndexerCreatedResources = new IndexerCreatedResources();
 
-            return Batching.of<File, IndexerResultEntry>(files, BATCH_SIZE).do(async (batch) => {
+            return Batch.of<File, IndexerResultEntry>(files, BATCH_SIZE).do(async (batch) => {
                 const entries: IndexerResultEntry[] = [];
 
                 const successFiles: File[] = [];
@@ -74,7 +74,7 @@ export default function (job: WorkerJobRef<IndexerProcessDTO>): Promise<IndexerR
                     const fileReadStartTime = Date.now();
                     const filepath = path.resolve(path.join(mount.directory, file.directory, file.name));
 
-                    if(Debug.isDebug) {
+                    if(Environment.isDebug) {
                         logger.debug(`Analyzing ID3-Tags of file ${filepath}...`);
                     }
 
@@ -226,7 +226,7 @@ export default function (job: WorkerJobRef<IndexerProcessDTO>): Promise<IndexerR
                 job.progress = progress;
                 workerpool.workerEmit(new WorkerProgressEvent(job));
 
-                if(Debug.isDebug) {
+                if(Environment.isDebug) {
                     logger.debug(`Analyzing ID3 Tags of files on mount '${mount.name}'... ${progress}%`);
                 }
             }).catch((batchNr, error) => {

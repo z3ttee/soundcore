@@ -4,7 +4,7 @@ export type ErrorHandler = (batchNr: number, error: Error) => Promise<void> | vo
 export type ThenHandler<T> = (result: T[]) => Promise<void> | void;
 export type ProgressHandler = (batches: number, current: number) => Promise<void> | void;
 
-export class Batching<I = any, R = I> {
+export class Batch<I = any, R = I> {
 
     private _handler?: BatchingHandler<I, R>;
     private _errorHandler?: ErrorHandler;
@@ -16,8 +16,8 @@ export class Batching<I = any, R = I> {
         private readonly batchSize: number = 100
     ) {}
 
-    public static of<T = any, R = T>(list: T[], batchSize: number = 100): Batching<T, R> {
-        return new Batching<T, R>(list, batchSize);
+    public static of<T = any, R = T>(list: T[], batchSize: number = 100): Batch<T, R> {
+        return new Batch<T, R>(list, batchSize);
     }
 
     public do(handler: BatchingHandler<I, R>) {
@@ -61,10 +61,7 @@ export class Batching<I = any, R = I> {
                 currentBatch++;
 
                 // Get batch from list
-                const size = length >= this.batchSize ? this.batchSize : length;       
-                
-                console.log(size);
-                
+                const size = length >= this.batchSize ? this.batchSize : length;                      
                 if(size <= 0) break;
                 
                 const batch = list.splice(0, size);

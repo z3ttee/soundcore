@@ -4,7 +4,7 @@ import { Injectable, Logger } from "@nestjs/common";
 import { FileSystemService } from "../../filesystem/services/filesystem.service";
 import { MountRegistry } from "../entities/mount-registry.entity";
 import { Mount } from "../entities/mount.entity";
-import Debug from "../../utils/environment";
+import { Environment } from "@soundcore/common";
 
 @Injectable()
 export class MountRegistryService {
@@ -23,7 +23,7 @@ export class MountRegistryService {
     public async readRegistry(mount: Mount): Promise<MountRegistry> {
         const filepath: string = this.filesystem.resolveMountRegistryPath(mount);
     
-        if(Debug.isDebug) {
+        if(Environment.isDebug) {
             this.logger.debug(`Reading registry file ${filepath}`);
         }
 
@@ -44,7 +44,7 @@ export class MountRegistryService {
      * @returns Saved MountRegistry
      */
     public async saveRegistry(registry: MountRegistry): Promise<MountRegistry> {
-        if(Debug.isDebug) {
+        if(Environment.isDebug) {
             this.logger.debug(`Saving registry file ${registry.filepath}...`);
         }
 
@@ -57,7 +57,7 @@ export class MountRegistryService {
     }
 
     public async resetRegistry(registry: MountRegistry): Promise<MountRegistry> {
-        if(Debug.isDebug) {
+        if(Environment.isDebug) {
             this.logger.debug(`Resetting registry file ${registry.filepath}...`);
         }
 

@@ -1,4 +1,4 @@
-import Debug from "../../utils/environment";
+import { Environment } from "@soundcore/common";
 import { Injectable, Logger } from "@nestjs/common";
 import { EventEmitter2, OnEvent } from "@nestjs/event-emitter";
 import { WorkerJob, WorkerJobRef, WorkerQueue } from "@soundcore/nest-queue";
@@ -24,7 +24,7 @@ export class IndexerQueueService {
             const { result, payload: { files } } = job;
             const { entries, timeTookMs } = result || {};
 
-            if(Debug.isDebug) {
+            if(Environment.isDebug) {
                 for(const entry of entries) {
                     this.logger.debug(`Successfully read metadata of file ${entry.filepath}. Took ${entry.timeTookMs}ms.`);
                 }
@@ -44,7 +44,7 @@ export class IndexerQueueService {
         this.queue.on("progress", (job: WorkerJobRef<IndexerProcessDTO>) => {
             const { progress } = job;
 
-            if(Debug.isDebug) {
+            if(Environment.isDebug) {
                 this.logger.debug(`Analyzing files: ${progress}`);
             }
         });

@@ -6,7 +6,7 @@ import { Artist } from "../../artist/entities/artist.entity";
 import { EVENT_ALBUMS_CHANGED, EVENT_ARTISTS_CHANGED, EVENT_PLAYLISTS_CHANGED, EVENT_SONGS_CHANGED } from "../../constants";
 import { Playlist } from "../../playlist/entities/playlist.entity";
 import { Song } from "../../song/entities/song.entity";
-import Debug from "../../utils/environment";
+import { Environment } from "@soundcore/common";
 import { MeiliSyncResultDTO } from "../dtos/meili-sync-result.dto";
 import { MeiliJob, MeiliJobType } from "../entities/meili-job.entity";
 
@@ -26,7 +26,7 @@ export class MeiliQueueService {
         });
 
         this.queue.on("failed", (_, error: Error) => {
-            this.logger.error(`Failed syncing resources with meilisearch: ${error.message}`, Debug.isDebug ? error.stack : null);
+            this.logger.error(`Failed syncing resources with meilisearch: ${error.message}`, Environment.isDebug ? error.stack : null);
         });
     }
 

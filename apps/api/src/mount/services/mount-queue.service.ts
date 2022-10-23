@@ -1,6 +1,3 @@
-import path from "node:path";
-import Debug from "../../utils/environment";
-
 import { Injectable, Logger } from "@nestjs/common";
 import { EventEmitter2, OnEvent } from "@nestjs/event-emitter";
 import { WorkerJob, WorkerJobRef, WorkerQueue } from "@soundcore/nest-queue";
@@ -11,6 +8,7 @@ import { Mount } from "../entities/mount.entity";
 import { MountService } from "./mount.service";
 import { AdminGateway } from "../../gateway/gateways/admin-gateway.gateway";
 import { MountStatus } from "../enums/mount-status.enum";
+import { Environment } from "@soundcore/common";
 
 @Injectable()
 export class MountQueueService {
@@ -23,13 +21,13 @@ export class MountQueueService {
         private readonly queue: WorkerQueue<Mount>
     ) {
         this.queue.on("waiting", async () => {
-            if(Debug.isDebug) {
+            if(Environment.isDebug) {
                 this.logger.debug(`Received jobs concerning scanning for new files. Distributing among workers...`);
             }
         });
 
         this.queue.on("drained", async () => {
-            if(Debug.isDebug) {
+            if(Environment.isDebug) {
                 this.logger.debug(`All jobs concerning scanning for new files have been distributed to workers. Waiting for new jobs...`);
             }
         });
@@ -62,7 +60,7 @@ export class MountQueueService {
 
         // Progress
         this.queue.on("progress", async (job: WorkerJobRef<Mount>) => {
-            if(Debug.isDebug) {
+            if(Environment.isDebug) {
                 this.logger.debug(`Received progress update from mount ${job.payload.name}: ${job.progress}`);
             }
 

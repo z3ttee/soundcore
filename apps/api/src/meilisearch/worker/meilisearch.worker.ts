@@ -5,7 +5,7 @@ import { WorkerJobRef } from "@soundcore/nest-queue";
 import { Album } from "../../album/entities/album.entity";
 import { Artist } from "../../artist/entities/artist.entity";
 import { Song } from "../../song/entities/song.entity";
-import { Batching } from "../../utils/batching";
+import { Batch } from "@soundcore/common";
 import { MeiliSyncResultDTO } from "../dtos/meili-sync-result.dto";
 import { MeiliJob, MeiliJobType } from "../entities/meili-job.entity";
 import { MeiliAlbumService } from "../services/meili-album.service";
@@ -15,7 +15,7 @@ import MeiliSearch, { TaskStatus } from "meilisearch";
 import Database from "../../utils/database/database-worker-client";
 import { SongService } from "../../song/song.service";
 import { SyncFlag } from "../interfaces/syncable.interface";
-import Debug from "../../utils/environment";
+import { Environment } from "@soundcore/common";
 
 const logger = new Logger("MeiliSync");
 
@@ -45,7 +45,7 @@ async function syncSongs(datasource, client: MeiliSearch, resources: Song[]): Pr
     const service = new MeiliSongService(client);
     const songService = new SongService(datasource.getRepository(Song), service);
     
-    return Batching.of<Song>(resources).do((batch) => {
+    return Batch.of<Song>(resources).do((batch) => {
         return service.setSongs(batch).then((task) => {
 
             // client.waitForTask(task.uid, { timeOutMs: 10 }).then((task) => {
@@ -63,7 +63,7 @@ async function syncSongs(datasource, client: MeiliSearch, resources: Song[]): Pr
             });
         }).catch((error: Error) => {
             songService.setLastSyncedDetails(resources, SyncFlag.ERROR);
-            logger.error(`Could not sync songs with meilisearch: ${error.message}`, Debug.isDebug ? error.stack : null);
+            logger.error(`Could not sync songs with meilisearch: ${error.message}`, Environment.isDebug ? error.stack : null);
             throw error;
         });
     }).start();
@@ -72,7 +72,7 @@ async function syncSongs(datasource, client: MeiliSearch, resources: Song[]): Pr
 async function syncAlbums(client: MeiliSearch, resources: Album[]): Promise<any> {
     const service = new MeiliAlbumService(client);
     
-    return Batching.of<Album>(resources).do((batch) => {
+    return Batch.of<Album>(resources).do((batch) => {
         service.setAlbums(batch);
         return batch;
     }).start();
@@ -81,7 +81,7 @@ async function syncAlbums(client: MeiliSearch, resources: Album[]): Promise<any>
 async function syncArtists(client: MeiliSearch, resources: Artist[]): Promise<any> {
     const service = new MeiliArtistService(client);
     
-    return Batching.of<Artist>(resources).do((batch) => {
+    return Batch.of<Artist>(resources).do((batch) => {
         service.setArtists(batch);
         return batch;
     }).start();
