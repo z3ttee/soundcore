@@ -16,6 +16,7 @@
     "updatedeps": "npx npm-check-updates"
   },
   "dependencies": {
+    "ioredis": "^5.2.3",
     "@nestjs/bull": "^0.6.0",
     "@nestjs/common": "^9.0.8",
     "@nestjs/config": "2.2.0",
