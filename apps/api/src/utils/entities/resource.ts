@@ -7,16 +7,19 @@ export enum ResourceFlag {
 }
 
 export enum GeniusFlag {
-    OK = 0,
-    GENIUS_PENDING,
-    GENIUS_FAILED
+    AWAITING = 0,
+    OK = 1,
+    GENIUS_FAILED = 2
 }
 
 export interface Resource {
     id: string;
     name: string;
-    slug: string;
-    flag: ResourceFlag;
     resourceType: ResourceType;
-    artwork?: Artwork;
+}
+
+export interface GeniusResource {
+    geniusId: string;
+    geniusFlag: GeniusFlag;
+    geniusFailedTries: number;
 }

@@ -34,7 +34,7 @@ import { HostnameModule } from './hostname/hostname.module';
 import { CronModule } from './cron/cron.module';
 import { HealthModule } from './health/health.module';
 import { HeartbeatServerModule } from "@soundcore/heartbeat";
-import { ConfigModule } from '@soundcore/common';
+import { CommonConfigModule } from '@soundcore/common';
 import { DiscoveryModule } from './discovery/discovery.module';
 import { WorkerQueueModule } from '@soundcore/nest-queue';
 
@@ -43,7 +43,7 @@ import { WorkerQueueModule } from '@soundcore/nest-queue';
     EventEmitterModule.forRoot({
       global: true
     }),
-    ConfigModule,
+    CommonConfigModule,
     FileSystemModule.forRoot(),
     TypeOrmModule.forRoot({
       type: "mysql",
@@ -99,7 +99,6 @@ import { WorkerQueueModule } from '@soundcore/nest-queue';
     BucketModule,
     AlbumModule,
     SongModule,
-    GeniusModule,
     LabelModule,
     PublisherModule,
     UploadModule,
@@ -135,7 +134,12 @@ import { WorkerQueueModule } from '@soundcore/nest-queue';
         }
       }
     }),
-    DiscoveryModule
+    DiscoveryModule,
+    GeniusModule.forRootAsync({
+      useFactory: () => ({
+        clientToken: process.env.GENIUS_TOKEN
+      }),
+    })
   ],
   controllers: [
     AppController

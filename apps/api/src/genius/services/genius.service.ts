@@ -1,22 +1,16 @@
-import { InjectQueue } from '@nestjs/bull';
 import { Injectable, Logger } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
-import { Queue } from 'bull';
 import { Album } from '../../album/entities/album.entity';
 import { Artist } from '../../artist/entities/artist.entity';
-import { EVENT_ARTISTS_CHANGED, EVENT_METADATA_CREATED, QUEUE_GENIUS_NAME } from '../../constants';
-import { ArtistChangedEvent } from '../../events/artist-changed.event';
+import { EVENT_METADATA_CREATED } from '../../constants';
 import { IndexerResultDTO } from '../../indexer/dtos/indexer-result.dto';
 import { Song } from '../../song/entities/song.entity';
-import { GeniusProcessDTO, GeniusProcessType } from '../dtos/genius-process.dto';
 
 @Injectable()
 export class GeniusService {
     private readonly logger: Logger = new Logger(GeniusService.name);
 
-    constructor(
-        @InjectQueue(QUEUE_GENIUS_NAME) private readonly queue: Queue<GeniusProcessDTO>
-    ) {}
+    constructor() {}
     
     @OnEvent(EVENT_METADATA_CREATED)
     public async handleMetadataCreatedEvent(payload: IndexerResultDTO) {
@@ -29,11 +23,6 @@ export class GeniusService {
         // }
 
         this.logger.debug(`Received event ${EVENT_METADATA_CREATED}`);
-    }
-
-    @OnEvent(EVENT_ARTISTS_CHANGED)
-    public async handleArtistChangedEvent(payload: ArtistChangedEvent) {
-        // this.createArtistLookupJob(payload.data)
     }
 
     public async createSongLookupJob(song: Song) {

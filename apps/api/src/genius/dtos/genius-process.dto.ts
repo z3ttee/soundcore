@@ -10,7 +10,7 @@ export class GeniusProcessDTO<T = Resource> {
 
     constructor(
         public readonly type: GeniusProcessType,
-        public readonly payload: T,
+        public readonly payload: T[],
     ) {}
 
 }
