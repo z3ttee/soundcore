@@ -1,13 +1,12 @@
 import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
-import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Environment } from '@soundcore/common';
 import { Page, Pageable } from 'nestjs-pager';
-import { In, Repository, SelectQueryBuilder } from 'typeorm';
+import { Repository, SelectQueryBuilder, UpdateResult } from 'typeorm';
 import { SyncFlag } from '../meilisearch/interfaces/syncable.interface';
 import { MeiliArtistService } from '../meilisearch/services/meili-artist.service';
 import { GeniusFlag, ResourceFlag } from '../utils/entities/resource';
 import { CreationBatchResult } from '../utils/results/creation-batch.result';
-import { CreateResult } from '../utils/results/creation.result';
 import { CreateArtistDTO } from './dtos/create-artist.dto';
 import { UpdateArtistDTO } from './dtos/update-artist.dto';
 import { Artist } from './entities/artist.entity';
@@ -17,9 +16,8 @@ export class ArtistService {
     private readonly logger: Logger = new Logger(ArtistService.name);
 
     constructor(
-        private readonly meiliClient: MeiliArtistService,
-        private readonly events: EventEmitter2,
         @InjectRepository(Artist) private readonly repository: Repository<Artist>,
+        private readonly meiliClient: MeiliArtistService,
     ){ }
 
     /**
@@ -113,59 +111,40 @@ export class ArtistService {
     /**
      * Create an artist if not exists.
      * @param createArtistDto Data to create artist from
+     * @param withSplitting If true, the result is splitted in "existed" and "created". Otherwise all entries will be in "created". Set true, if you do not need to evaluate which entries have been newly created as it causes a certain overhead.
      * @returns Artist
      */
-    public async createIfNotExists(createArtistDto: CreateArtistDTO): Promise<CreateResult<Artist>> {
-        createArtistDto.name = createArtistDto.name?.trim();
-        createArtistDto.description = createArtistDto.description?.trim();
+    public async createIfNotExists(dtos: CreateArtistDTO[], withSplitting: boolean = true): Promise<CreationBatchResult<Artist>> {
+        if(dtos.length <= 0) throw new BadRequestException("Cannot create resources for empty list.");
 
-        const existingArtist = await this.findByName(createArtistDto.name);
-        if(existingArtist) return new CreateResult(existingArtist, true); 
-
-        const artist = this.repository.create();
-        artist.name = createArtistDto.name;
-        artist.description = createArtistDto.description;
-        artist.geniusId = createArtistDto.geniusId;
-
-        return this.repository.createQueryBuilder()
+        const builder = this.repository.createQueryBuilder()
             .insert()
-            .values(artist)
-            .orIgnore()
-            .execute().then((result) => {
-                if(result.identifiers.length > 0) {
-                    return new CreateResult(artist, false);
+            .values(dtos)
+            .orIgnore();
+
+        return builder.execute().then(async (result) => {
+                const all = await this.repository.findBy(dtos);
+                const existed: Artist[] = [];
+                let created: Artist[] = [];
+
+                if(withSplitting) {
+                    for(const artist of all) {
+                        if(result.identifiers.includes({ id: artist.id })) {
+                            created.push(artist);
+                        } else {
+                            existed.push(artist);
+                        }
+                    }
+                } else {
+                    created = all;
                 }
-                return this.findByName(createArtistDto.name).then((artist) => new CreateResult(artist, true));
-            }).catch((error) => {
-                this.logger.error(`Could not create database entry for artist: ${error.message}`, error.stack);
-                return null
+
+                return new CreationBatchResult(created, existed);
+            }).catch((error: Error) => {
+                this.logger.error(`Could not create artists: ${error.message}`, Environment.isDebug ? error.stack : null);
+                return new CreationBatchResult([], []);
             })
     }
-
-    // public async createBatchIfNotExists(artists: (Artist | { name: string })[]): Promise<CreationBatchResult<Artist>> {
-    //     if(artists.length <= 0) throw new Error("Artists cannot be empty for batched insert.");
-
-    //     const builder = this.repository.createQueryBuilder()
-    //         .insert()
-    //         .values(artists)
-    //         .orIgnore();
-
-    //     return builder.execute().then(async (result) => {
-    //             const all = await this.repository.findBy(artists as { name: string }[]);
-    //             const existed: Artist[] = [];
-    //             const created: Artist[] = [];
-
-    //             for(const artist of all) {
-    //                 if(result.identifiers.includes({ id: artist.id })) {
-    //                     created.push(artist);
-    //                 } else {
-    //                     existed.push(artist);
-    //                 }
-    //             }
-
-    //             return new CreationBatchResult(created, existed);
-    //         });
-    // }
 
     /**
      * Update an artist by its id.
@@ -242,21 +221,18 @@ export class ArtistService {
     }
 
     /**
-     * Update the sync flag of an artist.
-     * @param idOrObject Id or object of the artist
-     * @param flag Updated sync flag
+     * Update the last synced attributes on songs.
+     * This will update the lastSyncedAt and lastSyncedFlag attributes.
+     * @param songs List of songs which should be affected by the change
+     * @param flag Flag to set for all songs
      * @returns UpdateResult
      */
-    private async setSyncFlags(artists: Artist[], flag: SyncFlag) {
-        const ids = artists.map((artist) => artist.id);
-
+    public async setLastSyncedDetails(resources: Artist[], flag: SyncFlag): Promise<UpdateResult> {
         return this.repository.createQueryBuilder()
-            .update({
-                lastSyncedAt: new Date(),
-                lastSyncFlag: flag
-            })
-            .where({ id: In(ids) })
-            .execute()
+            .update()
+            .set({ lastSyncedAt: new Date(), lastSyncFlag: flag })
+            .whereInIds(resources)
+            .execute();
     }
 
     /**
@@ -266,9 +242,9 @@ export class ArtistService {
      */
     public async sync(resources: Artist[]) {
         return this.meiliClient.setArtists(resources).then(() => {
-            return this.setSyncFlags(resources, SyncFlag.OK);
+            return this.setLastSyncedDetails(resources, SyncFlag.OK);
         }).catch(() => {
-            return this.setSyncFlags(resources, SyncFlag.ERROR);
+            return this.setLastSyncedDetails(resources, SyncFlag.ERROR);
         });
     }
 

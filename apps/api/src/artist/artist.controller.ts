@@ -21,7 +21,7 @@ export class ArtistController {
   @Roles(ROLE_MOD, ROLE_ADMIN)
   @Post(":artistId")
   public async createArtist(@Body() createArtistDto: CreateArtistDTO) {
-    return this.artistService.createIfNotExists(createArtistDto);
+    return this.artistService.createIfNotExists([ createArtistDto ]);
   }
 
   @Roles(ROLE_MOD, ROLE_ADMIN)

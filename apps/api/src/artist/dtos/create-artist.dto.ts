@@ -1,6 +1,7 @@
-import { IsBoolean, IsNotEmpty, IsOptional, Length } from "class-validator";
+import { IsNotEmpty, IsOptional, Length } from "class-validator";
+import { Artist } from "../entities/artist.entity";
 
-export class CreateArtistDTO {
+export class CreateArtistDTO implements Pick<Artist, "name">, Pick<Artist, "description">, Pick<Artist, "geniusId"> {
 
     @IsNotEmpty()
     @Length(3, 254)
@@ -8,13 +9,9 @@ export class CreateArtistDTO {
 
     @IsOptional()
     @Length(3, 4000)
-    public description?: string;
+    public description: string;
 
     @IsOptional()
-    public geniusId?: string;
-
-    @IsOptional()
-    @IsBoolean()
-    public doGeniusLookup?: boolean;
+    public geniusId: string;
 
 }
