@@ -1,24 +1,27 @@
 import { IsDate, IsNotEmpty, IsOptional, Length } from "class-validator";
 import { Artist } from "../../artist/entities/artist.entity";
+import { Album } from "../entities/album.entity";
 
-export class CreateAlbumDTO {
+export class CreateAlbumDTO implements 
+    Pick<Album, "name">, 
+    Pick<Album, "primaryArtist">, 
+    Pick<Album, "releasedAt">,
+    Pick<Album, "description">
+{
 
     @IsNotEmpty()
     @Length(3, 120)
     public name: string;
 
     @IsOptional()
-    public lookupGenius?: boolean;
-
-    @IsOptional()
     public primaryArtist: Artist;
 
     @IsOptional()
     @IsDate()
-    public releasedAt?: Date;
+    public releasedAt: Date;
 
     @IsOptional()
     @Length(3, 4000)
-    public description?: string;
+    public description: string;
     
 }

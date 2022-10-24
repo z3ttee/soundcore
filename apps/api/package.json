@@ -59,7 +59,7 @@
     "sharp": "^0.30.7",
     "socket.io": "^4.5.1",
     "sqlstring": "^2.3.3",
-    "typeorm": "^0.3.7",
+    "typeorm": "^0.3.10",
     "workerpool": "^6.2.1",
     "ytdl-core": "^4.11.0",
     "ytpl": "^2.3.0"

@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Environment } from '@soundcore/common';
 import { Page, Pageable } from 'nestjs-pager';
 import { In, Repository, SelectQueryBuilder, UpdateResult } from 'typeorm';
 import { Artist } from '../artist/entities/artist.entity';
@@ -9,6 +10,7 @@ import { SyncFlag } from '../meilisearch/interfaces/syncable.interface';
 import { MeiliAlbumService } from '../meilisearch/services/meili-album.service';
 import { User } from '../user/entities/user.entity';
 import { GeniusFlag, ResourceFlag } from '../utils/entities/resource';
+import { CreationBatchResult } from '../utils/results/creation-batch.result';
 import { CreateResult } from '../utils/results/creation.result';
 import { CreateAlbumDTO } from './dto/create-album.dto';
 import { UpdateAlbumDTO } from './dto/update-album.dto';
@@ -188,33 +190,36 @@ export class AlbumService {
      * @param createAlbumDto Data to create album from
      * @returns Album
      */
-    public async createIfNotExists(createAlbumDto: CreateAlbumDTO): Promise<CreateResult<Album>> {
-        createAlbumDto.name = createAlbumDto.name?.trim();
-        createAlbumDto.description = createAlbumDto.description?.trim();
-        if(!createAlbumDto.primaryArtist) throw new BadRequestException("Creating album without primary artist is not allowed.");
+    public async createIfNotExists(dtos: CreateAlbumDTO[], withSplitting: boolean = true): Promise<CreationBatchResult<Album>> {
+        if(dtos.length <= 0) throw new BadRequestException("Cannot create resources for empty list.");
 
-        const existingAlbum = await this.findByNameAndArtist(createAlbumDto.name, createAlbumDto.primaryArtist);
-        if(existingAlbum) return new CreateResult(existingAlbum, true); 
-
-        const album = this.repository.create();
-        album.name = createAlbumDto.name;
-        album.description = createAlbumDto.description;
-        album.releasedAt = createAlbumDto.releasedAt;
-        album.primaryArtist = createAlbumDto.primaryArtist;
-
-        return this.repository.createQueryBuilder()
+        const builder = this.repository.createQueryBuilder()
             .insert()
-            .values(album)
-            .orIgnore()
-            .execute().then((result) => {
-                if(result.identifiers.length > 0) {
-                    return new CreateResult(album, false);
+            .values(dtos)
+            .orUpdate(["id"]);
+
+        return builder.execute().then(async (result) => {
+            const all = await this.repository.findBy(dtos as unknown);
+            const existed: Album[] = [];
+            let created: Album[] = [];
+
+            if(withSplitting) {
+                for(const artist of all) {
+                    if(result.identifiers.includes({ id: artist.id })) {
+                        created.push(artist);
+                    } else {
+                        existed.push(artist);
+                    }
                 }
-                return this.findByNameAndArtist(createAlbumDto.name, createAlbumDto.primaryArtist).then((album) => new CreateResult(album, true));
-            }).catch((error) => {
-                this.logger.error(`Could not create database entry for album: ${error.message}`, error.stack);
-                return null
-            })
+            } else {
+                created = all;
+            }
+
+            return new CreationBatchResult(created, existed);
+        }).catch((error: Error) => {
+            this.logger.error(`Could not create albums: ${error.message}`, Environment.isDebug ? error.stack : null);
+            return new CreationBatchResult([], []);
+        })
     }
 
     /**

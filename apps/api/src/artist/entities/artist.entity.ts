@@ -65,7 +65,7 @@ export class Artist implements Resource, Syncable, GeniusResource {
     public songsCount?: number = 0;
     public albumsCount?: number = 0;
 
-    @Column({ select: false })
+    @Column({ select: false, nullable: true })
     public streamCount?: number = 0;
 
     @BeforeInsert()

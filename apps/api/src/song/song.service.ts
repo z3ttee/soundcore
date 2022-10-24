@@ -20,15 +20,21 @@ import { In, Repository, UpdateResult } from "typeorm";
 import { MeiliSongService } from "../meilisearch/services/meili-song.service";
 import { SyncFlag } from "../meilisearch/interfaces/syncable.interface";
 import { CreateResult } from "../utils/results/creation.result";
+import { SyncingService } from "../utils/services/syncing.service";
+import { EventEmitter2 } from "@nestjs/event-emitter";
+import { Environment } from "@soundcore/common";
 
 @Injectable()
-export class SongService {
+export class SongService extends SyncingService {
     private readonly logger: Logger = new Logger(SongService.name)
 
     constructor(
         @InjectRepository(Song) private readonly repository: Repository<Song>,
+        eventEmitter: EventEmitter2,
         private readonly meiliSong: MeiliSongService
-    ){}
+    ){
+        super(eventEmitter);
+    }
 
     /**
      * Find page with the 20 latest indexed songs.
@@ -240,18 +246,6 @@ export class SongService {
     }
 
     /**
-     * Save an song entity.
-     * @param song Entity data to be saved
-     * @returns Song
-     */
-    public async save(song: Song): Promise<Song> {
-        return this.repository.save(song).then((result) => {
-            this.sync([result]);
-            return result;
-        });
-    }
-
-    /**
      * Create new song entry in database. If the same entry already exists,
      * the existing one will be returned.
      * Existing song contains following relations: primaryArtist, featuredArtist, album
@@ -291,8 +285,10 @@ export class SongService {
             .insert()
             .values(song)
             .orIgnore()
-            .execute().then((result) => {
+            .execute().then(async (result) => {
+
                 if(result.identifiers.length > 0) {
+                    // this.prepareForMeiliSync([ song ]);
                     return new CreateResult(song, false);
                 }
                 return this.findUniqueSong(uniqueDto).then((song) => new CreateResult(song, true));
@@ -350,7 +346,7 @@ export class SongService {
      * @param flag Updated sync flag
      * @returns Song
      */
-     private async setSyncFlags(resources: Song[], flag: SyncFlag) {
+    private async setSyncFlags(resources: Song[], flag: SyncFlag) {
         const ids = resources.map((user) => user.id);
 
         return this.repository.createQueryBuilder()
@@ -382,7 +378,7 @@ export class SongService {
      * @param resource Song data
      * @returns Song
      */
-    public async sync(resources: Song[]) {
+    public async requestSync(resources: Song[]) {
         return this.meiliSong.setSongs(resources).then(() => {
             return this.setSyncFlags(resources, SyncFlag.OK);
         }).catch(() => {
@@ -423,10 +419,16 @@ export class SongService {
         // Get artists
         const artists: string[] = [];
         if (id3Tags.artist) {
-            artists.push(...(id3Tags.artist.split("/") || []))
-            for (const index in artists) {
-                artists.push(...artists[index].split(",").map((name) => name.trim()))
-                artists.splice(parseInt(index), 1)
+            const splitted = id3Tags.artist.split(",") || [];
+
+            for (const index in splitted) {
+                artists.push(splitted[index]?.trim());
+            }
+        }
+
+        if(artists.length <= 0) {
+            if(Environment.isDebug) {
+                this.logger.debug(`No artists found on file ${filepath}`);
             }
         }
 
@@ -442,7 +444,9 @@ export class SongService {
             title: id3Tags.title?.trim() || path.basename(filepath).replace(/\.[^/.]+$/, "").trim(),
             duration: durationInSeconds,
             artists: artists.map((name) => ({
-                name: name?.trim()
+                name: name?.trim(),
+                description: null,
+                geniusId: null
             })),
             album: id3Tags.album?.trim(),
             cover: artworkBuffer,

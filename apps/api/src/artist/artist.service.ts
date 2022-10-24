@@ -2,7 +2,7 @@ import { BadRequestException, Injectable, Logger, NotFoundException } from '@nes
 import { InjectRepository } from '@nestjs/typeorm';
 import { Environment } from '@soundcore/common';
 import { Page, Pageable } from 'nestjs-pager';
-import { Repository, SelectQueryBuilder, UpdateResult } from 'typeorm';
+import { In, Repository, SelectQueryBuilder, UpdateResult } from 'typeorm';
 import { SyncFlag } from '../meilisearch/interfaces/syncable.interface';
 import { MeiliArtistService } from '../meilisearch/services/meili-artist.service';
 import { GeniusFlag, ResourceFlag } from '../utils/entities/resource';
@@ -111,38 +111,29 @@ export class ArtistService {
     /**
      * Create an artist if not exists.
      * @param createArtistDto Data to create artist from
-     * @param withSplitting If true, the result is splitted in "existed" and "created". Otherwise all entries will be in "created". Set true, if you do not need to evaluate which entries have been newly created as it causes a certain overhead.
      * @returns Artist
      */
-    public async createIfNotExists(dtos: CreateArtistDTO[], withSplitting: boolean = true): Promise<CreationBatchResult<Artist>> {
+    public async createIfNotExists(dtos: CreateArtistDTO[]): Promise<Artist[]> {
         if(dtos.length <= 0) throw new BadRequestException("Cannot create resources for empty list.");
 
         const builder = this.repository.createQueryBuilder()
             .insert()
             .values(dtos)
-            .orIgnore();
+            .orUpdate(["name"]);
 
         return builder.execute().then(async (result) => {
-                const all = await this.repository.findBy(dtos);
-                const existed: Artist[] = [];
-                let created: Artist[] = [];
+                const ids: string[] = result.identifiers.map((val) => val["id"]);
 
-                if(withSplitting) {
-                    for(const artist of all) {
-                        if(result.identifiers.includes({ id: artist.id })) {
-                            created.push(artist);
-                        } else {
-                            existed.push(artist);
-                        }
-                    }
-                } else {
-                    created = all;
-                }
+                const all = await this.repository.find({
+                    where: { id: In(ids) }
+                });
 
-                return new CreationBatchResult(created, existed);
+                console.log(dtos.length, result.identifiers.length, all.length);
+
+                return all;
             }).catch((error: Error) => {
                 this.logger.error(`Could not create artists: ${error.message}`, Environment.isDebug ? error.stack : null);
-                return new CreationBatchResult([], []);
+                return [];
             })
     }
 
