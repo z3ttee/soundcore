@@ -2,15 +2,13 @@ import { BadRequestException, Injectable, Logger, NotFoundException } from '@nes
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Page, Pageable } from 'nestjs-pager';
-import { In, Repository, SelectQueryBuilder } from 'typeorm';
+import { In, Repository, SelectQueryBuilder, UpdateResult } from 'typeorm';
 import { Artist } from '../artist/entities/artist.entity';
 import { EVENT_ALBUMS_CHANGED } from '../constants';
-import { AlbumChangedEvent } from '../events/album-changed.event';
 import { SyncFlag } from '../meilisearch/interfaces/syncable.interface';
 import { MeiliAlbumService } from '../meilisearch/services/meili-album.service';
 import { User } from '../user/entities/user.entity';
 import { GeniusFlag, ResourceFlag } from '../utils/entities/resource';
-import { CreationBatchResult } from '../utils/results/creation-batch.result';
 import { CreateResult } from '../utils/results/creation.result';
 import { CreateAlbumDTO } from './dto/create-album.dto';
 import { UpdateAlbumDTO } from './dto/update-album.dto';
@@ -288,19 +286,17 @@ export class AlbumService {
     }
 
     /**
-     * Update the sync flag of an album.
-     * @param flag Updated sync flag
+     * Update the last synced attributes on songs.
+     * This will update the lastSyncedAt and lastSyncedFlag attributes.
+     * @param songs List of songs which should be affected by the change
+     * @param flag Flag to set for all songs
      * @returns UpdateResult
      */
-    private async setSyncFlags(albums: Album[], flag: SyncFlag) {
-        const ids = albums.map((album) => album.id);
-
+    public async setLastSyncedDetails(resources: Album[], flag: SyncFlag): Promise<UpdateResult> {
         return this.repository.createQueryBuilder()
-            .update({
-                lastSyncedAt: new Date(),
-                lastSyncFlag: flag
-            })
-            .where({ id: In(ids) })
+            .update()
+            .set({ lastSyncedAt: new Date(), lastSyncFlag: flag })
+            .whereInIds(resources)
             .execute();
     }
 
@@ -311,9 +307,9 @@ export class AlbumService {
      */
     public async sync(resources: Album[]) {
         return this.meiliClient.setAlbums(resources).then(() => {
-            return this.setSyncFlags(resources, SyncFlag.OK);
+            return this.setLastSyncedDetails(resources, SyncFlag.OK);
         }).catch(() => {
-            return this.setSyncFlags(resources, SyncFlag.ERROR);
+            return this.setLastSyncedDetails(resources, SyncFlag.ERROR);
         });
     }
 

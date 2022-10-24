@@ -1,11 +1,12 @@
 import { BadRequestException, ForbiddenException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Page, Pageable } from 'nestjs-pager';
-import { In, Not, Repository, SelectQueryBuilder } from 'typeorm';
+import { In, Not, Repository, SelectQueryBuilder, UpdateResult } from 'typeorm';
+import { EVENT_PLAYLISTS_CHANGED } from '../constants';
 import { SyncFlag } from '../meilisearch/interfaces/syncable.interface';
 import { MeiliPlaylistService } from '../meilisearch/services/meili-playlist.service';
 import { Song } from '../song/entities/song.entity';
-import { SongService } from '../song/song.service';
 import { User } from '../user/entities/user.entity';
 import { AddSongDTO } from './dtos/add-song.dto';
 import { CreatePlaylistDTO } from './dtos/create-playlist.dto';
@@ -20,7 +21,7 @@ export class PlaylistService {
     
     constructor(
         private readonly meiliClient: MeiliPlaylistService,
-        private readonly songService: SongService,
+        private readonly emitter: EventEmitter2,
         @InjectRepository(Playlist) private playlistRepository: Repository<Playlist>,
         @InjectRepository(PlaylistItem)  private song2playlistRepository: Repository<PlaylistItem>
     ) {}
@@ -207,18 +208,6 @@ export class PlaylistService {
     }
 
     /**
-     * Save a playlist entity.
-     * @param playlist Entity data to be saved
-     * @returns Playlist
-     */
-    public async save(playlist: Playlist): Promise<Playlist> {
-        return this.playlistRepository.save(playlist).then((result) => {
-            this.sync([result]);
-            return result;
-        });
-    }
-
-    /**
      * Create new playlist. This fails with 
      * @param createPlaylistDto Playlist metadata
      * @param author Author entity (User)
@@ -234,7 +223,18 @@ export class PlaylistService {
         playlist.description = createPlaylistDto.description;
         playlist.privacy = createPlaylistDto.privacy;
 
-        return this.save(playlist);
+        return this.playlistRepository.createQueryBuilder().insert()
+            .values(playlist)
+            .orIgnore()
+            .execute().then(async (result) => {
+                const id = result.identifiers?.[0]?.id;
+                if(result.identifiers.length > 0) {
+                    const pl = await this.findById(id);
+                    this.emitter.emit(EVENT_PLAYLISTS_CHANGED, [ pl ])
+                    return pl;
+                };
+                throw new BadRequestException("Did not create playlist");
+            });
     }
 
     public async update(playlistId: string, updatePlaylistDto: UpdatePlaylistDTO, authentication: User): Promise<Playlist> {
@@ -248,7 +248,16 @@ export class PlaylistService {
         playlist.privacy = updatePlaylistDto.privacy || playlist.privacy;
         playlist.description = updatePlaylistDto.description || playlist.description;
 
-        return this.save(playlist);
+        return this.playlistRepository.createQueryBuilder().update()
+            .set(playlist)
+            .whereEntity(playlist)
+            .execute().then((result) => {
+                if(result.affected > 0) {
+                    return playlist;
+
+                }
+                throw new BadRequestException("Did not update playlist");
+            });
     }
 
     /**
@@ -344,20 +353,17 @@ export class PlaylistService {
     }
 
     /**
-     * Update the sync flag of a playlist.
-     * @param resources Id or object of the playlist
-     * @param flag Updated sync flag
-     * @returns Playlist
+     * Update the last synced attributes on resources.
+     * This will update the lastSyncedAt and lastSyncedFlag attributes.
+     * @param resources List of resources which should be affected by the change
+     * @param flag Flag to set for all resources
+     * @returns UpdateResult
      */
-     private async setSyncFlags(resources: Playlist[], flag: SyncFlag) {
-        const ids = resources.map((user) => user.id);
-
+    public async setLastSyncedDetails(resources: Playlist[], flag: SyncFlag): Promise<UpdateResult> {
         return this.playlistRepository.createQueryBuilder()
-            .update({
-                lastSyncedAt: new Date(),
-                lastSyncFlag: flag
-            })
-            .where({ id: In(ids) })
+            .update()
+            .set({ lastSyncedAt: new Date(), lastSyncFlag: flag })
+            .whereInIds(resources)
             .execute();
     }
 
@@ -368,9 +374,9 @@ export class PlaylistService {
      */
     public async sync(resources: Playlist[]) {
         return this.meiliClient.setPlaylists(resources).then(() => {
-            return this.setSyncFlags(resources, SyncFlag.OK);
+            return this.setLastSyncedDetails(resources, SyncFlag.OK);
         }).catch(() => {
-            return this.setSyncFlags(resources, SyncFlag.ERROR);
+            return this.setLastSyncedDetails(resources, SyncFlag.ERROR);
         });
     }
 
