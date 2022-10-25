@@ -13,7 +13,7 @@ class DatabaseImpl {
     }
 
     private _dataSourceOptions: DataSourceOptions = {
-        type: process.env.DB_DIALECT as any,
+        type: process.env.DB_DIALECT as any || "mariadb",
         port: parseInt(process.env.DB_PORT),
         host: process.env.DB_HOST,
         database: process.env.DB_NAME,

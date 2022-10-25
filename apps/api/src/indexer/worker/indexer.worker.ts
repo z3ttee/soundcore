@@ -30,6 +30,7 @@ import { Environment } from "@soundcore/common";
 import { Batch } from "@soundcore/common";
 import { CreateArtistDTO } from "../../artist/dtos/create-artist.dto";
 import { CreateAlbumDTO } from "../../album/dto/create-album.dto";
+import { CreateSongDTO } from "../../song/dtos/create-song.dto";
 
 const logger = new Logger("IndexWorker");
 const BATCH_SIZE = 100;
@@ -80,6 +81,7 @@ export default function (job: WorkerJobRef<IndexerProcessDTO>): Promise<IndexerR
 
                 const artists: Map<string, CreateArtistDTO> = new Map();
                 const albums: Map<string, CreateAlbumDTO> = new Map();
+                const songs: Map<string, CreateSongDTO> = new Map();
 
                 // TODO: Work out how this can be batched. Currently this approach is spamming the database
                 for(const file of batch) {
@@ -104,8 +106,6 @@ export default function (job: WorkerJobRef<IndexerProcessDTO>): Promise<IndexerR
                         return null;
                     });
 
-                    // TODO: Track info to which song this artist belongs
-
                     // Extract artists
                     const id3Artists: CreateArtistDTO[] = id3TagsDto?.artists || [];
 
@@ -120,15 +120,31 @@ export default function (job: WorkerJobRef<IndexerProcessDTO>): Promise<IndexerR
                     const primaryId3Artist: CreateArtistDTO = id3Artists.splice(0, 1)?.[0];
 
                     // Extract album
+                    let album: CreateAlbumDTO = undefined;
                     if(id3TagsDto?.album) {
                         // Collect album for batched db query
-                        albums.set(createAlbumMapKey(id3TagsDto.album, primaryId3Artist), {
+                        album = {
                             name: id3TagsDto.album,
                             primaryArtist: primaryId3Artist as Artist,
                             releasedAt: undefined,
                             description: undefined
-                        });
+                        }
+
+                        albums.set(getAlbumMapKey(id3TagsDto.album, primaryId3Artist), album);
                     }
+
+                    // Extract song and collect data
+                    const song: CreateSongDTO = {
+                        file: file,
+                        name: id3TagsDto.title,
+                        duration: id3TagsDto.duration,
+                        order: id3TagsDto.orderNr,
+                        album: album as Album,
+                        primaryArtist: primaryId3Artist as Artist,
+                        featuredArtists: id3Artists as Artist[],
+                    }
+
+                    songs.set(getSongMapKey(song.name, song.primaryArtist, song.album, song.duration), song);
 
                     // Prepare variable.
                     // let songResult: CreateResult<Song> = null;
@@ -262,20 +278,34 @@ export default function (job: WorkerJobRef<IndexerProcessDTO>): Promise<IndexerR
                     createdArtists.set(artist.name, artist);
                 }
 
-                console.log(collectedArtists.length, artistCreationResult.length, createdArtists.size);
-
                 // Create database entries for collected albums
-                const albumCreationResult = await albumService.createIfNotExists(Array.from(albums.values()).map((album) => {
-                    // console.log(createdArtists.get(album.primaryArtist.name)?.name);
-                    
+                const albumCreationResult = await albumService.createIfNotExists(Array.from(albums.values()).map((album) => {    
+                    // Map previous primaryArtist data with the created data from above                
                     album.primaryArtist = createdArtists.get(album.primaryArtist.name);
                     return album;
-                }), false);
+                }));
+                const createdAlbums = new Map<string, Album>();
+
+                for(const album of albumCreationResult) {
+                    createdAlbums.set(getAlbumMapKey(album.name, album.primaryArtist), album);
+                }
                 
+                // Create database entries for collected songs
+                const songCreationResult = await songService.createIfNotExists(Array.from(songs.values()).map((song) => {
+                    console.log(song.featuredArtists.length, song.album?.name)
+
+                    // Map previous primaryArtist and album data with the created data from above      
+                    song.primaryArtist = createdArtists.get(song.primaryArtist.name);
+                    song.featuredArtists = song.featuredArtists.map((artist) => createdArtists.get(artist.name));
+                    song.album = createdAlbums.get(getAlbumMapKey(song.album?.name, song.album?.primaryArtist));          
+                    return song;
+                }));
 
                 // Set flag for duplicate files
                 await fileService.setFlags(duplicates, FileFlag.POTENTIAL_DUPLICATE);
                 await fileService.setFlags(successFiles, FileFlag.OK);
+
+                // TODO: Create artwork via queue and workers
 
                 return entries;
             }).progress((batches, current) => {
@@ -299,9 +329,11 @@ export default function (job: WorkerJobRef<IndexerProcessDTO>): Promise<IndexerR
     });
 }
 
-function createAlbumMapKey(name: string, primaryArtist?: Artist | CreateArtistDTO) {
+function getAlbumMapKey(name: string, primaryArtist?: Artist | CreateArtistDTO) {
     return `${name}:${primaryArtist?.name}`;
 }
 
-
+function getSongMapKey(name: string, primaryArtist?: Artist | CreateArtistDTO, album?: Album | CreateAlbumDTO, duration: number = 0) {
+    return `${name}:${primaryArtist?.name}:${album?.name}:${duration}`;
+}
 

@@ -187,26 +187,20 @@ export class AlbumService {
 
     /**
      * Create an album if not exists.
-     * @param createAlbumDto Data to create album from
+     * @param dtos Data to create album from
      * @returns Album
      */
-    public async createIfNotExists(dtos: CreateAlbumDTO[], withSplitting: boolean = true): Promise<CreationBatchResult<Album>> {
+    public async createIfNotExists(dtos: CreateAlbumDTO[]): Promise<Album[]> {
         if(dtos.length <= 0) throw new BadRequestException("Cannot create resources for empty list.");
 
-        const builder = this.repository.createQueryBuilder()
+        return await this.repository.createQueryBuilder()
             .insert()
             .values(dtos)
             .returning("*")
-            .orUpdate(["name"]);
-
-        return builder.execute().then(async (result) => {
-            let all = result.raw as Album[];
-            // all = result.generatedMaps as Album[];
-            return new CreationBatchResult(all, []);
-        }).catch((error: Error) => {
-            this.logger.error(`Could not create albums: ${error.message}`, Environment.isDebug ? error.stack : null);
-            return new CreationBatchResult([], []);
-        })
+            .orUpdate(["name"], ["name"], { skipUpdateIfNoValuesChanged: false })
+            .execute().then((insertResult) => {
+                return insertResult.raw as Album[];
+            });
     }
 
     /**
