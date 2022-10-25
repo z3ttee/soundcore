@@ -23,7 +23,7 @@ export class Artist implements Resource, Syncable, GeniusResource {
      * GENIUS RELATED ATTRIBUTES
      */
     @Column({ nullable: true })
-    public geniusId: string;
+    public geniusId?: string;
 
     @Column({ type: "tinyint", default: 0 })
     public geniusFlag: GeniusFlag;
@@ -44,7 +44,7 @@ export class Artist implements Resource, Syncable, GeniusResource {
     public slug: string;
 
     @Column({ nullable: true, type: "text" })
-    public description: string;
+    public description?: string;
 
     @Column({ nullable: false, unique: true })
     public name: string;

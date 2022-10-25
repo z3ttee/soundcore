@@ -196,26 +196,13 @@ export class AlbumService {
         const builder = this.repository.createQueryBuilder()
             .insert()
             .values(dtos)
-            .orUpdate(["id"]);
+            .returning("*")
+            .orUpdate(["name"]);
 
         return builder.execute().then(async (result) => {
-            const all = await this.repository.findBy(dtos as unknown);
-            const existed: Album[] = [];
-            let created: Album[] = [];
-
-            if(withSplitting) {
-                for(const artist of all) {
-                    if(result.identifiers.includes({ id: artist.id })) {
-                        created.push(artist);
-                    } else {
-                        existed.push(artist);
-                    }
-                }
-            } else {
-                created = all;
-            }
-
-            return new CreationBatchResult(created, existed);
+            let all = result.raw as Album[];
+            // all = result.generatedMaps as Album[];
+            return new CreationBatchResult(all, []);
         }).catch((error: Error) => {
             this.logger.error(`Could not create albums: ${error.message}`, Environment.isDebug ? error.stack : null);
             return new CreationBatchResult([], []);

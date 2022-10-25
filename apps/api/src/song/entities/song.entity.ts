@@ -77,6 +77,7 @@ export class Song implements Resource, Syncable {
     public artwork: Artwork;
 
     @ManyToOne(() => Artist)
+    @JoinColumn()
     public primaryArtist: Artist;
 
     @ManyToMany(() => Artist)

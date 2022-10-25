@@ -6,7 +6,6 @@ import { In, Repository, SelectQueryBuilder, UpdateResult } from 'typeorm';
 import { SyncFlag } from '../meilisearch/interfaces/syncable.interface';
 import { MeiliArtistService } from '../meilisearch/services/meili-artist.service';
 import { GeniusFlag, ResourceFlag } from '../utils/entities/resource';
-import { CreationBatchResult } from '../utils/results/creation-batch.result';
 import { CreateArtistDTO } from './dtos/create-artist.dto';
 import { UpdateArtistDTO } from './dtos/update-artist.dto';
 import { Artist } from './entities/artist.entity';
@@ -116,25 +115,14 @@ export class ArtistService {
     public async createIfNotExists(dtos: CreateArtistDTO[]): Promise<Artist[]> {
         if(dtos.length <= 0) throw new BadRequestException("Cannot create resources for empty list.");
 
-        const builder = this.repository.createQueryBuilder()
+        return await this.repository.createQueryBuilder()
             .insert()
             .values(dtos)
-            .orUpdate(["name"]);
-
-        return builder.execute().then(async (result) => {
-                const ids: string[] = result.identifiers.map((val) => val["id"]);
-
-                const all = await this.repository.find({
-                    where: { id: In(ids) }
-                });
-
-                console.log(dtos.length, result.identifiers.length, all.length);
-
-                return all;
-            }).catch((error: Error) => {
-                this.logger.error(`Could not create artists: ${error.message}`, Environment.isDebug ? error.stack : null);
-                return [];
-            })
+            .returning("*")
+            .orUpdate(["name"], ["name"], { skipUpdateIfNoValuesChanged: false })
+            .execute().then((insertResult) => {
+                return insertResult.raw as Artist[];
+            });
     }
 
     /**

@@ -46,7 +46,7 @@ import { WorkerQueueModule } from '@soundcore/nest-queue';
     CommonConfigModule,
     FileSystemModule.forRoot(),
     TypeOrmModule.forRoot({
-      type: "mysql",
+      type: "mariadb",
       host: process.env.DB_HOST,
       port: parseInt(process.env.DB_PORT),
       username: process.env.DB_USER,

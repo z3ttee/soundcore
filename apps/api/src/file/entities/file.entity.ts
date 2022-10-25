@@ -18,7 +18,7 @@ export class File {
     @Column({ nullable: false, length: 256, type: "varchar" })
     public name: string;
 
-    @Column({ type: "varchar", length: 4097, collation: "utf8mb4_0900_as_ci" })
+    @Column({ type: "varchar", length: 4097 })
     public directory: string;
 
     @Column({ nullable: false })

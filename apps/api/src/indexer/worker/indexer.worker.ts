@@ -254,18 +254,19 @@ export default function (job: WorkerJobRef<IndexerProcessDTO>): Promise<IndexerR
                 }
 
                 // Create database entries for collected artists
-                const artistCreationResult = await artistService.createIfNotExists(Array.from(artists.values()));
+                const collectedArtists = Array.from(artists.values());
+                const artistCreationResult = await artistService.createIfNotExists(collectedArtists);
                 const createdArtists = new Map<string, Artist>();
                 
                 for(const artist of artistCreationResult) {
                     createdArtists.set(artist.name, artist);
                 }
 
-                // console.log("created " + createdArtists.size + " artists");
+                console.log(collectedArtists.length, artistCreationResult.length, createdArtists.size);
 
                 // Create database entries for collected albums
                 const albumCreationResult = await albumService.createIfNotExists(Array.from(albums.values()).map((album) => {
-                    // console.log(album.primaryArtist.name);
+                    // console.log(createdArtists.get(album.primaryArtist.name)?.name);
                     
                     album.primaryArtist = createdArtists.get(album.primaryArtist.name);
                     return album;

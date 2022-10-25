@@ -444,9 +444,7 @@ export class SongService extends SyncingService {
             title: id3Tags.title?.trim() || path.basename(filepath).replace(/\.[^/.]+$/, "").trim(),
             duration: durationInSeconds,
             artists: artists.map((name) => ({
-                name: name?.trim(),
-                description: null,
-                geniusId: null
+                name: name?.trim()
             })),
             album: id3Tags.album?.trim(),
             cover: artworkBuffer,
