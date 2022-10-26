@@ -118,10 +118,12 @@ export class ArtistService {
         return await this.repository.createQueryBuilder()
             .insert()
             .values(dtos)
-            .returning("*")
             .orUpdate(["name"], ["name"], { skipUpdateIfNoValuesChanged: false })
             .execute().then((insertResult) => {
-                return insertResult.raw as Artist[];
+                return this.repository.createQueryBuilder("artist")
+                    .leftJoinAndSelect("artist.artwork", "artwork")
+                    .where(insertResult.identifiers)
+                    .getMany();
             });
     }
 

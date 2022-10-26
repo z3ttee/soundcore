@@ -196,10 +196,12 @@ export class AlbumService {
         return await this.repository.createQueryBuilder()
             .insert()
             .values(dtos)
-            .returning("*")
             .orUpdate(["name"], ["name"], { skipUpdateIfNoValuesChanged: false })
             .execute().then((insertResult) => {
-                return insertResult.raw as Album[];
+                return this.repository.createQueryBuilder("album")
+                    .leftJoinAndSelect("album.primaryArtist", "primaryArtist")
+                    .where(insertResult.identifiers)
+                    .getMany();
             });
     }
 

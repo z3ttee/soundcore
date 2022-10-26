@@ -14,7 +14,7 @@ import { GeniusFlag, ResourceFlag } from "../utils/entities/resource";
 import { ID3TagsDTO } from "./dtos/id3-tags.dto";
 import path from "path";
 
-import { FileFlag } from "../file/entities/file.entity";
+import { File, FileFlag } from "../file/entities/file.entity";
 import { InjectRepository } from "@nestjs/typeorm";
 import { In, Repository, UpdateResult } from "typeorm";
 import { MeiliSongService } from "../meilisearch/services/meili-song.service";
@@ -23,6 +23,8 @@ import { CreateResult } from "../utils/results/creation.result";
 import { SyncingService } from "../utils/services/syncing.service";
 import { EventEmitter2 } from "@nestjs/event-emitter";
 import { Environment } from "@soundcore/common";
+import { Artist } from "../artist/entities/artist.entity";
+import { Album } from "../album/entities/album.entity";
 
 @Injectable()
 export class SongService extends SyncingService {
@@ -254,57 +256,24 @@ export class SongService extends SyncingService {
      */
     public async createIfNotExists(dtos: CreateSongDTO[]): Promise<Song[]> {
         if(dtos.length <= 0) throw new BadRequestException("Cannot create resources for empty list.");
-        // Do some validation to be sure there is an existing value
-        // createSongDto.name = createSongDto.name.trim();
-        // createSongDto.duration = createSongDto.duration || 0;
-        // createSongDto.order = createSongDto.order || 0;
-        // createSongDto.featuredArtists = createSongDto.featuredArtists || [];
-
-        // const uniqueDto: SongUniqueFindDTO = {
-        //     name: createSongDto.name,
-        //     duration: createSongDto.duration,
-        //     album: createSongDto.album,
-        //     primaryArtist: createSongDto.primaryArtist,
-        //     featuredArtists: createSongDto.featuredArtists
-        // }
-
-        // // Execute find query.
-        // const existingSong = await this.findUniqueSong(uniqueDto)
-        // if(existingSong) return new CreateResult(existingSong, true);
-
-        // const song = this.repository.create();
-        // song.name = createSongDto.name;
-        // song.primaryArtist = createSongDto.primaryArtist;
-        // song.featuredArtists = createSongDto.featuredArtists;
-        // song.album = createSongDto.album;
-        // song.order = createSongDto.order;
-        // song.duration = createSongDto.duration;
-        // song.file = createSongDto.file;
-        // song.artwork = createSongDto.artwork;
-
-        // return this.repository.createQueryBuilder()
-        //     .insert()
-        //     .values(song)
-        //     .orIgnore()
-        //     .execute().then(async (result) => {
-
-        //         if(result.identifiers.length > 0) {
-        //             // this.prepareForMeiliSync([ song ]);
-        //             return new CreateResult(song, false);
-        //         }
-        //         return this.findUniqueSong(uniqueDto).then((song) => new CreateResult(song, true));
-        //     }).catch((error) => {
-        //         this.logger.error(`Could not create database entry for song: ${error.message}`, error.stack);
-        //         return null
-        //     })
 
         return this.repository.createQueryBuilder()
             .insert()
             .values(dtos)
             .orUpdate(["name"], ["name"])
             .execute().then((insertResult) => {
-                return insertResult.raw as Song[];
+                return this.repository.createQueryBuilder("song")
+                    .leftJoinAndSelect("song.primaryArtist", "primaryArtist")
+                    .leftJoinAndSelect("song.album", "album")
+                    .leftJoinAndSelect("song.file", "file")
+                    .leftJoinAndSelect("song.artwork", "artwork")
+                    .where(insertResult.identifiers)
+                    .getMany();
             })
+    }
+
+    public async saveAll(songs: Song[]) {
+        return this.repository.save(songs);
     }
 
     /**
