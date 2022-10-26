@@ -5,8 +5,8 @@ import { Album } from "../entities/album.entity";
 export class CreateAlbumDTO implements 
     Pick<Album, "name">, 
     Pick<Album, "primaryArtist">, 
-    Pick<Album, "releasedAt">,
-    Pick<Album, "description">
+    Partial<Pick<Album, "releasedAt">>,
+    Partial<Pick<Album, "description">>
 {
 
     @IsNotEmpty()
@@ -18,10 +18,10 @@ export class CreateAlbumDTO implements
 
     @IsOptional()
     @IsDate()
-    public releasedAt: Date;
+    public releasedAt?: Date;
 
     @IsOptional()
     @Length(3, 4000)
-    public description: string;
+    public description?: string;
     
 }

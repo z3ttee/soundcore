@@ -31,6 +31,7 @@ import { Batch } from "@soundcore/common";
 import { CreateArtistDTO } from "../../artist/dtos/create-artist.dto";
 import { CreateAlbumDTO } from "../../album/dto/create-album.dto";
 import { CreateSongDTO } from "../../song/dtos/create-song.dto";
+import { Mount } from "../../mount/entities/mount.entity";
 
 const logger = new Logger("IndexWorker");
 const BATCH_SIZE = 100;
@@ -83,8 +84,13 @@ export default function (job: WorkerJobRef<IndexerProcessDTO>): Promise<IndexerR
                 const albums: Map<string, CreateAlbumDTO> = new Map();
                 const songs: Map<string, CreateSongDTO> = new Map();
 
-                // TODO: Work out how this can be batched. Currently this approach is spamming the database
+                // TODO: Track artists and the songs they belong to, so we do not have to track the album to a song
+                // This 
+
                 for(const file of batch) {
+                    // Set mount for file context
+                    file.mount = mount;
+
                     const fileReadStartTime = Date.now();
                     const filepath = path.resolve(path.join(mount.directory, file.directory, file.name));
 
@@ -125,9 +131,7 @@ export default function (job: WorkerJobRef<IndexerProcessDTO>): Promise<IndexerR
                         // Collect album for batched db query
                         album = {
                             name: id3TagsDto.album,
-                            primaryArtist: primaryId3Artist as Artist,
-                            releasedAt: undefined,
-                            description: undefined
+                            primaryArtist: primaryId3Artist as Artist
                         }
 
                         albums.set(getAlbumMapKey(id3TagsDto.album, primaryId3Artist), album);
@@ -144,7 +148,7 @@ export default function (job: WorkerJobRef<IndexerProcessDTO>): Promise<IndexerR
                         featuredArtists: id3Artists as Artist[],
                     }
 
-                    songs.set(getSongMapKey(song.name, song.primaryArtist, song.album, song.duration), song);
+                    songs.set(getSongMapKey(file), song);
 
                     // Add to success array so the file flag can be changed later
                     successFiles.push(file);
@@ -199,15 +203,20 @@ export default function (job: WorkerJobRef<IndexerProcessDTO>): Promise<IndexerR
                         song.file.mount = mount;
                     }
 
-                    const key = getSongMapKey(song.name, song.primaryArtist, song.album, song.duration);
+                    const key = getSongMapKey(song.file);
                     const collectedSong = songs.get(key);
                     const featuredArtists: Artist[] = collectedSong?.featuredArtists?.map((artist) => createdArtists.get(artist.name)) || [];
                     
                     if(!collectedSong) {
                         if(song.file) {
                             const filepath = fileSystem.resolveFilepath(song.file);
+                            const missingAttributes = [];
+
+                            if(!song.primaryArtist) missingAttributes.push("primaryArtist");
+                            if(!song.album) missingAttributes.push("album");
+
                             // Print which attrs are missing
-                            logger.warn(`Found song that was created but is not tracked internally. File: ${filepath}`);
+                            logger.warn(`Found song that was created but is not tracked by indexer internally. Missing attributes [${missingAttributes.join(", ")}] on song entity. File: ${filepath}`);
                         } else {
                             logger.warn(`Song has some invalid data. No file attached to it. Song ID: ${song.id}`);
                         }
@@ -242,15 +251,30 @@ export default function (job: WorkerJobRef<IndexerProcessDTO>): Promise<IndexerR
                 const timeTookMs = Date.now() - startTimeMs;
                 return new IndexerResultDTO(result, createdResources, timeTookMs);
             });
+
+            /**
+             * Helper function to create key for the songs map
+             * @param file File data
+             */
+            function getSongMapKey(file: File) {
+                return fileSystem.resolveFilepath(file);
+            }
+
+            /**
+             * Helper function to create key for the albums map
+             * @param name Name of the album
+             * @param primaryArtist Primary artist of the album
+             */
+            function getAlbumMapKey(name: string, primaryArtist?: Artist | CreateArtistDTO) {
+                return `${name}:${primaryArtist?.name}`;
+            }
         });
     });
+
+    
 }
 
-function getAlbumMapKey(name: string, primaryArtist?: Artist | CreateArtistDTO) {
-    return `${name}:${primaryArtist?.name}`;
-}
 
-function getSongMapKey(name: string, primaryArtist?: Artist | CreateArtistDTO, album?: Album | CreateAlbumDTO, duration: number = 0) {
-    return `${name}:${primaryArtist?.name}:${album?.name}:${duration}`;
-}
+
+
 
