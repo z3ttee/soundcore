@@ -156,14 +156,15 @@ export default function (job: WorkerJobRef<IndexerProcessDTO>): Promise<IndexerR
 
                 // Create database entries for collected artists
                 const collectedArtists = Array.from(artists.values());
-                const artistCreationResult = await artistService.createIfNotExists(collectedArtists);
+                const artistResults = await artistService.createIfNotExists(collectedArtists);
+                // const artistResults = await artistService.findByIds(artistIds);
                 const createdArtists = new Map<string, Artist>();
                 
-                for(const artist of artistCreationResult) {
+                for(const artist of artistResults) {
                     createdArtists.set(artist.name, artist);
                 }
 
-                console.log("artists: ", artists.size, artistCreationResult.length, createdArtists.size)
+                console.log("artists: ", artists.size, artistResults.length, createdArtists.size)
 
                 // Create database entries for collected albums
                 const albumCreationResult = await albumService.createIfNotExists(Array.from(albums.values()).map((album) => {    
@@ -189,15 +190,30 @@ export default function (job: WorkerJobRef<IndexerProcessDTO>): Promise<IndexerR
                     return song;
                 }));
 
-                // console.log(songs.keys());
+                console.log("songs: ", songs.size, songCreationResult.length);
 
                 // Insert query seems not to be able to insert many-to-many relations.
                 // So at this point the featuredArtists are updated
                 await songService.saveAll(songCreationResult.map((song) => {
+                    if(song.file) {
+                        song.file.mount = mount;
+                    }
+
                     const key = getSongMapKey(song.name, song.primaryArtist, song.album, song.duration);
-                    // console.log(key);
                     const collectedSong = songs.get(key);
-                    const artists = collectedSong.featuredArtists?.map((artist) => createdArtists.get(artist.name)) || [];
+                    const featuredArtists: Artist[] = collectedSong?.featuredArtists?.map((artist) => createdArtists.get(artist.name)) || [];
+                    
+                    if(!collectedSong) {
+                        if(song.file) {
+                            const filepath = fileSystem.resolveFilepath(song.file);
+                            // Print which attrs are missing
+                            logger.warn(`Found song that was created but is not tracked internally. File: ${filepath}`);
+                        } else {
+                            logger.warn(`Song has some invalid data. No file attached to it. Song ID: ${song.id}`);
+                        }
+                    }
+
+                    const artists = featuredArtists;
                     song.featuredArtists = artists;
                     return song;
                 }))

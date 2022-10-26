@@ -260,6 +260,7 @@ export class SongService extends SyncingService {
         return this.repository.createQueryBuilder()
             .insert()
             .values(dtos)
+            .returning(["id"])
             .orUpdate(["name"], ["name"])
             .execute().then((insertResult) => {
                 return this.repository.createQueryBuilder("song")
@@ -267,7 +268,7 @@ export class SongService extends SyncingService {
                     .leftJoinAndSelect("song.album", "album")
                     .leftJoinAndSelect("song.file", "file")
                     .leftJoinAndSelect("song.artwork", "artwork")
-                    .where(insertResult.identifiers)
+                    .whereInIds(insertResult.raw)
                     .getMany();
             })
     }

@@ -2,7 +2,7 @@ import { BadRequestException, Injectable, Logger, NotFoundException } from '@nes
 import { InjectRepository } from '@nestjs/typeorm';
 import { Environment } from '@soundcore/common';
 import { Page, Pageable } from 'nestjs-pager';
-import { In, Repository, SelectQueryBuilder, UpdateResult } from 'typeorm';
+import { In, ObjectLiteral, Repository, SelectQueryBuilder, UpdateResult } from 'typeorm';
 import { SyncFlag } from '../meilisearch/interfaces/syncable.interface';
 import { MeiliArtistService } from '../meilisearch/services/meili-artist.service';
 import { GeniusFlag, ResourceFlag } from '../utils/entities/resource';
@@ -107,6 +107,15 @@ export class ArtistService {
         });
     }
 
+    public async findByIds(ids: ObjectLiteral): Promise<Artist[]> {
+        return this.repository.createQueryBuilder()
+            .whereInIds(ids)
+            .getManyAndCount().then(([artists, count]) => {
+                console.log(count);
+                return artists;
+            })
+    }
+
     /**
      * Create an artist if not exists.
      * @param createArtistDto Data to create artist from
@@ -118,11 +127,12 @@ export class ArtistService {
         return await this.repository.createQueryBuilder()
             .insert()
             .values(dtos)
+            .returning(["id"])
             .orUpdate(["name"], ["name"], { skipUpdateIfNoValuesChanged: false })
             .execute().then((insertResult) => {
                 return this.repository.createQueryBuilder("artist")
                     .leftJoinAndSelect("artist.artwork", "artwork")
-                    .where(insertResult.identifiers)
+                    .whereInIds(insertResult.raw)
                     .getMany();
             });
     }
