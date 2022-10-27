@@ -23,7 +23,7 @@ export class Artist implements Resource, Syncable, GeniusResource {
      * GENIUS RELATED ATTRIBUTES
      */
     @Column({ nullable: true })
-    public geniusId: string;
+    public geniusId?: string;
 
     @Column({ type: "tinyint", default: 0 })
     public geniusFlag: GeniusFlag;
@@ -44,9 +44,9 @@ export class Artist implements Resource, Syncable, GeniusResource {
     public slug: string;
 
     @Column({ nullable: true, type: "text" })
-    public description: string;
+    public description?: string;
 
-    @Column({ nullable: false, unique: true })
+    @Column({ nullable: false, unique: true, collation: "utf8mb4_bin" })
     public name: string;
 
     @CreateDateColumn()
@@ -65,7 +65,7 @@ export class Artist implements Resource, Syncable, GeniusResource {
     public songsCount?: number = 0;
     public albumsCount?: number = 0;
 
-    @Column({ select: false })
+    @Column({ select: false, nullable: true })
     public streamCount?: number = 0;
 
     @BeforeInsert()

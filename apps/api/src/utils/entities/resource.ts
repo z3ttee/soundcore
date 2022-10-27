@@ -19,7 +19,7 @@ export interface Resource {
 }
 
 export interface GeniusResource {
-    geniusId: string;
+    geniusId?: string;
     geniusFlag: GeniusFlag;
     geniusFailedTries: number;
 }

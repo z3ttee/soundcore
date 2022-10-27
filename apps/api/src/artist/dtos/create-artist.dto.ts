@@ -9,9 +9,9 @@ export class CreateArtistDTO implements Pick<Artist, "name">, Pick<Artist, "desc
 
     @IsOptional()
     @Length(3, 4000)
-    public description: string;
+    public description?: string;
 
     @IsOptional()
-    public geniusId: string;
+    public geniusId?: string;
 
 }

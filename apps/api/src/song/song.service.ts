@@ -3,7 +3,7 @@ import NodeID3 from "node-id3";
 import ffprobe from 'ffprobe';
 import ffprobeStatic from "ffprobe-static";
 
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { CreateSongDTO } from './dtos/create-song.dto';
 import { Song } from './entities/song.entity';
 import { Page, Pageable } from 'nestjs-pager';
@@ -14,21 +14,29 @@ import { GeniusFlag, ResourceFlag } from "../utils/entities/resource";
 import { ID3TagsDTO } from "./dtos/id3-tags.dto";
 import path from "path";
 
-import { FileFlag } from "../file/entities/file.entity";
+import { File, FileFlag } from "../file/entities/file.entity";
 import { InjectRepository } from "@nestjs/typeorm";
 import { In, Repository, UpdateResult } from "typeorm";
 import { MeiliSongService } from "../meilisearch/services/meili-song.service";
 import { SyncFlag } from "../meilisearch/interfaces/syncable.interface";
 import { CreateResult } from "../utils/results/creation.result";
+import { SyncingService } from "../utils/services/syncing.service";
+import { EventEmitter2 } from "@nestjs/event-emitter";
+import { Environment } from "@soundcore/common";
+import { Artist } from "../artist/entities/artist.entity";
+import { Album } from "../album/entities/album.entity";
 
 @Injectable()
-export class SongService {
+export class SongService extends SyncingService {
     private readonly logger: Logger = new Logger(SongService.name)
 
     constructor(
         @InjectRepository(Song) private readonly repository: Repository<Song>,
+        eventEmitter: EventEmitter2,
         private readonly meiliSong: MeiliSongService
-    ){}
+    ){
+        super(eventEmitter);
+    }
 
     /**
      * Find page with the 20 latest indexed songs.
@@ -240,66 +248,33 @@ export class SongService {
     }
 
     /**
-     * Save an song entity.
-     * @param song Entity data to be saved
-     * @returns Song
-     */
-    public async save(song: Song): Promise<Song> {
-        return this.repository.save(song).then((result) => {
-            this.sync([result]);
-            return result;
-        });
-    }
-
-    /**
      * Create new song entry in database. If the same entry already exists,
      * the existing one will be returned.
      * Existing song contains following relations: primaryArtist, featuredArtist, album
      * @param createSongDto Song data to be saved
      * @returns [Song, hasExistedBefore]
      */
-    public async createIfNotExists(createSongDto: CreateSongDTO): Promise<CreateResult<Song>> {
-        // Do some validation to be sure there is an existing value
-        createSongDto.name = createSongDto.name.trim();
-        createSongDto.duration = createSongDto.duration || 0;
-        createSongDto.order = createSongDto.order || 0;
-        createSongDto.featuredArtists = createSongDto.featuredArtists || [];
-
-        const uniqueDto: SongUniqueFindDTO = {
-            name: createSongDto.name,
-            duration: createSongDto.duration,
-            album: createSongDto.album,
-            primaryArtist: createSongDto.primaryArtist,
-            featuredArtists: createSongDto.featuredArtists
-        }
-
-        // Execute find query.
-        const existingSong = await this.findUniqueSong(uniqueDto)
-        if(existingSong) return new CreateResult(existingSong, true);
-
-        const song = this.repository.create();
-        song.name = createSongDto.name;
-        song.primaryArtist = createSongDto.primaryArtist;
-        song.featuredArtists = createSongDto.featuredArtists;
-        song.album = createSongDto.album;
-        song.order = createSongDto.order;
-        song.duration = createSongDto.duration;
-        song.file = createSongDto.file;
-        song.artwork = createSongDto.artwork;
+    public async createIfNotExists(dtos: CreateSongDTO[]): Promise<Song[]> {
+        if(dtos.length <= 0) throw new BadRequestException("Cannot create resources for empty list.");
 
         return this.repository.createQueryBuilder()
             .insert()
-            .values(song)
-            .orIgnore()
-            .execute().then((result) => {
-                if(result.identifiers.length > 0) {
-                    return new CreateResult(song, false);
-                }
-                return this.findUniqueSong(uniqueDto).then((song) => new CreateResult(song, true));
-            }).catch((error) => {
-                this.logger.error(`Could not create database entry for song: ${error.message}`, error.stack);
-                return null
+            .values(dtos)
+            .returning(["id"])
+            .orUpdate(["name"], ["name"])
+            .execute().then((insertResult) => {
+                return this.repository.createQueryBuilder("song")
+                    .leftJoinAndSelect("song.primaryArtist", "primaryArtist")
+                    .leftJoinAndSelect("song.album", "album")
+                    .leftJoinAndSelect("song.file", "file")
+                    .leftJoinAndSelect("song.artwork", "artwork")
+                    .whereInIds(insertResult.raw)
+                    .getMany();
             })
+    }
+
+    public async saveAll(songs: Song[]) {
+        return this.repository.save(songs);
     }
 
     /**
@@ -350,7 +325,7 @@ export class SongService {
      * @param flag Updated sync flag
      * @returns Song
      */
-     private async setSyncFlags(resources: Song[], flag: SyncFlag) {
+    private async setSyncFlags(resources: Song[], flag: SyncFlag) {
         const ids = resources.map((user) => user.id);
 
         return this.repository.createQueryBuilder()
@@ -382,7 +357,7 @@ export class SongService {
      * @param resource Song data
      * @returns Song
      */
-    public async sync(resources: Song[]) {
+    public async requestSync(resources: Song[]) {
         return this.meiliSong.setSongs(resources).then(() => {
             return this.setSyncFlags(resources, SyncFlag.OK);
         }).catch(() => {
@@ -410,23 +385,39 @@ export class SongService {
      * @returns ID3TagsDTO
      */
     public async readID3TagsFromFile(filepath: string): Promise<ID3TagsDTO> {
-        // TODO: Check mime type for mp3
+        // Get duration in seconds
+        const probe = await ffprobe(filepath, { path: ffprobeStatic.path });
+        const durationInSeconds = Math.round(probe.streams[0].duration || 0);
+        
         const id3Tags = NodeID3.read(fs.readFileSync(filepath));
 
-        // Get duration in seconds
-        const probe = await ffprobe(filepath, {
-            path: ffprobeStatic.path
-        })
-
-        const durationInSeconds = Math.round(probe.streams[0].duration || 0);
+        // Media file not a mp3 file, so return
+        // at this point with some data from the file details
+        if(!id3Tags) {
+            return {
+                album: undefined,
+                artists: [],
+                cover: undefined,
+                orderNr: 0,
+                filepath: filepath,
+                title: path.basename(filepath).replace(/\.[^/.]+$/, "").trim(),
+                duration: durationInSeconds
+            }
+        }
 
         // Get artists
         const artists: string[] = [];
         if (id3Tags.artist) {
-            artists.push(...(id3Tags.artist.split("/") || []))
-            for (const index in artists) {
-                artists.push(...artists[index].split(",").map((name) => name.trim()))
-                artists.splice(parseInt(index), 1)
+            const splitted = id3Tags.artist.split(",") || [];
+
+            for (const index in splitted) {
+                artists.push(splitted[index]?.trim());
+            }
+        }
+
+        if(artists.length <= 0) {
+            if(Environment.isDebug) {
+                this.logger.debug(`No artists found on file ${filepath}`);
             }
         }
 
@@ -519,8 +510,6 @@ export class SongService {
         const result = await q.getManyAndCount();
         return Page.of(result[0], result[1], pageable.page);
     }
-
-
 
     /**
      * Build a general query which includes different relations.

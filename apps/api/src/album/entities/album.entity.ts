@@ -43,7 +43,7 @@ export class Album implements Resource, Syncable, GeniusResource {
     @PrimaryGeneratedColumn("uuid")
     public id: string;
 
-    @Column({ nullable: false })
+    @Column({ nullable: false, collation: "utf8mb4_bin" })
     public name: string;
 
     @Column({ nullable: true, unique: true, length: 120 })
