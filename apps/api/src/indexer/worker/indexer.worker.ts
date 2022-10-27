@@ -77,15 +77,11 @@ export default function (job: WorkerJobRef<IndexerProcessDTO>): Promise<IndexerR
             return Batch.of<File, IndexerResultEntry>(files, BATCH_SIZE).do(async (batch) => {
                 const entries: IndexerResultEntry[] = [];
 
-                const successFiles: File[] = [];
-                const duplicates: File[] = [];
+                const collectedFiles: Map<string, File> = new Map();
 
                 const artists: Map<string, CreateArtistDTO> = new Map();
                 const albums: Map<string, CreateAlbumDTO> = new Map();
                 const songs: Map<string, CreateSongDTO> = new Map();
-
-                // TODO: Track artists and the songs they belong to, so we do not have to track the album to a song
-                // This 
 
                 for(const file of batch) {
                     // Set mount for file context
@@ -148,10 +144,18 @@ export default function (job: WorkerJobRef<IndexerProcessDTO>): Promise<IndexerR
                         featuredArtists: id3Artists as Artist[],
                     }
 
-                    songs.set(getSongMapKey(file), song);
+                    const key = getSongMapKey(song);
+                    songs.set(key, song);
+                    // if(songs.has(key)) {
+                    //     logger.warn(`Found potential duplicate song file: ${filepath}. Marking as duplicate. User action is required.`);
+                    //     duplicates.push(file);
+                    //     continue;
+                    // } else {
+                    //     songs.set(key, song);
+                    // }
 
                     // Add to success array so the file flag can be changed later
-                    successFiles.push(file);
+                    collectedFiles.set(file.id, file);
 
                     // Prepare result and push to results array
                     const timeTookMs = Date.now() - fileReadStartTime;
@@ -168,8 +172,6 @@ export default function (job: WorkerJobRef<IndexerProcessDTO>): Promise<IndexerR
                     createdArtists.set(artist.name, artist);
                 }
 
-                console.log("artists: ", artists.size, artistResults.length, createdArtists.size)
-
                 // Create database entries for collected albums
                 const albumCreationResult = await albumService.createIfNotExists(Array.from(albums.values()).map((album) => {    
                     // Map previous primaryArtist data with the created data from above                
@@ -181,8 +183,6 @@ export default function (job: WorkerJobRef<IndexerProcessDTO>): Promise<IndexerR
                 for(const album of albumCreationResult) {
                     createdAlbums.set(getAlbumMapKey(album.name, album.primaryArtist), album);
                 }
-
-                console.log("albums: ", albums.size, albumCreationResult.length, createdAlbums.size)
                 
                 // Create database entries for collected songs
                 const songCreationResult = await songService.createIfNotExists(Array.from(songs.values()).map((song) => {
@@ -194,29 +194,31 @@ export default function (job: WorkerJobRef<IndexerProcessDTO>): Promise<IndexerR
                     return song;
                 }));
 
-                console.log("songs: ", songs.size, songCreationResult.length);
+                // Used to check for duplicates later
+                const createdSongFileIds: string[] = [];
 
                 // Insert query seems not to be able to insert many-to-many relations.
                 // So at this point the featuredArtists are updated
-                await songService.saveAll(songCreationResult.map((song) => {
-                    if(song.file) {
-                        song.file.mount = mount;
-                    }
+                await songService.saveAll(songCreationResult.map((song) => {   
+                    const file = song.file;
+                    file.mount = mount;
 
-                    const key = getSongMapKey(song.file);
+                    createdSongFileIds.push(file.id);
+
+                    const key = getSongMapKey(song);
                     const collectedSong = songs.get(key);
                     const featuredArtists: Artist[] = collectedSong?.featuredArtists?.map((artist) => createdArtists.get(artist.name)) || [];
                     
                     if(!collectedSong) {
-                        if(song.file) {
-                            const filepath = fileSystem.resolveFilepath(song.file);
+                        if(file) {
+                            const filepath = fileSystem.resolveFilepath(file);
                             const missingAttributes = [];
 
                             if(!song.primaryArtist) missingAttributes.push("primaryArtist");
                             if(!song.album) missingAttributes.push("album");
 
                             // Print which attrs are missing
-                            logger.warn(`Found song that was created but is not tracked by indexer internally. Missing attributes [${missingAttributes.join(", ")}] on song entity. File: ${filepath}`);
+                            logger.warn(`Found song that was created but is not tracked by indexer internally. Missing attributes [${missingAttributes.join(", ")}, key: ${key}] on song entity. File: ${filepath}`);
                         } else {
                             logger.warn(`Song has some invalid data. No file attached to it. Song ID: ${song.id}`);
                         }
@@ -225,7 +227,19 @@ export default function (job: WorkerJobRef<IndexerProcessDTO>): Promise<IndexerR
                     const artists = featuredArtists;
                     song.featuredArtists = artists;
                     return song;
-                }))
+                }));
+
+                // Check for duplicates
+                const successFiles: File[] = [];
+                const duplicates: File[] = [];
+
+                batch.forEach((file) => {
+                    if(createdSongFileIds.includes(file.id)) {
+                        successFiles.push(file)
+                    } else {
+                        duplicates.push(file);
+                    }
+                })
 
                 // Set flag for duplicate files
                 await fileService.setFlags(duplicates, FileFlag.POTENTIAL_DUPLICATE);
@@ -240,9 +254,7 @@ export default function (job: WorkerJobRef<IndexerProcessDTO>): Promise<IndexerR
                 job.progress = progress;
                 workerpool.workerEmit(new WorkerProgressEvent(job));
 
-                if(Environment.isDebug) {
-                    logger.debug(`Analyzing ID3 Tags of files on mount '${mount.name}'... ${progress}%`);
-                }
+                logger.verbose(`Indexing files on mount '${mount.name}': ${progress.toFixed(2)}%`);
             }).catch((batchNr, error) => {
                 logger.warn(`An error occured while processing batch #${batchNr}: ${error.message}`);
             })
@@ -256,8 +268,8 @@ export default function (job: WorkerJobRef<IndexerProcessDTO>): Promise<IndexerR
              * Helper function to create key for the songs map
              * @param file File data
              */
-            function getSongMapKey(file: File) {
-                return fileSystem.resolveFilepath(file);
+            function getSongMapKey(song: CreateSongDTO) {
+                return `${song.name}:${song.duration}:${song.order}:${song.primaryArtist?.name}:${song.album?.name}`;
             }
 
             /**

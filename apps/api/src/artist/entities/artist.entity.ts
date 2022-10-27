@@ -46,7 +46,7 @@ export class Artist implements Resource, Syncable, GeniusResource {
     @Column({ nullable: true, type: "text" })
     public description?: string;
 
-    @Column({ nullable: false, unique: true })
+    @Column({ nullable: false, unique: true, collation: "utf8mb4_bin" })
     public name: string;
 
     @CreateDateColumn()

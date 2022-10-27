@@ -16,7 +16,7 @@ import { Artwork } from "../../artwork/entities/artwork.entity";
 import { Syncable, SyncFlag } from "../../meilisearch/interfaces/syncable.interface";
 
 @Entity()
-@Index(["name", "primaryArtist", "album", "duration"], { unique: true })
+@Index(["name", "primaryArtist", "album", "duration", "order"], { unique: true })
 export class Song implements Resource, Syncable, GeniusResource {
     public resourceType: ResourceType = "song";
 
@@ -53,7 +53,7 @@ export class Song implements Resource, Syncable, GeniusResource {
     @Column({ nullable: true, length: 120 })
     public slug: string;
 
-    @Column({ nullable: false })
+    @Column({ nullable: false, collation: "utf8mb4_bin" })
     public name: string;
 
     @Column({ nullable: false, default: 0 })

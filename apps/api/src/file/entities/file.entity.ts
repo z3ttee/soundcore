@@ -34,7 +34,6 @@ export class File {
     public flag: FileFlag
 
     @OneToOne(() => Song, { onDelete: "SET NULL" })
-    @JoinColumn()
     public song: Song;
 
     @ManyToOne(() => Mount, { onDelete: "CASCADE", nullable: false })
