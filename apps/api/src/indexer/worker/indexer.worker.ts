@@ -170,6 +170,7 @@ export default function (job: WorkerJobRef<IndexerProcessDTO>): Promise<IndexerR
                 
                 for(const artist of artistResults) {
                     createdArtists.set(artist.name, artist);
+                    createdResources.artists.push(artist);
                 }
 
                 // Create database entries for collected albums
@@ -182,6 +183,7 @@ export default function (job: WorkerJobRef<IndexerProcessDTO>): Promise<IndexerR
 
                 for(const album of albumCreationResult) {
                     createdAlbums.set(getAlbumMapKey(album.name, album.primaryArtist), album);
+                    createdResources.albums.push(album);
                 }
                 
                 // Create database entries for collected songs
@@ -204,6 +206,7 @@ export default function (job: WorkerJobRef<IndexerProcessDTO>): Promise<IndexerR
                     file.mount = mount;
 
                     createdSongFileIds.push(file.id);
+                    createdResources.songs.push(song);
 
                     const key = getSongMapKey(song);
                     const collectedSong = songs.get(key);
