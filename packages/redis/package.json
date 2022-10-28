@@ -1,0 +1,36 @@
+{
+  "name": "@soundcore/redis",
+  "version": "0.0.4",
+  "description": "",
+  "author": "z3ttee",
+  "private": false,
+  "license": "MIT",
+  "main": "dist/index.js",
+  "scripts": {
+    "build:api": "nest build",
+    "dev": "nest build --watch"
+  },
+  "files": [
+    "dist/**/*"
+  ],
+  "peerDependencies": {
+    "@nestjs/common": "^9.0.0",
+    "@nestjs/core": "^9.0.0",
+    "ioredis": "^5.2.3"
+  },
+  "dependencies": {
+    "reflect-metadata": "^0.1.13"
+  },
+  "devDependencies": {
+    "@nestjs/cli": "^9.0.0",
+    "@types/node": "^16.0.0",
+    "tsconfig": "*",
+    "eslint-config-nestjs": "*",
+    "eslint": "^8.0.1",
+    "source-map-support": "^0.5.20",
+    "ts-loader": "^9.2.3",
+    "ts-node": "^10.0.0",
+    "tsconfig-paths": "4.0.0",
+    "typescript": "^4.3.5"
+  }
+}

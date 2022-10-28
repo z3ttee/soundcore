@@ -1,0 +1,66 @@
+{
+  "name": "@soundcore/ngx",
+  "version": "0.0.0",
+  "module": "./dist/fesm2015/soundcore-ngx.mjs",
+  "es2020": "./dist/fesm2020/soundcore-ngx.mjs",
+  "esm2020": "./dist/esm2020/soundcore-ngx.mjs",
+  "fesm2020": "./dist/fesm2020/soundcore-ngx.mjs",
+  "fesm2015": "./dist/fesm2015/soundcore-ngx.mjs",
+  "typings": "./dist/index.d.ts",
+  "exports": {
+    "./package.json": {
+      "default": "./dist/package.json"
+    },
+    ".": {
+      "types": "./dist/index.d.ts",
+      "esm2020": "./dist/esm2020/soundcore-ngx.mjs",
+      "es2020": "./dist/fesm2020/soundcore-ngx.mjs",
+      "es2015": "./dist/fesm2015/soundcore-ngx.mjs",
+      "node": "./dist/fesm2015/soundcore-ngx.mjs",
+      "default": "./dist/fesm2020/soundcore-ngx.mjs"
+    }
+  },
+  "scripts": {
+    "ng": "ng",
+    "start": "ng serve",
+    "build:app": "ng build",
+    "watch": "ng build --watch --configuration development",
+    "test": "ng test"
+  },
+  "private": true,
+  "dependencies": {
+    "@angular/animations": "^14.2.0",
+    "@angular/common": "^14.2.0",
+    "@angular/compiler": "^14.2.0",
+    "@angular/core": "^14.2.0",
+    "@angular/forms": "^14.2.0",
+    "@angular/platform-browser": "^14.2.0",
+    "@angular/platform-browser-dynamic": "^14.2.0",
+    "@angular/router": "^14.2.0",
+    "@soundcore/cdk": "*",
+    "@soundcore/sdk": "*",
+    "@soundcore/tailwind": "*",
+    "rxjs": "~7.5.0",
+    "tslib": "^2.3.0",
+    "zone.js": "~0.11.4",
+    "ng-heroicon": "^2.0.0",
+    "lottie-web": "^5.9.2",
+    "ngx-lottie": "^8.1.1"
+  },
+  "devDependencies": {
+    "@angular-devkit/build-angular": "^14.2.5",
+    "@angular/cli": "~14.2.5",
+    "@angular/compiler-cli": "^14.2.0",
+    "@types/jasmine": "~4.0.0",
+    "jasmine-core": "~4.3.0",
+    "karma": "~6.4.0",
+    "karma-chrome-launcher": "~3.1.0",
+    "karma-coverage": "~2.2.0",
+    "karma-jasmine": "~5.1.0",
+    "karma-jasmine-html-reporter": "~2.0.0",
+    "ng-packagr": "^14.2.0",
+    "typescript": "~4.7.2",
+    "tsconfig": "*"
+  },
+  "packageManager": "yarn@1.22.19"
+}

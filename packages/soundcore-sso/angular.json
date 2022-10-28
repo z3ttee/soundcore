@@ -1,0 +1,38 @@
+{
+  "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
+  "version": 1,
+  "newProjectRoot": "projects",
+  "projects": {
+    "soundcore-sso": {
+      "projectType": "library",
+      "root": "projects/soundcore-sso",
+      "sourceRoot": "projects/soundcore-sso/src",
+      "prefix": "lib",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:ng-packagr",
+          "options": {
+            "project": "projects/soundcore-sso/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/soundcore-sso/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/soundcore-sso/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "projects/soundcore-sso/src/test.ts",
+            "tsConfig": "projects/soundcore-sso/tsconfig.spec.json",
+            "karmaConfig": "projects/soundcore-sso/karma.conf.js"
+          }
+        }
+      }
+    }
+  }
+}

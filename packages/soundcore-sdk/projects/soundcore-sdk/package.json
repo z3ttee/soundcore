@@ -1,0 +1,18 @@
+{
+  "name": "@soundcore/sdk",
+  "version": "0.0.0",
+  "peerDependencies": {
+    "@angular/common": "^14.2.0",
+    "@angular/core": "^14.2.0",
+    "ngx-indexed-db": "^11.0.0",
+    "@soundcore/constants": "*",
+    "@soundcore/sso": "*",
+    "uuid": "^9.0.0"
+  },
+  "dependencies": {
+    "tslib": "^2.3.0"
+  },
+  "devDependencies": {
+    "@types/uuid": "^8.3.4"
+  }
+}

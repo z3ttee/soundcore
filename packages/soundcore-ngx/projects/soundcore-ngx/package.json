@@ -1,0 +1,17 @@
+{
+  "name": "@soundcore/ngx",
+  "version": "0.0.0",
+  "peerDependencies": {
+    "@soundcore/cdk": "*",
+    "@soundcore/sdk": "*",
+    "@soundcore/tailwind": "*",
+    "@angular/common": "^14.2.0",
+    "@angular/core": "^14.2.0",
+    "ng-heroicon": "^2.0.0",
+    "lottie-web": "^5.9.2",
+    "ngx-lottie": "^8.1.1"
+  },
+  "dependencies": {
+    "tslib": "^2.3.0"
+  }
+}

@@ -1,0 +1,15 @@
+/* To learn more about this file see: https://angular.io/config/tsconfig. */
+{
+  "extends": "tsconfig/angular",
+  "compilerOptions": {
+    "baseUrl": "./",
+    "outDir": "./dist/out-tsc",
+    "paths": {
+      "soundcore-sso": [
+        "dist/soundcore-sso"
+      ]
+    },
+  },
+  
+  "exclude": ["node_modules"]
+}
