@@ -22,10 +22,6 @@ export class FileQueueService {
             this.logger.error(`Could not process batch of files for mount '${job.payload.mount.name}': ${error?.message}`, error?.stack);
         })
 
-        // this.eventEmitter.on(EVENT_FILES_FOUND, (event: FilesFoundEvent) => {
-        //     console.log(event);
-        // })
-
         this.queue.on("started", (job: WorkerJob<FileProcessDTO, FileProcessResultDTO>) => {
             const { payload } = job;
             const { mount } = payload;
@@ -34,15 +30,15 @@ export class FileQueueService {
         })
 
         this.queue.on("completed", (job: WorkerJob<FileProcessDTO, FileProcessResultDTO>) => {
-            const { mount, timeTookMs = 0, filesProcessed = [] } = job.result;
+            const { mount, timeTookMs = 0, filesProcessed = [] } = job.result || {};
 
-            if(filesProcessed.length > 0) {
-                this.logger.verbose(`Created database entries for ${filesProcessed.length} files on mount '${mount.name}'. Took ${timeTookMs}ms.`);
-                this.eventEmitter.emit(EVENT_FILES_PROCESSED, new FilesProcessedEvent(filesProcessed, mount));
+            if(filesProcessed.length <= 0) {
+                this.logger.verbose(`No new files were created on mount '${mount?.name}'. Took ${timeTookMs}ms.`);
                 return;
             }
             
-            this.logger.verbose(`No new files were created on mount '${mount.name}'. Took ${timeTookMs}ms.`);
+            this.logger.verbose(`Created database entries for ${filesProcessed.length} files on mount '${mount?.name}'. Took ${timeTookMs}ms.`);
+            this.eventEmitter.emit(EVENT_FILES_PROCESSED, new FilesProcessedEvent(filesProcessed, mount));
         })
 
         this.queue.on("progress", (job: WorkerJobRef<FileProcessDTO>) => {
@@ -61,6 +57,7 @@ export class FileQueueService {
      */
     @OnEvent(EVENT_FILES_FOUND)
     public handleFilesFoundEvent(event: FilesFoundEvent) {
+        console.log("received files found event");
         this.processFiles(event.mount, event.files);
     }
 

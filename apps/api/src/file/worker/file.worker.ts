@@ -25,6 +25,8 @@ export default async function (job: WorkerJobRef<FileProcessDTO>): Promise<FileP
         let length = files.length;
         let currentBatch = 0;
         const batches = Math.round(length / BATCH_SIZE);
+
+        console.log("working...");
     
         // Split arrays in batches of BATCH_SIZE entries
         while (length) {

@@ -51,11 +51,13 @@ export class MountQueueService {
 
             const files = result?.files || [];
 
-            if(files.length > 0) {
-                this.events.emit(EVENT_FILES_FOUND, new FilesFoundEvent(job.payload, files));
+            if(files.length <= 0) {
+                this.logger.verbose(`No new files found (total: ${result?.totalFiles}) on mount '${payload.name}'. Took ${job.result?.timeMs}ms.`);
+                return;
             }
 
             this.logger.verbose(`Found ${files.length} new files (total: ${result?.totalFiles}) on mount '${payload.name}'. Took ${job.result?.timeMs}ms.`);
+            this.events.emit(EVENT_FILES_FOUND, new FilesFoundEvent(job.payload, files));
         });
 
         // Progress

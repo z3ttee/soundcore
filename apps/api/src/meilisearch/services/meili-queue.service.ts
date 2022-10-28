@@ -54,25 +54,29 @@ export class MeiliQueueService {
     }
     
     public async syncSongs(songs: Song[]) {
-        console.log("syncing songs")
+        console.log(`syncing ${songs.length} songs`);
+
         const job = new MeiliJob(songs, MeiliJobType.SYNC_SONGS);
         return this.queue.enqueue(job);
     }
 
     public async syncAlbums(albums: Album[]) {
-        console.log("syncing albums")
+        console.log(`syncing ${albums.length} albums`);
+
         const job = new MeiliJob(albums, MeiliJobType.SYNC_ALBUMS);
         return this.queue.enqueue(job);
     }
 
     public async syncArtists(artists: Artist[]) {
-        console.log("syncing artists")
+        console.log(`syncing ${artists.length} artists`);
 
         const job = new MeiliJob(artists, MeiliJobType.SYNC_ARTISTS);
         return this.queue.enqueue(job);
     }
 
     public async syncPlaylists(playlists: Playlist[]) {
+        console.log(`syncing ${playlists.length} playlists`);
+
         const job = new MeiliJob(playlists, MeiliJobType.SYNC_PLAYLISTS);
         return this.queue.enqueue(job);
     }

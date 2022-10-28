@@ -33,7 +33,7 @@ export class IndexerQueueService {
             // Print out results & stats
             const skippedFiles = files.length - entries.length;
             this.logger.verbose(`Successfully read metadata of ${entries.length} files.${skippedFiles > 0 ? ` Skipped ${skippedFiles} files.` : ''} Took ${timeTookMs}ms`);
-            this.eventEmitter.emit(EVENT_METADATA_CREATED, result);
+            // this.eventEmitter.emit(EVENT_METADATA_CREATED, result);
 
             // Emit events for meilisearch syncer
             this.eventEmitter.emit(EVENT_SONGS_CHANGED, result.createdResources.songs);
