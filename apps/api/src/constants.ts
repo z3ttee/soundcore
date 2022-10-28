@@ -27,6 +27,9 @@ export const EVENT_ALBUMS_CHANGED = "albums-changed-event"
 export const EVENT_ARTISTS_CHANGED = "artists-changed-event"
 export const EVENT_PLAYLISTS_CHANGED = "playlists-changed-event"
 
+export const EVENT_TRIGGER_FILE_PROCESS_BY_FLAG = "trigger-file-process-by-flag-event"
+
+
 export const EVENT_METADATA_CREATED = "metadata-created-event"
 
 // TypeORM

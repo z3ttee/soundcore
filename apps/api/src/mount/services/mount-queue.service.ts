@@ -1,7 +1,7 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { EventEmitter2, OnEvent } from "@nestjs/event-emitter";
 import { WorkerJob, WorkerJobRef, WorkerQueue } from "@soundcore/nest-queue";
-import { EVENT_FILES_FOUND } from "../../constants";
+import { EVENT_FILES_FOUND, EVENT_TRIGGER_FILE_PROCESS_BY_FLAG } from "../../constants";
 import { FilesFoundEvent } from "../../events/files-found.event";
 import { MountScanResultDTO } from "../dtos/scan-result.dto";
 import { Mount } from "../entities/mount.entity";
@@ -20,6 +20,7 @@ export class MountQueueService {
         private readonly events: EventEmitter2,
         private readonly queue: WorkerQueue<Mount>
     ) {
+
         this.queue.on("waiting", async () => {
             if(Environment.isDebug) {
                 this.logger.debug(`Received jobs concerning scanning for new files. Distributing among workers...`);
@@ -50,6 +51,8 @@ export class MountQueueService {
             this.mountService.updateLastScanned(job.payload);
 
             const files = result?.files || [];
+
+            this.events.emit(EVENT_TRIGGER_FILE_PROCESS_BY_FLAG, new FilesFoundEvent(job.payload, []));
 
             if(files.length <= 0) {
                 this.logger.verbose(`No new files found (total: ${result?.totalFiles}) on mount '${payload.name}'. Took ${job.result?.timeMs}ms.`);

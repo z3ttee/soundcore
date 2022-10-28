@@ -245,6 +245,7 @@ export default function (job: WorkerJobRef<IndexerProcessDTO>): Promise<IndexerR
                 })
 
                 // Set flag for duplicate files
+                // TODO: Collect errored files (where query has failed somehow)
                 await fileService.setFlags(duplicates, FileFlag.POTENTIAL_DUPLICATE);
                 await fileService.setFlags(successFiles, FileFlag.OK);
 

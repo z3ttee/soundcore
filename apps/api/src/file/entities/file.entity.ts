@@ -5,7 +5,8 @@ import { Song } from "../../song/entities/song.entity";
 export enum FileFlag {
     PENDING_ANALYSIS = 0,
     OK = 1,
-    POTENTIAL_DUPLICATE = 2
+    POTENTIAL_DUPLICATE = 2,
+    ERROR = 3
 }
 
 @Entity()

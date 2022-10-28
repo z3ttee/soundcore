@@ -1,5 +1,5 @@
 
-export type BatchingHandler<I = any, T = I> = (batch: I[]) => Promise<T[]> | T[];
+export type BatchingHandler<I = any, T = I> = (batch: I[], batchNr?: number, maxBatches?: number) => Promise<T[]> | T[];
 export type ErrorHandler = (batchNr: number, error: Error) => Promise<void> | void;
 export type ThenHandler<T> = (result: T[]) => Promise<void> | void;
 export type ProgressHandler = (batches: number, current: number) => Promise<void> | void;
@@ -68,7 +68,7 @@ export class Batch<I = any, R = I> {
     
                 // Build executer
                 const runHandler = async () => {
-                    return this._handler(batch);
+                    return this._handler(batch, currentBatch, batches);
                 }
     
                 // Execute handler and get result.

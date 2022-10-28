@@ -24,6 +24,13 @@ export class FileService {
             .getOne();
     }
 
+    public async findByFlagAndMount(mountId: string, flag: FileFlag) {
+        return this.repository.createQueryBuilder("file")
+            .leftJoin("file.mount", "mount")
+            .where("file.flag = :flag AND mount.id = :mountId", { flag, mountId })
+            .getMany();
+    }
+
     /**
      * Find a file by its name and sub-directory in mount.
      * @param name File's name
