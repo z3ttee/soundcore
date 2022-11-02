@@ -3,6 +3,9 @@
  */
 export { SCNGXModule } from "./lib/scngx.module";
 
+// Scroll Module
+export * from "./lib/scroll";
+
 // Drawer
 export * from "./lib/components/drawer/drawer.module";
 export * from "./lib/components/drawer/drawer.component";
@@ -152,7 +155,6 @@ export * from "./lib/pipes/resource-type-pipe/resource-type-pipe.module";
 export * from "./lib/pipes/resource-type-pipe/resource-type-pipe.pipe";
 
 // Datasource
-export * from "./lib/utils/datasource/datasource";
 export * from "./lib/utils/datasource/infinite-datasource";
 export * from "./lib/utils/datasource/playlist-datasource";
 export * from "./lib/utils/datasource/tracklist-datasource";

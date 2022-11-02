@@ -3,10 +3,9 @@ import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/co
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BehaviorSubject, Observable, Subject, takeUntil } from 'rxjs';
-import { SCNGXDialogService, SCNGXInfiniteDataSource } from '@soundcore/ngx';
+import { SCNGXDialogService, SCNGXDatasource } from '@soundcore/ngx';
 import { File, Mount, SCDKFileService, SCDKMountService } from '@soundcore/sdk';
 import { AppMountCreateDialog, MountCreateDialogOptions } from 'src/app/dialogs/mount-create-dialog/mount-create-dialog.component';
-import { IDatasource } from 'ngx-ui-scroll';
 
 @Component({
   selector: 'app-mount-info',
@@ -34,36 +33,20 @@ export class MountInfoComponent implements OnInit, OnDestroy {
   public readonly $deleting: BehaviorSubject<boolean> = new BehaviorSubject(false);
   public readonly $mount: Observable<Mount> = this._mountSubject.asObservable();
 
-  public dataSource: SCNGXInfiniteDataSource<File>;
-
-  datasource: IDatasource;
+  public datasource: SCNGXDatasource<File>;
 
   public ngOnInit(): void {
     this.activatedRoute.paramMap.pipe(takeUntil(this._destroy)).subscribe((params) => {
       const mountId = params.get("mountId");
 
-      let page = -1;
-
-      this.datasource = {
-        get: (index, count, success) => {
-          const url = `${this.fileService.findByMountIdBaseURL(mountId)}?page=${++page}&`;
-    
-          // const data = [];
-          // for (let i = index; i <= index + count - 1; i++) {
-          //   data.push({ text: 'item #' + i });
-          // }
-          // success(data);
-        }
-      };
+      this.datasource = new SCNGXDatasource(this.httpClient, {
+        url: this.fileService.findByMountIdBaseURL(mountId)
+      });
 
       // Reset and set state
       // to loading.
       this._mountSubject.next(null);
       this.$loading.next(true);
-
-      this.dataSource = new SCNGXInfiniteDataSource(this.httpClient, {
-        url: this.fileService.findByMountIdBaseURL(mountId)
-      });
 
       // Find mount and update state
       this.mountService.findById(mountId).pipe(takeUntil(this._destroy)).subscribe((mount) => {
