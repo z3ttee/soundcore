@@ -115,7 +115,7 @@ export abstract class BaseDatasource<T> {
         if(this._totalElements > 0 && this._totalElements <= this._dataStream.getValue().length) return of([]);
 
         // Check if page was already fetched or has invalid page settings.
-        if (pageNr < 0 || pageable.size <= 0 || this._fetchedPages.has(pageNr) || this._pageFetchStatus[pageNr]) {
+        if (pageNr < 0 || pageable.limit <= 0 || this._fetchedPages.has(pageNr) || this._pageFetchStatus[pageNr]) {
             return of([]);
         }
   
@@ -139,7 +139,7 @@ export abstract class BaseDatasource<T> {
                 this._totalElements = page.totalElements;
     
                 // Take in the cachedData array (contains all the previously fetched items) and add the newly fetched items to it.
-                this._cachedData.splice(pageNr * pageable.size, pageable.size, ...Array.from({ length: page.elements.length }).map<DatasourceItem<T>>((_, i) => {
+                this._cachedData.splice(pageable.offset, pageable.limit, ...Array.from({ length: page.elements.length }).map<DatasourceItem<T>>((_, i) => {
                     if(!page.elements[i]) return null;
                     const element = Object.assign({}, page.elements[i]);
                     return {

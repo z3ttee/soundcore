@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import MeiliSearch, { SearchResponse, Task } from "meilisearch";
-import { Pageable } from "nestjs-pager";
+import { BasePageable } from "nestjs-pager";
 import { Playlist } from "../../playlist/entities/playlist.entity";
 import { PlaylistPrivacy } from "../../playlist/enums/playlist-privacy.enum";
 import { User } from "../../user/entities/user.entity";
@@ -60,15 +60,15 @@ export class MeiliPlaylistService extends MeiliService<MeiliPlaylist> {
     /**
      * Search for playlist.
      * @param {string} query Search query
-     * @param {Pageable} pageable Page settings
+     * @param {BasePageable} pageable Page settings
      * @param {User} authentication Authentication object
      * @returns {SearchResponse} SearchResponse<MeiliPlaylist>
      */
-    public async searchPlaylists(query: string, pageable: Pageable, authentication: User): Promise<SearchResponse<MeiliPlaylist>> {
+    public async searchPlaylists(query: string, pageable: BasePageable, authentication: User): Promise<SearchResponse<MeiliPlaylist>> {
         return this.search(query, {
             attributesToRetrieve: ["*"],
-            limit: pageable.size,
-            offset: pageable.size * pageable.page,
+            limit: pageable.limit,
+            offset: pageable.offset,
             showMatchesPosition: true,
             filter: `privacy = '${PlaylistPrivacy.PUBLIC}' OR author.id = '${authentication.id}'`
         })

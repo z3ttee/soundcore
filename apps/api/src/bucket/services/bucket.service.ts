@@ -1,6 +1,6 @@
 import os from "os"
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import { Page, Pageable } from 'nestjs-pager';
+import { Page, BasePageable } from 'nestjs-pager';
 import { Bucket } from '../entities/bucket.entity';
 import { CreateBucketDTO } from '../dto/create-bucket.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -21,7 +21,7 @@ export class BucketService {
      * @param pageable Page settings
      * @returns Page<Bucket>
      */
-    public async findPage(pageable: Pageable): Promise<Page<Bucket>> {
+    public async findPage(pageable: BasePageable): Promise<Page<Bucket>> {
         const query = await this.repository.createQueryBuilder("bucket")
             // Select the amount of mounts
             .loadRelationCountAndMap("bucket.mountsCount", "bucket.mounts", "mountsCount")
@@ -32,8 +32,8 @@ export class BucketService {
             .leftJoin("mount.files", "file")
             .addSelect("SUM(file.size) AS usedSpace")
             // Pagination
-            .offset(pageable.page * pageable.size)
-            .limit(pageable.size)
+            .offset(pageable.offset)
+            .limit(pageable.limit)
             .groupBy("bucket.id");
 
         const result = await query.getRawAndEntities();
@@ -41,7 +41,7 @@ export class BucketService {
         return Page.of(result.entities.map((bucket, index) => {
             bucket.usedSpace = result.raw[index]?.usedSpace || 0;
             return bucket;
-        }), totalElements, pageable.page);
+        }), totalElements, pageable.offset);
     }
 
     /**

@@ -1,6 +1,6 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Page, Pageable } from 'nestjs-pager';
+import { Page, BasePageable } from 'nestjs-pager';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 import { CreateResult } from '../../utils/results/creation.result';
 import { CreateGenreDTO } from '../dtos/create-genre.dto';
@@ -20,13 +20,13 @@ export class GenreService {
      * @param pageable Page settings
      * @returns Page<Genre>
      */
-    public async findAll(pageable: Pageable): Promise<Page<Genre>> {
+    public async findAll(pageable: BasePageable): Promise<Page<Genre>> {
         const result = await this.buildGeneralQuery("genre")
-            .skip(pageable.page * pageable.size)
-            .take(pageable.size)
+            .skip(pageable.offset)
+            .take(pageable.limit)
             .getManyAndCount();
 
-        return Page.of(result[0], result[1], pageable.page);
+        return Page.of(result[0], result[1], pageable.offset);
     }
 
     /**
@@ -60,18 +60,18 @@ export class GenreService {
      * @param pageable Page settings
      * @returns Page<Genre>
      */
-    public async findByArtist(artistIdOrSlug: string, pageable: Pageable): Promise<Page<Genre>> {
+    public async findByArtist(artistIdOrSlug: string, pageable: BasePageable): Promise<Page<Genre>> {
         const result = await this.repository.createQueryBuilder("genre")
             .leftJoin("genre.songs", "song")
             .leftJoin("song.artists", "artist")
 
-            .limit(pageable.size || 30)
-            .offset((pageable.page || 0) * (pageable.size || 30))
+            .limit(pageable.limit)
+            .offset(pageable.offset)
 
             .where("artist.id = :artistIdOrSlug OR artist.slug = :artistIdOrSlug", { artistIdOrSlug })
             .getManyAndCount();
 
-        return Page.of(result[0], result[1], pageable.page);
+        return Page.of(result[0], result[1], pageable.offset);
     }
 
     /**

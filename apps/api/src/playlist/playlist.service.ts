@@ -1,8 +1,8 @@
 import { BadRequestException, ForbiddenException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Page, Pageable } from 'nestjs-pager';
-import { In, Not, Repository, SelectQueryBuilder, UpdateResult } from 'typeorm';
+import { Page, BasePageable } from 'nestjs-pager';
+import { Not, Repository, SelectQueryBuilder, UpdateResult } from 'typeorm';
 import { EVENT_PLAYLISTS_CHANGED } from '../constants';
 import { SyncFlag } from '../meilisearch/interfaces/syncable.interface';
 import { MeiliPlaylistService } from '../meilisearch/services/meili-playlist.service';
@@ -131,7 +131,7 @@ export class PlaylistService {
      * @param authentication User authentication object to check playlist access
      * @returns Page<Playlist>
      */
-    public async findByAuthor(authorId: string, pageable: Pageable, authentication: User): Promise<Page<Playlist>> {
+    public async findByAuthor(authorId: string, pageable: BasePageable, authentication: User): Promise<Page<Playlist>> {
         if(authorId == "@me" || authorId == authentication.id || authorId == authentication.slug) authorId = authentication.id;
         
         // TODO: Test on user profiles
@@ -141,8 +141,8 @@ export class PlaylistService {
             .leftJoin("playlist.collaborators", "collaborator")
 
             // Pagination
-            .limit(pageable?.size || 30)
-            .offset((pageable?.size || 30) * (pageable?.page || 0))
+            .limit(pageable.limit)
+            .offset(pageable.offset)
 
             // Count how many likes. This takes user's id in count
             .loadRelationCountAndMap("playlist.liked", "playlist.likedBy", "likedBy", (qb) => qb.where("likedBy.userId = :userId", { userId: authentication.id }))
@@ -152,10 +152,10 @@ export class PlaylistService {
             .orWhere("collaborator.id = :userId", { userId: authentication.id })
             .getManyAndCount();
 
-        return Page.of(result[0], result[1], pageable.page);
+        return Page.of(result[0], result[1], pageable.offset);
     }
 
-    public async findByArtist(artistId: string, pageable: Pageable, authentication: User): Promise<Page<Playlist>> {
+    public async findByArtist(artistId: string, pageable: BasePageable, authentication: User): Promise<Page<Playlist>> {
         const result = await this.playlistRepository.createQueryBuilder("playlist")
             .leftJoin("playlist.items", "item")
             .leftJoin("item.song", "song")
@@ -169,8 +169,8 @@ export class PlaylistService {
             .leftJoin("playlist.likedBy", "likedByUser", "likedByUser.userId = :userId", { userId: authentication.id })
 
             // Pagination
-            .limit(pageable?.size || 30)
-            .offset((pageable?.size || 30) * (pageable?.page || 0))
+            .limit(pageable.limit)
+            .offset(pageable.offset)
 
             // Count how many likes. This takes user's id in count
             .loadRelationCountAndMap("playlist.liked", "playlist.likedBy", "likedBy", (qb) => qb.where("likedBy.userId = :userId", { userId: authentication.id }))
@@ -178,10 +178,10 @@ export class PlaylistService {
             .where("(primaryArtist.id = :primaryArtistId OR primaryArtist.slug = :primaryArtistId) AND (playlist.privacy = :privacy OR author.id = :authorId OR collaborator.id = :authorId OR (likedByUser.userId = :authorId AND playlist.privacy != 'private'))", { artistId: artistId, privacy: PlaylistPrivacy.PUBLIC.toString(), authorId: authentication.id })
             .getManyAndCount();
 
-        return Page.of(result[0], result[1], pageable.page);
+        return Page.of(result[0], result[1], pageable.offset);
     }
 
-    public async findByGenre(genreId: string, pageable: Pageable, authentication: User): Promise<Page<Playlist>> {
+    public async findByGenre(genreId: string, pageable: BasePageable, authentication: User): Promise<Page<Playlist>> {
         const result = await this.playlistRepository.createQueryBuilder("playlist")
             .leftJoin("playlist.author", "author")
             .leftJoin("playlist.artwork", "artwork")
@@ -191,15 +191,15 @@ export class PlaylistService {
 
             .addSelect(["artwork.id", "artwork.accentColor", "author.id", "author.name", "author.slug"])
 
-            .offset(pageable.page * pageable.size)
-            .limit(pageable.size)
+            .offset(pageable.offset)
+            .limit(pageable.limit)
 
             .where("genre.id = :genreId OR genre.slug = :genreId", { genreId })
             .getMany()
 
             // TODO: Check if user has access to playlist
 
-        return Page.of(result, result.length, pageable.page);
+        return Page.of(result, result.length, pageable.offset);
     }
 
     public async existsByTitleInUser(title: string, userId: string, playlistId?: string): Promise<boolean> {

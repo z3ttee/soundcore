@@ -1,6 +1,6 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Page, Pageable } from 'nestjs-pager';
+import { BasePageable, Page } from 'nestjs-pager';
 import { Repository, UpdateResult } from 'typeorm';
 import { Mount } from '../../mount/entities/mount.entity';
 import { Song } from '../../song/entities/song.entity';
@@ -50,14 +50,16 @@ export class FileService {
      * @param pageable Page settings
      * @returns Page<File>
      */
-    public async findByMount(mountId: string, pageable: Pageable): Promise<Page<File>> {
+    public async findByMount(mountId: string, pageable: BasePageable): Promise<Page<File>> {
         const result = await this.repository.createQueryBuilder("file")
             .leftJoin("file.mount", "mount")
             .leftJoinAndSelect("file.song", "song")
             .where("mount.id = :mountId", { mountId })
+            .offset(pageable.offset)
+            .limit(pageable.limit)
             .getManyAndCount()
 
-        return Page.of(result[0], result[1], pageable.page);
+        return Page.of(result[0], result[1]);
     }
 
     /**

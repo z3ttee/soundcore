@@ -7189,10 +7189,10 @@ neo-async@^2.6.2:
   resolved "https://registry.yarnpkg.com/neo-async/-/neo-async-2.6.2.tgz#b4aafb93e3aeb2d8174ca53cf163ab7d7308305f"
   integrity sha512-Yd3UES5mWCSqR+qNT93S3UoYUkqAZ9lLg8a7g9rimsWmYGK8cVToA4/sF3RrshdyV3sAGMXVUmpMYOw+dLpOuw==
 
-nestjs-pager@^1.1.0:
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/nestjs-pager/-/nestjs-pager-1.1.0.tgz#4578f0f2bbb41592c3315910c8fdbbafec54752a"
-  integrity sha512-flJpRhWYES6G1wLSguKjB5kLvvFO5r06a+1+MQDTWQIhgOgCadfdeOFgU7iDiW7COylPXUc+S4//eHakoY+xuA==
+nestjs-pager@^1.1.9:
+  version "1.1.9"
+  resolved "https://registry.yarnpkg.com/nestjs-pager/-/nestjs-pager-1.1.9.tgz#8dca6a92406cd13353d6da064466f5940a9ba5e5"
+  integrity sha512-kL5WUYoncKcCfVzdDHlQUdlBUakSV8yvPWREh6BDFZ86w7i1cqdbXPD6rDRU60P3QA8Lmp+x4gYpWxMss+c2qQ==
 
 ng-heroicon@^2.0.0:
   version "2.1.0"

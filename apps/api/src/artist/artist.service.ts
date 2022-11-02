@@ -1,8 +1,7 @@
 import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Environment } from '@soundcore/common';
-import { Page, Pageable } from 'nestjs-pager';
-import { In, ObjectLiteral, Repository, SelectQueryBuilder, UpdateResult } from 'typeorm';
+import { Page, BasePageable } from 'nestjs-pager';
+import { ObjectLiteral, Repository, SelectQueryBuilder, UpdateResult } from 'typeorm';
 import { SyncFlag } from '../meilisearch/interfaces/syncable.interface';
 import { MeiliArtistService } from '../meilisearch/services/meili-artist.service';
 import { GeniusFlag, ResourceFlag } from '../utils/entities/resource';
@@ -82,17 +81,17 @@ export class ArtistService {
      * @param pageable Page settings
      * @returns Page<Artist>
      */
-    public async findBySyncFlag(flag: SyncFlag, pageable: Pageable): Promise<Page<Artist>> {
+    public async findBySyncFlag(flag: SyncFlag, pageable: BasePageable): Promise<Page<Artist>> {
         const result = await this.repository.createQueryBuilder("artist")
             .leftJoinAndSelect("artist.artwork", "artwork")
             .where("artist.lastSyncFlag = :flag", { flag })
             // Here we can safely use offset/limit, because artwork is no array
             // and therefor no extra rows are returned in the selection table.
-            .offset(pageable.page * pageable.size)
-            .limit(pageable.size)
+            .offset(pageable.offset)
+            .limit(pageable.limit)
             .getManyAndCount();
 
-        return Page.of(result[0], result[1], pageable.page);
+        return Page.of(result[0], result[1], pageable.offset);
     }
 
     /**

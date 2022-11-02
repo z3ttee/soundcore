@@ -6,6 +6,8 @@ export * from "./lib/scdk.module";
 // Gateways
 export * from "./lib/gateway";
 
+// Pagination
+export { BasePageable, IndexPageable, Pageable, Page } from "nestjs-pager";
 
 
 
@@ -35,10 +37,6 @@ export * from "./lib/meilisearch/entities/meili-artist.entity";
 export * from "./lib/meilisearch/entities/meili-album.entity";
 export * from "./lib/meilisearch/entities/meili-song.entity";
 export * from "./lib/meilisearch/entities/meili-genre.entity";
-
-// Pagination
-export * from "./lib/utils/page/page";
-export * from "./lib/utils/page/pageable";
 
 // Bucket Module
 export * from "./lib/bucket/bucket.module";

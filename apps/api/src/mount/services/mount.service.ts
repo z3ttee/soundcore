@@ -322,10 +322,11 @@ export class MountService {
 
         let page: Page<Mount>;
         let fetchedElements = 0;
+        let pageIndex = options.page;
     
         while(fetchedElements < page?.totalElements || page == null) {
             page = await this.findByBucketId(this.fileSystem.getInstanceId(), options);
-            options.page++;
+            pageIndex++;
             fetchedElements += page.size;
 
             for(const mount of page.elements) {

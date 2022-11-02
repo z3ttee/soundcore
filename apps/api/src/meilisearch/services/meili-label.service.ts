@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import MeiliSearch, { SearchResponse, Task } from "meilisearch";
-import { Pageable } from "nestjs-pager";
+import { BasePageable } from "nestjs-pager";
 import { Label } from "../../label/entities/label.entity";
 import { MeiliArtwork } from "../entities/meili-artwork.entity";
 import { MeiliLabel } from "../entities/meili-label.entity";
@@ -45,14 +45,14 @@ export class MeiliLabelService extends MeiliService<MeiliLabel> {
     /**
      * Search for label.
      * @param {string} query Search query
-     * @param {Pageable} pageable Page settings
+     * @param {BasePageable} pageable Page settings
      * @returns {SearchResponse} SearchResponse<MeiliLabel>
      */
-    public async searchLabels(query: string, pageable: Pageable): Promise<SearchResponse<MeiliLabel>> {
+    public async searchLabels(query: string, pageable: BasePageable): Promise<SearchResponse<MeiliLabel>> {
         return this.search(query, {
             attributesToRetrieve: ["*"],
-            limit: pageable.size,
-            offset: pageable.size * pageable.page,
+            limit: pageable.limit,
+            offset: pageable.offset,
             showMatchesPosition: true,
         })
     }

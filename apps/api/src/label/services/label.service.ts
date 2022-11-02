@@ -1,6 +1,6 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Page, Pageable } from 'nestjs-pager';
+import { Page, BasePageable } from 'nestjs-pager';
 import { In, Repository } from 'typeorm';
 import { Artwork } from '../../artwork/entities/artwork.entity';
 import { SyncFlag } from '../../meilisearch/interfaces/syncable.interface';
@@ -51,15 +51,15 @@ export class LabelService {
      * @param pageable Page settings
      * @returns Page<Publisher>
      */
-    public async findBySyncFlag(flag: SyncFlag, pageable: Pageable): Promise<Page<Label>> {
+    public async findBySyncFlag(flag: SyncFlag, pageable: BasePageable): Promise<Page<Label>> {
         const result = await this.repository.createQueryBuilder("label")
             .leftJoin("label.artwork", "artwork").addSelect(["artwork.id"])
             .where("label.lastSyncFlag = :flag", { flag })
-            .offset(pageable.page * pageable.size)
-            .limit(pageable.size)
+            .offset(pageable.offset)
+            .limit(pageable.limit)
             .getManyAndCount();
 
-        return Page.of(result[0], result[1], pageable.page);
+        return Page.of(result[0], result[1], pageable.offset);
     }
 
     /**

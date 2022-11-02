@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Page, Pageable } from 'nestjs-pager';
+import { Page, BasePageable } from 'nestjs-pager';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 import { PlaylistItem } from '../../playlist/entities/playlist-item.entity';
 import { User } from '../../user/entities/user.entity';
@@ -35,7 +35,7 @@ export class TracklistService {
      * @param authentication User authentication object
      * @returns Page<Song>
      */
-    public async findMetaByArtist(artistId: string, pageable: Pageable, authentication?: User): Promise<Page<Song>> {
+    public async findMetaByArtist(artistId: string, pageable: BasePageable, authentication?: User): Promise<Page<Song>> {
         const baseQuery = await this.buildFindByArtistQuery(artistId, "song", pageable, authentication)
         
         const result = await baseQuery.getRawAndEntities();
@@ -43,7 +43,7 @@ export class TracklistService {
         return Page.of(result.entities.map((song, index) => {
             song.streamCount = result.raw[index]?.streamCount || 0
             return song;
-        }), totalElements, pageable.page);   
+        }), totalElements, pageable.offset);   
     }
 
     /**
@@ -96,7 +96,7 @@ export class TracklistService {
      * @param authentication User authentication object
      * @returns Page<Song>
      */
-    public async findMetaByAlbum(albumId: string, pageable: Pageable, authentication?: User): Promise<Page<Song>> {
+    public async findMetaByAlbum(albumId: string, pageable: BasePageable, authentication?: User): Promise<Page<Song>> {
         const baseQuery = await this.buildFindByAlbumQuery(albumId, "song", pageable, authentication)
             
         const result = await baseQuery.getRawAndEntities();
@@ -104,7 +104,7 @@ export class TracklistService {
         return Page.of(result.entities.map((song, index) => {
             song.streamCount = result.raw[index]?.streamCount || 0
             return song;
-        }), totalElements, pageable.page);    
+        }), totalElements, pageable.offset);    
     }
 
     /**
@@ -136,7 +136,7 @@ export class TracklistService {
      * @param authentication User authentication object
      * @returns Page<Song>
      */
-    public async findMetaByPlaylist(playlistId: string, pageable: Pageable, authentication?: User): Promise<Page<PlaylistItem>> {
+    public async findMetaByPlaylist(playlistId: string, pageable: BasePageable, authentication?: User): Promise<Page<PlaylistItem>> {
         // TODO: Check if user has access to playlist
         const result = await this.tracklistRepository.createQueryBuilder("item")
             .leftJoin("item.song", "song").addSelect(["song.id", "song.slug", "song.name"])
@@ -152,11 +152,11 @@ export class TracklistService {
             .orderBy("item.order", "ASC")
             .addOrderBy("item.createdAt", "ASC")
             // Pagination
-            .skip(pageable.page * pageable.size)
-            .take(pageable.size)
+            .skip(pageable.offset)
+            .take(pageable.limit)
             .getManyAndCount();
 
-        return Page.of(result[0], result[1], pageable.page);
+        return Page.of(result[0], result[1], pageable.offset);
     }
 
     /**
@@ -169,7 +169,7 @@ export class TracklistService {
      * @param authentication 
      * @returns SelectQueryBuilder<Song>
      */
-    protected buildFindByArtistQuery(artistId: string, alias: string, pageable?: Pageable, authentication?: User): SelectQueryBuilder<Song> {
+    protected buildFindByArtistQuery(artistId: string, alias: string, pageable?: BasePageable, authentication?: User): SelectQueryBuilder<Song> {
         const query = this.songService.buildGeneralQuery(alias, authentication)
             // Get amount of streams
             // TODO: To be optimised using selectAndMap in next TypeORM release
@@ -184,7 +184,7 @@ export class TracklistService {
 
         // Add optional page settings
         if(!!pageable) {
-            query.skip((pageable.page) * (pageable.size)).take(pageable.size)
+            query.skip(pageable.offset).take(pageable.limit)
         }
 
         return query;
@@ -228,7 +228,7 @@ export class TracklistService {
      * @param authentication 
      * @returns SelectQueryBuilder<Song>
      */
-    protected buildFindByAlbumQuery(albumId: string, alias: string, pageable?: Pageable, authentication?: User): SelectQueryBuilder<Song> {
+    protected buildFindByAlbumQuery(albumId: string, alias: string, pageable?: BasePageable, authentication?: User): SelectQueryBuilder<Song> {
         const query = this.songService.buildGeneralQuery(alias, authentication)
             // Get amount of streams
             // TODO: To be optimised using selectAndMap in next TypeORM release
@@ -240,7 +240,7 @@ export class TracklistService {
 
         // Add optional page settings
         if(!!pageable) {
-            query.skip((pageable.page) * (pageable.size)).take(pageable.size)
+            query.skip(pageable.offset).take(pageable.limit)
         }
 
         return query;
@@ -256,7 +256,7 @@ export class TracklistService {
      * @param authentication 
      * @returns SelectQueryBuilder<Song>
      */
-     protected buildFindByPlaylistQuery(playlistId: string, alias: string, pageable?: Pageable, authentication?: User): SelectQueryBuilder<Song> {
+     protected buildFindByPlaylistQuery(playlistId: string, alias: string, pageable?: BasePageable, authentication?: User): SelectQueryBuilder<Song> {
         const query = this.songService.buildGeneralQuery(alias, authentication)
             // Get amount of streams
             // TODO: To be optimised using selectAndMap in next TypeORM release
@@ -276,7 +276,7 @@ export class TracklistService {
 
         // Add optional page settings
         if(!!pageable) {
-            query.skip((pageable.page) * (pageable.size)).take(pageable.size)
+            query.skip(pageable.offset).take(pageable.limit)
         }
 
         return query;

@@ -6,7 +6,7 @@ import ffprobeStatic from "ffprobe-static";
 import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { CreateSongDTO } from './dtos/create-song.dto';
 import { Song } from './entities/song.entity';
-import { Page, Pageable } from 'nestjs-pager';
+import { Page, BasePageable } from 'nestjs-pager';
 import { User } from '../user/entities/user.entity';
 import { Artwork } from '../artwork/entities/artwork.entity';
 import { SongUniqueFindDTO } from "./dtos/unique-find.dto";
@@ -123,16 +123,16 @@ export class SongService extends SyncingService {
      * @param authentication User authentication object
      * @returns Page<Song>
      */
-    public async findByGenreAndOrArtist(genreId: string, artistId: string, pageable?: Pageable, authentication?: User): Promise<Page<Song>> {
+    public async findByGenreAndOrArtist(genreId: string, artistId: string, pageable?: BasePageable, authentication?: User): Promise<Page<Song>> {
         const query = this.buildGeneralQuery("song", authentication)
             .leftJoin("song.genres", "genre")
             // Pagination
-            .skip((pageable?.page || 0) * (pageable?.size || 30))
-            .take(pageable?.size || 30)
+            .skip(pageable.offset)
+            .take(pageable.limit)
             .where("(primaryArtist.id = :artistId OR artist.slug = :artistId) AND (genre.id = :genreId OR genre.slug = :genreId)", { genreId, artistId });
 
         const result = await query.getManyAndCount();
-        return Page.of(result[0], result[1], pageable.page);
+        return Page.of(result[0], result[1], pageable.offset);
     }
 
     /**
@@ -142,7 +142,7 @@ export class SongService extends SyncingService {
      * @param artistId Artist's id, to fetch songs from an artist that a user has in his collection.
      * @returns Page<Song>
      */
-    public async findByCollectionAndOrArtist(user: User, pageable: Pageable, artistId?: string): Promise<Page<Song>> {
+    public async findByCollectionAndOrArtist(user: User, pageable: BasePageable, artistId?: string): Promise<Page<Song>> {
         // TODO: Ignore indexes that are not OK
         // Fetch available elements
         let qb = await this.repository.createQueryBuilder('song')
@@ -157,8 +157,8 @@ export class SongService extends SyncingService {
             
             .where("likedBy.userId = :userId", { userId: user?.id })
 
-            .skip(pageable.page * pageable.size)
-            .take(pageable.size)
+            .skip(pageable.offset)
+            .take(pageable.limit)
             .orderBy("likedBy.likedAt", "DESC")
         
         // Take artistId into account if it exists
@@ -182,7 +182,7 @@ export class SongService extends SyncingService {
         return Page.of(result.entities.map((s) => {
             s.liked = true
             return s;
-        }), totalElements, pageable.page)
+        }), totalElements);
     }
 
     /**
@@ -230,7 +230,7 @@ export class SongService extends SyncingService {
      * @param pageable Page settings
      * @returns Page<Artist>
      */
-    public async findBySyncFlag(flag: SyncFlag, pageable: Pageable): Promise<Page<Song>> {
+    public async findBySyncFlag(flag: SyncFlag, pageable: BasePageable): Promise<Page<Song>> {
         const result = await this.repository.createQueryBuilder("song")
             .leftJoin("song.artwork", "artwork").addSelect(["artwork.id"])
             .leftJoin("song.album", "album").addSelect(["album.id", "album.slug", "album.name"])
@@ -240,11 +240,11 @@ export class SongService extends SyncingService {
 
             .where("song.lastSyncFlag = :flag", { flag })
             
-            .skip(pageable.page * pageable.size)
-            .take(pageable.size)
+            .skip(pageable.offset)
+            .take(pageable.limit)
             .getManyAndCount();
 
-        return Page.of(result[0], result[1], pageable.page);
+        return Page.of(result[0], result[1], pageable.offset);
     }
 
     /**
@@ -489,7 +489,7 @@ export class SongService extends SyncingService {
      * @param pageable Page settings
      * @returns Page<Song>
      */
-    public async findBySearchQuery(query: string, pageable: Pageable, authentication?: User): Promise<Page<Song>> {
+    public async findBySearchQuery(query: string, pageable: BasePageable, authentication?: User): Promise<Page<Song>> {
         if(!query || query == "") {
             query = "%"
         } else {
@@ -503,12 +503,12 @@ export class SongService extends SyncingService {
             .where("song.title LIKE :query", { query })
             .orWhere("artist.name LIKE :query", { query })
 
-            .skip((pageable?.page || 0) * (pageable?.size || 10))
-            .take(pageable.size || 10)
+            .skip(pageable.offset)
+            .take(pageable.limit)
             .orderBy("rand()");
 
         const result = await q.getManyAndCount();
-        return Page.of(result[0], result[1], pageable.page);
+        return Page.of(result[0], result[1], pageable.offset);
     }
 
     /**

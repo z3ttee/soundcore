@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import MeiliSearch, { SearchResponse, Task } from "meilisearch";
-import { Pageable } from "nestjs-pager";
+import { BasePageable } from "nestjs-pager";
 import { User } from "../../user/entities/user.entity";
 import { MeiliArtwork } from "../entities/meili-artwork.entity";
 import { MeiliUser } from "../entities/meili-user.entity";
@@ -46,14 +46,14 @@ export class MeiliUserService extends MeiliService<MeiliUser> {
     /**
      * Search for users.
      * @param {string} query Search query
-     * @param {Pageable} pageable Page settings
+     * @param {BasePageable} pageable Page settings
      * @returns {SearchResponse<MeiliUser>} SearchResponse<MeiliUser>
      */
-    public async searchUser(query: string, pageable: Pageable): Promise<SearchResponse<MeiliUser>> {
+    public async searchUser(query: string, pageable: BasePageable): Promise<SearchResponse<MeiliUser>> {
         return this.search(query, {
             attributesToRetrieve: ["*"],
-            limit: pageable.size,
-            offset: pageable.size * pageable.page,
+            limit: pageable.limit,
+            offset: pageable.offset,
             showMatchesPosition: true
         })
     }
