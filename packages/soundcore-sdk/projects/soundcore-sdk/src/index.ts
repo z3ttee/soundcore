@@ -7,7 +7,7 @@ export * from "./lib/scdk.module";
 export * from "./lib/gateway";
 
 // Pagination
-export { BasePageable, IndexPageable, Pageable, Page } from "nestjs-pager";
+export * from "./lib/pagination";
 
 
 

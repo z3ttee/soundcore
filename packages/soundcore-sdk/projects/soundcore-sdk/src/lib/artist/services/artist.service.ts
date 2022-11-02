@@ -4,10 +4,10 @@ import { Observable, of } from "rxjs";
 import { MeiliArtist } from "../../meilisearch/entities/meili-artist.entity";
 import { ApiSearchResponse } from "../../meilisearch/entities/search-response.entity";
 import { SCDKOptions, SCDK_OPTIONS } from "../../scdk.module";
-import { Pageable } from "../../utils/page/pageable";
 import { ApiResponse } from "../../utils/responses/api-response";
 import { apiResponse } from "../../utils/rxjs/operators/api-response";
 import { Artist } from "../entities/artist.entity";
+import { Pageable } from "../../pagination";
 
 @Injectable()
 export class SCDKArtistService {

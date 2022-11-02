@@ -1,14 +1,13 @@
 import { HttpClient } from "@angular/common/http";
 import { Inject, Injectable } from "@angular/core";
 import { Observable, of } from "rxjs";
-import { Page } from "../../utils/page/page";
-import { Pageable } from "../../utils/page/pageable";
 import { SCDKOptions, SCDK_OPTIONS } from "../../scdk.module";
 import { Song } from "../entities/song.entity";
 import { ApiResponse } from "../../utils/responses/api-response";
 import { apiResponse } from "../../utils/rxjs/operators/api-response";
 import { ApiSearchResponse } from "../../meilisearch/entities/search-response.entity";
 import { MeiliSong } from "../../meilisearch/entities/meili-song.entity";
+import { Page, Pageable } from "../../pagination";
 
 @Injectable({
     providedIn: "root"

@@ -4,14 +4,13 @@ import { BehaviorSubject, Observable, of, tap } from 'rxjs';
 import { MeiliPlaylist } from '../../meilisearch/entities/meili-playlist.entity';
 import { ApiSearchResponse } from '../../meilisearch/entities/search-response.entity';
 import { SCDKOptions, SCDK_OPTIONS } from '../../scdk.module';
-import { Page } from '../../utils/page/page';
-import { Pageable } from '../../utils/page/pageable';
 import { ApiResponse } from '../../utils/responses/api-response';
 import { apiResponse } from '../../utils/rxjs/operators/api-response';
 import { AddSongDTO } from '../dtos/add-song.dto';
 import { CreatePlaylistDTO } from '../dtos/create-playlist.dto';
 import { PlaylistItemAddResult } from '../entities/playlist-item-added.entity';
 import { Playlist } from '../entities/playlist.entity';
+import { Page, Pageable } from "../../pagination";
 
 @Injectable({
   providedIn: "root"

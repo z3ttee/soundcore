@@ -1,11 +1,10 @@
 import { HttpClient } from "@angular/common/http";
 import { Inject, Injectable } from "@angular/core";
+import { Page, Pageable } from "../../pagination";
 import { BehaviorSubject, Observable, of } from "rxjs";
 import { MeiliAlbum } from "../../meilisearch/entities/meili-album.entity";
 import { ApiSearchResponse } from "../../meilisearch/entities/search-response.entity";
 import { SCDKOptions, SCDK_OPTIONS } from "../../scdk.module";
-import { Page } from "../../utils/page/page";
-import { Pageable } from "../../utils/page/pageable";
 import { ApiResponse } from "../../utils/responses/api-response";
 import { apiResponse } from "../../utils/rxjs/operators/api-response";
 import { Album } from "../entities/album.entity";

@@ -2,9 +2,8 @@ import { HttpClient } from "@angular/common/http";
 import { Inject, Injectable } from "@angular/core";
 import { Observable, of } from "rxjs";
 import { SCDKOptions, SCDK_OPTIONS } from "../../scdk.module";
-import { Page } from "../../utils/page/page";
-import { Pageable } from "../../utils/page/pageable";
 import { Bucket } from "../entities/bucket.entity";
+import { Page, Pageable } from "../../pagination";
 
 @Injectable()
 export class SCDKBucketService {

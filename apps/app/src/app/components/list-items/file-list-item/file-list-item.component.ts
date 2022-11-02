@@ -27,11 +27,11 @@ export class FileListItemComponent implements OnInit, OnChanges {
       this.indicatorAppearance = "success";
       return;
     }
-    if(this.file.flag == FileFlag.DUPLICATE || this.file.flag == FileFlag.PROCESSING) {
+    if(this.file.flag == FileFlag.POTENTIAL_DUPLICATE || this.file.flag == FileFlag.PENDING_ANALYSIS) {
       this.indicatorAppearance = "warn";
       return;
     }
-    if(this.file.flag == FileFlag.DELETED || this.file.flag == FileFlag.CORRUPT || this.file.flag == FileFlag.FAILED_SONG_CREATION) {
+    if(this.file.flag == FileFlag.ERROR) {
       this.indicatorAppearance = "error";
       return;
     }

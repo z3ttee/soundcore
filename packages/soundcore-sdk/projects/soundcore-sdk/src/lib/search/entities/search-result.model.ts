@@ -1,3 +1,4 @@
+import { Page } from "../../pagination";
 import { Album } from "../../album/entities/album.entity";
 import { Artist } from "../../artist/entities/artist.entity";
 import { Distributor } from "../../distributor/entities/distributor.entity";
@@ -7,7 +8,6 @@ import { Playlist } from "../../playlist/entities/playlist.entity";
 import { Publisher } from "../../publisher/entities/publisher.entity";
 import { Song } from "../../song/entities/song.entity";
 import { User } from "../../user/entities/user.entity";
-import { Page } from "../../utils/page/page";
 import { SearchBestMatch } from "./best-match.entity";
 
 export class ComplexSearchResult {
