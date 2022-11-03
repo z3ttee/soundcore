@@ -146,7 +146,6 @@ export abstract class SCNGXBaseDatasource<T = any> implements IDatasource {
                 // Slice the array to return just the requested resources
                 return items.slice(start, end);
             }).then((items) => {
-                console.log(items);
                 resolve(items);
             }).catch((error) => reject(error));
         });
