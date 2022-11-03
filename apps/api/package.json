@@ -16,8 +16,6 @@
     "updatedeps": "npx npm-check-updates"
   },
   "dependencies": {
-    "ioredis": "^5.2.3",
-    "@nestjs/bull": "^0.6.0",
     "@nestjs/common": "^9.0.8",
     "@nestjs/config": "2.2.0",
     "@nestjs/core": "^9.0.8",
@@ -33,12 +31,9 @@
     "@soundcore/bootstrap": "*",
     "@soundcore/common": "*",
     "@soundcore/constants": "*",
-    "@soundcore/heartbeat": "*",
     "@soundcore/nest-queue": "*",
-    "@soundcore/redis": "*",
     "@tsalliance/utilities": "^1.19.0",
     "axios": "^0.27.2",
-    "bull": "^4.8.5",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.13.2",
     "ffmpeg-static": "^5.0.2",
@@ -50,19 +45,18 @@
     "node-id3": "^0.2.3",
     "node-vibrant": "^3.2.1-alpha.1",
     "openid-client": "^5.1.8",
-    "redlock": "^5.0.0-beta.2",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
     "rxjs": "^7.5.6",
     "sanitize-filename": "^1.6.3",
-    "sharp": "^0.30.7",
     "socket.io": "^4.5.1",
     "sqlstring": "^2.3.3",
     "mysql2": "^2.3.3",
     "typeorm": "^0.3.10",
     "workerpool": "^6.2.1",
     "ytdl-core": "^4.11.0",
-    "ytpl": "^2.3.0"
+    "ytpl": "^2.3.0",
+    "sharp": "^0.31.1"
   },
   "devDependencies": {
     "@nestjs/cli": "^9.0.0",

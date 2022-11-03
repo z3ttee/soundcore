@@ -17,7 +17,6 @@ import { PlaylistModule } from './playlist/playlist.module';
 import { UserModule } from './user/user.module';
 import { ImportModule } from './import/import.module';
 import { CollectionModule } from './collection/collection.module';
-import { BullModule } from '@nestjs/bull';
 import { NotificationModule } from './notification/notification.module';
 import { OIDCModule } from './authentication/oidc.module';
 import { ProfileModule } from './profile/profile.module';
@@ -32,10 +31,7 @@ import { AppService } from './app.service';
 import { PipesModule } from '@tsalliance/utilities';
 import { HostnameModule } from './hostname/hostname.module';
 import { CronModule } from './cron/cron.module';
-import { HealthModule } from './health/health.module';
-import { HeartbeatServerModule } from "@soundcore/heartbeat";
 import { CommonConfigModule } from '@soundcore/common';
-import { DiscoveryModule } from './discovery/discovery.module';
 import { WorkerQueueModule } from '@soundcore/nest-queue';
 
 @Module({
@@ -75,26 +71,7 @@ import { WorkerQueueModule } from '@soundcore/nest-queue';
         }
       })
     }),
-    BullModule.forRoot({
-      redis: {
-        host: process.env.REDIS_HOST,
-        port: parseInt(process.env.REDIS_PORT),
-        password: process.env.REDIS_AUTH_PASS,
-        maxRetriesPerRequest: null,
-        enableReadyCheck: false
-      },
-      defaultJobOptions: {
-        removeOnFail: true,
-        removeOnComplete: true,
-      },
-      limiter: {
-        // Maximum 200 tasks per second
-        max: 200,
-        duration: 1000
-      }
-    }),
     EventEmitterModule.forRoot({ global: true, ignoreErrors: true }),
-    HealthModule,
     ArtistModule,
     BucketModule,
     AlbumModule,
@@ -122,19 +99,6 @@ import { WorkerQueueModule } from '@soundcore/nest-queue';
     FileModule,
     IndexerModule,
     HostnameModule,
-    HeartbeatServerModule.forRootAsync({
-      useFactory: () => {
-        return {
-          redis: {
-            host: process.env.REDIS_HOST,
-            port: parseInt(process.env.REDIS_PORT),
-            password: process.env.REDIS_AUTH_PASS,
-            maxRetriesPerRequest: null,
-          }
-        }
-      }
-    }),
-    DiscoveryModule,
     GeniusModule.forRootAsync({
       useFactory: () => ({
         clientToken: process.env.GENIUS_TOKEN

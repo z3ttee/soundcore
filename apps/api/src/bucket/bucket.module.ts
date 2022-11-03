@@ -2,7 +2,6 @@ import { Logger, Module, OnModuleInit } from '@nestjs/common';
 import { BucketService } from './services/bucket.service';
 import { BucketController } from './controllers/bucket.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { BullModule } from '@nestjs/bull';
 import { Bucket } from './entities/bucket.entity';
 
 @Module({
@@ -14,10 +13,7 @@ import { Bucket } from './entities/bucket.entity';
   ],
   exports: [ BucketService ],
   imports: [
-    TypeOrmModule.forFeature([ Bucket ]),
-    BullModule.registerQueue({
-      name: "mount-queue"
-    })
+    TypeOrmModule.forFeature([ Bucket ])
   ]
 })
 export class BucketModule implements OnModuleInit {

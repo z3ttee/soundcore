@@ -1,4 +1,3 @@
-import { InjectQueue } from "@nestjs/bull";
 import { Injectable, Logger } from "@nestjs/common";
 import { WorkerJob, WorkerQueue } from "@soundcore/nest-queue";
 import { Job, Queue } from "bull";

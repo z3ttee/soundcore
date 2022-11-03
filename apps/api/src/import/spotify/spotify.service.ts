@@ -1,7 +1,5 @@
-import { InjectQueue } from "@nestjs/bull";
 import { Injectable, Logger } from "@nestjs/common";
 import axios, { AxiosError } from "axios";
-import { Queue } from "bull";
 import { User } from "../../user/entities/user.entity";
 import { SpotifyBullJob, SpotifyClientAccessToken, SpotifyPlaylist, SpotifyTrackList } from "../entities/spotify-song.entity";
 
@@ -13,7 +11,6 @@ export class SpotifyService {
     private tokenExpiresAt: number;
 
     constructor(
-        @InjectQueue("import-spotify-queue") private spotifyQueue: Queue<SpotifyBullJob>
     ) {}
 
     /**
@@ -72,14 +69,7 @@ export class SpotifyService {
                 if(data.images?.[0]) playlist.images = [ data.images[0] ];
 
                 // Add to queue
-                return this.spotifyQueue.add({
-                    importer: user,
-                    playlist: playlist
-                }).then(() => {
-                    return playlist;
-                }).catch((error) => {
-                    throw error;
-                })
+                return null;
             })
         }).catch((error: Error) => {
             this.logger.error(error);
