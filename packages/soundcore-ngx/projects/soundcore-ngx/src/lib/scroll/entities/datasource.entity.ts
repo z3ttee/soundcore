@@ -16,7 +16,9 @@ enum PageFetchStatus {
 export class SCNGXDatasource<T = any> implements IDatasource {
 
     public readonly id: string = uuidv4();
-    protected readonly cachedData: DatasourceItem<T>[] = Array.from<DatasourceItem<T>>([]);
+    // protected readonly cachedData: DatasourceItem<T>[] = Array.from<DatasourceItem<T>>([]);
+    protected readonly cachedPages: Map<number, DatasourceItem<T>> = new Map();
+
     private _totalElements: number = -1;
 
     /**
@@ -129,7 +131,8 @@ export class SCNGXDatasource<T = any> implements IDatasource {
         });
     }
 
-    protected fetchPage(pageable: IndexPageable): Observable<DatasourceItem<T>[]> {
+    protected fetchPage(pageable: Pageable): Observable<DatasourceItem<T>[]> {
+        const pageIndex = pageable.page;
         // const pageIndex = pageable.page;
 
         // Check if page was already fetched or has invalid page settings.
@@ -140,61 +143,38 @@ export class SCNGXDatasource<T = any> implements IDatasource {
         // Update status to fetching
         // this._fetchedPageStatus[pageIndex] = PageFetchStatus.FETCHING;
 
+        if(this.isCached(pageIndex)) {
+            console.log("page already in cache, returning from cache");
+            return of(this.getCachedPage(pageIndex));
+        }
+
+        console.log("page not cached yet, fetching from remote...");
+
         return this.httpClient.get<Page<T>>(`${this.pagination.url}${pageable.toQuery()}`).pipe(
             apiResponse(),
             switchMap((response: ApiResponse<Page<T>>): Observable<DatasourceItem<T>[]> => {
+                const page = response?.payload;
 
                 // If there were errors, set status to error.
                 // Then it can be retried later.
-                if(response.error) {
-                    // this._fetchedPageStatus[pageIndex] = PageFetchStatus.ERROR;
+                if(response.error || page.size < pageable.limit) {
                     return of([]);
                 }
 
-            
-
-                // Page is not being fetched as the request is over
-                // at this point.
-                // this._fetchedPageStatus[pageIndex] = PageFetchStatus.OK;
-                // Add page to the fetchedPages list.
-                // this._fetchedPageIndexes.add(pageIndex);
-
-                const page = response.payload;
-
-                // console.log("fetched page, returned size: ", page.size);
-
-                if(page.size < pageable.limit) {
-                    return of([]);
-                }
-
-                this._totalElements = page.totalElements;
-
-                // console.log(page.size);
-
-                return of(page.elements.map<DatasourceItem<T>>((_, i) => {
+                let items: DatasourceItem<T>[] = page.elements.map<DatasourceItem<T>>((_, i) => {
                     if(!page.elements[i]) return null;
                     const element = Object.assign({}, page.elements[i]);
                     return {
                         data: element,
-                        index: pageable.offset + i
+                        index: (pageIndex * this.pagination.pageSize) + i
                     }
-                }));
-    
-                // Take in the cachedData array (contains all the previously fetched items) and add the newly fetched items to it.
-                // this.cachedData.splice(pageIndex * pageable.size, pageable.limit, ...Array.from({ length: page.size }).map<DatasourceItem<T>>((_, i) => {
-                    // if(!page.elements[i]) return null;
-                    // const element = Object.assign({}, page.elements[i]);
-                    // return {
-                    //     data: element,
-                    //     index: this.getIndexForPageAndItemIndex(pageIndex, i)
-                    // };
-                // }));
-    
-                // Push updated data array
-                // this._dataStream.next(this.cachedData);
+                });
 
-                // return of(this.getPageOfCache(pageIndex));
-                return of([]);
+                // Cache page
+                this.cachedPages[pageIndex] = items;
+
+                this._totalElements = page.totalElements;
+                return of(items);
             })
         );
     }
@@ -208,14 +188,11 @@ export class SCNGXDatasource<T = any> implements IDatasource {
         return amount + index;
     }
 
-    protected hasFetched(pageIndex: number): boolean {
-        return this._fetchedPageIndexes[pageIndex];
+    protected isCached(pageIndex: number): boolean {
+        return !!this.cachedPages[pageIndex];
     }
 
-    protected getPageOfCache(pageIndex: number): DatasourceItem<T>[] {
-        const start = pageIndex * this.pagination.pageSize;
-        const end = start + this.pagination.pageSize - 1;
-
-        return this.cachedData.slice(start, end);
+    protected getCachedPage(pageIndex: number): DatasourceItem<T>[] {
+        return this.cachedPages[pageIndex];
     }
 }
