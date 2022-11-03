@@ -1,25 +1,24 @@
 import { IAdapter, IDatasource, SizeStrategy } from "ngx-ui-scroll";
 import { DatasourceGet, Settings, DevSettings } from "vscroll/dist/typings/interfaces";
 import { v4 as uuidv4 } from "uuid";
-import { Observable, of, Subject, switchMap, takeUntil } from "rxjs";
+import { catchError, Observable, of, Subject, switchMap, takeUntil } from "rxjs";
 import { DatasourceItem } from "./datasource-item.entity";
-import { ApiResponse, apiResponse, Page, IndexPageable, Pageable } from "@soundcore/sdk";
+import { ApiResponse, apiResponse, Page, Pageable } from "@soundcore/sdk";
 import { Pagination } from "../config/datasource-pagination";
 import { HttpClient } from "@angular/common/http";
 
-enum PageFetchStatus {
-    OK = 0,
-    FETCHING = 1,
-    ERROR = 2
-}
-
-export class SCNGXDatasource<T = any> implements IDatasource {
-
+export abstract class SCNGXBaseDatasource<T = any> implements IDatasource {
+    /**
+     * Unique identifier of the datasource.
+     * Format: UUIDv4
+     */
     public readonly id: string = uuidv4();
-    // protected readonly cachedData: DatasourceItem<T>[] = Array.from<DatasourceItem<T>>([]);
-    protected readonly cachedPages: Map<number, DatasourceItem<T>> = new Map();
 
-    private _totalElements: number = -1;
+    /**
+     * Map that holds all fetched pages.
+     * Keys are page index and values are Datasource items.
+     */
+    private readonly _cachedPages: Map<number, DatasourceItem<T>[]> = new Map();
 
     /**
      * Subject used to trigger destroying the datasource.
@@ -27,18 +26,6 @@ export class SCNGXDatasource<T = any> implements IDatasource {
      * and the datasource gets closed.
      */
     protected readonly _destroy: Subject<void> = new Subject();
-
-    /**
-     * Set for tracking the pages that already have been fetched.
-     */
-    protected readonly _fetchedPageIndexes: Set<number> = new Set();
-
-    /**
-     * Map for tracking current status of a fetching process for a page.
-     * Keys are the index of a page and the values are true or false. True
-     * means page was successfully fetched, otherwise it will be false.
-     */
-    protected readonly _fetchedPageStatus: Map<number, PageFetchStatus> = new Map();
 
     /**
      * Property required by the IDatasource interface of vscroll
@@ -50,9 +37,7 @@ export class SCNGXDatasource<T = any> implements IDatasource {
      * Property required by the IDatasource interface of vscroll
      * Currently unused.
      */
-    public readonly devSettings?: DevSettings = {
-        debug: false
-    };
+    public readonly devSettings?: DevSettings;
 
     /**
      * Property required by the IDatasource interface of vscroll.
@@ -61,98 +46,181 @@ export class SCNGXDatasource<T = any> implements IDatasource {
      */
     public readonly get: DatasourceGet<unknown>;
 
+    /**
+     * VScroll specific settings.
+     */
+    public readonly settings: Settings<unknown>;
+
+    protected readonly pageSize: number = 30;
+
     constructor(
-        public readonly httpClient: HttpClient,
-        public readonly pagination: Pagination,
-        public readonly settings: Settings<unknown> = {
+        pageSize: number = 30,
+        settings: Settings<unknown> = {},
+        devSettings: DevSettings = {}
+    ) {
+        // Set settings
+        this.settings = {
             startIndex: 0,
             minIndex: 0,
             sizeStrategy: SizeStrategy.Frequent,
-            // infinite: true
+            bufferSize: 20,
+            ...settings,
         }
-    ) {
-        if(!this.pagination.pageSize) this.pagination.pageSize = 30;
 
+        // Set devSettings
+        this.devSettings = {
+            debug: false,
+            ...devSettings
+        }
+
+        // Set pageSize
+        this.pageSize = pageSize || 30;
+
+        // Register the get() method for vscroll's datasource
         this.get = (index, count) => new Promise((resolve, reject) => {
-            const pageSize = this.pagination.pageSize;
+            const pageSize = this.pageSize;
 
+            // Calculate requested indices
             const startIndex = Math.max(index, 0);
             const endIndex = index + count - 1;
 
+            // If start greater than end, return empty array
             if (startIndex > endIndex) {
                 resolve([]); // empty result
                 return;
             }
 
+            // Calculate pages needed
             const startPage = Math.floor(startIndex / pageSize);
             const endPage = Math.floor(endIndex / pageSize);
 
             const requests: Promise<DatasourceItem<T>[]>[] = [];
-            for (let i = startPage; i <= endPage; i++) {
+            for (let pageIndex = startPage; pageIndex <= endPage; pageIndex++) {
+
+                // Directly add cached data to the requests
+                if(this.isCached(pageIndex)) {
+                    requests.push(new Promise((resolve) => {
+                        resolve(this.getCachedPage(pageIndex));
+                    }))
+                    continue;
+                }
+
+                // Otherwise push network call promise to the requests array
                 requests.push(new Promise((resolve, reject) => {
-                    this.fetchPage(new Pageable(i, pageSize)).pipe(takeUntil(this._destroy)).subscribe((items) => {
-                        resolve(items);
+                    const pageable: Pageable = new Pageable(pageIndex, pageSize);
+                    this.getPageData(pageable).pipe(takeUntil(this._destroy), catchError((err: Error) => {
+                        reject(err)
+                        return of([] as T[]);
+                    })).subscribe((items) => {
+
+                        // Map to internal datasource items
+                        const mappedItems = items.map<DatasourceItem<T>>((_, i) => {
+                            if(!items[i]) return null;
+
+                            const element = Object.assign({}, items[i]);
+                            return {
+                                data: element,
+                                index: (pageIndex * this.pageSize) + i
+                            }
+                        });
+
+                        if(!!items) {
+                            this.setCachedPage(pageIndex, mappedItems);
+                        }
+
+                        // Resolve with the items
+                        resolve(mappedItems);
                     });
                 }));
             }
 
+            // Await all promises created above
             Promise.all(requests).then((results) => {
+                // Flatten out the pages and gather all items in one array
                 const items: DatasourceItem<T>[] = results.reduce((acc, result) => [...acc, ...result], []);
 
+                // Calculate requested start and end indexes
                 const start = startIndex - startPage * pageSize;
                 const end = start + endIndex - startIndex + 1;
 
+                // Slice the array to return just the requested resources
                 return items.slice(start, end);
             }).then((items) => {
                 console.log(items);
                 resolve(items);
             }).catch((error) => reject(error));
-
-            // const page = Math.ceil((index / count));
-
-            // console.log(index, count, page);
-
-            // const pageable: IndexPageable = this.getPageableForIndex(index, count);
-
-            // console.log("fetching... ", pageable);
-
-            // if(this.hasFetched(pageIndex)) {
-            //     console.log("already fetched");
-            //     resolve(this.getPageOfCache(pageIndex));
-            //     return;
-            // }
-
-            // this.fetchPage(pageable).pipe(takeUntil(this._destroy)).subscribe((items) => {
-            //     console.log(items);
-            //     resolve(items);
-            // });
-
-            // resolve([1,2,3]);
         });
     }
 
-    protected fetchPage(pageable: Pageable): Observable<DatasourceItem<T>[]> {
+    /**
+     * Request a page from a different source (e.g. remote REST API).
+     * Returned values are always stored in the internal cache and are resolved
+     * before this function is called. So there is no need for manual caching.
+     * @param pageable Page settings
+     */
+    protected abstract getPageData(pageable: Pageable): Observable<T[]>;
+
+    /**
+     * Set a cached page's contents
+     * @param pageIndex Page index to cache
+     * @param items Items to insert to cache
+     */
+    protected setCachedPage(pageIndex: number, items: DatasourceItem<T>[]) {
+        this._cachedPages.set(pageIndex, items);
+    }
+
+    /**
+     * Check if a page already exists in cache by its index.
+     * @param pageIndex Index of the requested page to check
+     * @returns True or False
+     */
+    protected isCached(pageIndex: number): boolean {
+        return this._cachedPages.has(pageIndex);
+    }
+
+    /**
+     * Get the datasource items from the cache matching a pageIndex.
+     * @param pageIndex Index of the requested page to lookup from cache
+     * @returns DatasourceItem<T>[]
+     */
+    protected getCachedPage(pageIndex: number): DatasourceItem<T>[] {
+        return this._cachedPages.get(pageIndex);
+    }
+
+    /**
+     * Clear internal cache.
+     * This is useful if the contents should be refetched after updates occured.
+     * When the user scrolls again, the pages get refetched.
+     */
+    public clearCache() {
+        this._cachedPages.clear();
+    }
+}
+
+export class SCNGXDatasource<T = any> extends SCNGXBaseDatasource<T> {
+    
+    constructor(
+        public readonly httpClient: HttpClient,
+        public readonly pagination: Pagination,
+        settings?: Settings<unknown>
+    ) {
+        super(pagination.pageSize, settings);
+    }
+
+    /**
+     * Get the datasource items from the cache matching a pageIndex.
+     * @param pageIndex Index of the requested page to lookup from cache
+     * @returns DatasourceItem<T>[]
+     */
+    protected getPageData(pageable: Pageable): Observable<T[]> {
         const pageIndex = pageable.page;
-        // const pageIndex = pageable.page;
 
-        // Check if page was already fetched or has invalid page settings.
-        // if (pageIndex < 0 || pageable.size <= 0 || this._fetchedPageIndexes.has(pageIndex) || this._fetchedPageStatus[pageIndex] == PageFetchStatus.OK) {
-        //     return of([]);
-        // }
-
-        // Update status to fetching
-        // this._fetchedPageStatus[pageIndex] = PageFetchStatus.FETCHING;
-
-        if(this.isCached(pageIndex)) {
-            console.log("page already in cache, returning from cache");
-            return of(this.getCachedPage(pageIndex));
-        }
-
-        console.log("page not cached yet, fetching from remote...");
-
+        // Make network call
         return this.httpClient.get<Page<T>>(`${this.pagination.url}${pageable.toQuery()}`).pipe(
+            // Transform errors
             apiResponse(),
-            switchMap((response: ApiResponse<Page<T>>): Observable<DatasourceItem<T>[]> => {
+            // Intercept the response and switch to different observable type
+            switchMap((response: ApiResponse<Page<T>>): Observable<T[]> => {
                 const page = response?.payload;
 
                 // If there were errors, set status to error.
@@ -161,6 +229,7 @@ export class SCNGXDatasource<T = any> implements IDatasource {
                     return of([]);
                 }
 
+                // Map the results to internal 
                 let items: DatasourceItem<T>[] = page.elements.map<DatasourceItem<T>>((_, i) => {
                     if(!page.elements[i]) return null;
                     const element = Object.assign({}, page.elements[i]);
@@ -170,29 +239,8 @@ export class SCNGXDatasource<T = any> implements IDatasource {
                     }
                 });
 
-                // Cache page
-                this.cachedPages[pageIndex] = items;
-
-                this._totalElements = page.totalElements;
-                return of(items);
+                return of(page.elements);
             })
         );
-    }
-
-    protected getPageableForIndex(index: number, size: number): IndexPageable {
-        return new IndexPageable(index, size);
-    }
-
-    protected getIndexForPageAndItemIndex(pageNr: number, index: number): number {
-        const amount = pageNr * this.pagination.pageSize;
-        return amount + index;
-    }
-
-    protected isCached(pageIndex: number): boolean {
-        return !!this.cachedPages[pageIndex];
-    }
-
-    protected getCachedPage(pageIndex: number): DatasourceItem<T>[] {
-        return this.cachedPages[pageIndex];
     }
 }
