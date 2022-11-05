@@ -10,7 +10,7 @@
   "scripts": {
     "build:api": "turbo run build:api",
     "build:app": "turbo run build:app",
-    "dockerize:api": "turbo run dockerize:api && docker build --tag z3ttee/soundcore:latest .",
+    "dockerize:api": "docker builder prune -a -f && docker build --tag z3ttee/soundcore:latest .",
     "dev": "turbo run dev --parallel",
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\""

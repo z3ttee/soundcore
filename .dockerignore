@@ -1,7 +1,14 @@
-node_modules/
-dist/
-.env
-.env.dev
+node_modules
+./**/databases
+./**/dist
+./**/.env
+./**/.env.dev
+
+.angular
+.vscode
+
+./**/docker-compose.yml
+./**/ecosystem.config.js
 
 packages/soundcore-*
 apps/app
