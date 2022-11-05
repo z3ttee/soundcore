@@ -41,6 +41,7 @@
     "ffprobe-static": "^3.1.0",
     "glob": "^8.0.3",
     "meilisearch": "^0.27.0",
+    "mysql2": "^2.3.3",
     "nestjs-pager": "^1.1.9",
     "node-id3": "^0.2.3",
     "node-vibrant": "^3.2.1-alpha.1",
@@ -49,14 +50,13 @@
     "rimraf": "^3.0.2",
     "rxjs": "^7.5.6",
     "sanitize-filename": "^1.6.3",
+    "sharp": "^0.31.1",
     "socket.io": "^4.5.1",
     "sqlstring": "^2.3.3",
-    "mysql2": "^2.3.3",
     "typeorm": "^0.3.10",
     "workerpool": "^6.2.1",
     "ytdl-core": "^4.11.0",
-    "ytpl": "^2.3.0",
-    "sharp": "^0.31.1"
+    "ytpl": "^2.3.0"
   },
   "devDependencies": {
     "@nestjs/cli": "^9.0.0",

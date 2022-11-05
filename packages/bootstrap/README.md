@@ -1,75 +1,54 @@
-# Soundcore Redis Module
-This package includes `ioredis` as NestJS Module.
-It is a more lightweight version of `@nest-modules/ioredis` and contains only the necessary methods used in this monorepo.
-Additionally, it introduces only support for NestJS 9.x.x
+# Soundcore Bootstrap Module
+Bootstrap package to boot up a NestJS application.
+
+# Motivation
+Booting up a NestJS application comes with boilerplate code that is the same across multiple applications.
+To have a single point of source code for such scenario, this package has been created. This package also comes with
+a more friendly to read way to create a nest application. For more, see the usage section.
 
 ## Installation
 ```bash
-npm install --save @soundcore/redis ioredis
+npm install --save @soundcore/bootstrap
 ```
 or using yarn
 ```bash
-yarn add @soundcore/redis ioredis
+yarn add @soundcore/bootstrap
 ```
 
 ## Usage
 First, you have to register the module in your `app.module.ts`:
 ```javascript
-import { Module } from '@nestjs/common';
-import { SoundcoreRedisModule } from '@soundcore/redis';
+import { createBootstrap } from "@soundcore/bootstrap";
+import { AppModule } from './app.module';
+import { Logger, VersioningType } from '@nestjs/common';
 
-@Module({
-  imports: [
-    SoundcoreRedisModule.forRoot({
-        // IORedis options go here
-    })
-  ]
-})
-export class AppModule {}
+// Create a logger to log messages
+const logger = new Logger("Bootstrap");
+
+// Call createBootstrap() with your desired application
+// and the root module of your NestJS application
+createBootstrap("Soundcore @NEXT", AppModule)
+  // Define some additional options like you would in a normal NestFactory
+  .useOptions({ cors: true, abortOnError: false })
+  // Enable CORS, unnecessary in this example as we have already set cors to true
+  .enableCors()
+  // Enable versioning for api routes
+  .enableVersioning({ type: VersioningType.URI, defaultVersion: "1" })
+  // Bind to a specific host
+  .useHost(process.env.BIND_ADDRESS || "0.0.0.0")
+  // Define desired port of your application
+  .usePort(Number(process.env.PORT) || 3002)
+  // This will read a file containing some build info. The file must contain json data in the form of:
+  // { name: string, version: string, date: number }.
+  // Name = Application name
+  // Version = Application's version
+  // Date = Build date
+  .withBuildInfo()
+  // Call bootstrap to boot up nestjs application
+  .bootstrap().then((app) => {
+    // Do something with the app instance
+    app.getUrl().then((url) => {
+      logger.log(`Service now listening for requests on url '${url}'.`);      
+    });
+  });
 ```
-To configure the redis client, please read the docs of the [ioredis](https://github.com/luin/ioredis) package.
-After that, you can inject the redis client in your services like that:
-```javascript
-import { Injectable } from '@nestjs/common';
-import Redis from "ioredis";
-
-@Injectable()
-export class AppService {
-  constructor(private readonly redis: Redis) {}
-}
-```
-
-You can choose between 2 redis connections: One that is just for subscribing, publishing and a default one.
-To inject just the connection to subscribe to messages, please do the following:
-
-```
-import { Injectable } from '@nestjs/common';
-import { RedisSub } from "@soundcore/redis";
-
-@Injectable()
-export class AppService {
-  constructor(private readonly redis: RedisSub) {}
-}
-```
-
-This is done to prevent, that there is only one connection for developers to use. Because of the nature of redis,
-if a connection goes into subscribtion mode, no messages can be published anymore. If you do not care about Pub/Sub,
-then stick to the default `Redis` injection token shown in the first example of this section.
-
-If you need more connections. You can register new connections in your modules using `registerConnections()`.
-
-## Subscribe
-Redis is known for its ability for Pub/Sub. To make subscribing to messages and channels more comfortable, a new decorator has been introduced: `@RedisSubscribe(channel: string, expectJSON: boolean)`. This is a method decorator and takes in 2 parameters. The first one specifies the channel to which the client should listen. The second parameter defines, wether the client should parse the JSON string to an actual JSON object or not. Please see the following example on how to use the decorator:
-
-```javascript
-import { RedisSubscribe } from "@soundcore/redis";
-
-@RedisSubscribe("test", true)
-public handleSubscribe(channel: string, payload: any) {
-  console.log(channel, payload);
-}
-
-```
-
-The example above would subscribe on the channel called "test" and parse the received messages to an JSON object. Please make sure that on these channels, only json strings
-are sent. Otherwise it would cause parsing errors and the payload object may become a nullish value.

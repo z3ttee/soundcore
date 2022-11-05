@@ -1,7 +1,5 @@
-# Soundcore Redis Module
-This package includes `ioredis` as NestJS Module.
-It is a more lightweight version of `@nest-modules/ioredis` and contains only the necessary methods used in this monorepo.
-Additionally, it introduces only support for NestJS 9.x.x
+# Soundcore Common
+This package contains common utilities used in the soundcore api backend
 
 ## Installation
 ```bash
