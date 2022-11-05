@@ -1,6 +1,6 @@
 {
   "name": "@soundcore/bootstrap",
-  "version": "0.0.1",
+  "version": "1.0.1",
   "description": "",
   "author": "z3ttee",
   "private": false,
@@ -8,7 +8,8 @@
   "main": "dist/index.js",
   "scripts": {
     "build:api": "nest build",
-    "dev": "nest build --watch"
+    "dev": "nest build --watch",
+    "publishPackage": "yarn run build:api && yarn config set version-sign-git-tag false && yarn version --patch && yarn publish --access=public"
   },
   "files": [
     "dist/**/*",
@@ -18,7 +19,7 @@
     "@nestjs/common": "^9.0.0",
     "@nestjs/core": "^9.0.0",
     "@nestjs/config": "^2.2.0",
-    "rxjs": "7.5.6"
+    "rxjs": "^7.5.6"
   },
   "dependencies": {
     "reflect-metadata": "^0.1.13"
