@@ -1,4 +1,3 @@
-import { PlaylistItem } from "../../playlist/entities/playlist-item.entity";
 
 /**
  * Enum to handle different
@@ -23,7 +22,7 @@ export class TracklistItem {
     /**
      * Song id.
      */
-    public readonly id: string;
+    public readonly id: number;
 }
 
 /**
@@ -31,7 +30,7 @@ export class TracklistItem {
  * It contains the size, type
  * and items of a tracklist.
  */
-export class Tracklist {
+export class SCSDKTracklist {
 
     constructor(
         /**
@@ -45,7 +44,7 @@ export class Tracklist {
         /**
          * Items array
          */
-        public readonly items: (PlaylistItem | TracklistItem)[],
+        public readonly itemIds: TracklistItem[],
         /**
          * Returns a relative url that points
          * to the metadata endpoint for that list.

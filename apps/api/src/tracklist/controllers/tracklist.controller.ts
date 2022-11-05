@@ -4,7 +4,7 @@ import { Authentication } from '../../authentication/decorators/authentication.d
 import { Hostname } from '../../hostname/decorator/hostname.decorator';
 import { PlaylistItem } from '../../playlist/entities/playlist-item.entity';
 import { User } from '../../user/entities/user.entity';
-import { Song } from '../entities/song.entity';
+import { Song } from '../../song/entities/song.entity';
 import { Tracklist } from '../entities/tracklist.entity';
 import { TracklistService } from '../services/tracklist.service';
 
@@ -12,7 +12,7 @@ import { TracklistService } from '../services/tracklist.service';
  * Controller class that contains
  * endpoints for handling tracklists.
  */
-@Controller('tracklist')
+@Controller('tracklists')
 export class TracklistController {
     constructor(private readonly service: TracklistService) {}
 
@@ -96,7 +96,7 @@ export class TracklistController {
      */
     @Get("/playlist/:playlistId")
     public async findListByPlaylist(@Param("playlistId") playlistId: string, @Authentication() authentication: User, @Hostname() hostname: string): Promise<Tracklist> {
-        return this.service.findListByPlaylist(playlistId, hostname, authentication);
+        return this.service.findByPlaylist(playlistId, hostname, authentication);
     }
 
     /**

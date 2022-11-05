@@ -33,6 +33,7 @@ import { HostnameModule } from './hostname/hostname.module';
 import { CronModule } from './cron/cron.module';
 import { CommonConfigModule } from '@soundcore/common';
 import { WorkerQueueModule } from '@soundcore/nest-queue';
+import { TracklistModule } from './tracklist/tracklist.module';
 
 @Module({
   imports: [
@@ -103,7 +104,8 @@ import { WorkerQueueModule } from '@soundcore/nest-queue';
       useFactory: () => ({
         clientToken: process.env.GENIUS_TOKEN
       }),
-    })
+    }),
+    TracklistModule
   ],
   controllers: [
     AppController

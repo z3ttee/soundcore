@@ -9,18 +9,13 @@ export * from "./lib/gateway";
 // Pagination
 export * from "./lib/pagination";
 
-
-
-
-
-
-
-
-
-
-
 // Tracklist
-export * from "./lib/song/entities/tracklist.entity";
+export * from "./lib/tracklist";
+
+
+
+
+
 
 // Utils
 export * from "./lib/utils/responses/api-response";

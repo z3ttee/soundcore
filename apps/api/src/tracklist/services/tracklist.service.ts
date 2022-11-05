@@ -3,17 +3,18 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Page, BasePageable } from 'nestjs-pager';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 import { PlaylistItem } from '../../playlist/entities/playlist-item.entity';
+import { Song } from '../../song/entities/song.entity';
+import { Tracklist, TracklistItem, TracklistType } from '../entities/tracklist.entity';
+import { SongService } from '../../song/services/song.service';
 import { User } from '../../user/entities/user.entity';
-import { Song } from '../entities/song.entity';
-import { Tracklist, TracklistType } from '../entities/tracklist.entity';
-import { SongService } from '../song.service';
 
 @Injectable()
 export class TracklistService {
 
     constructor(
         private readonly songService: SongService,
-        @InjectRepository(PlaylistItem)  private tracklistRepository: Repository<PlaylistItem>
+        @InjectRepository(PlaylistItem)  private tracklistRepository: Repository<PlaylistItem>,
+        @InjectRepository(Song)  private songRepository: Repository<Song>
     ) {}
 
     /**
@@ -24,7 +25,7 @@ export class TracklistService {
      */
     public async findListByArtist(artistId: string, hostname: string, authentication?: User): Promise<Tracklist> {
         const result = this.buildFindByArtistQuery(artistId, "song", null, authentication).select(["song.id"]).getManyAndCount();
-        const metadataUrl = `${hostname}/v1/tracklist/artist/${artistId}/meta`;
+        const metadataUrl = `${hostname}/v1/tracklists/artist/${artistId}/meta`;
         return new Tracklist(result[1], TracklistType.ARTIST, result[0], metadataUrl);
     }
 
@@ -54,7 +55,7 @@ export class TracklistService {
      */
     public async findListByArtistTop(artistId: string, hostname: string, authentication?: User): Promise<Tracklist> {
         const result = this.buildFindByArtistTopQuery(artistId, "song", authentication).select(["song.id"]).getManyAndCount();
-        const metadataUrl = `${hostname}/v1/tracklist/artist/top/${artistId}/meta`;
+        const metadataUrl = `${hostname}/v1/tracklists/artist/top/${artistId}/meta`;
         return new Tracklist(result[1], TracklistType.ARTIST, result[0], metadataUrl);
     }
 
@@ -85,8 +86,8 @@ export class TracklistService {
      */
     public async findListByAlbum(albumId: string, hostname: string, authentication?: User): Promise<Tracklist> {
         const result = await this.buildFindByAlbumQuery(albumId, "song", null, authentication).select(["song.id"]).getMany();
-        const metadataUrl = `${hostname}/v1/tracklist/album/${albumId}/meta`;
-        return new Tracklist(result.length, TracklistType.ALBUM, result, metadataUrl);   
+        const metadataUrl = `${hostname}/v1/tracklists/album/${albumId}/meta`;
+        return new Tracklist(result.length, TracklistType.ALBUM, result as unknown as TracklistItem[], metadataUrl);   
     }
 
     /**
@@ -97,8 +98,7 @@ export class TracklistService {
      * @returns Page<Song>
      */
     public async findMetaByAlbum(albumId: string, pageable: BasePageable, authentication?: User): Promise<Page<Song>> {
-        const baseQuery = await this.buildFindByAlbumQuery(albumId, "song", pageable, authentication)
-            
+        const baseQuery = await this.buildFindByAlbumQuery(albumId, "song", pageable, authentication)            
         const result = await baseQuery.getRawAndEntities();
         const totalElements = await baseQuery.getCount();
         return Page.of(result.entities.map((song, index) => {
@@ -114,7 +114,7 @@ export class TracklistService {
      * @param authentication User authentication object
      * @returns Tracklist
      */
-    public async findListByPlaylist(playlistId: string, hostname: string, authentication?: User): Promise<Tracklist> {
+    public async findByPlaylist(playlistId: string, hostname: string, authentication?: User): Promise<Tracklist> {
         // TODO: Check if user has access to playlist
         const result = await this.tracklistRepository.createQueryBuilder("item")
             .leftJoin("item.playlist", "playlist")
@@ -125,7 +125,7 @@ export class TracklistService {
             .addOrderBy("item.createdAt", "ASC")
             .getMany();
 
-        const metadataUrl = `${hostname}/v1/tracklist/playlist/${playlistId}/meta`;
+        const metadataUrl = `${hostname}/v1/tracklists/playlist/${playlistId}/meta`;
         return new Tracklist(result.length, TracklistType.PLAYLIST, result, metadataUrl);    
     }
 
@@ -139,7 +139,7 @@ export class TracklistService {
     public async findMetaByPlaylist(playlistId: string, pageable: BasePageable, authentication?: User): Promise<Page<PlaylistItem>> {
         // TODO: Check if user has access to playlist
         const result = await this.tracklistRepository.createQueryBuilder("item")
-            .leftJoin("item.song", "song").addSelect(["song.id", "song.slug", "song.name"])
+            .leftJoin("item.song", "song").addSelect(["song.id", "song.slug", "song.name", "song.duration"])
             .leftJoin("song.album", "album").addSelect(["album.id", "album.slug", "album.name"])
             .leftJoin("song.primaryArtist", "primaryArtist").addSelect(["primaryArtist.id", "primaryArtist.slug", "primaryArtist.name"])
             .leftJoin("song.featuredArtists", "featuredArtists").addSelect(["featuredArtists.id", "featuredArtists.slug", "featuredArtists.name"])

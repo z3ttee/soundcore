@@ -1,6 +1,3 @@
-import { PlaylistItem } from "../../playlist/entities/playlist-item.entity";
-import { Song } from "./song.entity";
-
 /**
  * Enum to handle different
  * Tracklist types.
@@ -15,11 +12,24 @@ export enum TracklistType {
 }
 
 /**
+ * Class to handle items
+ * inside a Tracklist.
+ * It consists currently only of an id
+ * that corresponds to a song.
+ */
+export class TracklistItem {
+    /**
+     * Song id.
+     */
+    public readonly id: number;
+}
+
+/**
  * Class to handle Tracklists.
  * It contains the size, type
  * and items of a tracklist.
  */
-export class SCDKTracklist<T = (PlaylistItem | Song)> {
+export class Tracklist {
 
     constructor(
         /**
@@ -33,7 +43,7 @@ export class SCDKTracklist<T = (PlaylistItem | Song)> {
         /**
          * Items array
          */
-        public readonly items: T[],
+        public readonly itemIds: (TracklistItem)[],
         /**
          * Returns a relative url that points
          * to the metadata endpoint for that list.
