@@ -3,7 +3,7 @@ import { Page, Pageable, Pagination } from 'nestjs-pager';
 import { Authentication } from '../../authentication/decorators/authentication.decorator';
 import { User } from '../../user/entities/user.entity';
 import { Song } from '../entities/song.entity';
-import { SongService } from '../song.service';
+import { SongService } from '../services/song.service';
 
 @Controller('songs')
 export class SongController {

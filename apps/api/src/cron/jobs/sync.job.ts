@@ -13,7 +13,7 @@ import { SyncFlag } from "../../meilisearch/interfaces/syncable.interface";
 import { Publisher } from "../../publisher/entities/publisher.entity";
 import { PublisherService } from "../../publisher/services/publisher.service";
 import { Song } from "../../song/entities/song.entity";
-import { SongService } from "../../song/song.service";
+import { SongService } from "../../song/services/song.service";
 
 const SYNC_ITEMS_LIMIT = 100;
 

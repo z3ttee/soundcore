@@ -3,7 +3,6 @@ import path from "node:path";
 import workerpool from "workerpool";
 
 import { ArtistService } from "../../artist/artist.service";
-import { SongService } from "../../song/song.service";
 import { IndexerProcessDTO } from "../dtos/indexer-process.dto";
 
 import { Artist } from "../../artist/entities/artist.entity";
@@ -20,7 +19,6 @@ import { Album } from "../../album/entities/album.entity";
 import { MeiliArtistService } from "../../meilisearch/services/meili-artist.service";
 import { MeiliAlbumService } from "../../meilisearch/services/meili-album.service";
 import { MeiliSongService } from "../../meilisearch/services/meili-song.service";
-import { CreateResult } from "../../utils/results/creation.result";
 import Database from "../../utils/database/database-worker-client";
 import { FileSystemService } from "../../filesystem/services/filesystem.service";
 import MeiliClient from "../../utils/database/meilisearch-worker-client";
@@ -31,7 +29,7 @@ import { Batch } from "@soundcore/common";
 import { CreateArtistDTO } from "../../artist/dtos/create-artist.dto";
 import { CreateAlbumDTO } from "../../album/dto/create-album.dto";
 import { CreateSongDTO } from "../../song/dtos/create-song.dto";
-import { Mount } from "../../mount/entities/mount.entity";
+import { SongService } from "../../song/services/song.service";
 
 const logger = new Logger("IndexWorker");
 const BATCH_SIZE = 100;

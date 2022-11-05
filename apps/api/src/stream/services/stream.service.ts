@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { Request, Response } from 'express';
-import { SongService } from '../../song/song.service';
 
 import { StreamTokenService } from './stream-token.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Stream } from '../entities/stream.entity';
 import { Repository } from 'typeorm';
+import { SongService } from '../../song/services/song.service';
 
 @Injectable()
 export class StreamService {

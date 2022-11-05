@@ -4,27 +4,24 @@ import ffprobe from 'ffprobe';
 import ffprobeStatic from "ffprobe-static";
 
 import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
-import { CreateSongDTO } from './dtos/create-song.dto';
-import { Song } from './entities/song.entity';
 import { Page, BasePageable } from 'nestjs-pager';
-import { User } from '../user/entities/user.entity';
-import { Artwork } from '../artwork/entities/artwork.entity';
-import { SongUniqueFindDTO } from "./dtos/unique-find.dto";
-import { GeniusFlag, ResourceFlag } from "../utils/entities/resource";
-import { ID3TagsDTO } from "./dtos/id3-tags.dto";
 import path from "path";
 
-import { File, FileFlag } from "../file/entities/file.entity";
 import { InjectRepository } from "@nestjs/typeorm";
 import { In, Repository, UpdateResult } from "typeorm";
-import { MeiliSongService } from "../meilisearch/services/meili-song.service";
-import { SyncFlag } from "../meilisearch/interfaces/syncable.interface";
-import { CreateResult } from "../utils/results/creation.result";
-import { SyncingService } from "../utils/services/syncing.service";
 import { EventEmitter2 } from "@nestjs/event-emitter";
 import { Environment } from "@soundcore/common";
-import { Artist } from "../artist/entities/artist.entity";
-import { Album } from "../album/entities/album.entity";
+import { SyncingService } from "../../utils/services/syncing.service";
+import { Song } from "../entities/song.entity";
+import { MeiliSongService } from "../../meilisearch/services/meili-song.service";
+import { User } from "../../user/entities/user.entity";
+import { SyncFlag } from "../../meilisearch/interfaces/syncable.interface";
+import { CreateSongDTO } from "../dtos/create-song.dto";
+import { Artwork } from "../../artwork/entities/artwork.entity";
+import { GeniusFlag, ResourceFlag } from "../../utils/entities/resource";
+import { ID3TagsDTO } from "../dtos/id3-tags.dto";
+import { SongUniqueFindDTO } from "../dtos/unique-find.dto";
+import { FileFlag } from "../../file/entities/file.entity";
 
 @Injectable()
 export class SongService extends SyncingService {
