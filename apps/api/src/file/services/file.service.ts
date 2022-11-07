@@ -24,6 +24,14 @@ export class FileService {
             .getOne();
     }
 
+    public async findBySongId(songId: string): Promise<File> {
+        return this.repository.createQueryBuilder("file")
+            .leftJoinAndSelect("file.song", "song")
+            .leftJoinAndSelect("file.mount", "mount")
+            .where("song.id = :songId", { songId })
+            .getOne();
+    }
+
     public async findByFlagAndMount(mountId: string, flag: FileFlag) {
         return this.repository.createQueryBuilder("file")
             .leftJoin("file.mount", "mount")

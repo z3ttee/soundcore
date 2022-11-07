@@ -1,12 +1,12 @@
 import { Module } from '@nestjs/common';
 import { StreamService } from './services/stream.service';
-import { StreamController } from './stream.controller';
-import { SongModule } from '../song/song.module';
+import { StreamController } from './controllers/stream.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { StreamTokenService } from './services/stream-token.service';
 import { JwtModule } from '@nestjs/jwt';
 import { v4 as uuidv4 } from "uuid"
 import { Stream } from './entities/stream.entity';
+import { FileModule } from '../file/file.module';
 
 @Module({
   controllers: [
@@ -17,7 +17,7 @@ import { Stream } from './entities/stream.entity';
     StreamTokenService
   ],
   imports: [
-    SongModule,
+    FileModule,
     TypeOrmModule.forFeature([ Stream ]),
     JwtModule.register({
       verifyOptions: {
