@@ -28,6 +28,17 @@ export abstract class SCNGXBaseDatasource<T = any> implements IDatasource {
     protected readonly _destroy: Subject<void> = new Subject();
 
     /**
+     * Subject used to inform subscribers on errors that occured inside the datasource
+     */
+    private readonly _errorSubject: Subject<Error> = new Subject();
+
+    /**
+     * Observable to which subscribers can be subscribed. Used to act upon
+     * errors inside the datasource.
+     */
+    public readonly $error: Observable<Error> = this._errorSubject.asObservable();
+
+    /**
      * Property required by the IDatasource interface of vscroll
      * Currently unused.
      */
@@ -77,7 +88,7 @@ export abstract class SCNGXBaseDatasource<T = any> implements IDatasource {
         this.pageSize = pageSize || 30;
 
         // Register the get() method for vscroll's datasource
-        this.get = (index, count) => new Promise((resolve, reject) => {
+        this.get = (index, count) => new Promise((getResolve, getReject) => {
             const pageSize = this.pageSize;
 
             // Calculate requested indices
@@ -86,7 +97,7 @@ export abstract class SCNGXBaseDatasource<T = any> implements IDatasource {
 
             // If start greater than end, return empty array
             if (startIndex > endIndex) {
-                resolve([]); // empty result
+                getResolve([]); // empty result
                 return;
             }
 
@@ -99,17 +110,19 @@ export abstract class SCNGXBaseDatasource<T = any> implements IDatasource {
 
                 // Directly add cached data to the requests
                 if(this.isCached(pageIndex)) {
-                    requests.push(new Promise((resolve) => {
-                        resolve(this.getCachedPage(pageIndex));
+                    requests.push(new Promise((requestResolve) => {
+                        requestResolve(this.getCachedPage(pageIndex));
                     }))
                     continue;
                 }
 
                 // Otherwise push network call promise to the requests array
-                requests.push(new Promise((resolve, reject) => {
+                requests.push(new Promise((requestResolve, requestReject) => {
                     const pageable: Pageable = new Pageable(pageIndex, pageSize);
+                    
                     this.getPageData(pageable).pipe(takeUntil(this._destroy), catchError((err: Error) => {
-                        reject(err)
+                        this.pushError(err);
+                        requestReject(err)
                         return of([] as T[]);
                     })).subscribe((items) => {
 
@@ -129,7 +142,7 @@ export abstract class SCNGXBaseDatasource<T = any> implements IDatasource {
                         }
 
                         // Resolve with the items
-                        resolve(mappedItems);
+                        requestResolve(mappedItems);
                     });
                 }));
             }
@@ -146,8 +159,11 @@ export abstract class SCNGXBaseDatasource<T = any> implements IDatasource {
                 // Slice the array to return just the requested resources
                 return items.slice(start, end);
             }).then((items) => {
-                resolve(items);
-            }).catch((error) => reject(error));
+                getResolve(items);
+            }).catch((error: Error) => {
+                this.pushError(error);
+                getReject(error);
+            });
         });
     }
 
@@ -191,8 +207,30 @@ export abstract class SCNGXBaseDatasource<T = any> implements IDatasource {
      * This is useful if the contents should be refetched after updates occured.
      * When the user scrolls again, the pages get refetched.
      */
-    public clearCache() {
+     public clearCache() {
         this._cachedPages.clear();
+    }
+
+    /**
+     * Emit a new error. Subscribers can act upon this error.
+     * Use this to inform your frontend parts on errors.
+     * @param error Error to push
+     */
+    protected pushError(error: Error): void {
+        this._errorSubject.next(error);
+    }
+
+    /**
+     * Translate an items index in the tracklist to
+     * its associated page index.
+     * @param index Index of the item
+     * @returns Page index as number
+     */
+    protected translateIndexToPageIndex(index: number): number {
+        const startIndex = Math.max(index, 0);
+        const startPage = Math.floor(startIndex / this.pageSize);
+
+        return startPage;
     }
 }
 
@@ -212,8 +250,6 @@ export class SCNGXDatasource<T = any> extends SCNGXBaseDatasource<T> {
      * @returns DatasourceItem<T>[]
      */
     protected getPageData(pageable: Pageable): Observable<T[]> {
-        const pageIndex = pageable.page;
-
         // Make network call
         return this.httpClient.get<Page<T>>(`${this.pagination.url}${pageable.toQuery()}`).pipe(
             // Transform errors
@@ -224,19 +260,9 @@ export class SCNGXDatasource<T = any> extends SCNGXBaseDatasource<T> {
 
                 // If there were errors, set status to error.
                 // Then it can be retried later.
-                if(response.error || page.size < pageable.limit) {
+                if(response.error) {
                     return of([]);
                 }
-
-                // Map the results to internal 
-                let items: DatasourceItem<T>[] = page.elements.map<DatasourceItem<T>>((_, i) => {
-                    if(!page.elements[i]) return null;
-                    const element = Object.assign({}, page.elements[i]);
-                    return {
-                        data: element,
-                        index: (pageIndex * this.pagination.pageSize) + i
-                    }
-                });
 
                 return of(page.elements);
             })
