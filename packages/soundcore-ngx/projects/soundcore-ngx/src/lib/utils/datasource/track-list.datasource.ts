@@ -74,7 +74,7 @@ export class TrackListDataSource extends DataSource<Song> {
           return;
         }
 
-        const pageable: Pageable = { page: pageNr, size: this.options.pageSize }
+        const pageable: Pageable = new Pageable(pageNr, this.options.pageSize);
         console.log("fetching next page: ", pageable)
 
         firstValueFrom(this.httpClient.get<Page<Song>>(`${this.options.apiBaseUri}/v1/songs/${this.options.type}/${this.options.resourceId}${pageable.toQuery()}`)).then((page) => {

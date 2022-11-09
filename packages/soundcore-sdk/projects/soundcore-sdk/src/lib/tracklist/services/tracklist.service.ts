@@ -6,7 +6,9 @@ import { ApiResponse } from "../../utils/responses/api-response";
 import { apiResponse } from "../../utils/rxjs/operators/api-response";
 import { SCSDKTracklist } from "../entities/tracklist.entity";
 
-@Injectable()
+@Injectable({
+    providedIn: "root"
+})
 export class SCSDKTracklistService {
 
     constructor(

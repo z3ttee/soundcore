@@ -6,6 +6,17 @@ export { SCNGXModule } from "./lib/scngx.module";
 // Scroll Module
 export * from "./lib/scroll";
 
+// Table Module
+// export * from "./lib/table";
+
+// Tracklist Module
+export * from "./lib/tracklist";
+
+
+
+
+
+
 // Drawer
 export * from "./lib/components/drawer/drawer.module";
 export * from "./lib/components/drawer/drawer.component";
@@ -158,11 +169,6 @@ export * from "./lib/pipes/resource-type-pipe/resource-type-pipe.pipe";
 export * from "./lib/utils/datasource/infinite-datasource";
 export * from "./lib/utils/datasource/playlist-datasource";
 export * from "./lib/utils/datasource/tracklist-datasource";
-
-// Playable lists
-export * from "./lib/entities/playable-list.entity";
-export * from "./lib/entities/playable-tracklist.entity";
-export * from "./lib/utils/builder/playable-list.builder";
 
 // Notifications
 export * from "./lib/components/notification/notification-list-item/notification-list-item.module";
