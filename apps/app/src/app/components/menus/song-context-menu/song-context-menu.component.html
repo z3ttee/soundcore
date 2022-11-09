@@ -1,6 +1,6 @@
 <sccdk-context-menu>
     <sccdk-context-menu-category>
-        <sccdk-context-menu-item>
+        <sccdk-context-menu-item (click)="playNext()">
             <hero-icon name="collection" [class]="'h-5 w-5'"></hero-icon>
             <span>Zur Warteschlange hinzufügen</span>
         </sccdk-context-menu-item>
@@ -9,11 +9,4 @@
             <span>Zu Playlist hinzufügen</span>
         </sccdk-context-menu-item>
     </sccdk-context-menu-category>
-    
-    <!--<sccdk-context-menu-category label="Administration" *ngIf="($isAdmin | async)">
-        <sccdk-context-menu-item>
-            <hero-icon name="view-grid-add" [class]="'h-5 w-5'"></hero-icon>
-            <span>Datei ansehen</span>
-        </sccdk-context-menu-item>
-    </sccdk-context-menu-category>-->
 </sccdk-context-menu>

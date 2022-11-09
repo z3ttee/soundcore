@@ -5,6 +5,7 @@ import { Observable, Subject, takeUntil } from 'rxjs';
 import { SCNGXDialogService } from '@soundcore/ngx';
 import { MeiliSong, Playlist, PlaylistAddSongFailReason, SCDKPlaylistService, Song } from '@soundcore/sdk';
 import { AppPlaylistChooseDialog } from 'src/app/dialogs/playlist-choose-dialog/playlist-choose-dialog.component';
+import { AppPlayerService } from 'src/app/modules/player/services/player.service';
 
 @Component({
   selector: 'app-song-context-menu',
@@ -19,7 +20,8 @@ export class SongContextMenuComponent implements OnInit, OnDestroy {
     private readonly authService: SSOService,
     private readonly playlistService: SCDKPlaylistService,
     private readonly dialog: SCNGXDialogService,
-    private readonly snackbar: MatSnackBar
+    private readonly snackbar: MatSnackBar,
+    private readonly playerService: AppPlayerService
   ) { }
 
   private readonly _destroy: Subject<void> = new Subject();
@@ -71,6 +73,14 @@ export class SongContextMenuComponent implements OnInit, OnDestroy {
 
       this.snackbar.open(`Song wurde zur Playlist hinzugefügt.`, null, { duration: 5000 });
     })
+  }
+
+  /**
+   * Request the playerService to play the song
+   * next by adding it to the queue
+   */
+  public playNext() {
+    this.playerService.playSingle(this.song as Song, false);
   }
 
 }

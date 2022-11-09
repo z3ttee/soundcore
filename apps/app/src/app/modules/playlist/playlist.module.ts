@@ -6,7 +6,7 @@ import { Error404Module } from 'src/app/shared/error404/error404.module';
 import { HeroIconModule, play, heart, dotsVertical } from 'ng-heroicon';
 import { MatRippleModule } from '@angular/material/core';
 import { ScrollingModule } from '@angular/cdk/scrolling';
-import { SCNGXSkeletonModule, SCNGXSongListItemModule, SCNGXVirtualSongListModule, SCNGXVirtualPlaylistModule } from '@soundcore/ngx';
+import { SCNGXScrollModule, SCNGXSkeletonModule, SCNGXSongListItemModule, SCNGXTableModule } from '@soundcore/ngx';
 import { ListViewModule } from 'src/app/components/resource-views/list-view/list-view.module';
 import { VirtualScrollerModule } from '@tsalliance/ngx-virtual-scroller';
 
@@ -33,8 +33,8 @@ const routes: Routes = [
     SCNGXSkeletonModule,
     SCNGXSongListItemModule,
 
-    // SCNGXVirtualSongListModule,
-    SCNGXVirtualPlaylistModule
+    SCNGXScrollModule,
+    SCNGXTableModule
   ]
 })
 export class PlaylistModule { }

@@ -3,7 +3,7 @@ import { Pipe, PipeTransform } from "@angular/core";
 @Pipe({
     name: 'durationPipe'
 })
-export class SCDurationPipe implements PipeTransform {
+export class AppDurationPipe implements PipeTransform {
   
     transform(value: number): string {
         const pad = function(num, size) { return ('000' + num).slice(size * -1); }
