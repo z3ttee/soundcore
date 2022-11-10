@@ -1,7 +1,7 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { Cron } from "@nestjs/schedule";
 import { Page, Pageable } from "nestjs-pager";
-import { AlbumService } from "../../album/album.service";
+import { AlbumService } from "../../album/services/album.service";
 import { Album } from "../../album/entities/album.entity";
 import { ArtistService } from "../../artist/artist.service";
 import { Artist } from "../../artist/entities/artist.entity";

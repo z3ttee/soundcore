@@ -508,6 +508,10 @@ export class SongService extends SyncingService {
         return Page.of(result[0], result[1], pageable.offset);
     }
 
+    public getRepository(): Repository<Song> {
+        return this.repository;
+    }
+
     /**
      * Build a general query which includes different relations.
      * Relations included: Artwork, primaryArtist, featuredArtists, available bool, liked bool, album
@@ -519,21 +523,21 @@ export class SongService extends SyncingService {
         const queryBuilder = this.repository.createQueryBuilder(alias);
         
         // Fetch info if user has liked the song
-        if(authentication) queryBuilder.loadRelationCountAndMap("song.liked", "song.likes", "likes", (qb) => qb.where("likes.userId = :userId", { userId: authentication?.id }))
+        if(authentication) queryBuilder.loadRelationCountAndMap(`${alias}.liked`, `${alias}.likes`, "likes", (qb) => qb.where("likes.userId = :userId", { userId: authentication?.id }))
         
         // Add artwork to query
-        queryBuilder.leftJoin("song.artwork", "artwork").addSelect(["artwork.id", "artwork.colors"]);
+        queryBuilder.leftJoin(`${alias}.artwork`, "artwork").addSelect(["artwork.id", "artwork.colors"]);
 
         // Populate "available" property by checking if the 
         // song has a file or the file has flag of 0 (OK)
-        queryBuilder.loadRelationCountAndMap("song.available", "song.file", "available", (qb) => qb.where("available.flag = :flag", { flag: FileFlag.OK }))
+        // queryBuilder.loadRelationCountAndMap(`${alias}.available`, `${alias}.file`, "available", (qb) => qb.where("available.flag = :flag", { flag: FileFlag.OK }))
 
         // Add artists information
-        queryBuilder.leftJoin("song.primaryArtist", "primaryArtist").addSelect(["primaryArtist.id", "primaryArtist.slug", "primaryArtist.name"])
-        queryBuilder.leftJoin("song.featuredArtists", "featuredArtist").addSelect(["featuredArtist.id", "featuredArtist.slug", "featuredArtist.name"])
+        queryBuilder.leftJoin(`${alias}.primaryArtist`, "primaryArtist").addSelect(["primaryArtist.id", "primaryArtist.slug", "primaryArtist.name"])
+        queryBuilder.leftJoin(`${alias}.featuredArtists`, "featuredArtist").addSelect(["featuredArtist.id", "featuredArtist.slug", "featuredArtist.name"])
 
         // Add album information
-        queryBuilder.leftJoin("song.album", "album").addSelect(["album.id", "album.slug", "album.name"])
+        queryBuilder.leftJoin(`${alias}.album`, "album").addSelect(["album.id", "album.slug", "album.name"])
 
         return queryBuilder;
     }

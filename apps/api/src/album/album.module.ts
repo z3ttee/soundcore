@@ -1,5 +1,5 @@
 import { forwardRef, Module } from '@nestjs/common';
-import { AlbumService } from './album.service';
+import { AlbumService } from './services/album.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { GeniusModule } from '../genius/genius.module';
 import { AlbumController } from './controllers/album.controller';

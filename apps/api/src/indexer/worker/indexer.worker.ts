@@ -6,7 +6,7 @@ import { ArtistService } from "../../artist/artist.service";
 import { IndexerProcessDTO } from "../dtos/indexer-process.dto";
 
 import { Artist } from "../../artist/entities/artist.entity";
-import { AlbumService } from "../../album/album.service";
+import { AlbumService } from "../../album/services/album.service";
 import { ArtworkService } from "../../artwork/services/artwork.service";
 import { Artwork } from "../../artwork/entities/artwork.entity";
 import { Logger } from "@nestjs/common";

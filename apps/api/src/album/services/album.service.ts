@@ -3,15 +3,15 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Page, BasePageable } from 'nestjs-pager';
 import { Repository, SelectQueryBuilder, UpdateResult } from 'typeorm';
-import { Artist } from '../artist/entities/artist.entity';
-import { EVENT_ALBUMS_CHANGED } from '../constants';
-import { SyncFlag } from '../meilisearch/interfaces/syncable.interface';
-import { MeiliAlbumService } from '../meilisearch/services/meili-album.service';
-import { User } from '../user/entities/user.entity';
-import { GeniusFlag, ResourceFlag } from '../utils/entities/resource';
-import { CreateAlbumDTO } from './dto/create-album.dto';
-import { UpdateAlbumDTO } from './dto/update-album.dto';
-import { Album } from './entities/album.entity';
+import { Artist } from '../../artist/entities/artist.entity';
+import { EVENT_ALBUMS_CHANGED } from '../../constants';
+import { SyncFlag } from '../../meilisearch/interfaces/syncable.interface';
+import { MeiliAlbumService } from '../../meilisearch/services/meili-album.service';
+import { User } from '../../user/entities/user.entity';
+import { GeniusFlag, ResourceFlag } from '../../utils/entities/resource';
+import { CreateAlbumDTO } from '../dto/create-album.dto';
+import { UpdateAlbumDTO } from '../dto/update-album.dto';
+import { Album } from '../entities/album.entity';
 
 @Injectable()
 export class AlbumService {
@@ -34,11 +34,11 @@ export class AlbumService {
             .addSelect(["artwork.colors"])
             .loadRelationCountAndMap("album.songsCount", "album.songs")
 
-            .leftJoin("album.distributor", "distributor").leftJoin("distributor.artwork", "da").addSelect(["distributor.id", "distributor.slug", "distributor.name", "da.id"])
-            .leftJoin("album.publisher", "publisher").leftJoin("publisher.artwork", "da").addSelect(["publisher.id", "publisher.slug", "publisher.name", "da.id"])
-            .leftJoin("album.label", "label").leftJoin("label.artwork", "da").addSelect(["label.id", "label.slug", "label.name", "da.id"])
+            .leftJoin("album.distributors", "distributor").leftJoin("distributor.artwork", "da").addSelect(["distributor.id", "distributor.slug", "distributor.name", "da.id"])
+            .leftJoin("album.publishers", "publisher").leftJoin("publisher.artwork", "pa").addSelect(["publisher.id", "publisher.slug", "publisher.name", "pa.id"])
+            .leftJoin("album.labels", "label").leftJoin("label.artwork", "la").addSelect(["label.id", "label.slug", "label.name", "la.id"])
             .leftJoin("primaryArtist.artwork", "artistArtwork").addSelect(["artistArtwork.id"])
-            .leftJoin("album.songs", "song").addSelect('SUM(song.duration) as _album_totalDuration')
+            .leftJoin("album.songs", "song").addSelect('SUM(song.duration) as album_totalDuration')
             
             .groupBy("album.id")
             .where("album.id = :albumId OR album.slug = :albumId", { albumId })
@@ -103,17 +103,18 @@ export class AlbumService {
      * @returns Page<Album>
      */
     public async findRecommendedProfilesByArtist(artistId: string, exceptAlbumIds: string | string[] = [], authentication?: User): Promise<Page<Album>> {
+        const maxAlbums = 8;
         if(!exceptAlbumIds) exceptAlbumIds = []
         if(!Array.isArray(exceptAlbumIds)) {
             exceptAlbumIds = [ exceptAlbumIds ];
         }
 
         const result = await this.buildGeneralQuery("album", authentication)
-            .take(10)
-            .where("album.id NOT IN(:except) AND (primaryArtist.id = :artistId OR primaryArtist.slug = :artistId)", { except: exceptAlbumIds || [], artistId })
-            .getMany()
+            .take(maxAlbums)
+            .where("album.id NOT IN(:except) AND (primaryArtist.id = :artistId OR primaryArtist.slug = :artistId)", { except: exceptAlbumIds, artistId })
+            .getMany();
 
-        return Page.of(result, 10, 0);
+        return Page.of(result, maxAlbums, 0);
     }
 
     /**

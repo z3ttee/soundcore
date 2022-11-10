@@ -17,7 +17,7 @@ import { SyncFlag } from "../interfaces/syncable.interface";
 import { Environment } from "@soundcore/common";
 import { ArtistService } from "../../artist/artist.service";
 import { DataSource } from "typeorm";
-import { AlbumService } from "../../album/album.service";
+import { AlbumService } from "../../album/services/album.service";
 import { EventEmitter2 } from "@nestjs/event-emitter";
 import { Playlist } from "../../playlist/entities/playlist.entity";
 import { MeiliPlaylistService } from "../services/meili-playlist.service";

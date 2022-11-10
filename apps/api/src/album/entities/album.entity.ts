@@ -61,6 +61,9 @@ export class Album implements Resource, Syncable, GeniusResource {
     @Column({ nullable: true, type: "text" })
     public description: string;
 
+    /**
+     * RELATIONS
+     */
     @ManyToOne(() => Artist)
     @JoinColumn()
     public primaryArtist: Artist;

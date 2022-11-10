@@ -7,6 +7,7 @@ import { Song } from '../../song/entities/song.entity';
 import { Tracklist, TracklistItem, TracklistType } from '../entities/tracklist.entity';
 import { SongService } from '../../song/services/song.service';
 import { User } from '../../user/entities/user.entity';
+import { FileFlag } from '../../file/entities/file.entity';
 
 @Injectable()
 export class TracklistService {
@@ -229,18 +230,17 @@ export class TracklistService {
      * @returns SelectQueryBuilder<Song>
      */
     protected buildFindByAlbumQuery(albumId: string, alias: string, pageable?: BasePageable, authentication?: User): SelectQueryBuilder<Song> {
-        const query = this.songService.buildGeneralQuery(alias, authentication)
+        let query = this.songService.buildGeneralQuery(alias, authentication)
             // Get amount of streams
-            // TODO: To be optimised using selectAndMap in next TypeORM release
             // If this has landed, this row can actually be moved to buildGeneralQuery()
-            .leftJoin('song.streams', 'streams').addSelect(["SUM(IFNULL(streams.streamCount, 0)) AS streamCount"])
+            // .leftJoin('song.streams', 'streams').addSelect(["SUM(IFNULL(streams.streamCount, 0)) AS streamCount"])
             // Order songs by album order
-            .orderBy("song.order", "ASC")
+            .orderBy(`${alias}.order`, "ASC")
             .where("album.id = :albumId OR album.slug = :albumId", { albumId })
 
         // Add optional page settings
         if(!!pageable) {
-            query.skip(pageable.offset).take(pageable.limit)
+            query = query.skip(pageable.offset).take(pageable.limit)
         }
 
         return query;
@@ -263,6 +263,7 @@ export class TracklistService {
             // If this has landed, this row can actually be moved to buildGeneralQuery()
             .leftJoin('song.streams', 'streams').addSelect(["SUM(IFNULL(streams.streamCount, 0)) AS streamCount"])
             .leftJoin("song.playlists", "item").addSelect(["item.order", "item.createdAt"])
+            .leftJoin("song.primaryArtist", "primaryArtist").addSelect(["primaryArtist.id", "primaryArtist.slug", "primaryArtist.name"])
             .leftJoin("item.playlist", "playlist")
 
             .orderBy("item.order", "ASC")

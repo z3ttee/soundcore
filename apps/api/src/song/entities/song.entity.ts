@@ -83,7 +83,7 @@ export class Song implements Resource, Syncable, GeniusResource {
     @Column({ nullable: true, default: null })
     public order: number;
 
-    @OneToOne(() => File, { onDelete: "CASCADE" })
+    @OneToOne(() => File, (file) => file.song, { onDelete: "CASCADE" })
     @JoinColumn()
     public file: File;
 
