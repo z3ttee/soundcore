@@ -1,5 +1,6 @@
 import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Slug } from '@tsalliance/utilities';
 import { Page, BasePageable } from 'nestjs-pager';
 import { ObjectLiteral, Repository, SelectQueryBuilder, UpdateResult } from 'typeorm';
 import { SyncFlag } from '../meilisearch/interfaces/syncable.interface';
@@ -39,7 +40,7 @@ export class ArtistService {
         const result = await this.repository.createQueryBuilder("artist")
             .leftJoin("artist.songs", "song")
             .leftJoin("song.streams", "stream")
-            .addSelect("SUM(stream.streamCount) as artist_streamCount")
+            // .addSelect("SUM(stream.streamCount) as artist_streamCount")
             .groupBy("artist.id")
             .where("artist.id = :artistId OR artist.slug = :artistId" , { artistId })
             .getOne();      
@@ -152,6 +153,7 @@ export class ArtistService {
 
         artist.name = updateArtistDto.name;
         artist.description = updateArtistDto.description;
+        artist.slug = Slug.create(artist.name);
 
         return this.save(artist);
     }
@@ -250,6 +252,9 @@ export class ArtistService {
 
             .loadRelationCountAndMap(`${alias}.songsCount`, `${alias}.songs`)
             .loadRelationCountAndMap(`${alias}.albumsCount`, `${alias}.albums`)
+
+            .leftJoin(`${alias}.songs`, "song")
+            .loadRelationCountAndMap(`${alias}.streamCount`, "song.streams", "streamCount")
     }
 
 }

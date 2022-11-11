@@ -22,6 +22,7 @@ import { GeniusFlag, ResourceFlag } from "../../utils/entities/resource";
 import { ID3TagsDTO } from "../dtos/id3-tags.dto";
 import { SongUniqueFindDTO } from "../dtos/unique-find.dto";
 import { FileFlag } from "../../file/entities/file.entity";
+import { Slug } from "@tsalliance/utilities";
 
 @Injectable()
 export class SongService extends SyncingService {
@@ -430,7 +431,8 @@ export class SongService extends SyncingService {
             title: id3Tags.title?.trim() || path.basename(filepath).replace(/\.[^/.]+$/, "").trim(),
             duration: durationInSeconds,
             artists: artists.map((name) => ({
-                name: name?.trim()
+                name: name?.trim(),
+                slug: Slug.create(name?.trim())
             })),
             album: id3Tags.album?.trim(),
             cover: artworkBuffer,

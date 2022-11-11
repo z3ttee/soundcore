@@ -1,8 +1,7 @@
-import { BeforeInsert, BeforeUpdate, Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { Album } from "../../album/entities/album.entity";
 import { Artwork } from "../../artwork/entities/artwork.entity";
 import { GeniusFlag, GeniusResource, Resource, ResourceFlag, ResourceType } from "../../utils/entities/resource";
-import { Slug } from "@tsalliance/utilities";
 import { Syncable, SyncFlag } from "../../meilisearch/interfaces/syncable.interface";
 import { Song } from "../../song/entities/song.entity";
 
@@ -23,7 +22,7 @@ export class Artist implements Resource, Syncable, GeniusResource {
      * GENIUS RELATED ATTRIBUTES
      */
     @Column({ nullable: true })
-    public geniusId?: string;
+    public geniusId: string;
 
     @Column({ type: "tinyint", default: 0 })
     public geniusFlag: GeniusFlag;
@@ -40,11 +39,11 @@ export class Artist implements Resource, Syncable, GeniusResource {
     @Column({ type: "tinyint", default: 0 })
     public flag: ResourceFlag;
 
-    @Column({ nullable: true, unique: true, length: 120 })
+    @Column({ nullable: false, unique: true })
     public slug: string;
 
     @Column({ nullable: true, type: "text" })
-    public description?: string;
+    public description: string;
 
     @Column({ nullable: false, unique: true, collation: "utf8mb4_bin" })
     public name: string;
@@ -64,18 +63,6 @@ export class Artist implements Resource, Syncable, GeniusResource {
 
     public songsCount?: number = 0;
     public albumsCount?: number = 0;
-
-    @Column({ select: false, nullable: true })
     public streamCount?: number = 0;
-
-    @BeforeInsert()
-    public onBeforeInsert() {
-        this.slug = Slug.create(this.name);
-    }
-
-    @BeforeUpdate() 
-    public onBeforeUpdate() {
-        if(!this.slug) Slug.create(this.name);
-    }
 
 }

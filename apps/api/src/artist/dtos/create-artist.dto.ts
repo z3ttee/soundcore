@@ -1,7 +1,11 @@
 import { IsNotEmpty, IsOptional, Length } from "class-validator";
 import { Artist } from "../entities/artist.entity";
 
-export class CreateArtistDTO implements Pick<Artist, "name">, Pick<Artist, "description">, Pick<Artist, "geniusId"> {
+export class CreateArtistDTO implements 
+    Pick<Artist, "name">, 
+    Pick<Artist, "slug">,
+    Partial<Pick<Artist, "description">>, 
+    Partial<Pick<Artist, "geniusId">> {
 
     @IsNotEmpty()
     @Length(3, 254)
@@ -13,5 +17,8 @@ export class CreateArtistDTO implements Pick<Artist, "name">, Pick<Artist, "desc
 
     @IsOptional()
     public geniusId?: string;
+
+    @IsOptional()
+    public slug: string;
 
 }
