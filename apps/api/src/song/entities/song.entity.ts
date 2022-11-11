@@ -14,10 +14,11 @@ import { Like } from "../../collection/entities/like.entity";
 import { File } from "../../file/entities/file.entity";
 import { Artwork } from "../../artwork/entities/artwork.entity";
 import { Syncable, SyncFlag } from "../../meilisearch/interfaces/syncable.interface";
+import { TracklistItem } from "../../tracklist/entities/tracklist.entity";
 
 @Entity()
 @Index(["name", "primaryArtist", "album", "duration", "order"], { unique: true })
-export class Song implements Resource, Syncable, GeniusResource {
+export class Song implements Resource, Syncable, GeniusResource, TracklistItem {
     public resourceType: ResourceType = "song";
 
     /**

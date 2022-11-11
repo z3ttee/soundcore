@@ -6,5 +6,6 @@ export class TokenDTO {
 export class Token {
     public userId: string;
     public songId: string;
-    public expiresAt: Date;
+    public expiresAt: number;
+    public shortToken: string;
 }

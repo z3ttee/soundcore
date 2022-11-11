@@ -21,7 +21,7 @@ export class TracklistItem {
     /**
      * Song id.
      */
-    public readonly id: number;
+    public readonly id: number | string;
 }
 
 /**

@@ -7,6 +7,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { v4 as uuidv4 } from "uuid"
 import { Stream } from './entities/stream.entity';
 import { FileModule } from '../file/file.module';
+import { DeleteStreamsCronJob } from './cron/delete-streams.cron';
 
 @Module({
   controllers: [
@@ -14,7 +15,8 @@ import { FileModule } from '../file/file.module';
   ],
   providers: [
     StreamService,
-    StreamTokenService
+    StreamTokenService,
+    DeleteStreamsCronJob
   ],
   imports: [
     FileModule,

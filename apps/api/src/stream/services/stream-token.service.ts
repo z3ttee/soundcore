@@ -2,8 +2,10 @@ import { Injectable } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { User } from "../../user/entities/user.entity";
 import { Token, TokenDTO } from "../entities/token.entity";
+import { v4 as uuidv4 } from "uuid";
 
-const TOKEN_EXPIRES_IN = 60*30
+// Expires in (seconds)
+const TOKEN_EXPIRES_IN = 30
 
 @Injectable()
 export class StreamTokenService {
@@ -13,16 +15,15 @@ export class StreamTokenService {
     ) {}
 
     public async createForSong(authentication: User, songId: string): Promise<TokenDTO> {
-        return this.jwtService.signAsync({
+        const tokenData: Token = {
             songId,
             userId: authentication.id,
-            expiresAt: await this.generateExpiry()
-        } as Token, {
-            expiresIn: TOKEN_EXPIRES_IN
-        }).then((token) => {
-            return {
-                token
-            }
+            expiresAt: await this.generateExpiry(),
+            shortToken: uuidv4()
+        }
+
+        return this.jwtService.signAsync(tokenData, { expiresIn: TOKEN_EXPIRES_IN }).then((token) => {
+            return { token }
         })
     }
 
@@ -32,8 +33,12 @@ export class StreamTokenService {
         })
     }
 
-    private async generateExpiry(): Promise<Date> {
-        return new Date(Date.now() + 1000*TOKEN_EXPIRES_IN);
+    public isExpired(token: Token) {
+        return token.expiresAt <= Date.now();
+    }
+
+    private async generateExpiry(): Promise<number> {
+        return new Date(Date.now() + 1000*TOKEN_EXPIRES_IN).getTime();
     }
 
 }
