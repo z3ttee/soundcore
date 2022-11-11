@@ -6,38 +6,46 @@ import { Request, Response } from 'express';
 import { StreamTokenService } from './stream-token.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Stream } from '../entities/stream.entity';
-import { Repository } from 'typeorm';
+import { LessThanOrEqual, Repository } from 'typeorm';
 import { FileService } from '../../file/services/file.service';
 import { FileSystemService } from "../../filesystem/services/filesystem.service";
 import { Environment } from "@soundcore/common";
+import { CreateStreamDTO } from "../dtos/create-stream.dto";
+import { User } from "../../user/entities/user.entity";
+import { Song } from "../../song/entities/song.entity";
 
 @Injectable()
 export class StreamService {
     private readonly logger = new Logger(StreamService.name);
 
     constructor(
-        private tokenService: StreamTokenService,
+        private readonly tokenService: StreamTokenService,
         private readonly fileService: FileService,
         private readonly fileSystem: FileSystemService,
         @InjectRepository(Stream) private readonly repository: Repository<Stream>,
     ){}
 
-    public async increaseStreamCount(songId: string, listenerId: string) {
-        const stream = await this.repository.findOne({ where: { songId, listenerId }}).catch(() => {
-            return null;
-        });
+    public async createIfNotExists(createStreamDto: CreateStreamDTO) {
+        const stream = new Stream();
+        stream.listener = { id: createStreamDto.listenerId } as User;
+        stream.song = { id: createStreamDto.songId } as Song;
+        stream.shortToken = createStreamDto.shortToken;
 
-        if(!stream) {
-            this.repository.save({ songId, listenerId }).catch(() => {
-            return null;
+        this.repository.createQueryBuilder()
+            .insert()
+            .orIgnore()
+            .values(stream)
+            .execute().then((insertResult) => {
+                if(insertResult.identifiers.length > 0) {
+                    if(Environment.isDebug) {
+                        this.logger.debug(`Successfully saved stream record for user ${createStreamDto.listenerId}`);
+                    }
+                } else {
+                    this.logger.warn(`Failed saving stream record for user ${createStreamDto.listenerId} without throwing any errors. Perhaps an identical entry already exists?`);
+                }
+            }).catch((error: Error) => {
+                this.logger.error(`Failed saving stream record for user ${createStreamDto.listenerId}: ${error.message}`, Environment.isDebug ? error.stack : undefined);
             })
-            return
-        }
-        
-        stream.streamCount++;
-        this.repository.save(stream).catch(() => {
-            return null;
-        })
     }
 
     public async findStreamableSongByToken(tokenValue: string, request: Request, response: Response) {
@@ -48,11 +56,9 @@ export class StreamService {
 
         return this.fileService.findBySongId(token.songId).then(async (file) => {
             if(!file) throw new NotFoundException("Song not found.");
-            console.log(file);
 
             // Get file's path
             const filePath = this.fileSystem.resolveFilepath(file);
-            console.log(filePath);
 
             // Get file stats
             let filesize = file.size;
@@ -65,6 +71,10 @@ export class StreamService {
             let readableStream: fs.ReadStream;
 
             if(request.headers.range) {    
+                if(Environment.isDebug) {
+                    this.logger.debug(`Received "Content-Range" header. Serving file in requested range.`);
+                }
+
                 const range = request.headers.range;
                 const parts = range.replace(/bytes=/, "").split("-");
                 const partialstart = parts[0];
@@ -74,14 +84,6 @@ export class StreamService {
                 const end = partialend ? parseInt(partialend, 10) : filesize-1;
                 const chunksize = (end-start)+1;
                 readableStream = fs.createReadStream(filePath, {start: start, end: end});
-      
-                /*if(end/total >= 0.4) {
-                  // TODO: Fix streamCount increasing if user is skipping in player.
-                  // Currently, it works, but if the user uses the seeking functionality and not the whole data is retrieved
-                  // The browser will send a new request with the appropriate range. This causes to reexcute this whole method
-                  // and also increases the streamCount another time
-                  this.increaseStreamCount(songId, listener.id);
-                }*/
                 
                 response.writeHead(206, {
                     'Content-Range': 'bytes ' + start + '-' + end + '/' + filesize,
@@ -90,15 +92,35 @@ export class StreamService {
                 });
             } else {
                 readableStream = fs.createReadStream(filePath)
-                readableStream.on("end", () => {
-                  /*if(listener) {
-                    this.increaseStreamCount(songId, listener.id);
-                  }*/
-                })
+            }
+
+            if(!this.tokenService.isExpired(token)) {
+                // If the internal expiry is still valid, create new stream record 
+                // to track user's stream history
+                this.createIfNotExists({
+                    listenerId: token.userId,
+                    songId: token.songId,
+                    shortToken: token.shortToken
+                });
+            } else {
+                this.logger.verbose(`Skipped saving stream record for user: Detected expired token.`);
             }
 
             // Pipe stream to response
             readableStream.pipe(response);
+        });
+    }
+
+    public async clearStreamRecords() {
+        const startTime = Date.now();
+        const pivotDateMs = startTime - (1000*60*60*24*30);
+
+        this.repository.delete({
+            listenedAt: LessThanOrEqual(pivotDateMs)
+        }).then((deleteResult) => {
+            this.logger.log(`Cleared ${deleteResult.affected || 0} stream records from the database.`);
+        }).catch((error: Error) => {
+            this.logger.error(`Failed clearing stream records older than 30days: ${error.message}`, Environment.isDebug ? error.stack : undefined);
         });
     }
 

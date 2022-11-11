@@ -1,23 +1,26 @@
-import { Column, Entity, ManyToOne, PrimaryColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { Song } from "../../song/entities/song.entity";
 import { User } from "../../user/entities/user.entity";
 
 @Entity()
+@Index([ "song", "listener", "shortToken" ], { unique: true })
 export class Stream {
 
-    @PrimaryColumn({ type: "varchar", name: "songId" })
-    public songId: string;
-
-    @PrimaryColumn({ type: "varchar", name: "listenerId" })
-    public listenerId: string;
-
-    @Column({ default: 1 })
-    public streamCount: number;
+    @PrimaryGeneratedColumn("uuid")
+    public id: string;
     
     @ManyToOne(() => Song, s => s.streams, { onDelete: "CASCADE" })
+    @JoinColumn()
     public song: Song;
 
     @ManyToOne(() => User, u => u.streams, { onDelete: "CASCADE" })
+    @JoinColumn()
     public listener: User;
+
+    @Column({ nullable: false, length: 36 })
+    public shortToken: string;
+
+    @CreateDateColumn()
+    public listenedAt: number;
 
 }
