@@ -2,9 +2,9 @@ import { HttpClient } from '@angular/common/http';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { BehaviorSubject, Observable, Subject, takeUntil } from 'rxjs';
-import { PlayableListBuilder, SCNGXPlayableList, SCNGXPlayableTracklist, SCNGXSongColConfig } from '@soundcore/ngx';
 import { Album, SCDKAlbumService } from '@soundcore/sdk';
-import { environment } from 'src/environments/environment';
+import { SCNGXSongColConfig, SCNGXTracklist, SCNGXTracklistBuilder } from '@soundcore/ngx';
+import { AppPlayerService } from 'src/app/modules/player/services/player.service';
 
 @Component({
   templateUrl: './album-info.component.html',
@@ -13,23 +13,20 @@ import { environment } from 'src/environments/environment';
 export class AlbumInfoComponent implements OnInit, OnDestroy {
 
   constructor(
-    private readonly httpClient: HttpClient,
     private readonly albumService: SCDKAlbumService,
-    private readonly activatedRoute: ActivatedRoute
+    private readonly activatedRoute: ActivatedRoute,
+    private readonly tracklistBuilder: SCNGXTracklistBuilder,
+    private readonly player: AppPlayerService
   ) { }
 
   private readonly _destroy: Subject<void> = new Subject();
   private readonly _cancel: Subject<void> = new Subject();
 
-  private readonly _loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject(false);
-  private readonly _albumSubject: BehaviorSubject<Album> = new BehaviorSubject(null);
-  private readonly _listSubject: BehaviorSubject<SCNGXPlayableTracklist> = new BehaviorSubject(null);
-  private readonly _featAlbumSubject: BehaviorSubject<Album[]> = new BehaviorSubject([]);
-
-  public readonly $loading: Observable<boolean> = this._loadingSubject.asObservable();
-  public readonly $album: Observable<Album> = this._albumSubject.asObservable();
-  public readonly $list: Observable<SCNGXPlayableTracklist> = this._listSubject.asObservable();
-  public readonly $featAlbums: Observable<Album[]> = this._featAlbumSubject.asObservable();
+  public showError404: boolean = false;
+  public album: Album;
+  public isLoadingAlbum: boolean = true;
+  public featuredAlbums: Album[];
+  public tracklist?: SCNGXTracklist;
 
   public columns: SCNGXSongColConfig = {
     id: { enabled: true, collapseAt: 420 },
@@ -42,28 +39,27 @@ export class AlbumInfoComponent implements OnInit, OnDestroy {
       this._cancel.next();
       const albumId = paramMap.get("albumId");
 
-      this._albumSubject.next(null);
-      this._loadingSubject.next(true);
-      this._albumSubject.next(null);
-      this._featAlbumSubject.next([]);
-      this._listSubject.next(null);
+      // Reset internal state
+      this.album = null;
+      this.featuredAlbums = [];
+      this.isLoadingAlbum = true;
+      this.tracklist = undefined;
 
       this.albumService.findById(albumId).pipe(takeUntil(this._cancel)).subscribe((response) => {
         const album = response.payload;
-        this._albumSubject.next(album);
-        if(!album) return;
+        if(!album || response.error) {
+          this.showError404 = true;
+          return;
+        }
 
-        this._listSubject.next(PlayableListBuilder
-          .forTracklist(this.httpClient)
-          .useUrl(`${environment.api_base_uri}/v1/songs/byAlbum/${album.id}`)
-          .build());
+        this.album = album;
+        this.isLoadingAlbum = false;
+        this.tracklist = this.tracklistBuilder.forAlbum(album.id);
 
-        this.albumService.findRecommendedByArtist(album.primaryArtist?.id).pipe(takeUntil(this._cancel)).subscribe((response) => {
-          this._featAlbumSubject.next(response.payload.elements);
-        })
-
-        this._loadingSubject.next(false)
-      })
+        this.albumService.findRecommendedByArtist(album.primaryArtist?.id, [album.id]).pipe(takeUntil(this._cancel)).subscribe((response) => {
+          this.featuredAlbums = response.payload.elements;
+        });
+      });
     })
   }
 
@@ -73,6 +69,10 @@ export class AlbumInfoComponent implements OnInit, OnDestroy {
 
       this._cancel.next();
       this._cancel.complete();
+  }
+
+  public forcePlay() {
+    this.player.playTracklist(this.tracklist);
   }
 
 }

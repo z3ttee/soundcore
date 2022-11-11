@@ -1,52 +1,75 @@
-<div class="h-full w-full pb-window" #parentScroll>
-    <app-list-view [resource]="($album | async)" [isLoading]="($loading | async)">
-        <ng-container scngx-stats>
-            <li class="inline-flex items-center gap-1 text-font-secondary hover:underline cursor-pointer" *ngIf="($album | async)?.primaryArtist">
-                <div class="w-7 h-7 rounded-full overflow-hidden">
-                    <scngx-artwork [artwork]="($album | async)?.artwork"></scngx-artwork>
+<app-error404 *ngIf="showError404" [title]="'Album nicht gefunden'"></app-error404>
+
+<scngx-scroll class="w-full h-full" #scroller>
+    <!-- Page Header -->
+    <ng-container header>
+        <app-list-view [resource]="album" [title]="album?.name" [isLoading]="isLoadingAlbum" [artwork]="album?.artwork">
+            <ng-container scngx-stats>
+                <li class="inline-flex items-center gap-1 text-font-secondary hover:underline cursor-pointer" *ngIf="album?.primaryArtist">
+                    <div class="w-7 h-7 rounded-full overflow-hidden">
+                        <scngx-artwork [artwork]="album?.artwork"></scngx-artwork>
+                    </div>
+                    <span [routerLink]="['/artist', album?.primaryArtist?.slug || album?.primaryArtist?.id]">
+                        {{ album?.primaryArtist?.name }}
+                    </span>
+                </li>
+                <li class="text-font-secondary">
+                    <span>{{ album?.songsCount }} {{ album?.songsCount != 1 ? 'Songs' : 'Song' }}</span>
+                </li>
+                <li class="text-font-secondary">
+                    <span>{{ album?.totalDuration| scngxSongDurationPipe }} min</span>
+                </li>
+            </ng-container>
+        
+            <ng-container scngx-controls>
+                <button (click)="forcePlay()" class="w-14 flex items-center justify-center aspect-square bg-accent transition-all will-change-transform text-body rounded-full hover:scale-105 active:scale-[97%]">
+                    <img class="w-7 h-7 text-body ml-0.5" src="assets/icons/play.svg">
+                </button>
+        
+                <button class="flex items-center p-2 rounded-full" matRipple [matRippleCentered]="true">
+                    <hero-icon [name]="'heart'" [class]="'h-7 aspect-square'"></hero-icon>
+                </button>
+        
+                <button class="flex items-center p-2 rounded-full" matRipple [matRippleCentered]="true">
+                    <hero-icon [name]="'dots-vertical'" [class]="'h-7 aspect-square'"></hero-icon>
+                </button>
+            </ng-container>
+        </app-list-view>
+    </ng-container>
+
+    <!-- List -->
+    <ng-container list>
+        <p>Initialized?: {{ tracklist?.$initialized | async }}</p>
+
+        <scngx-table>
+            <!-- Table Head
+            <ng-container thead>
+                <div>#</div>
+                <div>Titel</div>
+            </ng-container> -->
+
+            <!-- Table Body -->
+            <ng-container tbody *ngIf="tracklist">
+                <div *uiScroll="let item of tracklist">
+                    <scngx-song-list-item [song]="item.data" [index]="item.index"></scngx-song-list-item>
                 </div>
-                <span [routerLink]="['/artist', ($album | async)?.primaryArtist?.slug || ($album | async)?.primaryArtist?.id]">
-                    {{ ($album | async)?.primaryArtist?.name }}
-                </span>
-            </li>
-            <li class="text-font-secondary">
-                <span>{{ ($album | async)?.songsCount }} {{ ($album | async)?.songsCount != 1 ? 'Songs' : 'Song' }}</span>
-            </li>
-            <li class="text-font-secondary">
-                <span>{{ ($album | async)?.totalDuration| scngxSongDurationPipe }} min</span>
-            </li>
-        </ng-container>
+            </ng-container>
+        </scngx-table>
+    </ng-container>
 
-        <ng-container scngx-controls>
-            <button class="w-14 flex items-center justify-center aspect-square bg-accent transition-all will-change-transform text-body rounded-full hover:scale-105 active:scale-[97%]">
-                <img class="w-7 h-7 text-body ml-0.5" src="assets/icons/play.svg">
-            </button>
-
-            <button class="flex items-center p-2 rounded-full" matRipple [matRippleCentered]="true">
-                <hero-icon [name]="'heart'" [class]="'h-7 aspect-square'"></hero-icon>
-            </button>
-
-            <button class="flex items-center p-2 rounded-full" matRipple [matRippleCentered]="true">
-                <hero-icon [name]="'dots-vertical'" [class]="'h-7 aspect-square'"></hero-icon>
-            </button>
-        </ng-container>
-    </app-list-view>
-
-    <div class="w-full px-window" *ngIf="!($loading | async)">
-        <scngx-virtual-song-list [useMaxHeight]="true" [columns]="columns" [dataSource]="(($list | async)?.$dataSource | async)" [parentScroll]="parentScroll"></scngx-virtual-song-list>
-    </div>
-
-    <scngx-ui-row [headline]="'Weitere Alben'" *ngIf="($featAlbums | async)?.length > 0">
-        <div class="w-full">
-            <scngx-horizontal-grid>
-                    <ng-container *ngFor="let item of ($featAlbums | async)">
-                        <scngx-album-grid-item 
-                            [item]="item" 
-                            [useDate]="true"
-                            [routerLink]="['/album', item.slug || item.id]">
-                        </scngx-album-grid-item>
-                    </ng-container>
-            </scngx-horizontal-grid>
+    <!-- Page Footer -->
+    <ng-container footer>
+        <div class="p-window">
+            <h6>Mehr Playlisten</h6>
         </div>
-    </scngx-ui-row>
-</div>
+        <scngx-horizontal-grid>
+            <ng-container *ngFor="let item of featuredAlbums">
+                <scngx-album-grid-item 
+                    [item]="item" 
+                    [useDate]="true"
+                    [routerLink]="['/album', item.slug || item.id]">
+                </scngx-album-grid-item>
+            </ng-container>
+        </scngx-horizontal-grid>
+    </ng-container>
+</scngx-scroll>
