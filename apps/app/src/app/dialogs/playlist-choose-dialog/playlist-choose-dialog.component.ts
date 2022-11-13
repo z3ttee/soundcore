@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, OnDestroy } from "@angular/core";
 import { Subject, takeUntil } from "rxjs";
 import { DialogRef, SCNGXDialogService } from "@soundcore/ngx";
-import { Playlist, SCDKPlaylistService } from "@soundcore/sdk";
+import { Playlist, SCSDKPlaylistService } from "@soundcore/sdk";
 import { AppPlaylistCreateDialog } from "../playlist-create-dialog/playlist-create-dialog.component";
 
 @Component({
@@ -18,7 +18,7 @@ export class AppPlaylistChooseDialog implements OnDestroy {
     constructor(
         public readonly dialogRef: DialogRef<any, Playlist>,
         private readonly dialog: SCNGXDialogService,
-        private readonly playlistService: SCDKPlaylistService
+        private readonly playlistService: SCSDKPlaylistService
     ) {}
 
     public $playlists = this.playlistService.$library.pipe(takeUntil(this._destroy));

@@ -1,4 +1,9 @@
 import { NgModule } from '@angular/core';
+import { SCSDKPlaylistService } from './services/playlist.service';
 
-@NgModule({})
-export class SCDKPlaylistModule { }
+@NgModule({
+    providers: [
+        SCSDKPlaylistService
+    ]
+})
+export class SCSDKPlaylistModule { }

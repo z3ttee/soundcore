@@ -11,14 +11,14 @@ import { CreatePlaylistDTO } from '../dtos/create-playlist.dto';
 import { PlaylistItemAddResult } from '../entities/playlist-item-added.entity';
 import { Playlist } from '../entities/playlist.entity';
 import { Page, Pageable } from "../../pagination";
+import { Logger } from '../../logging';
 
-@Injectable({
-  providedIn: "root"
-})
-export class SCDKPlaylistService {
+@Injectable()
+export class SCSDKPlaylistService {
+  private readonly logger = new Logger("PlaylistService");
   private readonly _librarySubj: BehaviorSubject<Playlist[]> = new BehaviorSubject([]);
 
-  public $library: Observable<Playlist[]> = this._librarySubj.asObservable();
+  public readonly $library: Observable<Playlist[]> = this._librarySubj.asObservable();
 
   constructor(
     private readonly httpClient: HttpClient,
@@ -69,13 +69,7 @@ export class SCDKPlaylistService {
    * @returns PlaylistItemAddResult
    */
   public addSongToPlaylist(playlistId: string, addSongDto: AddSongDTO): Observable<ApiResponse<PlaylistItemAddResult>> {
-    return this.httpClient.put<PlaylistItemAddResult>(`${this.options.api_base_uri}/v1/playlists/${playlistId}/addSong`, addSongDto).pipe(
-      apiResponse(),
-      tap((response) => {
-        if(response.error) return;
-        // TODO: Create observable on which a notification will be pushed that the song has been added.
-      })
-    );
+    return this.httpClient.put<PlaylistItemAddResult>(`${this.options.api_base_uri}/v1/playlists/${playlistId}/addSong`, addSongDto).pipe(apiResponse());
   }
 
   /**
@@ -83,17 +77,18 @@ export class SCDKPlaylistService {
    * of the currently logged in user.
    */
   private fetchPlaylistLibrary() {
-    console.log(`[${SCDKPlaylistService.name}] Fetching playlist library of user.`);
+    this.logger.log(`Fetching playlist library of current user...`);
 
     this.httpClient.get<Page<Playlist>>(`${this.options.api_base_uri}/v1/playlists/@me`).pipe(apiResponse()).subscribe((response) => {
       if(response.error) {
-        console.error(`[${SCDKPlaylistService.name}] Could not fetch playlist library of current user: ${response.message}`, response.error);
-        return
+        this.logger.error(`Could not fetch playlist library of current user: ${response.message}`, response.error);
+        return;
       }
 
       const elements = response.payload.elements;
       this._librarySubj.next(elements);
-      console.log(`[${SCDKPlaylistService.name}] Found ${elements.length} playlists in current user's library.`);
+
+      this.logger.log(`Found ${elements.length} playlists in current user's library.`);
     });
   }
 
@@ -108,7 +103,8 @@ export class SCDKPlaylistService {
     const playlists = this._librarySubj.getValue();
     playlists.push(playlist)
     this._librarySubj.next(playlists);
-    console.log(`[${SCDKPlaylistService.name}] Added playlist '${playlist.name}' to local library.`);
+
+    this.logger.log(`Added playlist '${playlist.name}' to local library.`);
   }
 
 }

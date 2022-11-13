@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 import { BehaviorSubject, debounceTime, Observable, Subject, takeUntil } from 'rxjs';
 import { SCCDKScreenService } from '@soundcore/cdk';
 import { SCNGXInfiniteDataSource } from '@soundcore/ngx';
-import { SCDKGenreService, MeiliAlbum, MeiliArtist, SCDKSearchService, ComplexSearchResult, SCDKResource, ApiSearchResponse, MeiliPlaylist, Pageable, MeiliUser, SCDKUserService, SCDKArtistService, SCDKAlbumService, Genre, MeiliSong, SCDKSongService, SCDKPlaylistService } from '@soundcore/sdk';
+import { SCDKGenreService, MeiliAlbum, MeiliArtist, SCDKSearchService, ComplexSearchResult, SCDKResource, ApiSearchResponse, MeiliPlaylist, Pageable, MeiliUser, SCDKUserService, SCDKArtistService, SCDKAlbumService, Genre, MeiliSong, SCDKSongService, SCSDKPlaylistService } from '@soundcore/sdk';
 
 @Component({
   selector: 'app-search-index',
@@ -24,7 +24,7 @@ export class SearchIndexComponent implements OnInit, OnDestroy {
     private readonly albumService: SCDKAlbumService,
     private readonly genreService: SCDKGenreService,
     private readonly songService: SCDKSongService,
-    private readonly playlistService: SCDKPlaylistService,
+    private readonly playlistService: SCSDKPlaylistService,
 
     public readonly screenService: SCCDKScreenService
   ) { }

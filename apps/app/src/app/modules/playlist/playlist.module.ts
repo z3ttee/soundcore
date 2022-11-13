@@ -9,6 +9,7 @@ import { ScrollingModule } from '@angular/cdk/scrolling';
 import { SCNGXScrollModule, SCNGXSkeletonModule, SCNGXSongListItemModule, SCNGXTableModule } from '@soundcore/ngx';
 import { ListViewModule } from 'src/app/components/resource-views/list-view/list-view.module';
 import { VirtualScrollerModule } from '@tsalliance/ngx-virtual-scroller';
+import { SCSDKPlaylistModule } from '@soundcore/sdk';
 
 const routes: Routes = [
   { path: ":playlistId", component: PlaylistInfoComponent }
@@ -29,10 +30,11 @@ const routes: Routes = [
     VirtualScrollerModule,
 
     ListViewModule,
+
+    SCSDKPlaylistModule,
     
     SCNGXSkeletonModule,
     SCNGXSongListItemModule,
-
     SCNGXScrollModule,
     SCNGXTableModule
   ]

@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Subject, Subscription, takeUntil } from 'rxjs';
-import { Playlist, SCDKPlaylistService } from '@soundcore/sdk';
+import { Playlist, SCSDKPlaylistService } from '@soundcore/sdk';
 import { AppPlayerService } from 'src/app/modules/player/services/player.service';
 import { SCNGXTracklist, SCNGXTracklistBuilder } from '@soundcore/ngx';
 
@@ -23,7 +23,7 @@ export class PlaylistInfoComponent implements OnInit, OnDestroy {
   public tracklist: SCNGXTracklist;
 
   constructor(
-    private readonly playlistService: SCDKPlaylistService,
+    private readonly playlistService: SCSDKPlaylistService,
     private readonly activatedRoute: ActivatedRoute,
     private readonly tracklistBuilder: SCNGXTracklistBuilder,
     private readonly player: AppPlayerService
@@ -55,7 +55,7 @@ export class PlaylistInfoComponent implements OnInit, OnDestroy {
         // Update state
         this.playlist = response.payload;
 
-        this.tracklist = this.tracklistBuilder.forPlaylist(this.playlist.id);
+        this.tracklist = this.tracklistBuilder.forPlaylist(this.playlist);
 
         this.showError404 = !response.payload;
         this.isLoadingPlaylist = false;

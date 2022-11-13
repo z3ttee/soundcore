@@ -7,6 +7,7 @@ import { VirtualScrollerModule } from '@tsalliance/ngx-virtual-scroller';
 import { GenericResourceListItemModule } from 'src/app/components/list-items/generic-resource-list-item/generic-resource-list-item.module';
 import { AppPlaylistCreateDialogModule } from '../playlist-create-dialog/playlist-create-dialog.module';
 import { HeroIconModule, plus } from 'ng-heroicon';
+import { SCSDKPlaylistModule } from '@soundcore/sdk';
 
 @NgModule({
   declarations: [
@@ -24,7 +25,9 @@ import { HeroIconModule, plus } from 'ng-heroicon';
 
     SCNGXArtworkModule,
     GenericResourceListItemModule,
-    AppPlaylistCreateDialogModule
+    AppPlaylistCreateDialogModule,
+
+    SCSDKPlaylistModule
   ],
   exports: [
     SCNGXDialogModule

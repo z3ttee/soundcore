@@ -3,7 +3,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { SSOService } from '@soundcore/sso';
 import { Observable, Subject, takeUntil } from 'rxjs';
 import { SCNGXDialogService } from '@soundcore/ngx';
-import { MeiliSong, Playlist, PlaylistAddSongFailReason, SCDKPlaylistService, Song } from '@soundcore/sdk';
+import { MeiliSong, Playlist, PlaylistAddSongFailReason, SCSDKPlaylistService, Song } from '@soundcore/sdk';
 import { AppPlaylistChooseDialog } from 'src/app/dialogs/playlist-choose-dialog/playlist-choose-dialog.component';
 import { AppPlayerService } from 'src/app/modules/player/services/player.service';
 
@@ -18,7 +18,7 @@ export class SongContextMenuComponent implements OnInit, OnDestroy {
 
   constructor(
     private readonly authService: SSOService,
-    private readonly playlistService: SCDKPlaylistService,
+    private readonly playlistService: SCSDKPlaylistService,
     private readonly dialog: SCNGXDialogService,
     private readonly snackbar: MatSnackBar,
     private readonly playerService: AppPlayerService

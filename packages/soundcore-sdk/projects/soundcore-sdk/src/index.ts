@@ -18,8 +18,8 @@ export * from "./lib/logging";
 // Stream Module
 export * from "./lib/stream";
 
-
-
+// Playlist Module
+export * from "./lib/playlist";
 
 
 
@@ -59,20 +59,6 @@ export * from "./lib/mount/dtos/update-mount.dto";
 export * from "./lib/file/file.module";
 export * from "./lib/file/entities/file.entity";
 export * from "./lib/file/services/file.service";
-
-// Playlist Module
-export * from "./lib/playlist/playlist.module";
-export * from "./lib/playlist/services/playlist.service";
-
-export * from "./lib/playlist/entities/playlist.entity";
-export * from "./lib/playlist/entities/playlist-item.entity";
-export * from "./lib/playlist/entities/playlist-item-added.entity";
-
-export * from "./lib/playlist/dtos/create-playlist.dto";
-export * from "./lib/playlist/dtos/update-playlist.dto";
-export * from "./lib/playlist/dtos/add-song.dto";
-
-export * from "./lib/playlist/enums/playlist-privacy.enum";
 
 // User Module
 export * from "./lib/user/user.module";
