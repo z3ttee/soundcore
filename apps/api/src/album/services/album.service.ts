@@ -89,7 +89,8 @@ export class AlbumService {
             .orderBy("album.releasedAt", "DESC")
             .addOrderBy("album.createdAt", "DESC")
 
-            .where("songArtist.id = :artistId OR songArtist.slug = :artistId OR songFeatArtist.id = :artistId OR songFeatArtist.slug = :artistId", { artistId })
+            .where("primaryArtist.id != :artistId AND primaryArtist.slug != :artistId", { artistId })
+            .andWhere("(songArtist.id = :artistId OR songArtist.slug = :artistId OR songFeatArtist.id = :artistId OR songFeatArtist.slug = :artistId)", { artistId })
             .getManyAndCount();
         
         return Page.of(result[0], result[1], pageable.offset);

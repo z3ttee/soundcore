@@ -37,14 +37,19 @@ export class ArtistService {
      * @returns Artist
      */
     public async findProfileById(artistId: string): Promise<Artist> {
-        const result = await this.repository.createQueryBuilder("artist")
+        const rawAndEntities = await this.repository.createQueryBuilder("artist")
             .leftJoin("artist.songs", "song")
             .leftJoin("song.streams", "stream")
-            // .addSelect("SUM(stream.streamCount) as artist_streamCount")
-            .groupBy("artist.id")
+            .loadRelationCountAndMap("artist.albumCount", "artist.albums", "albumCount")
+            .loadRelationCountAndMap("artist.songCount", "artist.songs", "songCount")
+            .addSelect("COUNT(stream.id)", "streamCount")
             .where("artist.id = :artistId OR artist.slug = :artistId" , { artistId })
-            .getOne();      
+            .getRawAndEntities();      
+
+        const result = rawAndEntities.entities[0];
+        const streamCount = Number(rawAndEntities.raw[0]?.streamCount ?? 0);
                     
+        result.streamCount = streamCount;
         return result;
     }
 

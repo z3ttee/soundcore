@@ -61,8 +61,8 @@ export class Artist implements Resource, Syncable, GeniusResource {
     @OneToMany(() => Song, (song) => song.primaryArtist)
     public songs: Song[];
 
-    public songsCount?: number = 0;
-    public albumsCount?: number = 0;
+    public songCount?: number = 0;
+    public albumCount?: number = 0;
     public streamCount?: number = 0;
 
 }

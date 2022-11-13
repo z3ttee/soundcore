@@ -55,9 +55,9 @@ export class TracklistService {
      * @returns Tracklist
      */
     public async findListByArtistTop(artistId: string, hostname: string, authentication?: User): Promise<Tracklist> {
-        const result = this.buildFindByArtistTopQuery(artistId, "song", authentication).select(["song.id"]).getManyAndCount();
+        const result = await this.buildFindByArtistTopQuery(artistId, authentication).select(["song.id"]).getMany();
         const metadataUrl = `${hostname}/v1/tracklists/artist/top/${artistId}/meta`;
-        return new Tracklist(result[1], TracklistType.ARTIST, result[0], metadataUrl);
+        return new Tracklist(result.length, TracklistType.ARTIST, result, metadataUrl);
     }
 
     /**
@@ -68,10 +68,10 @@ export class TracklistService {
      * @returns Page<Song>
      */
     public async findMetaByArtistTop(artistId: string, authentication?: User): Promise<Page<Song>> {
-        const baseQuery = await this.buildFindByArtistTopQuery(artistId, "song", authentication)
+        const baseQuery = await this.buildFindByArtistTopQuery(artistId, authentication)
         
         const result = await baseQuery.getRawAndEntities();
-        const totalElements = await baseQuery.getCount();
+        const totalElements = result.entities.length;
         return Page.of(result.entities.map((song, index) => {
             song.streamCount = result.raw[index]?.streamCount || 0
             return song;
@@ -86,7 +86,7 @@ export class TracklistService {
      * @returns Tracklist
      */
     public async findListByAlbum(albumId: string, hostname: string, authentication?: User): Promise<Tracklist> {
-        const result = await this.buildFindByAlbumQuery(albumId, "song", null, authentication).select(["song.id"]).getMany();
+        const result = await this.buildFindByAlbumQuery(albumId, null, authentication).select(["song.id"]).getMany();
         const metadataUrl = `${hostname}/v1/tracklists/album/${albumId}/meta`;
         return new Tracklist(result.length, TracklistType.ALBUM, result as unknown as TracklistItem[], metadataUrl);   
     }
@@ -99,7 +99,7 @@ export class TracklistService {
      * @returns Page<Song>
      */
     public async findMetaByAlbum(albumId: string, pageable: BasePageable, authentication?: User): Promise<Page<Song>> {
-        const baseQuery = await this.buildFindByAlbumQuery(albumId, "song", pageable, authentication)            
+        const baseQuery = await this.buildFindByAlbumQuery(albumId, pageable, authentication)            
         const result = await baseQuery.getRawAndEntities();
         const totalElements = await baseQuery.getCount();
         return Page.of(result.entities.map((song, index) => {
@@ -200,21 +200,26 @@ export class TracklistService {
      * @param authentication 
      * @returns SelectQueryBuilder<Song>
      */
-    protected buildFindByArtistTopQuery(artistId: string, alias: string, authentication?: User): SelectQueryBuilder<Song> {
-        const query = this.songService.buildGeneralQuery(alias, authentication)
+    protected buildFindByArtistTopQuery(artistId: string, authentication?: User): SelectQueryBuilder<Song> {
+        const query = this.songService.buildGeneralQuery("song", authentication)
             // Get amount of streams
             // TODO: To be optimised using selectAndMap in next TypeORM release
             // If this has landed, this row can actually be moved to buildGeneralQuery()
-            .leftJoin('song.streams', 'streams').addSelect("SUM(IFNULL(streams.streamCount, 0)) AS streamCount")
-            .leftJoin("song.likedBy", "likedByAll").addSelect("COUNT(likedByAll.id) AS likedByAllCount")
+            // .leftJoin('song.streams', 'streams').addSelect("SUM(IFNULL(streams.streamCount, 0)) AS song_streamCount")
+            // .loadRelationCountAndMap("song.streamCount", "song.streams", "streamsCount")
+            .leftJoin("song.streams", "streams")
+            .leftJoin("song.likes", "likes")//.addSelect("COUNT(likedByAll.id) AS likedByAllCount")
 
             // Order by date of release or creation in database
-            .orderBy('streamCount', 'DESC')
-            .addOrderBy('likedByAllCount', "DESC")
+            // .orderBy('song_streamCount', 'DESC')
+            // .addOrderBy('likedByAllCount', "DESC")
+
+            .orderBy("COUNT(streams.id)", "DESC")
+            .addOrderBy("COUNT(likes.id)", "DESC")
 
             .groupBy("song.id")
             .limit(5)
-            .where("artist.id = :artistId OR artist.slug = :artistId", { artistId })
+            .where("primaryArtist.id = :artistId OR primaryArtist.slug = :artistId", { artistId })
 
         return query;
     }
@@ -229,13 +234,13 @@ export class TracklistService {
      * @param authentication 
      * @returns SelectQueryBuilder<Song>
      */
-    protected buildFindByAlbumQuery(albumId: string, alias: string, pageable?: BasePageable, authentication?: User): SelectQueryBuilder<Song> {
-        let query = this.songService.buildGeneralQuery(alias, authentication)
+    protected buildFindByAlbumQuery(albumId: string, pageable?: BasePageable, authentication?: User): SelectQueryBuilder<Song> {
+        let query = this.songService.buildGeneralQuery("song", authentication)
             // Get amount of streams
             // If this has landed, this row can actually be moved to buildGeneralQuery()
             // .leftJoin('song.streams', 'streams').addSelect(["SUM(IFNULL(streams.streamCount, 0)) AS streamCount"])
             // Order songs by album order
-            .orderBy(`${alias}.order`, "ASC")
+            .orderBy(`song.order`, "ASC")
             .where("album.id = :albumId OR album.slug = :albumId", { albumId })
 
         // Add optional page settings
