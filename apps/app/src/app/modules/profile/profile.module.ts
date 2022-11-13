@@ -9,9 +9,8 @@ import { SCNGXPlaylistGridItemModule, SCNGXTooltipModule, SCNGXUiRowModule } fro
 import { VirtualScrollerModule } from '@tsalliance/ngx-virtual-scroller';
 
 const routes: Routes = [
-  { path: "", redirectTo: "@me" },
+  { path: "", redirectTo: "@me", pathMatch: "full" },
   { path: ":profileId", component: ProfileInfoComponent }
-
 ]
 
 @NgModule({
