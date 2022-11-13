@@ -54,7 +54,7 @@ export class AlbumInfoComponent implements OnInit, OnDestroy {
 
         this.album = album;
         this.isLoadingAlbum = false;
-        this.tracklist = this.tracklistBuilder.forAlbum(album.id);
+        this.tracklist = this.tracklistBuilder.forAlbum(album);
 
         this.albumService.findRecommendedByArtist(album.primaryArtist?.id, [album.id]).pipe(takeUntil(this._cancel)).subscribe((response) => {
           this.featuredAlbums = response.payload.elements;

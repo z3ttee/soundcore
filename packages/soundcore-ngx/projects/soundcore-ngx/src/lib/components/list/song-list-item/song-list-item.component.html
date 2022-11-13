@@ -43,7 +43,8 @@
                 <div class="line-clamp-1">
                     <ul class="">
                         <li *ngIf="song.explicit" class="inline mr-2"><scngx-explicit-badge [extended]="false"></scngx-explicit-badge></li>
-                        <li *ngFor="let artist of song.featuredArtists; index as i" class="inline text-font text-opacity-70"><span class="text-sm hover:underline pointer-events-all cursor-pointer" [routerLink]="['/artist', artist.slug || artist.id]">{{ artist.name }}</span>{{ i + 1 < song.featuredArtists.length ? ", " : "" }}</li>
+                        <li *ngIf="song.primaryArtist" class="inline text-font text-opacity-70"><span class="text-sm hover:underline pointer-events-all cursor-pointer" [routerLink]="['/artist', song?.primaryArtist.slug ?? song?.primaryArtist.id]">{{ song?.primaryArtist.name }}</span>{{ song.featuredArtists.length > 0 ? ", " : "" }}</li>
+                        <li *ngFor="let artist of song.featuredArtists; index as i" class="inline text-font text-opacity-70"><span class="text-sm hover:underline pointer-events-all cursor-pointer" [routerLink]="['/artist', artist.slug ?? artist.id]">{{ artist.name }}</span>{{ i + 1 < song.featuredArtists.length ? ", " : "" }}</li>
                     </ul>
                 </div>
             </div>

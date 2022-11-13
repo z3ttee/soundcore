@@ -4,7 +4,7 @@ import { Queue } from "./queue.entity";
 import { SCNGXBaseDatasource } from "../../scroll/entities/datasource.entity";
 import { DatasourceItem } from "../../scroll/entities/datasource-item.entity";
 
-export class SCNGXTracklist extends SCNGXBaseDatasource<PlaylistItem> {
+export class SCNGXTracklist<C = any> extends SCNGXBaseDatasource<PlaylistItem> {
     private readonly logger = new Logger(SCNGXTracklist.name);
 
     private readonly _initializedSubject: BehaviorSubject<boolean> = new BehaviorSubject(false);
@@ -24,9 +24,10 @@ export class SCNGXTracklist extends SCNGXBaseDatasource<PlaylistItem> {
          * tracklist. For example an artist's id for a tracklist containing songs
          * of an artist.
          */
-        private readonly assocResId: string,
+        public readonly assocResId: string,
         
         private readonly service: SCSDKTracklistService,
+        public readonly context?: C
     ) {
         // Sets page size to 30
         super(30);
@@ -61,9 +62,15 @@ export class SCNGXTracklist extends SCNGXBaseDatasource<PlaylistItem> {
             const startPage = Math.floor(startIndex / this.pageSize);
             const indexInPage = startIndex - startPage * this.pageSize;
 
+            console.log(`startIndex: ${startIndex}, startPage: ${startPage}, indexInPage: ${indexInPage}`);
+
             // Check if the page is already cached
             if(this.isCached(startPage)) {
                 const page = this.getCachedPage(startPage);
+
+                console.log("cached page: ", page);
+                console.log("cached item: ", page[indexInPage]);
+
                 subscriber.next(page?.[indexInPage]);
                 subscriber.complete();
             } else {
@@ -170,8 +177,11 @@ export class SCNGXTracklist extends SCNGXBaseDatasource<PlaylistItem> {
         const item = this.queue.dequeueAt(index);
         if(typeof item === "undefined" || item == null) return of(null);
 
+        console.log("dequeued at ", index);
+
+        // TODO: Overhaul datasourceitem (should consider Song and PlaylistItem) as both are different things
         return this.getItemByIndex(item).pipe(map((datasourceitem) => {
-            return datasourceitem.data.song;
+            return datasourceitem.data.song ?? datasourceitem.data as unknown as Song;
         }));
     }
 
@@ -216,6 +226,7 @@ export class SCNGXTracklist extends SCNGXBaseDatasource<PlaylistItem> {
      */
     private setQueue(tracklist: SCSDKTracklist) {
         const queue = Array.from(Array(tracklist.size).keys());
+        console.log("setting tracklist queue: ", queue);
         this.queue.set(queue);
     }
 

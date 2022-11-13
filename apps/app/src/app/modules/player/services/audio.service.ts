@@ -37,25 +37,36 @@ export class AppAudioService {
      * This will request a stream token and automatically start streaming.
      */
     public forcePlay(item: PlayerItem): Observable<void> {
-        console.log("force playing ", item);
-
         if(!item) {
             this._audioElement.src = ``;
         }
 
         return this.streamService.requestStreamUrl(item.song.id).pipe(map((url) => {
-            this.logger.verbose(`Starting stream via url ${url}`);
+            const isTracklist = !!item.tracklist;
+            this.logger.verbose(`Now playing "${item.song.name}" by "${item.song.primaryArtist?.name}"${(isTracklist ? ` on tracklist "${item.tracklist.context?.["name"]}"` : ``)}`);   
+
             this._audioElement.src = `${url}`;
             this._audioElement.play();
         }));
     }
 
     /**
+     * reset current time to 0
+     */
+    public resetTime() {
+        this._audioElement.currentTime = 0;
+    }
+
+    /**
      * Pause playback and reset current time to 0
      */
-    public resetAtCurrent() {
+    public skipTime() {
         this.pause();
         this._audioElement.currentTime = 0;
+    }
+
+    public get currentTime(): number {
+        return this._audioElement.currentTime;
     }
 
     /**

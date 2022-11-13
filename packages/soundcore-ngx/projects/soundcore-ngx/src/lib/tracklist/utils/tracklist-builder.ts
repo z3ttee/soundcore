@@ -1,5 +1,5 @@
 import { Injectable } from "@angular/core";
-import { SCSDKTracklistService, TracklistType } from "@soundcore/sdk";
+import { Album, Artist, Playlist, SCSDKTracklistService, TracklistType } from "@soundcore/sdk";
 import { SCNGXTracklist } from "../entities/tracklist.entity";
 
 @Injectable({
@@ -15,20 +15,20 @@ export class SCNGXTracklistBuilder {
         return new SCNGXTracklistBuilder(service);
     }
 
-    public forPlaylist(playlistId: string): SCNGXTracklist {
-        return new SCNGXTracklist(TracklistType.PLAYLIST, playlistId, this.service);
+    public forPlaylist(playlist: Playlist): SCNGXTracklist {
+        return new SCNGXTracklist(TracklistType.PLAYLIST, playlist.id, this.service, playlist);
     }
 
-    public forAlbum(albumId: string): SCNGXTracklist {
-        return new SCNGXTracklist(TracklistType.ALBUM, albumId, this.service);
+    public forAlbum(album: Album): SCNGXTracklist {
+        return new SCNGXTracklist(TracklistType.ALBUM, album.id, this.service, album);
     }
 
-    public forArtist(artistId: string): SCNGXTracklist {
-        return new SCNGXTracklist(TracklistType.ARTIST, artistId, this.service);
+    public forArtist(artist: Artist): SCNGXTracklist {
+        return new SCNGXTracklist(TracklistType.ARTIST, artist.id, this.service, artist);
     }
 
-    public forArtistTop(artistId: string): SCNGXTracklist {
-        return new SCNGXTracklist(TracklistType.ARTIST_TOP, artistId, this.service);
+    public forArtistTop(artist: Artist): SCNGXTracklist {
+        return new SCNGXTracklist(TracklistType.ARTIST_TOP, artist.id, this.service, artist);
     }
 
 }

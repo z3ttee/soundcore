@@ -14,7 +14,8 @@ export class PlayerItem {
          * Contextual data like a tracklist or song
          * that is associated with the current item
          */
-        public readonly tracklist?: SCNGXTracklist
+        public readonly tracklist?: SCNGXTracklist,
+        public readonly fromHistory: boolean = false
     ) {}
 
 }
