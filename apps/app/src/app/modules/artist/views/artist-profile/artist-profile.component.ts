@@ -1,40 +1,33 @@
-import { HttpClient } from '@angular/common/http';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { BehaviorSubject, Observable, Subject, takeUntil } from 'rxjs';
-import { PlayableListBuilder, SCNGXSongColConfig, SCNGXPlayableTracklist } from '@soundcore/ngx';
-import { Album, Artist, Pageable, Playlist, SCDKAlbumService, SCDKArtistService } from '@soundcore/sdk';
-import { environment } from 'src/environments/environment';
+import { Subject, takeUntil } from 'rxjs';
+import { SCNGXSongColConfig, SCNGXTracklist, SCNGXTracklistBuilder } from '@soundcore/ngx';
+import { Album, Artist, Pageable, Playlist, SCDKAlbumService, SCDKArtistService, SCSDKPlaylistService } from '@soundcore/sdk';
+import { AppPlayerService } from 'src/app/modules/player/services/player.service';
 
 @Component({
   selector: 'app-artist-profile',
   templateUrl: './artist-profile.component.html',
-  styleUrls: ['./artist-profile.component.scss']
+  styleUrls: ['./artist-profile.component.scss'],
 })
 export class ArtistProfileComponent implements OnInit, OnDestroy {
 
   constructor(
     private readonly artistService: SCDKArtistService,
     private readonly albumService: SCDKAlbumService,
+    private readonly playlistService: SCSDKPlaylistService,
     private readonly activatedRoute: ActivatedRoute,
-    private readonly httpClient: HttpClient
+    private readonly tracklistBuilder: SCNGXTracklistBuilder,
+    private readonly player: AppPlayerService
   ) { }
 
   private readonly _destroy: Subject<void> = new Subject();
-  private readonly _loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject(false);
-  private readonly _artistSubject: BehaviorSubject<Artist> = new BehaviorSubject(null);
-  private readonly _albumSubject: BehaviorSubject<Album[]> = new BehaviorSubject([]);
-  private readonly _featAlbumsSubject: BehaviorSubject<Album[]> = new BehaviorSubject([]);
-  private readonly _featPlaylistSubject: BehaviorSubject<Playlist[]> = new BehaviorSubject([]);
-  private readonly _listSubject: BehaviorSubject<SCNGXPlayableTracklist> = new BehaviorSubject(null);
 
-  public readonly $loading: Observable<boolean> = this._loadingSubject.asObservable();
-  public readonly $artist: Observable<Artist> = this._artistSubject.asObservable();
-  public readonly $albums: Observable<Album[]> = this._albumSubject.asObservable();
-  public readonly $featAlbums: Observable<Album[]> = this._featAlbumsSubject.asObservable();
-  public readonly $featPlaylists: Observable<Playlist[]> = this._featPlaylistSubject.asObservable();
-
-  public readonly $list: Observable<SCNGXPlayableTracklist> = this._listSubject.asObservable();
+  public loading: boolean = true;
+  public artist: Artist = null;
+  public albums: Album[] = [];
+  public featAlbums: Album[] = [];
+  public featPlaylists: Playlist[] = [];
 
   public readonly songListCols: SCNGXSongColConfig = {
     id: { enabled: true, collapseAt: 420 },
@@ -43,40 +36,45 @@ export class ArtistProfileComponent implements OnInit, OnDestroy {
     duration: { enabled: true, collapseAt: 380 }
   }
 
+  public tracklist?: SCNGXTracklist;
+
   public ngOnInit(): void {
     this.activatedRoute.paramMap.pipe(takeUntil(this._destroy)).subscribe((paramMap) => {
       const artistId = paramMap.get("artistId");
 
-      this._loadingSubject.next(true);
-      this._artistSubject.next(null);
-      this._albumSubject.next([]);
-      this._featAlbumsSubject.next([]);
-      this._featPlaylistSubject.next([]);
-
-      // TODO: Check if playable list is not enqueued
-      this._listSubject.getValue()?.release();
+      // Reset state
+      this.loading = true;
+      this.artist = null;
+      this.albums = [];
+      this.featAlbums = [];
+      this.featPlaylists = [];
+      this.tracklist = null;
 
       this.artistService.findById(artistId).pipe(takeUntil(this._destroy)).subscribe((response) => {
         const artist = response.payload;
-        this._artistSubject.next(artist);
-        this._loadingSubject.next(false);
 
+        // Update state
+        this.loading = false;
+        this.artist = artist;
+
+        // Create tracklist
+        this.tracklist = this.tracklistBuilder.forArtistTop(artist);
+
+        // Find list of albums by the artist
         this.albumService.findByArtist(artistId, new Pageable(0, 12)).pipe(takeUntil(this._destroy)).subscribe((response) => {
-          this._albumSubject.next(response.payload?.elements || []);
+          // Update state
+          this.albums = response.payload?.elements ?? [];
         });
 
-        /*this.playlistService.findByArtist(artistId, new Pageable(0, 12)).pipe(takeUntil(this._destroy)).subscribe((page) => {
-          this._featPlaylistSubject.next(page?.elements || []);
-        });*/
+        // this.playlistService.findByArtist(artistId, new Pageable(0, 12)).pipe(takeUntil(this._destroy)).subscribe((page) => {
+        //   this._featPlaylistSubject.next(page?.elements || []);
+        // });
 
+        // Find list of albums the artist is featured in
         this.albumService.findFeaturedByArtist(artistId, new Pageable(0, 12)).pipe(takeUntil(this._destroy)).subscribe((response) => {
-          this._featAlbumsSubject.next(response.payload?.elements || []);
-        })
-
-        this._listSubject.next(PlayableListBuilder
-          .forTracklist(this.httpClient)
-          .useUrl(`${environment.api_base_uri}/v1/songs/byArtist/${artist.id}`)
-          .build());
+          // Update state
+          this.featAlbums = response.payload?.elements ?? [];
+        });
       })
     })
   }
@@ -84,6 +82,10 @@ export class ArtistProfileComponent implements OnInit, OnDestroy {
   public ngOnDestroy(): void {
       this._destroy.next();
       this._destroy.complete();
+  }
+
+  public forcePlay() {
+    this.player.playTracklist(this.tracklist, true);
   }
 
 }

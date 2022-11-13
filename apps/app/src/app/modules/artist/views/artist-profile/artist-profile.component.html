@@ -1,94 +1,116 @@
-<app-error404 *ngIf="!($loading | async) && !($artist | async)"></app-error404>
+<app-error404 *ngIf="!loading && !artist"></app-error404>
 
-<section class="w-full h-full pb-window overflow-y-auto" #pageScroll>
-    <virtual-scroller #pageScroll [parentScroll]="pageScroll" [enableUnequalChildrenSizes]="true">
-        
-        <div>
-            <app-list-view [resource]="($artist | async)" [title]="($artist | async)?.name" [artwork]="($artist | async)?.artwork" [isLoading]="($loading | async)">
-                <ng-container scngx-stats>
-                    <li class="text-font-secondary">
-                        <span>{{ ($artist | async)?.albumCount || 0 }} Alben</span>
-                    </li>
-                    <li class="text-font-secondary">
-                        <span>{{ ($artist | async)?.songCount || 0 }} Songs</span>
-                    </li>
-                    <li class="text-font-secondary">
-                        <span>{{ ($artist | async)?.streamCount || 0 }} Streams</span>
-                    </li>
-                </ng-container>
-        
-                <ng-container scngx-controls>
-                    <button class="w-14 flex items-center justify-center aspect-square bg-accent transition-all will-change-transform text-body rounded-full hover:scale-105 active:scale-[97%]">
-                        <img class="w-7 h-7 text-body ml-0.5" src="assets/icons/play.svg">
-                    </button>
-        
-                    <button class="flex items-center p-2 rounded-full" matRipple [matRippleCentered]="true">
-                        <hero-icon [name]="'dots-vertical'" [class]="'h-7 aspect-square'"></hero-icon>
-                    </button>
-                </ng-container>
-            </app-list-view>
-        </div>
+<scngx-scroll class="w-full h-full" #scroller>
 
-        <div class="flex gap-row items-start w-full px-window flex-col lg:flex-row">
-            <div class="relative w-full lgflex-grow">
-                <h6 *ngIf="!($loading | async)">Beliebte Songs</h6>
-                <scngx-skeleton *ngIf="($loading | async)" [class]="'w-44 max-w-[90%] h-7'"></scngx-skeleton>
+    <!-- Page Header -->
+    <ng-container header>
+        <app-list-view [resource]="artist" [title]="artist?.name" [isLoading]="loading" [artwork]="artist?.artwork">
+            <ng-container scngx-stats>
+                <li class="text-font-secondary">
+                    <span>{{ artist?.albumCount ?? 0 }} Alben</span>
+                </li>
+                <li class="text-font-secondary">
+                    <span>{{ artist?.songCount ?? 0 }} Songs</span>
+                </li>
+                <li class="text-font-secondary">
+                    <span>{{ artist?.streamCount ?? 0 }} Streams in 30 Tagen</span>
+                </li>
+            </ng-container>
+        
+            <ng-container scngx-controls>
+                <button (click)="forcePlay()" class="w-14 flex items-center justify-center aspect-square bg-accent transition-all will-change-transform text-body rounded-full hover:scale-105 active:scale-[97%]">
+                    <img class="w-7 h-7 text-body ml-0.5" src="assets/icons/play.svg">
+                </button>
+            
+                <button class="flex items-center p-2 rounded-full" matRipple [matRippleCentered]="true">
+                    <hero-icon [name]="'heart'" [class]="'h-7 aspect-square'"></hero-icon>
+                </button>
+            
+                <button class="flex items-center p-2 rounded-full" matRipple [matRippleCentered]="true">
+                    <hero-icon [name]="'dots-vertical'" [class]="'h-7 aspect-square'"></hero-icon>
+                </button>
+            </ng-container>
+        </app-list-view>
 
-                <div class="mt-4">
-                    <scngx-virtual-song-list [useMaxHeight]="true" [showSkeleton]="($loading | async)" [skeletons]="5" [parentScroll]="pageScroll" [columns]="songListCols" [dataSource]="($list | async)?.$dataSource | async"></scngx-virtual-song-list>
+        <!-- Favourite songs bar -->
+        <div class="flex flex-1 items-center justify-start w-full px-window mb-row">
+            <!-- Favourite songs -->
+            <div class="inline-block p-4 bg-body-light bg-opacity-60 shadow-lg rounded-sm gap-4 border border-body-lighter">
+                <div class="flex flex-1 items-center gap-4">
+                    <div class="min-w-11 min-h-11 w-11 h-11 rounded-full overflow-hidden">
+                        <scngx-artwork></scngx-artwork>
+                    </div>
+
+                    <div class="flex-grow">
+                        <p class="line-clamp-2">Deine Lieblingssongs</p>
+                        <p class="text-sm opacity-70 line-clamp-1">Dir gefallen {{ 0 }} Songs.</p>
+                    </div>
                 </div>
             </div>
-
-            <div>
-                <h6>Lieblingssongs</h6>
-            </div>
         </div>
+    </ng-container>
 
-        <!-- Albums -->
-        <scngx-ui-row [headline]="'Alben'" [route]="['./albums']" *ngIf="($albums | async)?.length > 0">
-            
+    <!-- List -->
+    <ng-container list>
+        <h6 class="px-window pb-row">Beliebte Songs</h6>
+
+        <scngx-table>
+            <!-- Table Head
+            <ng-container thead>
+                <div>#</div>
+                <div>Titel</div>
+            </ng-container> -->
+
+            <!-- Table Body -->
+            <ng-container tbody *ngIf="tracklist">
+                <div *uiScroll="let item of tracklist" class="px-window">
+                    <scngx-song-list-item [song]="item.data" [index]="item.index" [columns]="songListCols"></scngx-song-list-item>
+                </div>
+            </ng-container>
+        </scngx-table>
+    </ng-container>
+
+    <!-- Page Footer -->
+    <ng-container footer>
+        <scngx-ui-row [headline]="'Alben'" [route]="['./albums']" *ngIf="albums.length > 0">
             <div class="w-full">
                 <scngx-horizontal-grid>
-                        <ng-container *ngFor="let item of ($albums | async)">
+                        <ng-container *ngFor="let item of albums">
                             <scngx-album-grid-item 
                                 [item]="item" 
                                 [useDate]="true"
-                                [routerLink]="['/album', item.slug || item.id]">
+                                [routerLink]="['/album', item.slug ?? item.id]">
                             </scngx-album-grid-item>
                         </ng-container>
                 </scngx-horizontal-grid>
             </div>
         </scngx-ui-row>
 
-        <!-- Featured in playlists -->
-        <scngx-ui-row [headline]="'Enthalten in'" [route]="['./playlists']" *ngIf="($featPlaylists | async)?.length > 0">
-            
+        <scngx-ui-row [headline]="'Enthalten in'" [route]="['./playlists']" *ngIf="featPlaylists.length > 0">
             <div class="w-full">
                 <scngx-horizontal-grid>
-                        <ng-container *ngFor="let item of ($featPlaylists | async)">
+                        <ng-container *ngFor="let item of featPlaylists">
                             <scngx-playlist-grid-item
                                 [item]="item"
-                                [routerLink]="['/playlist', item?.slug || item?.id]">
+                                [routerLink]="['/playlist', item?.slug ?? item?.id]">
                             </scngx-playlist-grid-item>
                         </ng-container>
                 </scngx-horizontal-grid>
             </div>
         </scngx-ui-row>
 
-        <!-- Featured in album -->
-        <scngx-ui-row [headline]="'Alben mit ' + ($artist | async)?.name" [route]="['./playlists']" *ngIf="($featAlbums | async)?.length > 0">
-            
+        <scngx-ui-row [headline]="'Alben mit ' + artist?.name" [route]="['./playlists']" *ngIf="featAlbums.length > 0">
             <div class="w-full">
                 <scngx-horizontal-grid>
-                        <ng-container *ngFor="let item of ($featAlbums | async)">
+                        <ng-container *ngFor="let item of featAlbums">
                             <scngx-album-grid-item 
                                 [item]="item" 
-                                [routerLink]="['/album', item.slug || item.id]">
+                                [routerLink]="['/album', item.slug ?? item.id]">
                             </scngx-album-grid-item>
                         </ng-container>
                 </scngx-horizontal-grid>
             </div>
         </scngx-ui-row>
+    </ng-container>
 
-    </virtual-scroller>
-</section>
+</scngx-scroll>
