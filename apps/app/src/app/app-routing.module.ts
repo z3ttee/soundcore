@@ -1,10 +1,10 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { SSOGuard } from '@soundcore/sso';
-import { AdminLayoutComponent } from 'src/layouts/admin-layout/admin-layout.component';
-import { AdminLayoutModule } from 'src/layouts/admin-layout/admin-layout.module';
-import { AscMainLayoutComponent } from 'src/layouts/main-layout/main-layout.component';
-import { AscMainLayoutModule } from 'src/layouts/main-layout/main-layout.module';
+import { AdminLayoutComponent } from 'src/app/layouts/admin-layout/admin-layout.component';
+import { AdminLayoutModule } from 'src/app/layouts/admin-layout/admin-layout.module';
+import { AscMainLayoutComponent } from 'src/app/layouts/main-layout/main-layout.component';
+import { AscMainLayoutModule } from 'src/app/layouts/main-layout/main-layout.module';
 import { Error404Component } from './shared/error404/error404.component';
 import { Error404Module } from './shared/error404/error404.module';
 
