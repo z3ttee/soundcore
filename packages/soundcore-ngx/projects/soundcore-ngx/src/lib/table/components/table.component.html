@@ -1,0 +1,16 @@
+<div class="w-full">
+    <!-- Header -->
+    <div class="flex flex-1 w-full [&>*]:p-2 [&>*]:w-full">
+        <ng-content select="[thead]"></ng-content>
+    </div>
+
+    <!-- Content -->
+    <div class="w-full">
+        <ng-content select="[tbody]"></ng-content>
+    </div>
+
+    <!-- Footer -->
+    <div class="w-full">
+        <ng-content select="[tfoot]"></ng-content>
+    </div>
+</div>

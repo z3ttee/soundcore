@@ -7,7 +7,7 @@ export { SCNGXModule } from "./lib/scngx.module";
 export * from "./lib/scroll";
 
 // Table Module
-// export * from "./lib/table";
+export * from "./lib/table";
 
 // Tracklist Module
 export * from "./lib/tracklist";
