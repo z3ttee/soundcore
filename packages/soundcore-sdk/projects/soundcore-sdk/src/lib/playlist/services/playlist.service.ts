@@ -38,6 +38,16 @@ export class SCSDKPlaylistService {
   }
 
   /**
+   * Find playlists by its author.
+   * @param authorId Playlist author's id
+   * @returns Playlist
+   */
+   public findByAuthor(authorId: string, pageable: Pageable): Observable<ApiResponse<Page<Playlist>>> {
+    if(!authorId) return of(ApiResponse.withPayload(null));
+    return this.httpClient.get<Page<Playlist>>(`${this.options.api_base_uri}/v1/playlists/byAuthor/${authorId}${pageable.toQuery()}`).pipe(apiResponse());
+  }
+
+  /**
    * Search playlists by a given query.
    * @param {string} query Search query
    * @param {Pageable} pageable Page settings

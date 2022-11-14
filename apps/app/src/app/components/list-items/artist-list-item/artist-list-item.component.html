@@ -1,0 +1,50 @@
+<div #container (contextmenu)="emitOnContext($event)" class="flex flex-1 gap-1 h-16 px-1.5 w-full overflow-x-hidden items-center rounded select-none cursor-pointer bg-body-light bg-opacity-0 hover:bg-opacity-30 active:bg-opacity-50">
+    
+    <!-- ID -->
+    <div class="relative inline-flex max-w-11 min-w-11 h-11 justify-center items-center">
+        <scngx-skeleton *ngIf="!artist" [class]="'h-5 w-5 align-middle'"></scngx-skeleton>
+
+        <div class="flex justify-center items-center w-full h-full relative" *ngIf="artist">
+            <span class="text-font-secondary">{{ index + 1 }}</span>
+        </div>
+    </div>
+
+    <!-- Song title -->
+    <div class="flex w-full overflow-hidden">
+        <!-- Skeleton View -->
+        <div *ngIf="!artist" class="inline-flex w-full gap-2 items-center">
+            <scngx-skeleton [class]="'min-w-12 max-w-12 h-12'"></scngx-skeleton>
+            <div class="flex flex-col w-full">
+                <scngx-skeleton [class]="'w-[50%] h-5'"></scngx-skeleton>
+                <scngx-skeleton [class]="'w-[15%] h-5'"></scngx-skeleton>
+            </div>
+        </div>
+
+        <!-- Actual View -->
+        <div *ngIf="artist" class="inline-flex w-full gap-2 items-center">
+            <div class="min-w-12 max-w-12 h-12 rounded-sm overflow-hidden">
+                <scngx-artwork [artwork]="artist?.artwork" class=""></scngx-artwork>
+            </div>
+    
+            <div class="w-full">
+                <p class="line-clamp-1">
+                    {{ artist?.name || "Unbekannter Künstler" }}
+                </p>
+                <div class="line-clamp-1">
+                    <ul class="">
+                        <li *ngIf="artist?.streamCount || artist?.streamCount < 0" class="inline text-font text-opacity-70">
+                            <span class="text-sm">
+                                {{ artist?.streamCount }} mal gestreamed
+                            </span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Menu column -->
+    <div class="max-w-6 min-w-6" [ngClass]="{'hidden': !($isTouch | async)}">
+        <button class="block w-full text-center" matRipple [matRippleRadius]="15" [matRippleCentered]="true" [matRippleUnbounded]="true" (click)="emitOnContext($event)"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+    </div>
+</div>

@@ -1,18 +1,18 @@
-<app-error404 *ngIf="!($loading | async) && !($profile | async)"></app-error404>
+<app-error404 *ngIf="!loading && !profile"></app-error404>
 
 <section class="h-full w-full overflow-y-auto pb-window" #parent>
     <virtual-scroller #pageScroll [parentScroll]="parent" [enableUnequalChildrenSizes]="true">
-        <app-list-view [resource]="($profile | async)" [artwork]="null" [isLoading]="($loading | async)" [title]="($profile | async)?.name">
+        <app-list-view [resource]="profile" [artwork]="null" [isLoading]="loading" [title]="profile?.name">
 
             <ng-container scngx-stats>
-                <li class="text-font-secondary" scngxTooltip [scngxTooltipText]="($profile | async)?.createdAt | date:'dd.MM.yyyy'">
-                    Seit {{ ($profile | async)?.createdAt | date:"yyyy" }}
+                <li class="text-font-secondary" scngxTooltip [scngxTooltipText]="profile?.createdAt | date:'dd.MM.yyyy'">
+                    Seit {{ profile?.createdAt | date:"yyyy" }}
                 </li>
                 <li class="text-font-secondary">
-                    {{ ($profile | async)?.friendsCount || 0 }} Freunde
+                    {{ profile?.friendsCount || 0 }} Freunde
                 </li>
                 <li class="text-font-secondary">
-                    {{ ($playlists | async)?.length || 0 }} Öffentliche Playlists
+                    {{ playlists.length || 0 }} Öffentliche Playlists
                 </li>
             </ng-container>
         
@@ -27,7 +27,7 @@
         <!-- Playlists row -->
         <scngx-ui-row [route]="['./playlists']" [headline]="'Öffentliche Playlists'">
             <div class="w-full" #scrollArea>
-                <virtual-scroller class="w-full h-64" #scroll [parentScroll]="scrollArea" [items]="($playlists | async)" [horizontal]="true" [scrollbarWidth]="0" [scrollbarHeight]="0">
+                <virtual-scroller class="w-full h-64" #scroll [parentScroll]="scrollArea" [items]="playlists" [horizontal]="true" [scrollbarWidth]="0" [scrollbarHeight]="0">
                     <div class="w-48 h-full mx-2 first:ml-window last:mr-window" *ngFor="let playlist of scroll.viewPortItems">
                         <scngx-playlist-grid-item 
                             [routerLink]="['/playlist', playlist.slug || playlist.id]"
@@ -39,17 +39,14 @@
         </scngx-ui-row>
 
         <!-- Artists row -->
-        <scngx-ui-row [route]="['./playlists']" [headline]="'Top Künstler'" [subtitle]="'Der letzten 30 Tage'">
-            <div class="w-full" #scrollArea>
-                
+        <scngx-ui-row [headline]="'Top Künstler'" [subtitle]="'Der letzten 30 Tage'" [route]="null">
+            <div class="px-window">
+                <scngx-artist-list-item *ngFor="let artist of artists; index as i" [artist]="artist" [index]="i"></scngx-artist-list-item>
             </div>
         </scngx-ui-row>
 
         <!-- Songs row -->
-        <scngx-ui-row [route]="['./playlists']" [headline]="'Meistgehörte Songs'" [subtitle]="'Der letzten 30 Tage'">
-            <div class="w-full" #scrollArea>
-                
-            </div>
+        <scngx-ui-row [headline]="'Meistgehörte Songs'" [subtitle]="'Der letzten 30 Tage'" [route]="null">
         </scngx-ui-row>
     </virtual-scroller>
 </section>
