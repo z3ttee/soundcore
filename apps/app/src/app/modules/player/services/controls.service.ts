@@ -1,5 +1,5 @@
 import { Injectable } from "@angular/core";
-import { BehaviorSubject, Observable } from "rxjs";
+import { BehaviorSubject, Observable, Subject } from "rxjs";
 import { AppAudioService } from "./audio.service";
 
 @Injectable({
@@ -8,13 +8,18 @@ import { AppAudioService } from "./audio.service";
 export class AppControlsService {
 
     constructor(
-        private readonly audio: AppAudioService
+        private readonly audio: AppAudioService,
     ) {}
 
     private readonly _shuffleSubject: BehaviorSubject<boolean> = new BehaviorSubject(false);
-    public readonly $isShuffled: Observable<boolean> = this._shuffleSubject.asObservable();
+    private readonly _skipSubject: Subject<void> = new Subject();
+    private readonly _prevSubject: Subject<void> = new Subject();
 
+    public readonly $isShuffled: Observable<boolean> = this._shuffleSubject.asObservable();
     public readonly $isPaused: Observable<boolean> = this.audio.$isPaused;
+
+    public readonly $onSkip: Observable<void> = this._skipSubject.asObservable();
+    public readonly $onPrev: Observable<void> = this._prevSubject.asObservable();
 
     /**
      * Check if the player is currently shuffled.
@@ -29,6 +34,26 @@ export class AppControlsService {
      */
     public toggle() {
         this.audio.toggle();
+    }
+
+    public play() {
+        this.audio.play();
+    }
+
+    public pause() {
+        this.audio.pause();
+    }
+
+    public skip() {
+        this._skipSubject.next();
+    }
+
+    public prev() {
+        this._prevSubject.next();
+    }
+
+    public stop() {
+        this.audio.skipTime();
     }
 
 }

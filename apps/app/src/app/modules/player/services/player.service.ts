@@ -6,6 +6,7 @@ import { PlayerItem } from "../entities/player-item.entity";
 import { AppAudioService } from "./audio.service";
 import { AppControlsService } from "./controls.service";
 import { AppHistoryService } from "./history.service";
+import { AppMediasessionService } from "./mediasession.service";
 
 @Injectable({
     providedIn: "root"
@@ -16,7 +17,8 @@ export class AppPlayerService {
     constructor(
         private readonly controls: AppControlsService,
         private readonly audio: AppAudioService,
-        private readonly history: AppHistoryService
+        private readonly history: AppHistoryService,
+        private readonly session: AppMediasessionService
     ) {
         this._singleQueue.$onAdded.subscribe(() => {
             this.logger.verbose(`New playable item waiting in queue. Queue size: ${this.queueSize}`);
@@ -26,10 +28,13 @@ export class AppPlayerService {
             this.logger.verbose(`Queue state changed. Queue size: ${this.queueSize}`);
         })
 
-        this.audio.$onNext.subscribe(() => {
-            console.log("received onNext()");
-            this.next();
-        });
+        this.audio.$onNext.subscribe(() => this.next());
+        this.controls.$onSkip.subscribe(() => this.skip());
+        this.controls.$onPrev.subscribe(() => this.prev());
+
+        this.$current.subscribe((current) => {
+            this.session.setSession(current);
+        })
     }
 
     private readonly _currentItem: BehaviorSubject<PlayerItem> = new BehaviorSubject(null);
