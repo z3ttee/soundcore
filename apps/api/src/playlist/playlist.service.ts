@@ -136,9 +136,8 @@ export class PlaylistService {
         
         // TODO: Test on user profiles
         const result = await this.playlistRepository.createQueryBuilder("playlist")
-            .leftJoin("playlist.author", "author")
-            .leftJoin("playlist.artwork", "artwork")
-            .leftJoin("playlist.collaborators", "collaborator")
+            .leftJoin("playlist.author", "author").addSelect(["author.id", "author.name", "author.slug"])
+            .leftJoin("playlist.artwork", "artwork").addSelect(["artwork.id"])
 
             // Pagination
             .limit(pageable.limit)
@@ -147,9 +146,8 @@ export class PlaylistService {
             // Count how many likes. This takes user's id in count
             .loadRelationCountAndMap("playlist.liked", "playlist.likedBy", "likedBy", (qb) => qb.where("likedBy.userId = :userId", { userId: authentication.id }))
 
-            .addSelect(["author.id", "author.name", "author.slug", "artwork.id", "artwork.accentColor"])
             .where("author.id = :authorId OR author.slug = :authorId", { authorId: authorId })
-            .orWhere("collaborator.id = :userId", { userId: authentication.id })
+            // .orWhere("collaborator.id = :userId", { userId: authentication.id })
             .getManyAndCount();
 
         return Page.of(result[0], result[1], pageable.offset);
