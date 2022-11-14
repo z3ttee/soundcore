@@ -104,7 +104,9 @@ export class AppPlayerService {
      * @param force If true, will skip currently playing item and starts playing the tracklist
      */
     public playTracklist(tracklist: SCNGXTracklist, force: boolean = true) {
-        if(this.isPlayingSrcById(tracklist.id))
+        if(this.isPlayingSrcById(tracklist.id)) {
+            this.audio.pause();
+        }
 
         // "Enqueue" tracklist
         this._enqueuedTracklist = tracklist;
@@ -121,7 +123,8 @@ export class AppPlayerService {
 
     public isPlayingSrcById(id: string) {
         const current = this._currentItem.getValue();
-        return !!current.tracklist ? current.tracklist.id == id : current.song.id;
+        if(typeof current === "undefined" || current == null) return false;
+        return !!current.tracklist ? current.tracklist?.assocResId == id : current.song?.id;
     }
 
     /**

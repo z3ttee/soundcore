@@ -16,19 +16,19 @@ export class SCNGXTracklistBuilder {
     }
 
     public forPlaylist(playlist: Playlist): SCNGXTracklist {
-        return new SCNGXTracklist(TracklistType.PLAYLIST, playlist.id, this.service, playlist);
+        return new SCNGXTracklist(TracklistType.PLAYLIST, playlist?.id, this.service, playlist);
     }
 
     public forAlbum(album: Album): SCNGXTracklist {
-        return new SCNGXTracklist(TracklistType.ALBUM, album.id, this.service, album);
+        return new SCNGXTracklist(TracklistType.ALBUM, album?.id, this.service, album);
     }
 
     public forArtist(artist: Artist): SCNGXTracklist {
-        return new SCNGXTracklist(TracklistType.ARTIST, artist.id, this.service, artist);
+        return new SCNGXTracklist(TracklistType.ARTIST, artist?.id, this.service, artist);
     }
 
     public forArtistTop(artist: Artist): SCNGXTracklist {
-        return new SCNGXTracklist(TracklistType.ARTIST_TOP, artist.id, this.service, artist);
+        return new SCNGXTracklist(TracklistType.ARTIST_TOP, artist?.id, this.service, artist);
     }
 
 }

@@ -113,25 +113,27 @@ export class SCNGXTracklist<C = any> extends SCNGXBaseDatasource<PlaylistItem> {
                 // Otherwise fetch tracklist
                 let request: Observable<ApiResponse<SCSDKTracklist>>;
 
-                switch(this.type) {
-                    case TracklistType.PLAYLIST:
-                        request = this.service.findByPlaylist(this.assocResId)
-                        break;
-                    case TracklistType.ALBUM:
-                        request = this.service.findByAlbum(this.assocResId)
-                        break;
-                    case TracklistType.ARTIST:
-                        request = this.service.findByArtist(this.assocResId)
-                        break;
-                    case TracklistType.ARTIST_TOP:
-                        request = this.service.findByArtistTop(this.assocResId)
-                        break;
-
-                    default:
-                        // Unexpected type, "throw" error
-                        subscriber.error(new Error(`Received attempt to initialize tracklist with an invalid type. Aborting...`));
-                        subscriber.complete();
-                        return;
+                if(this.assocResId) {
+                    switch(this.type) {
+                        case TracklistType.PLAYLIST:
+                            request = this.service.findByPlaylist(this.assocResId)
+                            break;
+                        case TracklistType.ALBUM:
+                            request = this.service.findByAlbum(this.assocResId)
+                            break;
+                        case TracklistType.ARTIST:
+                            request = this.service.findByArtist(this.assocResId)
+                            break;
+                        case TracklistType.ARTIST_TOP:
+                            request = this.service.findByArtistTop(this.assocResId)
+                            break;
+    
+                        default:
+                            // Unexpected type, "throw" error
+                            subscriber.error(new Error(`Received attempt to initialize tracklist with an invalid type. Aborting...`));
+                            subscriber.complete();
+                            return;
+                    }
                 }
 
                 // Check if request could be built
@@ -152,6 +154,9 @@ export class SCNGXTracklist<C = any> extends SCNGXBaseDatasource<PlaylistItem> {
                         // Complete source to prevent memory leaks
                         subscriber.complete();
                     });
+                } else {
+                    subscriber.next(null);
+                    subscriber.complete();
                 }
             }
         });

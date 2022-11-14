@@ -48,8 +48,8 @@ export class ArtistService {
 
         const result = rawAndEntities.entities[0];
         const streamCount = Number(rawAndEntities.raw[0]?.streamCount ?? 0);
-                    
-        result.streamCount = streamCount;
+              
+        if(!!result) result.streamCount = streamCount;
         return result;
     }
 
