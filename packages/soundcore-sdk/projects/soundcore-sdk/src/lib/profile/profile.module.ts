@@ -1,10 +1,9 @@
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { SCDKProfileService } from './services/profile.service';
+import { SCSDKProfileService } from './services/profile.service';
 
 @NgModule({
   providers: [
-    SCDKProfileService
+    SCSDKProfileService
   ]
 })
-export class SCDKProfileModule { }
+export class SCSDKProfileModule { }

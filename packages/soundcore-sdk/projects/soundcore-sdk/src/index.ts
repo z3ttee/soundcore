@@ -21,7 +21,8 @@ export * from "./lib/stream";
 // Playlist Module
 export * from "./lib/playlist";
 
-
+// Profile Module
+export * from "./lib/profile";
 
 
 
@@ -133,12 +134,6 @@ export * from "./lib/notification/entities/notification.entity";
  * Gateway SDK
  */
 export * from "./lib/utils/gateway/gateway";
-
-/**
- * Profile SDK
- */
-export * from "./lib/profile/profile.module";
-export * from "./lib/profile/services/profile.service";
 
 /**
  * Settings SDK

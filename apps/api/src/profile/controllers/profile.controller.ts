@@ -20,4 +20,9 @@ export class ProfileController {
         return this.profileService.findByUserId(userId);
     }
 
+    @Get(":userId/topArtists")
+    public async findTopArtistsByUser(@Param("userId") userId: string) {
+        return this.profileService.findTopArtistsByUser(userId);
+    }
+
 }

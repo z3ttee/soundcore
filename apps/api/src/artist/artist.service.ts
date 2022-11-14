@@ -19,6 +19,10 @@ export class ArtistService {
         private readonly meiliClient: MeiliArtistService,
     ){ }
 
+    public getRepository() {
+        return this.repository;
+    }
+
     /**
      * Find an artist by its id.
      * @param artistId Artist's id

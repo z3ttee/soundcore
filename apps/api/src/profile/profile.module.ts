@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { ArtistModule } from '../artist/artist.module';
 import { UserModule } from '../user/user.module';
 import { ProfileController } from './controllers/profile.controller';
 import { ProfileService } from './services/profile.service';
@@ -11,7 +12,8 @@ import { ProfileService } from './services/profile.service';
     ProfileService
   ],
   imports: [
-    UserModule
+    UserModule,
+    ArtistModule
   ],
   exports: [
     ProfileService
