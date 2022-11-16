@@ -62,14 +62,9 @@ export class SCNGXTracklist<C = any> extends SCNGXBaseDatasource<PlaylistItem> {
             const startPage = Math.floor(startIndex / this.pageSize);
             const indexInPage = startIndex - startPage * this.pageSize;
 
-            console.log(`startIndex: ${startIndex}, startPage: ${startPage}, indexInPage: ${indexInPage}`);
-
             // Check if the page is already cached
             if(this.isCached(startPage)) {
                 const page = this.getCachedPage(startPage);
-
-                console.log("cached page: ", page);
-                console.log("cached item: ", page[indexInPage]);
 
                 subscriber.next(page?.[indexInPage]);
                 subscriber.complete();
@@ -182,9 +177,6 @@ export class SCNGXTracklist<C = any> extends SCNGXBaseDatasource<PlaylistItem> {
         const item = this.queue.dequeueAt(index);
         if(typeof item === "undefined" || item == null) return of(null);
 
-        console.log("dequeued at ", index);
-
-        // TODO: Overhaul datasourceitem (should consider Song and PlaylistItem) as both are different things
         return this.getItemByIndex(item).pipe(map((datasourceitem) => {
             return datasourceitem.data.song ?? datasourceitem.data as unknown as Song;
         }));
@@ -231,7 +223,6 @@ export class SCNGXTracklist<C = any> extends SCNGXBaseDatasource<PlaylistItem> {
      */
     private setQueue(tracklist: SCSDKTracklist) {
         const queue = Array.from(Array(tracklist.size).keys());
-        console.log("setting tracklist queue: ", queue);
         this.queue.set(queue);
     }
 

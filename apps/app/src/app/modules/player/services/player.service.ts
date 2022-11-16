@@ -26,9 +26,9 @@ export class AppPlayerService {
 
         this._singleQueue.$size.subscribe(() => {
             this.logger.verbose(`Queue state changed. Queue size: ${this.queueSize}`);
-        })
+        });
 
-        this.audio.$onNext.subscribe(() => this.next());
+        this.audio.$onNext.subscribe(() => this.next().subscribe());
         this.controls.$onSkip.subscribe(() => this.skip());
         this.controls.$onPrev.subscribe(() => this.prev());
 
