@@ -8,6 +8,7 @@ import { Slug } from "@tsalliance/utilities";
 import { Artwork } from "../../artwork/entities/artwork.entity";
 import { Syncable, SyncFlag } from "../../meilisearch/interfaces/syncable.interface";
 import { PlaylistItem } from "../../playlist/entities/playlist-item.entity";
+import { ImportTask } from "../../import/entities/import.entity";
 
 // TODO: Remove attributes from Syncable object when they get sent as response
 // TODO: Split profile and users logic
@@ -56,6 +57,9 @@ export class User implements Resource, Syncable {
 
     @OneToMany(() => PlaylistItem, (item) => item.addedBy)
     public itemsAddedToPlaylists?: PlaylistItem[];
+
+    @OneToMany(() => ImportTask, (task) => task.user)
+    public imports: ImportTask[];
 
     public friendsCount? = 0;
     public playlistCount? = 0;

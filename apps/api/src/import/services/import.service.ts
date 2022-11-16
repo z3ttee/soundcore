@@ -1,38 +1,37 @@
-import { BadRequestException, Inject, Injectable, Logger } from '@nestjs/common';
-import { CreateImportDTO } from './dtos/create-import.dto';
+import { Injectable, Logger } from '@nestjs/common';
+import { CreateImportDTO } from '../dtos/create-import.dto';
 
-import fs, { mkdirSync } from "fs";
-import sanitize from 'sanitize-filename';
-
-import ytdl from "ytdl-core";
-import ytpl from 'ytpl';
-
-import { Mount } from '../mount/entities/mount.entity';
-
-import NodeID3 from 'node-id3';
-
-import { ImportEntity } from './entities/import.entity';
-import { User } from '../user/entities/user.entity';
-import { exec } from 'child_process';
-import pathToFfmpeg from 'ffmpeg-static';
-import path from 'path';
-import { ImportGateway } from './gateway/import.gateway';
-import { CreateSpotifyImportDTO } from './dtos/create-spotify.dto';
-import { SpotifyPlaylist } from './entities/spotify-song.entity';
-import { SpotifyService } from './spotify/spotify.service';
-import { MountService } from '../mount/services/mount.service';
+import { User } from '../../user/entities/user.entity';
+import { ImportTask } from '../entities/import.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class ImportService {
     private logger: Logger = new Logger(ImportService.name);
 
     constructor(
-        private mountService: MountService,
-        private importGateway: ImportGateway,
-        private spotifyService: SpotifyService,
+        @InjectRepository(ImportTask) private readonly repository: Repository<ImportTask>
     ) {}
 
-    public async createImport(createImportDto: CreateImportDTO, importer?: User): Promise<ImportEntity> {
+    public getRepository() {
+        return this.repository;
+    }
+
+    public async createIfNotExists(task: ImportTask): Promise<ImportTask> {
+        return this.repository.createQueryBuilder()
+            .insert()
+            .orIgnore()
+            .returning(["id"])
+            .values(task)
+            .execute().then((insertResult) => {
+                return this.repository.createQueryBuilder("task")
+                    .whereInIds(insertResult.identifiers)
+                    .getOne();
+            });
+    }
+
+    public async createImport(createImportDto: CreateImportDTO, importer?: User): Promise<ImportTask> {
         return null;
         // const downloadableUrl = createImportDto.url;
         // if(!ytdl.validateURL(downloadableUrl)) throw new BadRequestException("Not a valid youtube url.")
@@ -136,7 +135,7 @@ export class ImportService {
         // return importEntity;
     }
 
-    private async download(importEntity: ImportEntity): Promise<void> {
+    private async download(importEntity: ImportTask): Promise<void> {
         /*return new Promise((resolve, reject) => {
             const tmpFilepath = this.storageService.buildTmpFilepath();
 
@@ -178,20 +177,20 @@ export class ImportService {
     /**
      * 
      */
-    private async sendUpdate(value: ImportEntity): Promise<void> {
-        this.importGateway.sendUpdateToImporter(value);
-    }
+    // private async sendUpdate(value: ImportTask): Promise<void> {
+    //     this.importGateway.sendUpdateToImporter(value);
+    // }
 
-    private async sendProgressUpdate(value: ImportEntity): Promise<void> {
-        this.importGateway.sendDownloadProgressToImport(value);
-    }
+    // private async sendProgressUpdate(value: ImportTask): Promise<void> {
+    //     this.importGateway.sendDownloadProgressToImport(value);
+    // }
 
-    public async createSpotifyImport(createImportDto: CreateSpotifyImportDTO, user: User): Promise<SpotifyPlaylist> {
-        const playlistId = createImportDto.url.replace(/(https:\/\/open.spotify.com\/playlist\/)/gm, "").replace(/\?[\s\S]*$/gm, "");
+    // public async createSpotifyImport(createImportDto: CreateSpotifyImportDTO, user: User): Promise<SpotifyPlaylist> {
+    //     const playlistId = createImportDto.url.replace(/(https:\/\/open.spotify.com\/playlist\/)/gm, "").replace(/\?[\s\S]*$/gm, "");
 
-        return this.spotifyService.findSpotifyPlaylistById(playlistId, user).then((playlist) => {
-            return playlist;
-        })
-    }
+    //     return this.spotifyService.findSpotifyPlaylistById(playlistId, user).then((playlist) => {
+    //         return playlist;
+    //     })
+    // }
 
 }

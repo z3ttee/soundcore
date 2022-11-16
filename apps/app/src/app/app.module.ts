@@ -4,7 +4,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { SCDKModule } from '@soundcore/sdk';
+import { SCDKModule, SCSDKImportModule } from '@soundcore/sdk';
 import { environment } from 'src/environments/environment';
 import { SCNGXModule, SCNGXDialogModule } from '@soundcore/ngx';
 import { SCCDKScreenModule } from '@soundcore/cdk';
@@ -34,7 +34,6 @@ import { SSOModule } from "@soundcore/sso";
         mod: environment.mod_role
       }
     }),
-    SCNGXDialogModule,
     SCDKModule.forRoot({
       api_base_uri: environment.api_base_uri
     }),
@@ -52,7 +51,10 @@ import { SSOModule } from "@soundcore/sso";
       }
     }),
     SCCDKScreenModule,
-    SCNGXDialogModule
+    SCNGXDialogModule,
+
+    // TODO: Make dialogs use module imports not from AppModule
+    SCSDKImportModule,
   ],
   providers: [],
   bootstrap: [AppComponent]

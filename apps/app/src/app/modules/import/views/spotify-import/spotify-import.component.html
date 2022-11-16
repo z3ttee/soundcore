@@ -1,0 +1,25 @@
+<div class="px-window pt-window w-full">
+    <scngx-ui-title [subtitle]="'Importiere existierende Playlisten von Spotify'">Spotify Import</scngx-ui-title>
+
+    <div class="my-row w-full p-4 rounded-sm bg-body-light border border-body-lighter">
+        <p>Wie funktioniert der Import?</p>
+        <p class="pt-row font-light">
+            Du kannst Spotify Playlisten importieren, in dem du den Link zur Playlist angibst. Das System öffnet diese 
+            Playlist und sammelt alle darin enthaltenen Lieder. Diese Sammlung wird danach mit der Soundcore-Datenbank abgeglichen.
+            Dabei werden Titel, Künstler und das Album des Lieds berücksichtigt. Bei Treffern, wird das Lied aus der Soundcore-Datenbank
+            in eine neue Playlist hinzugefügt. Der Name dieser neuen Playlist trägt den gleichen Name wie die Spotify Playlist.
+        </p>
+    </div>
+
+    <div class="my-row w-full">
+        <h6 class="pb-2">Derzeitige Imports</h6>
+
+        <div class="flex flex-col items-center justify-center p-window w-full bg-body-light bg-opacity-30 border border-body-lighter rounded-sm">
+            <h6>Keine Imports</h6>
+            <p class="opacity-60 pb-row">Du hast keine Imports in Auftrag gegeben.</p>
+
+            <scngx-btn (click)="openCreateImportDialog()">Import starten</scngx-btn>
+        </div>
+    </div>
+
+</div>
