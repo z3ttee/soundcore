@@ -27,7 +27,7 @@ services:
       - "./databases/redis:/data"
 
   meilisearch:
-    image: getmeili/meilisearch:v0.28
+    image: getmeili/meilisearch
     restart: always
     ports:
       - "7700:7700"
@@ -35,4 +35,4 @@ services:
       - MEILI_MASTER_KEY=super_secret_master_key
     volumes:
       - "./databases/meilisearch:/meili_data"
-    entrypoint: ["meilisearch", "--env=development", "--enable-auto-batching", "--debounce-duration-sec=1", "--max-documents-per-batch=30"]
+    entrypoint: ["meilisearch", "--env=development"]
