@@ -1,0 +1,3 @@
+<div class="block w-full relative bg-primary pointer-events-none transition-all">
+    <input class="pointer-events-auto rounded-full" #inputElement [max]="duration ?? 0" [min]="0" step="1" [value]="value" (input)="onInput()" (change)="onInputChanged($event)" type="range">
+</div>

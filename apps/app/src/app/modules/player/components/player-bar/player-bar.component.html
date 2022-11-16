@@ -1,17 +1,24 @@
 <div class="absolute bottom-0 right-0 z-[100000000000000000] block w-full p-window pointer-events-none overflow-hidden" #scngxPlayerContainer>
     <div class="relative flex flex-1 w-full items-center justify-between gap-4 p-3 bg-body-dark rounded pointer-events-auto overflow-hidden select-none" [ngClass]="{'gap-2 rounded-sm py-2': reducedMode}">
+        <!-- Seeker -->
+        <div class="absolute w-full left-0 top-0">
+            <scngx-seeker [duration]="song?.duration ?? 0" [current]="currentTime" (seek)="onSeek($event)"></scngx-seeker>
+        </div>
 
         <div class="flex flex-grow w-full items-center justify-start gap-2">
+            <!-- Maximize button -->
             <div *ngIf="showMaximize">
                 <span class="align-middle inline-flex justify-center items-center h-5 w-5 cursor-pointer" matRipple [matRippleRadius]="15" [matRippleCentered]="true" [matRippleUnbounded]="true">
                     <hero-icon name="arrows-expand" [class]="'h-5 w-5'"></hero-icon>
                 </span>
             </div>
 
+            <!-- Artwork -->
             <div class="min-w-12 max-w-12 h-12 rounded-sm overflow-hidden">
                 <scngx-artwork [artwork]="song?.artwork"></scngx-artwork>
             </div>
 
+            <!-- Title & Artist -->
             <div class="w-full overflow-hidden">
                 <p class="line-clamp-1">{{ song?.name || "Unbekannter Titel" }}</p>
                 <ul class="line-clamp-1 w-full">
@@ -22,8 +29,8 @@
             </div>
         </div>
 
+        <!-- Controls -->
         <div class="flex items-center justify-center gap-1" [ngClass]="{'justify-end': reducedMode}">
-            
             <button *ngIf="!reducedMode" class="w-11 h-11 inline-flex justify-center items-center rounded-full border" matRipple [matRippleRadius]="15" [matRippleCentered]="true" [matRippleUnbounded]="true"></button>
             
             <!-- Prev button -->
@@ -44,9 +51,10 @@
         </div>
 
         <div class="flex flex-grow w-full items-center justify-end gap-2" [ngClass]="{'flex-grow-0 w-min': reducedMode}">
-
+            <!-- Duration -->
             <span class="text-font-tertiary text-sm" *ngIf="showDuration">{{ currentTime | durationPipe }}/{{ song?.duration || 0 | durationPipe }}</span>
 
+            <!-- Queue button -->
             <button class="p-2 inline-flex justify-center items-center rounded-full" matRipple [matRippleRadius]="20" [matRippleCentered]="true" [matRippleUnbounded]="true">
                 <hero-icon name="collection" [class]="'h-6 w-6'"></hero-icon>
             </button>

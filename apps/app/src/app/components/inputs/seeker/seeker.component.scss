@@ -1,0 +1,30 @@
+:host {  
+
+    input[type=range] {
+        @apply bg-body-lighter absolute top-0 left-0 w-full appearance-none bg-opacity-70 h-[2px] transform-gpu origin-bottom transition-[height] hover:h-[6px] hover:lg:h-[4px] cursor-pointer will-change-auto;
+
+        background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #FFBF50), color-stop(100%, #FFBF50));
+        background-size: 0% 100%;
+        background-repeat: no-repeat;
+    }
+
+    /* Chrome based browsers */
+    input[type=range]::-webkit-slider-thumb {
+        @apply appearance-none border-none h-4 w-4 rounded-full bg-accent cursor-pointer -mt-0 opacity-0 transition-all;
+    }
+    input[type=range]:hover::-webkit-slider-thumb {
+        @apply opacity-100;
+    }
+    input[type=range]:active::-webkit-slider-thumb {
+        @apply transform-gpu scale-150 lg:scale-125;
+    }
+
+    /* Firefox */
+    input[type=range]::-moz-range-thumb {
+        @apply appearance-none border-none h-4 w-4 rounded-full bg-accent cursor-pointer -mt-0 opacity-0 transition-all;
+    }
+
+    input[type=range]:hover::-moz-range-thumb {
+        @apply opacity-100;
+    }
+}

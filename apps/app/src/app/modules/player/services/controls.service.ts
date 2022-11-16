@@ -56,4 +56,8 @@ export class AppControlsService {
         this.audio.skipTime();
     }
 
+    public seek(seconds: number) {
+        this.audio.seek(seconds);
+    }
+
 }

@@ -1,6 +1,7 @@
 import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from "@angular/core";
+import { FormControl } from "@angular/forms";
 import { Song } from "@soundcore/sdk";
-import { BehaviorSubject, Subject, takeUntil } from "rxjs";
+import { BehaviorSubject, debounce, debounceTime, Subject, takeUntil } from "rxjs";
 import { AppControlsService } from "../../services/controls.service";
 import { AppPlayerService } from "../../services/player.service";
 
@@ -11,6 +12,8 @@ import { AppPlayerService } from "../../services/player.service";
 export class AppPlayerBarComponent implements OnInit, OnDestroy, AfterViewInit {
 
     @ViewChild("scngxPlayerContainer") private readonly container: ElementRef<HTMLDivElement>;
+
+    public readonly seekInputControl: FormControl<number> = new FormControl(0);
 
     /**
      * Subject to notify subscriptions about destroying themselves.
@@ -44,6 +47,8 @@ export class AppPlayerBarComponent implements OnInit, OnDestroy, AfterViewInit {
      */
     public isPaused: boolean = true;
 
+    public seekTime: number = 0;
+
     constructor(
         public readonly player: AppPlayerService,
         public readonly controls: AppControlsService
@@ -59,13 +64,19 @@ export class AppPlayerBarComponent implements OnInit, OnDestroy, AfterViewInit {
         // Subscribe to current time changes
         this.player.$currentTime.pipe(takeUntil(this._destroy)).subscribe((currentTime) => {
             // Update internal current time state
-            this.currentTime = currentTime || 0;
+            this.currentTime = currentTime ?? 0;
+            this.seekInputControl.setValue(this.currentTime)
         });
 
         // Subscribe to pause state changes
         this.controls.$isPaused.pipe(takeUntil(this._destroy)).subscribe((isPaused) => {
             // Update pause state
             this.isPaused = isPaused;
+        });
+
+        this.seekInputControl.valueChanges.pipe(takeUntil(this._destroy), debounceTime(10)).subscribe((value) => {
+            // console.log(value);
+            // this.controls.seek(value);
         })
     }
 
@@ -93,4 +104,7 @@ export class AppPlayerBarComponent implements OnInit, OnDestroy, AfterViewInit {
         this._observer.disconnect();
     }
 
+    public onSeek(value: number) {
+        this.controls.seek(value);
+    }
 }

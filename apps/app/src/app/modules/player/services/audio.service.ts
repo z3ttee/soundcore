@@ -37,6 +37,8 @@ export class AppAudioService {
      * This will request a stream token and automatically start streaming.
      */
     public forcePlay(item: PlayerItem): Observable<void> {
+        this.resetTime();
+        
         if(!item) {
             this._audioElement.src = ``;
         }
@@ -81,6 +83,10 @@ export class AppAudioService {
      */
     public play() {
         this._audioElement.play();
+    }
+
+    public seek(seconds: number) {
+        this._audioElement.currentTime = seconds;
     }
 
     /**
