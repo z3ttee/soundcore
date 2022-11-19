@@ -4,7 +4,7 @@ import { SCNGXBottomNavModule, SCNGXDrawerModule, SCNGXProgressbarModule, SCNGXP
 import { RouterModule } from "@angular/router";
 import { CommonModule } from "@angular/common";
 import { HeroIconModule, home, search, user, bookmarkAlt, chevronDown, plus, shieldExclamation, bell, cog, logout } from "ng-heroicon";
-import { SCDKSearchModule, SCSDKPlaylistModule } from "@soundcore/sdk";
+import { SCDKSearchModule, SCSDKGatewayModule, SCSDKPlaylistModule } from "@soundcore/sdk";
 import {DragDropModule} from '@angular/cdk/drag-drop';
 import { ProfileBarModule } from "src/app/components/profile-bar/profile-bar.module";
 import { ReactiveFormsModule } from "@angular/forms";
@@ -29,6 +29,7 @@ import { AppPlayerModule } from "src/app/modules/player/player.module";
 
         SCDKSearchModule,
         SCSDKPlaylistModule,
+        SCSDKGatewayModule,
 
         AppPlaylistCreateDialogModule,
         AppPlayerModule,

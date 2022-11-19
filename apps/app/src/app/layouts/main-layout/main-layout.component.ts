@@ -7,7 +7,7 @@ import { SSOService } from "@soundcore/sso";
 import { filter, Subject, takeUntil } from "rxjs";
 import { SCCDKScreenService } from "@soundcore/cdk";
 import { SCNGXPlaylistListItemComponent, SCNGXDialogService } from "@soundcore/ngx";
-import { Playlist, SCDKSearchService, SCSDKPlaylistService } from "@soundcore/sdk";
+import { Playlist, SCDKSearchService, SCSDKGeneralGateway, SCSDKPlaylistService } from "@soundcore/sdk";
 import { AppPlaylistCreateDialog } from "src/app/dialogs/playlist-create-dialog/playlist-create-dialog.component";
 
 @Component({
@@ -28,7 +28,8 @@ export class AscMainLayoutComponent implements OnInit, OnDestroy {
         private readonly dialogService: SCNGXDialogService,
         private readonly searchService: SCDKSearchService,
         private readonly router: Router,
-        private readonly _location: Location
+        private readonly _location: Location,
+        public readonly gateway: SCSDKGeneralGateway
     ) {}
 
     public ngOnInit(): void {

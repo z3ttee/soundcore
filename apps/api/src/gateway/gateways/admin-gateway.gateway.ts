@@ -12,7 +12,7 @@ import { MountStatusUpdateEvent } from "../events/mount-status-update.event";
       origin: "*"
     },
     path: "/admin"
-  })
+})
 export class AdminGateway extends AuthGateway {
 
   constructor(userService: UserService, oidcService: OIDCService) {

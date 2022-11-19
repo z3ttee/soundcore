@@ -87,6 +87,8 @@
 
     <!-- Page contents -->
     <div class="h-full overflow-hidden relative" scngx-content>
+        <ng-container *ngTemplateOutlet="outageWarning; context: { $implicit: gateway.$connection }"></ng-container>
+
         <router-outlet></router-outlet>
         <scngx-player-bar></scngx-player-bar>
     </div>
@@ -106,7 +108,45 @@
     </scngx-nav-item>
     <!-- Page contents -->
     <div class="h-full overflow-hidden relative" scngx-content>
+        <ng-container *ngTemplateOutlet="outageWarning; context: { $implicit: gateway.$connection }"></ng-container>
         <router-outlet></router-outlet>
         <scngx-player-bar></scngx-player-bar>
     </div>
 </scngx-bottom-nav>
+
+<!-- Outage warning -->
+<ng-template #outageWarning let-connection>
+    <ng-container *ngIf="$any(connection | async) as con">
+        <ng-container *ngIf="con.status == 'disconnected'">
+            <div class="w-full pt-window px-window">
+                <div class="flex flex-1 items-center justify-start w-full bg-warn p-3 rounded-sm border border-warn-light">
+                    <div>
+                        
+                    </div>
+                    <div>
+                        <p class="text-sm">Störung erkannt.</p>
+                        <p class="text-xs">Derzeit kann keine zuverlässige Verbindung zum Soundcore-Service aufgebaut werden.</p>
+            
+                        <button *ngIf="con.$retry" (click)="con.$retry.subscribe()">Erneut versuchen</button>
+                    </div>
+                </div>
+            </div>
+        </ng-container>
+
+        <ng-container *ngIf="con.status != 'disconnected' && con.reconnectAttempts > 0">
+            <div class="w-full pt-window px-window">
+                <div class="flex flex-1 items-center justify-start w-full bg-warn p-3 rounded-sm border border-warn-light">
+                    <div>
+                        
+                    </div>
+                    <div>
+                        <p class="text-sm pb-2">Störung erkannt.</p>
+                        <p class="text-sm">Derzeit kann keine zuverlässige Verbindung zum Soundcore-Service aufgebaut werden. 
+                            Du wirst automatisch verbunden sobald der Service wieder erreichbar ist. ({{ con.reconnectAttempts ?? 0 }})
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </ng-container>
+    </ng-container>
+</ng-template>

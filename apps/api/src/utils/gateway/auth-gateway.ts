@@ -42,6 +42,8 @@ export abstract class AuthGateway implements OnGatewayConnection, OnGatewayDisco
     public handleConnection(socket: Socket) {
         const tokenValue = socket.handshake?.headers?.authorization?.slice("Bearer ".length);
 
+        
+
         this.oidcService.verifyAccessToken(tokenValue).then(async (token) => {
             const roles = token?.["realm_access"]?.["roles"] || [];
             const canAccessGateway = await this.canAccessGateway(roles);

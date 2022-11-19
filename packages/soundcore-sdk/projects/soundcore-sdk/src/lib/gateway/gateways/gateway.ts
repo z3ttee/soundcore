@@ -16,15 +16,21 @@ export enum GatewayDisconnectReason {
     RECONNECT_ERROR = "reconnect error"
 }
 
+export enum GatewayStatus {
+    CONNECTED = "connected",
+    CONNECTING = "connecting",
+    DISCONNECTED = "disconnected"
+}
+
 export class GatewayConnection {
 
-    public readonly isConnected: boolean;
+    public readonly status: GatewayStatus;
     public readonly disconnectReason?: GatewayDisconnectReason;
     public readonly reconnectAttempts?: number;
     public readonly $retry?: Observable<void>;
     
-    constructor(isConnected?: boolean, disconnectReason?: GatewayDisconnectReason, reconnectAttempts?: number, $retry?: Observable<void>) {
-        this.isConnected = isConnected ?? false;
+    constructor(status?: GatewayStatus, disconnectReason?: GatewayDisconnectReason, reconnectAttempts?: number, $retry?: Observable<void>) {
+        this.status = status ?? GatewayStatus.CONNECTING;
         this.disconnectReason = disconnectReason ?? null;
         this.$retry = $retry ?? null;
         this.reconnectAttempts = reconnectAttempts ?? 0;
@@ -65,29 +71,50 @@ export abstract class SCSDKAuthenticatedGateway {
         });
 
         this.socket.on("connect", () => {
+            console.log("socket connected");
             // Socket has successfully connected
-            this.updateConnection(new GatewayConnection(true, null));
+            this.updateConnection(new GatewayConnection(GatewayStatus.CONNECTED, null));
         });
 
-        this.socket.on("disconnect", (reason) => {
+        this.socket.on("disconnect", (reason, description) => {
+            console.error("disconnect: ", description);
+
             // In case of CLOSED_BY_SERVER or MANUAL_DISCONNECT, socket.io library
             // will not reconnect automatically.
             if(reason == GatewayDisconnectReason.CLOSED_BY_SERVER || reason == GatewayDisconnectReason.MANUAL_DISCONNECT) {
-                this.updateConnectionWithRetry(new GatewayConnection(false, reason as GatewayDisconnectReason));
+                this.updateConnectionWithRetry(new GatewayConnection(GatewayStatus.DISCONNECTED, reason as GatewayDisconnectReason));
             } else {
-                this.updateConnection(new GatewayConnection(false, reason as GatewayDisconnectReason));
+                // Set status to connecting because socketio automatically retries connecting
+                this.updateConnection(new GatewayConnection(GatewayStatus.CONNECTING, reason as GatewayDisconnectReason));
             }
         });
 
         // Listen on failed reconnect attempts.
-        this.socket.on("reconnect_error", () => {
+        this.socket.on("reconnect_error", (error) => {
+            console.error("reconnect_error: ", error);
+        });
+
+        // Listen on failed reconnect attempts.
+        this.socket.on("reconnect_attempt", () => {
+            console.error("reconnect_attempt");
             this.increaseReconnectAttempt();
         });
 
         // Listen on failed reconnect events. This only happens if the maximum
         // amount of retries has been reached
-        this.socket.on("reconnect_failed", () => {
-            this.updateConnectionWithRetry(new GatewayConnection(false, GatewayDisconnectReason.TOO_MANY_ATTEMPTS));
+        this.socket.on("reconnect_failed", (error) => {
+            console.error("reconnect_failed: ", error);
+            this.updateConnectionWithRetry(new GatewayConnection(GatewayStatus.DISCONNECTED, GatewayDisconnectReason.TOO_MANY_ATTEMPTS));
+        });
+
+        this.socket.on("error", (error) => {
+            console.error("error: ", error);
+            this.updateConnection(new GatewayConnection(GatewayStatus.DISCONNECTED, GatewayDisconnectReason.FATAL_ERROR));
+        });
+
+        this.socket.on("connect_error", (error) => {
+            console.error("connect_error: ", error);
+            this.increaseReconnectAttempt();
         });
 
         this.registerEvents();
@@ -96,7 +123,19 @@ export abstract class SCSDKAuthenticatedGateway {
     protected abstract registerEvents(): void;
 
     private updateConnection(connection: GatewayConnection) {
-        this._connectionSubject.next(connection);
+        const current = this.getConnectionInfo();
+
+        // Update only if something has changed
+        if(current.status != connection.status || current.reconnectAttempts != connection.reconnectAttempts || current.disconnectReason != connection.disconnectReason) {
+            this._connectionSubject.next(connection);
+        }
+    }
+
+    private updateConnectionStatus(status: GatewayStatus) {
+        const connection = this.getConnectionInfo();
+        const newCon = new GatewayConnection(status, connection.disconnectReason, connection.reconnectAttempts, connection.$retry);
+
+        this.updateConnection(newCon);
     }
 
     private updateConnectionWithRetry(connection: GatewayConnection) {
@@ -108,7 +147,7 @@ export abstract class SCSDKAuthenticatedGateway {
         });    
 
         const withRetry = new GatewayConnection(
-            connection.isConnected, 
+            connection.status, 
             connection.disconnectReason, 
             connection.reconnectAttempts,
             $retryObservable
@@ -120,7 +159,7 @@ export abstract class SCSDKAuthenticatedGateway {
     private increaseReconnectAttempt() {
         const currentConInfo = this.getConnectionInfo();
         const newConInfo = new GatewayConnection(
-            currentConInfo.isConnected,
+            currentConInfo.status,
             currentConInfo.disconnectReason,
             currentConInfo.reconnectAttempts + 1,
             currentConInfo.$retry
@@ -136,6 +175,7 @@ export abstract class SCSDKAuthenticatedGateway {
     public retryConnectionIfFailed() {
         const info = this.getConnectionInfo();
         if(info.disconnectReason) {
+            this.updateConnectionStatus(GatewayStatus.CONNECTING);
             console.warn(`Retrying gateway connection...`);
             this.socket.connect();
         }
