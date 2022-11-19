@@ -12,13 +12,36 @@
     </div>
 
     <div class="my-row w-full">
-        <h6 class="pb-2">Derzeitige Imports</h6>
+        <div class="flex flex-1 items-center justify-start pb-2">
+            <h6 class="text-inherit flex-grow">Derzeitige Imports</h6>
 
-        <div class="flex flex-col items-center justify-center p-window w-full bg-body-light bg-opacity-30 border border-body-lighter rounded-sm">
+            <scngx-btn (click)="openCreateImportDialog()">Import starten</scngx-btn>
+        </div>
+
+        <!-- <div class="flex flex-col items-center justify-center p-window w-full bg-body-light bg-opacity-30 border border-body-lighter rounded-sm">
             <h6>Keine Imports</h6>
             <p class="opacity-60 pb-row">Du hast keine Imports in Auftrag gegeben.</p>
 
             <scngx-btn (click)="openCreateImportDialog()">Import starten</scngx-btn>
+        </div> -->
+
+        <p>{{ datasource.$size | async }} items</p>
+
+        <div *uiScroll="let item of datasource; index as i">
+            <div class="flex flex-1 items-center justify-start w-full p-4 rounded-sm gap-4 select-none cursor-default" (click)="replace(i, item)">
+                <div>
+                    <p>{{ i + 1 }}</p>
+                </div>
+                <div>
+                    <p>{{ item?.url }}</p>
+                </div>
+                <div>
+                    <p>{{ item?.status | taskStatusPipe }}</p>
+                </div>
+                <div *ngIf="item?.status == 1">
+                    <p>{{ item?.progress }}%</p>
+                </div>
+            </div>
         </div>
     </div>
 

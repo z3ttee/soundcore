@@ -1,4 +1,5 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Pageable, Pagination } from 'nestjs-pager';
 import { Authentication } from '../../authentication/decorators/authentication.decorator';
 
 import { User } from '../../user/entities/user.entity';
@@ -13,10 +14,10 @@ export class ImportController {
     private readonly spotifyService: SpotifyImportService
   ) {}
 
-  // @Post()
-  // public async createImport(@Body() createImportDto: CreateImportDTO, @Authentication() importer: User) {
-  //   return this.importService.createImport(createImportDto, importer);
-  // }
+  @Get()
+  public async findAllByUserId(@Authentication() authentication: User, @Pagination() pageable: Pageable) {
+    return this.importService.findAllByUser(authentication.id, pageable);
+  }
 
   @Post("spotify/playlist")
   public async createSpotifyImport(@Body() createImportDto: CreateImportDTO, @Authentication() importer: User) {

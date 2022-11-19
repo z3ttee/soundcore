@@ -1,12 +1,16 @@
-import { Component, OnDestroy } from "@angular/core";
+import { HttpClient } from "@angular/common/http";
+import { Component, OnDestroy, OnInit } from "@angular/core";
 import { SCNGXDialogService } from "@soundcore/ngx";
+import { ImportTask, ImportTaskStatus, SCSDKGeneralGateway } from "@soundcore/sdk";
 import { Subject, takeUntil } from "rxjs";
 import { AppImportSpotifyCreateDialog } from "src/app/dialogs/import-spotify-create-dialog/import-spotify-create-dialog.component";
+import { SCNGXDatasource } from "src/app/modules/scroll/entities/datasource.entity";
+import { environment } from "src/environments/environment";
 
 @Component({
     templateUrl: "./spotify-import.component.html"
 })
-export class SpotifyImportView implements OnDestroy {
+export class SpotifyImportView implements OnInit, OnDestroy {
 
     /**
      * Subject used to destroy internal subscriptions
@@ -22,19 +26,44 @@ export class SpotifyImportView implements OnDestroy {
     ];
 
     constructor(
-        private readonly dialog: SCNGXDialogService
+        private readonly httpClient: HttpClient,
+        private readonly dialog: SCNGXDialogService,
+        private readonly gateway: SCSDKGeneralGateway
     ) {}
 
     public openCreateImportDialog() {
-        this.dialog.open(AppImportSpotifyCreateDialog).$afterClosed.pipe(takeUntil(this._destroy)).subscribe((data) => {
+        this.dialog.open(AppImportSpotifyCreateDialog).$afterClosed.pipe(takeUntil(this._destroy)).subscribe(async (data: ImportTask) => {
             console.log(data);
+            if(!data) return;
+
+            // await this.datasource.relax();
+            await this.datasource.append(data);
         });
     }
 
-    // https://open.spotify.com/playlist/16p4C5ULmMTeSTKXPlAAAT?si=2245a7ed665f4c60
+    public loading: boolean = true;
+    public datasource: SCNGXDatasource<ImportTask>;
+
+    public ngOnInit(): void {
+        this.datasource = new SCNGXDatasource(this.httpClient, {
+            url: `${environment.api_base_uri}/v1/imports`,
+            pageSize: 30
+        });
+
+        this.gateway.$onImportTaskUpdate.pipe(takeUntil(this._destroy)).subscribe((task) => {
+            console.log("received task update: ", task);
+            this.datasource.replaceById(task.id, task);
+        });
+    }
 
     public ngOnDestroy(): void {
         this._destroy.next();
         this._destroy.complete();
+    }
+
+    public replace(index: number, item: ImportTask) {
+
+        // item.status = ImportTaskStatus.OK;
+        // this.datasource.remove(index);
     }
 }

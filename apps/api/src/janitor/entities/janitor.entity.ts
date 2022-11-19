@@ -2,7 +2,8 @@ import { firstValueFrom, Observable } from "rxjs";
 import { v4 as uuidv4 } from "uuid";
 
 export enum JanitorTask {
-    CLEAR_ONGOING_IMPORTS = 0
+    CLEAR_ONGOING_IMPORTS = 0,
+    CLEAR_OLD_IMPORTS = 1
 }
 
 export class JanitorRef<T = any> {

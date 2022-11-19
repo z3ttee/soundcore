@@ -18,6 +18,8 @@ export default async function (job: WorkerJobRef<Janitor>): Promise<any> {
     return Database.connect().then(async (datasource) => {
         if(task == JanitorTask.CLEAR_ONGOING_IMPORTS) {
             return clearOngoingImports(datasource, janitor.ref);
+        } else if(task == JanitorTask.CLEAR_OLD_IMPORTS) {
+            return clearOldImports(datasource, janitor.ref);
         }
     });
 }
@@ -46,6 +48,34 @@ async function clearOngoingImports(datasource: DataSource, janitor: JanitorRef) 
             logger.error(`Failed clearing ongoing import tasks: ${error.message}`);
         } else {
             logger.error(`Failed clearing ongoing import tasks: ${error.message}`, error.stack);
+        }
+    });
+}
+
+/**
+ * Clear ongoing imports. This will send a query which
+ * sets the status for all imports (that where processing or enqueued)
+ * @param datasource 
+ * @param janitor 
+ * @returns 
+ */
+ async function clearOldImports(datasource: DataSource, janitor: JanitorRef) {
+    const logger = new Logger(janitor.name);
+    const startTimeMs = Date.now();
+
+    logger.log(`Clearing all imports older than 30days...`);
+
+    const respository = datasource.getRepository(ImportTask);
+    const service = new ImportService(respository);
+
+    return service.clearOngoingImports().then((updateResult) => {
+        const endTimeMs = Date.now();
+        logger.log(`Cleared ${updateResult.affected ?? 0} old import tasks. Took ${endTimeMs - startTimeMs}ms.`);
+    }).catch((error: Error) => {
+        if(!Environment.isDebug) {
+            logger.error(`Failed clearing old import tasks: ${error.message}`);
+        } else {
+            logger.error(`Failed clearing old import tasks: ${error.message}`, error.stack);
         }
     });
 }

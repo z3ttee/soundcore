@@ -20,10 +20,10 @@ import { PlaylistPrivacy } from './enums/playlist-privacy.enum';
 export class PlaylistService {
     
     constructor(
-        private readonly meiliClient: MeiliPlaylistService,
-        private readonly emitter: EventEmitter2,
         @InjectRepository(Playlist) private playlistRepository: Repository<Playlist>,
-        @InjectRepository(PlaylistItem)  private song2playlistRepository: Repository<PlaylistItem>
+        @InjectRepository(PlaylistItem)  private song2playlistRepository: Repository<PlaylistItem>,
+        private readonly emitter: EventEmitter2,
+        private readonly meiliClient: MeiliPlaylistService,
     ) {}
 
     /**
@@ -206,7 +206,7 @@ export class PlaylistService {
     }
 
     /**
-     * Create new playlist. This fails with 
+     * Create new playlist if it does not exist
      * @param createPlaylistDto Playlist metadata
      * @param author Author entity (User)
      * @throws BadRequestException if a playlist by its title already exists in user scope.
@@ -294,6 +294,18 @@ export class PlaylistService {
         return this.song2playlistRepository.save(item).then(() => {
             return new PlaylistItemAddResult(targetId, false);
         })
+    }
+
+    public async setSongs(playlistId: string, songs: Song[], authentication: User) {
+        return this.song2playlistRepository.createQueryBuilder()
+            .insert()
+            .values(songs.map((song) => ({
+                addedBy: authentication,
+                playlist: { id: playlistId },
+                song: song
+            })))
+            .orIgnore()
+            .execute();
     }
 
     /**

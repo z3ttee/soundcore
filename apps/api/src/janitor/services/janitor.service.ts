@@ -32,6 +32,10 @@ export class JanitorService {
         return this.run("ImportJanitor", JanitorTask.CLEAR_ONGOING_IMPORTS);
     }
 
+    public async clearOldImports() {
+        return this.run("ImportJanitor", JanitorTask.CLEAR_OLD_IMPORTS);
+    }
+
     private async run(name: string, task: JanitorTask): Promise<JanitorProcessRef> {
         // Instantiate new janitor with handler
         const janitor = new Janitor(name, task);

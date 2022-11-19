@@ -3,6 +3,7 @@ import { ImportTask, ImportTaskStatus } from '../entities/import.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Page, Pageable } from 'nestjs-pager';
+import { ImportQueueService } from './import-queue.service';
 
 @Injectable()
 export class ImportService {
@@ -33,6 +34,7 @@ export class ImportService {
             .values(task)
             .execute().then((insertResult) => {
                 return this.repository.createQueryBuilder("task")
+                    .leftJoin("task.user", "user").addSelect(["user.id", "user.username"])
                     .whereInIds(insertResult.identifiers)
                     .getOne();
             });
@@ -60,16 +62,12 @@ export class ImportService {
      * @param tasks Tasks to change status for
      * @param status Status to set
      */
-    public async updateImportStatus(tasks: ImportTask[], status: ImportTaskStatus): Promise<void> {
+    public async updateImportStatus(tasks: ImportTask[], status: ImportTaskStatus) {
         return this.repository.createQueryBuilder()
             .update()
             .set({ status })
             .whereInIds(tasks)
-            .execute().then((updateResult) => {
-                if(updateResult.affected > 0) {
-                    // TODO: Send update to websocket
-                }
-            });
+            .execute()
     }
 
     /**
@@ -77,16 +75,20 @@ export class ImportService {
      * @param tasks Tasks to change progress for
      * @param progress Progress to set
      */
-    public async updateImportProgress(tasks: ImportTask[], progress: number): Promise<void> {
+    public async updateImportProgress(tasks: ImportTask[], progress: number) {
         return this.repository.createQueryBuilder()
             .update()
             .set({ progress })
             .whereInIds(tasks)
-            .execute().then((updateResult) => {
-                if(updateResult.affected > 0) {
-                    // TODO: Send update to websocket
-                }
-            });
+            .execute();
+    }
+
+    public async setImportProgressAndStatus(tasks: ImportTask[], status: ImportTaskStatus, progress: number) {
+        return this.repository.createQueryBuilder()
+            .update()
+            .set({ progress, status })
+            .whereInIds(tasks)
+            .execute()
     }
 
     public async clearOngoingImports() {
@@ -95,6 +97,18 @@ export class ImportService {
             .set({ status: ImportTaskStatus.SERVER_ABORT, progress: 0 })
             .where("status IN(:status)", { status: [ ImportTaskStatus.ENQUEUED, ImportTaskStatus.PROCESSING ] })
             .execute()
+    }
+
+    /**
+     * This will delete all imports from the database older
+     * than 30days
+     */
+    public async clearOldImports() {
+        const datePrior30daysMs = Date.now() - (1000*60*60*24*30);
+        return this.repository.createQueryBuilder()
+            .delete()
+            .where("createdAt <= :datePrior30daysMs", { datePrior30daysMs })
+            .execute();
     }
 
 }

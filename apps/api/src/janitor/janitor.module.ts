@@ -14,7 +14,7 @@ import { JanitorService } from "./services/janitor.service";
         WorkerQueueModule.forFeature({
             script: path.join(__dirname, "worker", "janitor-base.worker.js"),
             concurrent: 10,
-            workerType: "thread"
+            workerType: "process"
         })
     ],
     exports: [

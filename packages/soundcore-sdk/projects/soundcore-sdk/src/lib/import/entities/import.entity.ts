@@ -9,7 +9,8 @@ export enum ImportTaskStatus {
     ENQUEUED = 0,
     PROCESSING = 1,
     OK = 2,
-    ERRORED = 3
+    ERRORED = 3,
+    SERVER_ABORT = 4
 }
 
 export class ImportTask {
