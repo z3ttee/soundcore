@@ -1,10 +1,10 @@
 import { Inject, Injectable } from "@angular/core";
 import { SSOService } from "@soundcore/sso";
 import { SCDKOptions, SCDK_OPTIONS } from "../../scdk.module";
-import { SCDKAuthenticatedGateway } from "../../utils/gateway/gateway";
+import { SCSDKAuthenticatedGateway } from "./gateway";
 
 @Injectable()
-export class SCSDKGeneralGateway extends SCDKAuthenticatedGateway {
+export class SCSDKGeneralGateway extends SCSDKAuthenticatedGateway {
 
   constructor(
     ssoService: SSOService,
@@ -13,8 +13,8 @@ export class SCSDKGeneralGateway extends SCDKAuthenticatedGateway {
       super(new URL(`${options.api_base_uri}/general`), ssoService);
   }
 
-  protected init(): void {
-    
+  protected registerEvents(): void {
+      
   }
 
 }

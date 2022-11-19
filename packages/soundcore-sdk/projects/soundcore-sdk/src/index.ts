@@ -132,11 +132,6 @@ export * from "./lib/notification/services/notification.service";
 export * from "./lib/notification/entities/notification.entity";
 
 /**
- * Gateway SDK
- */
-export * from "./lib/utils/gateway/gateway";
-
-/**
  * Settings SDK
  */
 export * from "./lib/settings/settings.module";
