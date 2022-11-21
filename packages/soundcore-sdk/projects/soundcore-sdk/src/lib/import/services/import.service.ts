@@ -9,6 +9,7 @@ import { apiResponse } from '../../utils/rxjs/operators/api-response';
 import { BehaviorSubject, Observable, of } from 'rxjs';
 import { Pageable } from '../../pagination/pageable';
 import { Page } from '../../pagination/page';
+import { ImportReport } from '../entities/import-report.entity';
 
 @Injectable()
 export class SCSDKImportService {
@@ -32,14 +33,57 @@ export class SCSDKImportService {
     }
 
     /**
-     * Find a page of tasks started by a user.
+     * Find a page of pending tasks started by a user.
      * @param userId User's id
      * @param pageable Page settings
      * @returns Page<ImportTask>
      */
-    public findAllByUser(userId: string, pageable: Pageable): Observable<ApiResponse<Page<ImportTask>>> {
+    public findPendingByUser(userId: string, pageable: Pageable): Observable<ApiResponse<Page<ImportTask>>> {
         if(!userId) return of(null);
-        return this.httpClient.get<Page<ImportTask>>(`${this.options.api_base_uri}/v1/imports${pageable.toQuery()}`).pipe(apiResponse());
+        return this.httpClient.get<Page<ImportTask>>(`${this.options.api_base_uri}/v1/imports/spotify${pageable.toQuery()}`).pipe(apiResponse());
+    }
+
+    /**
+     * Find a page of completed tasks started by a user.
+     * @param userId User's id
+     * @param pageable Page settings
+     * @returns Page<ImportTask>
+     */
+    public findCompletedByUser(userId: string, pageable: Pageable): Observable<ApiResponse<Page<ImportTask>>> {
+        if(!userId) return of(null);
+        return this.httpClient.get<Page<ImportTask>>(`${this.options.api_base_uri}/v1/imports/spotify/completed${pageable.toQuery()}`).pipe(apiResponse());
+    }
+
+    /**
+     * Find a page of failed tasks started by a user.
+     * @param userId User's id
+     * @param pageable Page settings
+     * @returns Page<ImportTask>
+     */
+    public findFailedByUser(userId: string, pageable: Pageable): Observable<ApiResponse<Page<ImportTask>>> {
+        if(!userId) return of(null);
+        return this.httpClient.get<Page<ImportTask>>(`${this.options.api_base_uri}/v1/imports/spotify/failed${pageable.toQuery()}`).pipe(apiResponse());
+    }
+
+    /**
+     * Delete an import task by its id.
+     * (Only deletes if the user also is the importer)
+     * @param taskId Task's id
+     * @returns True or False
+     */
+    public deleteById(taskId: string): Observable<ApiResponse<boolean>> {
+        if(!taskId) return of(null);
+        return this.httpClient.delete<boolean>(`${this.options.api_base_uri}/v1/imports/${taskId}`).pipe(apiResponse());
+    }
+
+    /**
+     * Find a report by a task.
+     * @param taskId Task's id
+     * @returns ImportReport
+     */
+    public findReportByTaskid(taskId: string): Observable<ApiResponse<ImportReport>> {
+        if(!taskId) return of(null);
+        return this.httpClient.delete<ImportReport>(`${this.options.api_base_uri}/v1/imports/${taskId}/report`).pipe(apiResponse());
     }
 
 }

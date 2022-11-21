@@ -1,5 +1,6 @@
 import { PlaylistPrivacy } from "../../playlist/enums/playlist-privacy.enum";
 import { User } from "../../user/entities/user.entity";
+import { ImportReport } from "./import-report.entity";
 
 export enum ImportTaskType {
     SPOTIFY_PLAYLIST = 0
@@ -13,7 +14,7 @@ export enum ImportTaskStatus {
     SERVER_ABORT = 4
 }
 
-export class ImportTask {
+export class ImportTask<P = any, R = any> {
 
     /**
      * DEFAULT ATTRIBUTES
@@ -23,6 +24,8 @@ export class ImportTask {
     public type: ImportTaskType;
     public status: ImportTaskStatus;
     public privacy: PlaylistPrivacy;
+    public payload?: P;
+    public report?: ImportReport<R>;
 
     /**
      * RELATIONS
