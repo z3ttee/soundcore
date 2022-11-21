@@ -17,6 +17,10 @@
         <p class="text-sm">{{ 0 }}/{{ 0 }}</p>
     </div>
 
+    <div>
+        <p class="text-sm">{{ task.createdAt | date:"dd.MM., HH:mm" }}</p>
+    </div>
+
     <div class="min-w-28">
         <p class="text-sm">{{ task.status | taskStatusPipe }}</p>
     </div>

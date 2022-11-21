@@ -53,15 +53,9 @@ import { faSpotify } from '@fortawesome/free-brands-svg-icons';
       }
     }),
     SCCDKScreenModule,
-    SCNGXDialogModule,
-    FontAwesomeModule,
-
+    SCNGXDialogModule
   ],
   providers: [],
   bootstrap: [AppComponent]
 })
-export class AppModule {
-  constructor(library: FaIconLibrary) {
-    library.addIcons(faSpotify)
-  }
-}
+export class AppModule {}

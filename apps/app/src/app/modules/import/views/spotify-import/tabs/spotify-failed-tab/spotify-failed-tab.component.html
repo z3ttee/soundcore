@@ -3,7 +3,7 @@
 </div>
 
 <div *ngIf="(datasource?.$size | async) <= 0">
-    <p>Es wurden keine laufenden Imports gefunden.</p>
+    <p>Es wurden keine fehlgeschlagenen Imports gefunden.</p>
 </div>
 
 <div *uiScroll="let item of datasource; index as i">

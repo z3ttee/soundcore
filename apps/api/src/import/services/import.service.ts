@@ -110,7 +110,7 @@ export class ImportService {
         const datePrior7daysMs = Date.now() - (1000*60*60*24*7);
         return this.repository.createQueryBuilder()
             .delete()
-            .where("createdAt <= :datePrior7daysMs", { datePrior7daysMs })
+            .where("createdAt <= :datePrior7daysMs AND status NOT IN (:status)", { datePrior7daysMs, status: [ ImportTaskStatus.PROCESSING, ImportTaskStatus.ENQUEUED ] })
             .execute();
     }
 

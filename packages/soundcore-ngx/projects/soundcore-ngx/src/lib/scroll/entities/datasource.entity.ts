@@ -153,7 +153,6 @@ export abstract class SCNGXBaseDatasource<T = any> extends Datasource {
     
                 // Await all promises created above
                 Promise.all(requests).then((results) => {
-
                     // Flatten out the pages and gather all items in one array
                     const items: T[] = results.reduce((acc, result) => [...acc, ...result], []);
     
@@ -279,8 +278,6 @@ export abstract class SCNGXBaseDatasource<T = any> extends Datasource {
             return this.adapter.remove({
                 indexes: [ index ]
             }).then((result) => {
-                console.log(result);
-
                 // Decrement datasource size on success
                 // Immediate is false, if no items were deleted
                 if(result.success && !result.immediate) {

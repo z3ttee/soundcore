@@ -26,6 +26,7 @@ export class ImportTask<P = any, R = any> {
     public privacy: PlaylistPrivacy;
     public payload?: P;
     public report?: ImportReport<R>;
+    public createdAt: number;
 
     /**
      * RELATIONS

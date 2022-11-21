@@ -3,23 +3,9 @@
 </div>
 
 <div *ngIf="(datasource?.$size | async) <= 0">
-    <p>Es wurden keine laufenden Imports gefunden.</p>
+    <p>Es wurden keine abgeschlossenen Imports gefunden.</p>
 </div>
 
 <div *uiScroll="let item of datasource; index as i">
     <app-spotify-import [task]="item"></app-spotify-import>
-    <!-- <div class="flex flex-1 items-center justify-start w-full p-4 rounded-sm gap-4 select-none cursor-default">
-        <div>
-            <p>{{ i + 1 }}</p>
-        </div>
-        <div>
-            <p>{{ item?.url }}</p>
-        </div>
-        <div>
-            <p>{{ item?.status | taskStatusPipe }}</p>
-        </div>
-        <div *ngIf="item?.status == 1">
-            <p>{{ item?.progress }}%</p>
-        </div>
-    </div> -->
 </div>
