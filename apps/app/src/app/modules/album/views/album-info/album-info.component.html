@@ -1,6 +1,6 @@
 <app-error404 *ngIf="showError404" [title]="'Album nicht gefunden'"></app-error404>
 
-<scngx-scroll class="w-full h-full" #scroller>
+<scngx-scroll class="w-full h-full pb-40" #scroller>
     <!-- Page Header -->
     <ng-container header>
         <app-list-view [resource]="album" [title]="album?.name" [isLoading]="isLoadingAlbum" [artwork]="album?.artwork">
@@ -39,7 +39,7 @@
 
     <!-- List -->
     <ng-container list>
-        <p>Initialized?: {{ tracklist?.$initialized | async }}</p>
+        <!-- <p>Initialized?: {{ tracklist?.$initialized | async }}</p> -->
 
         <scngx-table>
             <!-- Table Head
@@ -50,8 +50,8 @@
 
             <!-- Table Body -->
             <ng-container tbody *ngIf="tracklist">
-                <div *uiScroll="let item of tracklist">
-                    <scngx-song-list-item [song]="item.data" [index]="item.index"></scngx-song-list-item>
+                <div *uiScroll="let item of tracklist; index as i" class="px-window">
+                    <scngx-song-list-item [song]="item" [index]="i"></scngx-song-list-item>
                 </div>
             </ng-container>
         </scngx-table>
@@ -59,17 +59,19 @@
 
     <!-- Page Footer -->
     <ng-container footer>
-        <div class="p-window">
-            <h6>Mehr Playlisten</h6>
+        <div class="pb-bottom">
+            <div class="px-window mt-row">
+                <h6>Mehr Playlisten</h6>
+            </div>
+            <scngx-horizontal-grid>
+                <ng-container *ngFor="let item of featuredAlbums">
+                    <scngx-album-grid-item 
+                        [item]="item" 
+                        [useDate]="true"
+                        [routerLink]="['/album', item.slug || item.id]">
+                    </scngx-album-grid-item>
+                </ng-container>
+            </scngx-horizontal-grid>
         </div>
-        <scngx-horizontal-grid>
-            <ng-container *ngFor="let item of featuredAlbums">
-                <scngx-album-grid-item 
-                    [item]="item" 
-                    [useDate]="true"
-                    [routerLink]="['/album', item.slug || item.id]">
-                </scngx-album-grid-item>
-            </ng-container>
-        </scngx-horizontal-grid>
     </ng-container>
 </scngx-scroll>

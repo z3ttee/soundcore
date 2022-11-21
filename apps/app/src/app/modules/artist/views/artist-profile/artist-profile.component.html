@@ -52,7 +52,7 @@
 
     <!-- List -->
     <ng-container list>
-        <h6 class="px-window pb-row">Beliebte Songs</h6>
+        <h6 class="px-window pb-2 mt-row">Beliebte Songs</h6>
 
         <scngx-table>
             <!-- Table Head
@@ -63,8 +63,8 @@
 
             <!-- Table Body -->
             <ng-container tbody *ngIf="tracklist">
-                <div *uiScroll="let item of tracklist" class="px-window">
-                    <scngx-song-list-item [song]="item.data" [index]="item.index" [columns]="songListCols"></scngx-song-list-item>
+                <div *uiScroll="let item of tracklist; index as i" class="px-window">
+                    <scngx-song-list-item [song]="item" [index]="i" [columns]="songListCols"></scngx-song-list-item>
                 </div>
             </ng-container>
         </scngx-table>
@@ -72,45 +72,47 @@
 
     <!-- Page Footer -->
     <ng-container footer>
-        <scngx-ui-row [headline]="'Alben'" [route]="['./albums']" *ngIf="albums.length > 0">
-            <div class="w-full">
-                <scngx-horizontal-grid>
-                        <ng-container *ngFor="let item of albums">
-                            <scngx-album-grid-item 
-                                [item]="item" 
-                                [useDate]="true"
-                                [routerLink]="['/album', item.slug ?? item.id]">
-                            </scngx-album-grid-item>
-                        </ng-container>
-                </scngx-horizontal-grid>
-            </div>
-        </scngx-ui-row>
-
-        <scngx-ui-row [headline]="'Enthalten in'" [route]="['./playlists']" *ngIf="featPlaylists.length > 0">
-            <div class="w-full">
-                <scngx-horizontal-grid>
-                        <ng-container *ngFor="let item of featPlaylists">
-                            <scngx-playlist-grid-item
-                                [item]="item"
-                                [routerLink]="['/playlist', item?.slug ?? item?.id]">
-                            </scngx-playlist-grid-item>
-                        </ng-container>
-                </scngx-horizontal-grid>
-            </div>
-        </scngx-ui-row>
-
-        <scngx-ui-row [headline]="'Alben mit ' + artist?.name" [route]="['./playlists']" *ngIf="featAlbums.length > 0">
-            <div class="w-full">
-                <scngx-horizontal-grid>
-                        <ng-container *ngFor="let item of featAlbums">
-                            <scngx-album-grid-item 
-                                [item]="item" 
-                                [routerLink]="['/album', item.slug ?? item.id]">
-                            </scngx-album-grid-item>
-                        </ng-container>
-                </scngx-horizontal-grid>
-            </div>
-        </scngx-ui-row>
+        <div class="w-full pb-bottom">
+            <scngx-ui-row [headline]="'Alben'" [route]="['./albums']" *ngIf="albums.length > 0">
+                <div class="w-full">
+                    <scngx-horizontal-grid>
+                            <ng-container *ngFor="let item of albums">
+                                <scngx-album-grid-item 
+                                    [item]="item" 
+                                    [useDate]="true"
+                                    [routerLink]="['/album', item.slug ?? item.id]">
+                                </scngx-album-grid-item>
+                            </ng-container>
+                    </scngx-horizontal-grid>
+                </div>
+            </scngx-ui-row>
+    
+            <scngx-ui-row [headline]="'Enthalten in'" [route]="['./playlists']" *ngIf="featPlaylists.length > 0">
+                <div class="w-full">
+                    <scngx-horizontal-grid>
+                            <ng-container *ngFor="let item of featPlaylists">
+                                <scngx-playlist-grid-item
+                                    [item]="item"
+                                    [routerLink]="['/playlist', item?.slug ?? item?.id]">
+                                </scngx-playlist-grid-item>
+                            </ng-container>
+                    </scngx-horizontal-grid>
+                </div>
+            </scngx-ui-row>
+    
+            <scngx-ui-row [headline]="'Alben mit ' + artist?.name" [route]="['./playlists']" *ngIf="featAlbums.length > 0">
+                <div class="w-full">
+                    <scngx-horizontal-grid>
+                            <ng-container *ngFor="let item of featAlbums">
+                                <scngx-album-grid-item 
+                                    [item]="item" 
+                                    [routerLink]="['/album', item.slug ?? item.id]">
+                                </scngx-album-grid-item>
+                            </ng-container>
+                    </scngx-horizontal-grid>
+                </div>
+            </scngx-ui-row>
+        </div>
     </ng-container>
 
 </scngx-scroll>

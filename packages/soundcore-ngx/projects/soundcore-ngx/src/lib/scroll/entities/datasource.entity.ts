@@ -1,13 +1,40 @@
-import { IAdapter, IDatasource, SizeStrategy } from "ngx-ui-scroll";
-import { DatasourceGet, Settings, DevSettings } from "vscroll/dist/typings/interfaces";
+import { Datasource, SizeStrategy } from "ngx-ui-scroll";
+import { Settings, DevSettings, ItemsPredicate } from "vscroll/dist/typings/interfaces";
 import { v4 as uuidv4 } from "uuid";
-import { catchError, Observable, of, Subject, switchMap, takeUntil } from "rxjs";
-import { DatasourceItem } from "./datasource-item.entity";
+import { BehaviorSubject, catchError, filter, map, Observable, of, Subject, switchMap, takeUntil } from "rxjs";
 import { ApiResponse, apiResponse, Page, Pageable } from "@soundcore/sdk";
 import { Pagination } from "../config/datasource-pagination";
 import { HttpClient } from "@angular/common/http";
+import { PageCache } from "./page-cache.entity";
 
-export abstract class SCNGXBaseDatasource<T = any> implements IDatasource {
+export interface AdapterAppendOptions<T = any> {
+    items: T[];
+    eof?: boolean;
+    decrease?: boolean;
+}
+
+export interface AdapterPrependOptions<T = any> {
+    items: T[];
+    bof?: boolean;
+    increase?: boolean;
+}
+
+export interface AdapterReplaceOptions<T = any> {
+    predicate: ItemsPredicate;
+    items: T[];
+    fixRight?: boolean;
+}
+
+export interface AdapterRemoveOptions {
+    predicate?: ItemsPredicate;
+    indexes?: number[];
+    increase?: boolean;
+}
+
+const PAGE_SIZE = 20;
+
+export abstract class SCNGXBaseDatasource<T = any> extends Datasource {
+
     /**
      * Unique identifier of the datasource.
      * Format: UUIDv4
@@ -18,7 +45,7 @@ export abstract class SCNGXBaseDatasource<T = any> implements IDatasource {
      * Map that holds all fetched pages.
      * Keys are page index and values are Datasource items.
      */
-    private readonly _cachedPages: Map<number, DatasourceItem<T>[]> = new Map();
+    private readonly _cache: PageCache<T>;
 
     /**
      * Subject used to trigger destroying the datasource.
@@ -38,133 +65,265 @@ export abstract class SCNGXBaseDatasource<T = any> implements IDatasource {
      */
     public readonly $error: Observable<Error> = this._errorSubject.asObservable();
 
-    /**
-     * Property required by the IDatasource interface of vscroll
-     * Currently unused.
-     */
-    public readonly adapter?: IAdapter<unknown>;
+    private _size: number = 0;
+    public get size(): number {
+        return this._size;
+    }
 
-    /**
-     * Property required by the IDatasource interface of vscroll
-     * Currently unused.
-     */
-    public readonly devSettings?: DevSettings;
+    private readonly _readySubject: BehaviorSubject<boolean> = new BehaviorSubject(false);
+    public readonly $ready: Observable<boolean> = this._readySubject.asObservable();
 
-    /**
-     * Property required by the IDatasource interface of vscroll.
-     * This defines the get method which retrieves the list of items
-     * to render.
-     */
-    public readonly get: DatasourceGet<unknown>;
+    private readonly _sizeSubject: BehaviorSubject<number> = new BehaviorSubject(this._size);
+    public readonly $size: Observable<number> = this.$ready.pipe(filter((rdy) => rdy), map(() => this._size));
 
-    /**
-     * VScroll specific settings.
-     */
-    public readonly settings: Settings<unknown>;
-
-    protected readonly pageSize: number = 30;
+    protected readonly pageSize: number = PAGE_SIZE;
 
     constructor(
-        pageSize: number = 30,
+        pageSize: number = PAGE_SIZE,
         settings: Settings<unknown> = {},
         devSettings: DevSettings = {}
     ) {
-        // Set settings
-        this.settings = {
-            startIndex: 0,
-            minIndex: 0,
-            sizeStrategy: SizeStrategy.Frequent,
-            bufferSize: 20,
-            ...settings,
-        }
-
-        // Set devSettings
-        this.devSettings = {
-            debug: false,
-            ...devSettings
-        }
-
-        // Set pageSize
-        this.pageSize = pageSize || 30;
-
-        // Register the get() method for vscroll's datasource
-        this.get = (index, count) => new Promise((getResolve, getReject) => {
-            const pageSize = this.pageSize;
-
-            // Calculate requested indices
-            const startIndex = Math.max(index, 0);
-            const endIndex = index + count - 1;
-
-            // If start greater than end, return empty array
-            if (startIndex > endIndex) {
-                getResolve([]); // empty result
-                return;
-            }
-
-            // Calculate pages needed
-            const startPage = Math.floor(startIndex / pageSize);
-            const endPage = Math.floor(endIndex / pageSize);
-
-            const requests: Promise<DatasourceItem<T>[]>[] = [];
-            for (let pageIndex = startPage; pageIndex <= endPage; pageIndex++) {
-
-                // Directly add cached data to the requests
-                if(this.isCached(pageIndex)) {
-                    requests.push(new Promise((requestResolve) => {
-                        requestResolve(this.getCachedPage(pageIndex));
-                    }))
-                    continue;
+        super({
+            settings: {
+                startIndex: 0,
+                minIndex: 0,
+                sizeStrategy: SizeStrategy.Frequent,
+                bufferSize: pageSize ?? PAGE_SIZE,
+                ...settings,
+            },
+            devSettings: {
+                debug: false,
+                ...devSettings
+            },
+            get: (index, count) => new Promise((getResolve, getReject) => {
+                const size = pageSize ?? PAGE_SIZE;
+    
+                // Calculate requested indices
+                const startIndex = Math.max(index, 0);
+                const endIndex = index + count - 1;
+    
+                // If start greater than end, return empty array
+                if (startIndex > endIndex) {
+                    getResolve([]); // empty result
+                    return;
                 }
-
-                // Otherwise push network call promise to the requests array
-                requests.push(new Promise((requestResolve, requestReject) => {
-                    const pageable: Pageable = new Pageable(pageIndex, pageSize);
-                    
-                    this.getPageData(pageable).pipe(takeUntil(this._destroy), catchError((err: Error) => {
-                        this.pushError(err);
-                        requestReject(err)
-                        return of([] as T[]);
-                    })).subscribe((items) => {
-
-                        // Map to internal datasource items
-                        const mappedItems = items.map<DatasourceItem<T>>((_, i) => {
-                            if(!items[i]) return null;
-
-                            const element = Object.assign({}, items[i]);
-                            return {
-                                data: element,
-                                index: (pageIndex * this.pageSize) + i
+    
+                // Calculate pages needed
+                const startPage = Math.floor(startIndex / size);
+                const endPage = Math.floor(endIndex / size);
+    
+                const requests: Promise<T[]>[] = [];
+                for (let pageIndex = startPage; pageIndex <= endPage; pageIndex++) {
+    
+                    // Directly add cached data to the requests
+                    if(this.isCached(pageIndex)) {
+                        requests.push(new Promise(async (requestResolve) => {
+                            requestResolve(await this.getCachedPage(pageIndex));
+                        }))
+                        continue;
+                    }
+    
+                    // Otherwise push network call promise to the requests array
+                    requests.push(new Promise((requestResolve, requestReject) => {
+                        const pageable: Pageable = new Pageable(pageIndex, size);
+                        
+                        this.getPageData(pageable).pipe(takeUntil(this._destroy), catchError((err: Error) => {
+                            this.pushError(err);
+                            requestReject(err)
+                            return of([] as T[]);
+                        })).subscribe((items) => {
+    
+                            // Map to internal datasource items
+                            const mappedItems = items.map<T>((_, i) => {
+                                if(!items[i]) return null;
+    
+                                const element = Object.assign({}, items[i]);
+                                return element;
+                            });
+    
+                            if(!!items) {
+                                this.setCachedPage(pageIndex, mappedItems);
                             }
+    
+                            // Resolve with the items
+                            requestResolve(mappedItems);
                         });
+                    }));
+                }
+    
+                // Await all promises created above
+                Promise.all(requests).then((results) => {
 
-                        if(!!items) {
-                            this.setCachedPage(pageIndex, mappedItems);
-                        }
+                    // Flatten out the pages and gather all items in one array
+                    const items: T[] = results.reduce((acc, result) => [...acc, ...result], []);
+    
+                    // Calculate requested start and end indexes
+                    const start = startIndex - startPage * pageSize;
+                    const end = start + endIndex - startIndex + 1;
+    
+                    // Slice the array to return just the requested resources
+                    return items.slice(start, end);
+                }).then((items) => {
+                    getResolve(items);
+                }).catch((error: Error) => {
+                    this.pushError(error);
+                    getReject(error);
+                }).finally(() => {
+                    // First request has happened, set ready to true
+                    this.setReady(true);  
+                });
+            })
+        })
 
-                        // Resolve with the items
-                        requestResolve(mappedItems);
-                    });
-                }));
-            }
+        this.pageSize = pageSize ?? PAGE_SIZE;
+        this._cache = new PageCache(this.pageSize);
+    }
 
-            // Await all promises created above
-            Promise.all(requests).then((results) => {
-                // Flatten out the pages and gather all items in one array
-                const items: DatasourceItem<T>[] = results.reduce((acc, result) => [...acc, ...result], []);
-
-                // Calculate requested start and end indexes
-                const start = startIndex - startPage * pageSize;
-                const end = start + endIndex - startIndex + 1;
-
-                // Slice the array to return just the requested resources
-                return items.slice(start, end);
-            }).then((items) => {
-                getResolve(items);
-            }).catch((error: Error) => {
-                this.pushError(error);
-                getReject(error);
+    /**
+     * Add an item to the bottom of the datasource list
+     * @param item Item to append
+     */
+    public async append(item: T) {
+        return this._cache.append(item).then(async () => {
+            await this.relax();
+            return this.adapter.append({
+                items: [ item ]
+            } as AdapterAppendOptions<T>).then((result) => {
+                // Increment datasource size on success
+                if(result.success) this.incrementSize();
+                return result;
             });
         });
+    }
+
+    /**
+     * Add an item to the top of the datasource list.
+     * @param item Item to prepend
+     */
+    public async prepend(item: T) {
+        return this._cache.prepend(item).then(async () => {
+            await this.relax();
+            return this.adapter.append({
+                items: [ item ]
+            } as AdapterPrependOptions<T>).then((result) => {
+                // Increment datasource size on success
+                if(result.success) this.incrementSize();
+                return result;
+            });
+        });
+    }
+
+    /**
+     * Replace an item in the datasource list.
+     * @param index Index to replace at
+     * @param item Item to replace
+     */
+    public async replace(index: number, item: T) {
+        return this._cache.replaceAt(index, item).then(async () => {
+            await this.relax();
+            return this.adapter.replace({
+                predicate: ({ $index }) => index == $index,
+                items: [ item ]
+            });
+        });
+    }
+
+    /**
+     * Replace an item in the datasource list.
+     * @param id ID to replace at
+     * @param item Item to replace
+     */
+    public async replaceById(id: string, item: T) {
+        return this._cache.replaceAtId(id, item).then(async () => {
+            await this.relax();
+            return this.adapter.replace({
+                predicate: ({ data }) => data["id"] === id,
+                items: [ item ]
+            });
+        });
+    }
+
+    /**
+     * Append an item to the datasource. If the item's id is already known,
+     * it will be replaced instead
+     * @param data Data to append or replace
+     */
+    public async appendOrReplace(data: T) {
+        return this._cache.appendOrReplace(data).then(async ({ wasAppended, item }) => {
+            await this.relax();
+            
+            if(wasAppended) {
+                // Append to datasource
+                return this.adapter.append({ items: [ item.data ] }).then((result) => {
+                    // Increment datasource size on success
+                    if(result.success) this.incrementSize();
+                    return result;
+                });
+            } else {
+                // Otherwise replace
+                return this.adapter.replace({
+                    predicate: ({ data }) => data["id"] === item.id,
+                    items: [ item.data ]
+                });
+            }
+        })
+    }
+
+    /**
+     * Remove an item from the datasource list.
+     * @param index Index to remove
+     */
+    public async remove(index: number) {
+        return this._cache.removeByIndex(index).then(async () => {
+            await this.relax();
+            return this.adapter.remove({
+                indexes: [ index ]
+            }).then((result) => {
+                console.log(result);
+
+                // Decrement datasource size on success
+                // Immediate is false, if no items were deleted
+                if(result.success && !result.immediate) {
+                    this.decrementSize();
+                }
+                return result;
+            });
+        });
+    }
+
+    /**
+     * Remove an item from the datasource list.
+     * @param id ID to remove
+     */
+    public async removeById(id: string) {
+        return this._cache.removeById(id).then(async () => {
+            await this.relax();
+            return this.adapter.remove({
+                predicate: ({ data }) => data["id"] === id
+            }).then((result) => {
+                // Decrement datasource size on success
+                // Immediate is false, if no items were deleted
+                if(result.success && !result.immediate) {
+                    this.decrementSize();
+                }
+                return result;
+            });
+        });
+    }
+
+    /**
+     * Reload the datalist buffer.
+     * @param index Index to reload at. If omitted, datalist reloads at currently first visible index
+     */
+    public async reload(index?: number) {
+        index = index ?? this.adapter.firstVisible?.$index ?? 0;
+
+        await this.relax();
+        return this.adapter.reload(index);
+    }
+
+    public async relax() {
+        return this.adapter.relax();
     }
 
     /**
@@ -180,8 +339,9 @@ export abstract class SCNGXBaseDatasource<T = any> implements IDatasource {
      * @param pageIndex Page index to cache
      * @param items Items to insert to cache
      */
-    protected setCachedPage(pageIndex: number, items: DatasourceItem<T>[]) {
-        this._cachedPages.set(pageIndex, items);
+    protected setCachedPage(pageIndex: number, items: T[]) {
+        this._cache.setPage(pageIndex, items);
+        this.incrementSize(items.length);
     }
 
     /**
@@ -190,7 +350,7 @@ export abstract class SCNGXBaseDatasource<T = any> implements IDatasource {
      * @returns True or False
      */
     protected isCached(pageIndex: number): boolean {
-        return this._cachedPages.has(pageIndex);
+        return this._cache.hasPage(pageIndex);
     }
 
     /**
@@ -198,8 +358,8 @@ export abstract class SCNGXBaseDatasource<T = any> implements IDatasource {
      * @param pageIndex Index of the requested page to lookup from cache
      * @returns DatasourceItem<T>[]
      */
-    protected getCachedPage(pageIndex: number): DatasourceItem<T>[] {
-        return this._cachedPages.get(pageIndex);
+    protected async getCachedPage(pageIndex: number): Promise<T[]> {
+        return this._cache.getPage(pageIndex);
     }
 
     /**
@@ -207,8 +367,8 @@ export abstract class SCNGXBaseDatasource<T = any> implements IDatasource {
      * This is useful if the contents should be refetched after updates occured.
      * When the user scrolls again, the pages get refetched.
      */
-     public clearCache() {
-        this._cachedPages.clear();
+    public clearCache() {
+        this._cache.clear();
     }
 
     /**
@@ -231,6 +391,32 @@ export abstract class SCNGXBaseDatasource<T = any> implements IDatasource {
         const startPage = Math.floor(startIndex / this.pageSize);
 
         return startPage;
+    }
+
+    protected setSize(size: number) {
+        if(size < 0) size = 0;
+        if(this._size == size) return;
+
+        this._size = size;
+        this._sizeSubject.next(this._size);
+    }
+
+    protected incrementSize(inc: number = 1) {
+        this.setSize(this._size + inc);
+    }
+
+    protected decrementSize(dec: number = 1) {
+        this.setSize(this._size - dec);
+    }
+
+    /**
+     * Set the ready state for the datasource.
+     * This should be set to true, if the first request happened.
+     * @param ready Ready state
+     */
+    private setReady(ready: boolean) {
+        if(this._readySubject.getValue() == ready) return;
+        this._readySubject.next(ready);
     }
 }
 

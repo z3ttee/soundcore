@@ -117,8 +117,6 @@ export class AppPlayerService {
         this._enqueuedTracklist = tracklist;
         this.updateSize();
 
-        console.log(tracklist);
-
         if(force || this.isIdle()) {
             // Start with next title but take it from tracklist queue
             this.history.resetPointer();
@@ -144,8 +142,6 @@ export class AppPlayerService {
      * @param item PlayerItem data
      */
     private playItem(item: PlayerItem): void {
-        console.log(item);
-
         if(!item) {
             this.logger.log(`Queue is empty, cannot get next song`);
             this.audio.skipTime();
