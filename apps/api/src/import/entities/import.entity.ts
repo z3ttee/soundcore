@@ -1,6 +1,7 @@
-import { Column, CreateDateColumn, Entity, Index, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, Index, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { PlaylistPrivacy } from "../../playlist/enums/playlist-privacy.enum";
 import { User } from "../../user/entities/user.entity";
+import { ImportReport } from "./import-report.entity";
 
 export enum ImportTaskType {
     SPOTIFY_PLAYLIST = 0
@@ -16,7 +17,7 @@ export enum ImportTaskStatus {
 
 @Entity()
 @Index(["user", "url"], { unique: true })
-export class ImportTask<P = any> {
+export class ImportTask<P = any, R = any> {
 
     /**
      * DEFAULT ATTRIBUTES
@@ -39,11 +40,12 @@ export class ImportTask<P = any> {
     @Column({ type: "smallint", default: 0, nullable: true })
     public privacy: PlaylistPrivacy;
 
-    @Column({ default: 0, nullable: false })
-    public progress: number;
-
     @Column({ type: "json", nullable: true })
     public payload?: P;
+
+    @OneToOne(() => ImportReport, { nullable: true })
+    @JoinColumn()
+    public report?: ImportReport<R>;
 
     @CreateDateColumn()
     public createdAt: number;

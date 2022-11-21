@@ -10,6 +10,7 @@ import { JanitorService } from '../janitor/services/janitor.service';
 import { WorkerQueueModule } from '@soundcore/nest-queue';
 import { ImportQueueService } from './services/import-queue.service';
 import { GatewayModule } from '../gateway/gateway.module';
+import { ImportReport } from './entities/import-report.entity';
 
 @Module({
   controllers: [ImportController],
@@ -21,7 +22,7 @@ import { GatewayModule } from '../gateway/gateway.module';
   imports: [
     JanitorModule,
     GatewayModule,
-    TypeOrmModule.forFeature([ ImportTask ]),
+    TypeOrmModule.forFeature([ ImportTask, ImportReport ]),
     WorkerQueueModule.forFeature({
       script: path.join(__dirname, "worker", "import.worker.js"),
       concurrent: 4,

@@ -1,9 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { ImportTask, ImportTaskStatus } from '../entities/import.entity';
+import { ImportTask, ImportTaskStatus, ImportTaskType } from '../entities/import.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Page, Pageable } from 'nestjs-pager';
-import { ImportQueueService } from './import-queue.service';
+import { User } from '../../user/entities/user.entity';
 
 @Injectable()
 export class ImportService {
@@ -46,15 +46,23 @@ export class ImportService {
      * @param pageable Page settings
      * @returns Page<ImportTask>
      */
-    public async findAllByUser(userId: string, pageable: Pageable): Promise<Page<ImportTask>> {
+    public async findByStatusOfUser(userId: string, status: ImportTaskStatus[], type: ImportTaskType, pageable: Pageable): Promise<Page<ImportTask>> {
         return this.repository.createQueryBuilder("task")
             .leftJoin("task.user", "user")
             .offset(pageable.offset)
             .limit(pageable.limit)
-            .where("user.id = :userId", { userId })
+            .where("user.id = :userId AND task.status IN (:status) AND task.type = :type", { userId, status, type })
             .getManyAndCount().then(([tasks, count]) => {
                 return Page.of(tasks, count, pageable.offset);
             })
+    }
+
+    public async setTaskPayload<T = any>(task: ImportTask<T>) {
+        return this.repository.update(task.id, {
+            payload: task.payload as any
+        }).then(() => {
+            return task;
+        });
     }
 
     /**
@@ -62,7 +70,7 @@ export class ImportService {
      * @param tasks Tasks to change status for
      * @param status Status to set
      */
-    public async updateImportStatus(tasks: ImportTask[], status: ImportTaskStatus) {
+    public async setImportStatus(tasks: ImportTask[], status: ImportTaskStatus) {
         return this.repository.createQueryBuilder()
             .update()
             .set({ status })
@@ -71,43 +79,38 @@ export class ImportService {
     }
 
     /**
-     * Update progress for a list of tasks.
-     * @param tasks Tasks to change progress for
-     * @param progress Progress to set
+     * Delete an import task by id and corresponding user.
+     * @param taskId Task's id
+     * @param authentication Authentication object
+     * @returns True or False
      */
-    public async updateImportProgress(tasks: ImportTask[], progress: number) {
-        return this.repository.createQueryBuilder()
-            .update()
-            .set({ progress })
-            .whereInIds(tasks)
-            .execute();
+    public async deleteById(taskId: string, authentication: User): Promise<boolean> {
+        return this.repository.delete({ id: taskId, user: { id: authentication?.id }}).then((deleteResult) => deleteResult.affected > 0);
     }
 
-    public async setImportProgressAndStatus(tasks: ImportTask[], status: ImportTaskStatus, progress: number) {
-        return this.repository.createQueryBuilder()
-            .update()
-            .set({ progress, status })
-            .whereInIds(tasks)
-            .execute()
-    }
-
+    /**
+     * This will mark all imports from the database that are
+     * marked as enqueued or processing as aborted. Main usage of this function is at application
+     * startup to clear the queue and force the user to start import again because it got aborted
+     * by the application shutdown.
+     */
     public async clearOngoingImports() {
         return this.repository.createQueryBuilder()
             .update()
-            .set({ status: ImportTaskStatus.SERVER_ABORT, progress: 0 })
+            .set({ status: ImportTaskStatus.SERVER_ABORT })
             .where("status IN(:status)", { status: [ ImportTaskStatus.ENQUEUED, ImportTaskStatus.PROCESSING ] })
             .execute()
     }
 
     /**
      * This will delete all imports from the database older
-     * than 30days
+     * than 7days
      */
     public async clearOldImports() {
-        const datePrior30daysMs = Date.now() - (1000*60*60*24*30);
+        const datePrior7daysMs = Date.now() - (1000*60*60*24*7);
         return this.repository.createQueryBuilder()
             .delete()
-            .where("createdAt <= :datePrior30daysMs", { datePrior30daysMs })
+            .where("createdAt <= :datePrior7daysMs", { datePrior7daysMs })
             .execute();
     }
 

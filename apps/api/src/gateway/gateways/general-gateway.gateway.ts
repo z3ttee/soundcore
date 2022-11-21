@@ -8,7 +8,8 @@ import { GatewayEvent } from "../events/gateway-event";
     cors: {
       origin: "*"
     },
-    path: "/general"
+    path: "/general",
+    transports: [ "websocket", "polling" ]
 })
 export class GeneralGateway extends AuthGateway {
 

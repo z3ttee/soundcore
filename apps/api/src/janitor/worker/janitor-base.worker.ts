@@ -63,12 +63,12 @@ async function clearOngoingImports(datasource: DataSource, janitor: JanitorRef) 
     const logger = new Logger(janitor.name);
     const startTimeMs = Date.now();
 
-    logger.log(`Clearing all imports older than 30days...`);
+    logger.log(`Clearing all imports older than 7days...`);
 
     const respository = datasource.getRepository(ImportTask);
     const service = new ImportService(respository);
 
-    return service.clearOngoingImports().then((updateResult) => {
+    return service.clearOldImports().then((updateResult) => {
         const endTimeMs = Date.now();
         logger.log(`Cleared ${updateResult.affected ?? 0} old import tasks. Took ${endTimeMs - startTimeMs}ms.`);
     }).catch((error: Error) => {

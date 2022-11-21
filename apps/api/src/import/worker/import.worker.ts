@@ -1,4 +1,4 @@
-import { InternalServerErrorException } from "@nestjs/common";
+import { InternalServerErrorException, Logger } from "@nestjs/common";
 import { EventEmitter2 } from "@nestjs/event-emitter";
 import { Batch } from "@soundcore/common";
 import { WorkerJobRef } from "@soundcore/nest-queue";
@@ -12,8 +12,10 @@ import { SongService } from "../../song/services/song.service";
 import Database from "../../utils/database/database-worker-client";
 import MeiliClient from "../../utils/database/meilisearch-worker-client";
 import { SpotifyClient } from "../clients/spotify.client";
-import { ImportTask, ImportTaskType } from "../entities/import.entity";
+import { ImportTask, ImportTaskStatus, ImportTaskType } from "../entities/import.entity";
 import { SpotifySong, SpotifyTrackList } from "../entities/spotify-song.entity";
+import { ImportSpotifyResult } from "../results/import-spotify-result";
+import { ImportService } from "../services/import.service";
 
 export default async function (job: WorkerJobRef<ImportTask>): Promise<any> {
     const taskType = job.payload.type;
@@ -27,47 +29,74 @@ export default async function (job: WorkerJobRef<ImportTask>): Promise<any> {
     // https://open.spotify.com/playlist/1m1n3D4q1PXSmaqQBS5rK7?si=16545a9d58314b9c
 }
 
-async function importSpotifyPlaylist(job: WorkerJobRef<ImportTask>): Promise<any> {
+async function importSpotifyPlaylist(job: WorkerJobRef<ImportTask>): Promise<ImportSpotifyResult> {
     const client = SpotifyClient.getInstance();
 
-    // TODO: Better logging
+    // Just for logging and stats
+    const logger = new Logger()
+    const startedAtMs = Date.now();
     
+    // Connect the database client
     return Database.connect().then((datasource) => {
+        // Create new meilisearch instance
         return MeiliClient.connect().then((meilisearch) => {
+
+            // Check if spotify module is enabled
             if(!client.isEnabled) {
                 throw new InternalServerErrorException("Spotify module is disabled");
             }
 
+            // Create new event emitter required by services
             const eventEmitter = new EventEmitter2()
+
+            // Instantiate meilisearch client for playlist syncing
+            const meiliPlaylistClient = new MeiliPlaylistService(meilisearch);
     
+            // Instantiate repositories used by the services
             const songRepo = datasource.getRepository(Song);
             const playlistRepo = datasource.getRepository(Playlist);
             const song2playlistRepo = datasource.getRepository(PlaylistItem);
+            const importRepo = datasource.getRepository(ImportTask);
 
+            // Instantiate services
             const songService = new SongService(songRepo, eventEmitter, new MeiliSongService(meilisearch));
-            const playlistService = new PlaylistService(playlistRepo, song2playlistRepo, eventEmitter, new MeiliPlaylistService(meilisearch));
+            const playlistService = new PlaylistService(playlistRepo, song2playlistRepo, eventEmitter, meiliPlaylistClient);
+            const importService = new ImportService(importRepo);
             
+            // Destructure job object into payload
+            // and make variables of most used data
             const { payload } = job;
             const task = payload;
             const user = payload.user;
             const baseUrl = task.baseUrl;
         
+            // Extract playlist id from the url
             const url = new URL(task.url + "/", baseUrl);
-            
             const playlistId = url.pathname.replace("/playlist/", "");
 
             // Fetch playlist from spotify
             return client.findSpotifyPlaylistById(playlistId).then(async (spotifyPlaylist) => {
         
-                const foundSpotifySongs: Song[] = [];
-                const notFoundSongs: SpotifySong[] = [];
+                // Array of songs that were extracted from the spotify playlist
+                const extractedSongs: Song[] = [];
+                const notExtractedSpotifySongs: SpotifySong[] = [];
+                
+                // Used to track how many total songs are in the playlist on spotify
+                let totalSpotifyTracks: number = 0;
         
                 let nextUrl: string = undefined;
                 while(true) {
+                    const availableSpotifySongs: Map<string, SpotifySong> = new Map();
+                    // Array of songs that were also found on soundcore
+                    const foundSpotifySongs: SpotifySong[] = [];
+
                     // Fetch tracklist from spotify api
                     const tracklist: SpotifyTrackList = await client.findSpotifyPlaylistTracks(playlistId, nextUrl).then((val) => val).catch((error: Error) => {
                         throw new InternalServerErrorException("Spotify error: " + error.message)
                     });
+
+                    // Increments stats
+                    totalSpotifyTracks += tracklist.items.length;
         
                     // Save nextUrl for next iteration
                     nextUrl = tracklist.next;
@@ -81,9 +110,14 @@ async function importSpotifyPlaylist(job: WorkerJobRef<ImportTask>): Promise<any
                         const item = tracklist.items[i];
                         const track = item.track;
 
+                        // Split data up into song names, artists and album names
+                        // This is later used to lookup matching songs on soundcore
                         names.push(track.name);
                         artistNames.push(...track.artists.map((artist) => artist.name));
                         if(track.album?.name) albumNames.push(track.album?.name);
+
+                        // Save spotify song with key
+                        availableSpotifySongs.set(getSpotifySongKey(track), track)
                     }
 
                     // Find songs by names, artists and album names
@@ -91,38 +125,75 @@ async function importSpotifyPlaylist(job: WorkerJobRef<ImportTask>): Promise<any
                         throw new InternalServerErrorException("Error while accessing database.");
                     });
 
+                    // Map found songs in soundcore database to their keys
+                    const foundSongsMappedToKey = songs.reduce((map, song) => {
+                        const key = getSpotifySongKey({ name: song.name, album: song.album });
+                        map.set(key, true);
+
+                        return map;
+                    }, new Map<string, boolean>());
+
+                    // Filter which spotifySongs were not found
+                    const notFoundSpotifySongs = Array.from(availableSpotifySongs.values()).filter((spotifySong) => {
+                        return foundSongsMappedToKey.has(getSpotifySongKey(spotifySong));
+                    });
+
                     // Push to results
-                    foundSpotifySongs.push(...songs);
+                    notExtractedSpotifySongs.push(...notFoundSpotifySongs);
+                    extractedSongs.push(...songs);
 
                     // Was last page, so the loop can be broken
                     if(!tracklist.next) break;
                 }
 
                 // Create playlist in soundcore database
-                const playlist = await playlistService.create({
+                const playlist = await playlistService.createIfNotExists({
                     title: spotifyPlaylist.name,
                     description: spotifyPlaylist.description,
                     privacy: task.privacy
                 }, user).catch((error: Error) => {
+                    logger.error(`Could not create playlist via spotify import: ${error.message}`, error.stack);
                     throw new InternalServerErrorException("Could not create playlist.");
                 });
 
-                // Add songs to the playlist
-                return Batch.of<Song, any>(foundSpotifySongs, 20).do(async (batch) => {
+                // Used to track how many of the found songs
+                // were added to the playlist
+                let totalSongsImported = 0;
 
-                    await playlistService.setSongs(playlist.id, batch, user).catch((error: Error) => {
-                        console.log("could not add songs to playlist: ");
-                        console.error(error);
+                // Add songs to the playlist
+                return Batch.of<Song, any>(extractedSongs, 20).do(async (batch) => {
+
+                    await playlistService.setSongs(playlist.id, batch, user).then((insertResult) => {
+                        // Increment stats
+                        totalSongsImported += insertResult.identifiers.length;
+                    }).catch((error: Error) => {
+                        logger.error(`Failed adding songs to imported playlist: ${error.message}`, error.stack);
                     });
 
                     return [];
                 }).start().then(() => {
-                    // TODO: Return result of worker here
-                    console.log("added songs to playlist")
+                    const endedAtMs = Date.now();
+                    const timeTookMs: number = endedAtMs - startedAtMs;
+
+                    const result = new ImportSpotifyResult(playlist, ImportTaskStatus.OK, [], {
+                        total: totalSpotifyTracks,
+                        importedAmount: totalSongsImported
+                    }, timeTookMs);
+
+                    // Save import task with result
+                    task.payload = playlist;
+
+                    return importService.setTaskPayload(task).then(() => result);
                 }).catch((error: Error) => {
+                    logger.error(`Failed batch-import of songs for imported playlist: ${error.message}`);
                     throw new InternalServerErrorException("Failed adding songs to playlist");
                 });
             });
         });
     });
+}
+
+function getSpotifySongKey(spotifySong: Partial<SpotifySong>): string {
+    // return `${spotifySong.name}:${spotifySong.album?.name}:${spotifySong.artists.map((artist) => artist.name).join("-")}`;
+    return `${spotifySong?.name}:${spotifySong?.album?.name}`;
 }

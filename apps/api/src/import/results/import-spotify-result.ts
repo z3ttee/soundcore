@@ -1,12 +1,12 @@
 import { Playlist } from "../../playlist/entities/playlist.entity";
-import { ImportTaskStatus, ImportTaskType } from "../entities/import.entity";
+import { ImportTaskStatus } from "../entities/import.entity";
 
 export enum SpotifyFailedReason {
     NOT_FOUND = 0,
     ERROR = 1
 }
 
-export class FailedSpotifySongs {
+export class FailedSpotifyImport {
 
     constructor(
         public readonly title: string,
@@ -17,14 +17,19 @@ export class FailedSpotifySongs {
 
 }
 
+export interface ImportSpotifyResultStats {
+    importedAmount: number;
+    total: number;
+}
+
 export class ImportSpotifyResult {
 
     constructor(
-        public readonly type: ImportTaskType,
         public readonly playlist: Playlist,
         public readonly status: ImportTaskStatus,
-        public readonly notImported: FailedSpotifySongs[],
-        public readonly errorMessage?: string
+        public readonly notImported: FailedSpotifyImport[],
+        public readonly stats: ImportSpotifyResultStats,
+        public readonly timeTookMs: number
     ) {}
 
 }

@@ -1,12 +1,15 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, Logger } from "@nestjs/common";
+import { Environment } from "@soundcore/common";
 import { WorkerJob, WorkerJobRef, WorkerQueue } from "@soundcore/nest-queue";
 import { ImportTaskUpdateEvent } from "../../gateway/events/importtask-update.event";
 import { GeneralGateway } from "../../gateway/gateways/general-gateway.gateway";
-import { ImportTask, ImportTaskStatus } from "../entities/import.entity";
+import { ImportTask, ImportTaskStatus, ImportTaskType } from "../entities/import.entity";
+import { ImportSpotifyResult } from "../results/import-spotify-result";
 import { ImportService } from "./import.service";
 
 @Injectable()
 export class ImportQueueService {
+    private readonly logger = new Logger(ImportQueueService.name);
 
     constructor(
         private readonly gateway: GeneralGateway,
@@ -15,15 +18,29 @@ export class ImportQueueService {
     ) {
 
         this.queue.on("started", (job: WorkerJob<ImportTask>) => {
-            this.updateImportTask(job.payload, ImportTaskStatus.PROCESSING, 0);
+            this.updateImportTask(job.payload, ImportTaskStatus.PROCESSING);
+            this.logger.verbose(`Importing data from url '${job.payload.url}'. Initiated by user ${job.payload.user.name}`);
         });
 
         this.queue.on("completed", (job: WorkerJob<ImportTask>) => {
-            this.updateImportTask(job.payload, ImportTaskStatus.OK, 0);
+            this.updateImportTask(job.payload, ImportTaskStatus.OK);
+
+            // Do some logging
+            if(job.payload.type == ImportTaskType.SPOTIFY_PLAYLIST) {
+                const result = job.result as ImportSpotifyResult;
+                this.logger.verbose(`Successfully imported playlist '${result.playlist.name}' from Spotify. Found ${result.stats.importedAmount}/${result.stats.total} songs. Took ${result.timeTookMs}ms.`);
+            }
         });
 
-        this.queue.on("failed", (job: WorkerJobRef<ImportTask>) => {
-            this.updateImportTask(job.payload, ImportTaskStatus.ERRORED, 0);
+        this.queue.on("failed", (job: WorkerJobRef<ImportTask>, error: Error) => {
+            this.updateImportTask(job.payload, ImportTaskStatus.ERRORED);
+
+            // Do some logging
+            if(Environment.isDebug) {
+                this.logger.error(`Failed processing import task: ${error.message}`, error.stack);
+            } else {
+                this.logger.error(`Failed processing import task: ${error.message}`, error.stack);
+            }
         });
     }
 
@@ -31,16 +48,15 @@ export class ImportQueueService {
         this.queue.enqueue(task);
     }
 
-    private async updateImportTask(task: ImportTask, status: ImportTaskStatus, progress: number) {
+    private async updateImportTask(task: ImportTask, status: ImportTaskStatus) {
         const taskCopy = {...task};
         const user = task.user;
 
         taskCopy.user = undefined;
         taskCopy.status = status;
-        taskCopy.progress = progress;
 
         this.gateway.sendEventToUser(user.id, new ImportTaskUpdateEvent(taskCopy));
-        await this.service.setImportProgressAndStatus([task], status, progress);
+        await this.service.setImportStatus([task], status);
     }
 
 }
