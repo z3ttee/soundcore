@@ -4,17 +4,17 @@
     "build:app": {
       "dependsOn": ["^build:app"],
       "outputs": ["dist/**"],
-      "cache": false
+      "cache": true
     },
     "build:api": {
       "dependsOn": ["^build:api"],
       "outputs": ["dist/**"],
-      "cache": false
+      "cache": true
     },
     "dockerize:api": {
       "dependsOn": ["^build:api"],
       "outputs": ["dist/**"],
-      "cache": false
+      "cache": true
     },
     "lint": {
       "outputs": []
