@@ -1,0 +1,11 @@
+<div class="w-full">
+    
+    <div class="flex overflow-x-auto items-center justify-start [&>*]:flex-shrink-0 [&>*]:min-w-20 gap-4 p-3 rounded-sm" [ngClass]="{'bg-body-dark bg-opacity-60': !transparent}">
+        <ng-content select="scngx-tab-item"></ng-content>
+    </div>
+    
+    <div class="pt-row">
+        <ng-content select="scngx-tab-body"></ng-content>
+    </div>
+
+</div>
