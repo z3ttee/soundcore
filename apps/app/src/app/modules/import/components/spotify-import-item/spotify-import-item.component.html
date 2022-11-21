@@ -1,0 +1,27 @@
+<div class="flex flex-1 items-center justify-start w-full gap-4 p-2">
+
+    <div class="flex-grow p-2 rounded-sm hover:bg-body-light active:bg-body-lighter cursor-pointer transition-all">
+        <div class="flex flex-1 items-center justify-start gap-3 select-none" [routerLink]="['/playlist', task.payload.id]">
+            <div class="min-w-11 w-11 h-11 overflow-hidden rounded-full">
+                <scngx-artwork [artwork]="task.payload?.artwork"></scngx-artwork>
+            </div>
+
+            <div>
+                <p class="line-clamp-1">{{ task.payload?.name ?? 'Unbekannter Titel' }}</p>
+                <p class="line-clamp-1 text-sm opacity-70 font-light">by {{ task.payload?.author?.name ?? 'Unbekannter Autor' }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div>
+        <p class="text-sm">{{ 0 }}/{{ 0 }}</p>
+    </div>
+
+    <div class="min-w-28">
+        <p class="text-sm">{{ task.status | taskStatusPipe }}</p>
+    </div>
+
+    <div class="min-w-6 w-6 text-center">
+        <fa-icon [icon]="['fab', 'spotify']" size="xl"></fa-icon>
+    </div>
+</div>

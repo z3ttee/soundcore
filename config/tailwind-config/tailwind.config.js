@@ -50,6 +50,7 @@ module.exports = {
       }),
       padding: ({ theme }) => ({
         row: theme("spacing.6"),
+        bottom: 140
       }),
       gap: theme => ({
         row: theme("spacing.6")
