@@ -108,7 +108,13 @@ export class ImportService {
      * @returns True or False
      */
     public async deleteById(taskId: string, authentication: User): Promise<boolean> {
-        return this.repository.delete({ id: taskId, user: { id: authentication?.id }}).then((deleteResult) => deleteResult.affected > 0);
+        return this.repository.createQueryBuilder("task")  
+            .leftJoin("task.user", "user")
+            .delete()
+            .where("id = :taskId AND user.id = :userId", { taskId, userId: authentication.id })
+            .execute().then((deleteResult) => {
+                return deleteResult.affected > 0;
+            })
     }
 
     /**

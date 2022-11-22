@@ -1,13 +1,14 @@
 import { BadRequestException, Injectable, Logger } from "@nestjs/common";
 import { User } from "../../user/entities/user.entity";
 import { CreateImportDTO } from "../dtos/create-import.dto";
-import { ImportTask, ImportTaskType } from "../entities/import.entity";
+import { ImportTask, ImportTaskStatus, ImportTaskType } from "../entities/import.entity";
+import { SpotifyImport } from "../entities/spotify-import.entity";
 import { ImportQueueService } from "./import-queue.service";
 import { ImportService } from "./import.service";
 
 @Injectable()
 export class SpotifyImportService {
-    private logger: Logger = new Logger(SpotifyImportService.name)
+    private readonly logger: Logger = new Logger(SpotifyImportService.name)
 
     private readonly spotifyBaseUrls: string[] = [
         "https://open.spotify.com/playlist/"
@@ -56,8 +57,22 @@ export class SpotifyImportService {
         }
 
         // Check for possible duplicate import task
-        if(!!await this.findByUserIdAndUrl(authentication.id, createImportDto.url)) {
-            throw new BadRequestException("Import task for that url already exists.");
+        const existing: SpotifyImport = await this.findByUserIdAndUrl(authentication.id, createImportDto.url).then((task) => task).catch(() => null);
+        if(existing) {
+            // Delete import if it has errored, was aborted or has status ok
+            // This allows the user to create a new import with an url that was already processed (retry)
+            if(existing.status == ImportTaskStatus.ERRORED || existing.status == ImportTaskStatus.SERVER_ABORT|| existing.status == ImportTaskStatus.OK) {
+                await this.importService.deleteById(existing.id, authentication).catch((error: Error) => {
+                    this.logger.error(`Failed deleting import task: ${error.message}`);
+                    return false;
+                }).then((deleted) => {
+                    if(!deleted) {
+                        throw new BadRequestException("Import for that url already exists.");
+                    }
+                })
+            } else {
+                throw new BadRequestException("Import for that url already exists.");
+            }
         }
 
         // Create import task entity

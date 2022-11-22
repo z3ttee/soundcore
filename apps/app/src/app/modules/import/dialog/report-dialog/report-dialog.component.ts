@@ -8,8 +8,7 @@ export interface ReportDialogOptions {
 }
 
 @Component({
-    templateUrl: "./report-dialog.component.html",
-    styleUrls: ["./report-dialog.component.scss"]
+    templateUrl: "./report-dialog.component.html"
 })
 export class ReportDialogComponent implements OnInit, OnDestroy {
 
