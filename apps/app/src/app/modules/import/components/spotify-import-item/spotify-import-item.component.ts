@@ -1,4 +1,4 @@
-import { Component, Input } from "@angular/core";
+import { Component, EventEmitter, Input, Output } from "@angular/core";
 import { ImportTask, Playlist } from "@soundcore/sdk";
 
 @Component({
@@ -9,5 +9,8 @@ export class SpotifyImportItemComponent {
 
     @Input()
     public task: ImportTask<Playlist>
+
+    @Output()
+    public openReport: EventEmitter<void> = new EventEmitter();
 
 }

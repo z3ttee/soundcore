@@ -14,7 +14,7 @@ export enum ImportTaskStatus {
     SERVER_ABORT = 4
 }
 
-export class ImportTask<P = any, R = any> {
+export class ImportTask<P = any, S = any, R = any> {
 
     /**
      * DEFAULT ATTRIBUTES
@@ -26,6 +26,7 @@ export class ImportTask<P = any, R = any> {
     public privacy: PlaylistPrivacy;
     public payload?: P;
     public report?: ImportReport<R>;
+    public stats?: S;
     public createdAt: number;
 
     /**

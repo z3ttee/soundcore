@@ -1,9 +1,7 @@
 import { BadRequestException, Injectable, Logger } from "@nestjs/common";
-import axios, { AxiosError } from "axios";
 import { User } from "../../user/entities/user.entity";
 import { CreateImportDTO } from "../dtos/create-import.dto";
 import { ImportTask, ImportTaskType } from "../entities/import.entity";
-import { SpotifyClientAccessToken, SpotifyPlaylist, SpotifyTrackList } from "../entities/spotify-song.entity";
 import { ImportQueueService } from "./import-queue.service";
 import { ImportService } from "./import.service";
 

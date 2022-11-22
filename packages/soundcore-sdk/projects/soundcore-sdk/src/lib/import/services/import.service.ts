@@ -83,7 +83,7 @@ export class SCSDKImportService {
      */
     public findReportByTaskid(taskId: string): Observable<ApiResponse<ImportReport>> {
         if(!taskId) return of(null);
-        return this.httpClient.delete<ImportReport>(`${this.options.api_base_uri}/v1/imports/${taskId}/report`).pipe(apiResponse());
+        return this.httpClient.get<ImportReport>(`${this.options.api_base_uri}/v1/imports/${taskId}/report`).pipe(apiResponse());
     }
 
 }

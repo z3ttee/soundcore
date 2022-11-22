@@ -1,7 +1,6 @@
 import { Logger } from "@nestjs/common";
 import axios, { AxiosError } from "axios";
-import { User } from "../../user/entities/user.entity";
-import { SpotifyClientAccessToken, SpotifyPlaylist, SpotifyTrackList } from "../entities/spotify-song.entity";
+import { SpotifyClientAccessToken, SpotifyPlaylist, SpotifyTrackList } from "./spotify-entities";
 
 export class SpotifyClient {
     private readonly logger = new Logger(SpotifyClient.name);

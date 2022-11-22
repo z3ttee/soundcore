@@ -17,7 +17,7 @@ export enum ImportTaskStatus {
 
 @Entity()
 @Index(["user", "url"], { unique: true })
-export class ImportTask<P = any, R = any> {
+export class ImportTask<P = any, S = any, R = any> {
 
     /**
      * DEFAULT ATTRIBUTES
@@ -43,8 +43,10 @@ export class ImportTask<P = any, R = any> {
     @Column({ type: "json", nullable: true })
     public payload?: P;
 
-    @OneToOne(() => ImportReport, { nullable: true })
-    @JoinColumn()
+    @Column({ type: "json", nullable: true })
+    public stats?: S;
+
+    @OneToOne(() => ImportReport, (report) => report.task, { nullable: true })
     public report?: ImportReport<R>;
 
     @CreateDateColumn()

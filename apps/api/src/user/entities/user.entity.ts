@@ -30,7 +30,7 @@ export class User implements Resource, Syncable {
     @Column({ nullable: true, unique: true, length: 120 })
     public slug: string;
 
-    @Column({ nullable: true, length: 120, name: "username" })
+    @Column({ nullable: true, length: 120 })
     public name: string;
 
     @Column({ nullable: true })

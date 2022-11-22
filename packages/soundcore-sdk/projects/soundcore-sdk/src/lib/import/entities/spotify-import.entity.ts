@@ -1,5 +1,5 @@
 import { Playlist } from "../../playlist/entities/playlist.entity";
-import { ImportTaskStatus } from "../entities/import.entity";
+import { ImportTask } from "./import.entity";
 
 export enum SpotifyFailedReason {
     NOT_FOUND = 0,
@@ -17,18 +17,17 @@ export class FailedSpotifyImport {
 
 }
 
-export interface ImportSpotifyResultStats {
+export interface ImportSpotifyStats {
     importedAmount: number;
     total: number;
+    timeTookMs: number;
 }
 
-export class ImportSpotifyResult {
-
-    constructor(
-        public readonly playlist: Playlist,
-        public readonly status: ImportTaskStatus,
-        public readonly stats: ImportSpotifyResultStats,
-        public readonly timeTookMs: number
-    ) {}
-
+export interface ImportSpotifyReport {
+    notImportedSongs: FailedSpotifyImport[];
 }
+
+export class SpotifyImport extends ImportTask<Playlist, ImportSpotifyStats, ImportSpotifyReport> {
+    
+}
+

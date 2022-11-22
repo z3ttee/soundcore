@@ -5,6 +5,7 @@ import { Authentication } from '../../authentication/decorators/authentication.d
 import { User } from '../../user/entities/user.entity';
 import { CreateImportDTO } from '../dtos/create-import.dto';
 import { ImportTaskStatus, ImportTaskType } from '../entities/import.entity';
+import { ImportReportService } from '../services/import-report.service';
 import { ImportService } from '../services/import.service';
 import { SpotifyImportService } from '../services/spotify.service';
 
@@ -12,6 +13,7 @@ import { SpotifyImportService } from '../services/spotify.service';
 export class ImportController {
   constructor(
     private readonly importService: ImportService,
+    private readonly reportService: ImportReportService,
     private readonly spotifyService: SpotifyImportService
   ) {}
 
@@ -33,6 +35,11 @@ export class ImportController {
   @Post("spotify/playlist")
   public async createSpotifyImport(@Body() createImportDto: CreateImportDTO, @Authentication() importer: User) {
     return this.spotifyService.createPlaylistImport(createImportDto, importer);
+  }
+
+  @Get(":taskId/report")
+  public async findReportByTaskId(@Param("taskId") taskId: string, @Authentication() authentication: User) {
+    return this.reportService.findByTaskId(taskId, authentication);
   }
 
   @Delete(":taskId")

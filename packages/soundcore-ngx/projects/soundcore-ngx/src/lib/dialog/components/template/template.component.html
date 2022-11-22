@@ -2,7 +2,7 @@
 <!-- Container -->
 <div class="relative flex flex-1 flex-col items-start justify-start gap-4 min-w-full h-full">
 
-    <div class="sticky top-0 inline-flex justify-start items-center w-full">
+    <div class="sticky top-0 inline-flex justify-start items-center w-full px-window py-4 bg-body">
         <div class="flex-grow line-clamp-1">
             <h6 class="font-bold text-white text-opacity-80">
                 {{ title }}
@@ -13,13 +13,13 @@
         </div>
     </div>    
 
-    <div class="block w-full flex-grow select-auto max-h-[90%]">
-        <div class="inline-block w-full text-font text-opacity-75">
+    <div class="block w-full flex-grow select-auto max-h-[90%] px-window">
+        <div class="inline-block w-full text-font">
             <ng-content select="[scngx-dialog-content]"></ng-content>
         </div>
     </div>
 
-    <div class="inline-flex flex-wrap w-full justify-end items-center gap-2">
+    <div class="inline-flex flex-wrap w-full justify-end items-center gap-2 px-window py-2">
         <ng-content select="[scngx-dialog-footer]"></ng-content>
     </div>
 </div>

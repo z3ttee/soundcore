@@ -38,8 +38,10 @@ export class SpotifyPendingTabComponent implements OnInit, OnDestroy {
             console.log(`Received task update.`, task);
 
             if(task.status == ImportTaskStatus.ENQUEUED || task.status == ImportTaskStatus.PROCESSING) {
+                console.log("append or replace")
                 this.datasource.appendOrReplace(task);
             } else {
+                console.log("removing ...")
                 this.datasource.removeById(task.id);
             }
         });

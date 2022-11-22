@@ -4,7 +4,7 @@ import { WorkerJob, WorkerJobRef, WorkerQueue } from "@soundcore/nest-queue";
 import { ImportTaskUpdateEvent } from "../../gateway/events/importtask-update.event";
 import { GeneralGateway } from "../../gateway/gateways/general-gateway.gateway";
 import { ImportTask, ImportTaskStatus, ImportTaskType } from "../entities/import.entity";
-import { ImportSpotifyResult } from "../results/import-spotify-result";
+import { ImportSpotifyResult } from "../entities/spotify-import.entity";
 import { ImportService } from "./import.service";
 
 @Injectable()
@@ -28,7 +28,7 @@ export class ImportQueueService {
             // Do some logging
             if(job.payload.type == ImportTaskType.SPOTIFY_PLAYLIST) {
                 const result = job.result as ImportSpotifyResult;
-                this.logger.verbose(`Successfully imported playlist '${result.playlist.name}' from Spotify. Found ${result.stats.importedAmount}/${result.stats.total} songs. Took ${result.timeTookMs}ms.`);
+                this.logger.verbose(`Successfully imported playlist '${result.playlist.name}' from Spotify. Found ${result.stats.importedAmount}/${result.stats.total} songs. Took ${result.stats.timeTookMs}ms.`);
             }
         });
 

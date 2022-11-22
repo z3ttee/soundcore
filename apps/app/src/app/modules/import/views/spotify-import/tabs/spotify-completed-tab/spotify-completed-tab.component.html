@@ -7,5 +7,5 @@
 </div>
 
 <div *uiScroll="let item of datasource; index as i">
-    <app-spotify-import [task]="item"></app-spotify-import>
+    <app-spotify-import [task]="item" (openReport)="openReportDialog(item)"></app-spotify-import>
 </div>

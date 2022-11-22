@@ -11,12 +11,14 @@ import { WorkerQueueModule } from '@soundcore/nest-queue';
 import { ImportQueueService } from './services/import-queue.service';
 import { GatewayModule } from '../gateway/gateway.module';
 import { ImportReport } from './entities/import-report.entity';
+import { ImportReportService } from './services/import-report.service';
 
 @Module({
   controllers: [ImportController],
   providers: [
     ImportService,
     ImportQueueService,
+    ImportReportService,
     SpotifyImportService,
   ],
   imports: [

@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, Entity, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { ImportTask } from "./import.entity";
 
 @Entity()
@@ -11,6 +11,7 @@ export class ImportReport<D = any> {
     public createdAt: number;
 
     @OneToOne(() => ImportTask, { onDelete: "CASCADE", nullable: false })
+    @JoinColumn()
     public task: ImportTask;
 
     @Column({ type: "json" })

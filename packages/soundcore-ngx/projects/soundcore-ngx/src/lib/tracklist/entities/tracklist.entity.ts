@@ -1,7 +1,7 @@
 import { apiResponse, ApiResponse, Logger, Page, Pageable, PlaylistItem, SCSDKTracklist, SCSDKTracklistService, Song, TracklistType } from "@soundcore/sdk";
 import { BehaviorSubject, map, Observable, of, switchMap } from "rxjs";
+import { SCNGXBaseDatasource } from "../../scroll/entities/base-datasource.entity";
 import { Queue } from "./queue.entity";
-import { SCNGXBaseDatasource } from "../../scroll/entities/datasource.entity";
 
 export class SCNGXTracklist<C = any> extends SCNGXBaseDatasource<PlaylistItem> {
     private readonly logger = new Logger(SCNGXTracklist.name);

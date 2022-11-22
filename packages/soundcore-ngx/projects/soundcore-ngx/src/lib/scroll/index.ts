@@ -1,4 +1,6 @@
 
 export { SCNGXScrollModule } from "./scroll.module";
-export { SCNGXBaseDatasource, SCNGXDatasource, AdapterAppendOptions, AdapterPrependOptions } from "./entities/datasource.entity";
+export * from "./entities/base-datasource.entity";
+export { SCNGXDatasource } from "./entities/datasource.entity";
+export { SCNGXOfflineDatasource } from "./entities/offline-datasource.entity";
 export { SCNGXScrollWrapperComponent } from "./components/scroll-wrapper.component";

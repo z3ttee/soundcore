@@ -11,11 +11,13 @@ import { Song } from "../../song/entities/song.entity";
 import { SongService } from "../../song/services/song.service";
 import Database from "../../utils/database/database-worker-client";
 import MeiliClient from "../../utils/database/meilisearch-worker-client";
-import { SpotifyClient } from "../clients/spotify.client";
 import { ImportTask, ImportTaskStatus, ImportTaskType } from "../entities/import.entity";
-import { SpotifySong, SpotifyTrackList } from "../entities/spotify-song.entity";
-import { ImportSpotifyResult } from "../results/import-spotify-result";
+import { SpotifySong, SpotifyTrackList } from "../clients/spotify/spotify-entities";
 import { ImportService } from "../services/import.service";
+import { SpotifyClient } from "../clients/spotify/spotify.client";
+import { FailedReason, FailedSpotifyImport, ImportSpotifyReport, ImportSpotifyResult, ImportSpotifyStats, SpotifyImport } from "../entities/spotify-import.entity";
+import { ImportReport } from "../entities/import-report.entity";
+import { ImportReportService } from "../services/import-report.service";
 
 export default async function (job: WorkerJobRef<ImportTask>): Promise<any> {
     const taskType = job.payload.type;
@@ -57,16 +59,18 @@ async function importSpotifyPlaylist(job: WorkerJobRef<ImportTask>): Promise<Imp
             const playlistRepo = datasource.getRepository(Playlist);
             const song2playlistRepo = datasource.getRepository(PlaylistItem);
             const importRepo = datasource.getRepository(ImportTask);
+            const reportRepo = datasource.getRepository(ImportReport);
 
             // Instantiate services
             const songService = new SongService(songRepo, eventEmitter, new MeiliSongService(meilisearch));
             const playlistService = new PlaylistService(playlistRepo, song2playlistRepo, eventEmitter, meiliPlaylistClient);
             const importService = new ImportService(importRepo);
+            const reportService = new ImportReportService(reportRepo);
             
             // Destructure job object into payload
             // and make variables of most used data
             const { payload } = job;
-            const task = payload;
+            const task = payload as SpotifyImport;
             const user = payload.user;
             const baseUrl = task.baseUrl;
         
@@ -79,16 +83,15 @@ async function importSpotifyPlaylist(job: WorkerJobRef<ImportTask>): Promise<Imp
         
                 // Array of songs that were extracted from the spotify playlist
                 const extractedSongs: Song[] = [];
-                const notExtractedSpotifySongs: SpotifySong[] = [];
+                const notExtractedSpotifySongs: FailedSpotifyImport[] = [];
                 
                 // Used to track how many total songs are in the playlist on spotify
                 let totalSpotifyTracks: number = 0;
         
                 let nextUrl: string = undefined;
                 while(true) {
+                    // Array of songs that were found in spotify playlist
                     const availableSpotifySongs: Map<string, SpotifySong> = new Map();
-                    // Array of songs that were also found on soundcore
-                    const foundSpotifySongs: SpotifySong[] = [];
 
                     // Fetch tracklist from spotify api
                     const tracklist: SpotifyTrackList = await client.findSpotifyPlaylistTracks(playlistId, nextUrl).then((val) => val).catch((error: Error) => {
@@ -134,9 +137,14 @@ async function importSpotifyPlaylist(job: WorkerJobRef<ImportTask>): Promise<Imp
                     }, new Map<string, boolean>());
 
                     // Filter which spotifySongs were not found
-                    const notFoundSpotifySongs = Array.from(availableSpotifySongs.values()).filter((spotifySong) => {
-                        return foundSongsMappedToKey.has(getSpotifySongKey(spotifySong));
-                    });
+                    const notFoundSpotifySongs: FailedSpotifyImport[] = Array.from(availableSpotifySongs.values()).filter((spotifySong) => {
+                        return !foundSongsMappedToKey.has(getSpotifySongKey(spotifySong));
+                    }).map((song) => ({
+                        title: song.name,
+                        album: song.album?.name,
+                        artists: song.artists?.map((a) => a.name),
+                        reason: FailedReason.NOT_FOUND
+                    }));
 
                     // Push to results
                     notExtractedSpotifySongs.push(...notFoundSpotifySongs);
@@ -159,6 +167,7 @@ async function importSpotifyPlaylist(job: WorkerJobRef<ImportTask>): Promise<Imp
                 // Used to track how many of the found songs
                 // were added to the playlist
                 let totalSongsImported = 0;
+                const notImportedSongs: FailedSpotifyImport[] = [];
 
                 // Add songs to the playlist
                 return Batch.of<Song, any>(extractedSongs, 20).do(async (batch) => {
@@ -168,6 +177,12 @@ async function importSpotifyPlaylist(job: WorkerJobRef<ImportTask>): Promise<Imp
                         totalSongsImported += insertResult.identifiers.length;
                     }).catch((error: Error) => {
                         logger.error(`Failed adding songs to imported playlist: ${error.message}`, error.stack);
+                        notImportedSongs.push(...batch.map((song) => ({
+                            title: song.name,
+                            album: song.album?.name,
+                            artists: [ song.primaryArtist?.name, ...song.featuredArtists?.map((artist) => artist.name) ],
+                            reason: FailedReason.ERROR
+                        } as FailedSpotifyImport)))
                     });
 
                     return [];
@@ -175,15 +190,31 @@ async function importSpotifyPlaylist(job: WorkerJobRef<ImportTask>): Promise<Imp
                     const endedAtMs = Date.now();
                     const timeTookMs: number = endedAtMs - startedAtMs;
 
-                    const result = new ImportSpotifyResult(playlist, ImportTaskStatus.OK, [], {
+                    // Create stats for reporting
+                    const stats: ImportSpotifyStats = {
                         total: totalSpotifyTracks,
-                        importedAmount: totalSongsImported
-                    }, timeTookMs);
+                        importedAmount: totalSongsImported,
+                        timeTookMs
+                    }
 
-                    // Save import task with result
-                    task.payload = playlist;
+                    // Create result object that is returned by the worker
+                    const result = new ImportSpotifyResult(playlist, ImportTaskStatus.OK, stats);
 
-                    return importService.setTaskPayload(task).then(() => result);
+                    return reportService.createIfNotExistsForTask(task, {
+                        notImportedSongs: notExtractedSpotifySongs
+                    } as ImportSpotifyReport).catch((error: Error) => {
+                        logger.warn(`Failed creating report for import task: ${error.message}`);
+                        return null;
+                    }).then((report) => {
+                        // Update payload in database
+                        return importService.setTaskPayload(task, playlist).then(() => {
+                            // Update stats in database
+                            return importService.setTaskStats(task, stats).then(() => {
+                                // Return result created above
+                                return result;
+                            });
+                        });
+                    });
                 }).catch((error: Error) => {
                     logger.error(`Failed batch-import of songs for imported playlist: ${error.message}`);
                     throw new InternalServerErrorException("Failed adding songs to playlist");

@@ -1,5 +1,5 @@
-import { Playlist } from "../../playlist/entities/playlist.entity";
-import { User } from "../../user/entities/user.entity";
+import { Playlist } from "../../../playlist/entities/playlist.entity";
+import { User } from "../../../user/entities/user.entity";
 
 export class SpotifyClientAccessToken {
     public access_token: string;

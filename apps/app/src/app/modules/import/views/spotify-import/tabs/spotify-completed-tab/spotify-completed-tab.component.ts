@@ -1,8 +1,9 @@
 import { HttpClient } from "@angular/common/http";
 import { Component, OnDestroy, OnInit } from "@angular/core";
-import { SCNGXDatasource } from "@soundcore/ngx";
-import { ImportTask, ImportTaskStatus, ImportTaskType, SCSDKGeneralGateway } from "@soundcore/sdk";
+import { SCNGXDatasource, SCNGXDialogService } from "@soundcore/ngx";
+import { ImportTask, ImportTaskStatus, ImportTaskType, SCSDKGeneralGateway, SpotifyImport } from "@soundcore/sdk";
 import { filter, Subject, takeUntil } from "rxjs";
+import { ReportDialogComponent, ReportDialogOptions } from "src/app/modules/import/dialog/report-dialog/report-dialog.component";
 import { environment } from "src/environments/environment";
 
 @Component({
@@ -23,7 +24,8 @@ export class SpotifyCompletedTabComponent implements OnInit, OnDestroy {
 
     constructor(
         private readonly httpClient: HttpClient,
-        private readonly gateway: SCSDKGeneralGateway
+        private readonly gateway: SCSDKGeneralGateway,
+        private readonly dialog: SCNGXDialogService
     ) {}
 
     public ngOnInit(): void {
@@ -47,5 +49,12 @@ export class SpotifyCompletedTabComponent implements OnInit, OnDestroy {
         this._destroy.complete();
     }
 
+    public openReportDialog(task: SpotifyImport) {
+        console.log(task);
+        
+        this.dialog.open<ReportDialogComponent, ReportDialogOptions, any>(ReportDialogComponent, { data: {
+            data: task
+        }});
+    }
 
 }

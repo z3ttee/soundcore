@@ -3,7 +3,7 @@ import { NgModule } from "@angular/core";
 import { MatInputModule } from "@angular/material/input";
 import { RouterModule, Routes } from "@angular/router";
 import { FaIconLibrary, FontAwesomeModule } from "@fortawesome/angular-fontawesome";
-import { SCNGXArtworkModule, SCNGXButtonModule, SCNGXLabelModule, SCNGXScrollModule, SCNGXUiRowModule, SCNGXUiTitleModule } from "@soundcore/ngx";
+import { SCNGXArtworkModule, SCNGXButtonModule, SCNGXDialogModule, SCNGXLabelModule, SCNGXScrollModule, SCNGXUiRowModule, SCNGXUiTitleModule } from "@soundcore/ngx";
 import { SCSDKGatewayModule, SCSDKImportModule } from "@soundcore/sdk";
 import { SCNGXTabsModule } from "src/app/components/navigation-tabs";
 import { AppImportSpotifyCreateDialogModule } from "src/app/dialogs/import-spotify-create-dialog/import-spotify-create-dialog.module";
@@ -14,6 +14,8 @@ import { SpotifyCompletedTabComponent } from "./views/spotify-import/tabs/spotif
 import { SpotifyFailedTabComponent } from "./views/spotify-import/tabs/spotify-failed-tab/spotify-failed-tab.component";
 import { SpotifyPendingTabComponent } from "./views/spotify-import/tabs/spotify-pending-tab/spotify-pending-tab.component";
 import { faSpotify } from '@fortawesome/free-brands-svg-icons';
+import { ReportDialogComponent } from "./dialog/report-dialog/report-dialog.component";
+import { FailedReasonPipe } from "./pipes/failed-reason.pipe";
 
 const routes: Routes = [
     { path: "spotify", component: SpotifyImportView, children: [
@@ -28,12 +30,15 @@ const routes: Routes = [
     declarations: [
         SpotifyImportView,
         TaskStatusPipe,
+        FailedReasonPipe,
 
         SpotifyPendingTabComponent,
         SpotifyCompletedTabComponent,
         SpotifyFailedTabComponent,
 
-        SpotifyImportItemComponent
+        SpotifyImportItemComponent,
+
+        ReportDialogComponent
     ],
     imports: [
         CommonModule,
@@ -49,6 +54,7 @@ const routes: Routes = [
         SCNGXScrollModule,
         SCNGXTabsModule,
         SCNGXArtworkModule,
+        SCNGXDialogModule,
 
         SCSDKGatewayModule,
 

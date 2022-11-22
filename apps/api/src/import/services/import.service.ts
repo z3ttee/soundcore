@@ -34,7 +34,7 @@ export class ImportService {
             .values(task)
             .execute().then((insertResult) => {
                 return this.repository.createQueryBuilder("task")
-                    .leftJoin("task.user", "user").addSelect(["user.id", "user.username"])
+                    .leftJoin("task.user", "user").addSelect(["user.id", "user.name"])
                     .whereInIds(insertResult.identifiers)
                     .getOne();
             });
@@ -49,6 +49,7 @@ export class ImportService {
     public async findByStatusOfUser(userId: string, status: ImportTaskStatus[], type: ImportTaskType, pageable: Pageable): Promise<Page<ImportTask>> {
         return this.repository.createQueryBuilder("task")
             .leftJoin("task.user", "user")
+            .leftJoin("task.report", "report").addSelect(["report.id"])
             .offset(pageable.offset)
             .limit(pageable.limit)
             .where("user.id = :userId AND task.status IN (:status) AND task.type = :type", { userId, status, type })
@@ -57,10 +58,32 @@ export class ImportService {
             })
     }
 
-    public async setTaskPayload<T = any>(task: ImportTask<T>) {
+    /**
+     * Set the payload of a task.
+     * @param task Task to update
+     * @param payload Payload to set
+     * @returns Updated import task
+     */
+    public async setTaskPayload(task: ImportTask, payload: any) {
         return this.repository.update(task.id, {
-            payload: task.payload as any
+            payload: payload
         }).then(() => {
+            task.payload = payload;
+            return task;
+        });
+    }
+
+    /**
+     * Set the stats of a task.
+     * @param task Task to update
+     * @param stats Stats to set
+     * @returns Updated import task
+     */
+     public async setTaskStats(task: ImportTask, stats: any) {
+        return this.repository.update(task.id, {
+            stats: stats
+        }).then(() => {
+            task.stats = stats;
             return task;
         });
     }

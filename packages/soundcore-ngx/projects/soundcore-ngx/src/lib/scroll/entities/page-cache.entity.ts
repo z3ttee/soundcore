@@ -35,8 +35,15 @@ export class PageCache<T = any> {
         /**
          * The utilized size of each page.
          */
-        public readonly pageSize: number
-    ) {}
+        public readonly pageSize: number,
+
+        /**
+         * Initialize the cache with a dataset
+         */
+        items?: T[]
+    ) {
+        this.setPagesFromDataset(items ?? []);
+    }
 
     /**
      * Set the contents of a page in the cache.
@@ -45,6 +52,16 @@ export class PageCache<T = any> {
      * @param contents Elements of the page
      */
     public async setPage(pageIndex: number, contents: T[]) {
+        this.setPageSync(pageIndex, contents)
+    }
+
+    /**
+     * Set the contents of a page in the cache.
+     * This will register the page in the cache.
+     * @param pageIndex Index of the page
+     * @param contents Elements of the page
+     */
+    public setPageSync(pageIndex: number, contents: T[]) {
         const start = Date.now();
         const startIndex = pageIndex * this.pageSize;
 
@@ -75,9 +92,11 @@ export class PageCache<T = any> {
      */
     public async getPage(pageIndex: number): Promise<T[]> {
         const start = Date.now();
-        const rawItems =this.getPageItems(pageIndex);
+        const rawItems = this.getPageItems(pageIndex);
         const items = rawItems.map((item) => item.data);
         const end = Date.now();
+
+        console.log("raw page: ", rawItems);
 
         console.log(`Returned cached page. Took ${end-start}ms. Size: ${items.length}`);
         return items;
@@ -281,10 +300,39 @@ export class PageCache<T = any> {
      * @returns CacheItem<T>[]
      */
     private getPageItems(pageIndex: number): CacheItem<T>[] {
+        console.log("checking has page");
         if(!this.hasPage(pageIndex)) return [];
 
+
         const startIndex = pageIndex * this.pageSize;
+        console.log("startIndex: ", startIndex);
+
         return this._items.slice(startIndex, startIndex + this.pageSize - 1);
+    }
+
+    /**
+     * Initialize this cache with a dataset
+     * @param dataset List of items
+     */
+    private setPagesFromDataset(dataset: T[]) {
+        if(dataset.length <= 0) return;
+        
+        const start = Date.now();
+        const pages = Math.ceil(dataset.length / this.pageSize);
+
+        console.log("pages: ", pages);
+
+        for(let pageIndex = 0; pageIndex < pages; pageIndex++) {
+            const startIndex = pageIndex * this.pageSize;
+            const endIndex = startIndex + (this.pageSize - 1);
+
+            const contents = dataset.slice(startIndex, endIndex);
+            this.setPageSync(pageIndex, contents);
+            this.registerPage(pageIndex);
+        }
+
+        const end = Date.now();
+        console.log(`Set cached page from dataset. Took ${end-start}ms.`);
     }
 
 }
