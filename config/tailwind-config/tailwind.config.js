@@ -26,9 +26,9 @@ module.exports = {
           dark: "#B94848"
         },
         warn: {
-          light: "#FBC06E",
-          DEFAULT: "#f0ad4e",
-          dark: "#DE9939"
+          light: "#ff8243",
+          DEFAULT: "#cc6836",
+          dark: "#994e28"
         },
         success: {
           light: "#66A55B",
@@ -50,6 +50,7 @@ module.exports = {
       }),
       padding: ({ theme }) => ({
         row: theme("spacing.6"),
+        bottom: 140
       }),
       gap: theme => ({
         row: theme("spacing.6")

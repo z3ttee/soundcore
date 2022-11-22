@@ -1,22 +1,14 @@
-import { IsNotEmpty, IsOptional, IsUrl, Length } from "class-validator";
+import { IsNotEmpty, IsNumber, IsOptional, IsUrl, Length } from "class-validator";
+import { PlaylistPrivacy } from "../../playlist/enums/playlist-privacy.enum";
 
 export class CreateImportDTO {
 
     @IsNotEmpty()
-    @IsUrl()
+    @Length(3, 254)
     public url: string;
 
     @IsOptional()
-    public mountId?: string;
-
-    @IsOptional()
-    @Length(3, 254)
-    public title?: string;
-
-    @IsOptional()
-    public artists?: string[];
-
-    @IsOptional()
-    public albums?: string[];
+    @IsNumber()
+    public privacy: PlaylistPrivacy;
 
 }

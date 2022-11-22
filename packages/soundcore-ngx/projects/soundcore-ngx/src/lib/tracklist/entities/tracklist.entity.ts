@@ -1,8 +1,7 @@
 import { apiResponse, ApiResponse, Logger, Page, Pageable, PlaylistItem, SCSDKTracklist, SCSDKTracklistService, Song, TracklistType } from "@soundcore/sdk";
 import { BehaviorSubject, map, Observable, of, switchMap } from "rxjs";
+import { SCNGXBaseDatasource } from "../../scroll/entities/base-datasource.entity";
 import { Queue } from "./queue.entity";
-import { SCNGXBaseDatasource } from "../../scroll/entities/datasource.entity";
-import { DatasourceItem } from "../../scroll/entities/datasource-item.entity";
 
 export class SCNGXTracklist<C = any> extends SCNGXBaseDatasource<PlaylistItem> {
     private readonly logger = new Logger(SCNGXTracklist.name);
@@ -53,7 +52,7 @@ export class SCNGXTracklist<C = any> extends SCNGXBaseDatasource<PlaylistItem> {
         }));
     }
 
-    public getItemByIndex(index: number): Observable<DatasourceItem<PlaylistItem>> {
+    public getItemByIndex(index: number): Observable<PlaylistItem> {
         return new Observable((subscriber) => {
             // Make index min. 0
             const startIndex = Math.max(index, 0);
@@ -64,14 +63,17 @@ export class SCNGXTracklist<C = any> extends SCNGXBaseDatasource<PlaylistItem> {
 
             // Check if the page is already cached
             if(this.isCached(startPage)) {
-                const page = this.getCachedPage(startPage);
-
-                subscriber.next(page?.[indexInPage]);
-                subscriber.complete();
+                this.getCachedPage(startPage).then((items) => {
+                    subscriber.next(items?.[indexInPage]);
+                }).catch(() => {
+                    subscriber.next(null);
+                }).finally(() => {
+                    subscriber.complete();
+                });                
             } else {
                 // Directly calling the vscroll api. As we inherit from SCNGXDatasource, we do not
                 // bypass internal caching etc.
-                const request = this.get(index, 1, null) as Promise<DatasourceItem<PlaylistItem>[]>;
+                const request = this.get(index, 1, null) as Promise<PlaylistItem[]>;
 
                 // Hook to request results
                 request.then((result) => {
@@ -178,7 +180,10 @@ export class SCNGXTracklist<C = any> extends SCNGXBaseDatasource<PlaylistItem> {
         if(typeof item === "undefined" || item == null) return of(null);
 
         return this.getItemByIndex(item).pipe(map((datasourceitem) => {
-            return datasourceitem.data.song ?? datasourceitem.data as unknown as Song;
+
+            console.log(datasourceitem);
+
+            return datasourceitem.song ?? datasourceitem as unknown as Song;
         }));
     }
 

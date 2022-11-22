@@ -1,14 +1,14 @@
 import { Inject, Injectable } from "@angular/core";
 import { Observable, Subject, takeUntil } from "rxjs";
 import { SCDKOptions, SCDK_OPTIONS } from "../../scdk.module";
-import { SCDKAuthenticatedGateway } from "../../utils/gateway/gateway";
 import { Notification } from "../entities/notification.entity";
 import { SSOService } from "@soundcore/sso";
+import { SCSDKAuthenticatedGateway } from "../../gateway/gateways/gateway";
 
 export const NOTIFICATION_EVENT_PUSH = "notification:push";
 
 @Injectable()
-export class SCDKNotificationGateway extends SCDKAuthenticatedGateway {
+export class SCDKNotificationGateway extends SCSDKAuthenticatedGateway {
 
     private _destroy: Subject<void> = new Subject();
 
@@ -22,7 +22,7 @@ export class SCDKNotificationGateway extends SCDKAuthenticatedGateway {
         super(new URL(`${options.api_base_uri}/notifications`), ssoService);
     }
 
-    protected init(): void {
+    protected registerEvents(): void {
         this.socket.on(NOTIFICATION_EVENT_PUSH, (notification: Notification) => this._notificationReceivedSubject.next(notification));
     }
 

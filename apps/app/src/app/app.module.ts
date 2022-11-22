@@ -4,12 +4,14 @@ import { BrowserModule } from '@angular/platform-browser';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { SCDKModule } from '@soundcore/sdk';
+import { SCDKModule, SCSDKGatewayModule, SCSDKImportModule } from '@soundcore/sdk';
 import { environment } from 'src/environments/environment';
 import { SCNGXModule, SCNGXDialogModule } from '@soundcore/ngx';
 import { SCCDKScreenModule } from '@soundcore/cdk';
 import { HttpClientModule } from '@angular/common/http';
 import { SSOModule } from "@soundcore/sso";
+import { FaIconLibrary, FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { faSpotify } from '@fortawesome/free-brands-svg-icons';
 
 @NgModule({
   declarations: [
@@ -34,7 +36,6 @@ import { SSOModule } from "@soundcore/sso";
         mod: environment.mod_role
       }
     }),
-    SCNGXDialogModule,
     SCDKModule.forRoot({
       api_base_uri: environment.api_base_uri
     }),
@@ -57,4 +58,4 @@ import { SSOModule } from "@soundcore/sso";
   providers: [],
   bootstrap: [AppComponent]
 })
-export class AppModule { }
+export class AppModule {}

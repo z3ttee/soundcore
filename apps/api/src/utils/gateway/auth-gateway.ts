@@ -1,4 +1,4 @@
-import { ForbiddenException } from "@nestjs/common";
+import { ForbiddenException, Logger } from "@nestjs/common";
 import { OnGatewayConnection, OnGatewayDisconnect, WebSocketServer } from "@nestjs/websockets";
 import { Server, Socket } from "socket.io";
 import { OIDCUser } from "../../authentication/entities/oidc-user.entity";
@@ -12,6 +12,7 @@ export class AuthGatewayRegistry {
 
 }
 export abstract class AuthGateway implements OnGatewayConnection, OnGatewayDisconnect {
+    private readonly logger = new Logger(AuthGateway.name);
 
     @WebSocketServer()
     protected server: Server;
@@ -40,7 +41,7 @@ export abstract class AuthGateway implements OnGatewayConnection, OnGatewayDisco
     ) {}
     
     public handleConnection(socket: Socket) {
-        const tokenValue = socket.handshake?.headers?.authorization?.slice("Bearer ".length);
+        const tokenValue = socket.handshake.auth["token"];
 
         this.oidcService.verifyAccessToken(tokenValue).then(async (token) => {
             const roles = token?.["realm_access"]?.["roles"] || [];
@@ -58,7 +59,7 @@ export abstract class AuthGateway implements OnGatewayConnection, OnGatewayDisco
             socket.disconnect();
 
             if(!(error instanceof ForbiddenException)) {
-                console.error(error)
+                this.logger.warn(`Blocked unauthenticated socket connection: ${error.message}`);
             }
         });
     }

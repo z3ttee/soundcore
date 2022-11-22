@@ -53,7 +53,7 @@ export class PlaylistController {
 
   @Post() 
   public async createPlaylist(@Body() createPlaylistDto: CreatePlaylistDTO, @Authentication() author: User) {
-    return this.playlistService.create(createPlaylistDto, author);
+    return this.playlistService.createSafely(createPlaylistDto, author);
   }
 
   @Put(":playlistId") 

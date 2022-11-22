@@ -86,6 +86,16 @@ export class SongService extends SyncingService {
         return result;
     }
 
+    public async findByNamesAndArtistsAndAlbums(names: string[], artistNames: string[], albumNames: string[]): Promise<Song[]> {
+        return await this.repository.createQueryBuilder("song")
+            .leftJoin("song.album", "album").addSelect(["album.id", "album.slug", "album.name"])
+            .leftJoin("song.primaryArtist", "primaryArtist").addSelect(["primaryArtist.id", "primaryArtist.slug", "primaryArtist.name"])
+            .leftJoin("song.featuredArtists", "featuredArtist").addSelect(["featuredArtist.id", "featuredArtist.slug", "featuredArtist.name"])
+            .leftJoin("song.artwork", "artwork").addSelect(["artwork.id"])
+            .where("song.name IN(:names) AND album.name IN(:albumNames) AND (primaryArtist.name IN(:artistNames) OR featuredArtist.name IN(:artistNames))", { names, artistNames, albumNames })
+            .getMany();
+    }
+
     /**
      * Find a song including its artwork relation.
      * This function is especially used for finding songs in a playlist.

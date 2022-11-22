@@ -1,27 +1,46 @@
-import { Module } from '@nestjs/common';
-import { ImportService } from './import.service';
-import { ImportController } from './import.controller';
-import { BucketModule } from '../bucket/bucket.module';
-import { ArtworkModule } from '../artwork/artwork.module';
-import { ImportGateway } from './gateway/import.gateway';
-import { SpotifyService } from './spotify/spotify.service';
-import { PlaylistModule } from '../playlist/playlist.module';
-import { SongModule } from '../song/song.module';
-import { MountModule } from '../mount/mount.module';
+import path from 'node:path';
+import { Module, OnModuleInit } from '@nestjs/common';
+import { ImportService } from './services/import.service';
+import { ImportController } from './controllers/import.controller';
+import { SpotifyImportService } from './services/spotify.service';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { ImportTask } from './entities/import.entity';
+import { JanitorModule } from '../janitor/janitor.module';
+import { JanitorService } from '../janitor/services/janitor.service';
+import { WorkerQueueModule } from '@soundcore/nest-queue';
+import { ImportQueueService } from './services/import-queue.service';
+import { GatewayModule } from '../gateway/gateway.module';
+import { ImportReport } from './entities/import-report.entity';
+import { ImportReportService } from './services/import-report.service';
 
 @Module({
   controllers: [ImportController],
   providers: [
     ImportService,
-    ImportGateway,
-    SpotifyService,
+    ImportQueueService,
+    ImportReportService,
+    SpotifyImportService,
   ],
   imports: [
-    BucketModule,
-    MountModule,
-    ArtworkModule,
-    PlaylistModule,
-    SongModule
+    JanitorModule,
+    GatewayModule,
+    TypeOrmModule.forFeature([ ImportTask, ImportReport ]),
+    WorkerQueueModule.forFeature({
+      script: path.join(__dirname, "worker", "import.worker.js"),
+      concurrent: 4,
+      workerType: "thread"
+    })
   ]
 })
-export class ImportModule {}
+export class ImportModule implements OnModuleInit {
+
+  constructor(
+    private readonly janitor: JanitorService
+  ) {}
+
+  public async onModuleInit() {
+    this.janitor.clearOngoingImports();
+    this.janitor.clearOldImports();
+  }
+
+}

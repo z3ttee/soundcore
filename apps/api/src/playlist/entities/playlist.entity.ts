@@ -9,6 +9,7 @@ import { PlaylistItem } from "./playlist-item.entity";
 import { Syncable, SyncFlag } from "../../meilisearch/interfaces/syncable.interface";
 
 @Entity()
+@Index(["name", "author"], { unique: true })
 export class Playlist implements Resource, Syncable {
     public resourceType: ResourceType = "playlist";
 
@@ -27,14 +28,13 @@ export class Playlist implements Resource, Syncable {
     @Column({ nullable: true, unique: true, length: 120 })
     public slug: string;
 
-    @Index()
-    @Column({ nullable: false, name: "title" })
+    @Column({ nullable: false })
     public name: string;
 
     @Column({ nullable: true, length: 254 })
     public description: string;
 
-    @Column({ nullable: false, default: "public" })
+    @Column({ type: "smallint", nullable: false, default: 0 })
     public privacy: PlaylistPrivacy;
 
     @CreateDateColumn()

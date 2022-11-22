@@ -1,0 +1,39 @@
+<scngx-dialog title="Import Bericht">
+    
+    <div scngx-dialog-content>
+        <div class="block w-full p-4 rounded-sm bg-error bg-opacity-30 border border-error-dark" *ngIf="errorMessage">
+            <p class="text-font">{{ errorMessage }}</p>
+        </div>
+
+        <div class="flex items-center justify-start overflow-auto gap-2">
+            <span class="bg-body-light rounded-full border border-body-lighter py-2 px-4 text-xs">Benötigte Zeit: {{ task.stats.timeTookMs }}ms</span>
+            <span class="bg-body-light rounded-full border border-body-lighter py-2 px-4 text-xs">Status: {{ task.status | taskStatusPipe }}</span>
+            <span class="bg-body-light rounded-full border border-body-lighter py-2 px-4 text-xs">Importiert: {{ task.stats.importedAmount }}/{{ task.stats.total }}</span>
+        </div>
+
+        <div class="my-row">
+            <h6>Nicht importiert:</h6>
+
+            <ng-container *ngIf="datasource">
+                <div *uiScroll="let item of datasource; index as i" class="flex flex-1 items-center justify-start gap-6 p-2 my-2">
+                    <div class="flex-grow">
+                        <p class="text-sm line-clamp-1 break-words">{{ item.title }}</p>
+                        <p class="text-xs line-clamp-1 break-words">{{ item.artists?.join(", ") }}</p>
+                    </div>
+
+                    <div class="min-w-32 w-32 hidden lg:block">
+                        <p class="text-sm line-clamp-1 break-words">{{ item.album }}</p>
+                    </div>
+
+                    <div class="min-w-32 w-32">
+                        <p class="text-sm">{{ item.reason | failedReasonPipe }}</p>
+                    </div>
+                </div>
+            </ng-container>
+        </div>
+    </div>
+
+    <div scngx-dialog-footer>
+        <scngx-btn-text (click)="dialogRef.close(null)">OK</scngx-btn-text>
+    </div>
+</scngx-dialog>

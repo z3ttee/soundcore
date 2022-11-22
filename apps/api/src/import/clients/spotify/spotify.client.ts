@@ -1,17 +1,37 @@
-import { Injectable, Logger } from "@nestjs/common";
+import { Logger } from "@nestjs/common";
 import axios, { AxiosError } from "axios";
-import { User } from "../../user/entities/user.entity";
-import { SpotifyBullJob, SpotifyClientAccessToken, SpotifyPlaylist, SpotifyTrackList } from "../entities/spotify-song.entity";
+import { SpotifyClientAccessToken, SpotifyPlaylist, SpotifyTrackList } from "./spotify-entities";
 
-@Injectable()
-export class SpotifyService {
-    private logger: Logger = new Logger(SpotifyService.name)
+export class SpotifyClient {
+    private readonly logger = new Logger(SpotifyClient.name);
+
+    private static _instance: SpotifyClient;
+
+    private readonly spotifyClientId: string;
+    private readonly spotifyClientSecret: string;
+    private readonly spotifyRedirectUri: string;
+
+    private readonly hasClientConfig: boolean;
 
     private token: SpotifyClientAccessToken;
     private tokenExpiresAt: number;
 
-    constructor(
-    ) {}
+    public static getInstance(): SpotifyClient {
+        if(!this._instance) this._instance = new SpotifyClient();
+        return this._instance;
+    }
+
+    constructor() {
+        this.spotifyClientId = process.env.SPOTIFY_CLIENT_ID;
+        this.spotifyClientSecret = process.env.SPOTIFY_CLIENT_SECRET;
+        this.spotifyRedirectUri = process.env.SPOTIFY_REDIRECT_URI;
+
+        this.hasClientConfig = !!this.spotifyClientId && !!this.spotifyClientSecret && !!this.spotifyRedirectUri;
+    }
+
+    public get isEnabled(): boolean {
+        return this.hasClientConfig;
+    }
 
     /**
      * Get the access token of the current client.
@@ -19,7 +39,7 @@ export class SpotifyService {
      * is fetched automatically.
      * @returns SpotifyClientAccessToken
      */
-    public async authorizeClient(): Promise<SpotifyClientAccessToken> {
+     public async authorizeClient(): Promise<SpotifyClientAccessToken> {
         // Check if token is still valid.
         if(this.isTokenValid()) {
             this.logger.debug("Spotify Client token still valid. Using it...")
@@ -49,7 +69,7 @@ export class SpotifyService {
         })
     }
 
-    public async findSpotifyPlaylistById(playlistId: string, user: User): Promise<SpotifyPlaylist> {
+    public async findSpotifyPlaylistById(playlistId: string): Promise<SpotifyPlaylist> {
         return this.authorizeClient().then((token) => {
             return axios.get(`https://api.spotify.com/v1/playlists/${playlistId}`, {
                 headers: {
@@ -68,8 +88,7 @@ export class SpotifyService {
 
                 if(data.images?.[0]) playlist.images = [ data.images[0] ];
 
-                // Add to queue
-                return null;
+                return playlist;
             })
         }).catch((error: Error) => {
             this.logger.error(error);

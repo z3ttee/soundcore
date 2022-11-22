@@ -8,6 +8,7 @@ import { SyncFlag } from '../meilisearch/interfaces/syncable.interface';
 import { MeiliPlaylistService } from '../meilisearch/services/meili-playlist.service';
 import { Song } from '../song/entities/song.entity';
 import { User } from '../user/entities/user.entity';
+import { CreateResult } from '../utils/results/creation.result';
 import { AddSongDTO } from './dtos/add-song.dto';
 import { CreatePlaylistDTO } from './dtos/create-playlist.dto';
 import { UpdatePlaylistDTO } from './dtos/update-playlist.dto';
@@ -20,10 +21,10 @@ import { PlaylistPrivacy } from './enums/playlist-privacy.enum';
 export class PlaylistService {
     
     constructor(
-        private readonly meiliClient: MeiliPlaylistService,
-        private readonly emitter: EventEmitter2,
         @InjectRepository(Playlist) private playlistRepository: Repository<Playlist>,
-        @InjectRepository(PlaylistItem)  private song2playlistRepository: Repository<PlaylistItem>
+        @InjectRepository(PlaylistItem)  private song2playlistRepository: Repository<PlaylistItem>,
+        private readonly emitter: EventEmitter2,
+        private readonly meiliClient: MeiliPlaylistService,
     ) {}
 
     /**
@@ -200,38 +201,52 @@ export class PlaylistService {
         return Page.of(result, result.length, pageable.offset);
     }
 
-    public async existsByTitleInUser(title: string, userId: string, playlistId?: string): Promise<boolean> {
-        if(playlistId) return !! (await this.playlistRepository.findOne({ where: { name: title, author: { id: userId }, id: Not(playlistId)}}))
-        return !! (await this.playlistRepository.findOne({ where: { name: title, author: { id: userId }}}))
+    /**
+     * Check if the user already has a playlist with a specific name.
+     * You can define a playlistId to exclude. The intentional use case is to check for
+     * other playlists but not the current one which will be updated.
+     * @param name Playlist's name 
+     * @param userId Author's id
+     * @param playlistId Playlist to exclude from lookup
+     * @returns True or False
+     */
+    public async existsByNameAndUser(name: string, userId: string, playlistId?: string): Promise<boolean> {
+        if(playlistId) return !! (await this.playlistRepository.findOne({ where: { name: name, author: { id: userId }, id: Not(playlistId)}, select: ["id"]}))
+        return !!(await this.playlistRepository.findOne({ where: { name: name, author: { id: userId }}, select: ["id"]}))
+    }
+
+    public async createSafely(createPlaylistDto: CreatePlaylistDTO, authentication: User): Promise<Playlist> {
+        if(await this.existsByNameAndUser(createPlaylistDto.title, authentication.id)) throw new BadRequestException("Playlist already exists.");
+        return this.createIfNotExists(createPlaylistDto, authentication);
     }
 
     /**
-     * Create new playlist. This fails with 
+     * Create new playlist if it does not exist
      * @param createPlaylistDto Playlist metadata
-     * @param author Author entity (User)
-     * @throws BadRequestException if a playlist by its title already exists in user scope.
+     * @param authentication Author entity (User)
      * @returns Playlist
      */
-    public async create(createPlaylistDto: CreatePlaylistDTO, authentication: User): Promise<Playlist> {
-        if(await this.existsByTitleInUser(createPlaylistDto.title, authentication.id)) throw new BadRequestException("Playlist already exists.");
-
+    public async createIfNotExists(createPlaylistDto: CreatePlaylistDTO, authentication: User): Promise<Playlist> {
         const playlist = new Playlist();
         playlist.author = authentication;
         playlist.name = createPlaylistDto.title;
         playlist.description = createPlaylistDto.description;
         playlist.privacy = createPlaylistDto.privacy;
 
-        return this.playlistRepository.createQueryBuilder().insert()
+        return this.playlistRepository.createQueryBuilder()
+            .insert()
             .values(playlist)
-            .orIgnore()
-            .execute().then(async (result) => {
-                const id = result.identifiers?.[0]?.id;
-                if(result.identifiers.length > 0) {
-                    const pl = await this.findById(id);
-                    this.emitter.emit(EVENT_PLAYLISTS_CHANGED, [ pl ])
-                    return pl;
-                };
-                throw new BadRequestException("Did not create playlist");
+            .returning(["id"])
+            .orUpdate(["name"], ["name"], { skipUpdateIfNoValuesChanged: false })
+            .execute().then((insertResult) => {              
+                return this.playlistRepository.createQueryBuilder("playlist")
+                    .leftJoin("playlist.artwork", "artwork").addSelect(["artwork.id"])
+                    .leftJoin("playlist.author", "author").addSelect(["author.id", "author.slug", "author.name"])
+                    .whereInIds(insertResult.raw)
+                    .getOne().then((result) => {
+                        this.emitter.emit(EVENT_PLAYLISTS_CHANGED, [ result ]);
+                        return result;
+                    });
             });
     }
 
@@ -240,7 +255,7 @@ export class PlaylistService {
 
         if(!playlist) throw new NotFoundException("Playlist not found.")
         if(!await this.hasUserAccessToPlaylist(playlistId, authentication) || !await this.canEditPlaylist(playlist, authentication)) throw new ForbiddenException("Not allowed to edit this playlist.")
-        if(await this.existsByTitleInUser(updatePlaylistDto.title, authentication.id, playlistId)) throw new BadRequestException("Playlist already exists.");
+        if(await this.existsByNameAndUser(updatePlaylistDto.title, authentication.id, playlistId)) throw new BadRequestException("Playlist already exists.");
         
         playlist.name = updatePlaylistDto.title || playlist.name;
         playlist.privacy = updatePlaylistDto.privacy || playlist.privacy;
@@ -294,6 +309,18 @@ export class PlaylistService {
         return this.song2playlistRepository.save(item).then(() => {
             return new PlaylistItemAddResult(targetId, false);
         })
+    }
+
+    public async setSongs(playlistId: string, songs: Song[], authentication: User) {
+        return this.song2playlistRepository.createQueryBuilder()
+            .insert()
+            .values(songs.map((song) => ({
+                addedBy: authentication,
+                playlist: { id: playlistId },
+                song: song
+            })))
+            .orIgnore()
+            .execute();
     }
 
     /**

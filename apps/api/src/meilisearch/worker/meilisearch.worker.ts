@@ -105,7 +105,7 @@ async function syncArtists(datasource: DataSource, client: MeiliSearch, resource
 
 async function syncPlaylists(datasource: DataSource, client: MeiliSearch, resources: Playlist[]): Promise<any> {
     const service = new MeiliPlaylistService(client);
-    const playlistService = new PlaylistService(service, new EventEmitter2(), datasource.getRepository(Playlist), datasource.getRepository(PlaylistItem));
+    const playlistService = new PlaylistService(datasource.getRepository(Playlist), datasource.getRepository(PlaylistItem), new EventEmitter2(), service);
     
     return Batch.of<Playlist>(resources).do((batch) => {
         return service.setPlaylists(batch).then((task) => {

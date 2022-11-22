@@ -1,5 +1,5 @@
 import { Component, Input } from "@angular/core";
-import { SCNGXDatasource } from "../entities/datasource.entity";
+import { SCNGXBaseDatasource } from "../entities/base-datasource.entity";
 
 @Component({
     selector: "scngx-scroll",
@@ -8,6 +8,6 @@ import { SCNGXDatasource } from "../entities/datasource.entity";
 export class SCNGXScrollWrapperComponent {
 
     @Input()
-    public datasource: SCNGXDatasource<any>;
+    public datasource: SCNGXBaseDatasource<any>;
 
 }

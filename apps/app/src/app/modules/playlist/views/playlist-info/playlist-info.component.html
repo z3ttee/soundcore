@@ -35,7 +35,7 @@
 
     <!-- List -->
     <ng-container list>
-        <p>Initialized?: {{ tracklist?.$initialized | async }}</p>
+        <!-- <p>Initialized?: {{ tracklist?.$initialized | async }}</p> -->
 
         <scngx-table>
             <!-- Table Head
@@ -47,8 +47,8 @@
             <!-- Table Body -->
             <ng-container tbody *ngIf="tracklist">
 
-                <div *uiScroll="let item of tracklist">
-                    <scngx-song-list-item [song]="item.data.song" [index]="item.index"></scngx-song-list-item>
+                <div *uiScroll="let item of tracklist; index as i" class="px-window">
+                    <scngx-song-list-item [song]="item.song" [index]="i"></scngx-song-list-item>
                 </div>
             </ng-container>
         </scngx-table>
@@ -56,9 +56,7 @@
 
     <!-- Page Footer -->
     <ng-container footer>
-        <div class="p-window">
-            <h6>Mehr Playlisten</h6>
-        </div>
+        <div class="pb-bottom"></div>
     </ng-container>
 
 </scngx-scroll>

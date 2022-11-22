@@ -1,0 +1,11 @@
+<div class="flex flex-1 items-center justify-start pb-2">
+    <h6 class="text-inherit flex-grow">Abgeschlossene Imports</h6>
+</div>
+
+<div *ngIf="(datasource?.$size | async) <= 0">
+    <p>Es wurden keine abgeschlossenen Imports gefunden.</p>
+</div>
+
+<div *uiScroll="let item of datasource; index as i">
+    <app-spotify-import [task]="item" (openReport)="openReportDialog(item)"></app-spotify-import>
+</div>

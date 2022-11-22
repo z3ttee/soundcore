@@ -1,0 +1,12 @@
+<div class="flex flex-1 items-center justify-start pb-2">
+    <h6 class="text-inherit flex-grow">Fehlgeschlagene Imports</h6>
+</div>
+
+<div *ngIf="(datasource?.$size | async) <= 0">
+    <p>Es wurden keine fehlgeschlagenen Imports gefunden.</p>
+</div>
+
+<div *uiScroll="let item of datasource; index as i">
+    <app-spotify-import [task]="item"></app-spotify-import>
+</div>
+

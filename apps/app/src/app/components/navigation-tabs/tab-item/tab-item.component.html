@@ -1,0 +1,9 @@
+<li 
+    class="inline-block py-3 px-8 text-sm text-center cursor-pointer rounded-sm w-full transition-all active:bg-opacity-50 active:bg-body-light select-none" 
+    [routerLink]="route" 
+    routerLinkActive="bg-body-light" 
+    [routerLinkActiveOptions]="{exact: exactRoute ?? false}"
+    [ngClass]="{'hover:bg-body-light hover:bg-opacity-70': !(isTouchDevice ?? false)}">
+
+    <ng-content></ng-content>
+</li>

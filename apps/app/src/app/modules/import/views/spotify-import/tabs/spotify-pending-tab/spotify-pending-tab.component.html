@@ -1,0 +1,14 @@
+
+<div class="flex flex-1 items-center justify-start pb-2">
+    <h6 class="text-inherit flex-grow">Laufende Imports</h6>
+    <scngx-btn (click)="openCreateImportDialog()">Import starten</scngx-btn>
+</div>
+
+<div *ngIf="(datasource?.$size | async) <= 0">
+    <p>Es wurden keine laufenden Imports gefunden.</p>
+</div>
+
+<div *uiScroll="let item of datasource; index as i">
+    <app-spotify-import [task]="item"></app-spotify-import>
+</div>
+

@@ -24,7 +24,8 @@ export * from "./lib/playlist";
 // Profile Module
 export * from "./lib/profile";
 
-
+// Import Module
+export * from "./lib/import";
 
 
 // Utils
@@ -129,11 +130,6 @@ export * from "./lib/utils/structures/resource-queue-map";
 export * from "./lib/notification/notification.module";
 export * from "./lib/notification/services/notification.service";
 export * from "./lib/notification/entities/notification.entity";
-
-/**
- * Gateway SDK
- */
-export * from "./lib/utils/gateway/gateway";
 
 /**
  * Settings SDK

@@ -34,3 +34,6 @@ export const EVENT_METADATA_CREATED = "metadata-created-event"
 
 // TypeORM
 export const TYPEORM_ENTITY_GLOB = path.join(process.cwd(), "**/*.entity{ .ts,.js}");
+
+// Gateway events
+export const GATEWAY_EVENT_IMPORTTASK_UPDATE = "gateway-importtask-update";
