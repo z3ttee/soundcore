@@ -16,8 +16,15 @@ import { Logger } from '../../logging';
 @Injectable()
 export class SCSDKPlaylistService {
   private readonly logger = new Logger("PlaylistService");
+
+  /**
+   * Subject used to control the emitted data by the $library observable.
+   */
   private readonly _librarySubj: BehaviorSubject<Playlist[]> = new BehaviorSubject([]);
 
+  /**
+   * Observable that emits the currently available playlists of a user.
+   */
   public readonly $library: Observable<Playlist[]> = this._librarySubj.asObservable();
 
   constructor(
