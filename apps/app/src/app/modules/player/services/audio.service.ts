@@ -13,7 +13,7 @@ export class AppAudioService {
     private readonly _onNextSubject: Subject<void> = new Subject();
     public readonly $onNext: Observable<void> = this._onNextSubject.asObservable();
 
-    private readonly _isPausedSubject: Subject<boolean> = new Subject();
+    private readonly _isPausedSubject: BehaviorSubject<boolean> = new BehaviorSubject(this._audioElement.paused);
     public readonly $isPaused: Observable<boolean> = this._isPausedSubject.asObservable();
 
     private readonly _currenTimeSubject: BehaviorSubject<number> = new BehaviorSubject(0);
@@ -87,6 +87,10 @@ export class AppAudioService {
 
     public seek(seconds: number) {
         this._audioElement.currentTime = seconds;
+    }
+
+    public isPaused() {
+        return this._audioElement.paused ?? true;
     }
 
     /**

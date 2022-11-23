@@ -95,7 +95,6 @@ export class AppPlayerService {
         this.updateSize();
 
         // Otherwise play immediately
-        // TODO: This conflicts when in shuffle mode (When queue is not empty but shuffle is on, it may not pick the 0 index)
         if(force || this.isIdle()) {
             this.history.resetPointer();
             this.next().subscribe();
@@ -109,8 +108,13 @@ export class AppPlayerService {
      * @param force If true, will skip currently playing item and starts playing the tracklist
      */
     public playTracklist(tracklist: SCNGXTracklist, force: boolean = true) {
-        if(this.isPlayingSrcById(tracklist.id)) {
-            this.audio.pause();
+        if(this.isPlayingSrcById(tracklist.assocResId)) {
+            if(this.audio.isPaused()) {
+                this.audio.play();
+            } else {
+                this.audio.pause();
+            }
+            return;
         }
 
         // "Enqueue" tracklist
@@ -127,7 +131,12 @@ export class AppPlayerService {
     public isPlayingSrcById(id: string) {
         const current = this._currentItem.getValue();
         if(typeof current === "undefined" || current == null) return false;
-        return !!current.tracklist ? current.tracklist?.assocResId == id : current.song?.id;
+
+        if(current.tracklist) {
+            return current.tracklist?.assocResId == id;
+        } else {
+            return current.song?.id == id;
+        }
     }
 
     /**
