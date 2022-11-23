@@ -1,62 +1,69 @@
-<app-error404 *ngIf="showError404" [title]="'Playlist nicht gefunden'"></app-error404>
+<ng-container *ngIf="($props | async) as props">
+    <app-error404 *ngIf="showError404" [title]="'Playlist nicht gefunden'"></app-error404>
 
-<scngx-scroll class="w-full h-full" #scroller>
+    <scngx-scroll class="w-full h-full" #scroller>
 
-    <!-- Page Header -->
-    <ng-container header>
-        <app-list-view [resource]="playlist" [title]="playlist?.name" [isLoading]="isLoadingPlaylist" [artwork]="playlist?.artwork">
-            <ng-container scngx-stats>
-                <li class="text-font-secondary">
-                    <span *ngIf="playlist?.author">by <span class="hover:underline cursor-pointer" [routerLink]="['/profile', playlist?.author?.slug || playlist?.author?.id]">{{ playlist?.author?.name }}</span></span>
-                </li>
-                <li class="text-font-secondary">
-                    <span>{{ playlist?.songsCount }} {{ playlist?.songsCount != 1 ? 'Songs' : 'Song' }}</span>
-                </li>
-                <li class="text-font-secondary">
-                    <span>{{ playlist?.totalDuration | scngxSongDurationPipe }} min</span>
-                </li>
-            </ng-container>
-        
-            <ng-container scngx-controls>
-                <button (click)="forcePlay()" class="w-14 flex items-center justify-center aspect-square bg-accent transition-all will-change-transform text-body rounded-full hover:scale-105 active:scale-[97%]">
-                    <img class="w-7 h-7 text-body ml-0.5" src="assets/icons/play.svg">
-                </button>
-        
-                <button class="flex items-center p-2 rounded-full" matRipple [matRippleCentered]="true">
-                    <hero-icon [name]="'heart'" [class]="'h-7 aspect-square'"></hero-icon>
-                </button>
-        
-                <button class="flex items-center p-2 rounded-full" matRipple [matRippleCentered]="true">
-                    <hero-icon [name]="'dots-vertical'" [class]="'h-7 aspect-square'"></hero-icon>
-                </button>
-            </ng-container>
-        </app-list-view>
-    </ng-container>
+        <!-- Page Header -->
+        <ng-container header>
+            <app-list-view [resource]="props.playlist" [title]="props.playlist?.name" [isLoading]="props.loading" [artwork]="props.playlist?.artwork">
+                <ng-container scngx-stats>
+                    <li class="text-font-secondary">
+                        <span *ngIf="props.playlist?.author">by <span class="hover:underline cursor-pointer" [routerLink]="['/profile', props.playlist?.author?.slug || props.playlist?.author?.id]">{{ props.playlist?.author?.name }}</span></span>
+                    </li>
+                    <li class="text-font-secondary">
+                        <span>{{ props.playlist?.songsCount }} {{ props.playlist?.songsCount != 1 ? 'Songs' : 'Song' }}</span>
+                    </li>
+                    <li class="text-font-secondary">
+                        <span>{{ props.playlist?.totalDuration | scngxSongDurationPipe }} min</span>
+                    </li>
+                </ng-container>
+            
+                <ng-container scngx-controls>
+                    <scngx-ibtn (click)="forcePlay(props.tracklist)" size="md">
+                        <img *ngIf="!props.playing; else paused" class="w-7 h-7 text-body ml-0.5" src="assets/icons/play.svg">
+                        <ng-template #paused><img *ngIf="props.playing" class="w-7 h-7 text-body ml-0.5" src="assets/icons/pause.svg"></ng-template>
+                    </scngx-ibtn>
+            
+                    <button class="flex items-center p-2 rounded-full" matRipple [matRippleCentered]="true">
+                        <hero-icon [name]="'heart'" [class]="'h-7 aspect-square'"></hero-icon>
+                    </button>
+            
+                    <button class="flex items-center p-2 rounded-full" matRipple [matRippleCentered]="true">
+                        <hero-icon [name]="'dots-vertical'" [class]="'h-7 aspect-square'"></hero-icon>
+                    </button>
+                </ng-container>
+            </app-list-view>
+        </ng-container>
 
-    <!-- List -->
-    <ng-container list>
-        <!-- <p>Initialized?: {{ tracklist?.$initialized | async }}</p> -->
+        <!-- List -->
+        <ng-container list>
+            <!-- <p>Initialized?: {{ tracklist?.$initialized | async }}</p> -->
+            <p>Playing?: {{ props.playing }}</p>
 
-        <scngx-table>
-            <!-- Table Head
-            <ng-container thead>
-                <div>#</div>
-                <div>Titel</div>
-            </ng-container> -->
+            <scngx-table>
+                <!-- Table Head
+                <ng-container thead>
+                    <div>#</div>
+                    <div>Titel</div>
+                </ng-container> -->
 
-            <!-- Table Body -->
-            <ng-container tbody *ngIf="tracklist">
+                <!-- Table Body -->
+                <ng-container tbody *ngIf="props.tracklist">
+                    <div *uiScroll="let item of props.tracklist; index as i" class="px-window">
+                        <scngx-song-list-item 
+                            [song]="item.song" 
+                            [index]="i" 
+                            [isActive]="props.currentlyPlaying?.song?.id == item.song.id">
+                        </scngx-song-list-item>
+                    </div>
+                </ng-container>
+            </scngx-table>
+        </ng-container>
 
-                <div *uiScroll="let item of tracklist; index as i" class="px-window">
-                    <scngx-song-list-item [song]="item.song" [index]="i"></scngx-song-list-item>
-                </div>
-            </ng-container>
-        </scngx-table>
-    </ng-container>
+        <!-- Page Footer -->
+        <ng-container footer>
+            <div class="pb-bottom"></div>
+        </ng-container>
 
-    <!-- Page Footer -->
-    <ng-container footer>
-        <div class="pb-bottom"></div>
-    </ng-container>
-
-</scngx-scroll>
+    </scngx-scroll>
+</ng-container>

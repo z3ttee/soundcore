@@ -6,10 +6,12 @@ import { Error404Module } from 'src/app/shared/error404/error404.module';
 import { HeroIconModule, play, heart, dotsVertical } from 'ng-heroicon';
 import { MatRippleModule } from '@angular/material/core';
 import { ScrollingModule } from '@angular/cdk/scrolling';
-import { SCNGXScrollModule, SCNGXSkeletonModule, SCNGXSongListItemModule, SCNGXTableModule } from '@soundcore/ngx';
+import { SCNGXButtonModule, SCNGXIconBtnModule, SCNGXScrollModule, SCNGXSkeletonModule, SCNGXSongListItemModule, SCNGXTableModule } from '@soundcore/ngx';
 import { ListViewModule } from 'src/app/components/resource-views/list-view/list-view.module';
 import { VirtualScrollerModule } from '@tsalliance/ngx-virtual-scroller';
 import { SCSDKPlaylistModule } from '@soundcore/sdk';
+import { FaIconLibrary, FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { faPlay } from '@fortawesome/free-solid-svg-icons';
 
 const routes: Routes = [
   { path: ":playlistId", component: PlaylistInfoComponent }
@@ -26,6 +28,7 @@ const routes: Routes = [
     Error404Module,
     HeroIconModule.withIcons({ play, heart, dotsVertical }),
     MatRippleModule,
+    FontAwesomeModule,
 
     VirtualScrollerModule,
 
@@ -36,7 +39,13 @@ const routes: Routes = [
     SCNGXSkeletonModule,
     SCNGXSongListItemModule,
     SCNGXScrollModule,
-    SCNGXTableModule
+    SCNGXTableModule,
+    SCNGXButtonModule,
+    SCNGXIconBtnModule
   ]
 })
-export class PlaylistModule { }
+export class PlaylistModule {
+  constructor(faLibrary: FaIconLibrary) {
+    faLibrary.addIcons(faPlay)
+  }
+}

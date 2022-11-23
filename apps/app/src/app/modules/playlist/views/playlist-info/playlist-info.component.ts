@@ -1,9 +1,20 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Subject, Subscription, takeUntil } from 'rxjs';
-import { Playlist, SCSDKPlaylistService } from '@soundcore/sdk';
+import { combineLatest, map, Observable, Subject, switchMap, take, takeUntil, tap } from 'rxjs';
+import { Playlist, SCSDKPlaylistService, toFutureCompat } from '@soundcore/sdk';
 import { AppPlayerService } from 'src/app/modules/player/services/player.service';
 import { SCNGXTracklist, SCNGXTracklistBuilder } from '@soundcore/ngx';
+import { AppControlsService } from 'src/app/modules/player/services/controls.service';
+import { PlayerItem } from 'src/app/modules/player/entities/player-item.entity';
+
+interface PlaylistInfoProps {
+  playlist?: Playlist;
+  tracklist?: SCNGXTracklist;
+  currentlyPlaying?: PlayerItem;
+
+  playing?: boolean;
+  loading?: boolean;
+}
 
 @Component({
   templateUrl: './playlist-info.component.html',
@@ -13,77 +24,59 @@ export class PlaylistInfoComponent implements OnInit, OnDestroy {
 
   private _destroy: Subject<void> = new Subject();
   private _cancel: Subject<void> = new Subject();
-  private _playlistSub: Subscription;
 
   public showError404: boolean = false;
-  public isLoadingPlaylist: boolean = false;
-  public playlist: Playlist;
-
-  public items = []
-  public tracklist: SCNGXTracklist;
 
   constructor(
     private readonly playlistService: SCSDKPlaylistService,
     private readonly activatedRoute: ActivatedRoute,
     private readonly tracklistBuilder: SCNGXTracklistBuilder,
-    private readonly player: AppPlayerService
-  ) {
-    for(let i = 0; i < 100000; i++) {
-      this.items.push(i);
-    }
-  }
+    private readonly player: AppPlayerService,
+    private readonly controls: AppControlsService
+  ) {}
 
+  public readonly $props: Observable<PlaylistInfoProps> = combineLatest([
+    this.activatedRoute.paramMap.pipe(
+      takeUntil(this._destroy), 
+      map((params) => params.get("playlistId") ?? null), 
+      switchMap((playlistId) => this.playlistService.findById(playlistId).pipe(toFutureCompat())), 
+      map((future) => ({
+        ...future,
+        data: this.tracklistBuilder.forPlaylist(future.data)
+      }))),
+    this.player.$current.pipe(takeUntil(this._destroy)),
+    this.controls.$isPaused.pipe(takeUntil(this._destroy))
+  ]).pipe(
+    tap(([future]) => console.log(future)),
+    // Build props object
+    map(([future, currentItem, isPaused]) => ({
+      loading: future.loading,
+      playlist: future.data?.context,
+      currentlyPlaying: currentItem,
+      playing: !isPaused && currentItem?.tracklist?.assocResId == future.data?.assocResId,
+      tracklist: future.data
+    })),
+    tap((props) => console.log(props))
+  );
 
   public ngOnInit(): void {
     this.activatedRoute.paramMap.pipe(takeUntil(this._destroy)).subscribe((paramMap) => {
-      console.log(paramMap)
-
       // Cancel ongoing http request.
       this._cancel.next();
 
       // Reset state
-      this.isLoadingPlaylist = true;
       this.showError404 = false;
-      this.playlist = null;
-      this.tracklist = null;
-
-      // Close down previously initialized list
-      this.release();
-
-      // Trigger http request.
-      this._playlistSub = this.playlistService.findById(paramMap.get("playlistId")).subscribe((response) => {
-        // Update state
-        this.playlist = response.payload;
-
-        this.tracklist = this.tracklistBuilder.forPlaylist(this.playlist);
-
-        this.showError404 = !response.payload;
-        this.isLoadingPlaylist = false;
-      })
-    })
-
-    // Cancel ongoing http request.
-    this._cancel.pipe(takeUntil(this._destroy)).subscribe(() => {
-      this._playlistSub?.unsubscribe();
     })
   }
 
   public ngOnDestroy(): void {
-      this.release();
-
       this._destroy.next();
       this._destroy.complete();
   }
 
-  public release() {
-    // if(!this.list?.isLocked()) {
-    //   this.list?.release();
-    //   this.list = null;
-    // }
-  }
-
-  public forcePlay() {
-    this.player.playTracklist(this.tracklist, true);
+  public forcePlay(tracklist: SCNGXTracklist) {
+    if(!tracklist) return;
+    this.player.playTracklist(tracklist, true);
   }
 
 }
