@@ -12,6 +12,8 @@ export * from "./lib/table";
 // Tracklist Module
 export * from "./lib/tracklist";
 
+// Button module
+export * from "./lib/components/buttons";
 
 
 
@@ -21,16 +23,6 @@ export * from "./lib/tracklist";
 export * from "./lib/components/drawer/drawer.module";
 export * from "./lib/components/drawer/drawer.component";
 
-// Button
-export * from "./lib/components/buttons/btn/btn.module";
-export * from "./lib/components/buttons/btn/btn-base/btn.component";
-export * from "./lib/components/buttons/btn/btn-outlined/btn.component";
-export * from "./lib/components/buttons/btn/btn-text/btn.component";
-
-export * from "./lib/components/buttons/loading-btn/loading-btn.module";
-export * from "./lib/components/buttons/loading-btn/btn-base/btn.component";
-export * from "./lib/components/buttons/loading-btn/btn-outlined/btn.component";
-export * from "./lib/components/buttons/loading-btn/btn-text/btn.component";
 
 // Dialog
 export * from "./lib/dialog/dialog.module";
