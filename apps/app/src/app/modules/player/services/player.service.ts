@@ -73,6 +73,10 @@ export class AppPlayerService {
      * Emits the current time in seconds of the audio src.
      */
     public readonly $currentTime: Observable<number> = this.audio.$currentTime;
+    /**
+     * Redirect $isPaused observable from controls service
+     */
+    public readonly $isPaused: Observable<boolean> = this.controls.$isPaused;
 
     /**
      * Get full queue size

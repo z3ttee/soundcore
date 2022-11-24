@@ -4,7 +4,7 @@ import { AlbumInfoComponent } from './views/album-info/album-info.component';
 import { RouterModule, Routes } from '@angular/router';
 import { ListViewModule } from 'src/app/components/resource-views/list-view/list-view.module';
 import { SCDKAlbumModule } from '@soundcore/sdk';
-import { SCNGXAlbumGridItemModule, SCNGXHorizontalGridModule, SCNGXScrollModule, SCNGXSongDurationPipeModule, SCNGXTableModule, SCNGXUiRowModule, SCNGXVirtualSongListModule } from '@soundcore/ngx';
+import { SCNGXAlbumGridItemModule, SCNGXHorizontalGridModule, SCNGXIconBtnModule, SCNGXScrollModule, SCNGXSongDurationPipeModule, SCNGXTableModule, SCNGXUiRowModule, SCNGXVirtualSongListModule } from '@soundcore/ngx';
 import { HeroIconModule, heart, dotsVertical } from 'ng-heroicon';
 import { MatRippleModule } from '@angular/material/core';
 import { VirtualScrollerModule } from '@tsalliance/ngx-virtual-scroller';
@@ -37,6 +37,7 @@ const routes: Routes = [
     SCNGXAlbumGridItemModule,
     SCNGXScrollModule,
     SCNGXTableModule,
+    SCNGXIconBtnModule,
 
     Error404Module
   ]

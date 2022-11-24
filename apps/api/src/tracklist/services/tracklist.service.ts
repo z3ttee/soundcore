@@ -25,7 +25,7 @@ export class TracklistService {
      * @returns Tracklist
      */
     public async findListByArtist(artistId: string, hostname: string, authentication?: User): Promise<Tracklist> {
-        const result = this.buildFindByArtistQuery(artistId, "song", null, authentication).select(["song.id"]).getManyAndCount();
+        const result = this.buildFindByArtistQuery(artistId, null, authentication).select(["song.id"]).getManyAndCount();
         const metadataUrl = `${hostname}/v1/tracklists/artist/${artistId}/meta`;
         return new Tracklist(result[1], TracklistType.ARTIST, result[0], metadataUrl);
     }
@@ -38,7 +38,7 @@ export class TracklistService {
      * @returns Page<Song>
      */
     public async findMetaByArtist(artistId: string, pageable: BasePageable, authentication?: User): Promise<Page<Song>> {
-        const baseQuery = await this.buildFindByArtistQuery(artistId, "song", pageable, authentication)
+        const baseQuery = await this.buildFindByArtistQuery(artistId, pageable, authentication)
         
         const result = await baseQuery.getRawAndEntities();
         const totalElements = await baseQuery.getCount();
@@ -165,23 +165,20 @@ export class TracklistService {
      * and findMetaByArtist(). This is a shared query to make
      * maintaining the code easier.
      * @param artistId Artist's id
-     * @param alias Song entity alias in SQL
      * @param pageable Page settings. Set null for tracklists as this is only required for metadata endpoints.
      * @param authentication 
      * @returns SelectQueryBuilder<Song>
      */
-    protected buildFindByArtistQuery(artistId: string, alias: string, pageable?: BasePageable, authentication?: User): SelectQueryBuilder<Song> {
-        const query = this.songService.buildGeneralQuery(alias, authentication)
+    protected buildFindByArtistQuery(artistId: string, pageable?: BasePageable, authentication?: User): SelectQueryBuilder<Song> {
+        const query = this.songService.buildGeneralQuery("song", authentication)
             // Get amount of streams
-            // TODO: To be optimised using selectAndMap in next TypeORM release
-            // If this has landed, this row can actually be moved to buildGeneralQuery()
-            .leftJoin('song.streams', 'streams').addSelect("SUM(IFNULL(streams.streamCount, 0)) AS streamCount")
+            .loadRelationCountAndMap('song.streamCount', 'song.streams', 'streamCount')
 
             // Order by date of release or creation in database
-            .orderBy('song.released', 'DESC')
+            .orderBy('song.releasedAt', 'DESC')
             .addOrderBy("song.createdAt", "DESC")
 
-            .where("artist.id = :artistId OR artist.slug = :artistId", { artistId })
+            .where("primaryArtist.id = :artistId OR primaryArtist.slug = :artistId", { artistId })
 
         // Add optional page settings
         if(!!pageable) {
