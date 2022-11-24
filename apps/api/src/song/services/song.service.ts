@@ -536,15 +536,9 @@ export class SongService extends SyncingService {
         
         // Fetch info if user has liked the song
         if(authentication) queryBuilder.loadRelationCountAndMap(`${alias}.liked`, `${alias}.likes`, "likes", (qb) => qb.where("likes.userId = :userId", { userId: authentication?.id }))
-        
-        // Add artwork to query
+
+        // Add basic relations used everywhere
         queryBuilder.leftJoin(`${alias}.artwork`, "artwork").addSelect(["artwork.id", "artwork.colors"]);
-
-        // Populate "available" property by checking if the 
-        // song has a file or the file has flag of 0 (OK)
-        // queryBuilder.loadRelationCountAndMap(`${alias}.available`, `${alias}.file`, "available", (qb) => qb.where("available.flag = :flag", { flag: FileFlag.OK }))
-
-        // Add artists information
         queryBuilder.leftJoin(`${alias}.primaryArtist`, "primaryArtist").addSelect(["primaryArtist.id", "primaryArtist.slug", "primaryArtist.name"])
         queryBuilder.leftJoin(`${alias}.featuredArtists`, "featuredArtist").addSelect(["featuredArtist.id", "featuredArtist.slug", "featuredArtist.name"])
 

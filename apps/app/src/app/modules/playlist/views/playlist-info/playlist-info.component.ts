@@ -1,10 +1,9 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { combineLatest, map, Observable, Subject, switchMap, take, takeUntil, tap } from 'rxjs';
+import { combineLatest, map, Observable, Subject, switchMap, takeUntil } from 'rxjs';
 import { Playlist, SCSDKPlaylistService, toFutureCompat } from '@soundcore/sdk';
 import { AppPlayerService } from 'src/app/modules/player/services/player.service';
 import { SCNGXTracklist, SCNGXTracklistBuilder } from '@soundcore/ngx';
-import { AppControlsService } from 'src/app/modules/player/services/controls.service';
 import { PlayerItem } from 'src/app/modules/player/entities/player-item.entity';
 
 interface PlaylistInfoProps {
@@ -31,8 +30,7 @@ export class PlaylistInfoComponent implements OnInit, OnDestroy {
     private readonly playlistService: SCSDKPlaylistService,
     private readonly activatedRoute: ActivatedRoute,
     private readonly tracklistBuilder: SCNGXTracklistBuilder,
-    private readonly player: AppPlayerService,
-    private readonly controls: AppControlsService
+    private readonly player: AppPlayerService
   ) {}
 
   public readonly $props: Observable<PlaylistInfoProps> = combineLatest([
@@ -45,9 +43,8 @@ export class PlaylistInfoComponent implements OnInit, OnDestroy {
         data: this.tracklistBuilder.forPlaylist(future.data)
       }))),
     this.player.$current.pipe(takeUntil(this._destroy)),
-    this.controls.$isPaused.pipe(takeUntil(this._destroy))
+    this.player.$isPaused.pipe(takeUntil(this._destroy))
   ]).pipe(
-    tap(([future]) => console.log(future)),
     // Build props object
     map(([future, currentItem, isPaused]) => ({
       loading: future.loading,
@@ -55,8 +52,7 @@ export class PlaylistInfoComponent implements OnInit, OnDestroy {
       currentlyPlaying: currentItem,
       playing: !isPaused && currentItem?.tracklist?.assocResId == future.data?.assocResId,
       tracklist: future.data
-    })),
-    tap((props) => console.log(props))
+    }))
   );
 
   public ngOnInit(): void {
