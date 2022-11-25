@@ -1,0 +1,21 @@
+:host {
+
+    .song-list-item-wrapper {
+        &:hover {
+            // Show like button on list item hover
+            .song-item-like-col {
+                opacity: 100;
+                pointer-events: all;
+            }
+
+            .list-item-play-btn {
+                opacity: 100;
+            }
+
+            .list-item-id {
+                opacity: 0;
+            }
+        }
+    }
+
+}

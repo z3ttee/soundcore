@@ -2,15 +2,12 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SCNGXSongListItemComponent } from './song-list-item.component';
 import { LottieModule } from 'ngx-lottie';
-import { SCNGXArtworkModule } from '../../images/artwork/artwork.module';
 import { MatRippleModule } from '@angular/material/core';
-import { SCNGXSongDurationPipeModule } from '../../../pipes/song-duration/song-duration.module';
-import { SCNGXAddedToPlaylistPipeModule } from '../../../pipes/added-to-playlist/added-to-playlist.module';
 import { RouterModule } from '@angular/router';
-import { SCNGXExplicitBadgeModule } from "../../badges/explicit-badge/explicit-badge.module"
-import { SCNGXTooltipModule } from '../../../ui/tooltip/tooltip.module';
-import { SCNGXSkeletonModule } from '../../skeletons/skeleton/skeleton.module';
 import { HeroIconModule, heart } from 'ng-heroicon';
+import { SCNGXAddedToPlaylistPipeModule, SCNGXArtworkModule, SCNGXExplicitBadgeModule, SCNGXIconBtnModule, SCNGXSkeletonModule, SCNGXSongDurationPipeModule, SCNGXTooltipModule } from '@soundcore/ngx';
+import { FaIconLibrary, FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { faEllipsisV, faHeart, faPause, faPlay } from '@fortawesome/free-solid-svg-icons';
 
 @NgModule({
   declarations: [
@@ -21,6 +18,7 @@ import { HeroIconModule, heart } from 'ng-heroicon';
     RouterModule,
     LottieModule,
     HeroIconModule.withIcons({ heart }),
+    FontAwesomeModule,
 
     MatRippleModule,
 
@@ -29,17 +27,15 @@ import { HeroIconModule, heart } from 'ng-heroicon';
     SCNGXSongDurationPipeModule,
     SCNGXAddedToPlaylistPipeModule,
     SCNGXTooltipModule,
-    SCNGXSkeletonModule
+    SCNGXSkeletonModule,
+    SCNGXIconBtnModule
   ],
   exports: [
     SCNGXSongListItemComponent,
-
-    SCNGXArtworkModule,
-    SCNGXExplicitBadgeModule,
-    SCNGXSongDurationPipeModule,
-    SCNGXAddedToPlaylistPipeModule,
-    SCNGXTooltipModule,
-    SCNGXSkeletonModule
   ]
 })
-export class SCNGXSongListItemModule { }
+export class SCNGXSongListItemModule {
+  constructor(library: FaIconLibrary) {
+    library.addIcons(faPlay, faPause, faEllipsisV, faHeart);
+  }
+}
