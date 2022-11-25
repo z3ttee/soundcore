@@ -2,8 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 
 @Component({
   selector: 'scngx-ui-row',
-  templateUrl: './ui-row.component.html',
-  styleUrls: ['./ui-row.component.scss']
+  templateUrl: './ui-row.component.html'
 })
 export class SCNGXUiRowComponent implements OnInit {
 

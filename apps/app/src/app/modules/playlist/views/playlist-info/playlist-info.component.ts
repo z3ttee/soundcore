@@ -5,6 +5,7 @@ import { Playlist, SCSDKPlaylistService, toFutureCompat } from '@soundcore/sdk';
 import { AppPlayerService } from 'src/app/modules/player/services/player.service';
 import { SCNGXTracklist, SCNGXTracklistBuilder } from '@soundcore/ngx';
 import { PlayerItem } from 'src/app/modules/player/entities/player-item.entity';
+import { AUDIOWAVE_LOTTIE_OPTIONS } from 'src/app/constants';
 
 interface PlaylistInfoProps {
   playlist?: Playlist;
@@ -25,6 +26,9 @@ export class PlaylistInfoComponent implements OnInit, OnDestroy {
   private _cancel: Subject<void> = new Subject();
 
   public showError404: boolean = false;
+
+  // Lottie animations options
+  public animOptions = AUDIOWAVE_LOTTIE_OPTIONS;
 
   constructor(
     private readonly playlistService: SCSDKPlaylistService,

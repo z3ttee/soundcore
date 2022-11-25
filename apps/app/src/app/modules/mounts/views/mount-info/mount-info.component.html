@@ -1,19 +1,16 @@
-<section class="w-full h-full select-none viewport overflow-auto" #parent>
+<!-- <section class="w-full h-full select-none viewport overflow-auto" #parent>
     <app-error404 *ngIf="!($loading | async) && !($mount | async)"></app-error404>
 
-    <scngx-scroll [datasource]="datasource" #scroller *ngIf="datasource">
-
+    <scngx-scroll *ngIf="datasource">
         <ng-container header>
             <div class="w-full p-window">
 
-                <!-- UI Title -->
                 <div class="w-full">
                     <p class="uppercase text-sm text-font-secondary">Mount</p>
                     <scngx-skeleton [class]="'h-10 w-96 mt-1'" *ngIf="($loading | async)"></scngx-skeleton>
                     <h4 class="cursor-text select-text" *ngIf="!($loading | async)">{{ ($mount | async)?.name }}</h4>
                 </div>
 
-                <!-- Statistics -->
                 <div class="grid grid-cols-1 md:grid-cols-autofit gap-4 my-row">
             
                     <scngx-skeleton [class]="'h-32 w-full'" *ngIf="($loading | async)"></scngx-skeleton>
@@ -50,13 +47,37 @@
             </div>
         </ng-container>
         
-        <!-- List of files -->
         <ng-container list>
-            <div class="px-window py-2" *uiScroll="let item of scroller.datasource">
-                <app-file-list-item  [file]="item.data" [routerLink]="[item.data.slug || item.data.id]"></app-file-list-item>
+            <div class="flex items-center justify-start px-window py-2" *uiScroll="let item of datasource; index as i">
+                <div>
+                    {{ i }}
+                </div>
+                <div class="w-full">
+                    <app-file-list-item 
+                    [file]="item" 
+                    [routerLink]="[item.slug || item.id]">
+                    </app-file-list-item>
+                </div>
             </div>
         </ng-container>
 
     </scngx-scroll>
 
-</section>
+</section> -->
+
+<div class="h-full w-full overflow-y-auto" #viewport>
+
+
+    <ng-container *ngIf="datasource">
+        <div class="flex items-center justify-start px-window py-2" *uiScroll="let item of datasource; index as i">
+            <div>{{ i }}</div>
+            <div class="w-full">
+                <app-file-list-item 
+                [file]="item" 
+                [routerLink]="[item.slug || item.id]">
+                </app-file-list-item>
+            </div>
+        </div>
+    </ng-container>
+
+</div>

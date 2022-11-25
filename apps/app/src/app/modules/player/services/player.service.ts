@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { Queue, SCNGXTracklist } from "@soundcore/ngx";
 import { Logger, Song } from "@soundcore/sdk";
-import { BehaviorSubject, map, Observable, of } from "rxjs";
+import { BehaviorSubject, map, Observable, of, switchMap } from "rxjs";
 import { PlayerItem } from "../entities/player-item.entity";
 import { AppAudioService } from "./audio.service";
 import { AppControlsService } from "./controls.service";
@@ -111,19 +111,34 @@ export class AppPlayerService {
      * @param tracklist Tracklist to play next
      * @param force If true, will skip currently playing item and starts playing the tracklist
      */
-    public playTracklist(tracklist: SCNGXTracklist, force: boolean = true) {
-        if(this.isPlayingSrcById(tracklist.assocResId)) {
+    public playTracklist(tracklist: SCNGXTracklist, force: boolean = true, playAtIndex?: number) {
+        const shouldStartAtIndex: boolean = typeof playAtIndex !== "undefined" && playAtIndex != null;
+        
+        // Check if the tracklist is currently playing
+        if(this.isPlayingSrcById(tracklist.assocResId) && !shouldStartAtIndex) {
+            // If true, check if paused and toggle play/pause
             if(this.audio.isPaused()) {
                 this.audio.play();
             } else {
                 this.audio.pause();
             }
+
             return;
         }
 
         // "Enqueue" tracklist
         this._enqueuedTracklist = tracklist;
         this.updateSize();
+
+        if(shouldStartAtIndex) {
+            this._enqueuedTracklist.resetQueue().subscribe(() => {
+                this._enqueuedTracklist.dequeueAt(playAtIndex).subscribe((song) => {
+                    const item = new PlayerItem(song, tracklist, false);
+                    this.playItem(item);
+                });
+            });
+            return;
+        }
 
         if(force || this.isIdle()) {
             // Start with next title but take it from tracklist queue
@@ -214,12 +229,14 @@ export class AppPlayerService {
     private getNext(takeFromTracklist?: boolean): Observable<PlayerItem> {
         let result: PlayerItem;
 
-        console.log("takeFromTracklist?: ", takeFromTracklist, "history active?: ", this.history.isActive())
-
+        // Check if user went back in history.
+        // If so, try to serve next song from history pointer
         if(this.history.isActive()) {
+            // Move the pointer one position forward and get that item
             const item = this.history.forward();
             this.logger.log(`Took item from history (forward): `, item);
 
+            // If item not nullish, set it as result
             if(typeof item !== "undefined" && item != null) {
                 return of(item);
             } else {
@@ -229,46 +246,47 @@ export class AppPlayerService {
             }
         }
 
+        // Check if the queue of single songs is not empty and the player did not
+        // advice to explicitly take from a tracklist.
+        // If thats true, take a song from the single song queue
         if(this._singleQueue.isNotEmpty() && !takeFromTracklist) {
             // Single queue not empty, take from this queue first
             let item: Song;
 
+            // Check if the player is currently shuffled
             if(this.controls.isShuffled()) {
+                // If true, deqeueue from random position
                 item = this._singleQueue.dequeueRandom();
             } else {
+                // If false, dequeue normally
                 item = this._singleQueue.dequeue();
             }
             
+            // Build the result item
             result = !item ? null : new PlayerItem(item, null);
         } else {
-            // TODO: Tracklist needs overhaul
             // Otherwise take from tracklist queue
-
-            console.log("enqueued tracklist: ", this._enqueuedTracklist);
             
-            // Check if there is a tracklist enqueued and if that tracklist is not empty
-            if(this._enqueuedTracklist && this._enqueuedTracklist.queue.isNotEmpty()) {
+            // Check if there is a tracklist enqueued
+            if(!!this._enqueuedTracklist) {
                 const tracklist = this._enqueuedTracklist;
 
-                // If tracklist exists and queue is not empty, pick next
-                console.log("tracklist queue size: ", tracklist.queue.size);
+                // Initialize tracklist as it may not have happened
+                const itemObservable: Observable<Song> = tracklist.initialize().pipe(switchMap(() => {
+                    // Switch to dequeueing observable after initialization
+                    return this.controls.isShuffled() ? tracklist.dequeueRandom() : tracklist.dequeue();
+                }));
 
-                const itemObservable: Observable<Song> = this.controls.isShuffled() ? tracklist.dequeueRandom() : tracklist.dequeue();
                 return itemObservable.pipe(map((song) => {
-                    console.log("tracklist queue")
-
+                    // Check if the size of the tracklist's internal queue is empty
+                    // If true, dequeue the tracklist
                     if(tracklist.queue.size <= 0) {
-                        // Deqeueue tracklist
                         this.dequeueTracklist();
                     }
 
-                    console.log("dequeued from tracklist: ", song);
-
+                    // Build the result item
                     return !song ? null : new PlayerItem(song, tracklist);
                 }));
-            } else {
-                // Otherwise dequeue tracklist
-                this.dequeueTracklist();
             }
 
             result = null;

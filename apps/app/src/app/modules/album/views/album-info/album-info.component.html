@@ -56,7 +56,8 @@
                         <scngx-song-list-item 
                             [song]="item" 
                             [index]="i"
-                            [isActive]="props.currentlyPlaying?.song?.id == item.id">
+                            [active]="props.currentlyPlaying?.song?.id == item.id"
+                            [playing]="props.playing">
                         </scngx-song-list-item>
                     </div>
                 </ng-container>
@@ -82,3 +83,7 @@
         </ng-container>
     </scngx-scroll>
 </ng-container>
+
+<ng-template #lottieAnimationTemplate>
+    <ng-lottie [options]="animOptions" class="aspect-square"></ng-lottie>
+</ng-template>

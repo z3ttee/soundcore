@@ -62,6 +62,10 @@ export class Queue<T = any> {
         return this.dequeueAt(index);
     }
 
+    // public findIndex(filter: (item: T) => boolean): number {
+
+    // }
+
     /**
      * Get the current size of the queue
      */

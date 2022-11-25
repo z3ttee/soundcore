@@ -1,0 +1,4 @@
+<div class="inline-flex items-center justify-start py-2 px-4 rounded-full bg-body-light border border-body-lighter gap-2 select-none">
+    <span class="text-sm"><ng-content></ng-content></span>
+    <span class="text-sm cursor-pointer transform-gpu active:scale-75 transition-all" *ngIf="onclose.observers.length > 0"><fa-icon class="text-sm" [icon]="['fas', 'xmark']"></fa-icon></span>
+</div>

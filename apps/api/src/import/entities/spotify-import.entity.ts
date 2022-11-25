@@ -7,6 +7,7 @@ export enum FailedReason {
 }
 
 export interface FailedSpotifyImport {
+    id: string;
     title: string;
     artists: string[];
     album: string;

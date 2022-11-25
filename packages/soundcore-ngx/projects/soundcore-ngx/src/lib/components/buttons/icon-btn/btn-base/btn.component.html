@@ -2,11 +2,13 @@
     <div class="flex items-center justify-center relative min-h-6 aspect-square overflow-hidden text-inherit font-semi" [ngClass]="{'text-sm': size == 'sm', 'text-md': size == 'xl'}">
         <div class="inline-block" [ngClass]="{'opacity-0': loading}"><ng-content></ng-content></div>
         <div [ngClass]="{'opacity-100': loading}" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0">
-            <ng-lottie
-                width="24px"
-                height="24px"
-                [options]="options">
-            </ng-lottie>
+            <div *ngIf="!loaderRef; else loaderRef">
+                <ng-lottie
+                    width="24px"
+                    height="24px"
+                    [options]="options">
+                </ng-lottie>
+            </div>
         </div>
     </div>
 </button>

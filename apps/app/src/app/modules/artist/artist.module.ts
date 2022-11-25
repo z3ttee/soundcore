@@ -7,17 +7,37 @@ import { Error404Module } from 'src/app/shared/error404/error404.module';
 import { ListViewModule } from "src/app/components/resource-views/list-view/list-view.module";
 import { HeroIconModule, dotsVertical } from 'ng-heroicon';
 import { MatRippleModule } from '@angular/material/core';
-import { SCNGXVirtualSongListModule, SCNGXSongListModule, SCNGXSkeletonModule, SCNGXUiRowModule, SCNGXAlbumGridItemModule, SCNGXHorizontalGridModule, SCNGXPlaylistGridItemModule, SCNGXScrollModule, SCNGXTableModule, SCNGXIconBtnModule } from '@soundcore/ngx';
+import { 
+  SCNGXSkeletonModule, 
+  SCNGXUiRowModule, 
+  SCNGXAlbumGridItemModule, 
+  SCNGXHorizontalGridModule, 
+  SCNGXPlaylistGridItemModule,
+  SCNGXTableModule, 
+  SCNGXIconBtnModule, 
+  SCNGXUiSectionTitleModule, 
+  SCNGXUiTitleModule, 
+  SCNGXScrollModule, 
+  SCNGXArtworkModule
+} from '@soundcore/ngx';
 import { VirtualScrollerModule } from '@tsalliance/ngx-virtual-scroller';
+import { ArtistSongsComponent } from './views/artist-songs/artist-songs.component';
+import { SCNGXChipsModule } from 'src/app/components/chips/chips.module';
+import { SCNGXSongListItemModule } from 'src/app/components/list-items/song-list-item/song-list-item.module';
+import { FaIconLibrary, FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { faEllipsisV, faPause, faPlay } from '@fortawesome/free-solid-svg-icons';
+import { LottieModule } from 'ngx-lottie';
 
 const routes: Routes = [
   { path: ":artistId", component: ArtistProfileComponent },
+  { path: ":artistId/songs", component: ArtistSongsComponent },
   { path: "**", redirectTo: "/" }
 ]
 
 @NgModule({
   declarations: [
-    ArtistProfileComponent
+    ArtistProfileComponent,
+    ArtistSongsComponent
   ],
   imports: [
     CommonModule,
@@ -25,6 +45,8 @@ const routes: Routes = [
     Error404Module,
     HeroIconModule.withIcons({ dotsVertical }),
     VirtualScrollerModule,
+    FontAwesomeModule,
+    LottieModule,
 
     MatRippleModule,
 
@@ -33,17 +55,25 @@ const routes: Routes = [
     SCDKArtistModule,
     SCDKAlbumModule,
 
-    SCNGXVirtualSongListModule,
     SCNGXHorizontalGridModule,
-    SCNGXSongListModule,
     SCNGXSkeletonModule,
     SCNGXUiRowModule,
+    SCNGXUiSectionTitleModule,
+    SCNGXUiTitleModule,
     SCNGXAlbumGridItemModule,
     SCNGXPlaylistGridItemModule,
     SCNGXIconBtnModule,
+    SCNGXChipsModule,
+    SCNGXArtworkModule,
 
     SCNGXScrollModule,
-    SCNGXTableModule
+    SCNGXTableModule,
+
+    SCNGXSongListItemModule
   ]
 })
-export class ArtistModule { }
+export class ArtistModule {
+  constructor(library: FaIconLibrary) {
+    library.addIcons(faPlay, faPause, faEllipsisV);
+  }
+}

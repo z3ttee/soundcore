@@ -9,7 +9,6 @@ export interface Pagination {
 
     /**
      * Page size
-     * @default 50
      */
     pageSize?: number;
 }

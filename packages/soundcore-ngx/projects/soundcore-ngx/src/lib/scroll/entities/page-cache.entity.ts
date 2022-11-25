@@ -1,18 +1,8 @@
-import { v4 as uuidv4 } from "uuid";
-
-class CacheItem<T = any> {
-
-    public readonly id: string;
-
-    constructor(
-        public data: T
-    ) {
-        this.id = data?.["id"] ?? uuidv4();
-    }
-
+export abstract class PageCacheItem {
+    id: any;
 }
 
-export class PageCache<T = any> {
+export class PageCache<T extends PageCacheItem = any> {
 
     /**
      * Stores a boolean value to a pageIndex.
@@ -24,7 +14,7 @@ export class PageCache<T = any> {
     /**
      * Stores the list of cached items.
      */
-    private readonly _items: CacheItem<T>[] = [];
+    private readonly _items: T[] = [];
 
     /**
      * Stores a boolean that says if a key is stored or not
@@ -62,16 +52,12 @@ export class PageCache<T = any> {
      * @param contents Elements of the page
      */
     public setPageSync(pageIndex: number, contents: T[]) {
-        const start = Date.now();
         const startIndex = pageIndex * this.pageSize;
 
         for(let i = 0; i < contents.length; i++) {
             const item = contents[i];
-            this._items[startIndex + i] = new CacheItem(item) ?? null;
+            this._items[startIndex + i] = item ?? null;
         }
-
-        const end = Date.now();
-        console.log(`Set cached page. Took ${end-start}ms.`);
 
         this.registerPage(pageIndex);
     }
@@ -91,14 +77,7 @@ export class PageCache<T = any> {
      * @returns T[]
      */
     public async getPage(pageIndex: number): Promise<T[]> {
-        const start = Date.now();
-        const rawItems = this.getPageItems(pageIndex);
-        const items = rawItems.map((item) => item.data);
-        const end = Date.now();
-
-        console.log("raw page: ", rawItems);
-
-        console.log(`Returned cached page. Took ${end-start}ms. Size: ${items.length}`);
+        const items = this.getPageItems(pageIndex);
         return items;
     }
 
@@ -145,7 +124,7 @@ export class PageCache<T = any> {
      * @param item Item to append
      */
     public async append(item: T) {
-        const cachedItem = new CacheItem(item);
+        const cachedItem = item;
         this._items.push(cachedItem);
         this._registeredIds.set(cachedItem.id, true);
     }
@@ -155,7 +134,7 @@ export class PageCache<T = any> {
      * @param item Item to prepend
      */
     public async prepend(item: T) {
-        const cachedItem = new CacheItem(item);
+        const cachedItem = item;
         this._items.unshift(cachedItem);
         this._registeredIds.set(cachedItem.id, true);
     }
@@ -166,9 +145,7 @@ export class PageCache<T = any> {
      * @param item Item data to set
      */
     public async replaceAt(index: number, item: T) {
-        const cachedItem = this._items[index];
-        cachedItem.data = item;
-        this._items[index] = cachedItem;
+        this._items[index] = item;
     }
 
     /**
@@ -189,22 +166,21 @@ export class PageCache<T = any> {
      * @param item 
      * @returns True if was appended, if replaced it returns false
      */
-    public async appendOrReplace(item: T): Promise<{ wasAppended: boolean, item: CacheItem<T> }> {
-        const cacheItem = new CacheItem(item);
+    public async appendOrReplace(item: T): Promise<{ wasAppended: boolean, item: T }> {
 
         // Replace item if it exists
-        if(this.hasById(cacheItem.id)) {
-            return this.replaceAtId(cacheItem.id, cacheItem.data).then(() => ({
+        if(this.hasById(item.id)) {
+            return this.replaceAtId(item.id, item).then(() => ({
                 wasAppended: false,
-                item: cacheItem
+                item: item
             }));
         }
 
         // Otherwise append
-        this._items.push(new CacheItem(item));
+        this._items.push(item);
         return {
             wasAppended: false,
-            item: cacheItem
+            item: item
         };
     }
 
@@ -213,9 +189,8 @@ export class PageCache<T = any> {
      * @param index Index in the cache
      * @returns T
      */
-    public async getByIndex(index: number): Promise<T> {
-        const item = this._items[index] ?? null;
-        return item?.data ?? null;
+    public getByIndex(index: number): T {
+        return this._items[index] ?? null;
     }
 
     /**
@@ -244,8 +219,6 @@ export class PageCache<T = any> {
      * @returns number (-1 if item was not found)
      */
     public async translateIdToIndex(itemId: string): Promise<number> {
-        const start = Date.now();
-
         if(!this.hasById(itemId)) {
             return -1;
         }
@@ -259,8 +232,6 @@ export class PageCache<T = any> {
             }
         }
 
-        const end = Date.now();
-        console.log(`Translated itemId to index. Took ${end-start}ms.`);
         return index;
     }
 
@@ -279,7 +250,6 @@ export class PageCache<T = any> {
      */
     private registerPage(pageIndex: number) {
         this._pages[pageIndex] = true;
-        console.log("Registered page in cache.");
     }
 
     /**
@@ -289,7 +259,6 @@ export class PageCache<T = any> {
     private unregisterPage(pageIndex: number) {
         // TODO: Test
         //this._pages[pageIndex] = false;
-        // console.log("Unregistered page from cache.");
     }
 
     /**
@@ -299,15 +268,14 @@ export class PageCache<T = any> {
      * @param pageIndex Index of the page
      * @returns CacheItem<T>[]
      */
-    private getPageItems(pageIndex: number): CacheItem<T>[] {
-        console.log("checking has page");
+    private getPageItems(pageIndex: number): T[] {
         if(!this.hasPage(pageIndex)) return [];
 
-
         const startIndex = pageIndex * this.pageSize;
-        console.log("startIndex: ", startIndex);
+        const endIndex = startIndex + this.pageSize;
 
-        return this._items.slice(startIndex, startIndex + this.pageSize - 1);
+        // Remember: endIndex in slice is exclusive, so it does not get included
+        return this._items.slice(startIndex, endIndex);
     }
 
     /**
@@ -316,23 +284,17 @@ export class PageCache<T = any> {
      */
     private setPagesFromDataset(dataset: T[]) {
         if(dataset.length <= 0) return;
-        
-        const start = Date.now();
         const pages = Math.ceil(dataset.length / this.pageSize);
-
-        console.log("pages: ", pages);
 
         for(let pageIndex = 0; pageIndex < pages; pageIndex++) {
             const startIndex = pageIndex * this.pageSize;
-            const endIndex = startIndex + (this.pageSize - 1);
+            const endIndex = startIndex + this.pageSize;
 
+            // Remember: endIndex in slice is exclusive, so it does not get included
             const contents = dataset.slice(startIndex, endIndex);
             this.setPageSync(pageIndex, contents);
             this.registerPage(pageIndex);
         }
-
-        const end = Date.now();
-        console.log(`Set cached page from dataset. Took ${end-start}ms.`);
     }
 
 }

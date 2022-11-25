@@ -1,10 +1,11 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
 import { AnimationOptions } from 'ngx-lottie';
 
 @Component({
   selector: 'scngx-ibtn-outlined',
   templateUrl: './btn.component.html',
-  styleUrls: ['./btn.component.scss']
+  styleUrls: ['./btn.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SCNGXIconBtnOutlinedComponent implements OnInit {
 

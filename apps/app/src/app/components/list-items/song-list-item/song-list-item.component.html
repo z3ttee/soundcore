@@ -39,16 +39,16 @@
     </div>
 
     <!-- Song album -->
-    <div class="min-w-44 w-44 px-2 text-right text-font text-opacity-70 hidden md:block md:line-clamp-1">
+    <div class="min-w-44 w-44 px-2 text-right text-font text-opacity-70 hidden md:block md:line-clamp-1" *ngIf="showAlbum && song?.album">
         <span [routerLink]="['/album', song?.album?.slug || song?.album?.id]" class="text-sm text-font text-opacity-70 hover:underline cursor-pointer">{{ song?.album?.name }}</span>
     </div>
 
     <!-- Date added to playlist -->
-    <div class="min-w-32 w-32 px-2 text-right hidden lg:flex items-center justify-end gap-2">
-        <span class="text-font text-opacity-70 text-sm">
-            {{ addedAt ?? 14619478 | date:"dd.MM." }}
+    <div class="min-w-32 w-32 px-2 text-right hidden lg:flex items-center justify-end gap-2" *ngIf="addedAt || addedBy">
+        <span class="text-font text-opacity-70 text-sm" *ngIf="addedAt">
+            {{ addedAt | date:"dd.MM." }}
         </span>
-        <div class="h-7 w-7 rounded-full overflow-hidden"><scngx-artwork [artwork]="addedBy?.artwork"></scngx-artwork></div>
+        <div *ngIf="addedBy" class="h-7 w-7 rounded-full overflow-hidden"><scngx-artwork [artwork]="addedBy?.artwork"></scngx-artwork></div>
     </div>
 
     <!-- Like Col -->

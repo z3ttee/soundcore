@@ -32,6 +32,7 @@ import { faEllipsisV, faHeart, faPause, faPlay } from '@fortawesome/free-solid-s
   ],
   exports: [
     SCNGXSongListItemComponent,
+    LottieModule
   ]
 })
 export class SCNGXSongListItemModule {

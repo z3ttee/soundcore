@@ -25,7 +25,7 @@ export class TracklistService {
      * @returns Tracklist
      */
     public async findListByArtist(artistId: string, hostname: string, authentication?: User): Promise<Tracklist> {
-        const result = this.buildFindByArtistQuery(artistId, null, authentication).select(["song.id"]).getManyAndCount();
+        const result = await this.buildFindByArtistQuery(artistId, null, authentication).select(["song.id"]).getManyAndCount();
         const metadataUrl = `${hostname}/v1/tracklists/artist/${artistId}/meta`;
         return new Tracklist(result[1], TracklistType.ARTIST, result[0], metadataUrl);
     }

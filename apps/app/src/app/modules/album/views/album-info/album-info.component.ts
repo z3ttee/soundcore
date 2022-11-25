@@ -2,9 +2,10 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { combineLatest, map, Observable, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { Album, Future, Page, SCDKAlbumService, toFutureCompat } from '@soundcore/sdk';
-import { SCNGXSongColConfig, SCNGXTracklist, SCNGXTracklistBuilder } from '@soundcore/ngx';
+import { SCNGXTracklist, SCNGXTracklistBuilder } from '@soundcore/ngx';
 import { AppPlayerService } from 'src/app/modules/player/services/player.service';
 import { PlayerItem } from 'src/app/modules/player/entities/player-item.entity';
+import { AUDIOWAVE_LOTTIE_OPTIONS } from 'src/app/constants';
 
 interface AlbumInfoProps {
   album?: Album;
@@ -33,11 +34,8 @@ export class AlbumInfoComponent implements OnInit, OnDestroy {
   private readonly _destroy: Subject<void> = new Subject();
   private readonly _cancel: Subject<void> = new Subject();
 
-  public columns: SCNGXSongColConfig = {
-    id: { enabled: true, collapseAt: 420 },
-    count: { enabled: true, collapseAt: 560 },
-    duration: { enabled: true, collapseAt: 0 }
-  }
+  // Lottie animations options
+  public animOptions = AUDIOWAVE_LOTTIE_OPTIONS;
 
   public readonly $props: Observable<AlbumInfoProps> = combineLatest([
     this.activatedRoute.paramMap.pipe(

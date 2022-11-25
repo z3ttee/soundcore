@@ -3,9 +3,9 @@ import { Settings, DevSettings, ItemsPredicate } from "vscroll/dist/typings/inte
 import { v4 as uuidv4 } from "uuid";
 import { BehaviorSubject, catchError, filter, map, Observable, of, Subject, takeUntil } from "rxjs";
 import { Pageable } from "@soundcore/sdk";
-import { PageCache } from "./page-cache.entity";
+import { PageCache, PageCacheItem } from "./page-cache.entity";
 
-export const DEFAULT_PAGE_SIZE = 20;
+export const DEFAULT_PAGE_SIZE = 5;
 
 export interface AdapterAppendOptions<T = any> {
     items: T[];
@@ -31,7 +31,7 @@ export interface AdapterRemoveOptions {
     increase?: boolean;
 }
 
-export abstract class SCNGXBaseDatasource<T = any> extends Datasource {
+export abstract class SCNGXBaseDatasource<T extends PageCacheItem = any> extends Datasource {
 
     /**
      * Unique identifier of the datasource.
@@ -87,7 +87,6 @@ export abstract class SCNGXBaseDatasource<T = any> extends Datasource {
                 startIndex: 0,
                 minIndex: 0,
                 sizeStrategy: SizeStrategy.Frequent,
-                bufferSize: pageSize ?? DEFAULT_PAGE_SIZE,
                 ...settings,
             },
             devSettings: {
@@ -131,21 +130,18 @@ export abstract class SCNGXBaseDatasource<T = any> extends Datasource {
                             requestReject(err)
                             return of([] as T[]);
                         })).subscribe((items) => {
-    
                             // Map to internal datasource items
-                            const mappedItems = items.map<T>((_, i) => {
-                                if(!items[i]) return null;
-    
+                            const mappedItems = items.map<T>((_, i) => {    
                                 const element = Object.assign({}, items[i]);
                                 return element;
                             });
-    
+
                             if(!!items) {
-                                this.setCachedPage(pageIndex, mappedItems);
+                                this.setCachedPage(pageIndex, mappedItems).finally(() => requestResolve(mappedItems));
+                            } else {
+                                // Resolve with the items
+                                requestResolve(mappedItems);
                             }
-    
-                            // Resolve with the items
-                            requestResolve(mappedItems);
                         });
                     }));
                 }
@@ -252,7 +248,7 @@ export abstract class SCNGXBaseDatasource<T = any> extends Datasource {
             
             if(wasAppended) {
                 // Append to datasource
-                return this.adapter.append({ items: [ item.data ] }).then((result) => {
+                return this.adapter.append({ items: [ item ] }).then((result) => {
                     // Increment datasource size on success
                     if(result.success) this.incrementSize();
                     return result;
@@ -261,7 +257,7 @@ export abstract class SCNGXBaseDatasource<T = any> extends Datasource {
                 // Otherwise replace
                 return this.adapter.replace({
                     predicate: ({ data }) => data["id"] === item.id,
-                    items: [ item.data ]
+                    items: [ item ]
                 });
             }
         })
@@ -335,9 +331,8 @@ export abstract class SCNGXBaseDatasource<T = any> extends Datasource {
      * @param pageIndex Page index to cache
      * @param items Items to insert to cache
      */
-    protected setCachedPage(pageIndex: number, items: T[]) {
-        this._cache.setPage(pageIndex, items);
-        this.incrementSize(items.length);
+    protected async setCachedPage(pageIndex: number, items: T[]) {
+        return this._cache.setPage(pageIndex, items).then(() => this.incrementSize(items.length));
     }
 
     /**

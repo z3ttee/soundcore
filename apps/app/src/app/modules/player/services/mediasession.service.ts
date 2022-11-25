@@ -23,13 +23,14 @@ export class AppMediasessionService {
     }
 
     public setSession(item: PlayerItem) {
-        this.logger.debug(`Updating media session`, item);
-
         // Reset metadata if item is null
         if(typeof item === "undefined" || item == null) {
+            console.log("Mediasession has been reset.");
             this.session.metadata = null;
             return;
         }
+
+        console.log("Setting media session using: ", item?.song);
 
         // Update metadata
         this.session.metadata = new MediaMetadata({

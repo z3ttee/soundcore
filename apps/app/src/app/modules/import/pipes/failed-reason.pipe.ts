@@ -1,13 +1,13 @@
 import { Pipe, PipeTransform } from "@angular/core";
-import { SpotifyFailedReason } from "@soundcore/sdk";
+import { FailedReason } from "@soundcore/sdk";
 
 @Pipe({
     name: "failedReasonPipe"
 })
 export class FailedReasonPipe implements PipeTransform {
 
-    transform(value: SpotifyFailedReason): string {
-        if(value == SpotifyFailedReason.NOT_FOUND) {
+    transform(value: FailedReason): string {
+        if(value == FailedReason.NOT_FOUND) {
             return "Nicht gefunden"
         } else {
             return "Fehlgeschlagen"

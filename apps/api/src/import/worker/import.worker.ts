@@ -140,6 +140,7 @@ async function importSpotifyPlaylist(job: WorkerJobRef<ImportTask>): Promise<Imp
                     const notFoundSpotifySongs: FailedSpotifyImport[] = Array.from(availableSpotifySongs.values()).filter((spotifySong) => {
                         return !foundSongsMappedToKey.has(getSpotifySongKey(spotifySong));
                     }).map((song) => ({
+                        id: song.id,
                         title: song.name,
                         album: song.album?.name,
                         artists: song.artists?.map((a) => a.name),

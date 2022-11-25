@@ -26,14 +26,18 @@ export class SCNGXTracklist<C = any> extends SCNGXBaseDatasource<PlaylistItem> {
         public readonly assocResId: string,
         
         private readonly service: SCSDKTracklistService,
-        public readonly context?: C
+        public readonly context?: C,
+        pageSize?: number
     ) {
-        // Sets page size to 30
-        super(30);
+        super(pageSize ?? 30);
+    }
+
+    public get initialized(): boolean {
+        return this._initializedSubject.getValue() ?? false;
     }
 
     protected getPageData(pageable: Pageable): Observable<PlaylistItem[]> {
-        return this.initialize().pipe(switchMap((tracklist) => {
+        return this.initialize().pipe(switchMap(([tracklist, _]) => {
             return this.service.getHttpClient().get<Page<PlaylistItem>>(`${tracklist.metadataLocation}${pageable.toQuery()}`).pipe(
                 apiResponse(),
                 switchMap((response) => {
@@ -176,6 +180,8 @@ export class SCNGXTracklist<C = any> extends SCNGXBaseDatasource<PlaylistItem> {
      * @returns Item
      */
     public dequeueAt(index: number): Observable<Song> {
+        if(this.queue.isEmpty()) return of(null);
+
         const item = this.queue.dequeueAt(index);
         if(typeof item === "undefined" || item == null) return of(null);
 
@@ -204,13 +210,24 @@ export class SCNGXTracklist<C = any> extends SCNGXBaseDatasource<PlaylistItem> {
         return this.dequeueAt(0);
     }
 
+    public resetQueue(): Observable<void> {
+        return this.initialize().pipe(map(([tracklist, wasFreshlyInitialized]) => {
+            // Was initialized with this request, so the queue was set.
+            if(wasFreshlyInitialized) return;
+
+            // Otherwise set queue if the tracklist was initialized before
+            this.setQueue(tracklist);
+        }));
+    }
+
     /**
      * Initialize tracklist.
-     * @returns SCSDKTracklist
+     * @returns [SCSDKTracklist, wasFreshlyInitialized]
      */
-    public initialize(): Observable<SCSDKTracklist> {
-        if(typeof this.tracklist !== "undefined" && this.tracklist != null) return of(this.tracklist);
-        return this.findTrackList();
+    public initialize(): Observable<[SCSDKTracklist, boolean]> {
+        // TODO: Can it happen that system tries to simultaneously initialize a tracklist?
+        if(typeof this.tracklist !== "undefined" && this.tracklist != null) return of([this.tracklist, false]);
+        return this.findTrackList().pipe(map((tracklist) => ([tracklist, true])));
     }
 
     /**

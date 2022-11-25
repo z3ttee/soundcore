@@ -15,9 +15,12 @@ export * from "./lib/tracklist";
 // Button module
 export * from "./lib/components/buttons";
 
+// UI Module
+export * from "./lib/ui";
 
-
-
+// Lottie animations
+import lottieAudioWave from "./assets/lottie/audio_wave.json";
+export const scngxLottieAudioWave = lottieAudioWave;
 
 // Drawer
 export * from "./lib/components/drawer/drawer.module";
@@ -31,10 +34,6 @@ export * from "./lib/dialog/entities/dialog-ref.entity";
 export * from "./lib/dialog/entities/dialog-config.entity";
 export * from "./lib/dialog/components/template/template.component";
 export * from "./lib/dialog/components/dialog-section/dialog-section.component";
-
-// UI Title
-export * from "./lib/components/ui-title/ui-title.module";
-export * from "./lib/components/ui-title/ui-title.component";
 
 // Forms
 export * from "./lib/components/forms/forms.module";
@@ -97,24 +96,12 @@ export * from "./lib/components/list/playlist-list-item/playlist-list-item.compo
 export * from "./lib/components/list/bullet-list/bullet-list.module";
 export * from "./lib/components/list/bullet-list/bullet-list.component";
 
-export * from "./lib/components/list/song-list-item/song-list-item.module";
-export * from "./lib/components/list/song-list-item/song-list-item.component";
-
-export * from "./lib/components/list/song-list/song-list.module";
-export * from "./lib/components/list/song-list/song-list.component";
-
 export * from "./lib/components/list/playlist-list-item/playlist-list-item.module";
 export * from "./lib/components/list/playlist-list-item/playlist-list-item.component";
 
-export * from "./lib/components/list/virtual-song-list/virtual-song-list.module";
-export * from "./lib/components/list/virtual-song-list/virtual-song-list.component";
-
-export * from "./lib/components/list/virtual-playlist/virtual-playlist.module";
-export * from "./lib/components/list/virtual-playlist/virtual-playlist.component";
-
 // Rows
-export * from "./lib/components/ui-row/ui-row.module";
-export * from "./lib/components/ui-row/ui-row.component";
+export * from "./lib/ui/ui-row/ui-row.module";
+export * from "./lib/ui/ui-row/ui-row.component";
 
 // Grids
 export * from "./lib/components/grids/vertical-grid/vertical-grid.module";

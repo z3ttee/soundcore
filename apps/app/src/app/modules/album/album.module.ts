@@ -4,11 +4,12 @@ import { AlbumInfoComponent } from './views/album-info/album-info.component';
 import { RouterModule, Routes } from '@angular/router';
 import { ListViewModule } from 'src/app/components/resource-views/list-view/list-view.module';
 import { SCDKAlbumModule } from '@soundcore/sdk';
-import { SCNGXAlbumGridItemModule, SCNGXHorizontalGridModule, SCNGXIconBtnModule, SCNGXScrollModule, SCNGXSongDurationPipeModule, SCNGXTableModule, SCNGXUiRowModule, SCNGXVirtualSongListModule } from '@soundcore/ngx';
+import { SCNGXAlbumGridItemModule, SCNGXArtworkModule, SCNGXHorizontalGridModule, SCNGXIconBtnModule, SCNGXScrollModule, SCNGXSongDurationPipeModule, SCNGXTableModule, SCNGXUiRowModule } from '@soundcore/ngx';
 import { HeroIconModule, heart, dotsVertical } from 'ng-heroicon';
 import { MatRippleModule } from '@angular/material/core';
 import { VirtualScrollerModule } from '@tsalliance/ngx-virtual-scroller';
 import { Error404Module } from 'src/app/shared/error404/error404.module';
+import { SCNGXSongListItemModule } from 'src/app/components/list-items/song-list-item/song-list-item.module';
 
 const routes: Routes = [
   { path: ":albumId", component: AlbumInfoComponent },
@@ -31,13 +32,14 @@ const routes: Routes = [
     SCDKAlbumModule,
 
     SCNGXSongDurationPipeModule,
-    SCNGXVirtualSongListModule,
     SCNGXHorizontalGridModule,
     SCNGXUiRowModule,
     SCNGXAlbumGridItemModule,
     SCNGXScrollModule,
     SCNGXTableModule,
     SCNGXIconBtnModule,
+    SCNGXSongListItemModule,
+    SCNGXArtworkModule,
 
     Error404Module
   ]

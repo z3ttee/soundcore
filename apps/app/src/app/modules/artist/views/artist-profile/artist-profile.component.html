@@ -54,7 +54,9 @@
 
         <!-- List -->
         <ng-container list>
-            <h6 class="px-window pb-2 mt-row">Beliebte Songs</h6>
+            <div class="px-window pb-4">
+                <scngx-ui-section-title [route]="['./songs']">Beliebte Songs</scngx-ui-section-title>
+            </div>
 
             <scngx-table>
                 <!-- Table Head
@@ -69,8 +71,10 @@
                         <scngx-song-list-item 
                             [song]="item" 
                             [index]="i" 
-                            [columns]="songListCols"
-                            [isActive]="props.currentlyPlaying?.song?.id == item.id"></scngx-song-list-item>
+                            [active]="props.currentlyPlaying?.song?.id == item.id"
+                            [playing]="props.playing"
+                            [animRef]="lottieAnimationTemplate">
+                        </scngx-song-list-item>
                     </div>
                 </ng-container>
             </scngx-table>
@@ -123,3 +127,7 @@
 
     </scngx-scroll>
 </ng-container>
+
+<ng-template #lottieAnimationTemplate>
+    <ng-lottie [options]="animOptions" class="aspect-square"></ng-lottie>
+</ng-template>

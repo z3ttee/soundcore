@@ -1,10 +1,11 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { combineLatest, map, Observable, Subject, switchMap, takeUntil } from 'rxjs';
-import { SCNGXSongColConfig, SCNGXTracklist, SCNGXTracklistBuilder } from '@soundcore/ngx';
+import { SCNGXTracklist, SCNGXTracklistBuilder } from '@soundcore/ngx';
 import { Album, Artist, Pageable, Playlist, SCDKAlbumService, SCDKArtistService, toFutureCompat } from '@soundcore/sdk';
 import { AppPlayerService } from 'src/app/modules/player/services/player.service';
 import { PlayerItem } from 'src/app/modules/player/entities/player-item.entity';
+import { AUDIOWAVE_LOTTIE_OPTIONS } from 'src/app/constants';
 
 interface ArtistInfoProps {
   artist?: Artist;
@@ -61,12 +62,8 @@ export class ArtistProfileComponent implements OnInit, OnDestroy {
   public featAlbums: Album[] = [];
   public featPlaylists: Playlist[] = [];
 
-  public readonly songListCols: SCNGXSongColConfig = {
-    id: { enabled: true, collapseAt: 420 },
-    cover: { enabled: true },
-    count: { enabled: true, collapseAt: 450 },
-    duration: { enabled: true, collapseAt: 380 }
-  }
+  // Lottie animations options
+  public animOptions = AUDIOWAVE_LOTTIE_OPTIONS;
 
   public ngOnInit(): void {
     this.activatedRoute.paramMap.pipe(takeUntil(this._destroy)).subscribe((paramMap) => {

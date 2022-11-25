@@ -6,7 +6,7 @@ export class CreateMountDTO {
     @Length(3, 32)
     public name: string;
 
-    @IsNotEmpty()
+    @IsOptional()
     @Length(3, 4095)
     public directory?: string;
 

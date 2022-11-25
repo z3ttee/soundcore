@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SCNGXUiRowComponent } from './ui-row.component';
 import { RouterModule } from '@angular/router';
+import { SCNGXUiSectionTitleModule } from '../ui-section-title/ui-section-title.module';
 
 @NgModule({
   declarations: [
@@ -9,10 +10,12 @@ import { RouterModule } from '@angular/router';
   ],
   imports: [
     CommonModule,
-    RouterModule
+    RouterModule,
+    SCNGXUiSectionTitleModule
   ],
   exports: [
-    SCNGXUiRowComponent
+    SCNGXUiRowComponent,
+    SCNGXUiSectionTitleModule
   ]
 })
 export class SCNGXUiRowModule { }

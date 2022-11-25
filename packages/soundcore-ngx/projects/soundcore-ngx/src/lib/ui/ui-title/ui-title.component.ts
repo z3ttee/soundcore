@@ -15,6 +15,9 @@ export class SCNGXUiTitleComponent implements OnInit, OnDestroy {
     this.$subtitle.next(val);
   }
 
+  @Input()
+  public route: string | any[];
+
   constructor() { }
 
   public ngOnInit(): void {}

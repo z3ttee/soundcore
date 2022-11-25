@@ -1,10 +1,11 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnInit, TemplateRef } from '@angular/core';
 import { AnimationOptions } from 'ngx-lottie';
 
 @Component({
   selector: 'scngx-ibtn-text',
   templateUrl: './btn.component.html',
-  styleUrls: ['./btn.component.scss']
+  styleUrls: ['./btn.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SCNGXIconBtnTextComponent implements OnInit {
 
@@ -13,6 +14,7 @@ export class SCNGXIconBtnTextComponent implements OnInit {
   @Input() public fullWidth: boolean = false;
   @Input() public loading: boolean = false;
   @Input() public disabled: boolean = false;
+  @Input() public loaderRef: TemplateRef<any>;
 
   options: AnimationOptions = {
     path: '/assets/animated/loader_light.json',

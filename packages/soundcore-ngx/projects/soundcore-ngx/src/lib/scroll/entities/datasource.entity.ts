@@ -4,8 +4,9 @@ import { ApiResponse, apiResponse, Page, Pageable } from "@soundcore/sdk";
 import { Pagination } from "../config/datasource-pagination";
 import { HttpClient } from "@angular/common/http";
 import { SCNGXBaseDatasource } from "./base-datasource.entity";
+import { PageCacheItem } from "./page-cache.entity";
 
-export class SCNGXDatasource<T = any> extends SCNGXBaseDatasource<T> {
+export class SCNGXDatasource<T extends PageCacheItem = any> extends SCNGXBaseDatasource<T> {
     
     constructor(
         public readonly httpClient: HttpClient,

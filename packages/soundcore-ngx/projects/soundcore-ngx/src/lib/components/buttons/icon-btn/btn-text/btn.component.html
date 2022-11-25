@@ -1,12 +1,14 @@
-<button [disabled]="disabled || loading" class="inline-block p-1.5 rounded-full overflow-hidden bg-opacity-0 hover:bg-opacity-20 active:scale-95 transform-gpu will-change-transform transition-all select-none border-none" [ngClass]="{'cursor-not-allowed': disabled, 'p-1.5': size == 'sm', 'p-3': size == 'md', 'p-4': size == 'lg', 'p-6': size == 'xl', 'bg-white text-white font-semi': appearance == 'default', 'bg-success text-white': appearance == 'success', 'bg-error text-white': appearance == 'error', 'bg-warn text-white': appearance == 'warn', 'bg-info text-white': appearance == 'info'}">
+<button [disabled]="disabled || loading" class="inline-block p-2 rounded-full overflow-hidden bg-opacity-0 hover:bg-opacity-20 active:scale-95 transform-gpu will-change-transform transition-all select-none border-none" [ngClass]="{'cursor-not-allowed': disabled, 'p-1.5': size == 'sm', 'p-3': size == 'md', 'p-4': size == 'lg', 'p-6': size == 'xl', 'bg-white text-white font-semi': appearance == 'default', 'bg-success text-white': appearance == 'success', 'bg-error text-white': appearance == 'error', 'bg-warn text-white': appearance == 'warn', 'bg-info text-white': appearance == 'info'}">
     <div class="flex items-center justify-center relative min-h-6 aspect-square overflow-hidden text-inherit font-semi" [ngClass]="{'text-sm': size == 'sm', 'text-md': size == 'xl'}">
         <div [ngClass]="{'opacity-0': loading}"><ng-content></ng-content></div>
         <div [ngClass]="{'opacity-100': loading}" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0">
-            <ng-lottie
-                width="24px"
-                height="24px"
-                [options]="options">
-            </ng-lottie>
+            <div *ngIf="!loaderRef; else loaderRef">
+                <ng-lottie
+                    width="24px"
+                    height="24px"
+                    [options]="options">
+                </ng-lottie>
+            </div>
         </div>
     </div>
 </button>

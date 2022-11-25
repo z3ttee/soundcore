@@ -1,9 +1,8 @@
-import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, TemplateRef } from '@angular/core';
-import { Subject } from 'rxjs';
+import { AfterViewInit, ChangeDetectionStrategy, Component, EventEmitter, Input, OnDestroy, OnInit, Output, TemplateRef } from '@angular/core';
 import { Song, User } from '@soundcore/sdk';
 
 @Component({
-  selector: 'scngx-song-item',
+  selector: 'scngx-song-list-item',
   templateUrl: './song-list-item.component.html',
   styleUrls: ['./song-list-item.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -32,9 +31,10 @@ export class SCNGXSongListItemComponent implements OnInit, OnDestroy, AfterViewI
 
   @Input()
   public showCover: boolean = true;
-
   @Input()
   public showId: boolean = true;
+  @Input()
+  public showAlbum: boolean = true;
 
   @Input()
   public animRef: TemplateRef<any>;
