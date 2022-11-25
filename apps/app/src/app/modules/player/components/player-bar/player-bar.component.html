@@ -1,63 +1,66 @@
+
 <div class="absolute bottom-0 right-0 z-[100000000000000000] block w-full p-window pointer-events-none overflow-hidden" #scngxPlayerContainer>
-    <div class="relative flex flex-1 w-full items-center justify-between gap-4 p-3 bg-body-dark rounded pointer-events-auto overflow-hidden select-none" [ngClass]="{'gap-2 rounded-sm py-2': reducedMode}">
-        <!-- Seeker -->
-        <div class="absolute w-full left-0 top-0">
-            <scngx-seeker [duration]="song?.duration ?? 0" [current]="currentTime" (seek)="onSeek($event)"></scngx-seeker>
-        </div>
-
-        <div class="flex flex-grow w-full items-center justify-start gap-2">
-            <!-- Maximize button -->
-            <div *ngIf="showMaximize">
-                <span class="align-middle inline-flex justify-center items-center h-5 w-5 cursor-pointer" matRipple [matRippleRadius]="15" [matRippleCentered]="true" [matRippleUnbounded]="true">
-                    <hero-icon name="arrows-expand" [class]="'h-5 w-5'"></hero-icon>
-                </span>
+    <ng-container *ngIf="($props | async) as props">
+        <div class="relative flex flex-1 w-full items-center justify-between gap-4 p-3 bg-body-dark rounded pointer-events-auto overflow-hidden select-none" [ngClass]="{'gap-2 rounded-sm py-2': props.responsive.reducedMode}">
+            <!-- Seeker -->
+            <div class="absolute w-full left-0 top-0">
+                <scngx-seeker [duration]="props.song?.duration ?? 0" [current]="props.currentTime" (seek)="onSeek($event)"></scngx-seeker>
             </div>
-
-            <!-- Artwork -->
-            <div class="min-w-12 max-w-12 h-12 rounded-sm overflow-hidden">
-                <scngx-artwork [artwork]="song?.artwork"></scngx-artwork>
+    
+            <div class="flex flex-grow w-full items-center justify-start gap-2">
+                <!-- Maximize button -->
+                <div *ngIf="props.responsive.showMaximize">
+                    <span class="align-middle inline-flex justify-center items-center h-5 w-5 cursor-pointer" matRipple [matRippleRadius]="15" [matRippleCentered]="true" [matRippleUnbounded]="true">
+                        <hero-icon name="arrows-expand" [class]="'h-5 w-5'"></hero-icon>
+                    </span>
+                </div>
+    
+                <!-- Artwork -->
+                <div class="min-w-12 max-w-12 h-12 rounded-sm overflow-hidden">
+                    <scngx-artwork [artwork]="props.song?.artwork"></scngx-artwork>
+                </div>
+    
+                <!-- Title & Artist -->
+                <div class="w-full overflow-hidden">
+                    <p class="line-clamp-1">{{ props.song?.name || "Unbekannter Titel" }}</p>
+                    <ul class="line-clamp-1 w-full">
+                        <li *ngIf="props.song?.explicit" class="inline mr-2"><scngx-explicit-badge [extended]="false"></scngx-explicit-badge></li>
+                        <li class="inline text-font text-opacity-70"><span class="text-sm hover:underline pointer-events-all cursor-pointer" [routerLink]="props.song?.primaryArtist ? ['/artist', props.song?.primaryArtist?.slug || props.song?.primaryArtist?.id] : []">{{ props.song?.primaryArtist.name ?? "Unbekannter Künstler" }}</span>{{ props.song?.featuredArtists.length > 0 ? ", " : "" }}</li>
+                        <li *ngFor="let artist of props.song?.featuredArtists; index as i" class="inline text-font text-opacity-70"><span class="text-sm hover:underline pointer-events-all cursor-pointer" [routerLink]="['/artist', artist.slug || artist.id]">{{ artist.name }}</span>{{ i + 1 < props.song.featuredArtists.length ? ", " : "" }}</li>
+                    </ul>
+                </div>
             </div>
-
-            <!-- Title & Artist -->
-            <div class="w-full overflow-hidden">
-                <p class="line-clamp-1">{{ song?.name || "Unbekannter Titel" }}</p>
-                <ul class="line-clamp-1 w-full">
-                    <li *ngIf="song?.explicit" class="inline mr-2"><scngx-explicit-badge [extended]="false"></scngx-explicit-badge></li>
-                    <li class="inline text-font text-opacity-70"><span class="text-sm hover:underline pointer-events-all cursor-pointer" [routerLink]="song?.primaryArtist ? ['/artist', song?.primaryArtist?.slug || song?.primaryArtist?.id] : []">{{ song?.primaryArtist.name ?? "Unbekannter Künstler" }}</span>{{ song?.featuredArtists.length > 0 ? ", " : "" }}</li>
-                    <li *ngFor="let artist of song?.featuredArtists; index as i" class="inline text-font text-opacity-70"><span class="text-sm hover:underline pointer-events-all cursor-pointer" [routerLink]="['/artist', artist.slug || artist.id]">{{ artist.name }}</span>{{ i + 1 < song.featuredArtists.length ? ", " : "" }}</li>
-                </ul>
+    
+            <!-- Controls -->
+            <div class="flex items-center justify-center gap-1" [ngClass]="{'justify-end': props.responsive.reducedMode}">
+                <button *ngIf="!props.responsive.reducedMode" class="w-11 h-11 inline-flex justify-center items-center rounded-full border" matRipple [matRippleRadius]="15" [matRippleCentered]="true" [matRippleUnbounded]="true"></button>
+                
+                <!-- Prev button -->
+                <button (click)="player.prev()" *ngIf="props.responsive.showHistoryControls" class="w-11 h-11 inline-flex justify-center items-center rounded-full" matRipple [matRippleRadius]="15" [matRippleCentered]="true" [matRippleUnbounded]="true">
+                    <hero-icon name="fast-forward" type="solid" [class]="'h-7 w-7 rotate-180'"></hero-icon>
+                </button>
+    
+                <button class="w-12 h-12 flex items-center justify-center bg-accent transition-all will-change-transform text-body rounded-full hover:scale-105 active:scale-[97%]" [ngClass]="{'bg-transparent text-white': props.responsive.reducedMode}" (click)="controls.toggle()">
+                    <img *ngIf="!props.playing" class="w-7 h-7 text-body ml-0.5" [ngClass]="{'text-white': props.responsive.reducedMode}" src="assets/icons/play.svg">
+                    <img *ngIf="props.playing" class="w-7 h-7 text-body ml-0.5" [ngClass]="{'text-white': props.responsive.reducedMode}" src="assets/icons/pause.svg">
+                </button>
+    
+                <!-- Skip button -->
+                <button (click)="player.skip()" *ngIf="!props.responsive.reducedMode" class="w-11 h-11 inline-flex justify-center items-center rounded-full" matRipple [matRippleRadius]="20" [matRippleCentered]="true" [matRippleUnbounded]="true">
+                    <hero-icon name="fast-forward" type="solid" [class]="'h-7 w-7'"></hero-icon>
+                </button>
+                <button *ngIf="props.responsive.showHistoryControls" class="w-11 h-11 inline-flex justify-center items-center rounded-full border" matRipple [matRippleRadius]="15" [matRippleCentered]="true" [matRippleUnbounded]="true"></button>
+            </div>
+    
+            <div class="flex flex-grow w-full items-center justify-end gap-2" [ngClass]="{'flex-grow-0 w-min': props.responsive.reducedMode}">
+                <!-- Duration -->
+                <span class="text-font-tertiary text-sm" *ngIf="props.responsive.showDuration">{{ props.currentTime | durationPipe }}/{{ props.song?.duration || 0 | durationPipe }}</span>
+    
+                <!-- Queue button -->
+                <button class="p-2 inline-flex justify-center items-center rounded-full" matRipple [matRippleRadius]="20" [matRippleCentered]="true" [matRippleUnbounded]="true">
+                    <hero-icon name="collection" [class]="'h-6 w-6'"></hero-icon>
+                </button>
             </div>
         </div>
-
-        <!-- Controls -->
-        <div class="flex items-center justify-center gap-1" [ngClass]="{'justify-end': reducedMode}">
-            <button *ngIf="!reducedMode" class="w-11 h-11 inline-flex justify-center items-center rounded-full border" matRipple [matRippleRadius]="15" [matRippleCentered]="true" [matRippleUnbounded]="true"></button>
-            
-            <!-- Prev button -->
-            <button (click)="player.prev()" *ngIf="showHistoryControls" class="w-11 h-11 inline-flex justify-center items-center rounded-full" matRipple [matRippleRadius]="15" [matRippleCentered]="true" [matRippleUnbounded]="true">
-                <hero-icon name="fast-forward" type="solid" [class]="'h-7 w-7 rotate-180'"></hero-icon>
-            </button>
-
-            <button class="w-12 h-12 flex items-center justify-center bg-accent transition-all will-change-transform text-body rounded-full hover:scale-105 active:scale-[97%]" [ngClass]="{'bg-transparent text-white': reducedMode}" (click)="controls.toggle()">
-                <img *ngIf="isPaused" class="w-7 h-7 text-body ml-0.5" [ngClass]="{'text-white': reducedMode}" src="assets/icons/play.svg">
-                <img *ngIf="!isPaused" class="w-7 h-7 text-body ml-0.5" [ngClass]="{'text-white': reducedMode}" src="assets/icons/pause.svg">
-            </button>
-
-            <!-- Skip button -->
-            <button (click)="player.skip()" *ngIf="!reducedMode" class="w-11 h-11 inline-flex justify-center items-center rounded-full" matRipple [matRippleRadius]="20" [matRippleCentered]="true" [matRippleUnbounded]="true">
-                <hero-icon name="fast-forward" type="solid" [class]="'h-7 w-7'"></hero-icon>
-            </button>
-            <button *ngIf="showHistoryControls" class="w-11 h-11 inline-flex justify-center items-center rounded-full border" matRipple [matRippleRadius]="15" [matRippleCentered]="true" [matRippleUnbounded]="true"></button>
-        </div>
-
-        <div class="flex flex-grow w-full items-center justify-end gap-2" [ngClass]="{'flex-grow-0 w-min': reducedMode}">
-            <!-- Duration -->
-            <span class="text-font-tertiary text-sm" *ngIf="showDuration">{{ currentTime | durationPipe }}/{{ song?.duration || 0 | durationPipe }}</span>
-
-            <!-- Queue button -->
-            <button class="p-2 inline-flex justify-center items-center rounded-full" matRipple [matRippleRadius]="20" [matRippleCentered]="true" [matRippleUnbounded]="true">
-                <hero-icon name="collection" [class]="'h-6 w-6'"></hero-icon>
-            </button>
-        </div>
-    </div>
+    </ng-container>
 </div>
