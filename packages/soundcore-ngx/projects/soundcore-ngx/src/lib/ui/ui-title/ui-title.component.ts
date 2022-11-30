@@ -7,22 +7,23 @@ import { BehaviorSubject } from 'rxjs';
   styleUrls: ['./ui-title.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class SCNGXUiTitleComponent implements OnInit, OnDestroy {
+export class SCNGXUiTitleComponent {
 
-  public readonly $subtitle: BehaviorSubject<string> = new BehaviorSubject(null);
-
-  @Input() public set subtitle(val: string) {
-    this.$subtitle.next(val);
-  }
-
+  /**
+   * By specifying a route, clicking on the title will
+   * result in navigating to the given route.
+   */
   @Input()
   public route: string | any[];
 
-  constructor() { }
+  /**
+   * Property that inverts the order of displaying
+   * subtitle and title. If true, the subtitle will be
+   * placed above the title.
+   */
+  @Input()
+  public inverted: boolean = false;
 
-  public ngOnInit(): void {}
-  public ngOnDestroy(): void {
-      this.$subtitle.complete();
-  }
+  constructor() { }
 
 }

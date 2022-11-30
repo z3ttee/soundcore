@@ -1,16 +1,23 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
-import { BehaviorSubject, Observable, Subject, takeUntil } from 'rxjs';
-import { File, Mount, SCDKFileService, SCDKMountService } from '@soundcore/sdk';
+import { BehaviorSubject, combineLatest, map, Observable, Subject, switchMap, takeUntil, tap } from 'rxjs';
+import { File, Future, Mount, SCDKFileService, SCDKMountService, toFuture } from '@soundcore/sdk';
 import { AppMountCreateDialog, MountCreateDialogOptions } from 'src/app/dialogs/mount-create-dialog/mount-create-dialog.component';
 import { SCNGXDatasource, SCNGXDialogService } from '@soundcore/ngx';
+
+interface MountInfoProps {
+  mount?: Mount;
+  loading?: boolean;
+  datasource?: SCNGXDatasource<File>;
+}
 
 @Component({
   selector: 'app-mount-info',
   templateUrl: './mount-info.component.html',
-  styleUrls: ['./mount-info.component.scss']
+  styleUrls: ['./mount-info.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class MountInfoComponent implements OnInit, OnDestroy {
 
@@ -27,45 +34,43 @@ export class MountInfoComponent implements OnInit, OnDestroy {
   @ViewChild("container") public containerRef: ElementRef<HTMLDivElement>;
   
   private readonly _destroy: Subject<void> = new Subject();
-  private readonly _mountSubject: BehaviorSubject<Mount> = new BehaviorSubject(null);
+  private readonly _updateMountSubject: BehaviorSubject<Mount> = new BehaviorSubject(null);
 
-  public readonly $loading: BehaviorSubject<boolean> = new BehaviorSubject(false);
   public readonly $deleting: BehaviorSubject<boolean> = new BehaviorSubject(false);
-  public readonly $mount: Observable<Mount> = this._mountSubject.asObservable();
 
-  public datasource: SCNGXDatasource<File>;
+  public $props: Observable<MountInfoProps> = combineLatest([
+    this.activatedRoute.paramMap.pipe(
+      takeUntil(this._destroy),
+      map((paramMap) => paramMap.get("mountId")),
+      switchMap((mountId) => this.mountService.findById(mountId).pipe(toFuture())),
+      map((request): [Future<Mount>, SCNGXDatasource] => {
+        if(request.loading) return [request, null];
+        return [
+          request,
+          new SCNGXDatasource(this.httpClient, { url: this.fileService.findByMountIdBaseURL(request.data?.id) })
+        ];
+      })
+    ),
+    this._updateMountSubject.asObservable()
+  ]).pipe(
+    map(([[request, datasource], onMountUpdate]): MountInfoProps => ({
+      loading: request.loading,
+      mount: onMountUpdate ?? request.data,
+      datasource: datasource
+    })),
+  );
 
-  public ngOnInit(): void {
-    this.activatedRoute.paramMap.pipe(takeUntil(this._destroy)).subscribe((params) => {
-      const mountId = params.get("mountId");
-
-      this.datasource = new SCNGXDatasource(this.httpClient, {
-        url: this.fileService.findByMountIdBaseURL(mountId)
-      });
-
-      // Reset and set state
-      // to loading.
-      this._mountSubject.next(null);
-      this.$loading.next(true);
-
-      // Find mount and update state
-      this.mountService.findById(mountId).pipe(takeUntil(this._destroy)).subscribe((mount) => {
-        this.$loading.next(false);
-        this._mountSubject.next(mount);
-      });
-    })
-  }
-
+  public ngOnInit(): void {}
   public ngOnDestroy(): void {
       this._destroy.next();
       this._destroy.complete();
   }
 
-  public deleteMount() {
+  public deleteMount(mount: Mount) {
     this.dialog.confirm("Mount löschen", "Möchtest du den Mounpunkt wirklich löschen?").$afterClosed.pipe(takeUntil(this._destroy)).subscribe((confirmed) => {
       if(confirmed) {
         this.$deleting.next(true);
-        this.mountService.deleteById(this._mountSubject.getValue().id).pipe(takeUntil(this._destroy)).subscribe((response) => {
+        this.mountService.deleteById(mount.id).pipe(takeUntil(this._destroy)).subscribe((response) => {
           this.$deleting.next(false);
 
           if(response.error) {
@@ -81,18 +86,18 @@ export class MountInfoComponent implements OnInit, OnDestroy {
     })
   }
 
-  public openMountEditorDialog() {
-    if(!this._mountSubject.getValue()) return;
+  public openMountEditorDialog(mount?: Mount) {
+    if(!mount) return;
 
     this.dialog.open<any, MountCreateDialogOptions, Mount>(AppMountCreateDialog, {
       data: {
-        data: this._mountSubject.getValue(),
+        data: mount,
         mode: "edit"
       }
     }).$afterClosed.pipe(takeUntil(this._destroy)).subscribe((result) => {
       if(!!result) {
-        this._mountSubject.next({
-          ...this._mountSubject.getValue(),
+        this._updateMountSubject.next({
+          ...mount,
           ...result
         });
       }

@@ -1,4 +1,5 @@
 <ng-container *ngIf="($props | async) as props">
+    <app-error404 *ngIf="!props.loading && !props.artist"></app-error404>
 
     <div class="w-full h-full overflow-y-auto" #viewport>
         <div class="bg-body sticky top-0 z-50 p-window">
@@ -13,7 +14,10 @@
                 </div>
                 <div class="">
                     <scngx-skeleton *ngIf="props.loading" [class]="'w-1/4 h-12'"></scngx-skeleton>
-                    <scngx-ui-title *ngIf="!props.loading" [route]="['..']" [subtitle]="'Die komplette Künstler-Kollektion'">{{ props.artist?.name }}</scngx-ui-title>
+                    <scngx-ui-title *ngIf="!props.loading" [route]="['..']">
+                        {{ props.artist?.name }}
+                        <div scngxSubtitle>Die komplette Künstler-Kollektion</div>
+                    </scngx-ui-title>
                 </div>
             </div>
         </div>

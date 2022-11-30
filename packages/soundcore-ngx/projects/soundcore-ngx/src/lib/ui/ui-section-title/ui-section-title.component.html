@@ -1,6 +1,6 @@
-<div class="block w-full">
+<div class="block w-full select-none">
     <div class="w-full">
-        <h6 class="inline select-none font-semi" [ngClass]="{'hover:underline cursor-pointer': !!route}" [routerLink]="route"><ng-content></ng-content></h6>
+        <h6 class="inline font-semi" [ngClass]="{'hover:underline cursor-pointer': !!route}" [routerLink]="route"><ng-content></ng-content></h6>
     </div>
-    <p class="font-semi text-sm text-font text-opacity-70 line-clamp-1"><ng-content select="scngxSubtitle"></ng-content></p>
+    <p class="font-semi text-sm text-font text-opacity-70 line-clamp-1 [&:empty]:hidden"><ng-content select="scngxSubtitle"></ng-content></p>
 </div>

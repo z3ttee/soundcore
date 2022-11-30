@@ -3,7 +3,10 @@
     <scngx-infinite-list class="w-full mt-row" [dataSource]="dataSource" [parentScroll]="page" #list>
         <!-- Page Headline -->
         <ng-container scngx-content>
-            <scngx-ui-title [subtitle]="'Verwalte hier die einzelnen Speicherzonen.'">Speicherzonen</scngx-ui-title>
+            <scngx-ui-title>
+                Speicherzonen
+                <div scngxSubtitle>Verwalte hier die einzelnen Speicherzonen.</div>
+            </scngx-ui-title>
         </ng-container>
 
         <!-- List items -->

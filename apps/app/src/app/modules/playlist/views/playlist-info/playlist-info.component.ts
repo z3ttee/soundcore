@@ -23,9 +23,6 @@ interface PlaylistInfoProps {
 export class PlaylistInfoComponent implements OnInit, OnDestroy {
 
   private _destroy: Subject<void> = new Subject();
-  private _cancel: Subject<void> = new Subject();
-
-  public showError404: boolean = false;
 
   // Lottie animations options
   public animOptions = AUDIOWAVE_LOTTIE_OPTIONS;
@@ -59,15 +56,7 @@ export class PlaylistInfoComponent implements OnInit, OnDestroy {
     }))
   );
 
-  public ngOnInit(): void {
-    this.activatedRoute.paramMap.pipe(takeUntil(this._destroy)).subscribe((paramMap) => {
-      // Cancel ongoing http request.
-      this._cancel.next();
-
-      // Reset state
-      this.showError404 = false;
-    })
-  }
+  public ngOnInit(): void {}
 
   public ngOnDestroy(): void {
       this._destroy.next();

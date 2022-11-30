@@ -1,6 +1,15 @@
-<div class="block w-full">
+<div class="flex justify-center items-start w-full" [ngClass]="{'flex-col-reverse': inverted, 'flex-col': !inverted}">
     <div class="w-full">
-        <h5 class="inline" [ngClass]="{'hover:underline cursor-pointer': !!route}" [routerLink]="route"><ng-content></ng-content></h5>
+        <h4 
+            class="inline" 
+            [ngClass]="{'hover:underline cursor-pointer': !!route}" 
+            [routerLink]="route">
+            <ng-content></ng-content>
+        </h4>
     </div>
-    <p *ngIf="($subtitle | async)" class="text-font text-opacity-80">{{ ($subtitle | async) }}</p>
+    <p 
+        class="[&:empty]:hidden select-none" 
+        [ngClass]="{'text-font text-opacity-80': !inverted, '[&>*]:text-font-secondary [&>*]:uppercase [&>*]:text-sm': inverted}">
+        <ng-content select="[scngxSubtitle]"></ng-content>
+    </p>
 </div>

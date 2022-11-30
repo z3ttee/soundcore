@@ -1,70 +1,50 @@
 <ng-container *ngIf="($props | async) as props">
-    <app-error404 *ngIf="showError404" [title]="'Playlist nicht gefunden'"></app-error404>
+    <app-error404 *ngIf="!props.loading && !props.playlist" [title]="'Playlist nicht gefunden'"></app-error404>
 
-    <scngx-scroll class="w-full h-full" #scroller>
+    <div class="w-full h-full overflow-y-auto" #viewport>
+        <app-list-view [resource]="props.playlist" [title]="props.playlist?.name" [isLoading]="props.loading" [artwork]="props.playlist?.artwork">
+            <ng-container scngx-stats>
+                <li class="text-font-secondary">
+                    <span *ngIf="props.playlist?.author">by <span class="hover:underline cursor-pointer" [routerLink]="['/profile', props.playlist?.author?.slug || props.playlist?.author?.id]">{{ props.playlist?.author?.name }}</span></span>
+                </li>
+                <li class="text-font-secondary">
+                    <span>{{ props.playlist?.songsCount }} {{ props.playlist?.songsCount != 1 ? 'Songs' : 'Song' }}</span>
+                </li>
+                <li class="text-font-secondary">
+                    <span>{{ props.playlist?.totalDuration | scngxSongDurationPipe }} min</span>
+                </li>
+            </ng-container>
+        
+            <ng-container scngx-controls>
+                <scngx-ibtn (click)="forcePlay(props.tracklist)" size="md">
+                    <img *ngIf="!props.playing; else paused" class="w-7 h-7 text-body ml-0.5" src="assets/icons/play.svg">
+                    <ng-template #paused><img *ngIf="props.playing" class="w-7 h-7 text-body ml-0.5" src="assets/icons/pause.svg"></ng-template>
+                </scngx-ibtn>
+        
+                <button class="flex items-center p-2 rounded-full" matRipple [matRippleCentered]="true">
+                    <hero-icon [name]="'heart'" [class]="'h-7 aspect-square'"></hero-icon>
+                </button>
+        
+                <button class="flex items-center p-2 rounded-full" matRipple [matRippleCentered]="true">
+                    <hero-icon [name]="'dots-vertical'" [class]="'h-7 aspect-square'"></hero-icon>
+                </button>
+            </ng-container>
+        </app-list-view>
 
-        <!-- Page Header -->
-        <ng-container header>
-            <app-list-view [resource]="props.playlist" [title]="props.playlist?.name" [isLoading]="props.loading" [artwork]="props.playlist?.artwork">
-                <ng-container scngx-stats>
-                    <li class="text-font-secondary">
-                        <span *ngIf="props.playlist?.author">by <span class="hover:underline cursor-pointer" [routerLink]="['/profile', props.playlist?.author?.slug || props.playlist?.author?.id]">{{ props.playlist?.author?.name }}</span></span>
-                    </li>
-                    <li class="text-font-secondary">
-                        <span>{{ props.playlist?.songsCount }} {{ props.playlist?.songsCount != 1 ? 'Songs' : 'Song' }}</span>
-                    </li>
-                    <li class="text-font-secondary">
-                        <span>{{ props.playlist?.totalDuration | scngxSongDurationPipe }} min</span>
-                    </li>
-                </ng-container>
-            
-                <ng-container scngx-controls>
-                    <scngx-ibtn (click)="forcePlay(props.tracklist)" size="md">
-                        <img *ngIf="!props.playing; else paused" class="w-7 h-7 text-body ml-0.5" src="assets/icons/play.svg">
-                        <ng-template #paused><img *ngIf="props.playing" class="w-7 h-7 text-body ml-0.5" src="assets/icons/pause.svg"></ng-template>
-                    </scngx-ibtn>
-            
-                    <button class="flex items-center p-2 rounded-full" matRipple [matRippleCentered]="true">
-                        <hero-icon [name]="'heart'" [class]="'h-7 aspect-square'"></hero-icon>
-                    </button>
-            
-                    <button class="flex items-center p-2 rounded-full" matRipple [matRippleCentered]="true">
-                        <hero-icon [name]="'dots-vertical'" [class]="'h-7 aspect-square'"></hero-icon>
-                    </button>
-                </ng-container>
-            </app-list-view>
+        <ng-container tbody *ngIf="props.tracklist">
+            <div *uiScroll="let item of props.tracklist; index as i" class="px-window">
+                <scngx-song-list-item 
+                    [song]="item.song" 
+                    [index]="i" 
+                    [active]="props.currentlyPlaying?.song?.id == item.song.id"
+                    [playing]="props.playing"
+                    [animRef]="lottieAnimationTemplate">
+                </scngx-song-list-item>
+            </div>
         </ng-container>
 
-        <!-- List -->
-        <ng-container list>
-            <scngx-table>
-                <!-- Table Head
-                <ng-container thead>
-                    <div>#</div>
-                    <div>Titel</div>
-                </ng-container> -->
-
-                <!-- Table Body -->
-                <ng-container tbody *ngIf="props.tracklist">
-                    <div *uiScroll="let item of props.tracklist; index as i" class="px-window">
-                        <scngx-song-list-item 
-                            [song]="item.song" 
-                            [index]="i" 
-                            [active]="props.currentlyPlaying?.song?.id == item.song.id"
-                            [playing]="props.playing"
-                            [animRef]="lottieAnimationTemplate">
-                        </scngx-song-list-item>
-                    </div>
-                </ng-container>
-            </scngx-table>
-        </ng-container>
-
-        <!-- Page Footer -->
-        <ng-container footer>
-            <div class="pb-bottom"></div>
-        </ng-container>
-
-    </scngx-scroll>
+        <div class="pb-bottom"></div>
+    </div>
 </ng-container>
 
 <ng-template #lottieAnimationTemplate>
