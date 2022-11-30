@@ -1,5 +1,11 @@
 import { Bucket } from "../../bucket/entities/bucket.entity";
-import { MountStatus } from "../enums/mount-status.enum";
+
+export enum MountStatus {
+    UP = 0,
+    ENQUEUED = 1,
+    SCANNING = 2,
+    INDEXING = 3
+}
 
 export class Mount {
     public id: string;

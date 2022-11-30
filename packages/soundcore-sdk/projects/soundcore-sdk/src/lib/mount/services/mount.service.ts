@@ -1,6 +1,6 @@
 import { HttpClient } from "@angular/common/http";
 import { Inject, Injectable } from "@angular/core";
-import { Observable, of } from "rxjs";
+import { map, Observable, of } from "rxjs";
 import { SCDKOptions, SCDK_OPTIONS } from "../../scdk.module";
 import { ApiResponse } from "../../utils/responses/api-response";
 import { CreateResult } from "../../utils/results/creation.result";
@@ -9,11 +9,10 @@ import { CreateMountDTO } from "../dtos/create-mount.dto";
 import { UpdateMountDTO } from "../dtos/update-mount.dto";
 import { Mount } from "../entities/mount.entity";
 import { Page, Pageable } from "../../pagination";
+import { Future, toFuture } from "../../utils/future";
 
-@Injectable({
-    providedIn: "root"
-})
-export class SCDKMountService {
+@Injectable()
+export class SCSDKMountService {
 
     constructor(
         private readonly httpClient: HttpClient,
@@ -25,9 +24,9 @@ export class SCDKMountService {
      * @param mountId Mount's id
      * @returns Mount
      */
-    public findById(mountId: string): Observable<Mount> {
+    public findById(mountId: string): Observable<Future<Mount>> {
         if(!mountId) return of(null);
-        return this.httpClient.get<Mount>(`${this.options.api_base_uri}/v1/mounts/${mountId}`);
+        return this.httpClient.get<Mount>(`${this.options.api_base_uri}/v1/mounts/${mountId}`).pipe(toFuture());
     }
 
     /**
@@ -36,9 +35,9 @@ export class SCDKMountService {
      * @param pageable Page settings
      * @returns Page<Mount>
      */
-    public findByBucketId(bucketId: string, pageable: Pageable): Observable<Page<Mount>> {
-        if(!bucketId) return of(Page.of([], 0, pageable.page));
-        return this.httpClient.get<Page<Mount>>(`${this.options.api_base_uri}/v1/mounts/bucket/${bucketId}`);
+    public findAllByBucketId(bucketId: string, pageable: Pageable): Observable<Future<Page<Mount>>> {
+        if(!bucketId) return of(Future.notfound("Invalid bucketId."));
+        return this.httpClient.get<Page<Mount>>(`${this.options.api_base_uri}/v1/mounts/bucket/${bucketId}${pageable.toQuery()}`).pipe(toFuture());
     }
 
     /**
@@ -47,9 +46,9 @@ export class SCDKMountService {
      * @param mountId Mount's id to set as default in own bucket.
      * @returns Mount
      */
-    public setDefault(mountId: string): Observable<Mount> {
-        if(!mountId) return of(null);
-        return this.httpClient.put<Mount>(`${this.options.api_base_uri}/v1/mounts/${mountId}/default`, null);
+    public setDefault(mountId: string): Observable<Future<Mount>> {
+        if(!mountId) return of(Future.notfound("Invalid mountId."));
+        return this.httpClient.put<Mount>(`${this.options.api_base_uri}/v1/mounts/${mountId}/default`, null).pipe(toFuture());
     }
 
     /**
@@ -57,9 +56,9 @@ export class SCDKMountService {
      * @param createMountDto Data to create
      * @returns Mount
      */
-    public create(createMountDto: CreateMountDTO): Observable<ApiResponse<CreateResult<Mount>>> {
-        if(!createMountDto) return of(ApiResponse.withPayload(null));
-        return this.httpClient.post<CreateResult<Mount>>(`${this.options.api_base_uri}/v1/mounts`, createMountDto).pipe(apiResponse());
+    public create(createMountDto: CreateMountDTO): Observable<Future<CreateResult<Mount>>> {
+        if(!createMountDto) return of(Future.error("Missing required data.", 400));
+        return this.httpClient.post<CreateResult<Mount>>(`${this.options.api_base_uri}/v1/mounts`, createMountDto).pipe(toFuture());
     }
 
     /**
@@ -68,9 +67,9 @@ export class SCDKMountService {
      * @param updateMountDto Updated data
      * @returns Mount
      */
-    public update(mountId: string, updateMountDto: UpdateMountDTO): Observable<ApiResponse<Mount>> {
-        if(!updateMountDto) return of(null);
-        return this.httpClient.put<Mount>(`${this.options.api_base_uri}/v1/mounts/${mountId}`, updateMountDto).pipe(apiResponse());
+    public update(mountId: string, updateMountDto: UpdateMountDTO): Observable<Future<Mount>> {
+        if(!updateMountDto) return of(Future.error("Missing required data.", 400));
+        return this.httpClient.put<Mount>(`${this.options.api_base_uri}/v1/mounts/${mountId}`, updateMountDto).pipe(toFuture());
     }
 
     /**
@@ -78,9 +77,20 @@ export class SCDKMountService {
      * @param mountId Mount id to delete
      * @returns True if deleted. Otherwise false.
      */
-    public deleteById(mountId: string): Observable<ApiResponse<boolean>> {
-        if(!mountId) return of(ApiResponse.withPayload(false));
-        return this.httpClient.delete<boolean>(`${this.options.api_base_uri}/v1/mounts/${mountId}`).pipe(apiResponse());
+    public deleteById(mountId: string): Observable<Future<boolean>> {
+        if(!mountId) return of(Future.notfound());
+        return this.httpClient.delete<boolean>(`${this.options.api_base_uri}/v1/mounts/${mountId}`).pipe(toFuture());
+    }
+
+    /**
+     * Trigger scanning process for a mount. Returns
+     * the position in the mount-scan queue.
+     * @param mountId Mount's id
+     * @returns Position in queue
+     */
+    public rescanMount(mountId: string): Observable<Future<number>> {
+        if(!mountId) return of(Future.notfound());
+        return this.httpClient.get<number>(`${this.options.api_base_uri}/v1/mounts/${mountId}/rescan`).pipe(toFuture());
     }
 
 }

@@ -1,7 +1,9 @@
 import { NgModule } from '@angular/core';
-import { SCDKMountService } from './services/mount.service';
+import { SCSDKMountService } from './services/mount.service';
 
 @NgModule({
-  
+  providers: [
+    SCSDKMountService
+  ]
 })
-export class SCDKMountModule { }
+export class SCSDKMountModule { }
