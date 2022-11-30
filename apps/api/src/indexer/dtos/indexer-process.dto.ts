@@ -6,11 +6,17 @@ export enum IndexerProcessMode {
     RESCAN = 1
 }
 
+export enum IndexerProcessType {
+    DEFAULT = 0,
+    FLAG_BASED = 1
+}
+
 export class IndexerProcessDTO {
 
     constructor(
         public readonly files: File[],
-        public readonly mount: Mount
+        public readonly type: IndexerProcessType = IndexerProcessType.DEFAULT,
+        public readonly mount?: Mount
     ) {}
 
 }

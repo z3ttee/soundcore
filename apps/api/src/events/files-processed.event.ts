@@ -5,7 +5,7 @@ export class FilesProcessedEvent {
 
     constructor(
         public readonly files: File[],
-        public readonly mount: Mount
+        public readonly mount?: Mount
     ) {}
 
 }

@@ -50,4 +50,10 @@ export class MountController {
     return this.mountService.setDefaultMount(mountId)
   }
 
+  @Roles(ROLE_ADMIN)
+  @Get(":mountId/rescan")
+  public async reindexMount(@Param("mountId") mountId: string): Promise<number> {
+    return this.mountService.rescanMount(mountId)
+  }
+
 }

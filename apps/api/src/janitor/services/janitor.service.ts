@@ -1,10 +1,12 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, Logger } from "@nestjs/common";
+import { Environment } from "@soundcore/common";
 import { WorkerJob, WorkerJobRef, WorkerQueue } from "@soundcore/nest-queue";
 import { Observable, Subject } from "rxjs";
 import { Janitor, JanitorProcessRef, JanitorTask } from "../entities/janitor.entity";
 
 @Injectable()
 export class JanitorService {
+    private readonly logger = new Logger(JanitorService.name);
 
     private readonly janitors: Map<String, Subject<any>> = new Map();
 
@@ -15,15 +17,26 @@ export class JanitorService {
         private readonly queue: WorkerQueue<Janitor>
     ) {
 
-        this.queue.on("failed", (jobRef: WorkerJobRef<Janitor>) => {
+        this.queue.on("failed", (jobRef: WorkerJobRef<Janitor>, error: Error) => {
+            if(Environment.isDebug) {
+                this.logger.error(`Janitor Task failed: ${error.message}`, error.stack);
+            } else {
+                this.logger.error(`Janitor Task failed: ${error.message}`);
+            }
+
             const janitorId = jobRef.payload?.ref?.id;
             this.sendCompletionForJanitor(janitorId, null);
         });
 
         this.queue.on("completed", (job: WorkerJob<Janitor>) => {
+            this.logger.log(`Janitor task '${job.payload.ref.task}' completed.`);
             const janitorId = job.payload?.ref?.id;
             const result = job.result ?? null;
             this.sendCompletionForJanitor(janitorId, result);
+        });
+
+        this.queue.on("started", (job: WorkerJob<Janitor>) => {
+            this.logger.log(`Janitor task '${job.payload.ref.task}' started.`);
         });
 
     }

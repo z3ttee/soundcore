@@ -19,7 +19,11 @@ export class FileQueueService {
         private readonly eventEmitter: EventEmitter2,
     ) {
         this.queue.on("failed", (job: WorkerJobRef<FileProcessDTO>, error: Error) => {
-            this.logger.error(`Could not process batch of files for mount '${job.payload.mount.name}': ${error?.message}`, error?.stack);
+            if(Environment.isDebug) {
+                this.logger.error(`Could not process batch of files for mount '${job.payload.mount?.name}': ${error?.message}`, error?.stack);
+            } else {
+                this.logger.error(`Could not process batch of files for mount '${job.payload.mount?.name}': ${error?.message}`);
+            }
         })
 
         this.queue.on("started", (job: WorkerJob<FileProcessDTO, FileProcessResultDTO>) => {
@@ -31,7 +35,7 @@ export class FileQueueService {
                 return;
             }
 
-            this.logger.verbose(`Checking for files on mount '${mount.name}' that still await analysis.`);
+            this.logger.verbose(`Checking for files that still await analysis.`);
         })
 
         this.queue.on("completed", (job: WorkerJob<FileProcessDTO, FileProcessResultDTO>) => {
@@ -50,16 +54,17 @@ export class FileQueueService {
             
             if(type == FileProcessType.DEFAULT) {
                 this.logger.verbose(`Created database entries for ${filesProcessed.length} files on mount '${mount?.name}'. Took ${timeTookMs}ms.`);
+                this.eventEmitter.emit(EVENT_FILES_PROCESSED, new FilesProcessedEvent(filesProcessed, mount));
             } else {
-                this.logger.verbose(`Found ${filesProcessed.length} files on mount '${mount?.name}' that still await analysis. Took ${timeTookMs}ms.`);
+                this.logger.verbose(`Found ${filesProcessed.length} files that still await analysis. Took ${timeTookMs}ms.`);
+                this.eventEmitter.emit(EVENT_TRIGGER_FILE_PROCESS_BY_FLAG, new FilesProcessedEvent(filesProcessed));
             }
 
-            this.eventEmitter.emit(EVENT_FILES_PROCESSED, new FilesProcessedEvent(filesProcessed, mount));
         })
 
         this.queue.on("progress", (job: WorkerJobRef<FileProcessDTO>) => {
-            if(Environment.isDebug) {
-                this.logger.debug(`Progress on mount ${job.payload.mount.name}: ${job.progress}%`);
+            if(Environment.isDebug && job.payload.type != FileProcessType.FLAG_BASED) {
+                this.logger.debug(`Progress on mount ${job.payload.mount?.name}: ${job.progress}%`);
             }
         })
     }
@@ -77,9 +82,8 @@ export class FileQueueService {
         this.processFiles(event.mount, event.files);
     }
 
-    @OnEvent(EVENT_TRIGGER_FILE_PROCESS_BY_FLAG)
-    public async processAwaitingFiles(event: FilesFoundEvent) {
-        const processDto = new FileProcessDTO(event.mount, [], FileProcessType.FLAG_BASED);
+    public async processAwaitingFiles() {
+        const processDto = new FileProcessDTO(null, [], FileProcessType.FLAG_BASED);
         return this.queue.enqueue(processDto);
     }
 

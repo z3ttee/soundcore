@@ -18,7 +18,6 @@ const logger = new Logger("FileWorker")
 
 export default async function (job: WorkerJobRef<FileProcessDTO>): Promise<FileProcessResultDTO> {
     return Database.connect().then(async (datasource) => {
-        console.log("working...");
         
         const { mount, type } = job.payload;
         const startTime = Date.now();
@@ -100,10 +99,9 @@ async function processGivenFiles(job: WorkerJobRef<FileProcessDTO>, datasource: 
 }
 
 async function processByAwaitingFlag(job: WorkerJobRef<FileProcessDTO>, datasource: DataSource) {
-    const service = new FileService(datasource.getRepository(File));
-    const { mount } = job.payload;
+    const service = new FileService(datasource.getRepository(File)); 
 
-    const files: File[] = await service.findByFlagAndMount(mount.id, FileFlag.PENDING_ANALYSIS).catch((error: Error) => {
+    const files: File[] = await service.findByFlag(FileFlag.PENDING_ANALYSIS).catch((error: Error) => {
         logger.error(`Could not fetch files to process files by flag: ${error.message}`);
         return [];
     });

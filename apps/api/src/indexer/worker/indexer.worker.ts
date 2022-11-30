@@ -9,7 +9,7 @@ import { Artist } from "../../artist/entities/artist.entity";
 import { AlbumService } from "../../album/services/album.service";
 import { ArtworkService } from "../../artwork/services/artwork.service";
 import { Artwork } from "../../artwork/entities/artwork.entity";
-import { Logger } from "@nestjs/common";
+import { InternalServerErrorException, Logger } from "@nestjs/common";
 import { FileService } from "../../file/services/file.service";
 import { EventEmitter2 } from "@nestjs/event-emitter";
 import { File, FileFlag } from "../../file/entities/file.entity";
@@ -49,7 +49,9 @@ export interface ID3Album {
 
 
 export default function (job: WorkerJobRef<IndexerProcessDTO>): Promise<IndexerResultDTO> {
-    const { files, mount } = job.payload;
+    const { payload } = job;
+    const { files } = payload;
+    const jobMount = payload.mount;
 
     return Database.connect().then((dataSource) => {
         return MeiliClient.connect().then((meiliClient) => {
@@ -83,10 +85,14 @@ export default function (job: WorkerJobRef<IndexerProcessDTO>): Promise<IndexerR
 
                 for(const file of batch) {
                     // Set mount for file context
-                    file.mount = mount;
+                    file.mount = jobMount ?? file.mount;
+
+                    if(typeof file.mount === "undefined" || file.mount == null) {
+                        throw new InternalServerErrorException("File requires mount data to be passed either by direct reference in entity data or by providing a mount object to the job.");
+                    }
 
                     const fileReadStartTime = Date.now();
-                    const filepath = path.resolve(path.join(mount.directory, file.directory, file.name));
+                    const filepath = path.resolve(path.join(file.mount.directory, file.directory, file.name));
 
                     if(Environment.isDebug) {
                         logger.debug(`Analyzing ID3-Tags of file ${filepath}...`);
@@ -201,7 +207,7 @@ export default function (job: WorkerJobRef<IndexerProcessDTO>): Promise<IndexerR
                 // So at this point the featuredArtists are updated
                 await songService.saveAll(songCreationResult.map((song) => {   
                     const file = song.file;
-                    file.mount = mount;
+                    file.mount = jobMount ?? file.mount;
 
                     createdSongFileIds.push(file.id);
                     createdResources.songs.push(song);
@@ -256,7 +262,11 @@ export default function (job: WorkerJobRef<IndexerProcessDTO>): Promise<IndexerR
                 job.progress = progress;
                 workerpool.workerEmit(new WorkerProgressEvent(job));
 
-                logger.verbose(`Indexing files on mount '${mount.name}': ${progress.toFixed(2)}%`);
+                if(jobMount) {
+                    logger.verbose(`Indexing files on mount '${jobMount.name}': ${progress.toFixed(2)}%`);
+                } else {
+                    logger.verbose(`Indexing files on multiple mounts: ${progress.toFixed(2)}%`);
+                }
             }).catch((batchNr, error) => {
                 logger.warn(`An error occured while processing batch #${batchNr}: ${error.message}`);
             })

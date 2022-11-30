@@ -20,6 +20,8 @@ export default async function (job: WorkerJobRef<Janitor>): Promise<any> {
             return clearOngoingImports(datasource, janitor.ref);
         } else if(task == JanitorTask.CLEAR_OLD_IMPORTS) {
             return clearOldImports(datasource, janitor.ref);
+        } else {
+            throw new InternalServerErrorException("Received janitor task with invalid type.");
         }
     });
 }
@@ -35,20 +37,16 @@ async function clearOngoingImports(datasource: DataSource, janitor: JanitorRef) 
     const logger = new Logger(janitor.name);
     const startTimeMs = Date.now();
 
-    logger.log(`Clearing all ongoing imports...`);
+    if(Environment.isDebug) {
+        logger.debug(`Clearing all ongoing imports...`);
+    }
 
     const respository = datasource.getRepository(ImportTask);
     const service = new ImportService(respository);
 
     return service.clearOngoingImports().then((updateResult) => {
         const endTimeMs = Date.now();
-        logger.log(`Cleared ${updateResult.affected ?? 0} ongoing import tasks. Took ${endTimeMs - startTimeMs}ms.`);
-    }).catch((error: Error) => {
-        if(!Environment.isDebug) {
-            logger.error(`Failed clearing ongoing import tasks: ${error.message}`);
-        } else {
-            logger.error(`Failed clearing ongoing import tasks: ${error.message}`, error.stack);
-        }
+        // logger.log(`Cleared ${updateResult.affected ?? 0} ongoing import tasks. Took ${endTimeMs - startTimeMs}ms.`);
     });
 }
 
@@ -63,19 +61,15 @@ async function clearOngoingImports(datasource: DataSource, janitor: JanitorRef) 
     const logger = new Logger(janitor.name);
     const startTimeMs = Date.now();
 
-    logger.log(`Clearing all imports older than 7days...`);
+    if(Environment.isDebug) {
+        logger.debug(`Clearing all imports older than 7days...`);
+    }
 
     const respository = datasource.getRepository(ImportTask);
     const service = new ImportService(respository);
 
     return service.clearOldImports().then((updateResult) => {
         const endTimeMs = Date.now();
-        logger.log(`Cleared ${updateResult.affected ?? 0} old import tasks. Took ${endTimeMs - startTimeMs}ms.`);
-    }).catch((error: Error) => {
-        if(!Environment.isDebug) {
-            logger.error(`Failed clearing old import tasks: ${error.message}`);
-        } else {
-            logger.error(`Failed clearing old import tasks: ${error.message}`, error.stack);
-        }
+        // logger.log(`Cleared ${updateResult.affected ?? 0} old import tasks. Took ${endTimeMs - startTimeMs}ms.`);
     });
 }

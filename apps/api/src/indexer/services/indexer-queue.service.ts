@@ -2,9 +2,9 @@ import { Environment } from "@soundcore/common";
 import { Injectable, Logger } from "@nestjs/common";
 import { EventEmitter2, OnEvent } from "@nestjs/event-emitter";
 import { WorkerJob, WorkerJobRef, WorkerQueue } from "@soundcore/nest-queue";
-import { EVENT_ALBUMS_CHANGED, EVENT_ARTISTS_CHANGED, EVENT_FILES_PROCESSED, EVENT_METADATA_CREATED, EVENT_SONGS_CHANGED } from "../../constants";
+import { EVENT_ALBUMS_CHANGED, EVENT_ARTISTS_CHANGED, EVENT_FILES_PROCESSED, EVENT_METADATA_CREATED, EVENT_SONGS_CHANGED, EVENT_TRIGGER_FILE_PROCESS_BY_FLAG } from "../../constants";
 import { FilesProcessedEvent } from "../../events/files-processed.event";
-import { IndexerProcessDTO } from "../dtos/indexer-process.dto";
+import { IndexerProcessDTO, IndexerProcessType } from "../dtos/indexer-process.dto";
 import { IndexerResultDTO } from "../dtos/indexer-result.dto";
 
 @Injectable()
@@ -50,7 +50,11 @@ export class IndexerQueueService {
         });
 
         this.queue.on("started", (job: WorkerJob<IndexerProcessDTO, IndexerResultDTO>) => {
-            this.logger.verbose(`Starting analyzing id3 tags of ${job.payload.files.length} files on mount '${job.payload.mount.name}'`);
+            if(job.payload.type == IndexerProcessType.DEFAULT) {
+                this.logger.verbose(`Starting analyzing id3 tags of ${job.payload.files.length} files on mount '${job.payload.mount.name}'`);
+            } else {
+                this.logger.verbose(`Starting analyzing id3 tags of ${job.payload.files.length} files`);
+            }
         })
     }
 
@@ -62,7 +66,18 @@ export class IndexerQueueService {
      */
     @OnEvent(EVENT_FILES_PROCESSED)
     public handleFileProcessedEvent(event: FilesProcessedEvent) {
-        this.queue.enqueue(new IndexerProcessDTO(event.files, event.mount))
+        this.queue.enqueue(new IndexerProcessDTO(event.files, IndexerProcessType.DEFAULT, event.mount))
     }
+
+    /**
+     * Handle file processed events.
+     * This event is emitted after a file has been processed
+     * successfully by the fileService.
+     * @param payload File object
+     */
+     @OnEvent(EVENT_TRIGGER_FILE_PROCESS_BY_FLAG)
+     public handleFileProcessByFlagEvent(event: FilesProcessedEvent) {
+         this.queue.enqueue(new IndexerProcessDTO(event.files,  IndexerProcessType.FLAG_BASED))
+     }
 
 }

@@ -32,6 +32,13 @@ export class FileService {
             .getOne();
     }
 
+    public async findByFlag(flag: FileFlag) {
+        return this.repository.createQueryBuilder("file")
+            .leftJoin("file.mount", "mount").addSelect(["mount.id", "mount.name", "mount.directory"])
+            .where("file.flag = :flag", { flag })
+            .getMany();
+    }
+
     public async findByFlagAndMount(mountId: string, flag: FileFlag) {
         return this.repository.createQueryBuilder("file")
             .leftJoin("file.mount", "mount")
