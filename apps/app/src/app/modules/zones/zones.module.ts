@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Routes } from '@angular/router';
 import { ZonesIndexComponent } from './views/zones-index/zones-index.component';
-import { SCDKBucketModule, SCDKMountModule, SCSDKGatewayModule } from '@soundcore/sdk';
+import { SCDKBucketModule, SCSDKGatewayModule, SCSDKMountModule } from '@soundcore/sdk';
 import { chartPie, collection, HeroIconModule, plus } from 'ng-heroicon';
 import { SCNGXButtonModule, SCNGXBytesPipeModule, SCNGXInfiniteListModule, SCNGXSkeletonModule, SCNGXUiTitleModule } from '@soundcore/ngx';
 import { ZoneInfoComponent } from './views/zone-info/zone-info.component';
@@ -31,7 +31,7 @@ const routes: Routes = [
     HeroIconModule.withIcons({ collection, chartPie, plus }),
 
     SCDKBucketModule,
-    SCDKMountModule,
+    SCSDKMountModule,
     SCSDKGatewayModule,
     
     SCNGXSkeletonModule,

@@ -44,6 +44,7 @@
                     <h6>Aktionen</h6>
                     <ul class="flex flex-wrap items-start w-full gap-2 mt-4">
                         <scngx-btn (click)="openMountEditorDialog()"><hero-icon [class]="'h-5 w-5'" name="pencil"></hero-icon>Mount bearbeiten</scngx-btn>
+                        <scngx-btn (click)="triggerReindex(props.mount)">Indexierung starten</scngx-btn>
                         <scngx-lbtn-outlined appearance="error" [loading]="($deleting | async)" (click)="deleteMount(props.mount)"><hero-icon [class]="'h-5 w-5 align-middle'" name="trash"></hero-icon><span class="align-middle">Mount löschen</span></scngx-lbtn-outlined>
                     </ul>
                 </div>

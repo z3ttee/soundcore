@@ -2,7 +2,7 @@ import { Component, OnDestroy } from "@angular/core";
 import { FormControl, FormGroup, Validators } from "@angular/forms";
 import { Subject, takeUntil } from "rxjs";
 import { DialogRef } from "@soundcore/ngx";
-import { ApiResponse, SCDKMountService, Mount, CreateResult } from "@soundcore/sdk";
+import { Mount, SCSDKMountService } from "@soundcore/sdk";
 
 export interface MountCreateDialogOptions {
     bucketId?: string;
@@ -17,7 +17,7 @@ export class AppMountCreateDialog implements OnDestroy {
 
     constructor(
         public readonly dialogRef: DialogRef<MountCreateDialogOptions, Mount>,
-        private readonly mountService: SCDKMountService,
+        private readonly mountService: SCSDKMountService,
     ) {}
 
     private readonly _destroy: Subject<void> = new Subject();
@@ -57,14 +57,16 @@ export class AppMountCreateDialog implements OnDestroy {
                 name: this.form.get("name").value,
                 setAsDefault: this.form.get("setAsDefault").value,
                 doScan: this.form.get("doScan").value
-            }).pipe((takeUntil(this._destroy))).subscribe((response) => {
-                this.loading = false;
-                if(response.error) {
-                    this.errorMessage = response.message;
+            }).pipe((takeUntil(this._destroy))).subscribe((request) => {
+                this.loading = request.loading;
+                if(request.loading) return;
+
+                if(request.error) {
+                    this.errorMessage = request.error?.message;
                     return;
                 }
 
-                this.dialogRef.close(response.payload);
+                this.dialogRef.close(request.data);
             })
             return;
         }
@@ -76,16 +78,17 @@ export class AppMountCreateDialog implements OnDestroy {
             directory: this.form.get("directory").value,
             setAsDefault: this.form.get("setAsDefault").value,
             doScan: this.form.get("doScan").value
-        }).pipe(takeUntil(this._destroy)).subscribe((response: ApiResponse<CreateResult<Mount>>) => {
-            this.loading = false;
+        }).pipe(takeUntil(this._destroy)).subscribe((request) => {
+            this.loading = request.loading;
+            if(request.loading) return;
 
-            if(response.error) {
-                this.errorMessage = response.message;
+            if(request.error) {
+                this.errorMessage = request.error?.message;
                 return;
             }
 
-            if(!response.payload.existed) {
-                this.dialogRef.close(response.payload.data);
+            if(!request.data?.existed) {
+                this.dialogRef.close(request.data.data);
             } else {
                 this.dialogRef.close(null);
             }

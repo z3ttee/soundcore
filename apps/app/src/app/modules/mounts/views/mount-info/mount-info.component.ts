@@ -3,7 +3,7 @@ import { ChangeDetectionStrategy, Component, ElementRef, OnDestroy, OnInit, View
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BehaviorSubject, combineLatest, map, Observable, Subject, switchMap, takeUntil, tap } from 'rxjs';
-import { File, Future, Mount, SCDKFileService, SCDKMountService, toFuture } from '@soundcore/sdk';
+import { File, Future, Mount, SCDKFileService, SCSDKMountModule, SCSDKMountService } from '@soundcore/sdk';
 import { AppMountCreateDialog, MountCreateDialogOptions } from 'src/app/dialogs/mount-create-dialog/mount-create-dialog.component';
 import { SCNGXDatasource, SCNGXDialogService } from '@soundcore/ngx';
 
@@ -22,7 +22,7 @@ interface MountInfoProps {
 export class MountInfoComponent implements OnInit, OnDestroy {
 
   constructor(
-    private readonly mountService: SCDKMountService,
+    private readonly mountService: SCSDKMountService,
     private readonly fileService: SCDKFileService,
     private readonly activatedRoute: ActivatedRoute,
     private readonly router: Router,
@@ -42,7 +42,7 @@ export class MountInfoComponent implements OnInit, OnDestroy {
     this.activatedRoute.paramMap.pipe(
       takeUntil(this._destroy),
       map((paramMap) => paramMap.get("mountId")),
-      switchMap((mountId) => this.mountService.findById(mountId).pipe(toFuture())),
+      switchMap((mountId) => this.mountService.findById(mountId)),
       map((request): [Future<Mount>, SCNGXDatasource] => {
         if(request.loading) return [request, null];
         return [
@@ -67,14 +67,15 @@ export class MountInfoComponent implements OnInit, OnDestroy {
   }
 
   public deleteMount(mount: Mount) {
-    this.dialog.confirm("Mount löschen", "Möchtest du den Mounpunkt wirklich löschen?").$afterClosed.pipe(takeUntil(this._destroy)).subscribe((confirmed) => {
+    this.dialog.confirm("Möchtest du den Mountpunkt wirklich löschen?", "Mount löschen").$afterClosed.pipe(takeUntil(this._destroy)).subscribe((confirmed) => {
       if(confirmed) {
         this.$deleting.next(true);
-        this.mountService.deleteById(mount.id).pipe(takeUntil(this._destroy)).subscribe((response) => {
-          this.$deleting.next(false);
+        this.mountService.deleteById(mount.id).pipe(takeUntil(this._destroy)).subscribe((request) => {
+          this.$deleting.next(request.loading);
+          if(request.loading) return;
 
-          if(response.error) {
-            this.snackbar.open(`${response.message}`, null, { duration: 5000 });
+          if(request.error) {
+            this.snackbar.open(`${request.error.message}`, null, { duration: 5000 });
             return;
           }
 
@@ -103,6 +104,14 @@ export class MountInfoComponent implements OnInit, OnDestroy {
       }
     })
 
+  }
+
+  public triggerReindex(mount: Mount) {
+    if(!mount) return;
+
+    this.mountService.rescanMount(mount.id).pipe(takeUntil(this._destroy)).subscribe((request) => {
+      console.log(request);
+    });
   }
 
 }
