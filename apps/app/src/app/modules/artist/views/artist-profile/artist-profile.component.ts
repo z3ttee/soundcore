@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { combineLatest, map, Observable, Subject, switchMap, takeUntil } from 'rxjs';
 import { SCNGXTracklist, SCNGXTracklistBuilder } from '@soundcore/ngx';
@@ -20,6 +20,7 @@ interface ArtistInfoProps {
   selector: 'app-artist-profile',
   templateUrl: './artist-profile.component.html',
   styleUrls: ['./artist-profile.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ArtistProfileComponent implements OnInit, OnDestroy {
 

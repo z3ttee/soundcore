@@ -51,6 +51,9 @@
         </div>
 
         <!-- List -->
+        <div class="px-window pb-2">
+            <scngx-ui-section-title [route]="['./songs']">Beliebte Songs</scngx-ui-section-title>
+        </div>
         <div class="px-window">
             <ng-container *ngIf="props.tracklist">
                 <div *uiScroll="let item of props.tracklist; index as i">

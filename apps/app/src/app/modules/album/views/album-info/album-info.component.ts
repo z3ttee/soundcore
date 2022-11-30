@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { combineLatest, map, Observable, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { Album, Future, Page, SCDKAlbumService, toFutureCompat } from '@soundcore/sdk';
@@ -20,7 +20,8 @@ interface AlbumInfoProps {
 
 @Component({
   templateUrl: './album-info.component.html',
-  styleUrls: ['./album-info.component.scss']
+  styleUrls: ['./album-info.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AlbumInfoComponent implements OnInit, OnDestroy {
 
