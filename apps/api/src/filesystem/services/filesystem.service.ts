@@ -59,6 +59,11 @@ export class FileSystemService {
         if(typeof mount === "undefined" || mount == null) {
             throw new Error(`Valid mount object required on file object in order to resolve absolute path of the file. Found: ${typeof mount === "undefined"}`);
         }
+
+        if(typeof mount.directory !== "string") {
+            throw new Error(`Invalid directory value on mount. Expected type string but received: ${typeof mount.directory}`);
+        }
+
         return path.resolve(mount.directory);
     }
 

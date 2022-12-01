@@ -11,6 +11,7 @@ import workerpool from "workerpool";
 import { FileSystemService } from "../../filesystem/services/filesystem.service";
 import { MountRegistryService } from "../services/mount-registry.service";
 import { MountRegistry } from "../entities/mount-registry.entity";
+import { MountScanFlag, MountScanProcessDTO } from "../dtos/scan-process.dto";
 
 const logger = new Logger("MountWorker");
 const filesystem = new FileSystemService();
@@ -28,8 +29,8 @@ export const MOUNT_STEP_SCAN = "SCANNING";
  * 3. 
  */
 
-export default async function (job: WorkerJobRef<Mount>): Promise<MountScanResultDTO> {
-    const mount = job.payload;
+export default async function (job: WorkerJobRef<MountScanProcessDTO>): Promise<MountScanResultDTO> {
+    const { mount, flag } = job.payload;
 
     if(typeof mount === "undefined" || mount == null) {
         throw new Error("Invalid mount: null");
@@ -43,8 +44,12 @@ export default async function (job: WorkerJobRef<Mount>): Promise<MountScanResul
         fs.mkdirSync(mountDirectory, { recursive: true });
     }
 
-    // Execute scan
-    return scanMount(job);
+    // Execute correct type of scan
+    if(flag === MountScanFlag.DEFAULT_SCAN) {
+        return scanMount(job);
+    } else if(flag === MountScanFlag.RESCAN) {
+        return rescanMount(job);
+    }
 }
 
 /**
@@ -54,13 +59,13 @@ export default async function (job: WorkerJobRef<Mount>): Promise<MountScanResul
  * @param exclude Exclude already scanned files.
  * @returns MountScanResultDTO
  */
-async function scanMount(job: WorkerJobRef<Mount>): Promise<MountScanResultDTO> {
+async function scanMount(job: WorkerJobRef<MountScanProcessDTO>): Promise<MountScanResultDTO> {
     return new Promise(async (resolve, reject) => {
         // Update progress
         updateProgress(job, 0.33);
 
         // Prepare variables
-        const mount = job.payload;
+        const { mount } = job.payload;
         const directory = path.resolve(mount.directory);
         const startTime = Date.now();
 
@@ -108,6 +113,23 @@ async function scanMount(job: WorkerJobRef<Mount>): Promise<MountScanResultDTO> 
             reject(err);
         })
     })
+}
+
+async function rescanMount(job: WorkerJobRef<MountScanProcessDTO>): Promise<MountScanResultDTO> {
+    const fsService = new FileSystemService();
+    const registryService = new MountRegistryService(fsService);
+
+    const { mount } = job.payload;
+    return registryService.resetRegistryOf(mount).then((registry) => {
+        logger.verbose(`Registry of mount '${mount.name}' has been reset.`);
+        return scanMount(job).then((result) => {
+            // Transform result so the RESCAN flag is carried on to the next process.
+            return {
+                ...result,
+                flag: MountScanFlag.RESCAN
+            };
+        });
+    });
 }
 
 /**

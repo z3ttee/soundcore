@@ -13,6 +13,7 @@ import { FileSystemService } from '../../filesystem/services/filesystem.service'
 import { WorkerQueue } from '@soundcore/nest-queue';
 import { MountRegistryService } from './mount-registry.service';
 import { MountStatus } from '../enums/mount-status.enum';
+import { MountScanFlag, MountScanProcessDTO } from '../dtos/scan-process.dto';
 
 @Injectable()
 export class MountService {
@@ -22,7 +23,7 @@ export class MountService {
         @InjectRepository(Mount) private readonly repository: Repository<Mount>,
         private readonly fileSystem: FileSystemService,
         private readonly mountRegistryService: MountRegistryService,
-        private readonly queue: WorkerQueue
+        private readonly queue: WorkerQueue<MountScanProcessDTO>
     ) { }
 
     /**
@@ -151,8 +152,9 @@ export class MountService {
         const mount = await this.resolveMount(idOrObject);
         if(!mount) throw new NotFoundException("Mount not found");
 
-        return this.mountRegistryService.resetRegistryOf(mount).then(() => {
-            return this.queue.enqueue(mount);
+        return this.queue.enqueue({
+            mount: mount,
+            flag: MountScanFlag.RESCAN
         });
     }
 
@@ -162,11 +164,14 @@ export class MountService {
      * @param idOrObject Mount ID or Object
      * @returns Job<Mount>
      */
-    private async rescanMountInternal(idOrObject: string | Mount): Promise<number> {
+    private async scanMountInternal(idOrObject: string | Mount): Promise<number> {
         const mount = await this.resolveMount(idOrObject);
         if(!mount) throw new NotFoundException("Mount not found");
 
-        return this.queue.enqueue(mount);
+        return this.queue.enqueue({
+            mount: mount,
+            flag: MountScanFlag.DEFAULT_SCAN
+        });
     }
 
     /**
@@ -330,7 +335,7 @@ export class MountService {
             fetchedElements += page.size;
 
             for(const mount of page.elements) {
-                this.rescanMountInternal(mount);
+                this.scanMountInternal(mount);
             }
         }
     }

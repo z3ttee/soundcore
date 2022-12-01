@@ -9,6 +9,7 @@ import { MountService } from "./mount.service";
 import { AdminGateway } from "../../gateway/gateways/admin-gateway.gateway";
 import { MountStatus } from "../enums/mount-status.enum";
 import { Environment } from "@soundcore/common";
+import { MountScanProcessDTO } from "../dtos/scan-process.dto";
 
 @Injectable()
 export class MountQueueService {
@@ -18,7 +19,7 @@ export class MountQueueService {
         private readonly mountService: MountService,
         private readonly adminGateway: AdminGateway,
         private readonly events: EventEmitter2,
-        private readonly queue: WorkerQueue<Mount>
+        private readonly queue: WorkerQueue<MountScanProcessDTO>
     ) {
 
         this.queue.on("waiting", async () => {
@@ -33,50 +34,55 @@ export class MountQueueService {
             }
         });
 
-        this.queue.on("started", async (job: WorkerJob<Mount>) => {
+        this.queue.on("started", async (job: WorkerJob<MountScanProcessDTO>) => {
             const { payload } = job;
+            const { mount } = payload;
 
             // Update status
-            this.mountService.setMountStatus(payload, MountStatus.SCANNING);
+            this.mountService.setMountStatus(mount, MountStatus.SCANNING);
 
-            this.logger.verbose(`Looking for files on mount '${payload.name}'...`);
+            this.logger.verbose(`Looking for files on mount '${mount.name}'...`);
         });
 
         // Completed
-        this.queue.on("completed", async (job: WorkerJob<Mount, MountScanResultDTO>) => {
+        this.queue.on("completed", async (job: WorkerJob<MountScanProcessDTO, MountScanResultDTO>) => {
             const { payload, result } = job;
+            const { mount } = payload;
 
-            this.mountService.setMountStatus(job.payload, MountStatus.UP);
-            this.adminGateway.sendMountStatusUpdate(job.payload, null);
-            this.mountService.updateLastScanned(job.payload);
+            this.mountService.setMountStatus(mount, MountStatus.UP);
+            this.adminGateway.sendMountStatusUpdate(mount, null);
+            this.mountService.updateLastScanned(mount);
 
             const files = result?.files || [];
 
             // this.events.emit(EVENT_TRIGGER_FILE_PROCESS_BY_FLAG, new FilesFoundEvent(job.payload, []));
 
             if(files.length <= 0) {
-                this.logger.verbose(`No new files found (total: ${result?.totalFiles}) on mount '${payload.name}'. Took ${job.result?.timeMs}ms.`);
+                this.logger.verbose(`No new files found (total: ${result?.totalFiles}) on mount '${mount.name}'. Took ${job.result?.timeMs}ms.`);
                 return;
             }
 
-            this.logger.verbose(`Found ${files.length} new files (total: ${result?.totalFiles}) on mount '${payload.name}'. Took ${job.result?.timeMs}ms.`);
-            this.events.emit(EVENT_FILES_FOUND, new FilesFoundEvent(job.payload, files));
+            this.logger.verbose(`Found ${files.length} new files (total: ${result?.totalFiles}) on mount '${mount.name}'. Took ${job.result?.timeMs}ms.`);
+            this.events.emit(EVENT_FILES_FOUND, new FilesFoundEvent(mount, files));
         });
 
         // Progress
-        this.queue.on("progress", async (job: WorkerJobRef<Mount>) => {
+        this.queue.on("progress", async (job: WorkerJobRef<MountScanProcessDTO>) => {
+            const { mount } = job.payload;
+
             if(Environment.isDebug) {
-                this.logger.debug(`Received progress update from mount ${job.payload.name}: ${job.progress}`);
+                this.logger.debug(`Received progress update from mount ${mount.name}: ${job.progress}`);
             }
 
-            this.mountService.setMountStatus(job.payload, MountStatus.SCANNING);
-            this.adminGateway.sendMountStatusUpdate(job.payload, job.progress);
+            this.mountService.setMountStatus(mount, MountStatus.SCANNING);
+            this.adminGateway.sendMountStatusUpdate(mount, job.progress);
         });
 
         // Failed
-        this.queue.on("failed", async (job: WorkerJobRef<Mount>, error: Error) => {
-            this.logger.error(`Failed looking for files on mount ${job.payload.name}: ${error.message}`, error.stack);
-            this.mountService.setMountStatus(job.payload, MountStatus.UP);
+        this.queue.on("failed", async (job: WorkerJobRef<MountScanProcessDTO>, error: Error) => {
+            const { mount } = job.payload;
+            this.logger.error(`Failed looking for files on mount ${mount.name}: ${error.message}`, error.stack);
+            this.mountService.setMountStatus(mount, MountStatus.UP);
         });
     }
 }
