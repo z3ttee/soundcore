@@ -1,4 +1,4 @@
-import { File } from "../../file/entities/file.entity";
+import { FileID } from "../../file/entities/file.entity";
 import { Mount } from "../../mount/entities/mount.entity";
 
 export enum IndexerProcessMode {
@@ -14,9 +14,9 @@ export enum IndexerProcessType {
 export class IndexerProcessDTO {
 
     constructor(
-        public readonly files: File[],
-        public readonly type: IndexerProcessType = IndexerProcessType.DEFAULT,
-        public readonly mount?: Mount
+        public readonly fileIds: FileID[],
+        public readonly mount: Mount,
+        public readonly type: IndexerProcessType = IndexerProcessType.DEFAULT
     ) {}
 
 }

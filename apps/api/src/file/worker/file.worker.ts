@@ -2,52 +2,59 @@ import fs from "node:fs";
 import crypto from "node:crypto";
 
 import { Logger } from "@nestjs/common";
-import { FileProcessDTO, FileProcessType } from "../dto/file-process.dto";
-import { File, FileFlag } from "../entities/file.entity";
+import { FileProcessDTO, FileProcessFlag } from "../dto/file-process.dto";
+import { File, FileFlag, FileID } from "../entities/file.entity";
 import { WorkerJobRef, WorkerProgressEvent } from "@soundcore/nest-queue";
 import workerpool from "workerpool";
 import Database from "../../utils/database/database-worker-client";
 import { FileService } from "../services/file.service";
 import { FileProcessResultDTO } from "../dto/file-process-result.dto";
-import { FileDTO } from "../../mount/dtos/file.dto";
+import { FileDTO } from "../dto/file.dto";
 import { Batch } from "@soundcore/common";
 import { DataSource } from "typeorm";
 import { FileSystemService } from "../../filesystem/services/filesystem.service";
+import { Mount } from "../../mount/entities/mount.entity";
+import { MountService } from "../../mount/services/mount.service";
+import { MountRegistryService } from "../../mount/services/mount-registry.service";
+import { MountScanFlag } from "../../mount/dtos/scan-process.dto";
 
 const logger = new Logger("FileWorker")
 
-export default async function (job: WorkerJobRef<FileProcessDTO>): Promise<FileProcessResultDTO> {
-    return Database.connect().then(async (datasource) => {
-        
-        const { mount, type } = job.payload;
-        const startTime = Date.now();
-        const results: File[] = [];
+// What comes in? FileDTO[]
+// What comes out? FileID[]
 
-        if(type == FileProcessType.DEFAULT) {
+export default async function (job: WorkerJobRef<FileProcessDTO>): Promise<FileProcessResultDTO[]> {
+    return Database.connect().then(async (datasource) => {
+        const { mount, flag, scanFlag } = job.payload;
+        const startTime = Date.now();
+        const fileIds: FileID[] = [];
+
+        if(flag == FileProcessFlag.DEFAULT) {
             // This will create new file entities by given dtos.
-            results.push(...await processGivenFiles(job, datasource));
-        } else if(type == FileProcessType.FLAG_BASED) {
+            fileIds.push(...await processGivenFiles(job, datasource));
+            const timeTookMs = Date.now() - startTime;
+            return [new FileProcessResultDTO(mount, fileIds, timeTookMs, flag, scanFlag)];
+        } else if(flag == FileProcessFlag.CONTINUE_AWAITING) {
             // This will just fetch all files depending on the awaiting flag.
             // It pushes entities to the result list which then will hand over the data
             // to the next step in the indexation pipeline
-            results.push(...await processByAwaitingFlag(job, datasource))
+            return continueAwaitingFiles(job);
         } else {
-            logger.warn(`Received file process task with an invalid process type. Received ${type}, expected one of [${Object.values(FileProcessType)}]`);
-        }
-    
-        const timeTookMs = Date.now() - startTime;
-        return new FileProcessResultDTO(mount, results, timeTookMs);
+            throw new Error(`Received file process task with an invalid process type. Received ${flag}, expected one of [${Object.values(FileProcessFlag)}]`);
+        }    
     });
 }
 
-async function processGivenFiles(job: WorkerJobRef<FileProcessDTO>, datasource: DataSource) {
+async function processGivenFiles(job: WorkerJobRef<FileProcessDTO>, datasource: DataSource): Promise<FileID[]> {
     const { mount, files } = job.payload;
+
+    // TODO: Implement rescans
 
     const fileSystem = new FileSystemService();
     const service = new FileService(datasource.getRepository(File));
 
-    return Batch.of<FileDTO, File>(files).do(async (batch, currentBatch, batches) => {
-        const results: File[] = [];
+    return Batch.of<FileDTO, FileID>(files).do(async (batch, currentBatch, batches) => {
+        const results: FileID[] = [];
         const collectedFiles: File[] = [];
 
         for(const dto of batch) {
@@ -84,7 +91,7 @@ async function processGivenFiles(job: WorkerJobRef<FileProcessDTO>, datasource: 
         results.push(... await service.createFiles(collectedFiles).catch((error: Error) => {
             logger.error(`Error occured whilst processing batch ${currentBatch}: ${error.message}`, error.stack);
             return [];
-        }));
+        }).then((files) => files.map((file): FileID => ({ id: file.id }))));
 
         return results;
     }).progress((batches, current) => {
@@ -98,13 +105,36 @@ async function processGivenFiles(job: WorkerJobRef<FileProcessDTO>, datasource: 
     }).start().catch(() => []);
 }
 
-async function processByAwaitingFlag(job: WorkerJobRef<FileProcessDTO>, datasource: DataSource) {
-    const service = new FileService(datasource.getRepository(File)); 
+async function continueAwaitingFiles(job: WorkerJobRef<FileProcessDTO>): Promise<FileProcessResultDTO[]> {
+    const startedAtMs = Date.now();
+    const { flag, scanFlag } = job.payload;
 
-    const files: File[] = await service.findByFlag(FileFlag.PENDING_ANALYSIS).catch((error: Error) => {
-        logger.error(`Could not fetch files to process files by flag: ${error.message}`);
-        return [];
+    return Database.connect().then((datasource) => {
+        const fsService = new FileSystemService();
+        const registryService = new MountRegistryService(fsService);
+
+        const mountRepo = datasource.getRepository(Mount);
+        const fileRepo = datasource.getRepository(File);
+
+        const mountService = new MountService(mountRepo, fsService, registryService, null);
+        const fileService = new FileService(fileRepo);
+
+        return mountService.findHasAwaitingFiles().then((mounts) => {
+            return Batch.of<Mount, FileProcessResultDTO>(mounts, 1).do(async (batch) => {
+                // As the batch size is always 1
+                const mount = batch[0];
+                const files = await fileService.findByFlagAndMount(mount.id, FileFlag.PENDING_ANALYSIS);
+
+                return [ new FileProcessResultDTO(
+                    mount, 
+                    files.map((file) => ({ id: file.id })), 
+                    Date.now() - startedAtMs, 
+                    flag,
+                    scanFlag
+                )];
+            }).start().then((values) => {
+                return values;
+            });
+        });
     });
-
-    return files;
 }

@@ -21,7 +21,7 @@ export class IndexerQueueService {
         });
 
         this.queue.on("completed", (job: WorkerJob<IndexerProcessDTO, IndexerResultDTO>) => {
-            const { result, payload: { files } } = job;
+            const { result, payload: { fileIds } } = job;
             const { entries, timeTookMs } = result || {};
 
             if(Environment.isDebug) {
@@ -31,7 +31,7 @@ export class IndexerQueueService {
             }
             
             // Print out results & stats
-            const skippedFiles = files.length - entries.length;
+            const skippedFiles = fileIds.length - entries.length;
             this.logger.verbose(`Successfully read metadata of ${entries.length} files.${skippedFiles > 0 ? ` Skipped ${skippedFiles} files.` : ''} Took ${timeTookMs}ms`);
             // this.eventEmitter.emit(EVENT_METADATA_CREATED, result);
 
@@ -50,12 +50,8 @@ export class IndexerQueueService {
         });
 
         this.queue.on("started", (job: WorkerJob<IndexerProcessDTO, IndexerResultDTO>) => {
-            if(job.payload.type == IndexerProcessType.DEFAULT) {
-                this.logger.verbose(`Starting analyzing id3 tags of ${job.payload.files.length} files on mount '${job.payload.mount.name}'`);
-            } else {
-                this.logger.verbose(`Starting analyzing id3 tags of ${job.payload.files.length} files`);
-            }
-        })
+            this.logger.verbose(`Starting analyzing id3 tags of ${job.payload.fileIds.length} files on mount '${job.payload.mount.name}'`);
+        });
     }
 
     /**
@@ -66,7 +62,7 @@ export class IndexerQueueService {
      */
     @OnEvent(EVENT_FILES_PROCESSED)
     public handleFileProcessedEvent(event: FilesProcessedEvent) {
-        this.queue.enqueue(new IndexerProcessDTO(event.files, IndexerProcessType.DEFAULT, event.mount))
+        this.queue.enqueue(new IndexerProcessDTO(event.files, event.mount, IndexerProcessType.DEFAULT))
     }
 
     /**
@@ -75,9 +71,9 @@ export class IndexerQueueService {
      * successfully by the fileService.
      * @param payload File object
      */
-     @OnEvent(EVENT_TRIGGER_FILE_PROCESS_BY_FLAG)
-     public handleFileProcessByFlagEvent(event: FilesProcessedEvent) {
-         this.queue.enqueue(new IndexerProcessDTO(event.files,  IndexerProcessType.FLAG_BASED))
-     }
+    //  @OnEvent(EVENT_TRIGGER_FILE_PROCESS_BY_FLAG)
+    //  public handleFileProcessByFlagEvent(event: FilesProcessedEvent) {
+    //      this.queue.enqueue(new IndexerProcessDTO(event.files,  IndexerProcessType.FLAG_BASED))
+    //  }
 
 }

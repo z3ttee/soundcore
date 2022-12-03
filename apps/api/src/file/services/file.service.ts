@@ -6,7 +6,7 @@ import { Mount } from '../../mount/entities/mount.entity';
 import { Song } from '../../song/entities/song.entity';
 import { CreateResult } from '../../utils/results/creation.result';
 import { CreateFileDTO } from '../dto/create-file.dto';
-import { File, FileFlag } from '../entities/file.entity';
+import { File, FileFlag, FileID } from '../entities/file.entity';
 
 @Injectable()
 export class FileService {
@@ -22,6 +22,14 @@ export class FileService {
             .leftJoinAndSelect("file.mount", "mount")
             .where("file.id = :fileId", { fileId })
             .getOne();
+    }
+
+    public async findByIds(fileIds: FileID[]): Promise<File[]> {
+        return this.repository.createQueryBuilder("file")
+            .leftJoinAndSelect("file.song", "song")
+            .leftJoin("file.mount", "mount").addSelect(["mount.id"])
+            .whereInIds(fileIds)
+            .getMany();
     }
 
     public async findBySongId(songId: string): Promise<File> {

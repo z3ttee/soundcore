@@ -1,9 +1,8 @@
 import { Logger } from "@nestjs/common";
 import { glob } from "glob";
 import fs from "fs";
-import { Mount } from "../entities/mount.entity";
 import path from "path";
-import { FileDTO } from "../dtos/file.dto";
+import { FileDTO } from "../../file/dto/file.dto";
 import { MountScanResultDTO } from "../dtos/scan-result.dto";
 import { WorkerJobRef, WorkerProgressEvent } from "@soundcore/nest-queue";
 
@@ -104,7 +103,7 @@ async function scanMount(job: WorkerJobRef<MountScanProcessDTO>): Promise<MountS
             // Update registry file entries
             registry.files = matches;
             registryService.saveRegistry(registry).finally(() => {
-                resolve(new MountScanResultDTO(files, matches.length, Date.now() - startTime));
+                resolve(new MountScanResultDTO(mount, files, matches.length, Date.now() - startTime));
             });
         })
 

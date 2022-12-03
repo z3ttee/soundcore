@@ -9,6 +9,10 @@ export enum FileFlag {
     ERROR = 3
 }
 
+export interface FileID {
+    id: string;
+}
+
 @Entity()
 @Index("UQ-files-on-mount", ["pathHash", "mount"], { unique: true })
 export class File {

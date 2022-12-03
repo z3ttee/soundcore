@@ -12,7 +12,7 @@ import { Artwork } from "../../artwork/entities/artwork.entity";
 import { InternalServerErrorException, Logger } from "@nestjs/common";
 import { FileService } from "../../file/services/file.service";
 import { EventEmitter2 } from "@nestjs/event-emitter";
-import { File, FileFlag } from "../../file/entities/file.entity";
+import { File, FileFlag, FileID } from "../../file/entities/file.entity";
 import { IndexerCreatedResources, IndexerResultDTO, IndexerResultEntry } from "../dtos/indexer-result.dto";
 import { Song } from "../../song/entities/song.entity";
 import { Album } from "../../album/entities/album.entity";
@@ -50,7 +50,7 @@ export interface ID3Album {
 
 export default function (job: WorkerJobRef<IndexerProcessDTO>): Promise<IndexerResultDTO> {
     const { payload } = job;
-    const { files } = payload;
+    const { fileIds } = payload;
     const jobMount = payload.mount;
 
     return Database.connect().then((dataSource) => {
@@ -74,7 +74,7 @@ export default function (job: WorkerJobRef<IndexerProcessDTO>): Promise<IndexerR
 
             const createdResources: IndexerCreatedResources = new IndexerCreatedResources();
 
-            return Batch.of<File, IndexerResultEntry>(files, BATCH_SIZE).do(async (batch) => {
+            return Batch.of<FileID, IndexerResultEntry>(fileIds, BATCH_SIZE).do(async (fileIdsBatch) => {
                 const entries: IndexerResultEntry[] = [];
 
                 const collectedFiles: Map<string, File> = new Map();
@@ -82,6 +82,8 @@ export default function (job: WorkerJobRef<IndexerProcessDTO>): Promise<IndexerR
                 const artists: Map<string, CreateArtistDTO> = new Map();
                 const albums: Map<string, CreateAlbumDTO> = new Map();
                 const songs: Map<string, CreateSongDTO> = new Map();
+
+                const batch: File[] = await fileService.findByIds(fileIdsBatch);
 
                 for(const file of batch) {
                     // Set mount for file context

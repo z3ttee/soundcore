@@ -1,16 +1,17 @@
-import { FileDTO } from "../../mount/dtos/file.dto";
+import { FileDTO } from "./file.dto";
 import { Mount } from "../../mount/entities/mount.entity";
+import { MountScanFlag } from "../../mount/dtos/scan-process.dto";
 
-export enum FileProcessType {
-
+export enum FileProcessFlag {
     DEFAULT = "default",
-    FLAG_BASED = "flag_based"
-
+    CONTINUE_AWAITING = "continue_awaiting_files"
 }
+
 export class FileProcessDTO {
     constructor(
         public readonly mount: Mount,
         public readonly files: FileDTO[],
-        public readonly type: FileProcessType = FileProcessType.DEFAULT
+        public readonly scanFlag: MountScanFlag,
+        public readonly flag: FileProcessFlag
     ) {}
 }

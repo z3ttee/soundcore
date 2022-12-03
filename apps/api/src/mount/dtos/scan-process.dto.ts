@@ -1,15 +1,15 @@
 import { Mount } from "../entities/mount.entity";
 
 export enum MountScanFlag {
-    DEFAULT_SCAN = 0,
-    RESCAN = 1
+    DEFAULT_SCAN = "scan",
+    RESCAN = "rescan"
 }
 
 export class MountScanProcessDTO {
 
     constructor(
+        public readonly flag: MountScanFlag,
         public readonly mount: Mount,
-        public readonly flag: MountScanFlag
     ) {}
 
 }

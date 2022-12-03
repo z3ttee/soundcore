@@ -1,4 +1,4 @@
-import { FileDTO } from "../../mount/dtos/file.dto";
+import { FileDTO } from "./file.dto";
 import { Mount } from "../../mount/entities/mount.entity";
 
 export class CreateFileDTO {

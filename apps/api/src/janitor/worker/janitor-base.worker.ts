@@ -5,9 +5,10 @@ import { DataSource } from "typeorm";
 import { ImportTask } from "../../import/entities/import.entity";
 import { ImportService } from "../../import/services/import.service";
 import Database from "../../utils/database/database-worker-client";
+import { JanitorResultDTO } from "../dtos/janitor-result.dto";
 import { Janitor, JanitorRef, JanitorTask } from "../entities/janitor.entity";
 
-export default async function (job: WorkerJobRef<Janitor>): Promise<any> {
+export default async function (job: WorkerJobRef<Janitor>): Promise<JanitorResultDTO> {
     const janitor = job.payload;
     const task = janitor?.ref?.task;
 
@@ -33,7 +34,7 @@ export default async function (job: WorkerJobRef<Janitor>): Promise<any> {
  * @param janitor 
  * @returns 
  */
-async function clearOngoingImports(datasource: DataSource, janitor: JanitorRef) {
+async function clearOngoingImports(datasource: DataSource, janitor: JanitorRef): Promise<JanitorResultDTO> {
     const logger = new Logger(janitor.name);
     const startTimeMs = Date.now();
 
@@ -47,6 +48,7 @@ async function clearOngoingImports(datasource: DataSource, janitor: JanitorRef) 
     return service.clearOngoingImports().then((updateResult) => {
         const endTimeMs = Date.now();
         // logger.log(`Cleared ${updateResult.affected ?? 0} ongoing import tasks. Took ${endTimeMs - startTimeMs}ms.`);
+        return {};
     });
 }
 
@@ -57,7 +59,7 @@ async function clearOngoingImports(datasource: DataSource, janitor: JanitorRef) 
  * @param janitor 
  * @returns 
  */
- async function clearOldImports(datasource: DataSource, janitor: JanitorRef) {
+ async function clearOldImports(datasource: DataSource, janitor: JanitorRef): Promise<JanitorResultDTO> {
     const logger = new Logger(janitor.name);
     const startTimeMs = Date.now();
 
@@ -71,5 +73,6 @@ async function clearOngoingImports(datasource: DataSource, janitor: JanitorRef) 
     return service.clearOldImports().then((updateResult) => {
         const endTimeMs = Date.now();
         // logger.log(`Cleared ${updateResult.affected ?? 0} old import tasks. Took ${endTimeMs - startTimeMs}ms.`);
+        return {};
     });
 }

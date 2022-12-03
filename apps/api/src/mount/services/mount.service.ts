@@ -14,6 +14,7 @@ import { WorkerQueue } from '@soundcore/nest-queue';
 import { MountRegistryService } from './mount-registry.service';
 import { MountStatus } from '../enums/mount-status.enum';
 import { MountScanFlag, MountScanProcessDTO } from '../dtos/scan-process.dto';
+import { FileFlag } from '../../file/entities/file.entity';
 
 @Injectable()
 export class MountService {
@@ -120,6 +121,13 @@ export class MountService {
      */
     public async findDefault(): Promise<Mount> {
         return this.findDefaultOfBucket(this.fileSystem.getInstanceId());
+    }
+
+    public async findHasAwaitingFiles(): Promise<Mount[]> {
+        return this.repository.createQueryBuilder("mount")
+            .leftJoin("mount.files", "file")
+            .where("file.flag = :flag", { flag: FileFlag.PENDING_ANALYSIS })
+            .getMany();
     }
 
     /**
