@@ -6,9 +6,9 @@ import { FilesFoundEvent } from "../../events/files-found.event";
 import { MountScanResultDTO } from "../dtos/scan-result.dto";
 import { MountService } from "./mount.service";
 import { AdminGateway } from "../../gateway/gateways/admin-gateway.gateway";
-import { MountStatus } from "../enums/mount-status.enum";
 import { Environment } from "@soundcore/common";
 import { MountScanProcessDTO } from "../dtos/scan-process.dto";
+import { MountStatus } from "../entities/mount.entity";
 
 @Injectable()
 export class MountQueueService {
@@ -49,14 +49,14 @@ export class MountQueueService {
             const files = result?.files || [];
             const mount = result.mount;
 
+            this.mountService.setMountStatus(mount, MountStatus.UP);
+            this.adminGateway.sendMountStatusUpdate(mount, null);
+            this.mountService.updateLastScanned(mount);
+
             if(files.length <= 0) {
                 this.logger.verbose(`No new files found (total: ${result?.totalFiles}) on mount '${mount.name}'. Took ${result?.timeMs}ms.`);
                 return;
             }
-
-            this.mountService.setMountStatus(mount, MountStatus.UP);
-            this.adminGateway.sendMountStatusUpdate(mount, null);
-            this.mountService.updateLastScanned(mount);
 
             this.logger.verbose(`Found ${files.length} new files (total: ${result?.totalFiles}) on mount '${mount.name}'. Took ${result?.timeMs}ms.`);
             this.events.emit(EVENT_FILES_FOUND, new FilesFoundEvent(mount, files, flag));
