@@ -1,4 +1,4 @@
-import { MountStatus } from "../../mount/enums/mount-status.enum";
+import { MountStatus } from "../../mount/entities/mount.entity";
 
 export class MountStatusUpdateEvent {
 
