@@ -11,13 +11,13 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { In, Repository, UpdateResult } from "typeorm";
 import { EventEmitter2 } from "@nestjs/event-emitter";
 import { Environment } from "@soundcore/common";
-import { SyncingService } from "../../utils/services/syncing.service";
+import { SyncableService } from "../../utils/services/syncing.service";
 import { Song } from "../entities/song.entity";
 import { MeiliSongService } from "../../meilisearch/services/meili-song.service";
 import { User } from "../../user/entities/user.entity";
 import { SyncFlag } from "../../meilisearch/interfaces/syncable.interface";
 import { CreateSongDTO } from "../dtos/create-song.dto";
-import { Artwork } from "../../artwork/entities/artwork.entity";
+import { Artwork, ArtworkID } from "../../artwork/entities/artwork.entity";
 import { GeniusFlag, ResourceFlag } from "../../utils/entities/resource";
 import { ID3TagsDTO } from "../dtos/id3-tags.dto";
 import { SongUniqueFindDTO } from "../dtos/unique-find.dto";
@@ -25,16 +25,14 @@ import { FileFlag } from "../../file/entities/file.entity";
 import { Slug } from "@tsalliance/utilities";
 
 @Injectable()
-export class SongService extends SyncingService {
+export class SongService implements SyncableService<Song> {
     private readonly logger: Logger = new Logger(SongService.name)
 
     constructor(
         @InjectRepository(Song) private readonly repository: Repository<Song>,
         eventEmitter: EventEmitter2,
-        private readonly meiliSong: MeiliSongService
-    ){
-        super(eventEmitter);
-    }
+        private readonly meilisearch: MeiliSongService
+    ){}
 
     /**
      * Find page with the 20 latest indexed songs.
@@ -93,6 +91,20 @@ export class SongService extends SyncingService {
             .leftJoin("song.featuredArtists", "featuredArtist").addSelect(["featuredArtist.id", "featuredArtist.slug", "featuredArtist.name"])
             .leftJoin("song.artwork", "artwork").addSelect(["artwork.id"])
             .where("song.name IN(:names) AND album.name IN(:albumNames) AND (primaryArtist.name IN(:artistNames) OR featuredArtist.name IN(:artistNames))", { names, artistNames, albumNames })
+            .getMany();
+    }
+
+    public async findByArtworkIds(artworkIds: string[]): Promise<Song[]> {
+        return await this.repository.createQueryBuilder("song")
+            .leftJoin("song.album", "album").addSelect(["album.id", "album.slug", "album.name"])
+            .leftJoin("song.primaryArtist", "primaryArtist").addSelect(["primaryArtist.id", "primaryArtist.slug", "primaryArtist.name"])
+            .leftJoin("song.featuredArtists", "featuredArtist").addSelect(["featuredArtist.id", "featuredArtist.slug", "featuredArtist.name"])
+            .leftJoinAndSelect("song.artwork", "artwork", "")
+            .leftJoinAndSelect("song.file", "file")
+            .leftJoinAndSelect("file.mount", "mount")
+            .groupBy("artwork.id")
+            .distinct(true)
+            .where("artwork.id IN (:artworkIds)", { artworkIds })
             .getMany();
     }
 
@@ -269,7 +281,7 @@ export class SongService extends SyncingService {
             .insert()
             .values(dtos)
             .returning(["id"])
-            .orUpdate(["name"], ["name"])
+            .orUpdate(["name"], ["id"], { skipUpdateIfNoValuesChanged: false })
             .execute().then((insertResult) => {
                 return this.repository.createQueryBuilder("song")
                     .leftJoinAndSelect("song.primaryArtist", "primaryArtist")
@@ -277,7 +289,9 @@ export class SongService extends SyncingService {
                     .leftJoinAndSelect("song.file", "file")
                     .leftJoinAndSelect("song.artwork", "artwork")
                     .whereInIds(insertResult.raw)
-                    .getMany();
+                    .getMany().then((songs) => {
+                        return songs;
+                    });
             })
     }
 
@@ -362,11 +376,11 @@ export class SongService extends SyncingService {
 
     /**
      * Synchronize the corresponding document on meilisearch.
-     * @param resource Song data
-     * @returns Song
+     * @param resources Songs to sync
+     * @returns UpdateResult
      */
-    public async requestSync(resources: Song[]) {
-        return this.meiliSong.setSongs(resources).then(() => {
+    public async syncWithMeilisearch(resources: Song[]) {
+        return this.meilisearch.setSongs(resources).then(() => {
             return this.setSyncFlags(resources, SyncFlag.OK);
         }).catch(() => {
             return this.setSyncFlags(resources, SyncFlag.ERROR);
@@ -538,7 +552,7 @@ export class SongService extends SyncingService {
         if(authentication) queryBuilder.loadRelationCountAndMap(`${alias}.liked`, `${alias}.likes`, "likes", (qb) => qb.where("likes.userId = :userId", { userId: authentication?.id }))
 
         // Add basic relations used everywhere
-        queryBuilder.leftJoin(`${alias}.artwork`, "artwork").addSelect(["artwork.id", "artwork.colors"]);
+        queryBuilder.leftJoin(`${alias}.artwork`, "artwork").addSelect(["artwork.id"]);
         queryBuilder.leftJoin(`${alias}.primaryArtist`, "primaryArtist").addSelect(["primaryArtist.id", "primaryArtist.slug", "primaryArtist.name"])
         queryBuilder.leftJoin(`${alias}.featuredArtists`, "featuredArtist").addSelect(["featuredArtist.id", "featuredArtist.slug", "featuredArtist.name"])
 

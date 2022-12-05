@@ -32,7 +32,7 @@ export class File {
     @Column({ nullable: false, default: 0 })
     public size: number;
 
-    @Column()
+    @Column({ nullable: true })
     public mimetype: string;
 
     @Column({ type: "tinyint", nullable: false, default: 0 })

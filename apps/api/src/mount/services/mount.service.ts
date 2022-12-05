@@ -260,9 +260,6 @@ export class MountService {
         if(!mount) throw new NotFoundException("Mount not found");
 
         mount.status = status;
-
-        console.log("setting mount status to ", status);
-
         return this.repository.update(mount.id, {
             status: status
         }).then(() => mount);

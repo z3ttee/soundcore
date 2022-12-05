@@ -2,7 +2,7 @@ import { Environment } from "@soundcore/common";
 import { Injectable, Logger } from "@nestjs/common";
 import { EventEmitter2, OnEvent } from "@nestjs/event-emitter";
 import { WorkerJob, WorkerJobRef, WorkerQueue } from "@soundcore/nest-queue";
-import { EVENT_ALBUMS_CHANGED, EVENT_ARTISTS_CHANGED, EVENT_FILES_PROCESSED, EVENT_METADATA_CREATED, EVENT_SONGS_CHANGED, EVENT_TRIGGER_FILE_PROCESS_BY_FLAG } from "../../constants";
+import { EVENT_ALBUMS_CHANGED, EVENT_ARTISTS_CHANGED, EVENT_FILES_PROCESSED, EVENT_METADATA_CREATED, EVENT_SONGS_CHANGED, EVENT_SONG_CREATE_ARTWORK, EVENT_TRIGGER_FILE_PROCESS_BY_FLAG } from "../../constants";
 import { FilesProcessedEvent } from "../../events/files-processed.event";
 import { IndexerProcessDTO, IndexerProcessType } from "../dtos/indexer-process.dto";
 import { IndexerResultDTO } from "../dtos/indexer-result.dto";
@@ -33,10 +33,10 @@ export class IndexerQueueService {
             // Print out results & stats
             const skippedFiles = fileIds.length - entries.length;
             this.logger.verbose(`Successfully read metadata of ${entries.length} files.${skippedFiles > 0 ? ` Skipped ${skippedFiles} files.` : ''} Took ${timeTookMs}ms`);
-            // this.eventEmitter.emit(EVENT_METADATA_CREATED, result);
 
             // Emit events for meilisearch syncer
             this.eventEmitter.emit(EVENT_SONGS_CHANGED, result.createdResources.songs);
+            this.eventEmitter.emit(EVENT_SONG_CREATE_ARTWORK, result.createdResources.artworks);
             this.eventEmitter.emit(EVENT_ALBUMS_CHANGED, result.createdResources.albums);
             this.eventEmitter.emit(EVENT_ARTISTS_CHANGED, result.createdResources.artists);
         });

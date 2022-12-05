@@ -1,5 +1,7 @@
 
-import { Column, CreateDateColumn, Entity, Index, PrimaryGeneratedColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, Index, JoinColumn, OneToOne, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
+import { ArtworkSource, ArtworkSourceType } from "../dtos/artwork-process.dto";
+import { ArtworkColorInfo } from "./artwork-color-info.entity";
 
 export enum ArtworkType {
     SONG = 0,
@@ -13,43 +15,41 @@ export enum ArtworkType {
 }
 
 export enum ArtworkFlag {
-    OK = 0,
-    PROCESSING,
-    ERROR,
+    AWAITING = 0,
+    OK = 1,
+    ERROR = 2,
 }
 
-export class ArtworkColors {
-    /**
-     *  Formerly used as accentColor
-     */ 
-    public vibrant: string;
-
-    public darkMuted: string;
-    public darkVibrant: string;
-    public lightMuted: string;
-    public lightVibrant: string;
-    public muted: string;
+export interface ArtworkID {
+    id: string;
 }
 
 @Entity()
-export class Artwork {
+export class Artwork implements ArtworkID {
     
-    @PrimaryGeneratedColumn("uuid")
+    @PrimaryColumn({ unique: true, nullable: false })
     public id: string;
     
-    @Column({ type: "tinyint", default: 0 })
-    public type?: ArtworkType;
+    @Column({ type: "smallint", nullable: false })
+    public type: ArtworkType;
 
-    @Column({ type: "json", nullable: true })
-    public colors?: ArtworkColors;
+    @Column({ type: "varchar", nullable: true })
+    public sourceType: ArtworkSourceType;
+
+    @Column({ type: "smallint", nullable: true })
+    public sourceUri: string;
 
     @Column()
-    public name?: string;
+    public name: string;
 
     @CreateDateColumn()
     public createdAt?: Date;
 
-    @Column({ type: "tinyint", default: 0 })
-    public flag?: ArtworkFlag;
+    @Column({ type: "smallint", default: 0 })
+    public flag: ArtworkFlag;
+
+    @OneToOne(() => ArtworkColorInfo, (info) => info.artwork, { nullable: true, cascade: true })
+    @JoinColumn()
+    public colorInfo?: ArtworkColorInfo;
 
 }

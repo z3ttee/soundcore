@@ -101,16 +101,16 @@ export class MeiliSyncer {
 
     private async resolveSyncErrorsForAlbums(resources: Album[]) {
         if(resources?.length <= 0) return;
-        return this.albumService.sync(resources).catch((error) => {
+        return this.albumService.syncWithMeilisearch(resources).catch((error) => {
             this.logger.error(`Failed resolving sync issues for ${resources.length} albums`, error.stack);
         });
     }
 
     private async resolveSyncErrorsForSongs(resources: Song[]) {
-        // if(resources?.length <= 0) return;
-        // return this.songService.sync(resources).catch((error) => {
-        //     this.logger.error(`Failed resolving sync issues for ${resources.length} songs`, error.stack);
-        // });
+        if(resources?.length <= 0) return;
+        return this.songService.syncWithMeilisearch(resources).catch((error) => {
+            this.logger.error(`Failed resolving sync issues for ${resources.length} songs`, error.stack);
+        });
     }
 
     private async resolveSyncErrorsForPublishers(resources: Publisher[]) {

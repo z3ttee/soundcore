@@ -7,7 +7,7 @@ import { MountScanResultDTO } from "../dtos/scan-result.dto";
 import { MountService } from "./mount.service";
 import { AdminGateway } from "../../gateway/gateways/admin-gateway.gateway";
 import { Environment } from "@soundcore/common";
-import { MountScanProcessDTO } from "../dtos/scan-process.dto";
+import { MountScanFlag, MountScanProcessDTO } from "../dtos/scan-process.dto";
 import { MountStatus } from "../entities/mount.entity";
 
 @Injectable()
@@ -55,10 +55,12 @@ export class MountQueueService {
 
             if(files.length <= 0) {
                 this.logger.verbose(`No new files found (total: ${result?.totalFiles}) on mount '${mount.name}'. Took ${result?.timeMs}ms.`);
-                return;
+                // Do not emit event if the flag is not set to rescan
+                if(flag != MountScanFlag.RESCAN) return;
+            } else {
+                this.logger.verbose(`Found ${files.length} new files (total: ${result?.totalFiles}) on mount '${mount.name}'. Took ${result?.timeMs}ms.`);
             }
 
-            this.logger.verbose(`Found ${files.length} new files (total: ${result?.totalFiles}) on mount '${mount.name}'. Took ${result?.timeMs}ms.`);
             this.events.emit(EVENT_FILES_FOUND, new FilesFoundEvent(mount, files, flag));
         });
 

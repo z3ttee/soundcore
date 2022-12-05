@@ -1,5 +1,6 @@
 import { Album } from "../../album/entities/album.entity";
 import { Artist } from "../../artist/entities/artist.entity";
+import { ArtworkID } from "../../artwork/entities/artwork.entity";
 import { Song } from "../../song/entities/song.entity";
 
 export class IndexerResultDTO {
@@ -27,6 +28,7 @@ export class IndexerCreatedResources {
         public readonly songs: Song[] = [],
         public readonly albums: Album[] = [],
         public readonly artists: Artist[] = [],
+        public readonly artworks: string[] = []
     ) {}
 
 }
