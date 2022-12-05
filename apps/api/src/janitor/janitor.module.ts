@@ -3,12 +3,14 @@ import path from "node:path";
 import { Module } from "@nestjs/common";
 import { WorkerQueueModule } from "@soundcore/nest-queue";
 import { JanitorService } from "./services/janitor.service";
+import { DeleteStreamsCronJob } from "./cron/delete-streams.cron";
 
 // TODO: Implement janitor for indexing process
 
 @Module({
     providers: [
-        JanitorService
+        JanitorService,
+        DeleteStreamsCronJob
     ],
     imports: [
         WorkerQueueModule.forFeature({
