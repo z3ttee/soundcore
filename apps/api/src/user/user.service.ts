@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { BasePageable, Page } from 'nestjs-pager';
 import { ILike, In, Repository } from 'typeorm';
-import { OIDCUser } from '../authentication/entities/oidc-user.entity';
+import { KeycloakTokenPayload } from '../authentication/entities/oidc-token.entity';
 import { SyncFlag } from '../meilisearch/interfaces/syncable.interface';
 import { MeiliUserService } from '../meilisearch/services/meili-user.service';
 import { User } from './entities/user.entity';
@@ -23,15 +23,16 @@ export class UserService {
             .getOne();
     }
 
-    public async findOrCreateByKeycloakUserInstance(userInstance: OIDCUser): Promise<User> {
-        if(!userInstance) return null;
+    public async findOrCreateByTokenPayload(token: KeycloakTokenPayload): Promise<User> {
+        // TODO: Support not only keycloak
+        if(!token) return null;
 
         // Find in database and return if found
-        const existingUser = await this.findById(userInstance.sub);
+        const existingUser = await this.findById(token.sub);
         if(existingUser) {
-            if(this.hasUpdated(userInstance, existingUser)) {
+            if(this.hasUpdated(token, existingUser)) {
                 // Update username (currently the only thing that can change which is important)
-                existingUser.name = userInstance.preferred_username?.trim();
+                existingUser.name = token.preferred_username?.trim();
                 return this.save(existingUser).catch((error) => {
                     this._logger.error(`Could not update user object, using old account data: ${error.message}`, error.stack);
                     return existingUser;
@@ -48,8 +49,8 @@ export class UserService {
 
         // Build new database entry
         const user = new User();
-        user.id = userInstance.sub;
-        user.name = userInstance.preferred_username?.trim();
+        user.id = token.sub;
+        user.name = token.name ?? token.preferred_username?.trim();
 
         return this.save(user);
     }
@@ -121,9 +122,9 @@ export class UserService {
         return Page.of(result[0], result[1], pageable.offset);
     }
 
-    private hasUpdated(userInstance: OIDCUser, existingUser: User): boolean {
-        if(userInstance.sub != existingUser.id) return false;
-        return userInstance.preferred_username !== existingUser.name;
+    private hasUpdated(token: KeycloakTokenPayload, existingUser: User): boolean {
+        if(token.sub != existingUser.id) return false;
+        return token.preferred_username !== existingUser.name;
     }
 
 }

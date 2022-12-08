@@ -1,6 +1,8 @@
-import { ForbiddenException, Logger } from "@nestjs/common";
+import { ForbiddenException, Logger, UnauthorizedException } from "@nestjs/common";
 import { OnGatewayConnection, OnGatewayDisconnect, WebSocketServer } from "@nestjs/websockets";
+import { catchError, of } from "rxjs";
 import { Server, Socket } from "socket.io";
+import { KeycloakTokenPayload } from "../../authentication/entities/oidc-token.entity";
 import { OIDCUser } from "../../authentication/entities/oidc-user.entity";
 import { OIDCService } from "../../authentication/services/oidc.service";
 import { User } from "../../user/entities/user.entity";
@@ -40,28 +42,52 @@ export abstract class AuthGateway implements OnGatewayConnection, OnGatewayDisco
         private readonly oidcService: OIDCService
     ) {}
     
-    public handleConnection(socket: Socket) {
+    public async handleConnection(socket: Socket): Promise<any> {
         const tokenValue = socket.handshake.auth["token"];
 
-        this.oidcService.verifyAccessToken(tokenValue).then(async (token) => {
-            const roles = token?.["realm_access"]?.["roles"] || [];
-            const canAccessGateway = await this.canAccessGateway(roles);
-            if(!canAccessGateway) throw new ForbiddenException("User not allowed to access this gateway");
-
-            return this.userService.findOrCreateByKeycloakUserInstance(token).then(async (user) => {
-                this.sockets.set(socket.id, socket);
-                this.userToSocket.set(user.id, socket.id);
-                this.authenticatedSockets.set(socket.id, user);
-
-                this.onConnect(socket, user)
+        return new Promise<User>((resolve, reject) => {
+            this.oidcService.verifyAccessToken(tokenValue).pipe(catchError((error: Error) => {
+                reject(error);
+                return of(null);
+            })).subscribe((token: KeycloakTokenPayload) => {
+                if(typeof token === "undefined" || token == null) {
+                    reject(new UnauthorizedException("Authorization required."));
+                    return;
+                }
+    
+                const roles = token?.realm_access?.roles || [];
+    
+                this.canAccessGateway(roles).then((canAccessGateway) => {
+                    if(!canAccessGateway) {
+                        reject(new ForbiddenException("User not allowed to access this gateway"));
+                        return;
+                    }
+                        
+                    this.userService.findOrCreateByTokenPayload(token).then((user) => {
+                        resolve(user);
+                    }).catch((error: Error) => {
+                        this.logger.warn(`Failed syncing user data with database: ${error.message}`);
+                        reject(error);
+                    });
+                }).catch((error: Error) => {
+                    reject(error);
+                });
             });
-        }).catch((error: Error) => {
-            socket.disconnect();
+        }).then((user) => {
+            // Connection authorized
+            this.sockets.set(socket.id, socket);
+            this.userToSocket.set(user.id, socket.id);
+            this.authenticatedSockets.set(socket.id, user);
 
+            this.onConnect(socket, user);
+        }).catch((error: Error) => {
+            // Connection unauthorized
+            socket.disconnect();
+    
             if(!(error instanceof ForbiddenException)) {
                 this.logger.warn(`Blocked unauthenticated socket connection: ${error.message}`);
             }
-        });
+        })
     }
 
     public handleDisconnect(socket: Socket) {
