@@ -14,13 +14,25 @@ import { MeiliSongService } from './services/meili-song.service';
 import { MeiliUserService } from './services/meili-user.service';
 import { MeiliQueueService } from './services/meili-queue.service';
 
-@Module({
-    
-})
+export interface MeilisearchOptions {
+    host: string;
+    port?: number;
+    apiKey?: string;
+}
+
+@Module({})
 export class MeilisearchModule {
     private static logger: Logger = new Logger(MeilisearchModule.name);
 
-    public static forRoot(config: Config): DynamicModule {
+    public static forRoot(options: MeilisearchOptions): DynamicModule {
+        // TODO: Disable module if options not valid
+
+        const config: Config = {
+            host: `${options.host}:${options.port ?? 7700}`,
+            headers: {
+                "Authorization": `Bearer ${options.apiKey}`
+            }
+        }
         let meiliclient: MeiliSearch = null;
 
         try {
