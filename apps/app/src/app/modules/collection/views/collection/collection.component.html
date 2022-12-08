@@ -1,1 +1,56 @@
-<p>collection works!</p>
+<ng-container *ngIf="($props | async) as props">
+    <app-error404 *ngIf="!props.tracklist" [title]="'Playlist nicht gefunden'"></app-error404>
+
+    <div class="w-full h-full overflow-y-auto" #viewport>
+        <app-list-view title="Lieblingssongs" [isLoading]="false">
+            <ng-container scngx-stats>
+                <!-- <li class="text-font-secondary">
+                    <span *ngIf="props.playlist?.author">by <span class="hover:underline cursor-pointer" [routerLink]="['/profile', props.playlist?.author?.slug || props.playlist?.author?.id]">{{ props.playlist?.author?.name }}</span></span>
+                </li>
+                <li class="text-font-secondary">
+                    <span>{{ props.playlist?.songsCount }} {{ props.playlist?.songsCount != 1 ? 'Songs' : 'Song' }}</span>
+                </li>
+                <li class="text-font-secondary">
+                    <span>{{ props.playlist?.totalDuration | scngxSongDurationPipe }} min</span>
+                </li> -->
+            </ng-container>
+        
+            <ng-container scngx-controls>
+                <scngx-ibtn (click)="forcePlay(props.tracklist)" size="md">
+                    <img *ngIf="!props.playing; else paused" class="w-7 h-7 text-body ml-0.5" src="assets/icons/play.svg">
+                    <ng-template #paused><img *ngIf="props.playing" class="w-7 h-7 text-body ml-0.5" src="assets/icons/pause.svg"></ng-template>
+                </scngx-ibtn>
+        
+                <!-- <button class="flex items-center p-2 rounded-full" matRipple [matRippleCentered]="true">
+                    <hero-icon [name]="'dots-vertical'" [class]="'h-7 aspect-square'"></hero-icon>
+                </button> -->
+            </ng-container>
+        </app-list-view>
+
+        {{ props.$size | async }}
+
+        <ng-container *ngIf="props.tracklist && (props.$size | async) > 0; else emptyCollectionTemplate">
+            <div *uiScroll="let item of props.tracklist; index as i" class="px-window">
+                <scngx-song-list-item 
+                    [song]="item.song" 
+                    [index]="i" 
+                    [active]="props.currentItem?.song?.id == item.song.id"
+                    [playing]="props.playing"
+                    [animRef]="lottieAnimationTemplate">
+                </scngx-song-list-item>
+            </div>
+        </ng-container>
+
+        <div class="pb-bottom"></div>
+    </div>
+</ng-container>
+
+<ng-template #lottieAnimationTemplate>
+    <ng-lottie [options]="animOptions" class="aspect-square"></ng-lottie>
+</ng-template>
+
+<ng-template #emptyCollectionTemplate>
+    <div class="px-window">
+        <p>Du hast bisher noch keine Lieder zu deinen Lieblingssongs hinzugefügt.</p>
+    </div>
+</ng-template>
