@@ -43,23 +43,22 @@ import { TracklistModule } from './tracklist/tracklist.module';
     CommonConfigModule,
     FileSystemModule.forRoot(),
     TypeOrmModule.forRoot({
-      type: process.env.DB_DIALECT as any || "mariadb",
+      type: "mariadb",
       host: process.env.DB_HOST,
-      port: parseInt(process.env.DB_PORT),
+      port: process.env.DB_PORT ? parseInt(process.env.DB_PORT) : 3306,
       username: process.env.DB_USER,
       password: process.env.DB_PASS,
       database: process.env.DB_NAME,
       autoLoadEntities: true,
       synchronize: true,
-      entityPrefix: process.env.DB_PREFIX,
+      entityPrefix: process.env.DB_PREFIX ?? "sc_",
       retryAttempts: Number.MAX_VALUE,
       retryDelay: 10000
     }),
     MeilisearchModule.forRoot({
-      host: `${process.env.MEILISEARCH_HOST}:${process.env.MEILISEARCH_PORT}`,
-      headers: {
-        "Authorization": `Bearer ${process.env.MEILISEARCH_KEY}`
-      }
+      host: process.env.MEILISEARCH_HOST,
+      port: process.env.MEILISEARCH_PORT ? parseInt(process.env.MEILISEARCH_PORT) : null,
+      apiKey: process.env.MEILISEARCH_KEY
     }),
     PipesModule,
     CronModule,
@@ -90,10 +89,9 @@ import { TracklistModule } from './tracklist/tracklist.module';
     CollectionModule,
     NotificationModule,
     OIDCModule.forRoot({
-      server_base_url: "https://sso.tsalliance.eu",
-      realm: "tsalliance",
-      client_id: "alliance-soundcore-api",
-      client_secret: "FHl4H5UFr8Tnrf921xUja0a1wHN9jPgR"
+      issuer: process.env.OIDC_ISSUER,
+      client_id: process.env.OIDC_CLIENT_ID,
+      client_secret: process.env.OIDC_CLIENT_SECRET
     }),
     ProfileModule,
     MountModule,
