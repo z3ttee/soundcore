@@ -49,6 +49,8 @@ services:
       - DB_PASS=root
       - DB_NAME=soundcore
       - DB_PREFIX=sc_
+      - MEILISEARCH_HOST=meilisearch
+      - MEILISEARCH_KEY=
     networks:
       - soundcore_dev
     volumes:
