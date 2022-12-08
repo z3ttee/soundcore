@@ -30,11 +30,14 @@ RUN yarn build:api
 
 # Build stage completed, begin with new base image
 # Remember, copy previously built files into the new image
-FROM node:18-alpine
+FROM node:18-alpine AS DEPLOY
 
 # Set workdir
 ARG CWD=/opt/soundcore
 WORKDIR ${CWD}
+
+# Create volume to persist instance info
+VOLUME [ "/data", "/mnt" ]
 
 # Copy compile output of backend application
 COPY --from=BUILDER ${CWD}/apps/api/dist ${CWD}/apps/api
@@ -63,6 +66,8 @@ ENV NODE_ENV=production
 ENV DOCKERIZED=true
 
 # Install only production deps
-RUN yarn install
+RUN yarn install --production
+
+EXPOSE 3002
 
 ENTRYPOINT ["node", "apps/api/main.js"]
