@@ -46,7 +46,7 @@ export default async function (job: WorkerJobRef<FileProcessDTO>): Promise<FileP
 }
 
 async function processGivenFiles(job: WorkerJobRef<FileProcessDTO>, datasource: DataSource): Promise<FileID[]> {
-    const { mount, files } = job.payload;
+    const { mount, files, scanFlag } = job.payload;
 
     // TODO: Implement rescans
 
@@ -54,7 +54,7 @@ async function processGivenFiles(job: WorkerJobRef<FileProcessDTO>, datasource: 
     const service = new FileService(datasource.getRepository(File));
 
     return Batch.of<FileDTO, FileID>(files).do(async (batch, currentBatch, batches) => {
-        const results: FileID[] = [];
+        const createdFiles: File[] = [];
         const collectedFiles: File[] = [];
 
         for(const dto of batch) {
@@ -88,12 +88,25 @@ async function processGivenFiles(job: WorkerJobRef<FileProcessDTO>, datasource: 
         }
 
         // Create database entries
-        results.push(... await service.createFiles(collectedFiles).catch((error: Error) => {
-            logger.error(`Error occured whilst processing batch ${currentBatch}: ${error.message}`, error.stack);
-            return [];
-        }).then((files) => files.map((file): FileID => ({ id: file.id }))));
+        if(scanFlag == MountScanFlag.DEFAULT_SCAN) {
+            // This will create files in database but only returns entities that were created
+            // via this query and did not exist before
+            createdFiles.push(... await service.createFiles(collectedFiles).catch((error: Error) => {
+                logger.error(`Error occured whilst processing batch ${currentBatch}: ${error.message}`, error.stack);
+                return [];
+            }));
+        } else if(scanFlag == MountScanFlag.RESCAN) {
+            // This will create files in database but returns all files even those that were not created
+            // with this query but are included in the list.
+            createdFiles.push(... await service.createAndFindAll(collectedFiles).catch((error: Error) => {
+                logger.error(`Error occured whilst processing batch ${currentBatch}: ${error.message}`, error.stack);
+                return [];
+            }));
+        } else {
+            throw new Error(`Received file process task with invalid flag. Received ${scanFlag}, expected one of [${Object.values(MountScanFlag).join(", ")}]`);
+        }
 
-        return results;
+        return createdFiles.map((file) => ({ id: file.id }));
     }).progress((batches, current) => {
         // Update job progress
         job.progress = Math.round((current / batches) * 100);

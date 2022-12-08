@@ -1,13 +1,13 @@
 import { Injectable, InternalServerErrorException, Logger, NotFoundException } from "@nestjs/common";
 import { CreateArtworkDTO } from "../dtos/create-artwork.dto";
-import { Artwork, ArtworkColors, ArtworkFlag, ArtworkType } from "../entities/artwork.entity";
+import { Artwork, ArtworkFlag, ArtworkID, ArtworkType } from "../entities/artwork.entity";
 import fs from "fs";
 import sharp from "sharp";
 import path from "path";
 import Vibrant from "node-vibrant";
-import { Random, Slug } from "@tsalliance/utilities";
+import { Random } from "@tsalliance/utilities";
 import axios from "axios";
-import { DeleteResult, Repository } from "typeorm";
+import { DeleteResult, Repository, UpdateResult } from "typeorm";
 import { Artist } from "../../artist/entities/artist.entity";
 import { Album } from "../../album/entities/album.entity";
 import { Song } from "../../song/entities/song.entity";
@@ -17,6 +17,8 @@ import { Publisher } from "../../publisher/entities/publisher.entity";
 import { Response } from "express";
 import { InjectRepository } from "@nestjs/typeorm";
 import { FileSystemService } from "../../filesystem/services/filesystem.service";
+import { ArtworkSourceType } from "../dtos/artwork-process.dto";
+import crypto from "node:crypto";
 
 @Injectable()
 export class ArtworkService {
@@ -38,16 +40,17 @@ export class ArtworkService {
             .getOne();
     }
 
-    /**
-     * Find an artwork by its name and type.
-     * @param name Name of the artwork
-     * @param type Type of the artwork
-     * @returns Artwork
-     */
-    public async findByNameAndType(name: string, type: ArtworkType): Promise<Artwork> {
+    public async findByIds(ids: ArtworkID[]): Promise<Artwork> {
         return this.repository.createQueryBuilder("artwork")
-            .where("artwork.name = :name AND artwork.type = :type", { name, type })
+            .whereInIds(ids)
             .getOne();
+    }
+
+    public async findByFlagAndSourceTypeIdOnly(flag: ArtworkFlag, sourceType: ArtworkSourceType): Promise<Artwork[]> {
+        return this.repository.createQueryBuilder("artwork")
+            .where("artwork.flag = :flag AND artwork.sourceType = :sourceType", { flag, sourceType })
+            .select(["id"])
+            .getMany();
     }
 
     /**
@@ -58,34 +61,23 @@ export class ArtworkService {
      * @param createArtworkDto Creation and Find options
      * @returns Artwork
      */
-    public async createIfNotExists(createArtworkDto: CreateArtworkDTO): Promise<Artwork> {
-        createArtworkDto.name = `${Slug.format(createArtworkDto.name)}`;
-
-        const existingArtwork = await this.findByNameAndType(createArtworkDto.name, createArtworkDto.type);
-        if(existingArtwork) return existingArtwork;
-
-        const artwork = this.repository.create();
-        artwork.flag = ArtworkFlag.OK;
-        artwork.name = createArtworkDto.name;
-        artwork.type = createArtworkDto.type;
-
+    public async createIfNotExists(createArtworkDtos: CreateArtworkDTO[]): Promise<Artwork[]> {
         return this.repository.createQueryBuilder()
             .insert()
-            .values(artwork)
-            .orIgnore()
+            .values(createArtworkDtos)
+            .returning(["id"])
+            .orUpdate(["sourceType", "flag", "sourceUri"], ["id"])
             .execute().then((result) => {
-                if(result.identifiers.length > 0) {
-                    // If process has not specified a source to write from,
-                    // then just return created artwork entity.
-                    if(!createArtworkDto.fromSource) return artwork;
-                    // Otherwise write to artwork
-                    return this.writeFromBufferOrFile(createArtworkDto.fromSource, artwork);
-                }
-                return this.findByNameAndType(createArtworkDto.name, createArtworkDto.type).then((artwork) => artwork);
+                return this.repository.createQueryBuilder("artwork")
+                    .where(result.identifiers)
+                    .getMany().then((artworks) => {
+                        return artworks;
+                    })
             }).catch((error) => {
                 this.logger.error(`Could not create database entry for artwork: ${error.message}`, error.stack);
+                console.error()
                 return null
-            })
+            });
     }
 
     /**
@@ -96,8 +88,16 @@ export class ArtworkService {
      * @param fromSource (Optional) Filepath or buffer. If not set, no artwork will be written during creation.
      * @returns Artwork
      */
-    public async createForArtistIfNotExists(artist: Artist, waitForLock = false, fromSource?: string | Buffer): Promise<Artwork> {
-        return this.createIfNotExists({ name: artist.name, type: ArtworkType.ARTIST, fromSource });
+    public async createForArtistIfNotExists(artist: Artist, sourceUri: string): Promise<Artwork> {
+        const name = artist.name;
+        const type = ArtworkType.ARTIST;
+
+        return this.createIfNotExists([{ 
+            type, 
+            sourceUri: sourceUri, 
+            sourceType: ArtworkSourceType.URL, 
+            id: this.createHash(`${name}:${type}`)
+        }])?.[0];
     }
 
     /**
@@ -108,8 +108,16 @@ export class ArtworkService {
      * @param fromSource (Optional) Filepath or buffer. If not set, no artwork will be written during creation.
      * @returns Artwork
      */
-    public async createForAlbumIfNotExists(album: Album, waitForLock = false, fromSource?: string | Buffer): Promise<Artwork> {
-        return this.createIfNotExists({ name: `${album.name} ${album.primaryArtist?.name || Random.randomString(8)}`, type: ArtworkType.ALBUM, fromSource })
+    public async createForAlbumIfNotExists(album: Album, sourceUri: string): Promise<Artwork> {
+        const name = `${album.name} ${album.primaryArtist?.name || Random.randomString(8)}`;
+        const type = ArtworkType.ALBUM;
+
+        return this.createIfNotExists([{ 
+            type, 
+            sourceUri: sourceUri, 
+            sourceType: ArtworkSourceType.URL, 
+            id: this.createHash(`${name}:${type}`)
+        }])?.[0];
     }
 
     /**
@@ -120,8 +128,16 @@ export class ArtworkService {
      * @param fromSource (Optional) Filepath or buffer. If not set, no artwork will be written during creation.
      * @returns Artwork
      */
-    public async createForLabelIfNotExists(label: Label, waitForLock = false, fromSource?: string | Buffer): Promise<Artwork> {
-        return this.createIfNotExists({ name: `${label.name}`, type: ArtworkType.LABEL, fromSource })
+    public async createForLabelIfNotExists(label: Label, sourceUri: string): Promise<Artwork> {
+        const name = label.name;
+        const type = ArtworkType.LABEL;
+
+        return this.createIfNotExists([{ 
+            type, 
+            sourceUri: sourceUri, 
+            sourceType: ArtworkSourceType.URL, 
+            id: this.createHash(`${name}:${type}`)
+        }])?.[0]
     }
 
     /**
@@ -132,8 +148,16 @@ export class ArtworkService {
      * @param fromSource (Optional) Filepath or buffer. If not set, no artwork will be written during creation.
      * @returns Artwork
      */
-    public async createForDistributorIfNotExists(distributor: Distributor, waitForLock = false, fromSource?: string | Buffer): Promise<Artwork> {
-        return this.createIfNotExists({ name: `${distributor.name}`, type: ArtworkType.DISTRIBUTOR, fromSource })
+    public async createForDistributorIfNotExists(distributor: Distributor, sourceUri: string): Promise<Artwork> {
+        const name = distributor.name;
+        const type = ArtworkType.DISTRIBUTOR;
+
+        return this.createIfNotExists([{ 
+            type, 
+            sourceUri: sourceUri, 
+            sourceType: ArtworkSourceType.URL, 
+            id: this.createHash(`${name}:${type}`)
+        }])?.[0];
     }
 
     /**
@@ -144,8 +168,16 @@ export class ArtworkService {
      * @param fromSource (Optional) Filepath or buffer. If not set, no artwork will be written during creation.
      * @returns Artwork
      */
-     public async createForPublisherIfNotExists(publisher: Publisher, waitForLock = false, fromSource?: string | Buffer): Promise<Artwork> {
-        return this.createIfNotExists({ name: `${publisher.name}`, type: ArtworkType.PUBLISHER, fromSource })
+     public async createForPublisherIfNotExists(publisher: Publisher, sourceUri: string): Promise<Artwork> {
+        const name = publisher.name;
+        const type = ArtworkType.PUBLISHER;
+
+        return this.createIfNotExists([{ 
+            type, 
+            sourceUri: sourceUri, 
+            sourceType: ArtworkSourceType.URL, 
+            id: this.createHash(`${name}:${type}`)
+        }])?.[0]
     }
 
     /**
@@ -156,14 +188,37 @@ export class ArtworkService {
      * @param fromSource (Optional) Filepath or buffer. If not set, no artwork will be written during creation.
      * @returns Artwork
      */
-    public async createForSongIfNotExists(song: Song, waitForLock = false, fromSource?: string | Buffer): Promise<Artwork> {
-        return this.createIfNotExists({ name: `${ArtworkService.createSongCoverNameSchema(song.name, song.primaryArtist, song.featuredArtists)}`, type: ArtworkType.SONG, fromSource })
+    public async createForSongIfNotExists(song: Song): Promise<Artwork> {
+        return this.createIfNotExists([this.createDTOOnlyForSong(song)])?.[0]
     }
 
-    public static createSongCoverNameSchema(title: string, primaryArtist: Artist, featuredArtists: Artist[]): string {
-        const primaryArtistName = primaryArtist?.name || Random.randomString(8);      
-        const featuredArtistNames = featuredArtists.map((artist) => artist.name).join(" ") || "";
-        return `${title} ${primaryArtistName} ${featuredArtistNames}`;
+    public createDTOOnlyForSong(song: Song): CreateArtworkDTO {
+        const name = `${ArtworkService.createSongCoverNameSchema(song)}`;
+        const type = ArtworkType.SONG;
+        const sourceType = ArtworkSourceType.SONG;
+
+        return {
+            type,
+            sourceType,
+            id: this.createHash(`${name}:${type}:${sourceType}`)
+        }
+    }
+
+    public createHash(input: string): string {
+        return crypto.createHash("md5").update(input, "binary").digest("hex")
+    }
+
+    public static createSongCoverNameSchema(song: Song): string {
+        if(!song) return null;
+
+        const primaryArtistName = song.primaryArtist?.name || Random.randomString(8);      
+        const album = song.album;
+
+        if(typeof album != "undefined" && album != null) {
+            return `${album.id}`
+        }
+
+        return `${song.name} ${primaryArtistName}`;
     }
 
     /**
@@ -187,7 +242,7 @@ export class ArtworkService {
      * @returns Artwork
      */
     public async writeFromBufferOrFile(bufferOrFile: string | Buffer, artwork: Artwork): Promise<Artwork> {
-        return new Promise((resolve, reject) => {
+        return new Promise<Artwork>((resolve, reject) => {
             const dstFile = this.fileSystem.resolveArtworkDir(artwork);
             let srcBuffer: Buffer;
 
@@ -198,7 +253,6 @@ export class ArtworkService {
             } else {
                 srcBuffer = bufferOrFile as Buffer;
             }
-
 
             // Create destination directory
             fs.mkdir(path.dirname(dstFile), { recursive: true }, (err, directory) => {
@@ -218,18 +272,19 @@ export class ArtworkService {
                     }
 
                     // Analyze colors from image
-                    this.getAccentColorFromArtwork(artwork).then((colors) => {
-                        artwork.colors = colors;
+                    // this.getAccentColorFromArtwork(artwork).then((colors) => {
+                    //     // TODO: artwork.colors = colors;
 
-                        // Save updated artwork with colors
-                        this.repository.save(artwork).then((result) => {
-                            resolve(result);
-                        }).catch((error) => {
-                            reject(error);
-                        })
-                    }).catch((error) => {
-                        reject(error);
-                    })
+                    //     // Save updated artwork with colors
+                    //     this.repository.save(artwork).then((result) => {
+                    //         resolve(result);
+                    //     }).catch((error) => {
+                    //         reject(error);
+                    //     })
+                    // }).catch((error) => {
+                    //     reject(error);
+                    // })
+                    resolve(artwork);
                 })
             })
         })
@@ -240,8 +295,10 @@ export class ArtworkService {
      * @param idOrObject Artwork id or object to extract colors from
      * @returns ArtworkColors
      */
-     public async getAccentColorFromArtwork(idOrObject: Artwork): Promise<ArtworkColors> {
+     public async extractAccentColor(idOrObject: Artwork): Promise<string> {
         const artwork = await this.resolveArtwork(idOrObject);
+        if(!artwork) return null;
+
         const filepath = this.fileSystem.resolveArtworkDir(artwork);
 
         return new Promise((resolve, reject) => {
@@ -252,19 +309,27 @@ export class ArtworkService {
                 }
 
                 Vibrant.from(filepath).getPalette().then((palette) => {
-                    const colors = new ArtworkColors();
-                    colors.vibrant = palette.Vibrant.hex;
-                    colors.muted = palette.Muted.hex;
-                    colors.darkMuted = palette.DarkMuted.hex;
-                    colors.darkVibrant = palette.DarkVibrant.hex;
-                    colors.lightMuted = palette.LightMuted.hex;
-                    colors.lightVibrant = palette.LightVibrant.hex;
-                    resolve(colors);
+                    resolve(palette?.Vibrant?.hex);
                 }).catch((error) => {
                     reject(error);
                 });
             });
         });
+    }
+
+    public async extractAndSetAccentColor(idOrObject: Artwork): Promise<string> {
+        const artwork = await this.resolveArtwork(idOrObject);
+        if(!artwork) return null;
+
+        return this.extractAccentColor(artwork).then((color) => {
+            return this.repository.update(artwork.id, { accentColor: color }).then(() => {
+                return color;
+            })
+        })
+    }
+
+    public async saveAll(artworks: Artwork[]) {
+        return this.repository.save(artworks);
     }
 
     /**
@@ -304,21 +369,26 @@ export class ArtworkService {
 
     /**
      * Update an artworks flag in the database.
-     * @param idOrObject Id or Artwork object
-     * @param flag ArtworkFlag
+     * @param artworkIds Artworks to set flag to
+     * @param flag Flag to set
      * @returns Artwork
      */
-    private async setFlag(idOrObject: string | Artwork, flag: ArtworkFlag): Promise<Artwork> {
-        const artwork = await this.resolveArtwork(idOrObject);
-
-        // Check if the flag actually changed.
-        // If not, do nothing and return.
-        if(artwork.flag == flag) return artwork;
-
-        // Update the flag
-        artwork.flag = flag;
-        return this.repository.save(artwork);
+    public async setFlags(artworkIds: string[], flag: ArtworkFlag): Promise<boolean> {
+        if(artworkIds.length <= 0) return false;
+        return this.repository.createQueryBuilder()
+            .update()
+            .set({ flag })
+            .where("id IN (:artworkIds)", { artworkIds })
+            .execute().then((updateResult) => updateResult.affected > 0);
     }
+
+    // public async removeSourceInfos(artworkIds: string[]): Promise<boolean> {
+    //     return this.repository.createQueryBuilder()
+    //         .update()
+    //         .set({ sourceType: null, sourceUri: null })
+    //         .where("id IN (:artworkIds)", { artworkIds })
+    //         .execute().then((updateResult) => updateResult.affected > 0)
+    // }
 
     /**
      * Resolve the parameter to an artwork entity.

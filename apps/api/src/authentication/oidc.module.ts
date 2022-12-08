@@ -1,4 +1,4 @@
-import { DynamicModule, Logger, Module, OnModuleInit } from '@nestjs/common';
+import { DynamicModule, Module } from '@nestjs/common';
 import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { JwtModule } from '@nestjs/jwt';
 import { UserModule } from '../user/user.module';
@@ -17,18 +17,7 @@ import { OIDCService } from './services/oidc.service';
         OIDCService
     ]
 })
-export class OIDCModule implements OnModuleInit {
-    private readonly logger: Logger = new Logger(OIDCModule.name);
-
-    constructor(private readonly service: OIDCService){}
-
-    public async onModuleInit() {
-        await this.service.discoverIssuer().then((issuer) => {
-            this.logger.log(`Discovered issuer at '${issuer.issuer}'`);
-        }).catch((error: Error) => {
-            this.logger.error(`Failed discovering issuer: ${error.message}`, error.stack);
-        });
-    }
+export class OIDCModule {
 
     public static forRoot(options: OIDCConfig): DynamicModule {
         return {

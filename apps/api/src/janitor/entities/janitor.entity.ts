@@ -3,7 +3,8 @@ import { v4 as uuidv4 } from "uuid";
 
 export enum JanitorTask {
     CLEAR_ONGOING_IMPORTS = "clear_ongoing_imports",
-    CLEAR_OLD_IMPORTS = "clear_overdue_imports"
+    CLEAR_OLD_IMPORTS = "clear_overdue_imports",
+    CLEAR_STREAMS = "clear_old_streams"
 }
 
 export class JanitorRef<T = any> {

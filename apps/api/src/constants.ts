@@ -26,6 +26,7 @@ export const EVENT_SONGS_CHANGED = "songs-changed-event"
 export const EVENT_ALBUMS_CHANGED = "albums-changed-event"
 export const EVENT_ARTISTS_CHANGED = "artists-changed-event"
 export const EVENT_PLAYLISTS_CHANGED = "playlists-changed-event"
+export const EVENT_SONG_CREATE_ARTWORK = "song-create-artwork-event"
 
 export const EVENT_TRIGGER_FILE_PROCESS_BY_FLAG = "trigger-file-process-by-flag-event"
 

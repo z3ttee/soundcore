@@ -10,6 +10,7 @@ import { Mount } from "../../mount/entities/mount.entity";
 import { SC_ARTWORKDIR_NAME, SC_IDFILE_NAME } from "../filesystem.module";
 import { Artwork } from "../../artwork/entities/artwork.entity";
 import { Random } from "@tsalliance/utilities";
+import { Environment } from "@soundcore/common";
 
 @Injectable()
 export class FileSystemService {
@@ -29,6 +30,9 @@ export class FileSystemService {
      * @returns {string} Root directory path
      */
     public getInstanceDir(): string {
+        if(Environment.isDockerized) {
+            return path.resolve("/data/")
+        }
         return path.join(os.homedir(), ".soundcore");
     }
 
@@ -105,7 +109,7 @@ export class FileSystemService {
      * @returns Absolute filepath
      */
     public resolveArtworkDir(artwork: Artwork): string {
-        return path.join(this.resolveArtworkRootDir(), `${artwork.type}_${artwork.name}.jpeg`);
+        return path.join(this.resolveArtworkRootDir(), `${artwork.id}.jpeg`);
     }
 
     /**

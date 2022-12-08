@@ -1,6 +1,6 @@
 import { InternalServerErrorException, Logger } from "@nestjs/common";
 import { Environment } from "@soundcore/common";
-import MeiliSearch, { Index, MeiliSearchError, MeiliSearchTimeOutError, SearchParams, Task } from "meilisearch";
+import MeiliSearch, { Index, MeiliSearchError, MeiliSearchTimeOutError, SearchParams, SearchResponse, Task } from "meilisearch";
 import { BehaviorSubject, filter, firstValueFrom, Observable } from "rxjs";
 import { Syncable, SyncFlag } from "../interfaces/syncable.interface";
 
@@ -43,6 +43,7 @@ export abstract class MeiliService<T = any> {
      * @returns {Task} Task
      */
     protected async sync(documents: T[], timeOutMs: number = MEILI_DEFAULT_TIMEOUT_MS): Promise<Task> {
+        if(this.isDisabled()) return null;
         return this.index().then((index) => {
             return index.addDocuments(documents).then((enqueuedTask) => {
                 return this.client().waitForTask(enqueuedTask.taskUid, {
@@ -68,6 +69,7 @@ export abstract class MeiliService<T = any> {
      * @returns {Task} Task
      */
     protected async delete(documentId: string, timeOutMs: number = MEILI_DEFAULT_TIMEOUT_MS) {
+        if(this.isDisabled()) return null;
         return this.index().then((index) => {
             return index.deleteDocument(documentId).then((task) => {
                 return this.client().waitForTask(task.taskUid, {
@@ -94,7 +96,7 @@ export abstract class MeiliService<T = any> {
      * @returns True or False if the recommended next date is overdue or if the last sync flag evaluates to error
      */
     public isSyncRecommended(syncable: Syncable): boolean {
-        if(typeof syncable === "undefined" || syncable == null) return false;
+        if(typeof syncable === "undefined" || syncable == null || this.isDisabled()) return false;
 
         const current = new Date().getTime();
         const lastSyncedAt = new Date(syncable.lastSyncedAt).getTime();
@@ -110,7 +112,8 @@ export abstract class MeiliService<T = any> {
      * @param {Partial<Request>} config Search config
      * @returns {SearchResponse<T>} SearchResponse<T>
      */
-    protected async search(query: string, params?: SearchParams, config?: Partial<Request>) {
+    protected async search(query: string, params?: SearchParams, config?: Partial<Request>): Promise<SearchResponse<T>> {
+        if(this.isDisabled()) return null;
         return this.index().then((index) => {
             return index.search<T>(query, params, config).catch((error) => {
                 this._logger.error(`Search failed for query '${query}': ${error.message}`, error.stack)
@@ -124,6 +127,7 @@ export abstract class MeiliService<T = any> {
      * @returns {MeiliSearch} Meilisearch Client Instance
      */
     protected client(): MeiliSearch {
+        if(this.isDisabled()) return null;
         return this._meili;
     }
 
@@ -132,9 +136,14 @@ export abstract class MeiliService<T = any> {
      * @returns {Index<T>} Meilisearch index used by the service
      */
     protected async index(): Promise<Index<T>> {
+        if(this.isDisabled()) return null;
         return firstValueFrom(this.$initialized.pipe(filter((initialized) => initialized === true))).then(() => {
             return this.client().index<T>(this._indexUid);
         });
+    }
+
+    protected isDisabled(): boolean {
+        return typeof this._meili === "undefined" || this._meili == null;
     }
 
     /**

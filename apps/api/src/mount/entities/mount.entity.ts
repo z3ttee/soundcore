@@ -1,7 +1,13 @@
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { Bucket } from "../../bucket/entities/bucket.entity";
 import { File } from "../../file/entities/file.entity";
-import { MountStatus } from "../enums/mount-status.enum";
+
+export enum MountStatus {
+    UP = 0,
+    ENQUEUED = 1,
+    SCANNING = 2,
+    INDEXING = 3
+}
 
 @Entity()
 export class Mount {

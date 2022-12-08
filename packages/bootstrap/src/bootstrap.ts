@@ -93,7 +93,6 @@ class Bootstrapper {
     return app.startAllMicroservices().then((app) => {
       return app.listen(this._port, this._host).then(() => {
         return app.getUrl().then((url) => {
-          console.log(url);
           appUrlSubject.next(url);
           return app;
         })

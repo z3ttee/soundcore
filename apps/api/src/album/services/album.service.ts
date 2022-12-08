@@ -4,23 +4,25 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Page, BasePageable } from 'nestjs-pager';
 import { Repository, SelectQueryBuilder, UpdateResult } from 'typeorm';
 import { Artist } from '../../artist/entities/artist.entity';
+import { ArtworkID } from '../../artwork/entities/artwork.entity';
 import { EVENT_ALBUMS_CHANGED } from '../../constants';
 import { SyncFlag } from '../../meilisearch/interfaces/syncable.interface';
 import { MeiliAlbumService } from '../../meilisearch/services/meili-album.service';
 import { User } from '../../user/entities/user.entity';
 import { GeniusFlag, ResourceFlag } from '../../utils/entities/resource';
+import { SyncableService } from '../../utils/services/syncing.service';
 import { CreateAlbumDTO } from '../dto/create-album.dto';
 import { UpdateAlbumDTO } from '../dto/update-album.dto';
 import { Album } from '../entities/album.entity';
 
 @Injectable()
-export class AlbumService {
+export class AlbumService implements SyncableService<Album> {
     private readonly logger: Logger = new Logger(AlbumService.name);
 
     constructor(
         @InjectRepository(Album) private readonly repository: Repository<Album>,
         private readonly eventEmitter: EventEmitter2,
-        private readonly meiliClient: MeiliAlbumService
+        private readonly meilisearch: MeiliAlbumService
     ) { }
 
     /**
@@ -179,7 +181,7 @@ export class AlbumService {
      */
     public async save(album: Album): Promise<Album> {
         return this.repository.save(album).then((result) => {
-            this.sync([result]);
+            this.syncWithMeilisearch([result]);
             return result;
         });
     }
@@ -293,8 +295,8 @@ export class AlbumService {
      * @param resource Album data
      * @returns Album
      */
-    public async sync(resources: Album[]) {
-        return this.meiliClient.setAlbums(resources).then(() => {
+    public async syncWithMeilisearch(resources: Album[]) {
+        return this.meilisearch.setAlbums(resources).then(() => {
             return this.setLastSyncedDetails(resources, SyncFlag.OK);
         }).catch(() => {
             return this.setLastSyncedDetails(resources, SyncFlag.ERROR);

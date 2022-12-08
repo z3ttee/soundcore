@@ -120,7 +120,6 @@ export class ArtistService {
         return this.repository.createQueryBuilder()
             .whereInIds(ids)
             .getManyAndCount().then(([artists, count]) => {
-                console.log(count);
                 return artists;
             })
     }

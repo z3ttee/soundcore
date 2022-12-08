@@ -5,14 +5,13 @@ import { Repository } from 'typeorm';
 import { Bucket } from '../../bucket/entities/bucket.entity';
 import { CreateMountDTO } from '../dtos/create-mount.dto';
 import { UpdateMountDTO } from '../dtos/update-mount.dto';
-import { Mount } from '../entities/mount.entity';
+import { Mount, MountStatus } from '../entities/mount.entity';
 import { Random } from '@tsalliance/utilities';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateResult } from '../../utils/results/creation.result';
 import { FileSystemService } from '../../filesystem/services/filesystem.service';
 import { WorkerQueue } from '@soundcore/nest-queue';
 import { MountRegistryService } from './mount-registry.service';
-import { MountStatus } from '../enums/mount-status.enum';
 import { MountScanFlag, MountScanProcessDTO } from '../dtos/scan-process.dto';
 import { FileFlag } from '../../file/entities/file.entity';
 

@@ -1,4 +1,5 @@
-import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
+import { Environment } from '@soundcore/common';
 import { Page, Pageable, Pagination } from 'nestjs-pager';
 import { Roles } from '../../authentication/decorators/role.decorator';
 import { ROLE_ADMIN } from '../../constants';
@@ -35,6 +36,10 @@ export class MountController {
   @Roles(ROLE_ADMIN)
   @Post()
   public async createMount(@Body() createMountDto: CreateMountDTO): Promise<CreateResult<Mount>> {
+    if(Environment.isDockerized) {
+      throw new BadRequestException("Application is dockerized, please mount a volume instead.");
+    }
+    
     return this.mountService.createIfNotExists(createMountDto)
   }
 

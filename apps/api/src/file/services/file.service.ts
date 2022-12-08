@@ -29,7 +29,9 @@ export class FileService {
             .leftJoinAndSelect("file.song", "song")
             .leftJoin("file.mount", "mount").addSelect(["mount.id"])
             .whereInIds(fileIds)
-            .getMany();
+            .getMany().then((files) => {
+                return files;
+            });
     }
 
     public async findBySongId(songId: string): Promise<File> {
@@ -171,6 +173,27 @@ export class FileService {
             .execute().then(async (result) => {
                 // Make db request to fetch affected rows
                 return this.repository.findBy(result.identifiers);
+            }).catch((error: Error) => {
+                this.logger.error(`Failed creating database entries for files batch: ${error.message}`, error.stack);
+                return [];
+            });
+    }
+
+    /**
+     * Save file object to the database and fetch all files.
+     * This does not exclude not created files.
+     * @param files 
+     * @returns 
+     */
+    public async createAndFindAll(files: File[]): Promise<File[]> {
+        return this.repository.createQueryBuilder()
+            .insert()
+            .values(files)
+            .orUpdate(["name", "flag"], ["name", "flag"])
+            .returning(["id"])
+            .execute().then(async (result) => {
+                // Make db request to fetch affected rows
+                return this.repository.findBy(result.raw);
             }).catch((error: Error) => {
                 this.logger.error(`Failed creating database entries for files batch: ${error.message}`, error.stack);
                 return [];

@@ -62,11 +62,13 @@ export class GeniusClientService {
                 // Download url to buffer
                 return this.artworkService.downloadToBuffer(resource.image_url).then((buffer) => {
                     // Create artwork and write buffer to file
-                    return this.artworkService.createForArtistIfNotExists(artist, true, buffer).then((artwork) => {
-                        // Update relation
-                        result.artwork = artwork;
-                        return result;
-                    })
+                    // return this.artworkService.createForArtistIfNotExists(artist, true, buffer).then((artwork) => {
+                    //     // Update relation
+                    //     result.artwork = artwork;
+                    //     return result;
+                    // })
+
+                    return null;
                 })
             }
 
@@ -120,11 +122,13 @@ export class GeniusClientService {
                 // Download url to buffer
                 return this.artworkService.downloadToBuffer(resource.cover_art_thumbnail_url).then((buffer) => {
                     // Create artwork and write buffer to file
-                    return this.artworkService.createForAlbumIfNotExists(album, true, buffer).then((artwork) => {
-                        // Update relation
-                        result.artwork = artwork;
-                        return result;
-                    })
+                    // return this.artworkService.createForAlbumIfNotExists(album, true, buffer).then((artwork) => {
+                    //     // Update relation
+                    //     result.artwork = artwork;
+                    //     return result;
+                    // })
+
+                    return null;
                 })
             }
 
@@ -189,11 +193,12 @@ export class GeniusClientService {
                 // Download url to buffer
                 return this.artworkService.downloadToBuffer(resource.song_art_image_thumbnail_url).then((buffer) => {
                     // Create artwork and write buffer to file
-                    return this.artworkService.createForSongIfNotExists(song, true, buffer).then((artwork) => {
-                        // Update relation
-                        result.artwork = artwork;
-                        return result;
-                    })
+                    // return this.artworkService.createForSongIfNotExists(song, true, buffer).then((artwork) => {
+                    //     // Update relation
+                    //     result.artwork = artwork;
+                    //     return result;
+                    // })
+                    return null;
                 })
             }
 
@@ -226,10 +231,12 @@ export class GeniusClientService {
                 // Download image url to buffer
                 return this.artworkService.downloadToBuffer(resource.image_url).then((buffer) => {
                     // Write artwork
-                    return this.artworkService.createForLabelIfNotExists(label, true, buffer).then((artwork) => {
-                        // Set artwork to label
-                        return this.labelService.setArtwork(label, artwork);
-                    });
+                    // return this.artworkService.createForLabelIfNotExists(label, true, buffer).then((artwork) => {
+                    //     // Set artwork to label
+                    //     return this.labelService.setArtwork(label, artwork);
+                    // });
+
+                    return null;
                 }).catch((error) => {
                     // In case of error during artwork creation,
                     // just return the label without an artwork.
@@ -276,10 +283,11 @@ export class GeniusClientService {
                 // Download image url to buffer
                 return this.artworkService.downloadToBuffer(resource.image_url).then((buffer) => {
                     // Write artwork
-                    return this.artworkService.createForDistributorIfNotExists(distributor, true, buffer).then((artwork) => {
-                        // Set artwork to distributor
-                        return this.distributorService.setArtwork(distributor, artwork);
-                    });
+                    // return this.artworkService.createForDistributorIfNotExists(distributor, true, buffer).then((artwork) => {
+                    //     // Set artwork to distributor
+                    //     return this.distributorService.setArtwork(distributor, artwork);
+                    // });
+                    return null;
                 }).catch((error) => {
                     // In case of error during artwork creation,
                     // just return the distributor without an artwork.
@@ -326,10 +334,11 @@ export class GeniusClientService {
                 // Download image url to buffer
                 return this.artworkService.downloadToBuffer(resource.image_url).then((buffer) => {
                     // Write artwork
-                    return this.artworkService.createForPublisherIfNotExists(publisher, true, buffer).then((artwork) => {
-                        // Set artwork to publisher
-                        return this.publisherService.setArtwork(publisher, artwork);
-                    });
+                    // return this.artworkService.createForPublisherIfNotExists(publisher, true, buffer).then((artwork) => {
+                    //     // Set artwork to publisher
+                    //     return this.publisherService.setArtwork(publisher, artwork);
+                    // });
+                    return null;
                 }).catch((error) => {
                     // In case of error during artwork creation,
                     // just return the publisher without an artwork.

@@ -115,13 +115,11 @@ export class StreamService {
         const startTime = Date.now();
         const pivotDateMs = startTime - (1000*60*60*24*30);
 
-        this.repository.delete({
+        return this.repository.delete({
             listenedAt: LessThanOrEqual(pivotDateMs)
         }).then((deleteResult) => {
-            this.logger.log(`Cleared ${deleteResult.affected || 0} stream records from the database.`);
-        }).catch((error: Error) => {
-            this.logger.error(`Failed clearing stream records older than 30days: ${error.message}`, Environment.isDebug ? error.stack : undefined);
-        });
+            return deleteResult;
+        })
     }
 
 }

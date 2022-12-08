@@ -1,5 +1,5 @@
 
-import { BeforeInsert, BeforeUpdate, Column, CreateDateColumn, Entity, Index, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { BeforeInsert, BeforeUpdate, Column, CreateDateColumn, Entity, Index, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { Album } from "../../album/entities/album.entity";
 import { Artist } from "../../artist/entities/artist.entity";
 import { Distributor } from "../../distributor/entities/distributor.entity";
@@ -16,9 +16,13 @@ import { Artwork } from "../../artwork/entities/artwork.entity";
 import { Syncable, SyncFlag } from "../../meilisearch/interfaces/syncable.interface";
 import { TracklistItem } from "../../tracklist/entities/tracklist.entity";
 
+export interface SongID {
+    id: string;
+}
+
 @Entity()
 @Index(["name", "primaryArtist", "album", "duration", "order"], { unique: true })
-export class Song implements Resource, Syncable, GeniusResource, TracklistItem {
+export class Song implements SongID, Resource, Syncable, GeniusResource, TracklistItem {
     public resourceType: ResourceType = "song";
 
     /**
@@ -69,9 +73,6 @@ export class Song implements Resource, Syncable, GeniusResource, TracklistItem {
     @Column({ nullable: true, type: "date" })
     public releasedAt?: Date;
 
-    @CreateDateColumn()
-    public createdAt: Date;
-
     @Column({ default: false })
     public explicit: boolean;
 
@@ -84,6 +85,18 @@ export class Song implements Resource, Syncable, GeniusResource, TracklistItem {
     @Column({ nullable: true, default: null })
     public order: number;
 
+    /**
+     * DATABASE DATES
+     */
+    @CreateDateColumn()
+    public createdAt: Date;
+
+    @UpdateDateColumn()
+    public updatedAt: Date;
+
+    /**
+     * ENTITY RELATIONS
+     */
     @OneToOne(() => File, (file) => file.song, { onDelete: "CASCADE" })
     @JoinColumn()
     public file: File;

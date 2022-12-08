@@ -11,7 +11,6 @@
     "build:api": "nest build && npm run bundle",
     "bundle": "node bundle/bundle-packagejson.js && node bundle/bundle-env.js && node bundle/bundle-info.js",
     "bundle:pm2": "npm run build && node ./bundle/bundle-pm2.js",
-    "docker-compose": "docker-compose up",
     "depcheck": "npx depcheck",
     "updatedeps": "npx npm-check-updates"
   },
@@ -40,7 +39,7 @@
     "ffprobe": "^1.1.2",
     "ffprobe-static": "^3.1.0",
     "glob": "^8.0.3",
-    "meilisearch": "^0.27.0",
+    "meilisearch": "^0.29.0",
     "mysql2": "^2.3.3",
     "nestjs-pager": "^1.1.9",
     "node-id3": "^0.2.3",
