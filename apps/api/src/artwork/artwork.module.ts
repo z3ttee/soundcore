@@ -1,12 +1,12 @@
-import { Module } from '@nestjs/common';
+import { Module, OnModuleInit } from '@nestjs/common';
 import { ArtworkController } from './controllers/artwork.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ArtworkService } from './services/artwork.service';
 import { Artwork } from './entities/artwork.entity';
-import { WorkerQueueModule } from '@soundcore/nest-queue';
+import { WorkerQueue, WorkerQueueModule } from '@soundcore/nest-queue';
 import path from 'path';
-import { ArtworkColorInfo } from './entities/artwork-color-info.entity';
 import { ArtworkQueueService } from './services/artwork-queue.service';
+import { ArtworkProcessDTO, ArtworkProcessFlag } from './dtos/artwork-process.dto';
 
 @Module({
   controllers: [ArtworkController],
@@ -15,7 +15,7 @@ import { ArtworkQueueService } from './services/artwork-queue.service';
     ArtworkQueueService
   ],
   imports: [
-    TypeOrmModule.forFeature([ Artwork, ArtworkColorInfo ]),
+    TypeOrmModule.forFeature([ Artwork ]),
     WorkerQueueModule.forFeature({
       script: path.join(__dirname, "worker", "artwork.worker.js"),
       concurrent: 4
@@ -25,4 +25,16 @@ import { ArtworkQueueService } from './services/artwork-queue.service';
     ArtworkService
   ]
 })
-export class ArtworkModule {}
+export class ArtworkModule implements OnModuleInit {
+
+  constructor(private readonly queue: WorkerQueue<ArtworkProcessDTO>) {}
+
+  public async onModuleInit() {
+      return this.queue.enqueue(<ArtworkProcessDTO>{
+        flag: ArtworkProcessFlag.CONTINUE_PROCESSING,
+        entities: [],
+        sourceType: null
+      });
+  }
+
+}

@@ -7,7 +7,7 @@ import path from "path";
 import Vibrant from "node-vibrant";
 import { Random } from "@tsalliance/utilities";
 import axios from "axios";
-import { DeleteResult, Repository } from "typeorm";
+import { DeleteResult, Repository, UpdateResult } from "typeorm";
 import { Artist } from "../../artist/entities/artist.entity";
 import { Album } from "../../album/entities/album.entity";
 import { Song } from "../../song/entities/song.entity";
@@ -17,7 +17,6 @@ import { Publisher } from "../../publisher/entities/publisher.entity";
 import { Response } from "express";
 import { InjectRepository } from "@nestjs/typeorm";
 import { FileSystemService } from "../../filesystem/services/filesystem.service";
-import { ArtworkColorInfo } from "../entities/artwork-color-info.entity";
 import { ArtworkSourceType } from "../dtos/artwork-process.dto";
 import crypto from "node:crypto";
 
@@ -47,16 +46,11 @@ export class ArtworkService {
             .getOne();
     }
 
-    /**
-     * Find an artwork by its name and type.
-     * @param name Name of the artwork
-     * @param type Type of the artwork
-     * @returns Artwork
-     */
-    public async findByNameAndType(name: string, type: ArtworkType): Promise<Artwork> {
+    public async findByFlagAndSourceTypeIdOnly(flag: ArtworkFlag, sourceType: ArtworkSourceType): Promise<Artwork[]> {
         return this.repository.createQueryBuilder("artwork")
-            .where("artwork.name = :name AND artwork.type = :type", { name, type })
-            .getOne();
+            .where("artwork.flag = :flag AND artwork.sourceType = :sourceType", { flag, sourceType })
+            .select(["id"])
+            .getMany();
     }
 
     /**
@@ -75,13 +69,13 @@ export class ArtworkService {
             .orUpdate(["sourceType", "flag", "sourceUri"], ["id"])
             .execute().then((result) => {
                 return this.repository.createQueryBuilder("artwork")
-                    .leftJoin("artwork.colorInfo", "colorInfo").addSelect(["colorInfo.id", "colorInfo.vibrant"])
                     .where(result.identifiers)
                     .getMany().then((artworks) => {
                         return artworks;
                     })
             }).catch((error) => {
                 this.logger.error(`Could not create database entry for artwork: ${error.message}`, error.stack);
+                console.error()
                 return null
             });
     }
@@ -99,7 +93,6 @@ export class ArtworkService {
         const type = ArtworkType.ARTIST;
 
         return this.createIfNotExists([{ 
-            name, 
             type, 
             sourceUri: sourceUri, 
             sourceType: ArtworkSourceType.URL, 
@@ -120,7 +113,6 @@ export class ArtworkService {
         const type = ArtworkType.ALBUM;
 
         return this.createIfNotExists([{ 
-            name, 
             type, 
             sourceUri: sourceUri, 
             sourceType: ArtworkSourceType.URL, 
@@ -141,7 +133,6 @@ export class ArtworkService {
         const type = ArtworkType.LABEL;
 
         return this.createIfNotExists([{ 
-            name, 
             type, 
             sourceUri: sourceUri, 
             sourceType: ArtworkSourceType.URL, 
@@ -162,7 +153,6 @@ export class ArtworkService {
         const type = ArtworkType.DISTRIBUTOR;
 
         return this.createIfNotExists([{ 
-            name, 
             type, 
             sourceUri: sourceUri, 
             sourceType: ArtworkSourceType.URL, 
@@ -183,7 +173,6 @@ export class ArtworkService {
         const type = ArtworkType.PUBLISHER;
 
         return this.createIfNotExists([{ 
-            name, 
             type, 
             sourceUri: sourceUri, 
             sourceType: ArtworkSourceType.URL, 
@@ -209,7 +198,6 @@ export class ArtworkService {
         const sourceType = ArtworkSourceType.SONG;
 
         return {
-            name,
             type,
             sourceType,
             id: this.createHash(`${name}:${type}:${sourceType}`)
@@ -307,8 +295,10 @@ export class ArtworkService {
      * @param idOrObject Artwork id or object to extract colors from
      * @returns ArtworkColors
      */
-     public async getAccentColorFromArtwork(idOrObject: Artwork): Promise<ArtworkColorInfo> {
+     public async extractAccentColor(idOrObject: Artwork): Promise<string> {
         const artwork = await this.resolveArtwork(idOrObject);
+        if(!artwork) return null;
+
         const filepath = this.fileSystem.resolveArtworkDir(artwork);
 
         return new Promise((resolve, reject) => {
@@ -319,20 +309,27 @@ export class ArtworkService {
                 }
 
                 Vibrant.from(filepath).getPalette().then((palette) => {
-                    const colors = new ArtworkColorInfo();
-                    colors.vibrant = palette.Vibrant.hex;
-                    colors.muted = palette.Muted.hex;
-                    colors.darkMuted = palette.DarkMuted.hex;
-                    colors.darkVibrant = palette.DarkVibrant.hex;
-                    colors.lightMuted = palette.LightMuted.hex;
-                    colors.lightVibrant = palette.LightVibrant.hex;
-                    colors.artwork = artwork;
-                    resolve(colors);
+                    resolve(palette?.Vibrant?.hex);
                 }).catch((error) => {
                     reject(error);
                 });
             });
         });
+    }
+
+    public async extractAndSetAccentColor(idOrObject: Artwork): Promise<string> {
+        const artwork = await this.resolveArtwork(idOrObject);
+        if(!artwork) return null;
+
+        return this.extractAccentColor(artwork).then((color) => {
+            return this.repository.update(artwork.id, { accentColor: color }).then(() => {
+                return color;
+            })
+        })
+    }
+
+    public async saveAll(artworks: Artwork[]) {
+        return this.repository.save(artworks);
     }
 
     /**
@@ -385,13 +382,13 @@ export class ArtworkService {
             .execute().then((updateResult) => updateResult.affected > 0);
     }
 
-    public async removeSourceInfos(artworkIds: string[]): Promise<boolean> {
-        return this.repository.createQueryBuilder()
-            .update()
-            .set({ sourceType: null, sourceUri: null })
-            .where("id IN (:artworkIds)", { artworkIds })
-            .execute().then((updateResult) => updateResult.affected > 0)
-    }
+    // public async removeSourceInfos(artworkIds: string[]): Promise<boolean> {
+    //     return this.repository.createQueryBuilder()
+    //         .update()
+    //         .set({ sourceType: null, sourceUri: null })
+    //         .where("id IN (:artworkIds)", { artworkIds })
+    //         .execute().then((updateResult) => updateResult.affected > 0)
+    // }
 
     /**
      * Resolve the parameter to an artwork entity.
