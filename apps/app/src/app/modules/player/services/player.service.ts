@@ -92,7 +92,17 @@ export class AppPlayerService {
      * @param force If true, will play the song immediately and skips the currently playing song. This does not cancel playback of a whole tracklist, but just the current song
      */
     public playSingle(song: Song, force: boolean = true) {
-        this.logger.log(`Enqueued song (force: ${force}): `, song);
+        // Check if the tracklist is currently playing
+        if(this.isPlayingSrcById(song.id)) {
+            // If true, check if paused and toggle play/pause
+            if(this.audio.isPaused()) {
+                this.audio.play();
+            } else {
+                this.audio.pause();
+            }
+
+            return;
+        }
 
         // Enqueue to top of the queue
         this._singleQueue.enqueueTop(song);

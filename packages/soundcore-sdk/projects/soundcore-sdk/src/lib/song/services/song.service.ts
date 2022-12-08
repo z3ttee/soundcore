@@ -8,11 +8,10 @@ import { apiResponse } from "../../utils/rxjs/operators/api-response";
 import { ApiSearchResponse } from "../../meilisearch/entities/search-response.entity";
 import { MeiliSong } from "../../meilisearch/entities/meili-song.entity";
 import { Page, Pageable } from "../../pagination";
+import { Future, toFuture } from "../../utils/future";
 
-@Injectable({
-    providedIn: "root"
-})
-export class SCDKSongService {
+@Injectable()
+export class SCSDKSongService {
 
     constructor(
         private httpClient: HttpClient,
@@ -20,26 +19,14 @@ export class SCDKSongService {
     ) {}
 
     /**
-     * Find the top songs by an artist.
-     * @param artistId Artist's id
-     * @returns Observable<Page<Song>>
+     * Find a song by its id.
+     * @param songId Song's id
+     * @returns Future<Song>
      */
-    public findTopSongsByArtist(artistId: string): Observable<ApiResponse<Page<Song>>> {
-        if(!artistId) return of(ApiResponse.withPayload(null));
-        return this.httpClient.get<Page<Song>>(`${this.options.api_base_uri}/v1/songs/byArtist/${artistId}/top`).pipe(apiResponse())
-    }
-
-    /**
-     * Find songs by an artist categorized in a specific genre.
-     * @param genreId Genre's id
-     * @param artistId Artist's id
-     * @param pageable Page settings
-     * @returns Observable<Page<Song>>
-     */
-    public findSongsByGenreAndArtist(genreId: string, artistId: string, pageable: Pageable): Observable<ApiResponse<Page<Song>>> {
-        if(!genreId || !artistId) return of(ApiResponse.withPayload(Page.of([])))
-        return this.httpClient.get<Page<Song>>(`${this.options.api_base_uri}/v1/songs/byGenre/${genreId}/byArtist/${artistId}${pageable.toQuery()}`).pipe(apiResponse());
-    }
+    public findById(songId: string): Observable<Future<Song>> {
+        if(!songId) return of(Future.notfound());
+        return this.httpClient.get<Song>(`${this.options.api_base_uri}/v1/songs/${songId}`).pipe(toFuture());
+    }    
 
     /**
      * Find songs of the user's collection
@@ -48,17 +35,6 @@ export class SCDKSongService {
      */
     public findSongsByCollection(pageable: Pageable): Observable<ApiResponse<Page<Song>>> {
         return this.httpClient.get<Page<Song>>(`${this.options.api_base_uri}/v1/songs/byCollection${pageable.toQuery()}`).pipe(apiResponse());
-    }
-
-    /**
-     * Find song by an artist and which the user has added to his collection.
-     * @param artistId Artist's id
-     * @param pageable Page settings
-     * @returns 
-     */
-    public findSongsByCollectionAndArtist(artistId: string, pageable: Pageable): Observable<ApiResponse<Page<Song>>> {
-        if(!artistId) return of(ApiResponse.withPayload(Page.of([])))
-        return this.httpClient.get<Page<Song>>(`${this.options.api_base_uri}/v1/songs/byCollection/byArtist/${artistId}${pageable.toQuery()}`).pipe(apiResponse());
     }
 
     /**

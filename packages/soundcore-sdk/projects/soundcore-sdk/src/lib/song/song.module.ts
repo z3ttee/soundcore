@@ -1,9 +1,9 @@
 import { NgModule } from "@angular/core";
-import { SCDKSongService } from "./services/song.service";
+import { SCSDKSongService } from "./services/song.service";
 
 @NgModule({
     providers: [
-        SCDKSongService
+        SCSDKSongService
     ]
 })
-export class SCDKSongModule { }
+export class SCSDKSongModule { }

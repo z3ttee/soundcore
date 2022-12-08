@@ -33,7 +33,8 @@ export * from "./lib/utils/future";
 // Mount Module
 export * from "./lib/mount";
 
-
+// Song Module
+export * from "./lib/song";
 
 
 
@@ -86,14 +87,6 @@ export * from "./lib/genre/entities/genre.entity";
 export * from "./lib/artist/artist.module";
 export * from "./lib/artist/services/artist.service";
 export * from "./lib/artist/entities/artist.entity";
-
-
-/**
- * Export all song sdk parts
- */
-export * from "./lib/song/song.module";
-export * from "./lib/song/services/song.service";
-export * from "./lib/song/entities/song.entity";
 
 /**
  * Export all album sdk parts

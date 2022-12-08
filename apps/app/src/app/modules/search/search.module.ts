@@ -6,7 +6,7 @@ import { SCNGXArtistGridItemModule, SCNGXInfiniteListModule, SCNGXToolbarModule,
 
 import { Error404Module } from 'src/app/shared/error404/error404.module';
 import { ReactiveFormsModule } from '@angular/forms';
-import { SCDKAlbumModule, SCDKArtistModule, SCDKUserModule, SCSDKPlaylistModule } from '@soundcore/sdk';
+import { SCDKAlbumModule, SCDKArtistModule, SCDKUserModule, SCSDKPlaylistModule, SCSDKSongModule } from '@soundcore/sdk';
 import { SongContextMenuModule } from 'src/app/components/menus/song-context-menu/song-context-menu.module';
 import { SongGridItemModule } from 'src/app/components/grid-items/song-grid-item/song-grid-item.module';
 
@@ -38,6 +38,7 @@ const routes: Routes = [
     SCDKAlbumModule,
 
     SCSDKPlaylistModule,
+    SCSDKSongModule,
 
     SongGridItemModule,
     SongContextMenuModule

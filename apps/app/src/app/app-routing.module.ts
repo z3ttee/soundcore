@@ -21,6 +21,7 @@ const routes: Routes = [
     { path: "album", canActivate: [SSOGuard], loadChildren: () => import("./modules/album/album.module").then((m) => m.AlbumModule) },
     { path: "artist", canActivate: [SSOGuard], loadChildren: () => import("./modules/artist/artist.module").then((m) => m.ArtistModule) },
     { path: "playlist", canActivate: [SSOGuard], loadChildren: () => import("./modules/playlist/playlist.module").then((m) => m.PlaylistModule) },
+    { path: "song", canActivate: [SSOGuard], loadChildren: () => import("./modules/songs/song.module").then((m) => m.SongModule) },
     { path: "library", canActivate: [SSOGuard], loadChildren: () => import("./modules/library/library.module").then((m) => m.LibraryModule) },
     { path: "collection", canActivate: [SSOGuard], loadChildren: () => import("./modules/collection/collection.module").then((m) => m.CollectionModule) },
     { path: "profile", canActivate: [SSOGuard], loadChildren: () => import("./modules/profile/profile.module").then((m) => m.ProfileModule) },
