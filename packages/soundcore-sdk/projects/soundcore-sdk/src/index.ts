@@ -36,7 +36,8 @@ export * from "./lib/mount";
 // Song Module
 export * from "./lib/song";
 
-
+// Collection Module
+export * from "./lib/collection";
 
 
 

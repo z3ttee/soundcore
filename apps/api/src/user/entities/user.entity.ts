@@ -1,6 +1,6 @@
 
 import { BeforeInsert, BeforeUpdate, Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryColumn, UpdateDateColumn } from "typeorm";
-import { Like } from "../../collection/entities/like.entity";
+import { LikedResource } from "../../collection/entities/like.entity";
 import { Playlist } from "../../playlist/entities/playlist.entity";
 import { Stream } from "../../stream/entities/stream.entity";
 import { Resource, ResourceFlag, ResourceType } from "../../utils/entities/resource";
@@ -46,8 +46,8 @@ export class User implements Resource, Syncable {
     @OneToMany(() => Playlist, (p) => p.author)
     public playlists?: Playlist[];
     
-    @OneToMany(() => Like, (l) => l.user, { onDelete: "CASCADE" })
-    public likedSongs?: Like;
+    @OneToMany(() => LikedResource, (l) => l.user, { onDelete: "CASCADE" })
+    public likedResources?: LikedResource;
 
     @CreateDateColumn()
     public createdAt?: Date;

@@ -10,7 +10,7 @@ import { Publisher } from "../../publisher/entities/publisher.entity";
 import { Stream } from "../../stream/entities/stream.entity";
 import { Slug } from "@tsalliance/utilities";
 import { GeniusFlag, GeniusResource, Resource, ResourceFlag, ResourceType } from "../../utils/entities/resource";
-import { Like } from "../../collection/entities/like.entity";
+import { LikedSong } from "../../collection/entities/like.entity";
 import { File } from "../../file/entities/file.entity";
 import { Artwork } from "../../artwork/entities/artwork.entity";
 import { Syncable, SyncFlag } from "../../meilisearch/interfaces/syncable.interface";
@@ -139,8 +139,8 @@ export class Song implements SongID, Resource, Syncable, GeniusResource, Trackli
     @OneToMany(() => Stream, stream => stream.song)
     public streams: Stream[];
 
-    @OneToMany(() => Like, (l) => l.song)
-    public likes: Like[];
+    @OneToMany(() => LikedSong, (l) => l.song)
+    public likes: LikedSong[];
 
     // Value that will be set if the songs of a playlist
     // are fetched

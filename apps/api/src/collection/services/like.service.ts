@@ -1,5 +1,6 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Page, Pageable } from 'nestjs-pager';
 import { Repository } from 'typeorm';
 import { Album } from '../../album/entities/album.entity';
 import { Playlist } from '../../playlist/entities/playlist.entity';
@@ -7,33 +8,100 @@ import { PlaylistPrivacy } from '../../playlist/enums/playlist-privacy.enum';
 import { PlaylistService } from '../../playlist/playlist.service';
 import { Song } from '../../song/entities/song.entity';
 import { User } from '../../user/entities/user.entity';
-import { Like, LikeType } from '../entities/like.entity';
+import { LikedAlbum, LikedPlaylist, LikedResource, LikedSong } from '../entities/like.entity';
 
 @Injectable()
 export class LikeService {
 
     constructor(
         private playlistService: PlaylistService,
-        @InjectRepository(Like) private repository: Repository<Like>
+        @InjectRepository(LikedResource) private repository: Repository<LikedResource>
     ) {}
 
-    public async findByUserAndSong(userId: string, songId: string): Promise<Like> {
-        return this.repository.findOne({ where: { user: { id: userId }, song: { id: songId }}}) as Promise<Like>
+    public getRepository() {
+        return this.repository;
     }
 
-    public async findByUserAndPlaylist(userId: string, playlistId: string): Promise<Like> {
-        return this.repository.findOne({ where: { user: { id: userId }, playlist: { id: playlistId }}}) as Promise<Like>
+    /**
+     * Find like informations for a userId and songId
+     * @param userId User's id
+     * @param songId Song's id
+     * @returns LikedSong
+     */
+    public async findByUserAndSong(userId: string, songId: string): Promise<LikedSong> {
+        return this.repository.createQueryBuilder("like")
+            .leftJoin("like.user", "user")
+            .leftJoinAndSelect("like.song", "song")
+            .where("user.id = :userId AND song.id = :songId", { userId, songId })
+            .getOne();
     }
 
-    public async findByUserAndAlbum(userId: string, albumId: string): Promise<Like> {
-        return this.repository.findOne({ where: { user: { id: userId }, album: { id: albumId }}}) as Promise<Like>
+    /**
+     * Find like informations for a userId and playlistId
+     * @param userId User's id
+     * @param playlistId Playlist's id
+     * @returns LikedPlaylist
+     */
+    public async findByUserAndPlaylist(userId: string, playlistId: string): Promise<LikedPlaylist> {
+        return this.repository.createQueryBuilder("like")
+            .leftJoin("like.user", "user")
+            .leftJoinAndSelect("like.playlist", "playlist")
+            .where("user.id = :userId AND playlist.id = :playlistId", { userId, playlistId })
+            .getOne();
     }
 
+    /**
+     * Find like informations for a userId and albumId
+     * @param userId User's id
+     * @param albumId Album's id
+     * @returns LikedAlbum
+     */
+    public async findByUserAndAlbum(userId: string, albumId: string): Promise<LikedAlbum> {
+        return this.repository.createQueryBuilder("like")
+            .leftJoin("like.user", "user")
+            .leftJoinAndSelect("like.album", "album")
+            .where("user.id = :userId AND album.id = :albumId", { userId, albumId })
+            .getOne();
+    }
+
+    public async findPageByLikedSongsOfUser(userId: string, pageable: Pageable): Promise<Page<LikedSong>> {
+        return this.repository.createQueryBuilder("like")
+            .leftJoin("like.user", "user")
+            .leftJoin("like.song", "song").addSelect(["song.id", "song.slug", "song.name", "song.duration", "song.releasedAt", "song.explicit"])
+            .leftJoin("song.album", "album").addSelect(["album.id", "album.slug", "album.name"])
+            .leftJoin("song.primaryArtist", "primaryArtist").addSelect(["primaryArtist.id", "primaryArtist.slug", "primaryArtist.name"])
+            .leftJoin("song.featuredArtists", "featuredArtists").addSelect(["featuredArtists.id", "featuredArtists.slug", "featuredArtists.name"])
+            .leftJoin("song.artwork", "artwork").addSelect(["artwork.id"])
+            .take(pageable.limit)
+            .skip(pageable.offset)
+            .where("user.id = :userId", { userId })
+            .getManyAndCount().then(([resources, total]) => Page.of(resources, total, pageable.offset));
+    }
+
+    /**
+     * Check if a user is the author of a playlist
+     * @param userId User's id
+     * @param playlistId Playlist's id
+     * @returns True or False
+     */
     public async isPlaylistAuthor(userId: string, playlistId: string): Promise<boolean> {
-        return !! await this.repository.findOne({ where: { playlist: { id: playlistId, author: { id: userId }}}})
+        return this.repository.createQueryBuilder("like")
+            .leftJoin("like.user", "user")
+            .leftJoin("like.playlist", "playlist")
+            .leftJoin("playlist.author", "author")
+            .where("playlist.id = :playlistId AND author.id = :authorId", { playlistId, authorId: userId })
+            .getCount().then((count) => count > 0);
     }
 
-    public async likeSong(songId: string, authentication: User): Promise<boolean> {
+    /**
+     * Toggle like state of a song.
+     * If the song was liked before, remove the like.
+     * Otherwise save like.
+     * @param songId Song's id
+     * @param authentication Authentication object
+     * @returns True or False. True, if song received like, otherwise false
+     */
+    public async toggleLikeForSong(songId: string, authentication: User): Promise<boolean> {
         const existing = await this.findByUserAndSong(authentication?.id, songId);
 
         // Remove like if exists.
@@ -43,8 +111,7 @@ export class LikeService {
             })
         }
 
-        const like = new Like();
-        like.type = LikeType.SONG;
+        const like = new LikedSong();
         like.user = authentication;
         like.song = { id: songId } as Song;
 
@@ -53,7 +120,15 @@ export class LikeService {
         })
     }
 
-    public async likePlaylist(playlistId: string, authentication: User): Promise<boolean> {
+    /**
+     * Toggle like state of a playlist.
+     * If the playlist was liked before, remove the like.
+     * Otherwise save like.
+     * @param playlistId Playlist's id
+     * @param authentication Authentication object
+     * @returns True or False. True, if playlist received like, otherwise false
+     */
+    public async toggleLikeForPlaylist(playlistId: string, authentication: User): Promise<boolean> {
         const playlist = await this.playlistService.findById(playlistId);
         if(!playlist) throw new NotFoundException();
         if(playlist.author?.id == authentication?.id) throw new BadRequestException("Author cannot like his own playlists.");
@@ -67,17 +142,24 @@ export class LikeService {
             })
         }
 
-        const like = new Like()
-        like.type = LikeType.PLAYLIST;
-        like.user = authentication;
-        like.playlist = { id: playlistId } as Playlist;
+        const like = new LikedPlaylist()
+        like.user = <User>{ id: authentication.id };
+        like.playlist = <Playlist>{ id: playlistId };
 
         return this.repository.save(like).then(() => true).catch(() => {
             throw new BadRequestException("Could not like playlist.")
         })
     }
 
-    public async likeAlbum(albumId: string, authentication: User): Promise<boolean> {
+    /**
+     * Toggle like state of an album.
+     * If the album was liked before, remove the like.
+     * Otherwise save like.
+     * @param albumId Album's id
+     * @param authentication Authentication object
+     * @returns True or False. True, if album received like, otherwise false
+     */
+    public async toggleLikeForAlbum(albumId: string, authentication: User): Promise<boolean> {
         const existing = await this.findByUserAndAlbum(authentication?.id, albumId);
 
         // Remove like if exists.
@@ -87,10 +169,9 @@ export class LikeService {
             })
         }
 
-        const like = new Like()
-        like.type = LikeType.ALBUM;
-        like.user = authentication;
-        like.album = { id: albumId } as Album;
+        const like = new LikedAlbum()
+        like.user = <User>{ id: authentication.id };
+        like.album = <Album>{ id: albumId };
 
         return this.repository.save(like).then(() => true).catch(() => {
             throw new BadRequestException("Could not like album.")
