@@ -99,7 +99,7 @@ export class SongService implements SyncableService<Song> {
             .leftJoin("song.album", "album").addSelect(["album.id", "album.slug", "album.name"])
             .leftJoin("song.primaryArtist", "primaryArtist").addSelect(["primaryArtist.id", "primaryArtist.slug", "primaryArtist.name"])
             .leftJoin("song.featuredArtists", "featuredArtist").addSelect(["featuredArtist.id", "featuredArtist.slug", "featuredArtist.name"])
-            .leftJoinAndSelect("song.artwork", "artwork", "")
+            .leftJoinAndSelect("song.artwork", "artwork")
             .leftJoinAndSelect("song.file", "file")
             .leftJoinAndSelect("file.mount", "mount")
             .groupBy("artwork.id")
