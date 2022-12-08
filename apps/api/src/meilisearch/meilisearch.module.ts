@@ -16,6 +16,10 @@ import { MeiliQueueService } from './services/meili-queue.service';
 
 export interface MeilisearchOptions {
     host: string;
+    /**
+     * Port of the meilisearch application
+     * @default 7700
+     */
     port?: number;
     apiKey?: string;
 }
@@ -25,7 +29,7 @@ export class MeilisearchModule {
     private static logger: Logger = new Logger(MeilisearchModule.name);
 
     public static forRoot(options: MeilisearchOptions): DynamicModule {
-        // TODO: Disable module if options not valid
+        const isDisabled = typeof options?.host === "undefined" || options?.host == null;
 
         const config: Config = {
             host: `${options.host}:${options.port ?? 7700}`,
@@ -36,12 +40,16 @@ export class MeilisearchModule {
         let meiliclient: MeiliSearch = null;
 
         try {
-            meiliclient = new MeiliSearch(config);
-            meiliclient.getVersion().then((version) => {
-                this.logger.verbose(`Found Meilisearch Instance under '${config.host}'. (v${version.pkgVersion})`);
-            }).catch((error: Error) => {
-                this.logger.error(`Failed finding Meilisearch Instance under ${config.host}: ${error.message}`, error.stack);
-            });
+            if(isDisabled) {
+                this.logger.warn(`No meilisearch host was specified. Disabled module.`);
+            } else {
+                meiliclient = new MeiliSearch(config);
+                meiliclient.getVersion().then((version) => {
+                    this.logger.verbose(`Found Meilisearch Instance under '${config.host}'. (v${version.pkgVersion})`);
+                }).catch((error: Error) => {
+                    this.logger.error(`Failed finding Meilisearch Instance under ${config.host}: ${error.message}`, error.stack);
+                });
+            }
         } catch (error: any) {
             this.logger.warn(`Could not build MeiliClient. Disabling meilisearch: ${error["message"] || error}`);
         }
