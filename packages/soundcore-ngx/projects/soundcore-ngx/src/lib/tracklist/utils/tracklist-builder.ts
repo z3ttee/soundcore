@@ -35,4 +35,9 @@ export class SCNGXTracklistBuilder {
         return new SCNGXTracklist(TracklistType.ARTIST_TOP, artist?.id, this.service, artist, pageSize);
     }
 
+    public forLikedSongs(currentUserId: string, pageSize?: number): SCNGXTracklist {
+        if(typeof currentUserId === "undefined" || currentUserId == null) return null;
+        return new SCNGXTracklist(TracklistType.LIKED_SONGS, currentUserId, this.service, null, pageSize);
+    }
+
 }

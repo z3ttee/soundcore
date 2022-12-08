@@ -8,7 +8,8 @@ export enum TracklistType {
     ARTIST = 2,
     ARTIST_TOP = 3,
     RANDOM = 4,
-    COLLECTION = 5
+    COLLECTION = 5,
+    LIKED_SONGS = 6
 }
 
 /**

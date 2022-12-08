@@ -117,16 +117,19 @@ export class SCNGXTracklist<C = any> extends SCNGXBaseDatasource<PlaylistItem> {
                 if(this.assocResId) {
                     switch(this.type) {
                         case TracklistType.PLAYLIST:
-                            request = this.service.findByPlaylist(this.assocResId)
+                            request = this.service.findByPlaylist(this.assocResId);
                             break;
                         case TracklistType.ALBUM:
-                            request = this.service.findByAlbum(this.assocResId)
+                            request = this.service.findByAlbum(this.assocResId);
                             break;
                         case TracklistType.ARTIST:
-                            request = this.service.findByArtist(this.assocResId)
+                            request = this.service.findByArtist(this.assocResId);
                             break;
                         case TracklistType.ARTIST_TOP:
-                            request = this.service.findByArtistTop(this.assocResId)
+                            request = this.service.findByArtistTop(this.assocResId);
+                            break;
+                        case TracklistType.LIKED_SONGS:
+                            request = this.service.findByLikedSongs();
                             break;
     
                         default:

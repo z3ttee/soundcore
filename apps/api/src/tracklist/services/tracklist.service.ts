@@ -7,15 +7,16 @@ import { Song } from '../../song/entities/song.entity';
 import { Tracklist, TracklistItem, TracklistType } from '../entities/tracklist.entity';
 import { SongService } from '../../song/services/song.service';
 import { User } from '../../user/entities/user.entity';
-import { FileFlag } from '../../file/entities/file.entity';
+import { LikedSong } from '../../collection/entities/like.entity';
+import { LikeService } from '../../collection/services/like.service';
 
 @Injectable()
 export class TracklistService {
 
     constructor(
         private readonly songService: SongService,
-        @InjectRepository(PlaylistItem)  private tracklistRepository: Repository<PlaylistItem>,
-        @InjectRepository(Song)  private songRepository: Repository<Song>
+        private readonly likeService: LikeService,
+        @InjectRepository(PlaylistItem)  private tracklistRepository: Repository<PlaylistItem>
     ) {}
 
     /**
@@ -158,6 +159,34 @@ export class TracklistService {
             .getManyAndCount();
 
         return Page.of(result[0], result[1], pageable.offset);
+    }
+
+    /**
+     * Find a list of song ids by users list of liked songs.
+     * @param pageable Page settings
+     * @param authentication User authentication object
+     * @returns Tracklist
+     */
+    public async findByLikedSongs(authentication: User, hostname: string): Promise<Tracklist> {
+        const metadataUrl = `${hostname}/v1/tracklists/liked_songs/meta`;
+        const result = await this.likeService.getRepository().createQueryBuilder("like")
+            .leftJoin("like.user", "user")
+            .leftJoin("like.song", "song")
+            .select(["like.id"])
+            .where("user.id = :userId AND song.id != NULL", { userId: authentication.id })
+            .getManyAndCount();
+
+        return new Tracklist(result[1], TracklistType.PLAYLIST, result[0], metadataUrl);    
+    }
+
+    /**
+     * Find a page of metadata of the tracklist of users liked songs.
+     * @param pageable Page settings
+     * @param authentication User authentication object
+     * @returns Page<Song>
+     */
+    public async findMetaByLikedSongs(authentication: User, pageable: BasePageable): Promise<Page<LikedSong>> {
+        return Page.of([], 0, pageable.offset);
     }
 
     /**
