@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Put } from '@nestjs/common';
+import { Controller, Get, Param } from '@nestjs/common';
 import { Pageable, Pagination } from 'nestjs-pager';
 import { Authentication } from '../../authentication/decorators/authentication.decorator';
 import { User } from '../../user/entities/user.entity';
@@ -14,17 +14,17 @@ export class LikeController {
     return this.likeService.findPageByLikedSongsOfUser(user.id, pageable);
   }
 
-  @Put("/songs/:songId")
+  @Get("/songs/:songId")
   public async likeSong(@Param("songId") songId: string, @Authentication() user: User): Promise<boolean> {
     return this.likeService.toggleLikeForSong(songId, user);
   }
 
-  @Put("/playlists/:playlistId")
+  @Get("/playlists/:playlistId")
   public async likePlaylist(@Param("playlistId") playlistId: string, @Authentication() user: User): Promise<boolean> {
     return this.likeService.toggleLikeForPlaylist(playlistId, user)
   }
 
-  @Put("/albums/:albumId")
+  @Get("/albums/:albumId")
   public async likeAlbum(@Param("albumId") albumId: string, @Authentication() user: User): Promise<boolean> {
     return this.likeService.toggleLikeForAlbum(albumId, user)
   }

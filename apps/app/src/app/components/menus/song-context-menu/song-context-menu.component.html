@@ -8,5 +8,9 @@
             <hero-icon name="view-grid-add" [class]="'h-5 w-5'"></hero-icon>
             <span>Zu Playlist hinzufügen</span>
         </sccdk-context-menu-item>
+        <sccdk-context-menu-item (click)="toggleLikeForSong()">
+            <hero-icon name="heart" [class]="'h-5 w-5'"></hero-icon>
+            <span>Zu Lieblingssongs hinzufügen</span>
+        </sccdk-context-menu-item>
     </sccdk-context-menu-category>
 </sccdk-context-menu>

@@ -16,15 +16,15 @@ export class SCSDKLikeService {
     ) {}
 
     public toggleLikeForSong(songId: string): Observable<Future<boolean>> {
-        return this.httpClient.put<boolean>(`${this.options.api_base_uri}/v1/likes/songs/${songId}`, {}).pipe(toFuture());
+        return this.httpClient.get<boolean>(`${this.options.api_base_uri}/v1/likes/songs/${songId}`).pipe(toFuture());
     }
 
     public toggleLikeForPlaylist(playlistId: string): Observable<Future<boolean>> {
-        return this.httpClient.put<boolean>(`${this.options.api_base_uri}/v1/likes/playlists/${playlistId}`, {}).pipe(toFuture());
+        return this.httpClient.get<boolean>(`${this.options.api_base_uri}/v1/likes/playlists/${playlistId}`).pipe(toFuture());
     }
 
     public toggleLikeForAlbum(albumId: string): Observable<Future<boolean>> {
-        return this.httpClient.put<boolean>(`${this.options.api_base_uri}/v1/likes/albums/${albumId}`, {}).pipe(toFuture());
+        return this.httpClient.get<boolean>(`${this.options.api_base_uri}/v1/likes/albums/${albumId}`).pipe(toFuture());
     }
 
     public findPageByLikedSongs(pageable: Pageable): Observable<Future<Page<LikedSong>>> {

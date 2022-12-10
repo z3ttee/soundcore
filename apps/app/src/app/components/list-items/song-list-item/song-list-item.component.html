@@ -52,7 +52,7 @@
     </div>
 
     <!-- Like Col -->
-    <div class="song-item-like-col inline-flex justify-center items-end max-w-10 min-w-10 px-2 opacity-100 md:opacity-0 pointer-events-none transition-all" [ngClass]="{'opacity-100 pointer-events-auto': song?.liked || isMobile, 'text-accent': song?.liked}">
+    <div class="song-item-like-col inline-flex justify-center items-end max-w-10 min-w-10 px-2 opacity-100 md:opacity-0 pointer-events-none transition-all" [ngClass]="{'opacity-100 pointer-events-auto': song?.liked || isMobile, 'text-accent opacity-100': song?.liked}">
         <span class="w-6 h-6" matRipple [matRippleCentered]="true" [matRippleUnbounded]="true" [matRippleRadius]="20">
             <hero-icon name="heart" type="outline" [class]="'w-6 h-6 ' + (song?.liked ? 'fill-accent' : '')"></hero-icon>
         </span>

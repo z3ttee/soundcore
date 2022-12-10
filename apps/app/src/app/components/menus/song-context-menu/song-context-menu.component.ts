@@ -1,16 +1,17 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { SSOService } from '@soundcore/sso';
 import { Observable, Subject, takeUntil } from 'rxjs';
 import { SCNGXDialogService } from '@soundcore/ngx';
-import { MeiliSong, Playlist, PlaylistAddSongFailReason, SCSDKPlaylistService, Song } from '@soundcore/sdk';
+import { MeiliSong, Playlist, PlaylistAddSongFailReason, SCSDKLikeService, SCSDKPlaylistService, Song } from '@soundcore/sdk';
 import { AppPlaylistChooseDialog } from 'src/app/dialogs/playlist-choose-dialog/playlist-choose-dialog.component';
 import { AppPlayerService } from 'src/app/modules/player/services/player.service';
 
 @Component({
   selector: 'app-song-context-menu',
   templateUrl: './song-context-menu.component.html',
-  styleUrls: ['./song-context-menu.component.scss']
+  styleUrls: ['./song-context-menu.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SongContextMenuComponent implements OnInit, OnDestroy {
 
@@ -21,7 +22,8 @@ export class SongContextMenuComponent implements OnInit, OnDestroy {
     private readonly playlistService: SCSDKPlaylistService,
     private readonly dialog: SCNGXDialogService,
     private readonly snackbar: MatSnackBar,
-    private readonly playerService: AppPlayerService
+    private readonly playerService: AppPlayerService,
+    private readonly likeService: SCSDKLikeService
   ) { }
 
   private readonly _destroy: Subject<void> = new Subject();
@@ -81,6 +83,31 @@ export class SongContextMenuComponent implements OnInit, OnDestroy {
    */
   public playNext() {
     this.playerService.playSingle(this.song as Song, false);
+  }
+
+  public toggleLikeForSong() {
+    const song = this.song as Song;
+
+    console.log(song)
+
+
+    if(!this.song) return;
+    this.likeService.toggleLikeForSong(song.id).subscribe((request) => {
+      console.log(request)
+      if(request.loading) return;
+      if(request.error) {
+        this.snackbar.open("Ein Fehler ist aufgetreten.", null, { duration: 3000 });
+        return;
+      }
+
+      song.liked = request.data ?? song.liked;
+
+      if(song.liked) {
+        this.snackbar.open(`Song zu Lieblingssongs hinzugefügt.`, null, { duration: 3000 });
+      } else {
+        this.snackbar.open(`Song von Lieblingssongs entfernt.`, null, { duration: 3000 });
+      }
+    })
   }
 
 }

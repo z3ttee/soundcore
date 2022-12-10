@@ -33,7 +33,6 @@ export class AlbumService implements SyncableService<Album> {
      */
      public async findById(albumId: string, authentication?: User): Promise<Album> {
         const result = await this.buildGeneralQuery("album", authentication)
-            .addSelect(["artwork.colors"])
             .loadRelationCountAndMap("album.songsCount", "album.songs")
 
             .leftJoin("album.distributors", "distributor").leftJoin("distributor.artwork", "da").addSelect(["distributor.id", "distributor.slug", "distributor.name", "da.id"])

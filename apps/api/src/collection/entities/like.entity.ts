@@ -4,9 +4,15 @@ import { Playlist } from "../../playlist/entities/playlist.entity";
 import { Song } from "../../song/entities/song.entity";
 import { User } from "../../user/entities/user.entity";
 
+export enum LikedResourceType {
+    SONG = 0,
+    PLAYLIST = 1,
+    ALBUM = 2
+}
+
 @Entity()
-@TableInheritance({ column: { type: "smallint", name: "type" }})
-export class LikedResource {
+@TableInheritance({ column: { name: "type", type: "varchar" }})
+export abstract class LikedResource {
     @PrimaryGeneratedColumn("uuid")
     public id: string;
 
@@ -16,6 +22,7 @@ export class LikedResource {
     @ManyToOne(() => User, { onDelete: "CASCADE", nullable: false })
     @JoinColumn()
     public user: User;
+
 }
 
 @ChildEntity()

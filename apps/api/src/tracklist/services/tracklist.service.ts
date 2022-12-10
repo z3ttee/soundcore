@@ -142,6 +142,7 @@ export class TracklistService {
         // TODO: Check if user has access to playlist
         const result = await this.tracklistRepository.createQueryBuilder("item")
             .leftJoin("item.song", "song").addSelect(["song.id", "song.slug", "song.name", "song.duration"])
+            .leftJoin("song.artwork", "artwork").addSelect(["artwork.id"])
             .leftJoin("song.album", "album").addSelect(["album.id", "album.slug", "album.name"])
             .leftJoin("song.primaryArtist", "primaryArtist").addSelect(["primaryArtist.id", "primaryArtist.slug", "primaryArtist.name"])
             .leftJoin("song.featuredArtists", "featuredArtists").addSelect(["featuredArtists.id", "featuredArtists.slug", "featuredArtists.name"])

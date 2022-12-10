@@ -15,7 +15,9 @@ export class LikeService {
 
     constructor(
         private playlistService: PlaylistService,
-        @InjectRepository(LikedResource) private repository: Repository<LikedResource>
+        @InjectRepository(LikedResource) private repository: Repository<LikedResource>,
+        @InjectRepository(LikedSong) private likedSongRepository: Repository<LikedSong>
+
     ) {}
 
     public getRepository() {
@@ -29,7 +31,7 @@ export class LikeService {
      * @returns LikedSong
      */
     public async findByUserAndSong(userId: string, songId: string): Promise<LikedSong> {
-        return this.repository.createQueryBuilder("like")
+        return this.likedSongRepository.createQueryBuilder("like")
             .leftJoin("like.user", "user")
             .leftJoinAndSelect("like.song", "song")
             .where("user.id = :userId AND song.id = :songId", { userId, songId })
@@ -74,7 +76,7 @@ export class LikeService {
             .leftJoin("song.artwork", "artwork").addSelect(["artwork.id"])
             .take(pageable.limit)
             .skip(pageable.offset)
-            .where("user.id = :userId", { userId })
+            .where("user.id = :userId AND song.id != NULL", { userId })
             .getManyAndCount().then(([resources, total]) => Page.of(resources, total, pageable.offset));
     }
 
@@ -106,7 +108,7 @@ export class LikeService {
 
         // Remove like if exists.
         if(existing) {
-            return this.repository.delete({ id: existing.id }).then(() => false).catch(() => {
+            return this.likedSongRepository.delete({ id: existing.id }).then(() => false).catch(() => {
                 throw new BadRequestException("Could not remove like from song.")
             })
         }
@@ -115,7 +117,8 @@ export class LikeService {
         like.user = authentication;
         like.song = { id: songId } as Song;
 
-        return this.repository.save(like).then(() => true).catch(() => {
+        return this.likedSongRepository.save(like).then(() => true).catch((error) => {
+            console.error(error);
             throw new BadRequestException("Could not like song.")
         })
     }
