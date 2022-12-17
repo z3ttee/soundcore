@@ -2,16 +2,20 @@ import { Overlay, OverlayRef } from "@angular/cdk/overlay";
 import { TemplatePortal } from "@angular/cdk/portal";
 import { Injectable, TemplateRef, ViewContainerRef } from "@angular/core";
 import { MatBottomSheet, MatBottomSheetRef } from "@angular/material/bottom-sheet";
-import { combineLatest, filter, fromEvent, map, take } from "rxjs";
+import { combineLatest, filter, fromEvent, map, Observable, Subject, take } from "rxjs";
 import { SCCDKScreenService } from "../../screen/screen.service";
+import { SCNGXContextRef } from "../entities/context-menu.entity";
 
-@Injectable({
-    providedIn: "root"
-})
+@Injectable()
 export class SCCDKContextService {
 
     private overlayRef?: OverlayRef;
     private bottomSheetRef?: MatBottomSheetRef;
+
+    private readonly contextMenuSubjects: Subject<void>[] = [];
+
+    private readonly _closedSubject: Subject<void> = new Subject();
+    public readonly $onClosed: Observable<void> = this._closedSubject.asObservable();
 
     constructor(
         private readonly screen: SCCDKScreenService,
@@ -29,7 +33,7 @@ export class SCCDKContextService {
         })
     }
 
-    public async open(event: MouseEvent, template: TemplateRef<any>, viewContainerRef: ViewContainerRef, contextData?: any) {
+    public async open(event: MouseEvent, template: TemplateRef<any>, viewContainerRef: ViewContainerRef, contextData?: any): Promise<SCNGXContextRef> {
         event.preventDefault();
         event.stopPropagation();
 
@@ -38,6 +42,11 @@ export class SCCDKContextService {
         }
 
         await this.close();
+
+        const closeSubject = new Subject<void>();
+        const contextRef = new SCNGXContextRef(closeSubject);
+
+        this.contextMenuSubjects.push(closeSubject);
 
         this.screen.$isTouch.pipe(take(1)).subscribe((isTouch) => {
             if(isTouch) {
@@ -60,10 +69,17 @@ export class SCCDKContextService {
             this.overlayRef.attach(new TemplatePortal(template, viewContainerRef, {
                 $implicit: contextData
             }));
-        })
+        });
+
+        return contextRef;
     }
 
     public async close() {
+        for(const closeSubject of this.contextMenuSubjects) {
+            closeSubject.next();
+            closeSubject.complete();
+        }
+
         if (this.overlayRef) {
             this.overlayRef.dispose();
             this.overlayRef = null;
