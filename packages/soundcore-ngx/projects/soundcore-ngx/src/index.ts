@@ -1,3 +1,7 @@
+// Lottie animations
+import lottieAudioWave from "./assets/lottie/audio_wave.json";
+export const scngxLottieAudioWave = lottieAudioWave;
+
 /*
  * Public API Surface of soundcore-ngx
  */
@@ -18,9 +22,18 @@ export * from "./lib/components/buttons";
 // UI Module
 export * from "./lib/ui";
 
-// Lottie animations
-import lottieAudioWave from "./assets/lottie/audio_wave.json";
-export const scngxLottieAudioWave = lottieAudioWave;
+// Divider Module
+export * from "./lib/components/divider";
+
+
+
+
+
+
+
+
+
+
 
 // Drawer
 export * from "./lib/components/drawer/drawer.module";
