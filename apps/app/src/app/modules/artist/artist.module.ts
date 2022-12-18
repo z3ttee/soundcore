@@ -27,6 +27,7 @@ import { SCNGXSongListItemModule } from 'src/app/components/list-items/song-list
 import { FaIconLibrary, FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faEllipsisV, faPause, faPlay } from '@fortawesome/free-solid-svg-icons';
 import { LottieModule } from 'ngx-lottie';
+import { SongContextMenuModule } from 'src/app/components/menus/song-context-menu/song-context-menu.module';
 
 const routes: Routes = [
   { path: ":artistId", component: ArtistProfileComponent },
@@ -51,6 +52,7 @@ const routes: Routes = [
     MatRippleModule,
 
     ListViewModule,
+    SongContextMenuModule,
 
     SCDKArtistModule,
     SCDKAlbumModule,

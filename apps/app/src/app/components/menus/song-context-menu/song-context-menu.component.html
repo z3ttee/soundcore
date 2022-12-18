@@ -1,12 +1,39 @@
 <sccdk-context-menu>
     <sccdk-context-menu-category>
-        <sccdk-context-menu-item (click)="playNext()">
+        <sccdk-context-menu-item [routerLink]="['/artist', song.primaryArtist.id ?? song.primaryArtist.slug]" *ngIf="song.primaryArtist">
+            <span>Künstler ansehen</span>
+        </sccdk-context-menu-item>
+        <sccdk-context-menu-item [routerLink]="['/album', song.album.id ?? song.album.slug]" *ngIf="song.album">
+            <span>Album ansehen</span>
+        </sccdk-context-menu-item>
+    </sccdk-context-menu-category>
+    <scngx-divider></scngx-divider>
+    <sccdk-context-menu-category>
+        <sccdk-context-menu-item (click)="enqueueNext(true)">
+            <hero-icon name="play" [class]="'h-5 w-5'"></hero-icon>
+            <span>Abspielen</span>
+        </sccdk-context-menu-item>
+        <sccdk-context-menu-item (click)="enqueueNext()">
             <hero-icon name="collection" [class]="'h-5 w-5'"></hero-icon>
             <span>Zur Warteschlange hinzufügen</span>
         </sccdk-context-menu-item>
+    </sccdk-context-menu-category>
+    <scngx-divider></scngx-divider>
+    <sccdk-context-menu-category>
         <sccdk-context-menu-item (click)="openChoosePlaylistDialog()">
             <hero-icon name="view-grid-add" [class]="'h-5 w-5'"></hero-icon>
-            <span>Zu Playlist hinzufügen</span>
+            <span>{{ !playlist ? "Zu Playlist hinzufügen": "Zu anderer Playlist hinzufügen" }}</span>
+        </sccdk-context-menu-item>
+        <sccdk-context-menu-item (click)="removeFromPlaylist()" *ngIf="playlist">
+            <hero-icon name="minus" [class]="'h-5 w-5'"></hero-icon>
+            <span>Aus Playlist entfernen</span>
+        </sccdk-context-menu-item>
+    </sccdk-context-menu-category>
+    <scngx-divider></scngx-divider>
+    <sccdk-context-menu-category *ngIf="$isAdmin | async">
+        <sccdk-context-menu-item>
+            <!-- <hero-icon name="minus" [class]="'h-5 w-5'"></hero-icon> -->
+            <span>Verwalten</span>
         </sccdk-context-menu-item>
     </sccdk-context-menu-category>
 </sccdk-context-menu>

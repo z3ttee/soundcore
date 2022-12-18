@@ -1,0 +1,8 @@
+<hr 
+    class="rounded-full appearance-none border-none mx-auto" 
+    [ngClass]="{
+        'w-[90%] bg-divider min-h-[3px] max-h-[3px]': variant === 'gradient', 
+        'w-full bg-body-lighter min-h-[2px] max-h-[2px]': variant === 'default',
+        'my-2': reduced,
+        'my-row': !reduced
+    }">

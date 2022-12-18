@@ -115,6 +115,10 @@ export class AppPlayerService {
         }
     }
 
+    public playSingleFromTracklist(song: Song, tracklist: SCNGXTracklist, force: boolean = false) {
+        // TODO:
+    }
+
     /**
      * Play a tracklist. This will enqueue the tracklist if "force"
      * is not set to true. 

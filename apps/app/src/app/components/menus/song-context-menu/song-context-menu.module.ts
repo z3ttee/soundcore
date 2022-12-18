@@ -2,10 +2,11 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SongContextMenuComponent } from './song-context-menu.component';
 import { SCCDKContextMenuModule } from '@soundcore/cdk';
-import { HeroIconModule, viewGridAdd, collection } from 'ng-heroicon';
+import { HeroIconModule, viewGridAdd, collection, play, minus } from 'ng-heroicon';
 import { AppPlaylistChooseDialogModule } from 'src/app/dialogs/playlist-choose-dialog/playlist-choose-dialog.module';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
-import { SCNGXDialogModule } from '@soundcore/ngx';
+import { SCNGXDialogModule, SCNGXDividerModule } from '@soundcore/ngx';
+import { RouterModule } from '@angular/router';
 
 @NgModule({
   declarations: [
@@ -13,10 +14,13 @@ import { SCNGXDialogModule } from '@soundcore/ngx';
   ],
   imports: [
     CommonModule,
-    HeroIconModule.withIcons({ viewGridAdd, collection }),
+    RouterModule,
+    HeroIconModule.withIcons({ viewGridAdd, minus, collection, play }),
     SCCDKContextMenuModule,
 
     SCNGXDialogModule,
+    SCNGXDividerModule,
+
     AppPlaylistChooseDialogModule,
     MatSnackBarModule
   ],

@@ -33,7 +33,6 @@ export class AlbumService implements SyncableService<Album> {
      */
      public async findById(albumId: string, authentication?: User): Promise<Album> {
         const result = await this.buildGeneralQuery("album", authentication)
-            .addSelect(["artwork.colors"])
             .loadRelationCountAndMap("album.songsCount", "album.songs")
 
             .leftJoin("album.distributors", "distributor").leftJoin("distributor.artwork", "da").addSelect(["distributor.id", "distributor.slug", "distributor.name", "da.id"])
@@ -318,7 +317,7 @@ export class AlbumService implements SyncableService<Album> {
 
     private buildGeneralQuery(alias: string, authentication?: User): SelectQueryBuilder<Album> {
         return this.repository.createQueryBuilder(alias)
-            .leftJoin(`${alias}.artwork`, "artwork").addSelect(["artwork.id"])
+            .leftJoin(`${alias}.artwork`, "artwork").addSelect(["artwork.id", "artwork.accentColor"])
             .leftJoin(`${alias}.primaryArtist`, "primaryArtist").addSelect(["primaryArtist.id", "primaryArtist.slug", "primaryArtist.name"])
             .loadRelationCountAndMap(`${alias}.liked`, `${alias}.likedBy`, "likedBy", (qb) => qb.where("likedBy.userId = :userId", { userId: authentication?.id }))
     }    
