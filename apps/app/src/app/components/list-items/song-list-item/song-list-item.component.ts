@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectionStrategy, Component, EventEmitter, Input, OnDestroy, OnInit, Output, TemplateRef } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, TemplateRef } from '@angular/core';
 import { Song, User } from '@soundcore/sdk';
 
 @Component({
@@ -42,7 +42,6 @@ export class SCNGXSongListItemComponent implements OnInit, OnDestroy, AfterViewI
   @Input()
   public isMobile: boolean = false;
 
-  @Output() public onContext: EventEmitter<Song> = new EventEmitter();
   @Output() public onPlay: EventEmitter<Song> = new EventEmitter();
   @Output() public onLike: EventEmitter<Song> = new EventEmitter();
 
@@ -54,17 +53,8 @@ export class SCNGXSongListItemComponent implements OnInit, OnDestroy, AfterViewI
   }
 
   public ngOnDestroy(): void {
-      this.onContext.complete();
       this.onPlay.complete();
       this.onPlay.complete();
-  }
-
-  public emitOnContext(event: MouseEvent) {
-    if(this.onContext.observed) {
-      this.cancelEvent(event);
-    }
-
-    this.onContext.emit(this.song);
   }
 
   public emitOnPlay(event: MouseEvent) {
@@ -96,6 +86,10 @@ export class SCNGXSongListItemComponent implements OnInit, OnDestroy, AfterViewI
   private cancelEvent(event: Event) {
     event.preventDefault();
     event.stopPropagation();
+  }
+
+  public onFocus() {
+    console.log("focus")
   }
 
 }

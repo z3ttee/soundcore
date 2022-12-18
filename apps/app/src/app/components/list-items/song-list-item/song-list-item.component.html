@@ -1,4 +1,4 @@
-<div (contextmenu)="emitOnContext($event)" (click)="emitOnPlayMobile($event)"  class="song-list-item-wrapper flex flex-1 gap-1 h-16 px-1.5 w-full overflow-x-hidden items-center rounded select-none cursor-pointer bg-body-light bg-opacity-0 hover:bg-opacity-30 active:bg-opacity-50 [&>.list-item-play-btn]:hover:opacity-100 border-body-lighter border border-opacity-0 hover:border-opacity-100">
+<div (click)="emitOnPlayMobile($event)" class="song-list-item-wrapper focus:shadow-2xl focus-within:shadow-2xl flex flex-1 gap-1 h-16 px-1.5 w-full overflow-x-hidden items-center rounded select-none cursor-pointer bg-body-light bg-opacity-0 hover:bg-opacity-30 active:bg-opacity-50 [&>.list-item-play-btn]:hover:opacity-100 border-body-lighter border border-opacity-0 hover:border-opacity-100">
         
     <!-- ID -->
     <div class="relative max-w-11 min-w-11 h-11 justify-center items-center hidden md:inline-flex" *ngIf="showId">

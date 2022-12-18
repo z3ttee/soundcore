@@ -1,8 +1,8 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { SSOService } from '@soundcore/sso';
 import { Observable, Subject, takeUntil } from 'rxjs';
-import { SCNGXDialogService } from '@soundcore/ngx';
+import { SCNGXDialogService, SCNGXTracklist } from '@soundcore/ngx';
 import { MeiliSong, Playlist, PlaylistAddSongFailReason, SCSDKPlaylistService, Song } from '@soundcore/sdk';
 import { AppPlaylistChooseDialog } from 'src/app/dialogs/playlist-choose-dialog/playlist-choose-dialog.component';
 import { AppPlayerService } from 'src/app/modules/player/services/player.service';
@@ -10,11 +10,19 @@ import { AppPlayerService } from 'src/app/modules/player/services/player.service
 @Component({
   selector: 'app-song-context-menu',
   templateUrl: './song-context-menu.component.html',
-  styleUrls: ['./song-context-menu.component.scss']
+  styleUrls: ['./song-context-menu.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SongContextMenuComponent implements OnInit, OnDestroy {
 
   @Input() public song: Song | MeiliSong
+  @Input() public playlist: Playlist;
+
+  /**
+   * Specify the tracklist the song belongs to.
+   * This changes the behaviour of some context menu items
+   */
+  @Input() public tracklist: SCNGXTracklist;
 
   constructor(
     private readonly authService: SSOService,
@@ -79,8 +87,17 @@ export class SongContextMenuComponent implements OnInit, OnDestroy {
    * Request the playerService to play the song
    * next by adding it to the queue
    */
-  public playNext() {
-    this.playerService.playSingle(this.song as Song, false);
+  public enqueueNext(forcePlay: boolean = false) {
+    if(typeof this.tracklist === "undefined" || this.tracklist == null) {
+      this.playerService.playSingle(this.song as Song, forcePlay);
+      return;
+    }
+
+    this.playerService.playSingleFromTracklist(this.song as Song, this.tracklist, forcePlay);
+  }
+
+  public removeFromPlaylist() {
+    throw new Error(`TODO`)
   }
 
 }
