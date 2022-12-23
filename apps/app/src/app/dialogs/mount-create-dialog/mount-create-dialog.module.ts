@@ -29,6 +29,7 @@ import {MatCheckboxModule} from '@angular/material/checkbox';
   ],
   exports: [
     SCNGXDialogModule,
+    SCSDKMountModule,
   ]
 })
 export class AppMountCreateDialogModule { }

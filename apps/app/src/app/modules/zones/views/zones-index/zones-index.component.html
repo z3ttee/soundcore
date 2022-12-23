@@ -8,7 +8,7 @@
         </div>
     
         <div *cdkVirtualFor="let bucket of datasource">
-            <app-bucket-list-item [routerLink]="bucket ? [bucket?.data?.slug || bucket?.data?.id] : null" [bucket]="bucket"></app-bucket-list-item>
+            <app-bucket-list-item [routerLink]="bucket ? [bucket?.slug ?? bucket?.id] : null" [bucket]="bucket"></app-bucket-list-item>
         </div>
     
     </cdk-virtual-scroll-viewport>

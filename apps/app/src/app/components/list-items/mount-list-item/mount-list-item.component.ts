@@ -1,33 +1,19 @@
-import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
-import { StatusIndicatorAppearance } from '@soundcore/ngx';
-import { Mount, MountStatus } from "@soundcore/sdk";
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { Mount } from "@soundcore/sdk";
 
 @Component({
   selector: 'app-mount-list-item',
   templateUrl: './mount-list-item.component.html',
-  styleUrls: ['./mount-list-item.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class MountListItemComponent implements OnInit, OnChanges {
+export class MountListItemComponent {
 
-  @Input() public mount: Mount;
-  public indicatorAppearance: StatusIndicatorAppearance;
+  @Input() 
+  public mount: Mount;
+
+  @Input()
+  public itemHeight: number = 64;
 
   constructor() { }
-
-  public ngOnInit(): void {
-    this.init();
-  }
-  public ngOnChanges(changes: SimpleChanges): void {
-    this.init();
-  }
-
-  private init() {
-    if(this.mount.status == MountStatus.UP) {
-      this.indicatorAppearance = "success";
-      return;
-    }
-
-    this.indicatorAppearance = "error";
-  }
 
 }

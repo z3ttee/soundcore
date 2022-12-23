@@ -47,7 +47,8 @@ export class MountInfoComponent implements OnInit, OnDestroy {
         if(request.loading) return [request, null];
         return [
           request,
-          new SCNGXDatasource(this.httpClient, { url: this.fileService.findByMountIdBaseURL(request.data?.id) })
+          null
+          // new SCNGXDatasource(this.httpClient, { url: this.fileService.findByMountIdBaseURL(request.data?.id) })
         ];
       })
     ),

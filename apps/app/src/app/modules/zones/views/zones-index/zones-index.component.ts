@@ -6,9 +6,7 @@ import { environment } from 'src/environments/environment';
 import { SCNGXDatasource } from '@soundcore/ngx';
 
 @Component({
-  selector: 'app-zones-index',
   templateUrl: './zones-index.component.html',
-  styleUrls: ['./zones-index.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ZonesIndexComponent implements OnInit, OnDestroy {

@@ -1,18 +1,60 @@
-<div class="select-none flex items-center gap-4 p-4 rounded bg-body-light bg-opacity-60 cursor-pointer transition-all active:bg-opacity-80 active:scale-99 transform-gpu will-change-transform">
-    <!-- Bucket artwork -->
-    <div class="min-w-36 max-w-36 aspect-square rounded bg-body bg-opacity-70"></div>
+<div class="flex items-center justify-start py-1 w-full overflow-hidden" [style.height]="itemHeight + 'px'">
+    <div 
+        class="flex flex-1 items-center justify-start gap-4 rounded-sm w-full h-full px-3 pointer-events-none"
+        [ngClass]="{'hover:border-opacity-100 border border-body-lighter border-opacity-0 transition-all bg-opacity-0 hover:bg-opacity-30 bg-body-light cursor-pointer pointer-events-auto active:bg-opacity-50': !!mount}">
+        
+        <!-- Mount artwork -->
+        <div class="h-10 min-w-10 w-10 rounded-sm">
+            <scngx-skeleton [class]="'h-full aspect-square'" *ngIf="!mount; else itemArtwork"></scngx-skeleton>
+            <ng-template #itemArtwork><img src="/assets/img/icon_mount.png" /></ng-template>
+        </div>
 
-    <!-- Bucket description -->
-    <div class="w-full">
-        <h6 class="cursor-text select-text">{{ mount.name }}</h6>
+        <!-- Mount description -->
+        <div class="flex-grow overflow-hidden">
+            <div class="flex flex-col" *ngIf="!mount; else mountInfo">
+                <scngx-skeleton [class]="'h-5 w-40'"></scngx-skeleton>
+                <scngx-skeleton [class]="'h-3 w-24'"></scngx-skeleton>
+            </div>
 
-        <ul class="flex flex-col items-start w-full gap-2 my-4">
-            <li class="inline-flex items-center gap-2 opacity-80"><hero-icon [class]="'h-5 w-5'" name="collection"></hero-icon><span class="text-sm">{{ mount.filesCount || 0 }} Datei{{ mount.filesCount != 1 ? 'en' : '' }}</span></li>
-            <li class="inline-flex items-center gap-2 opacity-80"><hero-icon [class]="'h-5 w-5'" name="chart-pie"></hero-icon><span class="text-sm">{{ mount.usedSpace | scngxBytesPipe:"gb" }}</span></li>
-            <li class="inline-flex items-center gap-2 opacity-80">
-                <scngx-status-indicator size="md" [appearance]="indicatorAppearance"></scngx-status-indicator>
-                <span class="text-xs">{{ mount.status | scngxMountStatusPipe }}</span>
-            </li>
-        </ul>
+            <ng-template #mountInfo>
+                <p class="line-clamp-1 break-words">{{ mount?.name }}</p>
+                <p class="line-clamp-1 break-words text-xs opacity-60 font-light">ID: {{ mount?.id }}</p>
+            </ng-template>
+        </div>
+
+        <div class="min-w-36 w-36 hidden md:block">
+            <scngx-skeleton [class]="'h-5 w-36'" *ngIf="!mount; else mountUsedSpace"></scngx-skeleton>
+
+            <ng-template #mountUsedSpace>
+                <div class="flex items-center gap-2 justify-end">
+                    <hero-icon class="h-5 w-5" name="chart-pie"></hero-icon>
+                    <span class="text-sm">{{ mount?.usedSpace | scngxBytesPipe:"gb" }}</span>
+                </div>
+            </ng-template>
+        </div>
+
+        <div class="min-w-36 w-36 hidden sm:block">
+            <scngx-skeleton [class]="'h-5 w-36'" *ngIf="!mount; else mountMountCount"></scngx-skeleton>
+
+            <ng-template #mountMountCount>
+                <div class="flex items-center justify-end gap-2">
+                    <hero-icon class="h-5 w-5" name="collection"></hero-icon>
+                    <span class="text-sm">{{ mount?.filesCount ?? 0 }} Datei{{ mount?.filesCount != 1 ? 'en' : '' }}</span>
+                </div>
+            </ng-template>
+        </div>
+
+        <div class="min-w-4 w-4" *ngIf="mount">
+            <div class="flex items-center justify-center w-full h-full">
+                <div class="w-3 h-3 rounded-full bg-info"></div>
+            </div>
+        </div>
+
+        <div class="min-w-6 w-6" *ngIf="mount">
+            <div class="flex items-center justify-center w-full h-full">
+                <hero-icon class="h-5 w-5" name="star" *ngIf="!mount.isDefault"></hero-icon>
+                <hero-icon class="h-5 w-5 text-accent fill-accent" name="star" [type]="'solid'" *ngIf="mount.isDefault"></hero-icon>
+            </div>
+        </div>
     </div>
 </div>
