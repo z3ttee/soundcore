@@ -1,7 +1,7 @@
 <section class="w-full h-full select-none" #page>
     <app-error404 *ngIf="!($loading | async) && !($zone | async)"></app-error404>
 
-    <scngx-infinite-list class="w-full h-full" [dataSource]="dataSource" [parentScroll]="page" #list>
+    <!-- <scngx-infinite-list class="w-full h-full" [dataSource]="dataSource" [parentScroll]="page" #list> -->
         <ng-container scngx-content>
             <div class="w-full p-window pb-0" #page *ngIf="($loading | async) || !!($zone | async)">
                 <!-- Title Row -->
@@ -47,11 +47,11 @@
             <div class="p-window">
                 <h6>Mounts</h6>
 
-                <div class="flex flex-col gap-2 w-full mt-2">
+                <!-- <div class="flex flex-col gap-2 w-full mt-2">
                     <app-mount-list-item *ngFor="let mount of list.viewPortItems" [mount]="mount.data" [routerLink]="[mount.data.slug || mount.data.id]"></app-mount-list-item>
-                </div>
+                </div> -->
             </div>
         </ng-container>
-    </scngx-infinite-list>
+    <!-- </scngx-infinite-list> -->
 
 </section>

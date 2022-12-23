@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { BehaviorSubject, Subject, takeUntil } from 'rxjs';
-import { SCNGXDialogService, SCNGXInfiniteDataSource } from '@soundcore/ngx';
+import { SCNGXDialogService } from '@soundcore/ngx';
 import { Bucket, Mount, SCDKBucketService, SCSDKAdminGateway } from '@soundcore/sdk';
 import { AppMountCreateDialog, MountCreateDialogOptions } from 'src/app/dialogs/mount-create-dialog/mount-create-dialog.component';
 import { environment } from 'src/environments/environment';
@@ -30,16 +30,11 @@ export class ZoneInfoComponent implements OnInit, OnDestroy {
   public infiniteFetchUrl: string = "";
   public readonly infinitePageSize: number = 30;
 
-  public dataSource: SCNGXInfiniteDataSource<Mount>;
 
   public ngOnInit(): void {
     // Observe route params changes and get new zoneId
     this.activatedRoute.paramMap.pipe(takeUntil(this._destroy)).subscribe((params) => {
       const zoneId = params.get("zoneId");
-
-      this.dataSource = new SCNGXInfiniteDataSource(this.httpClient, {
-        url: `${environment.api_base_uri}/v1/mounts/bucket/${zoneId}`
-      });
 
       // Set loading state
       this.$loading.next(true);
@@ -65,7 +60,7 @@ export class ZoneInfoComponent implements OnInit, OnDestroy {
         bucketId: this._zoneSubject.getValue().id
       }
     }).$afterClosed.pipe(takeUntil(this._destroy)).subscribe((result) => {
-      if(result != null) this.dataSource.append(result);
+      // if(result != null) this.dataSource.append(result);
     })
 
   }
