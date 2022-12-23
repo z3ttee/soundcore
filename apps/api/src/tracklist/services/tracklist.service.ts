@@ -174,7 +174,7 @@ export class TracklistService {
             .leftJoin("like.user", "user")
             .leftJoin("like.song", "song")
             .select(["like.id"])
-            .where("user.id = :userId AND song.id != NULL", { userId: authentication.id })
+            .where("user.id = :userId AND like.type = :type", { userId: authentication.id, type: LikedSong.name })
             .getManyAndCount();
 
         return new Tracklist(result[1], TracklistType.PLAYLIST, result[0], metadataUrl);    
@@ -187,7 +187,19 @@ export class TracklistService {
      * @returns Page<Song>
      */
     public async findMetaByLikedSongs(authentication: User, pageable: BasePageable): Promise<Page<LikedSong>> {
-        return Page.of([], 0, pageable.offset);
+        const result = await this.likeService.getRepository().createQueryBuilder("like")
+            .leftJoin("like.user", "user").addSelect(["user.id", "user.slug", "user.name"])
+            .leftJoin("user.artwork", "ua").addSelect(["ua.id"])
+            .leftJoin("like.song", "song").addSelect(["song.id", "song.slug", "song.name", "song.explicit", "song.duration"])
+            .leftJoin("song.artwork", "artwork").addSelect(["artwork.id"])
+            .leftJoin("song.album", "album").addSelect(["album.id", "album.slug", "album.name"])
+            .leftJoin("song.primaryArtist", "primaryArtist").addSelect(["primaryArtist.id", "primaryArtist.slug", "primaryArtist.name"])
+            .leftJoin("song.featuredArtists", "featuredArtists").addSelect(["featuredArtists.id", "featuredArtists.slug", "featuredArtists.name"])
+            .loadRelationCountAndMap("song.liked", "song.likes", "likes", (qb) => qb.where("likes.userId = :userId", { userId: authentication?.id }))
+            .where("user.id = :userId AND like.type = :type", { userId: authentication.id, type: LikedSong.name })
+            .getManyAndCount();
+
+        return Page.of(result[0], result[1], pageable.offset);
     }
 
     /**

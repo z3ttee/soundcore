@@ -8,6 +8,11 @@ export class ApplicationBuildInfo {
     public buildId: string;
 }
 
+export class ApplicationInfo {
+    public build: ApplicationBuildInfo;
+    public isDockerized: boolean;
+}
+
 @Injectable()
 export class AppService {
     private _info: ApplicationBuildInfo;

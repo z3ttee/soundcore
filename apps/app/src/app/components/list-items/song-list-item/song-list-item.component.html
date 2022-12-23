@@ -1,4 +1,8 @@
-<div (contextmenu)="emitOnContext($event)" (click)="emitOnPlayMobile($event)"  class="song-list-item-wrapper flex flex-1 gap-1 h-16 px-1.5 w-full overflow-x-hidden items-center rounded select-none cursor-pointer bg-body-light bg-opacity-0 hover:bg-opacity-30 active:bg-opacity-50 [&>.list-item-play-btn]:hover:opacity-100 border-body-lighter border border-opacity-0 hover:border-opacity-100">
+<div 
+    (click)="emitOnPlayMobile($event)" 
+    class="song-list-item-wrapper flex flex-1 gap-1 px-1.5 w-full overflow-x-hidden items-center rounded select-none cursor-pointer bg-body-light bg-opacity-0 hover:bg-opacity-30 active:bg-opacity-50 [&>.list-item-play-btn]:hover:opacity-100 border-body-lighter border border-opacity-0 hover:border-opacity-100" 
+    *ngIf="song"
+    [style.height]="itemHeight + 'px'">
         
     <!-- ID -->
     <div class="relative max-w-11 min-w-11 h-11 justify-center items-center hidden md:inline-flex" *ngIf="showId">
@@ -19,7 +23,7 @@
     </div>
 
     <!-- Song title -->
-    <div class="flex w-full overflow-hidden gap-2 items-center">
+    <div class="flex overflow-hidden w-full gap-2 items-center min-w-0">
         <div class="min-w-12 max-w-12 h-12 rounded-sm overflow-hidden" *ngIf="showCover">
             <scngx-artwork [artwork]="song?.artwork" class=""></scngx-artwork>
         </div>
@@ -44,16 +48,14 @@
     </div>
 
     <!-- Date added to playlist -->
-    <div class="min-w-32 w-32 px-2 text-right hidden lg:flex items-center justify-end gap-2" *ngIf="addedAt || addedBy">
-        <span class="text-font text-opacity-70 text-sm" *ngIf="addedAt">
-            {{ addedAt | date:"dd.MM." }}
-        </span>
-        <div *ngIf="addedBy" class="h-7 w-7 rounded-full overflow-hidden"><scngx-artwork [artwork]="addedBy?.artwork"></scngx-artwork></div>
+    <div class="min-w-32 w-32 border px-2 text-right hidden lg:flex items-center justify-end gap-2" *ngIf="showAddedBy && (addedAt || addedBy)">
+        <span class="text-font text-opacity-70 text-sm" *ngIf="addedAt">{{ addedAt | date:"dd.MM." }}</span>
+        <span class="h-7 w-7 rounded-full overflow-hidden bg-black" *ngIf="addedBy"><scngx-artwork [artwork]="addedBy?.artwork"></scngx-artwork></span>
     </div>
 
     <!-- Like Col -->
     <div class="song-item-like-col inline-flex justify-center items-end max-w-10 min-w-10 px-2 opacity-100 md:opacity-0 pointer-events-none transition-all" [ngClass]="{'opacity-100 pointer-events-auto': song?.liked || isMobile, 'text-accent opacity-100': song?.liked}">
-        <span class="w-6 h-6" matRipple [matRippleCentered]="true" [matRippleUnbounded]="true" [matRippleRadius]="20">
+        <span class="w-6 h-6" matRipple [matRippleCentered]="true" [matRippleUnbounded]="true" [matRippleRadius]="20" (click)="emitOnLike($event)">
             <hero-icon name="heart" type="outline" [class]="'w-6 h-6 ' + (song?.liked ? 'fill-accent' : '')"></hero-icon>
         </span>
     </div>

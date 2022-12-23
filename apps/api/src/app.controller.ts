@@ -1,5 +1,6 @@
 import { Controller, Get } from "@nestjs/common";
-import { ApplicationBuildInfo, AppService } from "./app.service";
+import { Environment } from "@soundcore/common";
+import { ApplicationInfo, AppService } from "./app.service";
 
 @Controller("")
 export class AppController {
@@ -7,8 +8,11 @@ export class AppController {
     constructor(private readonly service: AppService) {}
 
     @Get("/")
-    public async getBuildInfo(): Promise<ApplicationBuildInfo> {
-        return this.service.getApplicationBuildInfo();
+    public async getBuildInfo(): Promise<ApplicationInfo> {
+        return {
+            build: await this.service.getApplicationBuildInfo(),
+            isDockerized: Environment.isDockerized
+        }
     }
 
 }

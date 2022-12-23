@@ -4,11 +4,16 @@ import { Component, OnDestroy, OnInit } from "@angular/core";
 import { UntypedFormControl } from "@angular/forms";
 import { NavigationCancel, NavigationEnd, NavigationError, NavigationStart, Router } from "@angular/router";
 import { SSOService } from "@soundcore/sso";
-import { filter, Subject, takeUntil } from "rxjs";
+import { combineLatest, filter, map, Observable, startWith, Subject, takeUntil, tap } from "rxjs";
 import { SCCDKScreenService } from "@soundcore/cdk";
-import { SCNGXPlaylistListItemComponent, SCNGXDialogService } from "@soundcore/ngx";
-import { Playlist, SCDKSearchService, SCSDKGeneralGateway, SCSDKPlaylistService } from "@soundcore/sdk";
+import { SCNGXDialogService } from "@soundcore/ngx";
+import { Playlist, SCSDKGeneralGateway, SCSDKPlaylistService, SCSDKSearchService } from "@soundcore/sdk";
 import { AppPlaylistCreateDialog } from "src/app/dialogs/playlist-create-dialog/playlist-create-dialog.component";
+import { SCNGXPlaylistListItemComponent } from "src/app/components/list-items/playlist-list-item/playlist-list-item.component";
+
+interface MainLayoutProps {
+    playlists?: Playlist[];
+}
 
 @Component({
     templateUrl: "./main-layout.component.html"
@@ -26,11 +31,21 @@ export class AscMainLayoutComponent implements OnInit, OnDestroy {
         public readonly authService: SSOService,
         public readonly playlistService: SCSDKPlaylistService,
         private readonly dialogService: SCNGXDialogService,
-        private readonly searchService: SCDKSearchService,
+        private readonly searchService: SCSDKSearchService,
         private readonly router: Router,
         private readonly _location: Location,
         public readonly gateway: SCSDKGeneralGateway
     ) {}
+
+    public readonly $props: Observable<MainLayoutProps> = combineLatest([
+        this.playlistService.$library
+    ]).pipe(
+        map(([playlists]): MainLayoutProps => ({
+            playlists: playlists
+        })),
+        takeUntil(this._destroy),
+        tap((props) => console.log(props))
+    );
 
     public ngOnInit(): void {
         // Subscribe to router events to show a loader bar at the page top

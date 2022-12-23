@@ -92,7 +92,7 @@ export class SongContextMenuComponent implements OnInit, OnDestroy {
 
 
     if(!this.song) return;
-    this.likeService.toggleLikeForSong(song.id).subscribe((request) => {
+    this.likeService.toggleLikeForSong(song).subscribe((request) => {
       console.log(request)
       if(request.loading) return;
       if(request.error) {

@@ -1,15 +1,16 @@
 import { NgModule } from "@angular/core";
 import { AscMainLayoutComponent } from "./main-layout.component";
-import { SCNGXBottomNavModule, SCNGXDrawerModule, SCNGXProgressbarModule, SCNGXPlaylistListItemModule } from "@soundcore/ngx"
+import { SCNGXBottomNavModule, SCNGXDrawerModule, SCNGXProgressbarModule, SCNGXScrollingModule } from "@soundcore/ngx"
 import { RouterModule } from "@angular/router";
 import { CommonModule } from "@angular/common";
 import { HeroIconModule, home, search, user, bookmarkAlt, chevronDown, plus, shieldExclamation, bell, cog, logout } from "ng-heroicon";
-import { SCDKSearchModule, SCSDKGatewayModule, SCSDKPlaylistModule } from "@soundcore/sdk";
+import { SCSDKGatewayModule, SCSDKPlaylistModule, SCSDKSearchModule } from "@soundcore/sdk";
 import {DragDropModule} from '@angular/cdk/drag-drop';
 import { ProfileBarModule } from "src/app/components/profile-bar/profile-bar.module";
 import { ReactiveFormsModule } from "@angular/forms";
 import { AppPlaylistCreateDialogModule } from "src/app/dialogs/playlist-create-dialog/playlist-create-dialog.module";
 import { AppPlayerModule } from "src/app/modules/player/player.module";
+import { SCNGXPlaylistListItemModule } from "src/app/components/list-items/playlist-list-item/playlist-list-item.module";
 
 @NgModule({
     declarations: [
@@ -26,8 +27,9 @@ import { AppPlayerModule } from "src/app/modules/player/player.module";
         SCNGXBottomNavModule,
         SCNGXPlaylistListItemModule,
         SCNGXProgressbarModule,
+        SCNGXScrollingModule,
 
-        SCDKSearchModule,
+        SCSDKSearchModule,
         SCSDKPlaylistModule,
         SCSDKGatewayModule,
 
