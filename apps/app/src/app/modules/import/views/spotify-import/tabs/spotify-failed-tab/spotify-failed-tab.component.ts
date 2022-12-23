@@ -1,12 +1,13 @@
 import { HttpClient } from "@angular/common/http";
-import { Component, OnDestroy, OnInit } from "@angular/core";
+import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from "@angular/core";
 import { SCNGXDatasource } from "@soundcore/ngx";
-import { ImportTask, ImportTaskStatus, ImportTaskType, SCSDKGeneralGateway } from "@soundcore/sdk";
+import { ImportTaskStatus, ImportTaskType, SCSDKGeneralGateway, SpotifyImport } from "@soundcore/sdk";
 import { filter, Subject, takeUntil } from "rxjs";
 import { environment } from "src/environments/environment";
 
 @Component({
-    templateUrl: "./spotify-failed-tab.component.html"
+    templateUrl: "./spotify-failed-tab.component.html",
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SpotifyFailedTabComponent implements OnInit, OnDestroy {
 
@@ -19,7 +20,7 @@ export class SpotifyFailedTabComponent implements OnInit, OnDestroy {
     /**
      * Datasource to populate virtual scroller.
      */
-    public datasource: SCNGXDatasource<ImportTask>;
+    public readonly datasource: SCNGXDatasource<SpotifyImport> = new SCNGXDatasource(this.httpClient, `${environment.api_base_uri}/v1/imports/spotify/failed`, 8);
 
     constructor(
         private readonly httpClient: HttpClient,
@@ -27,15 +28,9 @@ export class SpotifyFailedTabComponent implements OnInit, OnDestroy {
     ) {}
 
     public ngOnInit(): void {
-        this.datasource = new SCNGXDatasource(this.httpClient, {
-            url: `${environment.api_base_uri}/v1/imports/spotify/failed`
-        });
-
         this.gateway.$onImportTaskUpdate.pipe(takeUntil(this._destroy), filter((task) => task.type == ImportTaskType.SPOTIFY_PLAYLIST)).subscribe((task) => {
-            console.log(`Received task update.`, task);
-
             if(task.status == ImportTaskStatus.ERRORED || task.status == ImportTaskStatus.SERVER_ABORT) {
-                this.datasource.appendOrReplace(task);
+                this.datasource.updateOrAppendById(task.id, task);
             } else {
                 this.datasource.removeById(task.id);
             }
@@ -46,6 +41,5 @@ export class SpotifyFailedTabComponent implements OnInit, OnDestroy {
         this._destroy.next();
         this._destroy.complete();
     }
-
 
 }

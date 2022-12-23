@@ -1,4 +1,4 @@
-<div class="px-window pt-window w-full h-full overflow-y-auto">
+<div class="flex flex-1 flex-col px-window pt-window w-full h-full overflow-hidden">
     <scngx-ui-title>
         Spotify Import
         <div scngxSubtitle>Importiere existierende Playlisten von Spotify</div>
@@ -14,13 +14,13 @@
         </p>
     </div>
 
-    <div class="my-row w-full">
-        <scngx-tabs>
+    <div class="flex-grow">
+        <scngx-tabs [fullHeight]="true">
             <scngx-tab-item [route]="['./']" [exactRoute]="true">Aktuelle Imports</scngx-tab-item>
             <scngx-tab-item [route]="['./completed']">Abgeschlossen</scngx-tab-item>
             <scngx-tab-item [route]="['./failed']">Fehlgeschlagen</scngx-tab-item>
-
-            <scngx-tab-body>
+    
+            <scngx-tab-body [fullHeight]="true">
                 <router-outlet></router-outlet>
             </scngx-tab-body>
         </scngx-tabs>

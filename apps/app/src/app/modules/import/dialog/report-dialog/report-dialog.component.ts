@@ -1,51 +1,43 @@
-import { Component, OnDestroy, OnInit } from "@angular/core";
-import { DialogRef, SCNGXOfflineDatasource } from "@soundcore/ngx";
-import { FailedSpotifyImport, ImportReport, ImportSpotifyReport, SCSDKImportService, SpotifyImport } from "@soundcore/sdk";
-import { Subject, takeUntil } from "rxjs";
+import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from "@angular/core";
+import { DialogRef } from "@soundcore/ngx";
+import { ApiError, FailedSpotifyImport, ImportReport, ImportSpotifyReport, SCSDKImportService, SpotifyImport, toFutureCompat } from "@soundcore/sdk";
+import { combineLatest, map, Observable, Subject, takeUntil } from "rxjs";
 
 export interface ReportDialogOptions {
     data: SpotifyImport;
 }
 
+interface ReportDialogProps {
+    loading?: boolean;
+    task?: SpotifyImport;
+    report?: ImportReport<ImportSpotifyReport>;
+    error?: ApiError;
+}
+
 @Component({
-    templateUrl: "./report-dialog.component.html"
+    templateUrl: "./report-dialog.component.html",
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ReportDialogComponent implements OnInit, OnDestroy {
+export class ReportDialogComponent implements OnDestroy {
 
     private readonly _destroy: Subject<void> = new Subject();
-
-    public errorMessage?: string;
-    public report?: ImportReport<ImportSpotifyReport>;
-    public datasource?: SCNGXOfflineDatasource<FailedSpotifyImport>;
-    public task: SpotifyImport;
 
     constructor(
         public readonly dialogRef: DialogRef<ReportDialogOptions, SpotifyImport>,
         private readonly reportService: SCSDKImportService,
     ) {}
 
-    public ngOnInit(): void {
-        this.task = this.dialogRef.config?.data?.data;
-
-        if(typeof this.task === "undefined" || this.task == null) {
-            this.dialogRef.close();
-            return;
-        }
-
-        this.reportService.findReportByTaskid(this.task?.id).pipe(takeUntil(this._destroy)).subscribe((response) => {
-            if(response.error) {
-                this.errorMessage = response.message;
-                return;
-            }
-
-            const report = response.payload as ImportReport<ImportSpotifyReport>;
-            console.log(report);
-
-            this.datasource = new SCNGXOfflineDatasource(report.data.notImportedSongs);
-
-            console.log(this.datasource);
-        })
-    }
+    public readonly $props: Observable<ReportDialogProps> = combineLatest([
+        this.reportService.findReportByTaskid(this.dialogRef.config?.data?.data?.id).pipe(toFutureCompat(), takeUntil(this._destroy))
+    ]).pipe(
+        map(([request]): ReportDialogProps => ({
+            loading: request.loading,
+            task: this.dialogRef.config?.data?.data,
+            report: (request.data as ImportReport<ImportSpotifyReport>),
+            error: request.error
+        })),
+        takeUntil(this._destroy)
+    );
 
     public ngOnDestroy(): void {
         this._destroy.next();
