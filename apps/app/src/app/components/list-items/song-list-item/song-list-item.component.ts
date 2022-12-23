@@ -37,6 +37,8 @@ export class SCNGXSongListItemComponent implements OnInit, OnDestroy, AfterViewI
   public showAlbum: boolean = true;
   @Input()
   public showAddedBy: boolean = false;
+  @Input()
+  public showAddedAt: boolean = false;
 
   @Input()
   public animRef: TemplateRef<any>;
@@ -71,6 +73,7 @@ export class SCNGXSongListItemComponent implements OnInit, OnDestroy, AfterViewI
   }
 
   public emitOnPlayMobile(event: MouseEvent) {
+    if(!this.song) return;
     if(!this.isMobile) return;
     
     if(this.onPlay.observed) {

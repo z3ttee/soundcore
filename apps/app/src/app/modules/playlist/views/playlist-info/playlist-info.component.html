@@ -1,7 +1,8 @@
 <ng-container *ngIf="($props | async) as props">
-    <app-error404 *ngIf="!props.loading && !props.playlist" [title]="'Playlist nicht gefunden'"></app-error404>
 
-    <div class="w-full h-full overflow-y-auto" #viewport>
+    <cdk-virtual-scroll-viewport [itemSize]="56" [minBufferPx]="300" [maxBufferPx]="400" class="w-full h-full overflow-x-hidden">
+        <app-error404 *ngIf="!props.loading && !props.playlist" [title]="'Playlist nicht gefunden'"></app-error404>
+
         <app-list-view [resource]="props.playlist" [title]="props.playlist?.name" [isLoading]="props.loading" [artwork]="props.playlist?.artwork">
             <ng-container scngx-stats>
                 <li class="text-font-secondary">
@@ -31,20 +32,24 @@
             </ng-container>
         </app-list-view>
 
-        <ng-container tbody *ngIf="props.tracklist">
-            <div *uiScroll="let item of props.tracklist; index as i" class="px-window">
+        <div *ngIf="(props.tracklist?.$empty | async); else songList">
+            Diese Playlist beinhaltet keine Songs.
+        </div>
+        
+        <ng-template #songList>
+            <div *cdkVirtualFor="let item of props.tracklist; index as i" class="px-window">
                 <scngx-song-list-item 
-                    [song]="item.song" 
+                    [song]="item?.song" 
                     [index]="i" 
-                    [active]="props.currentlyPlaying?.song?.id == item.song.id"
+                    [active]="props.currentlyPlaying?.song?.id == item?.song?.id"
                     [playing]="props.playing"
                     [animRef]="lottieAnimationTemplate">
                 </scngx-song-list-item>
             </div>
-        </ng-container>
 
-        <div class="pb-bottom"></div>
-    </div>
+            <div class="pb-bottom"></div>
+        </ng-template>
+    </cdk-virtual-scroll-viewport>
 </ng-container>
 
 <ng-template #lottieAnimationTemplate>

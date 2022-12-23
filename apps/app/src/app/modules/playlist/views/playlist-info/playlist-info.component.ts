@@ -51,7 +51,7 @@ export class PlaylistInfoComponent implements OnInit, OnDestroy {
       loading: future.loading,
       playlist: future.data?.context,
       currentlyPlaying: currentItem,
-      playing: !isPaused && currentItem?.tracklist?.assocResId == future.data?.assocResId,
+      playing: !isPaused && currentItem?.tracklist?.id == future.data?.id,
       tracklist: future.data
     }))
   );
