@@ -30,7 +30,7 @@ export abstract class SCNGXBaseDatasource<T = any> extends DataSource<T> {
 
     constructor(
         protected readonly pageSize: number = 30,
-        protected readonly initialSize: number = 0
+        protected readonly initialSize: number = pageSize
     ) {
         super();
 
