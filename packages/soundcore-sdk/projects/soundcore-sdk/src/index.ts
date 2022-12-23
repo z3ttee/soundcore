@@ -39,7 +39,8 @@ export * from "./lib/song";
 // Collection Module
 export * from "./lib/collection";
 
-
+// Search Module
+export * from "./lib/search";
 
 
 
@@ -102,16 +103,6 @@ export * from "./lib/album/entities/album.entity";
 export * from "./lib/artwork/artwork.module";
 export * from "./lib/artwork/services/artwork.service";
 export * from "./lib/artwork/entities/artwork.entity";
-
- /**
- * Export all search sdk parts
- */
-export * from "./lib/search/search.module";
-export * from "./lib/search/services/search.service";
-export * from "./lib/search/entities/search-result.model";
-export * from "./lib/search/entities/best-match.entity";
-export * from "./lib/search/entities/history-entry.entity";
-
 
 /**
  * Export all utils

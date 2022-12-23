@@ -1,6 +1,6 @@
 import { HttpClient } from "@angular/common/http";
 import { Inject, Injectable } from "@angular/core";
-import { BehaviorSubject, Observable, of, switchMap } from "rxjs";
+import { BehaviorSubject, Observable, of, switchMap, tap } from "rxjs";
 import { SCDKOptions, SCDK_OPTIONS } from "../../scdk.module";
 import { SCDKResource } from "../../utils/entities/resource";
 import { NgxIndexedDBService } from 'ngx-indexed-db';
@@ -10,7 +10,7 @@ import { SearchHistoryEntry } from "../entities/history-entry.entity";
 @Injectable({
   providedIn: "root"
 })
-export class SCDKSearchService {
+export class SCSDKSearchService {
 
   private readonly _onMainInputSubject: BehaviorSubject<string> = new BehaviorSubject("");
   public readonly $onMainInput: Observable<string> = this._onMainInputSubject.asObservable();
@@ -53,6 +53,18 @@ export class SCDKSearchService {
       }
     })
     
+  }
+
+  public removeFromHistory(resource: SCDKResource) {
+    return this.dbService.deleteByKey(SC_SEARCHHISTORY_STORE, resource.id).pipe(tap((wasDeleted) => {
+      if(wasDeleted) {
+        // Update observable
+        this._recentlySearchedSubject.next(this._recentlySearchedSubject.getValue().filter((res) => res.id !== resource.id));
+      } else {
+        // Print warning to console
+        console.warn(`Failed deleting history entry from database using key 'id: ${resource?.id}'`);
+      }
+    }));
   }
 
   private restoreRecentlySearched() {
