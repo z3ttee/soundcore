@@ -23,15 +23,19 @@ export class SCNGXTracklist<T = any, C = any> extends SCNGXBaseDatasource<SCNGXT
     ) {
         super(pageSize);
 
-        if(TRACKLIST_REGISTRY.has(assocResId)) {
+        if(TRACKLIST_REGISTRY.has(this.id)) {
             throw new Error(`It is preferred to reuse existing tracklists. Please use the tracklist builder for building tracklists.`);
         } else {
-            TRACKLIST_REGISTRY.set(assocResId, this);
+            TRACKLIST_REGISTRY.set(this.id, this);
         }
     }
 
     public get id(): string {
-        return this.assocResId;
+        return `${this.tracklistType}-${this.assocResId}`;
+    }
+
+    public static buildId(assocResId: string, tracklistType: TracklistType) {
+        return `${tracklistType}-${assocResId}`;
     }
 
     public get context(): C {
