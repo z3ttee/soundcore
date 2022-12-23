@@ -4,13 +4,10 @@
 export { SCNGXModule } from "./lib/scngx.module";
 
 // Scroll Module
-export * from "./lib/scroll";
+export * from "./lib/components/scrolling";
 
 // Table Module
 export * from "./lib/table";
-
-// Tracklist Module
-export * from "./lib/tracklist";
 
 // Button module
 export * from "./lib/components/buttons";
@@ -25,6 +22,11 @@ export const scngxLottieAudioWave = lottieAudioWave;
 // Drawer
 export * from "./lib/components/drawer/drawer.module";
 export * from "./lib/components/drawer/drawer.component";
+
+// Utils
+export * from "./lib/utils/queue";
+
+
 
 
 // Dialog
@@ -44,10 +46,6 @@ export * from "./lib/components/forms/text-input/text-input.module";
 export * from "./lib/components/forms/label/label.component";
 export * from "./lib/components/forms/hint/hint.component";
 export * from "./lib/components/forms/text-input/text-input.component";
-
-// Infinitelist
-export * from "./lib/components/list/infinite-list/infinite-list.module";
-export * from "./lib/components/list/infinite-list/infinite-list.component";
 
 // Skeletons
 export * from "./lib/components/skeletons/skeleton/skeleton.module";
@@ -90,14 +88,9 @@ export * from "./lib/components/grid/artist-grid-item/artist-grid-item.component
 // List exports
 export * from "./lib/components/list/nav-list-item/nav-list-item.module";
 export * from "./lib/components/list/nav-list-item/nav-list-item.component";
-export * from "./lib/components/list/playlist-list-item/playlist-list-item.module";
-export * from "./lib/components/list/playlist-list-item/playlist-list-item.component";
 
 export * from "./lib/components/list/bullet-list/bullet-list.module";
 export * from "./lib/components/list/bullet-list/bullet-list.component";
-
-export * from "./lib/components/list/playlist-list-item/playlist-list-item.module";
-export * from "./lib/components/list/playlist-list-item/playlist-list-item.component";
 
 // Rows
 export * from "./lib/ui/ui-row/ui-row.module";
@@ -143,11 +136,6 @@ export * from "./lib/pipes/mount-status-pipe/mount-status-pipe.module";
 export * from "./lib/pipes/mount-status-pipe/mount-status-pipe.pipe";
 export * from "./lib/pipes/resource-type-pipe/resource-type-pipe.module";
 export * from "./lib/pipes/resource-type-pipe/resource-type-pipe.pipe";
-
-// Datasource
-export * from "./lib/utils/datasource/infinite-datasource";
-export * from "./lib/utils/datasource/playlist-datasource";
-export * from "./lib/utils/datasource/tracklist-datasource";
 
 // Notifications
 export * from "./lib/components/notification/notification-list-item/notification-list-item.module";
