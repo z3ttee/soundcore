@@ -1,7 +1,6 @@
 <ng-container *ngIf="($props | async) as props">
-    <app-error404 *ngIf="!props.loading && !props.artist"></app-error404>
-
-    <div class="w-full h-full overflow-y-auto" #viewport>
+    <cdk-virtual-scroll-viewport [itemSize]="56" class="w-full h-full overflow-x-hidden border border-red-600">
+        <app-error404 *ngIf="!props.loading && !props.artist"></app-error404>
 
         <!-- Page Header -->
         <app-list-view [resource]="props.artist" [title]="props.artist?.name" [isLoading]="props.loading" [artwork]="props.artist?.artwork">
@@ -16,23 +15,23 @@
                     <span>{{ props.artist?.streamCount ?? 0 }} Streams in 30 Tagen</span>
                 </li>
             </ng-container>
-        
+            
             <ng-container scngx-controls>
                 <scngx-ibtn (click)="forcePlay(props.tracklist)" size="md">
                     <img *ngIf="!props.playing; else paused" class="w-7 h-7 text-body ml-0.5" src="assets/icons/play.svg">
                     <ng-template #paused><img *ngIf="props.playing" class="w-7 h-7 text-body ml-0.5" src="assets/icons/pause.svg"></ng-template>
                 </scngx-ibtn>
-            
+                
                 <button class="flex items-center p-2 rounded-full" matRipple [matRippleCentered]="true">
                     <hero-icon [name]="'heart'" [class]="'h-7 aspect-square'"></hero-icon>
                 </button>
-            
+                
                 <button class="flex items-center p-2 rounded-full" matRipple [matRippleCentered]="true">
                     <hero-icon [name]="'dots-vertical'" [class]="'h-7 aspect-square'"></hero-icon>
                 </button>
             </ng-container>
         </app-list-view>
-
+    
         <!-- Favourite songs bar -->
         <div class="flex flex-1 items-center justify-start w-full px-window mb-row">
             <!-- Favourite songs -->
@@ -41,7 +40,7 @@
                     <div class="min-w-11 min-h-11 w-11 h-11 rounded-full overflow-hidden">
                         <scngx-artwork></scngx-artwork>
                     </div>
-
+    
                     <div class="flex-grow">
                         <p class="line-clamp-2">Deine Lieblingssongs</p>
                         <p class="text-sm opacity-70 line-clamp-1">Dir gefallen {{ 0 }} Songs.</p>
@@ -54,63 +53,58 @@
         <div class="px-window pb-2">
             <scngx-ui-section-title [route]="['./songs']">Beliebte Songs</scngx-ui-section-title>
         </div>
+        <div *cdkVirtualFor="let item of props.tracklist; index as i" class="px-window">
+            <scngx-song-list-item 
+                [song]="item" 
+                [index]="i" 
+                [active]="props.currentlyPlaying?.song?.id == item?.id"
+                [playing]="props.playing"
+                [animRef]="lottieAnimationTemplate">
+                </scngx-song-list-item>
+        </div>
+
         <div class="px-window">
-            <ng-container *ngIf="props.tracklist">
-                <div *uiScroll="let item of props.tracklist; index as i">
-                    <scngx-song-list-item 
-                        [song]="item" 
-                        [index]="i" 
-                        [active]="props.currentlyPlaying?.song?.id == item.id"
-                        [playing]="props.playing"
-                        [animRef]="lottieAnimationTemplate">
-                    </scngx-song-list-item>
-                </div>
-            </ng-container>
+            <scngx-btn-text size="sm" [routerLink]="['./songs']">Mehr anzeigen</scngx-btn-text>
         </div>
-
-        <div class="w-full pb-bottom">
-            <scngx-ui-row [headline]="'Alben'" [route]="['./albums']" *ngIf="albums.length > 0">
-                <div class="w-full">
-                    <scngx-horizontal-grid>
-                            <ng-container *ngFor="let item of albums">
-                                <scngx-album-grid-item 
-                                    [item]="item" 
-                                    [useDate]="true"
-                                    [routerLink]="['/album', item.slug ?? item.id]">
-                                </scngx-album-grid-item>
-                            </ng-container>
-                    </scngx-horizontal-grid>
-                </div>
-            </scngx-ui-row>
     
-            <scngx-ui-row [headline]="'Enthalten in'" [route]="['./playlists']" *ngIf="featPlaylists.length > 0">
-                <div class="w-full">
-                    <scngx-horizontal-grid>
-                            <ng-container *ngFor="let item of featPlaylists">
-                                <scngx-playlist-grid-item
-                                    [item]="item"
-                                    [routerLink]="['/playlist', item?.slug ?? item?.id]">
-                                </scngx-playlist-grid-item>
-                            </ng-container>
-                    </scngx-horizontal-grid>
-                </div>
+        <div class="w-full pb-bottom overflow-hidden">
+            <scngx-ui-row [headline]="'Alben'" [route]="['./albums']" *ngIf="props.albums.data?.elements?.length > 0">
+                <scngx-horizontal-list>
+                    <scngx-album-grid-item 
+                        *ngFor="let item of props.albums.data?.elements"
+                        [item]="item" 
+                        [useDate]="true"
+                        [routerLink]="['/album', item.slug ?? item.id]">
+                    </scngx-album-grid-item>
+                </scngx-horizontal-list>
             </scngx-ui-row>
-    
-            <scngx-ui-row [headline]="'Alben mit ' + props.artist?.name" [route]="['./playlists']" *ngIf="featAlbums.length > 0">
-                <div class="w-full">
-                    <scngx-horizontal-grid>
-                            <ng-container *ngFor="let item of featAlbums">
-                                <scngx-album-grid-item 
-                                    [item]="item" 
-                                    [routerLink]="['/album', item.slug ?? item.id]">
-                                </scngx-album-grid-item>
-                            </ng-container>
-                    </scngx-horizontal-grid>
-                </div>
-            </scngx-ui-row>
+        
+                <scngx-ui-row [headline]="'Enthalten in'" [route]="['./playlists']" *ngIf="featPlaylists.length > 0">
+                    <div class="w-full">
+                        <scngx-horizontal-list>
+                            <scngx-playlist-grid-item
+                                *ngFor="let item of featPlaylists"
+                                [item]="item"
+                                [routerLink]="['/playlist', item?.slug ?? item?.id]">
+                            </scngx-playlist-grid-item>
+                        </scngx-horizontal-list>
+                    </div>
+                </scngx-ui-row>
+        
+                <scngx-ui-row [headline]="'Alben mit ' + props.artist?.name" [route]="['./playlists']" *ngIf="props.featAlbums.data?.elements?.length > 0">
+                    <div class="w-full">
+                        <scngx-horizontal-list>
+                            <scngx-album-grid-item 
+                                *ngFor="let item of props.featAlbums.data?.elements"
+                                [item]="item" 
+                                [useDate]="true"
+                                [routerLink]="['/album', item.slug ?? item.id]">
+                            </scngx-album-grid-item>
+                        </scngx-horizontal-list>
+                    </div>
+                </scngx-ui-row>
         </div>
-
-    </div>
+    </cdk-virtual-scroll-viewport>
 </ng-container>
 
 <ng-template #lottieAnimationTemplate>

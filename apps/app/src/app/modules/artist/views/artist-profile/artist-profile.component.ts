@@ -1,8 +1,8 @@
 import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { combineLatest, map, Observable, Subject, switchMap, takeUntil } from 'rxjs';
+import { combineLatest, map, Observable, startWith, Subject, switchMap, takeUntil } from 'rxjs';
 import { SCNGXTracklist, SCNGXTracklistBuilder } from '@soundcore/ngx';
-import { Album, Artist, Pageable, Playlist, SCDKAlbumService, SCDKArtistService, toFutureCompat } from '@soundcore/sdk';
+import { Album, Artist, Future, Page, Pageable, Playlist, SCDKAlbumService, SCDKArtistService, toFutureCompat } from '@soundcore/sdk';
 import { AppPlayerService } from 'src/app/modules/player/services/player.service';
 import { PlayerItem } from 'src/app/modules/player/entities/player-item.entity';
 import { AUDIOWAVE_LOTTIE_OPTIONS } from 'src/app/constants';
@@ -12,6 +12,10 @@ interface ArtistInfoProps {
   tracklist?: SCNGXTracklist;
   currentlyPlaying?: PlayerItem;
 
+  albums?: Future<Page<Album>>;
+  featAlbums?: Future<Page<Album>>;
+  playlists?: Future<Page<Album>>;
+
   playing?: boolean;
   loading?: boolean;
 }
@@ -19,7 +23,6 @@ interface ArtistInfoProps {
 @Component({
   selector: 'app-artist-profile',
   templateUrl: './artist-profile.component.html',
-  styleUrls: ['./artist-profile.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ArtistProfileComponent implements OnInit, OnDestroy {
@@ -40,27 +43,35 @@ export class ArtistProfileComponent implements OnInit, OnDestroy {
       // Get artist id from route
       map((params) => params.get("artistId") ?? null), 
       // Switch to request observable
-      switchMap((artistId) => this.artistService.findById(artistId).pipe(toFutureCompat())), 
+      switchMap((artistId) => combineLatest([
+        this.artistService.findById(artistId).pipe(toFutureCompat()),
+        this.albumService.findByArtist(artistId, new Pageable(0, 12)).pipe(toFutureCompat(), startWith(Future.loading<Page<Album>>())),
+        this.albumService.findFeaturedByArtist(artistId, new Pageable(0, 12)).pipe(toFutureCompat(), startWith(Future.loading<Page<Album>>())),
+      ])), 
       // Map future
-      map((future) => ({
-        ...future,
-        data: this.tracklistBuilder.forArtistTop(future.data)
-      }))),
+      map(([artistRequest, albumsRequest, featAlbumsRequest]): [Future<SCNGXTracklist<Artist>>, Future<Page<Album>>, Future<Page<Album>>] => ([
+        {
+          ...artistRequest,
+          data: this.tracklistBuilder.forArtistTop(artistRequest.data, 5)
+        },
+        albumsRequest,
+        featAlbumsRequest
+      ]))),
     this.player.$current.pipe(takeUntil(this._destroy)),
     this.player.$isPaused.pipe(takeUntil(this._destroy))
   ]).pipe(
     // Build props object
-    map(([future, currentItem, isPaused]): ArtistInfoProps => ({
-      loading: future.loading,
-      artist: future.data?.context,
+    map(([[tracklistRequest, albumsRequest, featAlbumsRequest], currentItem, isPaused]): ArtistInfoProps => ({
+      loading: tracklistRequest.loading,
+      artist: tracklistRequest.data?.context,
       currentlyPlaying: currentItem,
-      playing: !isPaused && currentItem?.tracklist?.assocResId == future.data?.assocResId,
-      tracklist: future.data
+      playing: !isPaused && currentItem?.tracklist?.id == tracklistRequest.data?.id,
+      tracklist: tracklistRequest.data,
+      albums: albumsRequest,
+      featAlbums: featAlbumsRequest
     })),
   );
 
-  public albums: Album[] = [];
-  public featAlbums: Album[] = [];
   public featPlaylists: Playlist[] = [];
 
   // Lottie animations options
@@ -71,28 +82,14 @@ export class ArtistProfileComponent implements OnInit, OnDestroy {
       const artistId = paramMap.get("artistId");
 
       // Reset state
-      this.albums = [];
-      this.featAlbums = [];
       this.featPlaylists = [];
 
       this.artistService.findById(artistId).pipe(takeUntil(this._destroy)).subscribe((response) => {
         const artist = response.payload;
 
-        // Find list of albums by the artist
-        this.albumService.findByArtist(artistId, new Pageable(0, 12)).pipe(takeUntil(this._destroy)).subscribe((response) => {
-          // Update state
-          this.albums = response.payload?.elements ?? [];
-        });
-
         // this.playlistService.findByArtist(artistId, new Pageable(0, 12)).pipe(takeUntil(this._destroy)).subscribe((page) => {
         //   this._featPlaylistSubject.next(page?.elements || []);
         // });
-
-        // Find list of albums the artist is featured in
-        this.albumService.findFeaturedByArtist(artistId, new Pageable(0, 12)).pipe(takeUntil(this._destroy)).subscribe((response) => {
-          // Update state
-          this.featAlbums = response.payload?.elements ?? [];
-        });
       })
     })
   }

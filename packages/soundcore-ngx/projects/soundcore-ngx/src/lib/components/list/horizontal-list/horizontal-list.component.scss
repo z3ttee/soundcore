@@ -1,8 +1,5 @@
-.scroll-area {
+.scroll-container {
     -webkit-overflow-scrolling: touch;
-    grid-auto-columns: 11rem;
-    grid-template-columns: repeat(auto-fill, 11rem);
-
     -ms-overflow-style: none;  /* IE and Edge */
     scrollbar-width: none;  /* Firefox */
 

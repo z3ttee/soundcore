@@ -1,3 +1,7 @@
+// Lottie animations
+import lottieAudioWave from "./assets/lottie/audio_wave.json";
+export const scngxLottieAudioWave = lottieAudioWave;
+
 /*
  * Public API Surface of soundcore-ngx
  */
@@ -15,10 +19,6 @@ export * from "./lib/components/buttons";
 // UI Module
 export * from "./lib/ui";
 
-// Lottie animations
-import lottieAudioWave from "./assets/lottie/audio_wave.json";
-export const scngxLottieAudioWave = lottieAudioWave;
-
 // Drawer
 export * from "./lib/components/drawer/drawer.module";
 export * from "./lib/components/drawer/drawer.component";
@@ -26,6 +26,8 @@ export * from "./lib/components/drawer/drawer.component";
 // Utils
 export * from "./lib/utils/queue";
 
+// Lists
+export * from "./lib/components/list";
 
 
 
@@ -85,13 +87,6 @@ export * from "./lib/components/grid/album-grid-item/album-grid-item.component";
 export * from "./lib/components/grid/artist-grid-item/artist-grid-item.module";
 export * from "./lib/components/grid/artist-grid-item/artist-grid-item.component";
 
-// List exports
-export * from "./lib/components/list/nav-list-item/nav-list-item.module";
-export * from "./lib/components/list/nav-list-item/nav-list-item.component";
-
-export * from "./lib/components/list/bullet-list/bullet-list.module";
-export * from "./lib/components/list/bullet-list/bullet-list.component";
-
 // Rows
 export * from "./lib/ui/ui-row/ui-row.module";
 export * from "./lib/ui/ui-row/ui-row.component";
@@ -99,9 +94,6 @@ export * from "./lib/ui/ui-row/ui-row.component";
 // Grids
 export * from "./lib/components/grids/vertical-grid/vertical-grid.module";
 export * from "./lib/components/grids/vertical-grid/vertical-grid.component";
-
-export * from "./lib/components/grids/horizontal-grid/horizontal-grid.module";
-export * from "./lib/components/grids/horizontal-grid/horizontal-grid.component";
 
 export * from "./lib/components/grid/profile-grid-item/profile-grid-item.module";
 export * from "./lib/components/grid/profile-grid-item/profile-grid-item.component";

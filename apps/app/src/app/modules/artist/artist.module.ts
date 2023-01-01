@@ -11,16 +11,16 @@ import {
   SCNGXSkeletonModule, 
   SCNGXUiRowModule, 
   SCNGXAlbumGridItemModule, 
-  SCNGXHorizontalGridModule, 
   SCNGXPlaylistGridItemModule,
   SCNGXTableModule, 
   SCNGXIconBtnModule, 
   SCNGXUiSectionTitleModule, 
   SCNGXUiTitleModule, 
-  SCNGXScrollModule, 
-  SCNGXArtworkModule
+  SCNGXArtworkModule,
+  SCNGXScrollingModule,
+  SCNGXButtonModule,
+  SCNGXHorizontalListModule
 } from '@soundcore/ngx';
-import { VirtualScrollerModule } from '@tsalliance/ngx-virtual-scroller';
 import { ArtistSongsComponent } from './views/artist-songs/artist-songs.component';
 import { SCNGXChipsModule } from 'src/app/components/chips/chips.module';
 import { SCNGXSongListItemModule } from 'src/app/components/list-items/song-list-item/song-list-item.module';
@@ -44,7 +44,6 @@ const routes: Routes = [
     RouterModule.forChild(routes),
     Error404Module,
     HeroIconModule.withIcons({ dotsVertical }),
-    VirtualScrollerModule,
     FontAwesomeModule,
     LottieModule,
 
@@ -55,7 +54,7 @@ const routes: Routes = [
     SCDKArtistModule,
     SCDKAlbumModule,
 
-    SCNGXHorizontalGridModule,
+    SCNGXHorizontalListModule,
     SCNGXSkeletonModule,
     SCNGXUiRowModule,
     SCNGXUiSectionTitleModule,
@@ -63,10 +62,11 @@ const routes: Routes = [
     SCNGXAlbumGridItemModule,
     SCNGXPlaylistGridItemModule,
     SCNGXIconBtnModule,
+    SCNGXButtonModule,
     SCNGXChipsModule,
     SCNGXArtworkModule,
 
-    SCNGXScrollModule,
+    SCNGXScrollingModule,
     SCNGXTableModule,
 
     SCNGXSongListItemModule
