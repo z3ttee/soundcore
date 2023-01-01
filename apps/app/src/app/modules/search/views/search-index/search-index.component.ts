@@ -4,8 +4,8 @@ import { UntypedFormControl } from '@angular/forms';
 import { Router } from '@angular/router';
 import { BehaviorSubject, debounceTime, Observable, Subject, takeUntil } from 'rxjs';
 import { SCCDKScreenService } from '@soundcore/cdk';
-import { SCNGXInfiniteDataSource } from '@soundcore/ngx';
-import { SCDKGenreService, MeiliAlbum, MeiliArtist, SCDKSearchService, ComplexSearchResult, SCDKResource, ApiSearchResponse, MeiliPlaylist, Pageable, MeiliUser, SCDKUserService, SCDKArtistService, SCDKAlbumService, Genre, MeiliSong, SCSDKSongService, SCSDKPlaylistService } from '@soundcore/sdk';
+import { SCDKGenreService, MeiliAlbum, MeiliArtist, SCSDKSearchService, ComplexSearchResult, SCDKResource, ApiSearchResponse, MeiliPlaylist, Pageable, MeiliUser, SCDKUserService, SCDKArtistService, SCDKAlbumService, Genre, MeiliSong, SCSDKSongService, SCSDKPlaylistService } from '@soundcore/sdk';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-search-index',
@@ -17,7 +17,7 @@ export class SearchIndexComponent implements OnInit, OnDestroy {
   constructor(
     private readonly httpClient: HttpClient,
     private readonly router: Router,
-    private readonly searchService: SCDKSearchService,
+    private readonly searchService: SCSDKSearchService,
 
     private readonly userService: SCDKUserService,
     private readonly artistService: SCDKArtistService,
@@ -26,7 +26,8 @@ export class SearchIndexComponent implements OnInit, OnDestroy {
     private readonly songService: SCSDKSongService,
     private readonly playlistService: SCSDKPlaylistService,
 
-    public readonly screenService: SCCDKScreenService
+    public readonly screenService: SCCDKScreenService,
+    private readonly snackbar: MatSnackBar
   ) { }
 
   private readonly _destroy: Subject<void> = new Subject();
@@ -44,10 +45,6 @@ export class SearchIndexComponent implements OnInit, OnDestroy {
   public $artists: BehaviorSubject<ApiSearchResponse<MeiliArtist>> = new BehaviorSubject(null);
   public $albums: BehaviorSubject<ApiSearchResponse<MeiliAlbum>> = new BehaviorSubject(null);
   public $songs: BehaviorSubject<ApiSearchResponse<MeiliSong>> = new BehaviorSubject(null);
-
-  public dataSource: SCNGXInfiniteDataSource<Genre> = new SCNGXInfiniteDataSource(this.httpClient, {
-    url: this.genreService.buildFindAllUrl()
-  });
 
   public ngOnInit(): void {
     this.searchService.$onMainInput.pipe(debounceTime(300), takeUntil(this._destroy)).subscribe((query) => {
@@ -106,6 +103,16 @@ export class SearchIndexComponent implements OnInit, OnDestroy {
   public routeToResult(route: any[], resource: SCDKResource) {
     this.searchService.addToSearchHistory(resource);
     this.router.navigate(route);
+  }
+
+  public removeFromSearch(song: MeiliSong) {
+    this.searchService.removeFromHistory(song).pipe(takeUntil(this._destroy)).subscribe((wasRemoved) => {
+      if(wasRemoved) {
+        this.snackbar.open(`Eintrag aus Suchverlauf gelöscht`, null, { duration: 5000 });
+      } else {
+        this.snackbar.open(`Es ist ein Fehler aufgetreten`, null, { duration: 5000 });
+      }
+    });
   }
 
 }

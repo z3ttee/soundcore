@@ -197,20 +197,33 @@ export abstract class SCNGXBaseDatasource<T = any> extends DataSource<T> {
     protected getPageOrFetch(pageIndex: number): Observable<T[]> {
         return new Observable((subscriber) => {
             if(this.hasPage(pageIndex)) {
-                const elements = this.cachedData.slice(pageIndex * this.pageSize, this.pageSize);
+                const pageStart = this.pageSize * pageIndex;
+                const pageEnd = pageStart + this.pageSize; 
+
+                // Note: Slice is exclusive the end param
+                const elements = this.cachedData.slice(pageIndex * this.pageSize, pageEnd + 1);
+
                 subscriber.next(elements);
                 subscriber.complete();
-
                 return;
             } 
 
             subscriber.add(this.fetchPage(pageIndex).pipe(catchError((err: Error) => {
+                console.error(err);
                 return of([]);
             })).subscribe((elements) => {
                 subscriber.next(elements);
                 subscriber.complete();
             }))
         });
+    }
+
+    protected calculatePageStart(pageIndex: number) {
+        return this.pageSize * pageIndex;
+    }
+
+    protected calculatePageEnd(pageIndex: number) {
+        return this.calculatePageStart(pageIndex) + this.pageSize;
     }
 
 }

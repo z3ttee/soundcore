@@ -2,13 +2,14 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Routes } from '@angular/router';
 import { SearchIndexComponent } from './views/search-index/search-index.component';
-import { SCNGXArtistGridItemModule, SCNGXInfiniteListModule, SCNGXToolbarModule, SCNGXUiRowModule, SCNGXHorizontalGridModule, SCNGXAlbumGridItemModule, SCNGXPlaylistGridItemModule, SCNGXProfileGridItemModule } from '@soundcore/ngx';
+import { SCNGXArtistGridItemModule, SCNGXToolbarModule, SCNGXUiRowModule, SCNGXAlbumGridItemModule, SCNGXPlaylistGridItemModule, SCNGXProfileGridItemModule, SCNGXHorizontalListModule } from '@soundcore/ngx';
 
 import { Error404Module } from 'src/app/shared/error404/error404.module';
 import { ReactiveFormsModule } from '@angular/forms';
-import { SCDKAlbumModule, SCDKArtistModule, SCDKUserModule, SCSDKPlaylistModule, SCSDKSongModule } from '@soundcore/sdk';
+import { SCDKAlbumModule, SCDKArtistModule, SCDKUserModule, SCSDKPlaylistModule, SCSDKSearchModule, SCSDKSongModule } from '@soundcore/sdk';
 import { SongContextMenuModule } from 'src/app/components/menus/song-context-menu/song-context-menu.module';
 import { SongGridItemModule } from 'src/app/components/grid-items/song-grid-item/song-grid-item.module';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 const routes: Routes = [
   { path: "", component: SearchIndexComponent }
@@ -24,14 +25,15 @@ const routes: Routes = [
     ReactiveFormsModule,
     Error404Module,
 
+    MatSnackBarModule,
+
     SCNGXToolbarModule,
     SCNGXUiRowModule,
-    SCNGXHorizontalGridModule,
     SCNGXAlbumGridItemModule,
     SCNGXPlaylistGridItemModule,
     SCNGXArtistGridItemModule,
     SCNGXProfileGridItemModule,
-    SCNGXInfiniteListModule,
+    SCNGXHorizontalListModule,
 
     SCDKUserModule,
     SCDKArtistModule,
@@ -39,6 +41,7 @@ const routes: Routes = [
 
     SCSDKPlaylistModule,
     SCSDKSongModule,
+    SCSDKSearchModule,
 
     SongGridItemModule,
     SongContextMenuModule

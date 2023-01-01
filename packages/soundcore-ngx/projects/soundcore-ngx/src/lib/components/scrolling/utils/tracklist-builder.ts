@@ -15,49 +15,49 @@ export class SCNGXTracklistBuilder {
         return new SCNGXTracklistBuilder(service);
     }
 
-    public forPlaylist(playlist: Playlist, pageSize?: number) {
+    public forPlaylist(playlist: Playlist, initialSize?: number, pageSize?: number) {
         if(typeof playlist === "undefined" || playlist == null) return null;
 
         const tracklistId = SCNGXTracklist.buildId(playlist.id, TracklistType.PLAYLIST);
         if(TRACKLIST_REGISTRY.has(tracklistId)) return TRACKLIST_REGISTRY.get(tracklistId);
 
-        return new SCNGXTracklist<PlaylistItem, Playlist>(this.service, TracklistType.PLAYLIST, playlist.id, playlist, pageSize);
+        return new SCNGXTracklist<PlaylistItem, Playlist>(this.service, TracklistType.PLAYLIST, playlist.id, playlist, initialSize, pageSize);
     }
 
-    public forAlbum(album: Album, pageSize?: number) {
+    public forAlbum(album: Album, initialSize?: number, pageSize?: number) {
         if(typeof album === "undefined" || album == null) return null;
 
         const tracklistId = SCNGXTracklist.buildId(album.id, TracklistType.ALBUM);
         if(TRACKLIST_REGISTRY.has(tracklistId)) return TRACKLIST_REGISTRY.get(tracklistId);
 
-        return new SCNGXTracklist<Song, Album>(this.service, TracklistType.ALBUM, album.id, album, pageSize);
+        return new SCNGXTracklist<Song, Album>(this.service, TracklistType.ALBUM, album.id, album, initialSize, pageSize);
     }
 
-    public forArtist(artist: Artist, pageSize?: number) {
+    public forArtist(artist: Artist, initialSize?: number, pageSize?: number) {
         if(typeof artist === "undefined" || artist == null) return null;
 
         const tracklistId = SCNGXTracklist.buildId(artist.id, TracklistType.ARTIST);
         if(TRACKLIST_REGISTRY.has(tracklistId)) return TRACKLIST_REGISTRY.get(tracklistId);
 
-        return new SCNGXTracklist<Song, Artist>(this.service, TracklistType.ARTIST, artist.id, artist, pageSize);
+        return new SCNGXTracklist<Song, Artist>(this.service, TracklistType.ARTIST, artist.id, artist, initialSize, pageSize);
     }
 
-    public forArtistTop(artist: Artist, pageSize?: number) {
+    public forArtistTop(artist: Artist, initialSize?: number, pageSize?: number) {
         if(typeof artist === "undefined" || artist == null) return null;
 
         const tracklistId = SCNGXTracklist.buildId(artist.id, TracklistType.ARTIST_TOP);
         if(TRACKLIST_REGISTRY.has(tracklistId)) return TRACKLIST_REGISTRY.get(tracklistId);
 
-        return new SCNGXTracklist<Song, Artist>(this.service, TracklistType.ARTIST_TOP, artist.id, artist, pageSize);
+        return new SCNGXTracklist<Song, Artist>(this.service, TracklistType.ARTIST_TOP, artist.id, artist, initialSize, pageSize);
     }
 
-    public forLikedSongs(currentUserId: string, pageSize?: number): SCNGXTracklist {
+    public forLikedSongs(currentUserId: string, initialSize?: number, pageSize?: number): SCNGXTracklist {
         if(typeof currentUserId === "undefined" || currentUserId == null) return null;
 
         const tracklistId = SCNGXTracklist.buildId(currentUserId, TracklistType.LIKED_SONGS);
         if(TRACKLIST_REGISTRY.has(tracklistId)) return TRACKLIST_REGISTRY.get(tracklistId);
 
-        return new SCNGXTracklist<LikedSong, null>(this.service, TracklistType.LIKED_SONGS, currentUserId, null, pageSize);
+        return new SCNGXTracklist<LikedSong, null>(this.service, TracklistType.LIKED_SONGS, currentUserId, null, initialSize, pageSize);
     }
 
 }

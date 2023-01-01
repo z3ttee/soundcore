@@ -1,7 +1,7 @@
 <ng-container *ngIf="($props | async) as props">
     <app-error404 *ngIf="!props.loading && !props.album" [title]="'Album nicht gefunden'"></app-error404>
 
-    <scngx-scroll class="w-full h-full pb-40" #scroller>
+    <!-- <scngx-scroll class="w-full h-full pb-40" #scroller> -->
         <!-- Page Header -->
         <ng-container header>
             <app-list-view [resource]="props.album" [title]="props.album?.name" [isLoading]="props.loading" [artwork]="props.album?.artwork">
@@ -70,7 +70,7 @@
                 <div class="px-window mt-row">
                     <h6>Mehr Playlisten</h6>
                 </div>
-                <scngx-horizontal-grid>
+                <scngx-horizontal-list>
                     <ng-container *ngFor="let item of props.featuredAlbums">
                         <scngx-album-grid-item 
                             [item]="item" 
@@ -78,10 +78,10 @@
                             [routerLink]="['/album', item.slug || item.id]">
                         </scngx-album-grid-item>
                     </ng-container>
-                </scngx-horizontal-grid>
+                </scngx-horizontal-list>
             </div>
         </ng-container>
-    </scngx-scroll>
+    <!-- </scngx-scroll> -->
 </ng-container>
 
 <ng-template #lottieAnimationTemplate>

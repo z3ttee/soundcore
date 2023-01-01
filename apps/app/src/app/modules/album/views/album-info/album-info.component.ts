@@ -88,7 +88,7 @@ export class AlbumInfoComponent implements OnInit, OnDestroy {
         loading: future.loading,
         album: tracklist?.context,
         currentlyPlaying: currentItem,
-        playing: !isPaused && currentItem?.tracklist?.assocResId == tracklist?.assocResId,
+        playing: !isPaused && currentItem?.tracklist?.id == tracklist?.id,
         tracklist: tracklist,
         featuredAlbums: albums?.elements
       };

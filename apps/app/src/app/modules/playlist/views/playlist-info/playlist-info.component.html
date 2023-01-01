@@ -32,23 +32,21 @@
             </ng-container>
         </app-list-view>
 
-        <div *ngIf="(props.tracklist?.$empty | async); else songList">
+        <div *ngIf="(props.tracklist?.$empty | async)">
             Diese Playlist beinhaltet keine Songs.
         </div>
         
-        <ng-template #songList>
-            <div *cdkVirtualFor="let item of props.tracklist; index as i" class="px-window">
-                <scngx-song-list-item 
-                    [song]="item?.song" 
-                    [index]="i" 
-                    [active]="props.currentlyPlaying?.song?.id == item?.song?.id"
-                    [playing]="props.playing"
-                    [animRef]="lottieAnimationTemplate">
-                </scngx-song-list-item>
-            </div>
+        <div *cdkVirtualFor="let item of props.tracklist; index as i" class="px-window">
+            <scngx-song-list-item 
+                [song]="item?.song" 
+                [index]="i" 
+                [active]="props.currentlyPlaying?.song?.id == item?.song?.id"
+                [playing]="props.playing"
+                [animRef]="lottieAnimationTemplate">
+            </scngx-song-list-item>
+        </div>
 
-            <div class="pb-bottom"></div>
-        </ng-template>
+        <div class="pb-bottom"></div>
     </cdk-virtual-scroll-viewport>
 </ng-container>
 

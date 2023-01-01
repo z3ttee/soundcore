@@ -1,7 +1,7 @@
 <div class="flex items-center justify-start py-1 w-full overflow-hidden" [style.height]="itemHeight + 'px'">
     <div 
-        class="flex flex-1 items-center justify-start gap-4 rounded-sm w-full h-full px-3 pointer-events-none"
-        [ngClass]="{'hover:border-opacity-100 border border-body-lighter border-opacity-0 transition-all bg-opacity-0 hover:bg-opacity-30 bg-body-light cursor-pointer pointer-events-auto active:bg-opacity-50': !!bucket}">
+        class="flex flex-1 items-center justify-start gap-4 rounded-sm w-full h-full px-3 pointer-events-none select-none transition-all cursor-pointer"
+        [ngClass]="{'hover:border-opacity-100 active:border-opacity-100 border border-body-lighter border-opacity-0 bg-opacity-0 hover:bg-opacity-30 bg-body-light cursor-pointer pointer-events-auto active:bg-opacity-50': !!bucket}">
         <!-- Bucket artwork -->
         <div class="h-10 min-w-10 w-10 rounded-sm">
             <scngx-skeleton [class]="'h-full aspect-square'" *ngIf="!bucket; else itemArtwork"></scngx-skeleton>

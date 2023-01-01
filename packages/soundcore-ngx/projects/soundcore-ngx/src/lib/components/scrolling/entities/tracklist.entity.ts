@@ -1,6 +1,6 @@
 import { CollectionViewer } from "@angular/cdk/collections";
 import { Future, LikedSong, Page, Pageable, PlaylistItem, SCSDKTracklist, SCSDKTracklistService, Song, toFuture, toFutureCompat, TracklistType } from "@soundcore/sdk";
-import { catchError, filter, map, Observable, of, switchMap, takeUntil } from "rxjs";
+import { catchError, combineLatest, filter, map, Observable, of, Subscription, switchMap, takeUntil } from "rxjs";
 import { Queue } from "../../../utils/queue/queue.entity";
 import { TRACKLIST_REGISTRY } from "../utils/tracklist-builder";
 import { SCNGXBaseDatasource, SCNGXDatasourceFreeHandler } from "./datasource.entity";
@@ -19,9 +19,10 @@ export class SCNGXTracklist<T = any, C = any> extends SCNGXBaseDatasource<SCNGXT
         private readonly tracklistType: TracklistType,
         private readonly assocResId: string,
         private readonly _context?: C,
-        pageSize: number = 30
+        initialSize?: number,
+        pageSize?: number
     ) {
-        super(pageSize);
+        super(pageSize ?? 30, initialSize ?? pageSize);
 
         if(TRACKLIST_REGISTRY.has(this.id)) {
             throw new Error(`It is preferred to reuse existing tracklists. Please use the tracklist builder for building tracklists.`);
@@ -51,7 +52,7 @@ export class SCNGXTracklist<T = any, C = any> extends SCNGXBaseDatasource<SCNGXT
         const pageable = new Pageable(pageIndex, this.pageSize);
 
         return this.initializeTracklist().pipe(
-            switchMap((tracklist) => {
+            switchMap(([tracklist]) => {
                 if(typeof tracklist === "undefined" || tracklist == null) return of([]);
 
                 return this.service.getHttpClient().get<Page<T>>(`${tracklist.metadataLocation}${pageable.toQuery()}`).pipe(
@@ -77,12 +78,12 @@ export class SCNGXTracklist<T = any, C = any> extends SCNGXBaseDatasource<SCNGXT
         );
     }
 
-    private initializeTracklist(): Observable<SCSDKTracklist> {
+    private initializeTracklist(): Observable<[SCSDKTracklist, boolean]> {
         return new Observable((subscriber) => {
             // Check if tracklist was fetched before
             if(typeof this.tracklist !== "undefined" && this.tracklist != null) {
                 // Push result to subscriber
-                subscriber.next(this.tracklist);
+                subscriber.next([this.tracklist, false]);
                 // Complete source to prevent memory leaks
                 subscriber.complete();
                 // Return so the rest of the observable does not get executed
@@ -149,7 +150,7 @@ export class SCNGXTracklist<T = any, C = any> extends SCNGXBaseDatasource<SCNGXT
                 this.setQueue(this.tracklist);
 
                 // Clean up subscription
-                subscriber.next(this.tracklist);
+                subscriber.next([this.tracklist, true]);
                 subscriber.complete();
             });
         });
@@ -246,10 +247,14 @@ export class SCNGXTracklist<T = any, C = any> extends SCNGXBaseDatasource<SCNGXT
      * @returns Item
      */
     public dequeueAt(index: number): Observable<Song> {
-        if(this.queue.isEmpty()) return of(null);
+        if(this.queue.isEmpty()) {
+            return of(null);
+        }
 
         const item = this.queue.dequeueAt(index);
-        if(typeof item === "undefined" || item == null) return of(null);
+        if(typeof item === "undefined" || item == null) {
+            return of(null)
+        };
 
         return this.getItemByIndex(item).pipe(map((datasourceitem) => {
             // Check if object is either LikedSong or PlaylistItem
@@ -259,7 +264,6 @@ export class SCNGXTracklist<T = any, C = any> extends SCNGXBaseDatasource<SCNGXT
             }
 
             // Object is just song object, return it
-            console.log(datasourceitem);
             return datasourceitem as Song;
         }));
     }
@@ -281,15 +285,15 @@ export class SCNGXTracklist<T = any, C = any> extends SCNGXBaseDatasource<SCNGXT
         return this.dequeueAt(0);
     }
 
-    // public resetQueue(): Observable<void> {
-    //     return this.initializeTracklist().pipe(map(([tracklist, wasFreshlyInitialized]) => {
-    //         // Was initialized with this request, so the queue was set.
-    //         if(wasFreshlyInitialized) return;
+    public resetQueue(): Observable<void> {
+        return this.initializeTracklist().pipe(map(([tracklist, wasFreshlyInitialized]) => {
+            // Was initialized with this request, so the queue was set.
+            if(wasFreshlyInitialized) return;
 
-    //         // Otherwise set queue if the tracklist was initialized before
-    //         this.setQueue(tracklist);
-    //     }));
-    // }
+            // Otherwise set queue if the tracklist was initialized before
+            this.setQueue(tracklist);
+        }));
+    }
 
     /**
      * Set internal queue state

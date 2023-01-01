@@ -28,4 +28,10 @@ export class Future<T = any> {
             }
         }
     }
+
+    public static loading<T = any>(): Future<T> {
+        return {
+            loading: true
+        }
+    }
 }

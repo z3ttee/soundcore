@@ -1,5 +1,5 @@
 import { Injectable } from "@angular/core";
-import { Queue, SCNGXTracklist } from "@soundcore/ngx";
+import { Queue, SCNGXDatasourceFreeHandler, SCNGXTracklist } from "@soundcore/ngx";
 import { Logger, Song } from "@soundcore/sdk";
 import { BehaviorSubject, map, Observable, of, switchMap } from "rxjs";
 import { PlayerItem } from "../entities/player-item.entity";
@@ -12,7 +12,7 @@ import { AppMediasessionService } from "./mediasession.service";
     providedIn: "root"
 })
 export class AppPlayerService {
-    private readonly logger = new Logger("Player");
+    private readonly logger = new Logger(AppPlayerService.name);
 
     constructor(
         private readonly controls: AppControlsService,
@@ -125,7 +125,7 @@ export class AppPlayerService {
         const shouldStartAtIndex: boolean = typeof playAtIndex !== "undefined" && playAtIndex != null;
         
         // Check if the tracklist is currently playing
-        if(this.isPlayingSrcById(tracklist.assocResId) && !shouldStartAtIndex) {
+        if(this.isPlayingSrcById(tracklist.id) && !shouldStartAtIndex) {
             // If true, check if paused and toggle play/pause
             if(this.audio.isPaused()) {
                 this.audio.play();
@@ -138,6 +138,7 @@ export class AppPlayerService {
 
         // "Enqueue" tracklist
         this._enqueuedTracklist = tracklist;
+        this._enqueuedTracklist.claim(this.tracklistFreeHandler);
         this.updateSize();
 
         if(shouldStartAtIndex) {
@@ -162,7 +163,7 @@ export class AppPlayerService {
         if(typeof current === "undefined" || current == null) return false;
 
         if(current.tracklist) {
-            return current.tracklist?.assocResId == id;
+            return current.tracklist?.id == id;
         } else {
             return current.song?.id == id;
         }
@@ -278,18 +279,26 @@ export class AppPlayerService {
             // Otherwise take from tracklist queue
             
             // Check if there is a tracklist enqueued
+            console.log("tracklist enqueued? ", !!this._enqueuedTracklist)
             if(!!this._enqueuedTracklist) {
                 const tracklist = this._enqueuedTracklist;
 
                 // Initialize tracklist as it may not have happened
-                const itemObservable: Observable<Song> = tracklist.initialize().pipe(switchMap(() => {
-                    // Switch to dequeueing observable after initialization
-                    return this.controls.isShuffled() ? tracklist.dequeueRandom() : tracklist.dequeue();
-                }));
+                // const itemObservable: Observable<Song> = tracklist.initialize().pipe(switchMap(() => {
+                //     // Switch to dequeueing observable after initialization
+                //     return this.controls.isShuffled() ? tracklist.dequeueRandom() : tracklist.dequeue();
+                // }));
+
+                const itemObservable: Observable<Song> = this.controls.isShuffled() ? tracklist.dequeueRandom() : tracklist.dequeue();
 
                 return itemObservable.pipe(map((song) => {
                     // Check if the size of the tracklist's internal queue is empty
                     // If true, dequeue the tracklist
+
+                    console.log(song);
+
+                    console.log(tracklist.queue.size);
+
                     if(tracklist.queue.size <= 0) {
                         this.dequeueTracklist();
                     }
@@ -306,12 +315,22 @@ export class AppPlayerService {
         this.updateSize();
         return of(result);
     }
+
     /**
      * Dequeue tracklist by setting it to undefined.
      */
     private dequeueTracklist() {
-        this.logger.verbose(`Dequeued tracklist: `, this._enqueuedTracklist);
+        this._enqueuedTracklist.destroyIfNotClaimed(this.tracklistFreeHandler).subscribe((destroyed) => {
+            if(!destroyed) {
+                console.warn(`[AudioPlayerService] Could not destroy tracklist when removing from queue.`);
+            }
 
+            this.unsetEnqueuedTracklist();
+        })
+    }
+
+    private unsetEnqueuedTracklist() {
+        this.logger.verbose(`Dequeued tracklist: `, this._enqueuedTracklist);
         this._enqueuedTracklist = undefined;
         this.updateSize();
     }
@@ -323,6 +342,8 @@ export class AppPlayerService {
         this._sizeSubject.next(this.queueSize);
     }
 
-    
+    private tracklistFreeHandler(): boolean {
+        return false;
+    }
 
 }
