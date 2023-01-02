@@ -1,9 +1,9 @@
 import { CdkDragDrop } from "@angular/cdk/drag-drop";
 import { Location } from "@angular/common";
-import { Component, OnDestroy, OnInit } from "@angular/core";
+import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from "@angular/core";
 import { UntypedFormControl } from "@angular/forms";
 import { NavigationCancel, NavigationEnd, NavigationError, NavigationStart, Router } from "@angular/router";
-import { SSOService } from "@soundcore/sso";
+import { SSOService, SSOUser } from "@soundcore/sso";
 import { combineLatest, filter, map, Observable, startWith, Subject, takeUntil, tap } from "rxjs";
 import { SCCDKScreenService } from "@soundcore/cdk";
 import { SCNGXDialogService } from "@soundcore/ngx";
@@ -13,10 +13,15 @@ import { SCNGXPlaylistListItemComponent } from "src/app/components/list-items/pl
 
 interface MainLayoutProps {
     playlists?: Playlist[];
+    account?: SSOUser;
+
+    isAdminAccount?: boolean;
+    isModAccount?: boolean;
 }
 
 @Component({
-    templateUrl: "./main-layout.component.html"
+    templateUrl: "./main-layout.component.html",
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AscMainLayoutComponent implements OnInit, OnDestroy {
 
@@ -28,7 +33,7 @@ export class AscMainLayoutComponent implements OnInit, OnDestroy {
 
     constructor(
         public readonly screenService: SCCDKScreenService,
-        public readonly authService: SSOService,
+        private readonly authService: SSOService,
         public readonly playlistService: SCSDKPlaylistService,
         private readonly dialogService: SCNGXDialogService,
         private readonly searchService: SCSDKSearchService,
@@ -38,10 +43,18 @@ export class AscMainLayoutComponent implements OnInit, OnDestroy {
     ) {}
 
     public readonly $props: Observable<MainLayoutProps> = combineLatest([
-        this.playlistService.$library
+        this.playlistService.$library,
+        this.authService.$user.pipe(startWith(null)),
+        combineLatest([
+            this.authService.$isAdmin,
+            this.authService.$isMod
+        ])
     ]).pipe(
-        map(([playlists]): MainLayoutProps => ({
-            playlists: playlists
+        map(([playlists, account, [isAdminAccount, isModAccount]]): MainLayoutProps => ({
+            playlists: playlists,
+            account: account,
+            isAdminAccount: isAdminAccount,
+            isModAccount: isAdminAccount || isModAccount
         })),
         takeUntil(this._destroy),
         tap((props) => console.log(props))
@@ -91,6 +104,10 @@ export class AscMainLayoutComponent implements OnInit, OnDestroy {
 
     public openCreatePlaylistDialog() {       
         this.dialogService.open(AppPlaylistCreateDialog, {}).$afterClosed.pipe(takeUntil(this._destroy));
+    }
+
+    public logout() {
+        this.authService.logout();
     }
 
 }
