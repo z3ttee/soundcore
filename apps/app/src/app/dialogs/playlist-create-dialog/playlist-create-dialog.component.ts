@@ -6,7 +6,7 @@ import { Playlist, ApiResponse, PlaylistPrivacy, SCSDKPlaylistService } from "@s
 
 @Component({
     templateUrl: "./playlist-create-dialog.component.html",
-    changeDetection: ChangeDetectionStrategy.Default
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AppPlaylistCreateDialog implements OnDestroy {
 

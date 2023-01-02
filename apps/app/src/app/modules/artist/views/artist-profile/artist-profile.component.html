@@ -64,7 +64,7 @@
                 </scngx-song-list-item>
         </div>
 
-        <div class="px-window">
+        <div class="px-window" *ngIf="(props.tracklist?.$totalSize | async) > 5">
             <scngx-btn-text size="sm" [routerLink]="['./songs']">Mehr anzeigen</scngx-btn-text>
         </div>
     

@@ -43,7 +43,7 @@ export class AscMainLayoutComponent implements OnInit, OnDestroy {
     ) {}
 
     public readonly $props: Observable<MainLayoutProps> = combineLatest([
-        this.playlistService.$library,
+        this.playlistService.$library.pipe(map((playlists) => ([...playlists]))),
         this.authService.$user.pipe(startWith(null)),
         combineLatest([
             this.authService.$isAdmin,

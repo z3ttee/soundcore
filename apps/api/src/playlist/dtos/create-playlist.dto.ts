@@ -13,6 +13,6 @@ export class CreatePlaylistDTO {
 
     @IsOptional()
     @IsEnum(PlaylistPrivacy)
-    public privacy?: PlaylistPrivacy;
+    public privacy?: PlaylistPrivacy = PlaylistPrivacy.PUBLIC;
 
 }
