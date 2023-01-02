@@ -12,6 +12,8 @@ import { PlaylistItemAddResult } from '../entities/playlist-item-added.entity';
 import { Playlist } from '../entities/playlist.entity';
 import { Page, Pageable } from "../../pagination";
 import { Logger } from '../../logging';
+import { Future } from '../../utils/future/future';
+import { toFuture } from '../../utils/future';
 
 @Injectable()
 export class SCSDKPlaylistService {
@@ -42,6 +44,17 @@ export class SCSDKPlaylistService {
   public findById(playlistId: string): Observable<ApiResponse<Playlist>> {
     if(!playlistId) return of(ApiResponse.withPayload(null));
     return this.httpClient.get<Playlist>(`${this.options.api_base_uri}/v1/playlists/${playlistId}`).pipe(apiResponse());
+  }
+
+  /**
+   * Find playlists featuring an artist.
+   * @param artistId Artist's id
+   * @param pageable Page settings
+   * @returns Future<Page<Playlist>>
+   */
+  public findByArtist(artistId: string, pageable: Pageable): Observable<Future<Page<Playlist>>> {
+    if(!artistId) return of(Future.notfound());
+    return this.httpClient.get<Page<Playlist>>(`${this.options.api_base_uri}/v1/playlists/byArtist/${artistId}${pageable.toQuery()}`).pipe(toFuture());
   }
 
   /**

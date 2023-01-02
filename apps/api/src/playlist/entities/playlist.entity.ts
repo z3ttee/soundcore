@@ -34,7 +34,7 @@ export class Playlist implements Resource, Syncable {
     @Column({ nullable: true, length: 254 })
     public description: string;
 
-    @Column({ type: "smallint", nullable: false, default: 0 })
+    @Column({ nullable: false, default: "public" })
     public privacy: PlaylistPrivacy;
 
     @CreateDateColumn()

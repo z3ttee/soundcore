@@ -71,11 +71,11 @@ export class ArtistSongsComponent implements OnInit, OnDestroy {
   }
 
   public forcePlay(tracklist: SCNGXTracklist) {
-    this.player.playTracklist(tracklist, true);
+    this.player.playTracklist(tracklist, true).subscribe();
   }
 
   public forcePlayAtSong(tracklist: SCNGXTracklist, playAtIndex: number) {
-    this.player.playTracklist(tracklist, true, playAtIndex);
+    this.player.playTracklist(tracklist, true, playAtIndex).subscribe();
   }
 
 }

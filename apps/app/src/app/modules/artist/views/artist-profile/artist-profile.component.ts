@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/
 import { ActivatedRoute } from '@angular/router';
 import { combineLatest, map, Observable, startWith, Subject, switchMap, takeUntil } from 'rxjs';
 import { SCNGXTracklist, SCNGXTracklistBuilder } from '@soundcore/ngx';
-import { Album, Artist, Future, Page, Pageable, Playlist, SCDKAlbumService, SCDKArtistService, toFutureCompat } from '@soundcore/sdk';
+import { Album, Artist, Future, Page, Pageable, Playlist, SCDKAlbumService, SCDKArtistService, SCSDKPlaylistService, toFutureCompat } from '@soundcore/sdk';
 import { AppPlayerService } from 'src/app/modules/player/services/player.service';
 import { PlayerItem } from 'src/app/modules/player/entities/player-item.entity';
 import { AUDIOWAVE_LOTTIE_OPTIONS } from 'src/app/constants';
@@ -14,7 +14,7 @@ interface ArtistInfoProps {
 
   albums?: Future<Page<Album>>;
   featAlbums?: Future<Page<Album>>;
-  playlists?: Future<Page<Album>>;
+  featPlaylists?: Future<Page<Playlist>>;
 
   playing?: boolean;
   loading?: boolean;
@@ -29,6 +29,7 @@ export class ArtistProfileComponent implements OnInit, OnDestroy {
 
   constructor(
     private readonly artistService: SCDKArtistService,
+    private readonly playlistService: SCSDKPlaylistService,
     private readonly albumService: SCDKAlbumService,
     private readonly activatedRoute: ActivatedRoute,
     private readonly tracklistBuilder: SCNGXTracklistBuilder,
@@ -47,28 +48,31 @@ export class ArtistProfileComponent implements OnInit, OnDestroy {
         this.artistService.findById(artistId).pipe(toFutureCompat()),
         this.albumService.findByArtist(artistId, new Pageable(0, 12)).pipe(toFutureCompat(), startWith(Future.loading<Page<Album>>())),
         this.albumService.findFeaturedByArtist(artistId, new Pageable(0, 12)).pipe(toFutureCompat(), startWith(Future.loading<Page<Album>>())),
+        this.playlistService.findByArtist(artistId, new Pageable(0, 12)).pipe(startWith(Future.loading<Page<Playlist>>())),
       ])), 
       // Map future
-      map(([artistRequest, albumsRequest, featAlbumsRequest]): [Future<SCNGXTracklist<Artist>>, Future<Page<Album>>, Future<Page<Album>>] => ([
+      map(([artistRequest, albumsRequest, featAlbumsRequest, featPlaylistsRequest]): [Future<SCNGXTracklist<Artist>>, Future<Page<Album>>, Future<Page<Album>>, Future<Page<Playlist>>] => ([
         {
           ...artistRequest,
           data: this.tracklistBuilder.forArtistTop(artistRequest.data, 5)
         },
         albumsRequest,
-        featAlbumsRequest
+        featAlbumsRequest,
+        featPlaylistsRequest
       ]))),
     this.player.$current.pipe(takeUntil(this._destroy)),
     this.player.$isPaused.pipe(takeUntil(this._destroy))
   ]).pipe(
     // Build props object
-    map(([[tracklistRequest, albumsRequest, featAlbumsRequest], currentItem, isPaused]): ArtistInfoProps => ({
+    map(([[tracklistRequest, albumsRequest, featAlbumsRequest, featPlaylistsRequest], currentItem, isPaused]): ArtistInfoProps => ({
       loading: tracklistRequest.loading,
       artist: tracklistRequest.data?.context,
       currentlyPlaying: currentItem,
       playing: !isPaused && currentItem?.tracklist?.id == tracklistRequest.data?.id,
       tracklist: tracklistRequest.data,
       albums: albumsRequest,
-      featAlbums: featAlbumsRequest
+      featAlbums: featAlbumsRequest,
+      featPlaylists: featPlaylistsRequest
     })),
   );
 
@@ -100,7 +104,7 @@ export class ArtistProfileComponent implements OnInit, OnDestroy {
   }
 
   public forcePlay(tracklist: SCNGXTracklist) {
-    this.player.playTracklist(tracklist, true);
+    this.player.playTracklist(tracklist, true).subscribe();
   }
 
 }

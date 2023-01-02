@@ -70,7 +70,7 @@ export class CollectionComponent implements OnInit, OnDestroy {
   }
 
   public forcePlay(tracklist: SCNGXTracklist<LikedSong>) {
-    // this.player.playTracklist(tracklist, true);
+    this.player.playTracklist(tracklist, true).subscribe();
   }
 
   public removeFromCollection(likedSong: LikedSong, tracklist: SCNGXTracklist<LikedSong>) {

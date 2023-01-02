@@ -1,6 +1,7 @@
 <ng-container *ngIf="($props | async) as props">
-    <cdk-virtual-scroll-viewport [itemSize]="56" class="w-full h-full overflow-x-hidden border border-red-600">
-        <app-error404 *ngIf="!props.loading && !props.artist"></app-error404>
+    <app-error404 *ngIf="!props.loading && !props.artist"></app-error404>
+
+    <cdk-virtual-scroll-viewport [itemSize]="56" class="w-full h-full overflow-x-hidden" *ngIf="props.loading || props.artist">
 
         <!-- Page Header -->
         <app-list-view [resource]="props.artist" [title]="props.artist?.name" [isLoading]="props.loading" [artwork]="props.artist?.artwork">
@@ -79,11 +80,11 @@
                 </scngx-horizontal-list>
             </scngx-ui-row>
         
-                <scngx-ui-row [headline]="'Enthalten in'" [route]="['./playlists']" *ngIf="featPlaylists.length > 0">
+                <scngx-ui-row [headline]="'Enthalten in'" [route]="['./playlists']" *ngIf="props.featPlaylists.data?.elements?.length > 0">
                     <div class="w-full">
                         <scngx-horizontal-list>
                             <scngx-playlist-grid-item
-                                *ngFor="let item of featPlaylists"
+                                *ngFor="let item of props.featPlaylists.data?.elements"
                                 [item]="item"
                                 [routerLink]="['/playlist', item?.slug ?? item?.id]">
                             </scngx-playlist-grid-item>

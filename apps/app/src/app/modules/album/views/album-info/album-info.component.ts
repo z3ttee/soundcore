@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { combineLatest, map, Observable, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
+import { combineLatest, map, Observable, of, Subject, switchMap, takeUntil } from 'rxjs';
 import { Album, Future, Page, SCDKAlbumService, toFutureCompat } from '@soundcore/sdk';
 import { SCNGXTracklist, SCNGXTracklistBuilder } from '@soundcore/ngx';
 import { AppPlayerService } from 'src/app/modules/player/services/player.service';
@@ -108,7 +108,7 @@ export class AlbumInfoComponent implements OnInit, OnDestroy {
   }
 
   public forcePlay(tracklist: SCNGXTracklist) {
-    this.player.playTracklist(tracklist, true);
+    this.player.playTracklist(tracklist, true).subscribe();
   }
 
 }

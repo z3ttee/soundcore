@@ -61,7 +61,7 @@ export class PlaylistService {
     }
 
     public async findPlaylistByIdWithInfo(playlistId: string): Promise<Playlist> {
-        return this.playlistRepository.findOne({ where: { id: playlistId }, relations: ["artwork", "author", "collaborators"]})
+        return this.playlistRepository.findOne({ where: { id: playlistId }, relations: ["artwork", "author"]})
     }
 
     /**
@@ -83,11 +83,11 @@ export class PlaylistService {
     }
 
     public async findPlaylistByIdWithCollaborators(playlistId: string): Promise<Playlist> {
-        return this.playlistRepository.findOne({ where: { id: playlistId }, relations: ["collaborators", "author"]})
+        return this.playlistRepository.findOne({ where: { id: playlistId }, relations: ["author"]})
     }
 
     public async findPlaylistByIdWithRelations(playlistId: string): Promise<Playlist> {
-        return this.playlistRepository.findOne({ where: { id: playlistId }, relations: ["artwork", "author", "collaborators", "items", "items.song"]})
+        return this.playlistRepository.findOne({ where: { id: playlistId }, relations: ["artwork", "author", "items", "items.song"]})
     }
 
     /**
@@ -159,12 +159,10 @@ export class PlaylistService {
             .leftJoin("playlist.items", "item")
             .leftJoin("item.song", "song")
             .leftJoin("song.primaryArtist", "primaryArtist")
-
-            // TODO: Include featured artists
+            .leftJoin("song.featuredArtists", "featuredArtist")
 
             .leftJoinAndSelect("playlist.author", "author")
             .leftJoinAndSelect("playlist.artwork", "artwork")
-            .leftJoin("playlist.collaborators", "collaborator")
             .leftJoin("playlist.likedBy", "likedByUser", "likedByUser.userId = :userId", { userId: authentication.id })
 
             // Pagination
@@ -174,7 +172,9 @@ export class PlaylistService {
             // Count how many likes. This takes user's id in count
             .loadRelationCountAndMap("playlist.liked", "playlist.likedBy", "likedBy", (qb) => qb.where("likedBy.userId = :userId", { userId: authentication.id }))
 
-            .where("(primaryArtist.id = :primaryArtistId OR primaryArtist.slug = :primaryArtistId) AND (playlist.privacy = :privacy OR author.id = :authorId OR collaborator.id = :authorId OR (likedByUser.userId = :authorId AND playlist.privacy != 'private'))", { artistId: artistId, privacy: PlaylistPrivacy.PUBLIC.toString(), authorId: authentication.id })
+            // .where("(primaryArtist.id = :primaryArtistId OR primaryArtist.slug = :primaryArtistId) AND (playlist.privacy = :privacy OR author.id = :authorId OR collaborator.id = :authorId OR (likedByUser.userId = :authorId AND playlist.privacy != 'private'))", { artistId: artistId, privacy: PlaylistPrivacy.PUBLIC.toString(), authorId: authentication.id })
+            .where("primaryArtist.id = :primaryArtistId OR primaryArtist.slug = :primaryArtistId OR featuredArtist.id = :featuredArtistId OR featuredArtist.slug = :featuredArtistId", { primaryArtistId: artistId, featuredArtistId: artistId })
+            .andWhere("(author.id = :authorId OR author.slug = :authorId OR playlist.privacy = :privacy)", { authorId: authentication?.id, privacy: PlaylistPrivacy.PUBLIC.toString() })
             .getManyAndCount();
 
         return Page.of(result[0], result[1], pageable.offset);

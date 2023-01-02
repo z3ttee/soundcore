@@ -65,7 +65,7 @@ export class PlaylistInfoComponent implements OnInit, OnDestroy {
 
   public forcePlay(tracklist: SCNGXTracklist) {
     if(!tracklist) return;
-    this.player.playTracklist(tracklist, true);
+    this.player.playTracklist(tracklist, true).pipe(takeUntil(this._destroy)).subscribe();
   }
 
 }
