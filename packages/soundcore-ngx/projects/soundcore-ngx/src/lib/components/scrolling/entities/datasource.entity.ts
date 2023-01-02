@@ -1,7 +1,7 @@
 import { CollectionViewer, DataSource } from "@angular/cdk/collections";
 import { HttpClient } from "@angular/common/http";
 import { Page, Pageable, toFuture } from "@soundcore/sdk";
-import { BehaviorSubject, catchError, combineLatest, filter, map, Observable, of, Subject, Subscription, takeUntil, tap } from "rxjs";
+import { BehaviorSubject, catchError, combineLatest, filter, map, Observable, of, startWith, Subject, Subscription, takeUntil, tap } from "rxjs";
 
 export type SCNGXDatasourceFreeHandler = () => boolean;
 
@@ -24,7 +24,7 @@ export abstract class SCNGXBaseDatasource<T = any> extends DataSource<T> {
     public readonly $destroyed: Observable<void> = this._destroy.asObservable();
     public readonly $totalSize: Observable<number> = this._totalSizeSubject.asObservable();
     public readonly $empty: Observable<boolean> = combineLatest([ 
-        this.$ready.pipe(filter((isReady) => isReady), takeUntil(this._destroy)),  
+        this.$ready.pipe(filter((isReady) => isReady), startWith(false), takeUntil(this._destroy)),  
         this.$totalSize.pipe(takeUntil(this._destroy))
     ]).pipe(map(([_, totalSize]) => totalSize <= 0));
 

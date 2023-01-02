@@ -29,6 +29,11 @@ export class SCNGXTracklist<T = any, C = any> extends SCNGXBaseDatasource<SCNGXT
         } else {
             TRACKLIST_REGISTRY.set(this.id, this);
         }
+
+        this.$destroyed.subscribe(() => {
+            TRACKLIST_REGISTRY.delete(this.id);
+            console.log(`Tracklist destroyed.`);
+        });
     }
 
     public get id(): string {
@@ -207,8 +212,6 @@ export class SCNGXTracklist<T = any, C = any> extends SCNGXBaseDatasource<SCNGXT
                 TRACKLIST_REGISTRY.delete(this.assocResId);
                 // Trigger destroy
                 this.destroy();
-
-                console.log(`Tracklist destroyed.`);
             } else {
                 console.warn(`Tracklist not destroyed.`);
             }

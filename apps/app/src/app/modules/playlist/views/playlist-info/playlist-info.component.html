@@ -22,7 +22,7 @@
                     <ng-template #paused><img *ngIf="props.playing" class="w-7 h-7 text-body ml-0.5" src="assets/icons/pause.svg"></ng-template>
                 </scngx-ibtn>
         
-                <button class="flex items-center p-2 rounded-full" matRipple [matRippleCentered]="true">
+                <button class="flex items-center p-2 rounded-full" matRipple [matRippleCentered]="true" *ngIf="props.playlist?.author?.id != props.currentUser?.id">
                     <hero-icon [name]="'heart'" [class]="'h-7 aspect-square'"></hero-icon>
                 </button>
         
@@ -32,8 +32,8 @@
             </ng-container>
         </app-list-view>
 
-        <div *ngIf="(props.tracklist?.$empty | async)">
-            Diese Playlist beinhaltet keine Songs.
+        <div *ngIf="(props.tracklist?.$empty | async)" class="px-window">
+            <p>Diese Playlist beinhaltet keine Songs.</p>
         </div>
         
         <div *cdkVirtualFor="let item of props.tracklist; index as i" class="px-window">
