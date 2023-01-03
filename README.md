@@ -29,11 +29,8 @@ Please make sure you have docker compose installed.
 
 ```
 
-<<<<<<< HEAD
+## Concept Art
+
 ![Soundcore Home Page](./concept_art/Front%20page.png)
 
 ### Tech Stack
-
-
-=======
->>>>>>> feat/soundcore@next
