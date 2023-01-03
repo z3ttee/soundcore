@@ -1,64 +1,28 @@
 {
-  "name": "alliance-soundcore",
+  "name": "soundcore",
   "version": "0.0.0",
-  "scripts": {
-    "ng": "ng",
-    "start": "ng serve",
-    "start:prod": "ng serve --watch --configuration production",
-    "build": "npm run build:sdk && ng build --configuration production",
-    "build:sdk": "ng build soundcore-sdk",
-    "build:sdk:watch": "ng build soundcore-sdk --watch",
-    "watch": "ng build --watch --configuration development",
-    "test": "ng test"
-  },
   "private": true,
-  "dependencies": {
-    "@angular/animations": "~13.3.1",
-    "@angular/cdk": "^13.3.2",
-    "@angular/common": "~13.3.1",
-    "@angular/compiler": "~13.3.1",
-    "@angular/core": "~13.3.1",
-    "@angular/forms": "~13.3.1",
-    "@angular/material": "~13.3.2",
-    "@angular/platform-browser": "~13.3.1",
-    "@angular/platform-browser-dynamic": "~13.3.1",
-    "@angular/router": "~13.3.1",
-    "@fortawesome/fontawesome-free": "^6.0.0-beta3",
-    "@ngneat/overview": "^3.0.2",
-    "@ngrx/store": "^13.1.0",
-    "@tailwindcss/line-clamp": "^0.3.0",
-    "dexie": "^4.0.0-alpha.1",
-    "js-cookie": "^3.0.1",
-    "keycloak-angular": "^9.1.0",
-    "lottie-web": "^5.8.1",
-    "ngx-infinite-scroll": "^10.0.1",
-    "ngx-lottie": "^8.0.1",
-    "rxjs": "~7.4.0",
-    "socket.io-client": "^4.4.0",
-    "soundcore-sdk": "file:projects/soundcore-sdk",
-    "tslib": "^2.3.0",
-    "uuid": "^8.3.2",
-    "zone.js": "~0.11.4"
+  "workspaces": [
+    "apps/*",
+    "config/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "build:api": "turbo run build:api",
+    "build:app": "turbo run build:app",
+    "dockerize:api": "turbo run dockerize:api && docker builder prune -a -f && docker build --tag z3ttee/soundcore:latest .",
+    "compose:dev": "docker-compose --file=docker-compose.dev.yml up -d",
+    "dev": "turbo run dev --parallel",
+    "lint": "turbo run lint",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\""
   },
   "devDependencies": {
-    "@angular-devkit/build-angular": "~13.3.1",
-    "@angular/cli": "~13.3.1",
-    "@angular/compiler-cli": "~13.3.1",
-    "@angular/localize": "^13.3.1",
-    "@types/jasmine": "~3.10.0",
-    "@types/js-cookie": "^3.0.1",
-    "@types/node": "^12.11.1",
-    "@types/tailwindcss": "^2.2.4",
-    "autoprefixer": "^10.4.0",
-    "jasmine-core": "~3.10.0",
-    "karma": "~6.3.0",
-    "karma-chrome-launcher": "~3.1.0",
-    "karma-coverage": "~2.0.3",
-    "karma-jasmine": "~4.0.0",
-    "karma-jasmine-html-reporter": "~1.7.0",
-    "ng-packagr": "^13.0.0",
-    "postcss": "^8.4.5",
-    "tailwindcss": "^3.0.2",
-    "typescript": "~4.4.3"
-  }
+    "eslint-config-custom": "*",
+    "prettier": "latest",
+    "turbo": "latest"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "packageManager": "yarn@1.22.19"
 }

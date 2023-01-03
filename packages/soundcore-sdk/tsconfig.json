@@ -1,0 +1,7 @@
+{
+  "extends": "tsconfig/angular",
+  "compilerOptions": {
+    "baseUrl": "./",
+    "outDir": "./dist/out-tsc"
+  }
+}

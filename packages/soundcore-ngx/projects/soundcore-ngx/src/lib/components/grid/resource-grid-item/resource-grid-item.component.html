@@ -1,0 +1,14 @@
+<div 
+[style.width.px]="itemWidth"
+[style.minHeight.px]="minItemHeight"
+class="select-none transition-all rounded-md shadow-sm overflow-hidden h-full cursor-pointer w-full bg-body-light bg-opacity-60 border will-change-transform border-body-light border-opacity-0 transform-gpu hover:border-opacity-100 hover:bg-opacity-40 active:bg-opacity-20 [&>*]:active:scale-[98%]">
+    <div class="flex flex-1 flex-col p-4 text-center w-full h-full will-change-transform transition-all">
+        <div class="relative inline-flex justify-center items-center w-full overflow-hidden">
+            <ng-content select="[scngx-artwork]"></ng-content>
+        </div>
+    
+        <div class="overflow-hidden text-left pt-4">
+            <ng-content></ng-content>
+        </div>
+    </div>
+</div>

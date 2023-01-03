@@ -1,0 +1,10 @@
+<scngx-resource-grid-item>
+    <scngx-artwork class="w-full aspect-square rounded-full overflow-hidden" [artwork]="item?.artwork" scngx-artwork></scngx-artwork>
+
+    <p class="font-bold line-clamp-3 break-words text-center">{{ item?.name || "Unbekannter Künstler" }}</p>
+    <div class="line-clamp-1 opacity-60 text-center">
+        <ul>
+            <li class="text-sm font-normal">Künstler</li>
+        </ul>
+    </div>
+</scngx-resource-grid-item>

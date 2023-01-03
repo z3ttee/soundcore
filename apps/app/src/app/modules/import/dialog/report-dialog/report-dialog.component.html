@@ -1,0 +1,49 @@
+<ng-container *ngIf="($props | async) as props">
+    <scngx-dialog title="Import Bericht">
+    
+        <div class="w-full h-full" scngx-dialog-content>
+            <cdk-virtual-scroll-viewport [itemSize]="56" class="w-full h-96">
+                <div class="block w-full p-4 rounded-sm bg-error bg-opacity-30 border border-error-dark" *ngIf="props.error">
+                    <p class="text-font">{{ props.error.message }}</p>
+                </div>
+        
+                <div class="flex items-center justify-start overflow-auto gap-2" *ngIf="props.loading; else reportStats">
+                    <scngx-skeleton [class]="'w-24 h-8 rounded-full'"></scngx-skeleton>
+                    <scngx-skeleton [class]="'w-24 h-8 rounded-full'"></scngx-skeleton>
+                    <scngx-skeleton [class]="'w-24 h-8 rounded-full'"></scngx-skeleton>
+                </div>
+    
+                <ng-template #reportStats>
+                    <div class="flex items-center justify-start overflow-auto gap-2">    
+                        <span class="bg-body-light rounded-full border border-body-lighter py-2 px-4 text-xs">Benötigte Zeit: {{ props.task.stats.timeTookMs }}ms</span>
+                        <span class="bg-body-light rounded-full border border-body-lighter py-2 px-4 text-xs">Status: {{ props.task.status | taskStatusPipe }}</span>
+                        <span class="bg-body-light rounded-full border border-body-lighter py-2 px-4 text-xs">Importiert: {{ props.task.stats.importedAmount }}/{{ props.task.stats.total }}</span>
+                    </div>
+                </ng-template>
+        
+                <div class="mt-row">
+                    <h6>Nicht importiert:</h6>
+
+                    <div *cdkVirtualFor="let item of props.report?.data?.notImportedSongs; index as i" class="flex flex-1 items-center justify-start gap-6 px-2 my-2" [style.height]="'36px'">
+                        <div class="flex-grow">
+                            <p class="text-sm line-clamp-1 break-words">{{ item?.title }}</p>
+                            <p class="text-xs line-clamp-1 break-words opacity-60">{{ item?.artists?.join(", ") }}</p>
+                        </div>
+    
+                        <div class="min-w-32 w-32 hidden lg:block">
+                            <p class="text-sm line-clamp-1 break-words">{{ item?.album }}</p>
+                        </div>
+    
+                        <div class="min-w-32 w-32">
+                            <p class="text-sm">{{ item?.reason | failedReasonPipe }}</p>
+                        </div>
+                    </div>
+                </div>
+            </cdk-virtual-scroll-viewport>
+        </div>
+    
+        <div scngx-dialog-footer>
+            <scngx-btn-text (click)="dialogRef.close(null)">OK</scngx-btn-text>
+        </div>
+    </scngx-dialog>
+</ng-container>

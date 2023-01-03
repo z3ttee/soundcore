@@ -1,4 +1,0 @@
-<button class="outline-none will-change-transform text-xxs rounded-full w-8 h-8 sm:w-10 sm:h-10 inline-flex justify-center items-center bg-accent-dark text-background transform-gpu transition-all active:scale-[97%]" [ngClass]="{'hover:scale-105': ($isDesktop | async), 'w-10 h-10 sm:w-12 sm:h-12': mode == 'lg'}">
-    <i class="fa-solid fa-play" *ngIf="($isPaused | async)"></i>
-    <i class="fa-solid fa-pause" *ngIf="!($isPaused | async)"></i>
-</button>

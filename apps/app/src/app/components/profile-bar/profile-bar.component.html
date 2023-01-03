@@ -1,0 +1,18 @@
+<div class="flex items-center gap-2 p-window cursor-pointer select-none relative" (mouseenter)="onMouseEnter($event)" (mouseleave)="onMouseLeave($event)">
+    <div class="flex items-center justify-center min-w-11 max-w-11 h-11 bg-body-light rounded-full">
+
+    </div>
+    <div class="w-full">
+        <p class="text-sm text-font-secondary -mb-0.5">Angemeldet als</p>
+        <p class="font-semi">{{ user?.name || user?.id }}</p>
+    </div>
+    <div class="flex items-center justify-center min-w-10 max-w-10 h-10 rounded-full">
+        <span class="transition-all will-change-transform inline-flex justify-center items-center" [ngClass]="{'transform-gpu rotate-180': showOverlay}"><hero-icon [name]="'chevron-down'" [class]="'h-5 w-5'"></hero-icon></span>
+    </div>
+
+    <div #profileRef class="absolute block w-full p-2 left-0 right-0 top-0 transform-gpu -translate-y-[85%] scale-95 opacity-0 will-change-transform transition-all pointer-events-none" [ngClass]="{'pointer-events-auto select-none scale-100 opacity-100': showOverlay }">
+        <div class="bg-body rounded p-2.5 cursor-default">
+            <ng-content></ng-content>
+        </div>
+    </div>
+</div>

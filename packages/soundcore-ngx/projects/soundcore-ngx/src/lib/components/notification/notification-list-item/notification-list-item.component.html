@@ -1,0 +1,29 @@
+<div class="block w-full p-4 rounded bg-body-light bg-opacity-40 shadow-sm border border-body-lighter border-opacity-50 relative hover:bg-opacity-60 overflow-hidden">
+    <div class="flex items-start gap-8 w-full">
+        <div class="min-w-24 max-w-24">
+            <div class="w-full aspect-square bg-body-light rounded-full">
+                <img src="assets/favicon.png" alt="" class="w-full h-full inline-block p-2">
+            </div>
+
+            <div class="mt-2 text-center">
+                <p class="text-sm text-font-secondary">
+                    von {{ notification.sender?.name || 'Soundcore' }}
+                </p>
+            </div>
+        </div>
+
+        <div class="w-full overflow-hidden">
+            <p class="text-xs text-font-secondary font-light">{{ notification.sentAt | date:"HH:mm 'Uhr -' dd.MM.yyyy" }}</p>
+            <h6 class="text-font text-opacity-90 my-2 line-clamp-1">Freundschaftsanfrage</h6>
+            <p class="text-font text-opacity-60 my-2 break-words">%username% möchte mit dir befreundet sein. Sobald du akzeptierst werdet ihr euch gegenseitig in den Aktivitäten angezeigt.</p>
+        </div>
+
+        <span class="absolute top-2 left-2 h-4 w-4 bg-info-dark rounded-full shadow-sm transform-gpu animate-ping"></span>
+        <span class="absolute top-2 left-2 h-4 w-4 bg-info-dark rounded-full shadow-sm transform-gpu"></span>
+    </div>
+
+    <div class="flex items-stretch md:items-center justify-end w-full gap-1 md:gap-4 mt-row">
+        <button class="w-1/2 md:w-min py-2 px-0 md:px-8 rounded-sm transition-all bg-success-dark bg-opacity-20 border border-success-dark border-opacity-40 hover:bg-opacity-30 active:bg-opacity-40">Annehmen</button>
+        <button class="w-1/2 md:w-min py-2 px-0 md:px-8 rounded-sm transition-all bg-error-dark bg-opacity-20 border border-error-dark border-opacity-40 hover:bg-opacity-30 active:bg-opacity-40">Ablehnen</button>
+    </div>
+</div>

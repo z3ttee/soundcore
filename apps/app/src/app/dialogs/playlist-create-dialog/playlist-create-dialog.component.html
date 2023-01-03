@@ -1,0 +1,39 @@
+<scngx-dialog title="Playlist erstellen">
+    <form class="py-2" scngx-dialog-content [formGroup]="form">
+        <div class="block w-full p-4 rounded-sm bg-error bg-opacity-30 border border-error-dark" *ngIf="errorMessage">
+            <p class="text-font">{{ errorMessage }}</p>
+        </div>
+
+        <div class="inline-block w-full my-row">
+            <mat-form-field appearance="outline" color="accent" class="w-full">
+                <mat-label>Titel der Playlist</mat-label>
+                <input matInput #title formControlName="title" maxlength="120" minlength="3">
+                <mat-hint align="end"><span class="text-xs">{{title.value?.length || 0}}/120</span></mat-hint>
+                <mat-error *ngIf="form.hasError('required', ['title'])"><span class="text-xs">Bitte gib einen Titel an</span></mat-error>
+            </mat-form-field>
+        </div>
+
+        <div class="inline-block w-full">
+            <mat-form-field appearance="outline" color="accent" class="w-full">
+                <mat-label>Beschreibung</mat-label>
+                <textarea matInput #description formControlName="description" rows="3" minlength="0" maxlength="254"></textarea>
+                <mat-hint align="end"><span class="text-xs">{{description.value?.length || 0}}/254</span></mat-hint>
+            </mat-form-field>
+        </div>
+
+        <div class="inline-block w-full">
+            <mat-form-field appearance="outline" color="accent" class="w-full">
+                <mat-label>Sichtbarkeit</mat-label>
+                <mat-select formControlName="privacy">
+                    <mat-option value="public">Öffentlich</mat-option>
+                    <mat-option value="not_listed">Nicht gelistet</mat-option>
+                    <mat-option value="private">Privat</mat-option>
+                </mat-select>
+            </mat-form-field>
+        </div>
+    </form>
+    <div scngx-dialog-footer>
+        <scngx-btn-text (click)="dialogRef.close(null)">Abbrechen</scngx-btn-text>
+        <scngx-lbtn-outlined appearance="success" [loading]="loading" (click)="submit()" [disabled]="form.invalid">Erstellen</scngx-lbtn-outlined>
+    </div>
+</scngx-dialog>

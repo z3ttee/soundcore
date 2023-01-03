@@ -1,0 +1,25 @@
+<scngx-dialog title="Wähle eine Playlist">
+    <div class="py-2" scngx-dialog-content #parent>
+        <div class="block w-full p-4 rounded-sm bg-error bg-opacity-30 border border-error-dark" *ngIf="errorMessage">
+            <p class="text-font">{{ errorMessage }}</p>
+        </div>
+
+        <scngx-btn-outlined (click)="openCreatePlaylistDialog()" class="w-full" size="md" [fullWidth]="true">
+            <hero-icon name="plus" [class]="'h-5 w-5'"></hero-icon>
+            <span>Playlist erstellen</span>
+        </scngx-btn-outlined>
+
+        <div class="w-full my-row"></div>
+
+        <!-- Playlist list -->
+        <app-generic-resource-list-item 
+            *ngFor="let playlist of ($playlists | async)" 
+            [resource]="playlist"
+            (click)="choosePlaylist(playlist)">
+        </app-generic-resource-list-item>
+                
+    </div>
+    <div scngx-dialog-footer>
+        <scngx-btn-text (click)="dialogRef.close(null)">Abbrechen</scngx-btn-text>
+    </div>
+</scngx-dialog>

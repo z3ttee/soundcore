@@ -1,0 +1,15 @@
+<div class="px-window pt-window w-full h-full">
+    <cdk-virtual-scroll-viewport [itemSize]="64" class="w-full h-full overflow-x-hidden">
+        <div class="mb-row">
+            <scngx-ui-title>
+                Speicherzonen
+                <div scngxSubtitle>Verwalte hier die einzelnen Speicherzonen.</div>
+            </scngx-ui-title>
+        </div>
+    
+        <div *cdkVirtualFor="let bucket of datasource">
+            <app-bucket-list-item [routerLink]="bucket ? [bucket?.slug ?? bucket?.id] : null" [bucket]="bucket"></app-bucket-list-item>
+        </div>
+    
+    </cdk-virtual-scroll-viewport>
+</div>

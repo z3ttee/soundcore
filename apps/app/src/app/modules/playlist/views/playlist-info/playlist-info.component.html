@@ -1,0 +1,61 @@
+<ng-container *ngIf="($props | async) as props">
+
+    <cdk-virtual-scroll-viewport [itemSize]="56" [minBufferPx]="300" [maxBufferPx]="400" class="w-full h-full overflow-x-hidden">
+        <app-error404 *ngIf="!props.loading && !props.playlist" [title]="'Playlist nicht gefunden'"></app-error404>
+
+        <app-list-view [resource]="props.playlist" [title]="props.playlist?.name" [isLoading]="props.loading" [artwork]="props.playlist?.artwork">
+            <ng-container scngx-stats>
+                <li class="text-font-secondary">
+                    <span *ngIf="props.playlist?.author">by <span class="hover:underline cursor-pointer" [routerLink]="['/profile', props.playlist?.author?.slug || props.playlist?.author?.id]">{{ props.playlist?.author?.name }}</span></span>
+                </li>
+                <li class="text-font-secondary">
+                    <span>{{ props.playlist?.songsCount }} {{ props.playlist?.songsCount != 1 ? 'Songs' : 'Song' }}</span>
+                </li>
+                <li class="text-font-secondary">
+                    <span>{{ props.playlist?.totalDuration | scngxSongDurationPipe }} min</span>
+                </li>
+            </ng-container>
+        
+            <ng-container scngx-controls>
+                <scngx-ibtn (click)="forcePlay(props.tracklist)" size="md">
+                    <img *ngIf="!props.playing; else paused" class="w-7 h-7 text-body ml-0.5" src="assets/icons/play.svg">
+                    <ng-template #paused><img *ngIf="props.playing" class="w-7 h-7 text-body ml-0.5" src="assets/icons/pause.svg"></ng-template>
+                </scngx-ibtn>
+        
+                <button class="flex items-center p-2 rounded-full" matRipple [matRippleCentered]="true" *ngIf="props.playlist?.author?.id != props.currentUser?.id">
+                    <hero-icon [name]="'heart'" [class]="'h-7 aspect-square'"></hero-icon>
+                </button>
+        
+                <button class="flex items-center p-2 rounded-full" matRipple [matRippleCentered]="true">
+                    <hero-icon [name]="'dots-vertical'" [class]="'h-7 aspect-square'"></hero-icon>
+                </button>
+            </ng-container>
+        </app-list-view>
+
+        <div *ngIf="(props.tracklist?.$empty | async)" class="px-window">
+            <p>Diese Playlist beinhaltet keine Songs.</p>
+        </div>
+        
+        <div *cdkVirtualFor="let item of props.tracklist; index as i" class="px-window">
+            <scngx-song-list-item 
+                [song]="item?.song" 
+                [index]="i" 
+                [active]="props.currentlyPlaying?.song?.id == item?.song?.id"
+                [playing]="props.playing"
+                [animRef]="lottieAnimationTemplate">
+            </scngx-song-list-item>
+        </div>
+
+        <div class="pb-bottom"></div>
+    </cdk-virtual-scroll-viewport>
+</ng-container>
+
+<ng-template #lottieAnimationTemplate>
+    <ng-lottie [options]="animOptions" class="aspect-square"></ng-lottie>
+</ng-template>
+
+<!-- <ng-template #songContextMenu let-data>
+    <app-song-context-menu [song]="data.song" [pla]>
+        
+    </app-song-context-menu>
+</ng-template> -->

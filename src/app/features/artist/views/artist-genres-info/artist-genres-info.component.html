@@ -1,6 +1,0 @@
-<asc-playlist-view mode="titleOnly" [options]="{ type: 'collection', title: 'Lieder von ' + artist?.name + ' aus ' + genre?.name, color: artist?.artwork?.accentColor }" *ngIf="!!artist">
-    <!-- Page contents -->
-    <div asc-contents>
-        <asc-song-list [dataSource]="$songs" [showMore]="true" [showCover]="false" [showDate]="false" (onMore)="findSongs()" [showMore]="($songs | async).length < totalElements"></asc-song-list>
-    </div>
-</asc-playlist-view>

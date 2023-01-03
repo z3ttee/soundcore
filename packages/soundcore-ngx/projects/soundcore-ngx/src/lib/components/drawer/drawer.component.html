@@ -1,0 +1,12 @@
+<div class="flex w-full relative h-full overflow-hidden">
+    <div class="min-w-[280px] max-w-[280px] h-full bg-body-dark z-50 transform-gpu transition-all" [ngClass]="{'drawer-mode-over': computedMode == 'over', 'drawer-mode-push': computedMode == 'push', 'drawer-not-collapsed': !isCollapsed, 'drawer-collapsed': isCollapsed && computedMode == 'push' }">
+        <div class="inline-block w-full h-full relative">
+            <ng-content select="[scngx-drawer]"></ng-content>
+        </div>
+    </div>
+
+    <div class="w-full h-full relative overflow-hidden z-20">
+        <div class="absolute w-full h-full top-0 left-0 overflow-hidden bg-body-dark bg-opacity-0 z-40 pointer-events-none transition-all" [ngClass]="{'bg-opacity-50 pointer-events-auto select-none': computedMode == 'over' && !isCollapsed, 'hidden': !hasBackdrop}" (click)="handleDismiss()"></div>
+        <ng-content select="[scngx-content]"></ng-content>
+    </div>
+</div>

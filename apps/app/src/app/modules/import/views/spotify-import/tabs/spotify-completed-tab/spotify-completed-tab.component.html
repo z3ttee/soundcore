@@ -1,0 +1,15 @@
+<div class="h-full w-full overflow-hidden pt-4 px-4">
+    <cdk-virtual-scroll-viewport class="w-full h-full overflow-x-hidden" [itemSize]="56">
+        <div class="flex flex-1 items-center justify-start pb-2">
+            <h6 class="text-inherit flex-grow">Abgeschlossene Imports</h6>
+        </div>
+
+        <div *ngIf="datasource.$empty | async">
+            <p>Keine Imports gefunden.</p>
+        </div>
+    
+        <div *cdkVirtualFor="let item of datasource">
+            <app-spotify-import [task]="item" (openReport)="openReportDialog(item)"></app-spotify-import>
+        </div>
+    </cdk-virtual-scroll-viewport>
+</div>

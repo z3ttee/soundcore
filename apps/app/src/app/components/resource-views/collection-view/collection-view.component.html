@@ -1,0 +1,27 @@
+<ng-container *ngIf="($props | async) as props">
+    <div class="block w-full relative overflow-x-hidden px-window pt-window">
+        <div class="absolute top-0 left-0 w-full h-[90%] z-0" [style]="'background: linear-gradient(180deg, rgba(204,204,204,1) 0%, rgba(204,204,204,0) 100%);'"></div>
+    
+        <div class="relative block items-end w-full z-10 md:flex">
+            <div class="block max-w-48 sm:min-w-52 sm:max-w-52 mx-auto aspect-square rounded overflow-hidden shadow-xl">
+                <div class="w-full h-full bg-body-light rounded">
+                    <img src="assets/img/collection_cover.png"> 
+                </div>
+            </div>
+    
+            <div class="block w-full py-4 md:p-4">    
+                <h3 class="drop-shadow line-clamp-2 break-words text-xl md:text-inherit">
+                    Lieblingssongs
+                </h3>
+    
+                <ul class="flex items-center w-full mt-2 gap-4">
+                    <ng-content select="[scngx-stats]"></ng-content>
+                </ul>
+            </div>
+        </div>
+    
+        <div class="flex flex-row items-center w-full gap-2 py-4 md:py-row">
+            <ng-content select="[scngx-controls]"></ng-content>
+        </div>
+    </div>
+</ng-container>
