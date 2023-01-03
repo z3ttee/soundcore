@@ -52,7 +52,7 @@ export class UserService {
         user.id = token.sub;
         user.name = token.name ?? token.preferred_username?.trim();
 
-        return this.save(user);
+        return this.createIfNotExists(user);
     }
 
     /**
@@ -65,6 +65,18 @@ export class UserService {
             this.sync([result]);
             return result;
         });
+    }
+
+    public async createIfNotExists(user: User): Promise<User> {
+        return this.repository.createQueryBuilder("user")
+            .insert()
+            .values(user)
+            .orUpdate(["name"], ["id"], { skipUpdateIfNoValuesChanged: true })
+            .returning(["id"])
+            .execute().then((insertResult) => {
+                const id = insertResult.raw[0]?.["id"];
+                return this.findById(id);
+            });
     }
 
     /**

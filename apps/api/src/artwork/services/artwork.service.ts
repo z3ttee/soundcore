@@ -271,19 +271,6 @@ export class ArtworkService {
                         return;
                     }
 
-                    // Analyze colors from image
-                    // this.getAccentColorFromArtwork(artwork).then((colors) => {
-                    //     // TODO: artwork.colors = colors;
-
-                    //     // Save updated artwork with colors
-                    //     this.repository.save(artwork).then((result) => {
-                    //         resolve(result);
-                    //     }).catch((error) => {
-                    //         reject(error);
-                    //     })
-                    // }).catch((error) => {
-                    //     reject(error);
-                    // })
                     resolve(artwork);
                 })
             })

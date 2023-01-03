@@ -1,8 +1,8 @@
 
 export enum PlaylistPrivacy {
 
-    PUBLIC = 0,
-    NOT_LISTED = 1,
-    PRIVATE = 2
+    PUBLIC = "public",
+    NOT_LISTED = "not_listed",
+    PRIVATE = "private"
 
 }

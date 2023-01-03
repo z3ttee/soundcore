@@ -2,7 +2,7 @@
 import { BeforeInsert, BeforeUpdate, Column, CreateDateColumn, Entity, Index, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { Artist } from "../../artist/entities/artist.entity";
 import { Artwork } from "../../artwork/entities/artwork.entity";
-import { Like } from "../../collection/entities/like.entity";
+import { LikedAlbum } from "../../collection/entities/like.entity";
 import { Distributor } from "../../distributor/entities/distributor.entity";
 import { Label } from "../../label/entities/label.entity";
 import { Publisher } from "../../publisher/entities/publisher.entity";
@@ -87,8 +87,8 @@ export class Album implements Resource, Syncable, GeniusResource {
     @JoinTable({ name: "album2publisher" })
     public publishers: Publisher[];
 
-    @OneToMany(() => Like, (l) => l.album)
-    public likedBy: Like[];
+    @OneToMany(() => LikedAlbum, (l) => l.album)
+    public likedBy: LikedAlbum[];
 
     public songsCount?: number;
     public totalDuration?: number;

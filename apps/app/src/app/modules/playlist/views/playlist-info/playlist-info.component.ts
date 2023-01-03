@@ -6,11 +6,13 @@ import { AppPlayerService } from 'src/app/modules/player/services/player.service
 import { SCNGXTracklist, SCNGXTracklistBuilder } from '@soundcore/ngx';
 import { PlayerItem } from 'src/app/modules/player/entities/player-item.entity';
 import { AUDIOWAVE_LOTTIE_OPTIONS } from 'src/app/constants';
+import { SSOService, SSOUser } from '@soundcore/sso';
 
 interface PlaylistInfoProps {
   playlist?: Playlist;
   tracklist?: SCNGXTracklist;
   currentlyPlaying?: PlayerItem;
+  currentUser?: SSOUser;
 
   playing?: boolean;
   loading?: boolean;
@@ -31,6 +33,7 @@ export class PlaylistInfoComponent implements OnInit, OnDestroy {
     private readonly playlistService: SCSDKPlaylistService,
     private readonly activatedRoute: ActivatedRoute,
     private readonly tracklistBuilder: SCNGXTracklistBuilder,
+    private readonly authService: SSOService,
     private readonly player: AppPlayerService
   ) {}
 
@@ -44,15 +47,17 @@ export class PlaylistInfoComponent implements OnInit, OnDestroy {
         data: this.tracklistBuilder.forPlaylist(future.data)
       }))),
     this.player.$current.pipe(takeUntil(this._destroy)),
-    this.player.$isPaused.pipe(takeUntil(this._destroy))
+    this.player.$isPaused.pipe(takeUntil(this._destroy)),
+    this.authService.$user.pipe(takeUntil(this._destroy))
   ]).pipe(
     // Build props object
-    map(([future, currentItem, isPaused]) => ({
+    map(([future, currentItem, isPaused, currentUser]) => ({
       loading: future.loading,
       playlist: future.data?.context,
       currentlyPlaying: currentItem,
-      playing: !isPaused && currentItem?.tracklist?.assocResId == future.data?.assocResId,
-      tracklist: future.data
+      playing: !isPaused && currentItem?.tracklist?.id == future.data?.id,
+      tracklist: future.data,
+      currentUser: currentUser
     }))
   );
 
@@ -65,7 +70,7 @@ export class PlaylistInfoComponent implements OnInit, OnDestroy {
 
   public forcePlay(tracklist: SCNGXTracklist) {
     if(!tracklist) return;
-    this.player.playTracklist(tracklist, true);
+    this.player.playTracklist(tracklist, true).pipe(takeUntil(this._destroy)).subscribe();
   }
 
 }

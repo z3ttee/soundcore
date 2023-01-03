@@ -91,7 +91,6 @@ export class AppHistoryService {
 
         // Add item to history
         this._history.unshift(historyItem);
-        console.log("added to history", this._history);
 
         if(this.isActive()) {
             // Because item gets pushed

@@ -1,6 +1,6 @@
 import { BeforeInsert, BeforeUpdate, Column, CreateDateColumn, Entity, Index, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { Artwork } from "../../artwork/entities/artwork.entity";
-import { Like } from "../../collection/entities/like.entity";
+import { LikedPlaylist } from "../../collection/entities/like.entity";
 import { User } from "../../user/entities/user.entity";
 import { Resource, ResourceFlag, ResourceType } from "../../utils/entities/resource";
 import { Slug } from "@tsalliance/utilities";
@@ -34,7 +34,7 @@ export class Playlist implements Resource, Syncable {
     @Column({ nullable: true, length: 254 })
     public description: string;
 
-    @Column({ type: "smallint", nullable: false, default: 0 })
+    @Column({ nullable: false, default: "public" })
     public privacy: PlaylistPrivacy;
 
     @CreateDateColumn()
@@ -51,8 +51,8 @@ export class Playlist implements Resource, Syncable {
     @JoinColumn()
     public artwork?: Artwork;
 
-    @OneToMany(() => Like, (l) => l.playlist)
-    public likedBy: Like[];
+    @OneToMany(() => LikedPlaylist, (l) => l.playlist)
+    public likedBy: LikedPlaylist[];
 
     public songsCount?: number = 0;
 

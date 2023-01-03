@@ -1,1 +1,45 @@
-<p>collection works!</p>
+<ng-container *ngIf="($props | async) as props">
+    <app-error404 *ngIf="!props.tracklist" [title]="'Playlist nicht gefunden'"></app-error404>
+        <cdk-virtual-scroll-viewport [itemSize]="56" class="h-full w-full overflow-x-hidden" *ngIf="props.tracklist">
+            <scngx-collection-view>
+                <div scngx-stats>
+                    <li class="text-font-secondary">
+                        <span *ngIf="props.user?.name">von <span class="hover:underline cursor-pointer" [routerLink]="['/profile']">{{ props.user?.name }}</span></span>
+                    </li>
+                </div>
+
+                <div scngx-controls>
+                    <scngx-ibtn (click)="forcePlay(props.tracklist)" size="md">
+                        <img *ngIf="!props.playing; else paused" class="w-7 h-7 text-body ml-0.5" src="assets/icons/play.svg">
+                        <ng-template #paused><img *ngIf="props.playing" class="w-7 h-7 text-body ml-0.5" src="assets/icons/pause.svg"></ng-template>
+                    </scngx-ibtn>
+                </div>
+            </scngx-collection-view>
+
+            <div class="px-window">
+                <div *cdkVirtualFor="let item of props.tracklist; index as i" class="w-full max-w-full min-w-0 overflow-hidden">
+                    <scngx-song-list-item 
+                            [song]="item.song" 
+                            [index]="i" 
+                            [active]="props.currentItem?.song?.id == item.song.id"
+                            [playing]="props.playing"
+                            [addedAt]="item.likedAt"
+                            [addedBy]="item.user"
+                            [showAddedAt]="true"
+                            [animRef]="lottieAnimationTemplate" *ngIf="item"
+                            (onLike)="toggleAndRemoveFromCollection(item, props.tracklist)">
+                    </scngx-song-list-item>
+                </div>
+            </div>
+
+            <div *ngIf="(props.tracklist?.$empty | async)" class="px-window">
+                <p>Du hast bisher noch keinen Song zu deinen Lieblingssongs hinzugefügt.</p>
+            </div>
+
+            <div class="pb-bottom"></div>
+        </cdk-virtual-scroll-viewport>
+</ng-container>
+
+<ng-template #lottieAnimationTemplate>
+    <ng-lottie [options]="animOptions" class="aspect-square"></ng-lottie>
+</ng-template>

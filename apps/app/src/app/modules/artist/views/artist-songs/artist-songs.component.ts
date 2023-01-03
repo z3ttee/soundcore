@@ -1,12 +1,12 @@
-import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { combineLatest, map, Observable, Subject, switchMap, takeUntil } from 'rxjs';
-import { scngxLottieAudioWave, SCNGXTracklist, SCNGXTracklistBuilder } from '@soundcore/ngx';
-import { Artist, SCDKArtistService, toFutureCompat } from '@soundcore/sdk';
+import { Artist, SCDKArtistService, Song, toFutureCompat } from '@soundcore/sdk';
 import { AppPlayerService } from 'src/app/modules/player/services/player.service';
 import { PlayerItem } from 'src/app/modules/player/entities/player-item.entity';
-import { AnimationOptions } from 'ngx-lottie';
 import { AUDIOWAVE_LOTTIE_OPTIONS } from 'src/app/constants';
+import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
+import { SCNGXTracklist, SCNGXTracklistBuilder } from '@soundcore/ngx';
 
 interface ArtistSongsProps {
   artist?: Artist;
@@ -22,6 +22,8 @@ interface ArtistSongsProps {
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ArtistSongsComponent implements OnInit, OnDestroy {
+
+  @ViewChild("scroller") public readonly scroller: CdkVirtualScrollViewport;
 
   constructor(
     private readonly artistService: SCDKArtistService,
@@ -53,7 +55,7 @@ export class ArtistSongsComponent implements OnInit, OnDestroy {
       loading: future.loading,
       artist: future.data?.context,
       currentlyPlaying: currentItem,
-      playing: !isPaused && currentItem?.tracklist?.assocResId == future.data?.assocResId,
+      playing: !isPaused && currentItem?.tracklist?.id == future.data?.id,
       tracklist: future.data
     })),
   );
@@ -69,11 +71,11 @@ export class ArtistSongsComponent implements OnInit, OnDestroy {
   }
 
   public forcePlay(tracklist: SCNGXTracklist) {
-    this.player.playTracklist(tracklist, true);
+    this.player.playTracklist(tracklist, true).subscribe();
   }
 
   public forcePlayAtSong(tracklist: SCNGXTracklist, playAtIndex: number) {
-    this.player.playTracklist(tracklist, true, playAtIndex);
+    this.player.playTracklist(tracklist, true, playAtIndex).subscribe();
   }
 
 }

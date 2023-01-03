@@ -61,7 +61,7 @@ export class PlaylistService {
     }
 
     public async findPlaylistByIdWithInfo(playlistId: string): Promise<Playlist> {
-        return this.playlistRepository.findOne({ where: { id: playlistId }, relations: ["artwork", "author", "collaborators"]})
+        return this.playlistRepository.findOne({ where: { id: playlistId }, relations: ["artwork", "author"]})
     }
 
     /**
@@ -83,11 +83,11 @@ export class PlaylistService {
     }
 
     public async findPlaylistByIdWithCollaborators(playlistId: string): Promise<Playlist> {
-        return this.playlistRepository.findOne({ where: { id: playlistId }, relations: ["collaborators", "author"]})
+        return this.playlistRepository.findOne({ where: { id: playlistId }, relations: ["author"]})
     }
 
     public async findPlaylistByIdWithRelations(playlistId: string): Promise<Playlist> {
-        return this.playlistRepository.findOne({ where: { id: playlistId }, relations: ["artwork", "author", "collaborators", "items", "items.song"]})
+        return this.playlistRepository.findOne({ where: { id: playlistId }, relations: ["artwork", "author", "items", "items.song"]})
     }
 
     /**
@@ -116,10 +116,10 @@ export class PlaylistService {
             .leftJoin("playlist.likedBy", "likedBy")
             .leftJoin("likedBy.user", "likedByUser")
 
-            .where("author.id = :authorId", { authorId: authentication.id })
+            .where("author.id = :authorId OR (likedByUser.id = :userId AND playlist.privacy != :privacy)", { authorId: authentication.id, privacy: PlaylistPrivacy.PRIVATE, userId: authentication.id })
             // .orWhere("collaborator.id = :userId", { userId: authentication.id })
-            .orWhere("likedByUser.id = :userId", { userId: authentication.id })
-            .andWhere("playlist.privacy != :privacy", { privacy: PlaylistPrivacy.PRIVATE })
+            // .orWhere("likedByUser.id = :userId", { userId: authentication.id })
+            // .andWhere("playlist.privacy != :privacy", { privacy: PlaylistPrivacy.PRIVATE })
             .getManyAndCount();
 
         return Page.of(result[0], result[1], 0);
@@ -132,13 +132,11 @@ export class PlaylistService {
      * @param authentication User authentication object to check playlist access
      * @returns Page<Playlist>
      */
-    public async findByAuthor(authorId: string, pageable: BasePageable, authentication: User): Promise<Page<Playlist>> {
-        if(authorId == "@me" || authorId == authentication.id || authorId == authentication.slug) authorId = authentication.id;
-        
-        // TODO: Test on user profiles
+    public async findByAuthor(authorId: string, pageable: BasePageable, authentication: User): Promise<Page<Playlist>> {        
         const result = await this.playlistRepository.createQueryBuilder("playlist")
             .leftJoin("playlist.author", "author").addSelect(["author.id", "author.name", "author.slug"])
             .leftJoin("playlist.artwork", "artwork").addSelect(["artwork.id"])
+            .leftJoin("playlist.likedBy", "likedByUser")
 
             // Pagination
             .limit(pageable.limit)
@@ -147,8 +145,7 @@ export class PlaylistService {
             // Count how many likes. This takes user's id in count
             .loadRelationCountAndMap("playlist.liked", "playlist.likedBy", "likedBy", (qb) => qb.where("likedBy.userId = :userId", { userId: authentication.id }))
 
-            .where("author.id = :authorId OR author.slug = :authorId", { authorId: authorId })
-            // .orWhere("collaborator.id = :userId", { userId: authentication.id })
+            .where("playlist.privacy = '" + PlaylistPrivacy.PUBLIC.toString() + "' AND (author.id = :authorId OR author.slug = :authorId) OR (likedByUser.userId = :userId AND playlist.privacy = :privacy)", { authorId: authorId, privacy: PlaylistPrivacy.NOT_LISTED.toString(), userId: authentication.id })
             .getManyAndCount();
 
         return Page.of(result[0], result[1], pageable.offset);
@@ -159,12 +156,10 @@ export class PlaylistService {
             .leftJoin("playlist.items", "item")
             .leftJoin("item.song", "song")
             .leftJoin("song.primaryArtist", "primaryArtist")
-
-            // TODO: Include featured artists
+            .leftJoin("song.featuredArtists", "featuredArtist")
 
             .leftJoinAndSelect("playlist.author", "author")
             .leftJoinAndSelect("playlist.artwork", "artwork")
-            .leftJoin("playlist.collaborators", "collaborator")
             .leftJoin("playlist.likedBy", "likedByUser", "likedByUser.userId = :userId", { userId: authentication.id })
 
             // Pagination
@@ -174,7 +169,9 @@ export class PlaylistService {
             // Count how many likes. This takes user's id in count
             .loadRelationCountAndMap("playlist.liked", "playlist.likedBy", "likedBy", (qb) => qb.where("likedBy.userId = :userId", { userId: authentication.id }))
 
-            .where("(primaryArtist.id = :primaryArtistId OR primaryArtist.slug = :primaryArtistId) AND (playlist.privacy = :privacy OR author.id = :authorId OR collaborator.id = :authorId OR (likedByUser.userId = :authorId AND playlist.privacy != 'private'))", { artistId: artistId, privacy: PlaylistPrivacy.PUBLIC.toString(), authorId: authentication.id })
+            // .where("(primaryArtist.id = :primaryArtistId OR primaryArtist.slug = :primaryArtistId) AND (playlist.privacy = :privacy OR author.id = :authorId OR collaborator.id = :authorId OR (likedByUser.userId = :authorId AND playlist.privacy != 'private'))", { artistId: artistId, privacy: PlaylistPrivacy.PUBLIC.toString(), authorId: authentication.id })
+            .where("primaryArtist.id = :primaryArtistId OR primaryArtist.slug = :primaryArtistId OR featuredArtist.id = :featuredArtistId OR featuredArtist.slug = :featuredArtistId", { primaryArtistId: artistId, featuredArtistId: artistId })
+            .andWhere("(author.id = :authorId OR author.slug = :authorId OR playlist.privacy = :privacy)", { authorId: authentication?.id, privacy: PlaylistPrivacy.PUBLIC.toString() })
             .getManyAndCount();
 
         return Page.of(result[0], result[1], pageable.offset);

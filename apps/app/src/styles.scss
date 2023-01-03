@@ -80,3 +80,16 @@ h6 {
 ::-webkit-scrollbar-track {
     @apply bg-transparent;
 }
+
+/**
+[]=============================[]
+    Fix horizontal scroll 
+    inside virtual scroll 
+    viewport
+[]=============================[]
+*/
+cdk-virtual-scroll-viewport {  
+    .cdk-virtual-scroll-content-wrapper {
+        max-width: 100% !important;
+    }
+}

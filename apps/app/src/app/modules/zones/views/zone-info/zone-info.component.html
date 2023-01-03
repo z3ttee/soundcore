@@ -1,57 +1,63 @@
-<section class="w-full h-full select-none" #page>
-    <app-error404 *ngIf="!($loading | async) && !($zone | async)"></app-error404>
+<ng-container *ngIf="($props | async) as props">
+    <cdk-virtual-scroll-viewport [itemSize]="64" class="w-full h-full overflow-x-hidden">
+        <app-error404 *ngIf="!props.loading && !props.zone"></app-error404>
 
-    <scngx-infinite-list class="w-full h-full" [dataSource]="dataSource" [parentScroll]="page" #list>
-        <ng-container scngx-content>
-            <div class="w-full p-window pb-0" #page *ngIf="($loading | async) || !!($zone | async)">
-                <!-- Title Row -->
-                <div class="w-full mb-row">
-                    <p class="uppercase text-sm text-font-secondary">Speicherzone</p>
-                    <scngx-skeleton [class]="'h-10 w-96 mt-1'" *ngIf="($loading | async)"></scngx-skeleton>
-                    <h4 class="cursor-text select-text" *ngIf="!($loading | async)">{{ ($zone | async)?.name }}</h4>
+        <div class="w-full p-window pb-0" #page *ngIf="props.loading || props.zone">
+            <div class="w-full mb-row">
+                <div class="flex flex-col" *ngIf="props.loading; else pageTitle">
+                    <scngx-skeleton [class]="'h-4 w-1/4'"></scngx-skeleton>
+                    <scngx-skeleton [class]="'h-10 w-1/2'"></scngx-skeleton>
                 </div>
 
-                <!-- Stats Row -->
-                <div class="grid grid-cols-1 md:grid-cols-autofit gap-4 my-row">
+                <ng-template #pageTitle>
+                    <scngx-ui-title [inverted]="true">
+                        {{ props.zone?.name }}
+                        <div scngxSubtitle>Speicherzone</div>
+                    </scngx-ui-title>
+                </ng-template>
+            </div>
 
-                    <scngx-skeleton [class]="'h-32 w-full'" *ngIf="($loading | async)"></scngx-skeleton>
-                    <div class="p-4 rounded-sm bg-body-light border border-body-lighter shadow-md" *ngIf="!($loading | async)">
+            <div class="grid grid-cols-1 md:grid-cols-autofit gap-4 my-row">
+
+                <scngx-skeleton [class]="'h-32 w-full'" *ngIf="props.loading; else pageStats"></scngx-skeleton>
+                <ng-template #pageStats>
+                    <div class="p-4 rounded-sm bg-body-light border border-body-lighter shadow-md">
                         <h6>Statistiken</h6>
                         <ul class="flex flex-col items-start w-full gap-2 mt-4">
-                            <li class="inline-flex items-center gap-2 opacity-80"><hero-icon [class]="'h-5 w-5'" name="collection"></hero-icon><span class="text-sm">{{ ($zone | async)?.mountsCount }} Mount{{ ($zone | async)?.mountsCount != 1 ? 's' : '' }}</span></li>
-                            <li class="inline-flex items-center gap-2 opacity-80"><hero-icon [class]="'h-5 w-5'" name="chart-pie"></hero-icon><span class="text-sm">{{ ($zone | async)?.usedSpace | scngxBytesPipe:"gb" }}</span></li>
+                            <li class="inline-flex items-center gap-2 opacity-80"><hero-icon [class]="'h-5 w-5'" name="collection"></hero-icon><span class="text-sm">{{ props.zone?.mountsCount }} Mount{{ props.zone?.mountsCount != 1 ? 's' : '' }}</span></li>
+                            <li class="inline-flex items-center gap-2 opacity-80"><hero-icon [class]="'h-5 w-5'" name="chart-pie"></hero-icon><span class="text-sm">{{ props.zone?.usedSpace | scngxBytesPipe:"gb" }}</span></li>
                         </ul>
                     </div>
+                </ng-template>
 
-                    <!--<scngx-skeleton [class]="'h-32 w-full'" *ngIf="($loading | async)"></scngx-skeleton>
-                    <div class="p-4 rounded-sm bg-body-light border border-body-lighter shadow-md" *ngIf="!($loading | async)">
+                <scngx-skeleton [class]="'h-32 w-full'" *ngIf="props.loading; else pageStatus"></scngx-skeleton>
+                <ng-template #pageStatus>
+                    <div class="p-4 rounded-sm bg-body-light border border-body-lighter shadow-md">
                         <h6>Status</h6>
                         <ul class="flex flex-col items-start w-full gap-2 mt-4">
-                            <li class="inline-flex items-center gap-2 opacity-80"><span class="w-2 h-2 rounded-full bg-success-light"></span><span class="text-xs">{{ ($zone | async)?.flag | scngxBucketFlagPipe }}</span></li>
-                        </ul>
-                    </div>-->
-
-                    <scngx-skeleton [class]="'h-32 w-full'" *ngIf="($loading | async)"></scngx-skeleton>
-                    <div class="p-4 rounded-sm bg-body-light border border-body-lighter shadow-md" *ngIf="!($loading | async)">
-                        <h6>Aktionen</h6>
-                        <ul class="flex flex-col items-start w-full gap-2 mt-4">
-                            <scngx-btn (click)="openMountCreateDialog()"><hero-icon [class]="'h-5 w-5'" name="plus"></hero-icon> Mount hinzufügen</scngx-btn>
+                            <li class="inline-flex items-center gap-2 opacity-80"><span class="w-2 h-2 rounded-full bg-success-light"></span><span class="text-xs">{{ props.zone?.flag | scngxBucketFlagPipe }}</span></li>
                         </ul>
                     </div>
-                </div>
+                </ng-template>
+
+                <scngx-skeleton [class]="'h-32 w-full'" *ngIf="props.loading; else pageActions"></scngx-skeleton>
+                <ng-template #pageActions>
+                    <div class="p-4 rounded-sm bg-body-light border border-body-lighter shadow-md">
+                        <h6>Aktionen</h6>
+                        <ul class="flex flex-col items-start w-full gap-2 mt-4">
+                            <scngx-btn (click)="openMountCreateDialog(props.zone, props.datasource)"><hero-icon [class]="'h-5 w-5'" name="plus"></hero-icon> Mount hinzufügen</scngx-btn>
+                        </ul>
+                    </div>
+                </ng-template>
             </div>
-        </ng-container>
-
-        <!-- List items -->
-        <ng-container scngx-list *ngIf="($zone | async)">
-            <div class="p-window">
-                <h6>Mounts</h6>
-
-                <div class="flex flex-col gap-2 w-full mt-2">
-                    <app-mount-list-item *ngFor="let mount of list.viewPortItems" [mount]="mount.data" [routerLink]="[mount.data.slug || mount.data.id]"></app-mount-list-item>
-                </div>
+        </div>
+        
+        <div class="px-window mt-row">
+            <scngx-ui-section-title *ngIf="!props.loading">Mounts</scngx-ui-section-title>
+            <div *cdkVirtualFor="let mount of props.datasource" [style.height]="'64px'">
+                <app-mount-list-item [mount]="mount" [routerLink]="mount ? [mount?.slug ?? mount?.id] : null"></app-mount-list-item>
             </div>
-        </ng-container>
-    </scngx-infinite-list>
-
-</section>
+        </div>
+        
+    </cdk-virtual-scroll-viewport>
+</ng-container>

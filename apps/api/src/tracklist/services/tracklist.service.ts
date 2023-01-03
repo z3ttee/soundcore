@@ -7,15 +7,16 @@ import { Song } from '../../song/entities/song.entity';
 import { Tracklist, TracklistItem, TracklistType } from '../entities/tracklist.entity';
 import { SongService } from '../../song/services/song.service';
 import { User } from '../../user/entities/user.entity';
-import { FileFlag } from '../../file/entities/file.entity';
+import { LikedSong } from '../../collection/entities/like.entity';
+import { LikeService } from '../../collection/services/like.service';
 
 @Injectable()
 export class TracklistService {
 
     constructor(
         private readonly songService: SongService,
-        @InjectRepository(PlaylistItem)  private tracklistRepository: Repository<PlaylistItem>,
-        @InjectRepository(Song)  private songRepository: Repository<Song>
+        private readonly likeService: LikeService,
+        @InjectRepository(PlaylistItem)  private tracklistRepository: Repository<PlaylistItem>
     ) {}
 
     /**
@@ -141,6 +142,7 @@ export class TracklistService {
         // TODO: Check if user has access to playlist
         const result = await this.tracklistRepository.createQueryBuilder("item")
             .leftJoin("item.song", "song").addSelect(["song.id", "song.slug", "song.name", "song.duration"])
+            .leftJoin("song.artwork", "artwork").addSelect(["artwork.id"])
             .leftJoin("song.album", "album").addSelect(["album.id", "album.slug", "album.name"])
             .leftJoin("song.artwork", "artwork").addSelect(["artwork.id", "artwork.accentColor"])
             .leftJoin("song.primaryArtist", "primaryArtist").addSelect(["primaryArtist.id", "primaryArtist.slug", "primaryArtist.name"])
@@ -156,6 +158,50 @@ export class TracklistService {
             // Pagination
             .skip(pageable.offset)
             .take(pageable.limit)
+            .getManyAndCount();
+
+        return Page.of(result[0], result[1], pageable.offset);
+    }
+
+    /**
+     * Find a list of song ids by users list of liked songs.
+     * @param pageable Page settings
+     * @param authentication User authentication object
+     * @returns Tracklist
+     */
+    public async findByLikedSongs(authentication: User, hostname: string): Promise<Tracklist> {
+        const metadataUrl = `${hostname}/v1/tracklists/liked_songs/meta`;
+        const result = await this.likeService.getRepository().createQueryBuilder("like")
+            .leftJoin("like.user", "user")
+            .leftJoin("like.song", "song")
+            .select(["like.id"])
+            .orderBy("like.likedAt", "DESC")
+            .where("user.id = :userId AND like.type = :type", { userId: authentication.id, type: LikedSong.name })
+            .getManyAndCount();
+
+        return new Tracklist(result[1], TracklistType.PLAYLIST, result[0], metadataUrl);    
+    }
+
+    /**
+     * Find a page of metadata of the tracklist of users liked songs.
+     * @param pageable Page settings
+     * @param authentication User authentication object
+     * @returns Page<Song>
+     */
+    public async findMetaByLikedSongs(authentication: User, pageable: BasePageable): Promise<Page<LikedSong>> {
+        const result = await this.likeService.getRepository().createQueryBuilder("like")
+            .leftJoin("like.user", "user").addSelect(["user.id", "user.slug", "user.name"])
+            .leftJoin("user.artwork", "ua").addSelect(["ua.id"])
+            .leftJoin("like.song", "song").addSelect(["song.id", "song.slug", "song.name", "song.explicit", "song.duration"])
+            .leftJoin("song.artwork", "artwork").addSelect(["artwork.id"])
+            .leftJoin("song.album", "album").addSelect(["album.id", "album.slug", "album.name"])
+            .leftJoin("song.primaryArtist", "primaryArtist").addSelect(["primaryArtist.id", "primaryArtist.slug", "primaryArtist.name"])
+            .leftJoin("song.featuredArtists", "featuredArtists").addSelect(["featuredArtists.id", "featuredArtists.slug", "featuredArtists.name"])
+            .loadRelationCountAndMap("song.liked", "song.likes", "likes", (qb) => qb.where("likes.userId = :userId", { userId: authentication?.id }))
+            .orderBy("like.likedAt", "DESC")
+            .take(pageable.limit)
+            .skip(pageable.offset)
+            .where("user.id = :userId AND like.type = :type", { userId: authentication.id, type: LikedSong.name })
             .getManyAndCount();
 
         return Page.of(result[0], result[1], pageable.offset);

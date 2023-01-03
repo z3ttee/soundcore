@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
-import { Queue, SCNGXTracklist } from "@soundcore/ngx";
+import { Queue, SCNGXDatasourceFreeHandler, SCNGXTracklist } from "@soundcore/ngx";
 import { Logger, Song } from "@soundcore/sdk";
-import { BehaviorSubject, map, Observable, of, switchMap } from "rxjs";
+import { BehaviorSubject, map, Observable, of, Subject, tap } from "rxjs";
 import { PlayerItem } from "../entities/player-item.entity";
 import { AppAudioService } from "./audio.service";
 import { AppControlsService } from "./controls.service";
@@ -12,7 +12,7 @@ import { AppMediasessionService } from "./mediasession.service";
     providedIn: "root"
 })
 export class AppPlayerService {
-    private readonly logger = new Logger("Player");
+    private readonly logger = new Logger(AppPlayerService.name);
 
     constructor(
         private readonly controls: AppControlsService,
@@ -77,6 +77,11 @@ export class AppPlayerService {
      * Redirect $isPaused observable from controls service
      */
     public readonly $isPaused: Observable<boolean> = this.controls.$isPaused;
+    /**
+     * 
+     */
+    private readonly _preparingSubject: BehaviorSubject<boolean> = new BehaviorSubject(true);
+    public readonly $preparing: Observable<boolean> = this._preparingSubject.asObservable();
 
     /**
      * Get full queue size
@@ -84,6 +89,8 @@ export class AppPlayerService {
     public get queueSize(): number {
         return this._singleQueue.size + (this._enqueuedTracklist?.queue?.size || 0);
     }
+
+    private freeHandler: SCNGXDatasourceFreeHandler = () => false;
 
     /**
      * Play a single resource. This will enqueue the song
@@ -125,40 +132,41 @@ export class AppPlayerService {
      * @param tracklist Tracklist to play next
      * @param force If true, will skip currently playing item and starts playing the tracklist
      */
-    public playTracklist(tracklist: SCNGXTracklist, force: boolean = true, playAtIndex?: number) {
+    public playTracklist(tracklist: SCNGXTracklist, force: boolean = true, playAtIndex?: number): Observable<void> {
         const shouldStartAtIndex: boolean = typeof playAtIndex !== "undefined" && playAtIndex != null;
         
         // Check if the tracklist is currently playing
-        if(this.isPlayingSrcById(tracklist.assocResId) && !shouldStartAtIndex) {
+        if(this.isPlayingSrcById(tracklist.id) && !shouldStartAtIndex) {
             // If true, check if paused and toggle play/pause
             if(this.audio.isPaused()) {
-                this.audio.play();
+                return this.audio.play();
             } else {
-                this.audio.pause();
+                return this.audio.pause();
             }
-
-            return;
         }
 
-        // "Enqueue" tracklist
-        this._enqueuedTracklist = tracklist;
-        this.updateSize();
-
-        if(shouldStartAtIndex) {
-            this._enqueuedTracklist.resetQueue().subscribe(() => {
-                this._enqueuedTracklist.dequeueAt(playAtIndex).subscribe((song) => {
-                    const item = new PlayerItem(song, tracklist, false);
-                    this.playItem(item);
+        return this.dequeueTracklist().pipe(tap((wasDestroyed) => {
+            // "Enqueue" tracklist
+            this._enqueuedTracklist = tracklist;
+            this._enqueuedTracklist.claim(this.freeHandler);
+            this.updateSize();
+    
+            if(shouldStartAtIndex) {
+                this._enqueuedTracklist.resetQueue().subscribe(() => {
+                    this._enqueuedTracklist.dequeueAt(playAtIndex).subscribe((song) => {
+                        const item = new PlayerItem(song, tracklist, false);
+                        this.playItem(item);
+                    });
                 });
-            });
-            return;
-        }
-
-        if(force || this.isIdle()) {
-            // Start with next title but take it from tracklist queue
-            this.history.resetPointer();
-            this.next(true).subscribe();
-        }
+                return;
+            }
+    
+            if(force || this.isIdle()) {
+                // Start with next title but take it from tracklist queue
+                this.history.resetPointer();
+                this.next(true).subscribe();
+            }
+        }), map((_) => null));
     }
 
     public isPlayingSrcById(id: string) {
@@ -166,7 +174,7 @@ export class AppPlayerService {
         if(typeof current === "undefined" || current == null) return false;
 
         if(current.tracklist) {
-            return current.tracklist?.assocResId == id;
+            return current.tracklist?.id == id;
         } else {
             return current.song?.id == id;
         }
@@ -282,20 +290,28 @@ export class AppPlayerService {
             // Otherwise take from tracklist queue
             
             // Check if there is a tracklist enqueued
+            console.log("tracklist enqueued? ", !!this._enqueuedTracklist)
             if(!!this._enqueuedTracklist) {
                 const tracklist = this._enqueuedTracklist;
 
                 // Initialize tracklist as it may not have happened
-                const itemObservable: Observable<Song> = tracklist.initialize().pipe(switchMap(() => {
-                    // Switch to dequeueing observable after initialization
-                    return this.controls.isShuffled() ? tracklist.dequeueRandom() : tracklist.dequeue();
-                }));
+                // const itemObservable: Observable<Song> = tracklist.initialize().pipe(switchMap(() => {
+                //     // Switch to dequeueing observable after initialization
+                //     return this.controls.isShuffled() ? tracklist.dequeueRandom() : tracklist.dequeue();
+                // }));
+
+                const itemObservable: Observable<Song> = this.controls.isShuffled() ? tracklist.dequeueRandom() : tracklist.dequeue();
 
                 return itemObservable.pipe(map((song) => {
                     // Check if the size of the tracklist's internal queue is empty
                     // If true, dequeue the tracklist
+
+                    console.log(song);
+
+                    console.log(tracklist.queue.size);
+
                     if(tracklist.queue.size <= 0) {
-                        this.dequeueTracklist();
+                        this.dequeueTracklist().subscribe();
                     }
 
                     // Build the result item
@@ -310,12 +326,27 @@ export class AppPlayerService {
         this.updateSize();
         return of(result);
     }
+
     /**
      * Dequeue tracklist by setting it to undefined.
      */
-    private dequeueTracklist() {
-        this.logger.verbose(`Dequeued tracklist: `, this._enqueuedTracklist);
+    private dequeueTracklist(): Observable<void> {
+        if(typeof this._enqueuedTracklist === "undefined" || this._enqueuedTracklist == null) {
+            return of(null);
+        }
 
+        this._enqueuedTracklist.unclaim(this.freeHandler)
+        return this._enqueuedTracklist.destroyIfNotClaimed(this.freeHandler).pipe(tap((wasDestroyed) => {
+            if(!wasDestroyed) {
+                console.warn(`[AudioPlayerService] Could not destroy tracklist when removing from queue.`);
+            }
+
+            this.unsetEnqueuedTracklist();
+        }), map(() => null));
+    }
+
+    private unsetEnqueuedTracklist() {
+        this.logger.verbose(`Dequeued tracklist: `, this._enqueuedTracklist);
         this._enqueuedTracklist = undefined;
         this.updateSize();
     }
@@ -326,7 +357,5 @@ export class AppPlayerService {
     private updateSize() {
         this._sizeSubject.next(this.queueSize);
     }
-
-    
 
 }

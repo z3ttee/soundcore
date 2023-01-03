@@ -35,12 +35,19 @@ export class SCNGXSongListItemComponent implements OnInit, OnDestroy, AfterViewI
   public showId: boolean = true;
   @Input()
   public showAlbum: boolean = true;
+  @Input()
+  public showAddedBy: boolean = false;
+  @Input()
+  public showAddedAt: boolean = false;
 
   @Input()
   public animRef: TemplateRef<any>;
 
   @Input()
   public isMobile: boolean = false;
+
+  @Input()
+  public itemHeight: number = 56;
 
   @Output() public onPlay: EventEmitter<Song> = new EventEmitter();
   @Output() public onLike: EventEmitter<Song> = new EventEmitter();
@@ -66,6 +73,7 @@ export class SCNGXSongListItemComponent implements OnInit, OnDestroy, AfterViewI
   }
 
   public emitOnPlayMobile(event: MouseEvent) {
+    if(!this.song) return;
     if(!this.isMobile) return;
     
     if(this.onPlay.observed) {

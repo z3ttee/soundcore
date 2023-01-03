@@ -1,8 +1,0 @@
-<div class="w-full h-full overflow-y-auto overflow-x-hidden" #parent>
-    <ng-content select="[scngx-content]"></ng-content>
-
-    <virtual-scroller class="w-full" [items]="(dataSource.$stream | async)" [parentScroll]="parent" (vsEnd)="vsEnd($event)" (vsUpdate)="vsUpdate($event)">
-        <ng-content select="[scngx-list]"></ng-content>
-    </virtual-scroller>
-</div>
-

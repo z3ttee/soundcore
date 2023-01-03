@@ -4,15 +4,14 @@ import { Bucket } from "@soundcore/sdk";
 @Component({
   selector: 'app-bucket-list-item',
   templateUrl: './bucket-list-item.component.html',
-  styleUrls: ['./bucket-list-item.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class BucketListItemComponent implements OnInit {
+export class BucketListItemComponent {
 
-  @Input() public bucket: Bucket;
+  @Input() 
+  public bucket: Bucket;
 
-  constructor() { }
-
-  public ngOnInit(): void {}
+  @Input()
+  public itemHeight: number = 64;
 
 }

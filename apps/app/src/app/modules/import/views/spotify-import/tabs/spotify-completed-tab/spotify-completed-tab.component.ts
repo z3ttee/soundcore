@@ -1,13 +1,14 @@
 import { HttpClient } from "@angular/common/http";
-import { Component, OnDestroy, OnInit } from "@angular/core";
+import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from "@angular/core";
 import { SCNGXDatasource, SCNGXDialogService } from "@soundcore/ngx";
-import { ImportTask, ImportTaskStatus, ImportTaskType, SCSDKGeneralGateway, SpotifyImport } from "@soundcore/sdk";
+import { ImportTaskStatus, ImportTaskType, SCSDKGeneralGateway, SpotifyImport } from "@soundcore/sdk";
 import { filter, Subject, takeUntil } from "rxjs";
 import { ReportDialogComponent, ReportDialogOptions } from "src/app/modules/import/dialog/report-dialog/report-dialog.component";
 import { environment } from "src/environments/environment";
 
 @Component({
-    templateUrl: "./spotify-completed-tab.component.html"
+    templateUrl: "./spotify-completed-tab.component.html",
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SpotifyCompletedTabComponent implements OnInit, OnDestroy {
 
@@ -20,7 +21,7 @@ export class SpotifyCompletedTabComponent implements OnInit, OnDestroy {
     /**
      * Datasource to populate virtual scroller.
      */
-    public datasource: SCNGXDatasource<ImportTask>;
+    public readonly datasource: SCNGXDatasource<SpotifyImport> = new SCNGXDatasource(this.httpClient, `${environment.api_base_uri}/v1/imports/spotify/completed`, 8);
 
     constructor(
         private readonly httpClient: HttpClient,
@@ -29,15 +30,9 @@ export class SpotifyCompletedTabComponent implements OnInit, OnDestroy {
     ) {}
 
     public ngOnInit(): void {
-        this.datasource = new SCNGXDatasource(this.httpClient, {
-            url: `${environment.api_base_uri}/v1/imports/spotify/completed`
-        });
-
         this.gateway.$onImportTaskUpdate.pipe(takeUntil(this._destroy), filter((task) => task.type == ImportTaskType.SPOTIFY_PLAYLIST)).subscribe((task) => {
-            console.log(`Received task update.`, task);
-
             if(task.status == ImportTaskStatus.OK) {
-                this.datasource.appendOrReplace(task);
+                this.datasource.updateOrAppendById(task.id, task);
             } else {
                 this.datasource.removeById(task.id);
             }
@@ -49,9 +44,7 @@ export class SpotifyCompletedTabComponent implements OnInit, OnDestroy {
         this._destroy.complete();
     }
 
-    public openReportDialog(task: SpotifyImport) {
-        console.log(task);
-        
+    public openReportDialog(task: SpotifyImport) {       
         this.dialog.open<ReportDialogComponent, ReportDialogOptions, any>(ReportDialogComponent, { data: {
             data: task
         }});

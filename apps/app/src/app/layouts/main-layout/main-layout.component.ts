@@ -1,17 +1,26 @@
 import { CdkDragDrop } from "@angular/cdk/drag-drop";
 import { Location } from "@angular/common";
-import { Component, OnDestroy, OnInit } from "@angular/core";
+import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from "@angular/core";
 import { UntypedFormControl } from "@angular/forms";
 import { NavigationCancel, NavigationEnd, NavigationError, NavigationStart, Router } from "@angular/router";
-import { SSOService } from "@soundcore/sso";
-import { filter, Subject, takeUntil } from "rxjs";
+import { SSOService, SSOUser } from "@soundcore/sso";
+import { combineLatest, filter, map, Observable, startWith, Subject, takeUntil, tap } from "rxjs";
 import { SCCDKScreenService } from "@soundcore/cdk";
-import { SCNGXPlaylistListItemComponent, SCNGXDialogService } from "@soundcore/ngx";
-import { Playlist, SCDKSearchService, SCSDKGeneralGateway, SCSDKPlaylistService } from "@soundcore/sdk";
+import { SCNGXDialogService } from "@soundcore/ngx";
+import { Playlist, SCSDKGeneralGateway, SCSDKPlaylistService, SCSDKSearchService } from "@soundcore/sdk";
 import { AppPlaylistCreateDialog } from "src/app/dialogs/playlist-create-dialog/playlist-create-dialog.component";
+import { SCNGXPlaylistListItemComponent } from "src/app/components/list-items/playlist-list-item/playlist-list-item.component";
+
+interface MainLayoutProps {
+    playlists?: Playlist[];
+    account?: SSOUser;
+
+    isAdminAccount?: boolean;
+    isModAccount?: boolean;
+}
 
 @Component({
-    templateUrl: "./main-layout.component.html"
+    templateUrl: "./main-layout.component.html",
 })
 export class AscMainLayoutComponent implements OnInit, OnDestroy {
 
@@ -23,14 +32,32 @@ export class AscMainLayoutComponent implements OnInit, OnDestroy {
 
     constructor(
         public readonly screenService: SCCDKScreenService,
-        public readonly authService: SSOService,
+        private readonly authService: SSOService,
         public readonly playlistService: SCSDKPlaylistService,
         private readonly dialogService: SCNGXDialogService,
-        private readonly searchService: SCDKSearchService,
+        private readonly searchService: SCSDKSearchService,
         private readonly router: Router,
         private readonly _location: Location,
         public readonly gateway: SCSDKGeneralGateway
     ) {}
+
+    public readonly $props: Observable<MainLayoutProps> = combineLatest([
+        this.playlistService.$library.pipe(map((playlists) => ([...playlists]))),
+        this.authService.$user.pipe(startWith(null)),
+        combineLatest([
+            this.authService.$isAdmin,
+            this.authService.$isMod
+        ])
+    ]).pipe(
+        map(([playlists, account, [isAdminAccount, isModAccount]]): MainLayoutProps => ({
+            playlists: playlists,
+            account: account,
+            isAdminAccount: isAdminAccount,
+            isModAccount: isAdminAccount || isModAccount
+        })),
+        takeUntil(this._destroy),
+        tap((props) => console.log(props))
+    );
 
     public ngOnInit(): void {
         // Subscribe to router events to show a loader bar at the page top
@@ -76,6 +103,10 @@ export class AscMainLayoutComponent implements OnInit, OnDestroy {
 
     public openCreatePlaylistDialog() {       
         this.dialogService.open(AppPlaylistCreateDialog, {}).$afterClosed.pipe(takeUntil(this._destroy));
+    }
+
+    public logout() {
+        this.authService.logout();
     }
 
 }

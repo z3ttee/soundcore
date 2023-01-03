@@ -1,12 +1,12 @@
-<div class="flex flex-1 items-center justify-start w-full gap-4 lg:gap-8 p-2 select-none">
-
+<div class="flex flex-1 items-center justify-start w-full gap-4 lg:gap-8 px-2 select-none overflow-hidden" [style.height]="itemHeight + 'px'">
     <!-- Task type (spotify icon) -->
     <div class="min-w-6 w-6 text-center">
-        <fa-icon [icon]="['fab', 'spotify']" size="xl"></fa-icon>
+        <scngx-skeleton *ngIf="!task; else taskTypeIcon" [class]="'w-8 h-8 aspect-square rounded-full'"></scngx-skeleton>
+        <ng-template #taskTypeIcon><fa-icon [icon]="['fab', 'spotify']" size="xl"></fa-icon></ng-template>
     </div>
-    
+
     <!-- Playlist Artwork with title -->
-    <div class="flex-grow p-2 rounded-sm hover:bg-body-light active:bg-body-lighter cursor-pointer transition-all" *ngIf="task.payload">
+    <div class="flex-grow p-2 rounded-sm hover:bg-body-light active:bg-body-lighter cursor-pointer transition-all" *ngIf="task?.payload">
         <div class="flex flex-1 items-center justify-start gap-3 select-none" [routerLink]="['/playlist', task.payload.id]">
             <div class="min-w-11 w-11 h-11 overflow-hidden rounded-full">
                 <scngx-artwork [artwork]="task.payload?.artwork"></scngx-artwork>
@@ -20,18 +20,26 @@
     </div>
 
     <!-- Display URL and ID as alternative if there is no payload -->
-    <div class="flex-grow" *ngIf="!task.payload">
-        <a target="_blank" [href]="task.url"><p class="line-clamp-1 hover:underline cursor-pointer break-words">{{ task.url ?? 'Unbekannter URL' }}</p></a>
-        <p class="line-clamp-1 text-sm opacity-70 font-light">ID: {{ task.id ?? 'Unbekannte ID' }}</p>
+    <div class="flex-grow" *ngIf="!task?.payload">
+        <div class="flex flex-col" *ngIf="!task; else taskUrl">
+            <scngx-skeleton [class]="'w-40 h-5 rounded-sm'"></scngx-skeleton>
+            <scngx-skeleton [class]="'w-28 h-4 rounded-sm'"></scngx-skeleton>
+        </div>
+
+        <ng-template #taskUrl>
+            <a target="_blank" [href]="task?.url"><p class="line-clamp-1 hover:underline cursor-pointer break-words">{{ task?.url ?? 'Unbekannte URL' }}</p></a>
+            <p class="line-clamp-1 text-sm opacity-70 font-light">ID: {{ task?.id ?? 'Unbekannte ID' }}</p>
+        </ng-template>
     </div>
 
     <!-- Show report button (only for failed) -->
-    <div class="min-w-36 text-center" *ngIf="task.report">
+    <div class="min-w-36 text-center" *ngIf="task?.report">
         <p class="text-sm"><scngx-btn-outlined size="sm" (click)="openReport.emit()">Bericht ansehen</scngx-btn-outlined></p>
     </div>
 
     <!-- Task status -->
     <div class="min-w-28 text-center">
-        <p class="text-sm">{{ task.status | taskStatusPipe }}</p>
+        <scngx-skeleton [class]="'w-28 h-5 rounded-sm'" *ngIf="!task; else taskStatus"></scngx-skeleton>
+        <ng-template #taskStatus><p class="text-sm">{{ task?.status | taskStatusPipe }}</p></ng-template>
     </div>
 </div>

@@ -1,4 +1,4 @@
-import { Component, OnDestroy } from "@angular/core";
+import { ChangeDetectionStrategy, Component, OnDestroy } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
 import { SCSDKSongService, Song } from "@soundcore/sdk";
 import { combineLatest, map, Observable, Subject, switchMap, takeUntil } from "rxjs";
@@ -15,7 +15,8 @@ interface SongInfoViewProps {
 }
 
 @Component({
-    templateUrl: "./song-info.component.html"
+    templateUrl: "./song-info.component.html",
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SongInfoViewComponent implements OnDestroy {
 

@@ -1,20 +1,15 @@
-<section class="p-window h-full w-full overflow-y-auto" #page>
-
-    <scngx-infinite-list class="w-full mt-row" [dataSource]="dataSource" [parentScroll]="page" #list>
-        <!-- Page Headline -->
-        <ng-container scngx-content>
+<div class="px-window pt-window w-full h-full">
+    <cdk-virtual-scroll-viewport [itemSize]="64" class="w-full h-full overflow-x-hidden">
+        <div class="mb-row">
             <scngx-ui-title>
                 Speicherzonen
                 <div scngxSubtitle>Verwalte hier die einzelnen Speicherzonen.</div>
             </scngx-ui-title>
-        </ng-container>
-
-        <!-- List items -->
-        <ng-container scngx-list>
-            <h6 class="mt-row mb-2">Speicherzonen</h6>
-            <div class="flex flex-col gap-2 w-full" *ngIf="list.viewPortItems.length > 0">
-                <app-bucket-list-item *ngFor="let bucket of list.viewPortItems" [routerLink]="[bucket.data.slug || bucket.data.id]" [bucket]="bucket.data"></app-bucket-list-item>
-            </div>
-        </ng-container>
-    </scngx-infinite-list>
-</section>
+        </div>
+    
+        <div *cdkVirtualFor="let bucket of datasource">
+            <app-bucket-list-item [routerLink]="bucket ? [bucket?.slug ?? bucket?.id] : null" [bucket]="bucket"></app-bucket-list-item>
+        </div>
+    
+    </cdk-virtual-scroll-viewport>
+</div>

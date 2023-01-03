@@ -1,71 +1,96 @@
-<div (click)="emitOnPlayMobile($event)" class="song-list-item-wrapper focus:shadow-2xl focus-within:shadow-2xl flex flex-1 gap-1 h-16 px-1.5 w-full overflow-x-hidden items-center rounded select-none cursor-pointer bg-body-light bg-opacity-0 hover:bg-opacity-30 active:bg-opacity-50 [&>.list-item-play-btn]:hover:opacity-100 border-body-lighter border border-opacity-0 hover:border-opacity-100">
+<div 
+    (click)="emitOnPlayMobile($event)" 
+    class="song-list-item-wrapper flex flex-1 gap-1 px-1.5 w-full overflow-x-hidden items-center rounded select-none cursor-pointer bg-body-light bg-opacity-0 hover:bg-opacity-30 active:bg-opacity-50 [&>.list-item-play-btn]:hover:opacity-100 border-body-lighter border border-opacity-0 hover:border-opacity-100" 
+    [ngClass]="{'pointer-events-none': !song}"
+    [style.height]="itemHeight + 'px'">
         
     <!-- ID -->
     <div class="relative max-w-11 min-w-11 h-11 justify-center items-center hidden md:inline-flex" *ngIf="showId">
-        <span 
-            [ngClass]="{'text-accent': active && !playing}" 
-            *ngIf="(active && !playing) || !active">
-            {{ index + 1 }}
-        </span>
+        <scngx-skeleton [class]="'w-6 h-6 rounded-sm'" *ngIf="!song; else songId"></scngx-skeleton>
 
-        <ng-container *ngIf="active && playing">
-            <ng-container *ngTemplateOutlet="animRef"></ng-container>
-        </ng-container>
+        <ng-template #songId>
+            <span 
+                [ngClass]="{'text-accent': active && !playing}" 
+                *ngIf="(active && !playing) || !active">
+                {{ index + 1 }}
+            </span>
 
-        <div (click)="emitOnPlay($event)" class="list-item-play-btn opacity-0 z-10 flex items-center justify-center transform-gpu absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-accent text-body-dark will-change-transform transition-all active:scale-90">
-            <img *ngIf="!playing || !active; else paused" class="w-5 h-5 text-body ml-0.5" src="assets/icons/play.svg">
-            <ng-template #paused><img *ngIf="playing" class="w-5 h-5 text-body ml-0.5" src="assets/icons/pause.svg"></ng-template>
-        </div>
+            <ng-container *ngIf="active && playing">
+                <ng-container *ngTemplateOutlet="animRef"></ng-container>
+            </ng-container>
+
+            <div (click)="emitOnPlay($event)" class="list-item-play-btn opacity-0 z-10 flex items-center justify-center transform-gpu absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-accent text-body-dark will-change-transform transition-all active:scale-90">
+                <img *ngIf="!playing || !active; else paused" class="w-5 h-5 text-body ml-0.5" src="assets/icons/play.svg">
+                <ng-template #paused><img *ngIf="playing" class="w-5 h-5 text-body ml-0.5" src="assets/icons/pause.svg"></ng-template>
+            </div>
+        </ng-template>
     </div>
 
     <!-- Song title -->
-    <div class="flex w-full overflow-hidden gap-2 items-center">
+    <div class="flex overflow-hidden w-full gap-2 items-center min-w-0">
         <div class="min-w-12 max-w-12 h-12 rounded-sm overflow-hidden" *ngIf="showCover">
-            <scngx-artwork [artwork]="song?.artwork" class=""></scngx-artwork>
+            <scngx-skeleton [class]="'w-full h-full'" *ngIf="!song; else songCover"></scngx-skeleton>
+            <ng-template #songCover><scngx-artwork [artwork]="song?.artwork"></scngx-artwork></ng-template>
         </div>
 
-        <div class="w-full">
-            <p class="line-clamp-1" [ngClass]="{'text-accent': active}">
-                {{ song?.name || "Unbekannter Titel" }}
-            </p>
-            <div class="line-clamp-1">
-                <ul class="">
-                    <li *ngIf="song?.explicit" class="inline mr-2"><scngx-explicit-badge [extended]="false"></scngx-explicit-badge></li>
-                    <li *ngIf="song?.primaryArtist" class="inline text-font text-opacity-70"><span class="text-sm hover:underline pointer-events-all cursor-pointer" [routerLink]="['/artist', song?.primaryArtist.slug ?? song?.primaryArtist.id]">{{ song?.primaryArtist.name }}</span>{{ song.featuredArtists.length > 0 ? ", " : "" }}</li>
-                    <li *ngFor="let artist of (song?.featuredArtists ?? []); index as i" class="inline text-font text-opacity-70"><span class="text-sm hover:underline pointer-events-all cursor-pointer" [routerLink]="['/artist', artist.slug ?? artist.id]">{{ artist.name }}</span>{{ i + 1 < song.featuredArtists.length ? ", " : "" }}</li>
-                </ul>
-            </div>
+        <div class="flex flex-col w-full" *ngIf="!song; else songTitle">
+            <scngx-skeleton [class]="'h-5 w-1/2'"></scngx-skeleton>
+            <scngx-skeleton [class]="'h-4 w-1/4'"></scngx-skeleton>
         </div>
+
+        <ng-template #songTitle>
+            <div class="w-full">
+                <p class="line-clamp-1" [ngClass]="{'text-accent': active}">
+                    {{ song?.name || "Unbekannter Titel" }}
+                </p>
+                <div class="line-clamp-1">
+                    <ul class="">
+                        <li *ngIf="song?.explicit" class="inline mr-2"><scngx-explicit-badge [extended]="false"></scngx-explicit-badge></li>
+                        <li *ngIf="song?.primaryArtist" class="inline text-font text-opacity-70"><span class="text-sm hover:underline pointer-events-all cursor-pointer" [routerLink]="['/artist', song?.primaryArtist.slug ?? song?.primaryArtist.id]">{{ song?.primaryArtist.name }}</span>{{ song.featuredArtists.length > 0 ? ", " : "" }}</li>
+                        <li *ngFor="let artist of (song?.featuredArtists ?? []); index as i" class="inline text-font text-opacity-70"><span class="text-sm hover:underline pointer-events-all cursor-pointer" [routerLink]="['/artist', artist.slug ?? artist.id]">{{ artist.name }}</span>{{ i + 1 < song.featuredArtists.length ? ", " : "" }}</li>
+                    </ul>
+                </div>
+            </div>
+        </ng-template>
     </div>
 
     <!-- Song album -->
-    <div class="min-w-44 w-44 px-2 text-right text-font text-opacity-70 hidden md:block md:line-clamp-1" *ngIf="showAlbum && song?.album">
-        <span [routerLink]="['/album', song?.album?.slug || song?.album?.id]" class="text-sm text-font text-opacity-70 hover:underline cursor-pointer">{{ song?.album?.name }}</span>
+    <div class="min-w-44 w-44 px-2 text-right text-font text-opacity-70 hidden md:block md:line-clamp-1" *ngIf="showAlbum">
+        <scngx-skeleton [class]="'w-full h-4'" *ngIf="!song; else songAlbum"></scngx-skeleton>
+
+        <ng-template #songAlbum>
+            <span [routerLink]="song?.album ? ['/album', song?.album?.slug ?? song?.album?.id] : null" class="text-sm text-font text-opacity-70 hover:underline cursor-pointer">{{ song?.album?.name }}</span>
+        </ng-template>
     </div>
 
     <!-- Date added to playlist -->
-    <div class="min-w-32 w-32 px-2 text-right hidden lg:flex items-center justify-end gap-2" *ngIf="addedAt || addedBy">
-        <span class="text-font text-opacity-70 text-sm" *ngIf="addedAt">
-            {{ addedAt | date:"dd.MM." }}
-        </span>
-        <div *ngIf="addedBy" class="h-7 w-7 rounded-full overflow-hidden"><scngx-artwork [artwork]="addedBy?.artwork"></scngx-artwork></div>
+    <div class="min-w-32 w-32 px-2 text-right hidden lg:block" *ngIf="(showAddedBy || showAddedAt) && (addedAt || addedBy)">
+        <scngx-skeleton [class]="'w-full h-4'" *ngIf="!song; else songAddedAt"></scngx-skeleton>
+
+        <ng-template #songAddedAt>
+            <div class="flex items-center justify-end gap-2">
+                <span class="text-font text-opacity-70 text-sm" *ngIf="addedAt && showAddedAt">{{ addedAt | date:"dd.MM." }}</span>
+                <span class="h-7 w-7 rounded-full overflow-hidden bg-black" *ngIf="addedBy && showAddedBy"><scngx-artwork [artwork]="addedBy?.artwork"></scngx-artwork></span>
+            </div>
+        </ng-template>
     </div>
 
     <!-- Like Col -->
-    <div class="song-item-like-col inline-flex justify-center items-end max-w-10 min-w-10 px-2 opacity-100 md:opacity-0 pointer-events-none transition-all" [ngClass]="{'opacity-100 pointer-events-auto': song?.liked || isMobile, 'text-accent': song?.liked}">
-        <span class="w-6 h-6" matRipple [matRippleCentered]="true" [matRippleUnbounded]="true" [matRippleRadius]="20">
+    <div class="song-item-like-col inline-flex justify-center items-end max-w-10 min-w-10 px-2 opacity-100 pointer-events-none transition-all" [ngClass]="{'md:opacity-0': !song?.liked, 'opacity-100 pointer-events-auto': song?.liked || isMobile, 'text-accent opacity-100': song?.liked}">
+        <span *ngIf="song" class="w-6 h-6" matRipple [matRippleCentered]="true" [matRippleUnbounded]="true" [matRippleRadius]="20" (click)="emitOnLike($event)">
             <hero-icon name="heart" type="outline" [class]="'w-6 h-6 ' + (song?.liked ? 'fill-accent' : '')"></hero-icon>
         </span>
     </div>
     
     <!-- Duration -->
     <div class="max-w-14 min-w-14 px-2 text-right hidden sm:block"> 
-        <span class="text-sm text-font text-opacity-70">{{ song?.duration | scngxSongDurationPipe }}</span>
+        <scngx-skeleton [class]="'w-full h-4'" *ngIf="!song; else songDuration"></scngx-skeleton>
+        <ng-template #songDuration><span class="text-sm text-font text-opacity-70">{{ song?.duration | scngxSongDurationPipe }}</span></ng-template>
     </div>
 
     <!-- Menu column -->
     <div class="min-w-10 text-center">
-        <span class="flex items-center justify-center w-8 h-8" matRipple [matRippleCentered]="true" [matRippleUnbounded]="true" [matRippleRadius]="20">
+        <span *ngIf="song" class="flex items-center justify-center w-8 h-8" matRipple [matRippleCentered]="true" [matRippleUnbounded]="true" [matRippleRadius]="20">
             <fa-icon [icon]="['fas', 'ellipsis-v']"></fa-icon>
         </span>
     </div>

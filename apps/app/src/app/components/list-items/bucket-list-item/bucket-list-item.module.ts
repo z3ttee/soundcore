@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { BucketListItemComponent } from './bucket-list-item.component';
 import { chartPie, collection, HeroIconModule } from 'ng-heroicon';
-import { SCNGXBytesPipeModule } from '@soundcore/ngx';
+import { SCNGXBytesPipeModule, SCNGXSkeletonModule } from '@soundcore/ngx';
 
 @NgModule({
   declarations: [
@@ -12,7 +12,8 @@ import { SCNGXBytesPipeModule } from '@soundcore/ngx';
     CommonModule,
     HeroIconModule.withIcons({ collection, chartPie }),
 
-    SCNGXBytesPipeModule
+    SCNGXBytesPipeModule,
+    SCNGXSkeletonModule
   ],
   exports: [
     BucketListItemComponent

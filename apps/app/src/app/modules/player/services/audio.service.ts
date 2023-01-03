@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 import { Logger, SCSDKStreamService } from "@soundcore/sdk";
-import { BehaviorSubject, map, Observable, Subject } from "rxjs";
+import { BehaviorSubject, from, map, Observable, of, Subject } from "rxjs";
 import { PlayerItem } from "../entities/player-item.entity";
 
 @Injectable({
@@ -74,15 +74,16 @@ export class AppAudioService {
     /**
      * Pause player source.
      */
-    public pause() {
-        this._audioElement.pause();
+    public pause(): Observable<void> {
+        this._audioElement.pause()
+        return of(null);
     }
 
     /**
      * Resume player source.
      */
-    public play() {
-        this._audioElement.play();
+    public play(): Observable<void> {
+        return from(this._audioElement.play());
     }
 
     public seek(seconds: number) {

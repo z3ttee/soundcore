@@ -1,7 +1,10 @@
-import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, OnDestroy, ViewChild } from "@angular/core";
+import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from "@angular/core";
 import { FormControl } from "@angular/forms";
-import { Song } from "@soundcore/sdk";
-import { combineLatest, map, Observable, Subject, takeUntil, tap } from "rxjs";
+import { MatSnackBar } from "@angular/material/snack-bar";
+import { Router } from "@angular/router";
+import { SCCDKScreenService } from "@soundcore/cdk";
+import { SCSDKLikeService, Song } from "@soundcore/sdk";
+import { combineLatest, filter, map, Observable, Subject, take, takeUntil, tap } from "rxjs";
 import { AppControlsService } from "../../services/controls.service";
 import { AppPlayerService } from "../../services/player.service";
 
@@ -9,7 +12,7 @@ interface PlayerbarProps {
     song?: Song;
     currentTime?: number;
     playing?: boolean;
-    responsive?: ResponsiveOptions;
+    isMobile?: boolean;
 }
 
 interface ResponsiveOptions {
@@ -24,9 +27,7 @@ interface ResponsiveOptions {
     templateUrl: "./player-bar.component.html",
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class AppPlayerBarComponent implements OnDestroy, AfterViewInit {
-
-    @ViewChild("scngxPlayerContainer") private readonly container: ElementRef<HTMLDivElement>;
+export class AppPlayerBarComponent implements OnInit, OnDestroy {
 
     public readonly seekInputControl: FormControl<number> = new FormControl(0);
 
@@ -35,65 +36,82 @@ export class AppPlayerBarComponent implements OnDestroy, AfterViewInit {
      */
     private readonly _destroy: Subject<void> = new Subject();
 
-    private readonly _responsiveness: Subject<ResponsiveOptions> = new Subject();
-    private readonly $responsiveness: Observable<ResponsiveOptions> = this._responsiveness;
-
-    /**
-     * ResizeObserver to observe viewport width changes.
-     * This is used to trigger specific elements from becoming
-     * hidden.
-     */
-    private _observer: ResizeObserver;
-
     constructor(
         public readonly player: AppPlayerService,
-        public readonly controls: AppControlsService
+        public readonly controls: AppControlsService,
+        private readonly likeService: SCSDKLikeService,
+        private readonly snackbar: MatSnackBar,
+        private readonly screen: SCCDKScreenService,
+        private readonly router: Router
     ) {}
 
     public $props: Observable<PlayerbarProps> = combineLatest([
         this.player.$current.pipe(takeUntil(this._destroy)),
         this.player.$currentTime.pipe(takeUntil(this._destroy)),
         this.controls.$isPaused.pipe(takeUntil(this._destroy)),
-        this.$responsiveness.pipe(takeUntil(this._destroy))
+        this.screen.$screen.pipe(takeUntil(this._destroy))
     ]).pipe(
-        map(([currentItem, currentTime, isPaused, responsiveness]): PlayerbarProps => ({
+        map(([currentItem, currentTime, isPaused, screen]): PlayerbarProps => ({
             song: currentItem?.song,
             currentTime: currentTime ?? 0,
             playing: !isPaused,
-            responsive: responsiveness
+            isMobile: screen.isMobile
         })),
         tap((props) => {
             this.seekInputControl.setValue(props.currentTime);
         })
     );
 
-    public ngAfterViewInit(): void {
-        // Create ResizeObserver to react on viewport width changes.
-        this._observer = new ResizeObserver((entries: ResizeObserverEntry[], observer: ResizeObserver) => {
-            const width = this.container.nativeElement.getBoundingClientRect().width;
+    public ngOnInit(): void {
+        this.likeService.$onSongLikeChanged.pipe(takeUntil(this._destroy)).subscribe((toggleResult) => {
+            const likedSong = toggleResult.song;
+            const isLiked = toggleResult.isLiked;
 
-            this._responsiveness.next({
-                reducedMode: width < 600,
-                showDuration: width > 650,
-                showHistoryControls: width > 770,
-                showMaximize: width > 650
+            this.$props.pipe(filter((props) => !!props.song && props.song?.id == likedSong?.song?.id), take(1), takeUntil(this._destroy)).subscribe(({ song }) => {
+                song.liked = isLiked ?? song.liked;
             });
         });
-      
-        // Observe current component's html ref
-        this._observer.observe(this.container.nativeElement);
     }
 
     public ngOnDestroy(): void {
         // Notify subscriptions to destroy themselves
         this._destroy.next();
         this._destroy.complete();
-
-        // Disconnect resize observer from component's html ref
-        this._observer.disconnect();
     }
 
     public onSeek(value: number) {
         this.controls.seek(value);
+    }
+
+    public toggleLike(event: MouseEvent, song: Song) {
+        event.stopPropagation();
+        event.preventDefault();
+
+        if(typeof song === "undefined" || song == null) return;
+        this.likeService.toggleLikeForSong(song).pipe(takeUntil(this._destroy), filter((request) => !request.loading)).subscribe((request) => {
+            if(request.error) {
+                this.snackbar.open(`Ein Fehler ist aufgetreten`, null, { duration: 3000 });
+                return;
+            }
+
+            const isLiked = request.data.isLiked;
+            song.liked = isLiked ?? song.liked;
+
+            if(isLiked) {
+                this.snackbar.open(`Song zu Lieblingssongs hinzugefügt`, null, { duration: 3000 });
+            } else {
+                this.snackbar.open(`Song aus Lieblingssongs entfernt`, null, { duration: 3000 });
+            }
+        });
+    }
+
+    public openBigPicture() {
+        console.log("TODO: Bigpicture")
+    }
+
+    public openBigPictureMobile() {
+        this.router.navigate(['/bigpicture'], {
+            skipLocationChange: true
+        });
     }
 }

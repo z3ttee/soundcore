@@ -56,4 +56,12 @@ export class SCSDKTracklistService {
         return this.httpClient.get<SCSDKTracklist>(`${this.options.api_base_uri}/v1/tracklists/playlist/${playlistId}`).pipe(apiResponse());
     }
 
+    /**
+     * Find tracklist entity by liked songs
+     * @returns Tracklist
+     */
+    public findByLikedSongs(): Observable<ApiResponse<SCSDKTracklist>> {
+        return this.httpClient.get<SCSDKTracklist>(`${this.options.api_base_uri}/v1/tracklists/liked_songs`).pipe(apiResponse());
+    }
+
 }

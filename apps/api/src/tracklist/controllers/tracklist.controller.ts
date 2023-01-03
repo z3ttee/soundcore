@@ -7,6 +7,7 @@ import { User } from '../../user/entities/user.entity';
 import { Song } from '../../song/entities/song.entity';
 import { Tracklist } from '../entities/tracklist.entity';
 import { TracklistService } from '../services/tracklist.service';
+import { LikedSong } from '../../collection/entities/like.entity';
 
 /**
  * Controller class that contains
@@ -109,6 +110,28 @@ export class TracklistController {
     @Get("/playlist/:playlistId/meta")
     public async findMetaByPlaylist(@Param("playlistId") playlistId: string, @Pagination() pageable: Pageable, @Authentication() authentication: User): Promise<Page<PlaylistItem>> {
         return this.service.findMetaByPlaylist(playlistId, pageable, authentication);
+    }
+
+    /**
+     * Endpoint for building a list of tracks of a playlist
+     * filled with only ids.
+     * @param authentication Authentication object
+     * @returns Tracklist
+     */
+    @Get("/liked_songs")
+    public async findListByLikedSongs(@Authentication() authentication: User, @Hostname() hostname: string): Promise<Tracklist> {
+        return this.service.findByLikedSongs(authentication, hostname);
+    }
+
+    /**
+     * Metadata endpoint of /liked_songs
+     * @param pageable Page settings
+     * @param authentication Authentication object
+     * @returns Page<Song>
+     */
+    @Get("/liked_songs/meta")
+    public async findMetaByLikedSongs(@Pagination() pageable: Pageable, @Authentication() authentication: User): Promise<Page<LikedSong>> {
+        return this.service.findMetaByLikedSongs(authentication, pageable);
     }
 
 }
