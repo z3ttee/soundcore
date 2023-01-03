@@ -83,7 +83,10 @@ export class AppPlayerBarComponent implements OnInit, OnDestroy {
         this.controls.seek(value);
     }
 
-    public toggleLike(song: Song) {
+    public toggleLike(event: MouseEvent, song: Song) {
+        event.stopPropagation();
+        event.preventDefault();
+
         if(typeof song === "undefined" || song == null) return;
         this.likeService.toggleLikeForSong(song).pipe(takeUntil(this._destroy), filter((request) => !request.loading)).subscribe((request) => {
             if(request.error) {

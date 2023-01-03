@@ -22,7 +22,7 @@
                     </ul>
                 </div>
 
-                <scngx-ibtn-text class="hidden sm:inline-block" (click)="toggleLike(props.song)" *ngIf="props.song">
+                <scngx-ibtn-text class="hidden sm:inline-block pointer-events-auto" (click)="toggleLike($event, props.song)" *ngIf="props.song">
                     <span class="w-full h-full flex items-center justify-center">
                         <hero-icon name="heart" type="outline" [class]="'w-6 h-6 ' + (props.song?.liked ? 'fill-accent text-accent' : '')"></hero-icon>
                     </span>

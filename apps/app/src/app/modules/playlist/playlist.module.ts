@@ -13,6 +13,7 @@ import { SCSDKPlaylistModule } from '@soundcore/sdk';
 import { FaIconLibrary, FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faPlay } from '@fortawesome/free-solid-svg-icons';
 import { SCNGXSongListItemModule } from 'src/app/components/list-items/song-list-item/song-list-item.module';
+import { SongContextMenuModule } from 'src/app/components/menus/song-context-menu/song-context-menu.module';
 
 const routes: Routes = [
   { path: ":playlistId", component: PlaylistInfoComponent }
@@ -43,7 +44,9 @@ const routes: Routes = [
     SCNGXIconBtnModule,
     SCNGXSongDurationPipeModule,
     SCNGXSongListItemModule,
-    SCNGXScrollingModule
+    SCNGXScrollingModule,
+
+    SongContextMenuModule
   ]
 })
 export class PlaylistModule {
