@@ -7,6 +7,8 @@ import { AppPlaylistChooseDialogModule } from 'src/app/dialogs/playlist-choose-d
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { SCNGXDialogModule } from '@soundcore/ngx';
 import { SCSDKCollectionModule } from '@soundcore/sdk';
+import { SCNGXDividerModule } from '@soundcore/ngx';
+import { RouterModule } from '@angular/router';
 
 @NgModule({
   declarations: [
@@ -14,10 +16,12 @@ import { SCSDKCollectionModule } from '@soundcore/sdk';
   ],
   imports: [
     CommonModule,
+    RouterModule,
     HeroIconModule.withIcons({ viewGridAdd, collection, heart }),
     SCCDKContextMenuModule,
 
     SCNGXDialogModule,
+    SCNGXDividerModule,
 
     AppPlaylistChooseDialogModule,
     MatSnackBarModule,

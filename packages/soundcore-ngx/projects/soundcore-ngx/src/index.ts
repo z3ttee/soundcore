@@ -29,6 +29,8 @@ export * from "./lib/utils/queue";
 // Lists
 export * from "./lib/components/list";
 
+// Divider
+export * from "./lib/components/divider";
 
 
 // Dialog
