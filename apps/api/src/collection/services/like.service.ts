@@ -8,6 +8,7 @@ import { PlaylistPrivacy } from '../../playlist/enums/playlist-privacy.enum';
 import { PlaylistService } from '../../playlist/playlist.service';
 import { Song } from '../../song/entities/song.entity';
 import { User } from '../../user/entities/user.entity';
+import { ToggleLikedSongDTO } from '../dtos/toggle-result.dto';
 import { LikedAlbum, LikedPlaylist, LikedResource, LikedSong } from '../entities/like.entity';
 
 @Injectable()
@@ -34,6 +35,10 @@ export class LikeService {
         return this.likedSongRepository.createQueryBuilder("like")
             .leftJoin("like.user", "user")
             .leftJoinAndSelect("like.song", "song")
+            .leftJoin("song.album", "album").addSelect(["album.id", "album.slug", "album.name"])
+            .leftJoin("song.primaryArtist", "primaryArtist").addSelect(["primaryArtist.id", "primaryArtist.slug", "primaryArtist.name"])
+            .leftJoin("song.featuredArtists", "featuredArtists").addSelect(["featuredArtists.id", "featuredArtists.slug", "featuredArtists.name"])
+            .leftJoin("song.artwork", "artwork").addSelect(["artwork.id"])
             .where("user.id = :userId AND song.id = :songId", { userId, songId })
             .getOne();
     }
@@ -103,21 +108,29 @@ export class LikeService {
      * @param authentication Authentication object
      * @returns True or False. True, if song received like, otherwise false
      */
-    public async toggleLikeForSong(songId: string, authentication: User): Promise<boolean> {
+    public async toggleLikeForSong(songId: string, authentication: User): Promise<ToggleLikedSongDTO> {
         const existing = await this.findByUserAndSong(authentication?.id, songId);
 
         // Remove like if exists.
         if(existing) {
-            return this.likedSongRepository.delete({ id: existing.id }).then(() => false).catch(() => {
+            return this.likedSongRepository.delete({ id: existing.id }).then((): ToggleLikedSongDTO => ({
+                isLiked: false,
+                song: existing
+            })).catch(() => {
                 throw new BadRequestException("Could not remove like from song.")
-            })
+            });
         }
 
         const like = new LikedSong();
         like.user = authentication;
         like.song = { id: songId } as Song;
 
-        return this.likedSongRepository.save(like).then(() => true).catch((error) => {
+
+
+        return this.likedSongRepository.save(like).then(async (): Promise<ToggleLikedSongDTO> => ({
+            isLiked: true,
+            song: await this.findByUserAndSong(authentication.id, songId)
+        })).catch((error) => {
             console.error(error);
             throw new BadRequestException("Could not like song.")
         })

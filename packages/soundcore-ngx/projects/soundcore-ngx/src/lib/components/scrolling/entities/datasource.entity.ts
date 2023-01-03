@@ -155,7 +155,16 @@ export abstract class SCNGXBaseDatasource<T = any> extends DataSource<T> {
 
     public append(item: T) {
         // Add fetched items to cachedData
-        this.cachedData.splice(this._totalSize, 1, item);
+
+        // this.cachedData.splice(this._totalSize, 1, item);
+        this.cachedData.push(item);
+        this.updateStream();
+
+        this.setTotalSize(this._totalSize + 1);
+    }
+
+    public prepend(item: T) {
+        this.cachedData.unshift(item);
         this.updateStream();
 
         this.setTotalSize(this._totalSize + 1);

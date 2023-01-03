@@ -174,6 +174,7 @@ export class TracklistService {
             .leftJoin("like.user", "user")
             .leftJoin("like.song", "song")
             .select(["like.id"])
+            .orderBy("like.likedAt", "DESC")
             .where("user.id = :userId AND like.type = :type", { userId: authentication.id, type: LikedSong.name })
             .getManyAndCount();
 
@@ -196,6 +197,9 @@ export class TracklistService {
             .leftJoin("song.primaryArtist", "primaryArtist").addSelect(["primaryArtist.id", "primaryArtist.slug", "primaryArtist.name"])
             .leftJoin("song.featuredArtists", "featuredArtists").addSelect(["featuredArtists.id", "featuredArtists.slug", "featuredArtists.name"])
             .loadRelationCountAndMap("song.liked", "song.likes", "likes", (qb) => qb.where("likes.userId = :userId", { userId: authentication?.id }))
+            .orderBy("like.likedAt", "DESC")
+            .take(pageable.limit)
+            .skip(pageable.offset)
             .where("user.id = :userId AND like.type = :type", { userId: authentication.id, type: LikedSong.name })
             .getManyAndCount();
 

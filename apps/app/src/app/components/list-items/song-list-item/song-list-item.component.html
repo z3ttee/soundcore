@@ -64,7 +64,7 @@
     </div>
 
     <!-- Date added to playlist -->
-    <div class="min-w-32 w-32 border px-2 text-right hidden lg:block" *ngIf="(showAddedBy || showAddedAt) && (addedAt || addedBy)">
+    <div class="min-w-32 w-32 px-2 text-right hidden lg:block" *ngIf="(showAddedBy || showAddedAt) && (addedAt || addedBy)">
         <scngx-skeleton [class]="'w-full h-4'" *ngIf="!song; else songAddedAt"></scngx-skeleton>
 
         <ng-template #songAddedAt>
@@ -76,7 +76,7 @@
     </div>
 
     <!-- Like Col -->
-    <div class="song-item-like-col inline-flex justify-center items-end max-w-10 min-w-10 px-2 opacity-100 md:opacity-0 pointer-events-none transition-all" [ngClass]="{'opacity-100 pointer-events-auto': song?.liked || isMobile, 'text-accent opacity-100': song?.liked}">
+    <div class="song-item-like-col inline-flex justify-center items-end max-w-10 min-w-10 px-2 opacity-100 pointer-events-none transition-all" [ngClass]="{'md:opacity-0': !song?.liked, 'opacity-100 pointer-events-auto': song?.liked || isMobile, 'text-accent opacity-100': song?.liked}">
         <span *ngIf="song" class="w-6 h-6" matRipple [matRippleCentered]="true" [matRippleUnbounded]="true" [matRippleRadius]="20" (click)="emitOnLike($event)">
             <hero-icon name="heart" type="outline" [class]="'w-6 h-6 ' + (song?.liked ? 'fill-accent' : '')"></hero-icon>
         </span>

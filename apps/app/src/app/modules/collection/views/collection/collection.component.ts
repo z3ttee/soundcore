@@ -2,9 +2,9 @@ import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute } from '@angular/router';
 import { SCNGXTracklist, SCNGXTracklistBuilder } from '@soundcore/ngx';
-import { LikedSong, SCSDKLikeService } from '@soundcore/sdk';
+import { LikedSong, SCSDKLikeService, ToggleLikedSongDTO } from '@soundcore/sdk';
 import { SSOService, SSOUser } from '@soundcore/sso';
-import { combineLatest, map, Observable, Subject, takeUntil, tap } from 'rxjs';
+import { combineLatest, filter, map, Observable, Subject, take, takeUntil } from 'rxjs';
 import { AUDIOWAVE_LOTTIE_OPTIONS } from 'src/app/constants';
 import { PlayerItem } from 'src/app/modules/player/entities/player-item.entity';
 import { AppPlayerService } from 'src/app/modules/player/services/player.service';
@@ -15,6 +15,7 @@ interface CollectionViewProps {
 
   tracklist?: SCNGXTracklist<LikedSong>;
   user?: SSOUser;
+  latestLikeChange?: ToggleLikedSongDTO;
 }
 
 @Component({
@@ -53,12 +54,23 @@ export class CollectionComponent implements OnInit, OnDestroy {
       currentItem,
       playing: !isPaused && currentItem?.tracklist?.id == tracklist?.id,
       tracklist,
-      user: ssoUser
-    })),
-    tap((props) => console.log(props))
+      user: ssoUser,
+    }))
   );
 
   ngOnInit(): void {
+    this.likeService.$onSongLikeChanged.pipe(filter((result) => !!result), takeUntil(this._destroy)).subscribe((toggleResult) => {
+      const likedSong = toggleResult.song;
+      const isLiked = toggleResult.isLiked;
+
+      this.$props.pipe(take(1), takeUntil(this._destroy)).subscribe(({ tracklist }) => {
+        if(isLiked) {
+          this.addToCollection(likedSong, tracklist);
+        } else {
+          this.removeFromCollection(likedSong, tracklist);
+        }
+      });
+    })
   }
 
   public ngOnDestroy(): void {
@@ -73,18 +85,24 @@ export class CollectionComponent implements OnInit, OnDestroy {
     this.player.playTracklist(tracklist, true).subscribe();
   }
 
-  public removeFromCollection(likedSong: LikedSong, tracklist: SCNGXTracklist<LikedSong>) {
+  public toggleAndRemoveFromCollection(likedSong: LikedSong, tracklist: SCNGXTracklist<LikedSong>) {
     this.likeService.toggleLikeForSong(likedSong.song).pipe(takeUntil(this._destroy)).subscribe((request) => {
       if(request.loading) return;
       if(request.error) {
-        this.snackbar.open(`Ein Fehler ist aufgetreten.`, null, { duration: 5000 });
+        this.snackbar.open(`Ein Fehler ist aufgetreten.`, null, { duration: 3000 });
         return;
       }
-      
-      console.log(likedSong);
-      tracklist.remove(likedSong);
-      this.snackbar.open(`Song aus Lieblingssongs entfernt`, null, { duration: 5000 });
     })
+  }
+
+  public removeFromCollection(likedSong: LikedSong, tracklist: SCNGXTracklist<LikedSong>) {
+    tracklist.removeById(likedSong.id);
+    this.snackbar.open(`Song aus Lieblingssongs entfernt`, null, { duration: 3000 });
+  }
+
+  public addToCollection(likedSong: LikedSong, tracklist: SCNGXTracklist<LikedSong>) {
+    console.log(likedSong);
+    tracklist.prepend(likedSong);
   }
 
 }

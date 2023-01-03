@@ -100,7 +100,7 @@ export class SongContextMenuComponent implements OnInit, OnDestroy {
         return;
       }
 
-      song.liked = request.data ?? song.liked;
+      song.liked = request.data.isLiked ?? song.liked;
 
       if(song.liked) {
         this.snackbar.open(`Song zu Lieblingssongs hinzugefügt.`, null, { duration: 3000 });

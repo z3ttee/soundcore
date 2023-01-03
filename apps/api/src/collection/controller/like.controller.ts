@@ -15,7 +15,7 @@ export class LikeController {
   }
 
   @Get("/songs/:songId")
-  public async likeSong(@Param("songId") songId: string, @Authentication() user: User): Promise<boolean> {
+  public async likeSong(@Param("songId") songId: string, @Authentication() user: User) {
     return this.likeService.toggleLikeForSong(songId, user);
   }
 

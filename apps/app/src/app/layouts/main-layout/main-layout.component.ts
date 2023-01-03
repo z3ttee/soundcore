@@ -21,7 +21,6 @@ interface MainLayoutProps {
 
 @Component({
     templateUrl: "./main-layout.component.html",
-    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AscMainLayoutComponent implements OnInit, OnDestroy {
 

@@ -16,7 +16,7 @@
                 </div>
             </scngx-collection-view>
 
-            <div class="px-window" *ngIf="!(props.tracklist?.$empty | async); else emptyListMessage">
+            <div class="px-window">
                 <div *cdkVirtualFor="let item of props.tracklist; index as i" class="w-full max-w-full min-w-0 overflow-hidden">
                     <scngx-song-list-item 
                             [song]="item.song" 
@@ -25,10 +25,15 @@
                             [playing]="props.playing"
                             [addedAt]="item.likedAt"
                             [addedBy]="item.user"
+                            [showAddedAt]="true"
                             [animRef]="lottieAnimationTemplate" *ngIf="item"
-                            (onLike)="removeFromCollection(item, props.tracklist)">
+                            (onLike)="toggleAndRemoveFromCollection(item, props.tracklist)">
                     </scngx-song-list-item>
                 </div>
+            </div>
+
+            <div *ngIf="(props.tracklist?.$empty | async)" class="px-window">
+                <p>Du hast bisher noch keinen Song zu deinen Lieblingssongs hinzugefügt.</p>
             </div>
 
             <div class="pb-bottom"></div>
@@ -37,10 +42,4 @@
 
 <ng-template #lottieAnimationTemplate>
     <ng-lottie [options]="animOptions" class="aspect-square"></ng-lottie>
-</ng-template>
-
-<ng-template #emptyListMessage>
-    <div class="px-window">
-        <p>Du hast bisher noch keinen Song zu deinen Lieblingssongs hinzugefügt.</p>
-    </div>
 </ng-template>

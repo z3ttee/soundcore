@@ -6,23 +6,27 @@ import { Pageable } from "../../pagination/pageable";
 import { SCDKOptions, SCDK_OPTIONS } from "../../scdk.module";
 import { Song } from "../../song";
 import { Future, toFuture } from "../../utils/future";
+import { ToggleLikedSongDTO } from "../dtos/toggle-result.dto";
 import { LikedSong } from "../entities/like.entity";
 
-@Injectable()
+@Injectable({
+    providedIn: "root"
+})
 export class SCSDKLikeService {
 
-    private readonly _onSongLikeChangedSubject: Subject<Song> = new Subject();
-    public readonly $onSongLikeChanged: Observable<Song> = this._onSongLikeChangedSubject.asObservable();
+    private readonly _onSongLikeChangedSubject: Subject<ToggleLikedSongDTO> = new Subject();
+    public readonly $onSongLikeChanged: Observable<ToggleLikedSongDTO> = this._onSongLikeChangedSubject.asObservable();
 
     constructor(
         private httpClient: HttpClient,
         @Inject(SCDK_OPTIONS) private readonly options: SCDKOptions
     ) {}
 
-    public toggleLikeForSong(song: Song): Observable<Future<boolean>> {
-        return this.httpClient.get<boolean>(`${this.options.api_base_uri}/v1/likes/songs/${song.id}`).pipe(toFuture(), tap((request) => {
+    public toggleLikeForSong(song: Song): Observable<Future<ToggleLikedSongDTO>> {
+        return this.httpClient.get<ToggleLikedSongDTO>(`${this.options.api_base_uri}/v1/likes/songs/${song.id}`).pipe(toFuture(), tap((request) => {
+            console.log(request);
             if(request.loading || request.error) return;
-            this._onSongLikeChangedSubject.next(song);
+            this._onSongLikeChangedSubject.next(request.data);
         }));
     }
 
