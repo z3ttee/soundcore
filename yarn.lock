@@ -186,13 +186,6 @@
   dependencies:
     tslib "^2.3.0"
 
-"@angular/cdk-experimental@^14.1.0":
-  version "14.2.7"
-  resolved "https://registry.yarnpkg.com/@angular/cdk-experimental/-/cdk-experimental-14.2.7.tgz#d7a0ccbd53460f33e5a0ed21d1b74bc04a22572c"
-  integrity sha512-SzdLiOW6hdtPfEPSgx8aKuX2xEf9w3uH9RlCaVXuj5cNDJCy50PiJhRIAoRrd6p3OhHexW4aBesdEQpyysRzkg==
-  dependencies:
-    tslib "^2.3.0"
-
 "@angular/cdk@^14.1.0":
   version "14.2.5"
   resolved "https://registry.yarnpkg.com/@angular/cdk/-/cdk-14.2.5.tgz#12cec1b890775cc9b041a2ae85d638068b5e90bb"

@@ -37,14 +37,24 @@ export class MountQueueService {
             const { payload } = job;
             const { mount, flag } = payload;
 
-            this.logger.verbose(`Looking for files on mount '${mount.name}'...`);
-            this.mountService.setMountStatus(mount, MountStatus.SCANNING);
+            if(flag === MountScanFlag.DOCKER_LOOKUP) {
+                this.logger.verbose(`Application running in docker container. Looking for mounted volumes...`);
+            } else {
+                this.logger.verbose(`Looking for files on mount '${mount.name}'...`);
+                this.mountService.setMountStatus(mount, MountStatus.SCANNING);
+            }
         });
 
         // Completed
         this.queue.on("completed", async (job: WorkerJob<MountScanProcessDTO, MountScanResultDTO>) => {
             const { payload, result } = job;
             const { flag } = payload;
+
+            if(job.payload.flag === MountScanFlag.DOCKER_LOOKUP) {
+                this.logger.verbose(`Successfully looked up mounted directories inside /mnt/. Next step is preparing the mounts for scanning.`);
+                this.mountService.checkMountsStandaloneMode();
+                return;
+            }
 
             const files = result?.files || [];
             const mount = result.mount;
@@ -66,7 +76,10 @@ export class MountQueueService {
 
         // Progress
         this.queue.on("progress", async (job: WorkerJobRef<MountScanProcessDTO>) => {
-            const { mount } = job.payload;
+            const { mount, flag } = job.payload;
+
+            // Unavailable if in docker lookup mode
+            if(flag === MountScanFlag.DOCKER_LOOKUP) return;
 
             if(Environment.isDebug) {
                 this.logger.debug(`Received progress update from mount ${mount.name}: ${job.progress}`);
@@ -78,9 +91,14 @@ export class MountQueueService {
 
         // Failed
         this.queue.on("failed", async (job: WorkerJobRef<MountScanProcessDTO>, error: Error) => {
-            const { mount } = job.payload;
-            this.logger.error(`Failed looking for files on mount ${mount.name}: ${error.message}`, error.stack);
-            this.mountService.setMountStatus(mount, MountStatus.UP);
+            const { mount, flag } = job.payload;
+
+            if(flag === MountScanFlag.DOCKER_LOOKUP) {
+                this.logger.error(`Failed looking up mounted directories via docker volumes: ${error.message}`, error.stack);
+            } else {
+                this.logger.error(`Failed looking for files on mount ${mount.name}: ${error.message}`, error.stack);
+                this.mountService.setMountStatus(mount, MountStatus.UP);
+            }
         });
     }
 }

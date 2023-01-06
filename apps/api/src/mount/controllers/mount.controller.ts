@@ -9,8 +9,6 @@ import { UpdateMountDTO } from '../dtos/update-mount.dto';
 import { Mount } from '../entities/mount.entity';
 import { MountService } from '../services/mount.service';
 
-// TODO: Implement artwork mount per bucket.
-
 @Controller('mounts')
 export class MountController {
   constructor(private readonly mountService: MountService) {}
@@ -37,7 +35,7 @@ export class MountController {
   @Post()
   public async createMount(@Body() createMountDto: CreateMountDTO): Promise<CreateResult<Mount>> {
     if(Environment.isDockerized) {
-      throw new BadRequestException("Application is dockerized, please mount a volume instead.");
+      throw new BadRequestException("Application is dockerized, please mount a docker volume into / instead.");
     }
     
     return this.mountService.createIfNotExists(createMountDto)

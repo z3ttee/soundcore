@@ -2,8 +2,8 @@ import { HttpClient } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
-import { BehaviorSubject, combineLatest, map, Observable, Subject, switchMap, takeUntil, tap } from 'rxjs';
-import { File, Future, Mount, SCDKFileService, SCSDKMountModule, SCSDKMountService } from '@soundcore/sdk';
+import { BehaviorSubject, combineLatest, map, Observable, Subject, switchMap, takeUntil } from 'rxjs';
+import { ApplicationInfo, File, Future, Mount, SCDKFileService, SCSDKAppService, SCSDKMountService } from '@soundcore/sdk';
 import { AppMountCreateDialog, MountCreateDialogOptions } from 'src/app/dialogs/mount-create-dialog/mount-create-dialog.component';
 import { SCNGXDatasource, SCNGXDialogService } from '@soundcore/ngx';
 
@@ -11,12 +11,11 @@ interface MountInfoProps {
   mount?: Mount;
   loading?: boolean;
   datasource?: SCNGXDatasource<File>;
+  appInfo?: ApplicationInfo;
 }
 
 @Component({
-  selector: 'app-mount-info',
   templateUrl: './mount-info.component.html',
-  styleUrls: ['./mount-info.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class MountInfoComponent implements OnInit, OnDestroy {
@@ -28,7 +27,8 @@ export class MountInfoComponent implements OnInit, OnDestroy {
     private readonly router: Router,
     private readonly httpClient: HttpClient,
     private readonly dialog: SCNGXDialogService,
-    private readonly snackbar: MatSnackBar
+    private readonly snackbar: MatSnackBar,
+    private readonly appService: SCSDKAppService
   ) { }
 
   @ViewChild("container") public containerRef: ElementRef<HTMLDivElement>;
@@ -52,13 +52,16 @@ export class MountInfoComponent implements OnInit, OnDestroy {
         ];
       })
     ),
-    this._updateMountSubject.asObservable()
+    this._updateMountSubject.asObservable(),
+    this.appService.$appInfo.pipe(takeUntil(this._destroy))
   ]).pipe(
-    map(([[request, datasource], onMountUpdate]): MountInfoProps => ({
+    map(([[request, datasource], onMountUpdate, appInfo]): MountInfoProps => ({
       loading: request.loading,
       mount: onMountUpdate ?? request.data,
-      datasource: datasource
+      datasource: datasource,
+      appInfo: appInfo
     })),
+    takeUntil(this._destroy)
   );
 
   public ngOnInit(): void {}
@@ -89,6 +92,8 @@ export class MountInfoComponent implements OnInit, OnDestroy {
   }
 
   public openMountEditorDialog(mount?: Mount) {
+    console.log(mount);
+
     if(!mount) return;
 
     this.dialog.open<any, MountCreateDialogOptions, Mount>(AppMountCreateDialog, {

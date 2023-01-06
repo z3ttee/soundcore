@@ -1,6 +1,10 @@
-import { IsNotEmpty, IsOptional, Length } from "class-validator";
+import { IsBoolean, IsNotEmpty, IsNumber, IsObject, IsOptional, Length, Max, Min } from "class-validator";
+import { Mount } from "../entities/mount.entity";
 
-export class CreateMountDTO {
+export class CreateMountDTO implements 
+    Pick<Mount, "name">, 
+    Partial<Pick<Mount, "isDefault">> 
+{
 
     @IsNotEmpty()
     @Length(3, 32)
@@ -11,13 +15,17 @@ export class CreateMountDTO {
     public directory?: string;
 
     @IsNotEmpty()
-    @Length(36)
-    public bucketId: string;
+    @IsObject()
+    public bucket: { id: string };
 
     @IsOptional()
+    @IsBoolean()
     public doScan?: boolean = true;
 
     @IsOptional()
-    public setAsDefault?: boolean = false;
+    @IsNumber()
+    @Max(1)
+    @Min(0)
+    public isDefault: boolean = false;
 
 }

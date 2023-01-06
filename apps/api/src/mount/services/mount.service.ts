@@ -1,6 +1,6 @@
-import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import path from 'node:path';
+import { BadRequestException, Injectable, InternalServerErrorException, Logger, NotFoundException } from '@nestjs/common';
 import { Page, Pageable } from 'nestjs-pager';
-import path from 'path';
 import { Repository } from 'typeorm';
 import { Bucket } from '../../bucket/entities/bucket.entity';
 import { CreateMountDTO } from '../dtos/create-mount.dto';
@@ -14,6 +14,7 @@ import { WorkerQueue } from '@soundcore/nest-queue';
 import { MountRegistryService } from './mount-registry.service';
 import { MountScanFlag, MountScanProcessDTO } from '../dtos/scan-process.dto';
 import { FileFlag } from '../../file/entities/file.entity';
+import { Environment } from '@soundcore/common';
 
 @Injectable()
 export class MountService {
@@ -24,7 +25,7 @@ export class MountService {
         private readonly fileSystem: FileSystemService,
         private readonly mountRegistryService: MountRegistryService,
         private readonly queue: WorkerQueue<MountScanProcessDTO>
-    ) { }
+    ) {}
 
     /**
      * Find a list of mounts inside a bucket.
@@ -111,7 +112,10 @@ export class MountService {
      * @returns Mount
      */
     public async findDefaultOfBucket(bucketId: string): Promise<Mount> {
-        return await this.repository.findOne({ where: { isDefault: true, bucket: { id: bucketId }}, relations: ["bucket"]});
+        return this.repository.createQueryBuilder("mount")
+            .leftJoinAndSelect("mount.bucket", "bucket")
+            .where("bucket.id = :bucketId AND mount.isDefault = :isDefault", { bucketId: bucketId, isDefault: 1 })
+            .getOne();
     }
 
     /**
@@ -122,6 +126,12 @@ export class MountService {
         return this.findDefaultOfBucket(this.fileSystem.getInstanceId());
     }
 
+    /**
+     * Find a list of mounts from the database that have relations
+     * with files that still need to be analysed (they have their flag set to PENDING_ANALYSIS).
+     * This is useful when re-enqueueing these files after the service crashed or restarted.
+     * @returns Mount[]
+     */
     public async findHasAwaitingFiles(): Promise<Mount[]> {
         return this.repository.createQueryBuilder("mount")
             .leftJoin("mount.files", "file")
@@ -191,31 +201,49 @@ export class MountService {
         createMountDto.directory = this.fileSystem.resolveMountDirectory(createMountDto.directory);
         const directory = createMountDto.directory
 
-        const existingMount = await this.findByNameInBucket(createMountDto.bucketId, createMountDto.name) || await this.findByDirectoryInBucket(createMountDto.bucketId, createMountDto.directory);
+        const existingMount = await this.findByNameInBucket(createMountDto.bucket.id, createMountDto.name) || await this.findByDirectoryInBucket(createMountDto.bucket.id, createMountDto.directory);
         if(existingMount) return new CreateResult(existingMount, true);
 
         const mount = this.repository.create();
         mount.name = createMountDto.name;
         mount.directory = directory;
-        mount.bucket = { id: createMountDto.bucketId } as Bucket;
+        mount.bucket = createMountDto.bucket as Bucket;
 
         return this.repository.createQueryBuilder()
             .insert()
             .values(mount)
             .orIgnore()
-            .execute().then((result) => {
-                if(result.identifiers.length > 0) {
-                    return new CreateResult(mount, false);
+            .execute().then((insertResult) => {
+                if(insertResult.identifiers.length < 0) {
+                    return this.findByNameInBucket(createMountDto.bucket.id, createMountDto.name).then((existingMount) => {
+                        return new CreateResult(existingMount, false);
+                    });
                 }
-                return this.findByNameInBucket(createMountDto.bucketId, createMountDto.name).then((mount) => {
-                    if(createMountDto.setAsDefault) this.setDefaultMount(mount);
+
+                return this.findById(insertResult.identifiers[0].id).then((result) => {
+                    if(createMountDto.isDefault) this.setDefaultMount(result);
                     if(createMountDto.doScan) this.rescanMount(mount);
                     return new CreateResult(mount, true)
-                });
+                })
             }).catch((error) => {
                 this.logger.error(`Could not create database entry for mount: ${error.message}`, error.stack);
                 return null
             })
+    }
+
+
+    public async createMultipleIfNotExists(createMountDtos: CreateMountDTO[]): Promise<Mount[]> {
+        return this.repository.createQueryBuilder()
+            .insert()
+            .orIgnore()
+            .values(createMountDtos)
+            .returning(["id"])
+            .execute().then((insertResult) => {
+                return this.repository.createQueryBuilder("mount")
+                    .leftJoinAndSelect("mount.bucket", "bucket")
+                    .whereInIds(insertResult.raw)
+                    .getMany();
+            });
     }
 
     /**
@@ -238,7 +266,7 @@ export class MountService {
 
         mount.name = updateMountDto.name;
         
-        if(mount.isDefault && !updateMountDto.setAsDefault) {
+        if(mount.isDefault && !updateMountDto.isDefault) {
             // Mount is removed as default mount, but no other mount
             // is selected to be next default --> select random one
             if(!await this.setRandomAsDefaultMount([mount.id])) {
@@ -249,7 +277,7 @@ export class MountService {
         }
 
         return this.repository.save(mount).then(async (result) => {
-            if(updateMountDto.setAsDefault) await this.setDefaultMount(mount);
+            if(updateMountDto.isDefault) await this.setDefaultMount(mount);
             if(updateMountDto.doScan) this.rescanMount(mount);
             return result;
         });
@@ -272,18 +300,21 @@ export class MountService {
      * default.
      */
     public async checkForDefaultMount() {
-        const defaultMount = await this.findDefaultOfBucket(this.fileSystem.getInstanceId());
+        return this.findDefault().then((defaultMount) => {
+            if(typeof defaultMount !== "undefined" && defaultMount != null) {
+                return defaultMount;
+            }
 
-        if(!defaultMount) {
+            // Create the default mount, should always
+            // be the default mount if no other default mount exists.
             return this.createIfNotExists({
-                bucketId: this.fileSystem.getInstanceId(),
+                bucket: { id: this.fileSystem.getInstanceId() },
                 directory: this.fileSystem.resolveInitialMountPath(),
-                name: `Default Mount #${Random.randomString(4)}`,
-                setAsDefault: true,
-            });
-        }
-
-        return defaultMount;
+                name: this.generateName("Default Mount"),
+                isDefault: true,
+                doScan: false
+            }).then((result) => result.data);
+        });
     }
 
     /**
@@ -329,7 +360,23 @@ export class MountService {
      * This will read all mounts from the database and add them
      * to the scanner queue for directory scanning.
      */
-    public async checkMounts() {
+    public async checkMountsDockerMode() {
+        if(!Environment.isDockerized) throw new InternalServerErrorException(`Tried checking mounts in docker mode, but application is in standalone mode.`);
+        
+        this.queue.enqueue(<MountScanProcessDTO>{
+            flag: MountScanFlag.DOCKER_LOOKUP,
+            mount: null
+        });
+    }
+
+    /**
+     * Function used to check for mounts when the application is in standalone
+     * mode. This will fetch all registered soundcore mounts from the database and
+     * enqueue all found mounts for scanning.
+     * This function is also called, after all mounted directories via docker volumes
+     * are registered as mounts.
+     */
+    public async checkMountsStandaloneMode() {
         const options: Pageable = new Pageable(0, 30);
 
         let page: Page<Mount>;
@@ -342,7 +389,9 @@ export class MountService {
             fetchedElements += page.size;
 
             for(const mount of page.elements) {
-                this.scanMountInternal(mount);
+                this.scanMountInternal(mount).catch((error: Error) => {
+                    this.logger.error(`Could not trigger scanning process for mount '${mount?.name}': ${error.message}`);
+                });
             }
         }
     }
@@ -363,6 +412,10 @@ export class MountService {
         return this.repository.delete({ id: mountId }).then((result) => {
             return result.affected > 0;
         })
+    }
+
+    public generateName(name: string): string {
+        return `${name.slice(0, Math.min(27, name.length))}#${Random.randomString(4)}`;
     }
 
     /**

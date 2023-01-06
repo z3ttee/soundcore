@@ -1,9 +1,9 @@
 import { HttpClient } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { BehaviorSubject, combineLatest, map, Observable, Subject, switchMap, takeUntil } from 'rxjs';
+import { BehaviorSubject, combineLatest, filter, map, Observable, Subject, switchMap, takeUntil } from 'rxjs';
 import { SCNGXDatasource, SCNGXDialogService } from '@soundcore/ngx';
-import { ApiError, Bucket, Future, Mount, SCDKBucketService, SCSDKAdminGateway, toFuture } from '@soundcore/sdk';
+import { ApiError, ApplicationInfo, Bucket, Future, Mount, SCDKBucketService, SCSDKAdminGateway, SCSDKAppService, toFuture } from '@soundcore/sdk';
 import { AppMountCreateDialog, MountCreateDialogOptions } from 'src/app/dialogs/mount-create-dialog/mount-create-dialog.component';
 import { environment } from 'src/environments/environment';
 
@@ -12,6 +12,7 @@ interface ZoneInfoProps {
   datasource?: SCNGXDatasource<Mount>;
   error?: ApiError;
   zone?: Bucket;
+  appInfo?: ApplicationInfo;
 }
 
 @Component({
@@ -25,7 +26,8 @@ export class ZoneInfoComponent implements OnDestroy {
     private readonly activatedRoute: ActivatedRoute,
     private readonly dialog: SCNGXDialogService,
     private readonly httpClient: HttpClient,
-    private readonly adminGateway: SCSDKAdminGateway
+    private readonly adminGateway: SCSDKAdminGateway,
+    private readonly appService: SCSDKAppService
   ) { }
 
   private readonly _destroy: Subject<void> = new Subject();
@@ -49,13 +51,15 @@ export class ZoneInfoComponent implements OnDestroy {
           })
         );
       })
-    )
+    ),
+    this.appService.$appInfo.pipe(filter((info) => !!info), takeUntil(this._destroy))
   ]).pipe(
-    map(([[request, datasource]]): ZoneInfoProps => ({
+    map(([[request, datasource], appInfo]): ZoneInfoProps => ({
       loading: request.loading,
       error: request.error,
       datasource: datasource,
-      zone: request.data
+      zone: request.data,
+      appInfo: appInfo
     })),
     takeUntil(this._destroy)
   );

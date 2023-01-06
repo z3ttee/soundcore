@@ -8,7 +8,7 @@ export class UpdateMountDTO {
 
     @IsOptional()
     @IsBoolean()
-    public setAsDefault?: boolean;
+    public isDefault?: boolean;
 
     @IsOptional()
     @IsBoolean()

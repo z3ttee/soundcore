@@ -1,8 +1,9 @@
-import { INestApplication, NestApplicationOptions, NestHybridApplicationOptions, VersioningOptions } from "@nestjs/common";
+import { Global, INestApplication, Logger, Module, NestApplicationOptions, NestHybridApplicationOptions, VersioningOptions } from "@nestjs/common";
 import { NestFactory } from "@nestjs/core";
 import { MicroserviceOptions } from '@nestjs/microservices';
-import { BehaviorSubject, filter, firstValueFrom, map } from "rxjs";
+import { BehaviorSubject, filter, firstValueFrom } from "rxjs";
 import { Printer } from "./printer";
+import { BootstrapShutdownService } from "./shutdown";
 import { buildHttpsOptions } from "./ssl";
 
 const appUrlSubject: BehaviorSubject<string> = new BehaviorSubject(null);
@@ -12,7 +13,19 @@ interface Microservice {
   hybridOptions?: NestHybridApplicationOptions
 }
 
+@Global()
+@Module({
+  providers: [
+    BootstrapShutdownService
+  ],
+  exports: [
+    BootstrapShutdownService
+  ]
+})
+export class BootstrapModule {}
+
 class Bootstrapper {
+  private readonly logger = new Logger(Bootstrapper.name);
 
   private _options: NestApplicationOptions = null;
   private _versioningOptions: VersioningOptions = null;
@@ -91,9 +104,27 @@ class Bootstrapper {
     }
 
     return app.startAllMicroservices().then((app) => {
+      
       return app.listen(this._port, this._host).then(() => {
         return app.getUrl().then((url) => {
           appUrlSubject.next(url);
+
+          // Register to shutdown service if available
+          const listener = app.get(BootstrapShutdownService)?.$shutdownListener;
+          if(typeof listener === "undefined" || listener == null) {
+            this.logger.warn(`Developer Notice: Shutdown hook may not be available because the application was unable to subscribe to the shutdown listener of the ${BootstrapShutdownService.name}.`);
+          } else {
+            this.logger.log(`Subscribed to internal shutdown signal.`);
+
+            // TODO: Listener is not triggered
+
+            listener.subscribe((error) => {
+              this.logger.log(`Received shutdown signal from inside application. Shutting down...`);
+              this.logger.error(`Received shutdown signal from inside application: ${error.message}`, error.stack);
+              process.exit(1);
+            })
+          }
+
           return app;
         })
       });

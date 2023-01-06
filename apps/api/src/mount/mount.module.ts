@@ -1,5 +1,5 @@
 import path from 'path';
-import { Module, OnModuleInit } from '@nestjs/common';
+import { Logger, Module, OnModuleInit } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { MountService } from './services/mount.service'
 import { MountController } from './controllers/mount.controller';
@@ -8,6 +8,7 @@ import { MountQueueService } from './services/mount-queue.service';
 import { WorkerQueueModule } from '@soundcore/nest-queue';
 import { MountRegistryService } from './services/mount-registry.service';
 import { GatewayModule } from '../gateway/gateway.module';
+import { Environment } from '@soundcore/common';
 
 @Module({
   controllers: [
@@ -32,6 +33,7 @@ import { GatewayModule } from '../gateway/gateway.module';
   ]
 })
 export class MountModule implements OnModuleInit {
+  private readonly logger = new Logger(MountModule.name);
 
   constructor(
     private readonly service: MountService,
@@ -39,7 +41,17 @@ export class MountModule implements OnModuleInit {
 
   public async onModuleInit() {
     return this.service.checkForDefaultMount().then(() => {
-      return this.service.checkMounts();
+      if(Environment.isDockerized) {
+        return this.service.checkMountsDockerMode();
+      } else {
+        return this.service.checkMountsStandaloneMode();
+      }
+    }).catch((error: Error) => {
+      if(Environment.isDebug) {
+        this.logger.error(`Error occured while checking mounts: ${error.message}`, error.stack);
+      } else {
+        this.logger.error(`Error occured while checking mounts: ${error.message}`);
+      }
     });
   }
 
