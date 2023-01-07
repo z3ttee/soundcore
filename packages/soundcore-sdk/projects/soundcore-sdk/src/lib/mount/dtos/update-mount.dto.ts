@@ -1,5 +1,5 @@
 export class UpdateMountDTO {
     public name: string;
-    public setAsDefault?: boolean;
-    public doScan?: boolean;
+    public isDefault?: boolean = false;
+    public doScan?: boolean = false;
 }

@@ -55,7 +55,7 @@ export class AppMountCreateDialog implements OnDestroy {
         if(this.dialogRef.config.data.mode == "edit") {
             this.mountService.update(this.dialogRef.config.data.data?.id, {
                 name: this.form.get("name").value,
-                setAsDefault: this.form.get("setAsDefault").value,
+                isDefault: this.form.get("setAsDefault").value,
                 doScan: this.form.get("doScan").value
             }).pipe((takeUntil(this._destroy))).subscribe((request) => {
                 this.loading = request.loading;
@@ -74,9 +74,9 @@ export class AppMountCreateDialog implements OnDestroy {
         // Handle editor mode == "create"
         this.mountService.create({
             name: this.form.get("name").value,
-            bucketId: this.dialogRef.config.data.bucketId,
+            bucket: { id: this.dialogRef.config.data.bucketId },
             directory: this.form.get("directory").value,
-            setAsDefault: this.form.get("setAsDefault").value,
+            isDefault: this.form.get("setAsDefault").value,
             doScan: this.form.get("doScan").value
         }).pipe(takeUntil(this._destroy)).subscribe((request) => {
             this.loading = request.loading;

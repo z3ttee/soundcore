@@ -7,7 +7,8 @@ import crypto from "node:crypto";
 import { OIDCUser } from "../entities/oidc-user.entity";
 import { catchError, map, Observable, of, switchMap, tap } from "rxjs";
 import { JWTDecodedToken, JWTTokenPayload, KeycloakDecodedToken } from "../entities/oidc-token.entity";
-import { JWK, JWKSet, JWKStore } from "../entities/jwks.entity";
+import { JWKSet, JWKStore } from "../entities/jwks.entity";
+import { BootstrapShutdownService } from "@soundcore/bootstrap";
 
 @Injectable()
 export class OIDCService {
@@ -21,8 +22,14 @@ export class OIDCService {
 
     constructor(
         private readonly jwtService: JwtService,
+        private readonly bootstrapper: BootstrapShutdownService,
         @Inject(OIDC_OPTIONS) private readonly options: OIDCConfig
-    ) {}
+    ) {
+        if(!this.options.issuer) {
+            this.logger.error(`Found invalid issuer url. A valid value is needed for proper authentication.`);
+            this.bootstrapper.shutdown();
+        }
+    }
 
     public client(): Observable<Client> {
         return new Observable((subscriber) => {
@@ -86,6 +93,8 @@ export class OIDCService {
             }
 
             const discoverObservable: Observable<Issuer<BaseClient>> = new Observable((sub) => {
+                console.log(this.options.issuer)
+
                 Issuer.discover(`${this.options.issuer}`).then((issuer) => {
                     this._issuer = issuer 
                     this._client = new this._issuer.Client({

@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, Index, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { Bucket } from "../../bucket/entities/bucket.entity";
 import { File } from "../../file/entities/file.entity";
 
@@ -10,6 +10,7 @@ export enum MountStatus {
 }
 
 @Entity()
+@Index(["name", "directory", "bucket"], { unique: true })
 export class Mount {
 
     @PrimaryGeneratedColumn("uuid")
@@ -36,7 +37,7 @@ export class Mount {
     @Column({ default: false })
     public isDefault: boolean;
 
-    @ManyToOne(() => Bucket, { onDelete: "CASCADE" })
+    @ManyToOne(() => Bucket, { onDelete: "CASCADE", nullable: false })
     @JoinColumn()
     public bucket: Bucket;
 

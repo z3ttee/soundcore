@@ -9,6 +9,10 @@
                 <p scngxSubtitle>Mount</p>
             </scngx-ui-title>
 
+            <div class="p-4 rounded-sm bg-warn border-warn-light border-2" *ngIf="props.appInfo.isDockerized">
+                <p class="text-sm">Die Anwendung wird derzeit in einer Docker-Umgebung ausgeführt. Neue Mounts kannst du deshalb nur über das Einbinden weiterer Docker-Volumes erstellen.</p>
+            </div>
+
             <ng-template #loadingTitle>
                 <div class="w-full">
                     <scngx-skeleton [class]="'h-10 w-96 mt-1'" *ngIf="props.loading"></scngx-skeleton>
@@ -43,7 +47,7 @@
                 <div class="p-4 rounded-sm bg-body-light border border-body-lighter shadow-md" *ngIf="!props.loading">
                     <h6>Aktionen</h6>
                     <ul class="flex flex-wrap items-start w-full gap-2 mt-4">
-                        <scngx-btn (click)="openMountEditorDialog()"><hero-icon [class]="'h-5 w-5'" name="pencil"></hero-icon>Mount bearbeiten</scngx-btn>
+                        <scngx-btn (click)="openMountEditorDialog(props.mount)"><hero-icon [class]="'h-5 w-5'" name="pencil"></hero-icon>Mount bearbeiten</scngx-btn>
                         <scngx-btn (click)="triggerReindex(props.mount)">Indexierung starten</scngx-btn>
                         <scngx-lbtn-outlined appearance="error" [loading]="($deleting | async)" (click)="deleteMount(props.mount)"><hero-icon [class]="'h-5 w-5 align-middle'" name="trash"></hero-icon><span class="align-middle">Mount löschen</span></scngx-lbtn-outlined>
                     </ul>

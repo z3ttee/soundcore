@@ -3,6 +3,7 @@ import { NavigationCancel, NavigationEnd, NavigationError, NavigationStart, Rout
 import { SSOService } from '@soundcore/sso';
 import { BehaviorSubject, combineLatest, filter, map, Observable, Subject, takeUntil } from 'rxjs';
 import { SCCDKScreenService } from '@soundcore/cdk';
+import { SCSDKAppService } from '@soundcore/sdk';
 
 @Component({
   selector: 'app-root',
@@ -14,7 +15,8 @@ export class AppComponent {
   constructor(
       public readonly screenService: SCCDKScreenService,
       public readonly authService: SSOService,
-      private readonly router: Router
+      private readonly router: Router,
+      private readonly appService: SCSDKAppService
   ) {}
 
   private _destroySubject: Subject<void> = new Subject();
@@ -30,7 +32,9 @@ export class AppComponent {
           } else {
             this._loadingSubject.next(false);
           }
-      })
+      });
+
+      this.appService.$appInfo.pipe(takeUntil(this.$destroy)).subscribe();
   }
 
   public ngAfterViewInit(): void {

@@ -1,9 +1,8 @@
 
 export class CreateMountDTO {
     public name: string;
-    public bucketId: string;
-    
+    public bucket: { id: string };
     public directory?: string;
     public doScan?: boolean = true;
-    public setAsDefault?: boolean = false;
+    public isDefault?: boolean = false;
 }

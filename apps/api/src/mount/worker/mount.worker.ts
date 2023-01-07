@@ -1,4 +1,4 @@
-import { Logger } from "@nestjs/common";
+import { InternalServerErrorException, Logger } from "@nestjs/common";
 import { glob } from "glob";
 import fs from "fs";
 import path from "path";
@@ -11,6 +11,10 @@ import { FileSystemService } from "../../filesystem/services/filesystem.service"
 import { MountRegistryService } from "../services/mount-registry.service";
 import { MountRegistry } from "../entities/mount-registry.entity";
 import { MountScanFlag, MountScanProcessDTO } from "../dtos/scan-process.dto";
+import { CreateMountDTO } from "../dtos/create-mount.dto";
+import Database from "../../utils/database/database-worker-client";
+import { Mount } from "../entities/mount.entity";
+import { MountService } from "../services/mount.service";
 
 const logger = new Logger("MountWorker");
 const filesystem = new FileSystemService();
@@ -31,6 +35,10 @@ export const MOUNT_STEP_SCAN = "SCANNING";
 export default async function (job: WorkerJobRef<MountScanProcessDTO>): Promise<MountScanResultDTO> {
     const { mount, flag } = job.payload;
 
+    if(flag === MountScanFlag.DOCKER_LOOKUP) {
+        return lookupDockerMountedVolumes(job);
+    }
+
     if(typeof mount === "undefined" || mount == null) {
         throw new Error("Invalid mount: null");
     }
@@ -48,6 +56,8 @@ export default async function (job: WorkerJobRef<MountScanProcessDTO>): Promise<
         return scanMount(job);
     } else if(flag === MountScanFlag.RESCAN) {
         return rescanMount(job);
+    } else {
+        throw new InternalServerErrorException(`Received mount scan task with invalid flag.`);
     }
 }
 
@@ -127,6 +137,47 @@ async function rescanMount(job: WorkerJobRef<MountScanProcessDTO>): Promise<Moun
                 ...result,
                 flag: MountScanFlag.RESCAN
             };
+        });
+    });
+}
+
+async function lookupDockerMountedVolumes(job: WorkerJobRef<MountScanProcessDTO>): Promise<MountScanResultDTO> {
+    const startedAtMs = Date.now();
+
+    return Database.connect().then((datasource) => {
+        const repository = datasource.getRepository(Mount);
+
+        const fsService = new FileSystemService();
+        const registryService = new MountRegistryService(fsService);
+        const service = new MountService(repository, filesystem, registryService, null);
+
+        return new Promise<MountScanResultDTO>((resolve, reject) => {
+            const rootDir = "/mnt/";
+    
+            fs.readdir(rootDir, { withFileTypes: true }, (err, files) => {
+                if(err) {
+                    reject(err);
+                    return;
+                }
+    
+                const mountDtos: CreateMountDTO[] = files.filter((dirent) => dirent.isDirectory()).map((dirent) => ({
+                    bucket: { id: fsService.getInstanceId() },
+                    name: service.generateName(dirent.name),
+                    directory: path.join(rootDir, dirent.name),
+                    isDefault: false,
+                    doScan: false
+                }));
+
+                service.createMultipleIfNotExists(mountDtos).then((mounts) => {
+                    logger.verbose(`Registered ${mounts.length} mounted directories.`);
+                    resolve(<MountScanResultDTO>{
+                        timeMs: Date.now() - startedAtMs
+                    });
+                }).catch((error: Error) => {
+                    console.error(error);
+                    reject(error);
+                });
+            });
         });
     });
 }

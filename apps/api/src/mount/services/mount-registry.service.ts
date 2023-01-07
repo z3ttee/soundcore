@@ -33,7 +33,7 @@ export class MountRegistryService {
                 return registry;
             });
         }).catch((error: Error) => {
-            this.logger.warn(`Could not read registry for mount. This means looking up files cannot be optimized: ${error.message}. If this is the first time the mount is scanned, this warning is just normal.`);
+            this.logger.warn(`Could not read registry for mount: ${error.message}`);
             return new MountRegistry(filepath);
         });
     }

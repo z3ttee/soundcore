@@ -17,6 +17,10 @@
                 </ng-template>
             </div>
 
+            <div class="p-4 rounded-sm bg-warn border-warn-light border-2" *ngIf="props.appInfo.isDockerized">
+                <p class="text-sm">Die Anwendung wird derzeit in einer Docker-Umgebung ausgeführt. Neue Mounts kannst du deshalb nur über das Einbinden weiterer Docker-Volumes erstellen.</p>
+            </div>
+
             <div class="grid grid-cols-1 md:grid-cols-autofit gap-4 my-row">
 
                 <scngx-skeleton [class]="'h-32 w-full'" *ngIf="props.loading; else pageStats"></scngx-skeleton>
@@ -45,7 +49,7 @@
                     <div class="p-4 rounded-sm bg-body-light border border-body-lighter shadow-md">
                         <h6>Aktionen</h6>
                         <ul class="flex flex-col items-start w-full gap-2 mt-4">
-                            <scngx-btn (click)="openMountCreateDialog(props.zone, props.datasource)"><hero-icon [class]="'h-5 w-5'" name="plus"></hero-icon> Mount hinzufügen</scngx-btn>
+                            <scngx-btn *ngIf="!props.appInfo.isDockerized" (click)="openMountCreateDialog(props.zone, props.datasource)"><hero-icon [class]="'h-5 w-5'" name="plus"></hero-icon> Mount hinzufügen</scngx-btn>
                         </ul>
                     </div>
                 </ng-template>
