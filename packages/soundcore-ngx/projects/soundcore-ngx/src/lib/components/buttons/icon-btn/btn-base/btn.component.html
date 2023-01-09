@@ -1,6 +1,11 @@
 <button [disabled]="disabled || loading" class="inline-block p-2 rounded-full overflow-hidden active:scale-95 transform-gpu will-change-transform transition-all select-none" [ngClass]="{'cursor-not-allowed': disabled, 'p-1.5': size == 'sm', 'p-3': size == 'md', 'p-4': size == 'lg', 'p-6': size == 'xl', 'bg-accent border-none text-body-dark font-semi': appearance == 'default', 'bg-success border-success': appearance == 'success', 'bg-error border-error': appearance == 'error', 'bg-warn border-warn text-body': appearance == 'warn', 'bg-info border-info': appearance == 'info'}">
     <div class="flex items-center justify-center relative min-h-6 aspect-square overflow-hidden text-inherit font-semi" [ngClass]="{'text-sm': size == 'sm', 'text-md': size == 'xl'}">
-        <div class="inline-block" [ngClass]="{'opacity-0': loading}"><ng-content></ng-content></div>
+        <div [ngClass]="{'opacity-0': loading}">
+            <ng-content></ng-content>
+            <span class="flex items-center justify-center w-full h-full">
+                <ng-content select="hero-icon"></ng-content>
+            </span>
+        </div>
         <div [ngClass]="{'opacity-100': loading}" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0">
             <div *ngIf="!loaderRef; else loaderRef">
                 <ng-lottie
