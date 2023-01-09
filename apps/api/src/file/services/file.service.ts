@@ -76,18 +76,24 @@ export class FileService {
      * @returns Page<File>
      */
     public async findByMount(mountId: string, pageable: BasePageable): Promise<Page<File>> {
-        const result = await this.repository.createQueryBuilder("file")
+        const idsResult = await this.repository.createQueryBuilder("file")
+            .leftJoin("file.mount", "mount")
+            .offset(pageable.offset)
+            .limit(pageable.limit)
+            .select(["file.id"])
+            .where("mount.id = :mountId", { mountId })
+            .getManyAndCount()
+
+        const files = await this.repository.createQueryBuilder("file")
             .leftJoin("file.mount", "mount")
             .leftJoinAndSelect("file.song", "song")
             .leftJoin("song.artwork", "artwork").addSelect(["artwork.id"])
             .leftJoin("song.primaryArtist", "primaryArtist").addSelect(["primaryArtist.id", "primaryArtist.slug", "primaryArtist.name"])
             .leftJoin("song.featuredArtists", "featuredArtists").addSelect(["featuredArtists.id", "featuredArtists.slug", "featuredArtists.name"])
-            .where("mount.id = :mountId", { mountId })
-            .offset(pageable.offset)
-            .limit(pageable.limit)
-            .getManyAndCount()
+            .whereInIds(idsResult[0])
+            .getMany()
 
-        return Page.of(result[0], result[1]);
+        return Page.of(files, idsResult[1], pageable.offset);
     }
 
     /**
