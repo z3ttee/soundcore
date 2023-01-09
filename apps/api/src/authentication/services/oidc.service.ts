@@ -3,12 +3,10 @@ import { JwtService } from "@nestjs/jwt";
 import { BaseClient, Client, Issuer } from "openid-client";
 import { OIDCConfig } from "../config/oidc.config";
 import { OIDC_OPTIONS } from "../oidc.constants";
-import crypto from "node:crypto";
-import { OIDCUser } from "../entities/oidc-user.entity";
 import { catchError, map, Observable, of, switchMap, tap } from "rxjs";
 import { JWTDecodedToken, JWTTokenPayload, KeycloakDecodedToken } from "../entities/oidc-token.entity";
 import { JWKSet, JWKStore } from "../entities/jwks.entity";
-import { BootstrapShutdownService } from "@soundcore/bootstrap";
+import { Bootstrapper } from "@soundcore/bootstrap";
 
 @Injectable()
 export class OIDCService {
@@ -22,12 +20,11 @@ export class OIDCService {
 
     constructor(
         private readonly jwtService: JwtService,
-        private readonly bootstrapper: BootstrapShutdownService,
         @Inject(OIDC_OPTIONS) private readonly options: OIDCConfig
     ) {
         if(!this.options.issuer) {
             this.logger.error(`Found invalid issuer url. A valid value is needed for proper authentication.`);
-            this.bootstrapper.shutdown();
+            Bootstrapper.shutdown();
         }
     }
 
@@ -42,7 +39,6 @@ export class OIDCService {
 
     public jwksUri(): Observable<string> {
         return this.client().pipe(map((client) => client?.issuer?.metadata?.jwks_uri));
-        // return this._client?.issuer?.metadata?.jwks_uri;
     }
 
     public verifyAccessToken(tokenValue: string): Observable<JWTTokenPayload> {
@@ -93,8 +89,6 @@ export class OIDCService {
             }
 
             const discoverObservable: Observable<Issuer<BaseClient>> = new Observable((sub) => {
-                console.log(this.options.issuer)
-
                 Issuer.discover(`${this.options.issuer}`).then((issuer) => {
                     this._issuer = issuer 
                     this._client = new this._issuer.Client({

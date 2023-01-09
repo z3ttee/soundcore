@@ -1,9 +1,8 @@
-import { Global, INestApplication, Logger, Module, NestApplicationOptions, NestHybridApplicationOptions, VersioningOptions } from "@nestjs/common";
+import { INestApplication, Logger, NestApplicationOptions, NestHybridApplicationOptions, VersioningOptions } from "@nestjs/common";
 import { NestFactory } from "@nestjs/core";
 import { MicroserviceOptions } from '@nestjs/microservices';
-import { BehaviorSubject, filter, firstValueFrom } from "rxjs";
+import { BehaviorSubject, filter, firstValueFrom, Subject } from "rxjs";
 import { Printer } from "./printer";
-import { BootstrapShutdownService } from "./shutdown";
 import { buildHttpsOptions } from "./ssl";
 
 const appUrlSubject: BehaviorSubject<string> = new BehaviorSubject(null);
@@ -13,19 +12,13 @@ interface Microservice {
   hybridOptions?: NestHybridApplicationOptions
 }
 
-@Global()
-@Module({
-  providers: [
-    BootstrapShutdownService
-  ],
-  exports: [
-    BootstrapShutdownService
-  ]
-})
-export class BootstrapModule {}
+export type BootstrapShutdownListener = (error?: Error) => void;
 
-class Bootstrapper {
+export class Bootstrapper {
   private readonly logger = new Logger(Bootstrapper.name);
+
+  private static readonly $shutdown: Subject<Error> = new Subject();
+  private static readonly $app: BehaviorSubject<INestApplication> = new BehaviorSubject(null);
 
   private _options: NestApplicationOptions = null;
   private _versioningOptions: VersioningOptions = null;
@@ -35,6 +28,11 @@ class Bootstrapper {
   private _host: string = "0.0.0.0";
   private _withBuildInfo: boolean = false;
   private _buildInfoFilepath: string = "./buildinfo.json";
+  private _shutdownListener: BootstrapShutdownListener = (error?: Error) => {
+    if(error) {
+      this.logger.error(`Received shutdown signal from inside application: ${error.message}`, error.stack);
+    }
+  }
 
   constructor(
     protected readonly appName: string,
@@ -76,11 +74,41 @@ class Bootstrapper {
     this._host = host;
     return this;
   }
+
+  public registerOnShutdownListener(listener: BootstrapShutdownListener): Bootstrapper {
+    this._shutdownListener = listener;
+    return this;
+  }
+
+  public static shutdown(error?: Error) {
+    this.$shutdown.next(error ?? null);
+  }
+
+  public static appInstance() {
+    return this.$app.asObservable();
+  }
   
   public async bootstrap(): Promise<INestApplication> {
     await Printer.printLogo();
     if(this._withBuildInfo) await Printer.printBootstrapInfo(this.appName, this._buildInfoFilepath);
     await Printer.printCopyright();
+
+    // Register to shutdown service if available
+    Bootstrapper.$shutdown.asObservable().subscribe((error) => {
+      this.logger.log(`Received shutdown signal from inside application. Shutting down...`);
+      this._shutdownListener(error);
+
+      // Get app instance if available
+      Bootstrapper.appInstance().subscribe((app) => {
+        // If not available, just exit the process
+        if(typeof app === "undefined" || app == null) {
+          process.exit(1);
+        }
+
+        // If available, gracefully close application context
+        app.close();
+      })
+    });
     
     // Build httpsOptions. This will lookup cert and privkey
     // files. If the do not exist, the service will not support https.
@@ -104,27 +132,11 @@ class Bootstrapper {
     }
 
     return app.startAllMicroservices().then((app) => {
-      
       return app.listen(this._port, this._host).then(() => {
         return app.getUrl().then((url) => {
+          app.enableShutdownHooks();
           appUrlSubject.next(url);
-
-          // Register to shutdown service if available
-          const listener = app.get(BootstrapShutdownService)?.$shutdownListener;
-          if(typeof listener === "undefined" || listener == null) {
-            this.logger.warn(`Developer Notice: Shutdown hook may not be available because the application was unable to subscribe to the shutdown listener of the ${BootstrapShutdownService.name}.`);
-          } else {
-            this.logger.log(`Subscribed to internal shutdown signal.`);
-
-            // TODO: Listener is not triggered
-
-            listener.subscribe((error) => {
-              this.logger.log(`Received shutdown signal from inside application. Shutting down...`);
-              this.logger.error(`Received shutdown signal from inside application: ${error.message}`, error.stack);
-              process.exit(1);
-            })
-          }
-
+          Bootstrapper.$app.next(app);
           return app;
         })
       });

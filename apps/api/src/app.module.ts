@@ -34,7 +34,6 @@ import { CronModule } from './cron/cron.module';
 import { CommonConfigModule } from '@soundcore/common';
 import { WorkerQueueModule } from '@soundcore/nest-queue';
 import { TracklistModule } from './tracklist/tracklist.module';
-import { BootstrapModule } from '@soundcore/bootstrap';
 
 @Module({
   imports: [
@@ -104,8 +103,7 @@ import { BootstrapModule } from '@soundcore/bootstrap';
         clientToken: process.env.GENIUS_TOKEN
       }),
     }),
-    TracklistModule,
-    BootstrapModule
+    TracklistModule
   ],
   controllers: [
     AppController
