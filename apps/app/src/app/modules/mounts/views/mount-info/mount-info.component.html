@@ -1,59 +1,73 @@
 <ng-container *ngIf="($props | async) as props">
 
-    <div class="w-full h-full overflow-y-auto" #viewport>
+    <div class="w-full h-full overflow-y-auto" cdkVirtualScrollingElement>
         <app-error404 *ngIf="!props.loading && !props.mount"></app-error404>
 
-        <div class="w-full p-window">
-            <scngx-ui-title [inverted]="true" *ngIf="!props.loading; else loadingTitle">
-                {{ props.mount?.name }}
+        <div class="px-window pt-window">
+            <scngx-ui-title [inverted]="true" *ngIf="!props.loading">
+                <div class="flex flex-1 items-baseline justify-start gap-4">
+                    <h4 class="line-clamp-2 break-words">{{ props.mount?.name }}</h4>
+                    <div class="hidden md:block" *ngIf="props.mount?.status == 0">
+                        <scngx-ibtn-text size="md" (click)="openMountEditorDialog(props.mount)"><hero-icon class="h-6 w-6" name="pencil"></hero-icon></scngx-ibtn-text>
+                        <scngx-ibtn-text *ngIf="props.mount?.status == 0" [loading]="($refreshStatus | async)" size="md" (click)="triggerReindex(props.mount)"><hero-icon [class]="'h-6 w-6'" name="refresh"></hero-icon></scngx-ibtn-text>
+                        <scngx-ibtn-text *ngIf="!props.mount?.isDefault" [loading]="($setAsDefaultStatus | async)" size="md" (click)="setAsDefault(props.mount)"><hero-icon class="h-6 w-6" name="star"></hero-icon></scngx-ibtn-text>
+                        <scngx-ibtn-text [loading]="($deletingStatus | async)" size="md" appearance="error" (click)="deleteMount(props.mount)"><hero-icon [class]="'h-6 w-6'" name="trash"></hero-icon></scngx-ibtn-text>
+                    </div>
+                </div>
                 <p scngxSubtitle>Mount</p>
             </scngx-ui-title>
+        </div>
 
-            <div class="p-4 rounded-sm bg-warn border-warn-light border-2" *ngIf="props.appInfo.isDockerized">
+        <div class="my-row px-window">
+            <div class="p-4 rounded-sm bg-warn border-warn-light border-2" *ngIf="props.appInfo?.isDockerized">
                 <p class="text-sm">Die Anwendung wird derzeit in einer Docker-Umgebung ausgeführt. Neue Mounts kannst du deshalb nur über das Einbinden weiterer Docker-Volumes erstellen.</p>
             </div>
+        </div>
 
-            <ng-template #loadingTitle>
-                <div class="w-full">
-                    <scngx-skeleton [class]="'h-10 w-96 mt-1'" *ngIf="props.loading"></scngx-skeleton>
-                </div>
-            </ng-template>
+        <div class="my-row px-window md:hidden" *ngIf="!props.loading">
+            <ul class="flex flex-wrap items-start w-full gap-2">
+                <scngx-btn (click)="openMountEditorDialog(props.mount)"><hero-icon class="h-6 w-6" name="pencil"></hero-icon>Bearbeiten</scngx-btn>
+                <scngx-lbtn *ngIf="props.mount?.status == 0" (click)="triggerReindex(props.mount)" [loading]="($refreshStatus | async)"><hero-icon class="h-6 w-6" name="refresh"></hero-icon>Scannen</scngx-lbtn>
+                <scngx-lbtn *ngIf="!props.mount?.isDefault" [loading]="($setAsDefaultStatus | async)" (click)="setAsDefault(props.mount)"><hero-icon [class]="'h-6 w-6'" name="star"></hero-icon>Als Standard-Mount festlegen</scngx-lbtn>
+                <scngx-lbtn-outlined appearance="error" [loading]="($deletingStatus | async)" (click)="deleteMount(props.mount)"><hero-icon [class]="'h-5 w-5 align-middle'" name="trash"></hero-icon><span class="align-middle">Mount löschen</span></scngx-lbtn-outlined>
+            </ul>
+        </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-autofit gap-4 my-row">
-        
-                <scngx-skeleton [class]="'h-32 w-full'" *ngIf="props.loading"></scngx-skeleton>
-                <div class="p-4 rounded-sm bg-body-light border border-body-lighter shadow-md" *ngIf="!props.loading">
-                    <h6>Statistiken</h6>
-                    <ul class="flex flex-col items-start w-full gap-2 mt-4">
-                        <li class="inline-flex items-center gap-2 opacity-80"><hero-icon [class]="'h-5 w-5'" name="collection"></hero-icon><span class="text-sm">{{ props.mount?.filesCount }} Datei{{ props.mount?.filesCount != 1 ? 'en' : '' }}</span></li>
-                        <li class="inline-flex items-center gap-2 opacity-80"><hero-icon [class]="'h-5 w-5'" name="chart-pie"></hero-icon><span class="text-sm">{{ props.mount?.usedSpace | scngxBytesPipe:"gb" }}</span></li>
-                        <li class="inline-flex items-center gap-2 opacity-80"><hero-icon [class]="'h-5 w-5'" name="refresh"></hero-icon><span class="text-sm">{{ props.mount?.lastScannedAt ? (props.mount?.lastScannedAt | date:"dd.MM.yyyy 'um' HH:mm 'Uhr'") : "Nie" }}</span></li>
-                    </ul>
-                </div>
+        <div class="my-row grid grid-cols-1 md:grid-cols-autofit gap-4 px-window">
+            <scngx-skeleton [class]="'h-32 w-full'" *ngIf="props.loading"></scngx-skeleton>
+            <div class="p-4 rounded-sm bg-body-light border border-body-lighter shadow-md" *ngIf="!props.loading">
+                <h6>Statistiken</h6>
+                <ul class="flex flex-col items-start w-full gap-2 mt-4">
+                    <li class="inline-flex items-center gap-2 opacity-80"><hero-icon [class]="'h-5 w-5'" name="collection"></hero-icon><span class="text-sm">{{ props.mount?.filesCount }} Datei{{ props.mount?.filesCount != 1 ? 'en' : '' }}</span></li>
+                    <li class="inline-flex items-center gap-2 opacity-80"><hero-icon [class]="'h-5 w-5'" name="chart-pie"></hero-icon><span class="text-sm">{{ props.mount?.usedSpace | scngxBytesPipe:"gb" }}</span></li>
+                    <li class="inline-flex items-center gap-2 opacity-80"><hero-icon [class]="'h-5 w-5'" name="refresh"></hero-icon><span class="text-sm">{{ props.mount?.lastScannedAt ? (props.mount?.lastScannedAt | date:"dd.MM.yyyy 'um' HH:mm 'Uhr'") : "Nie" }}</span></li>
+                </ul>
+            </div>
 
-                <scngx-skeleton [class]="'h-32 w-full'" *ngIf="props.loading"></scngx-skeleton>
-                <div class="p-4 rounded-sm bg-body-light border border-body-lighter shadow-md" *ngIf="!props.loading">
-                    <h6>Status</h6>
-                    <ul class="flex flex-col items-start w-full gap-2 mt-4">
-                        <li class="inline-flex items-center gap-2 opacity-80" *ngIf="props.mount?.isDefault"><hero-icon [class]="'h-5 w-5 fill-warn text-warn'" name="star"></hero-icon><span>Als Standard festgelegt</span></li>
-                        <li class="inline-flex items-center gap-2 opacity-80">
-                            <scngx-status-indicator size="md" [appearance]="props.mount?.status == 0 ? 'success' : 'warn'"></scngx-status-indicator>
-                            <span>{{ props.mount?.status | scngxMountStatusPipe }}</span>
-                        </li>
-                    </ul>
-                </div>
-
-                <scngx-skeleton [class]="'h-32 w-full'" *ngIf="props.loading"></scngx-skeleton>
-                <div class="p-4 rounded-sm bg-body-light border border-body-lighter shadow-md" *ngIf="!props.loading">
-                    <h6>Aktionen</h6>
-                    <ul class="flex flex-wrap items-start w-full gap-2 mt-4">
-                        <scngx-btn (click)="openMountEditorDialog(props.mount)"><hero-icon [class]="'h-5 w-5'" name="pencil"></hero-icon>Mount bearbeiten</scngx-btn>
-                        <scngx-btn (click)="triggerReindex(props.mount)">Indexierung starten</scngx-btn>
-                        <scngx-lbtn-outlined appearance="error" [loading]="($deleting | async)" (click)="deleteMount(props.mount)"><hero-icon [class]="'h-5 w-5 align-middle'" name="trash"></hero-icon><span class="align-middle">Mount löschen</span></scngx-lbtn-outlined>
-                    </ul>
-                </div>
+            <scngx-skeleton [class]="'h-32 w-full'" *ngIf="props.loading"></scngx-skeleton>
+            <div class="p-4 rounded-sm bg-body-light border border-body-lighter shadow-md" *ngIf="!props.loading">
+                <h6>Status</h6>
+                <ul class="flex flex-col items-start w-full gap-2 mt-4">
+                    <li class="inline-flex items-center gap-2 opacity-80" *ngIf="props.mount?.isDefault"><hero-icon [class]="'h-5 w-5 fill-warn text-warn'" name="star"></hero-icon><span>Als Standard festgelegt</span></li>
+                    <li class="inline-flex items-center gap-2 opacity-80">
+                        <scngx-status-indicator size="md" [appearance]="props.mount?.status == 0 ? 'success' : 'warn'"></scngx-status-indicator>
+                        <span>{{ props.mount?.status | scngxMountStatusPipe }}</span>
+                    </li>
+                </ul>
             </div>
         </div>
+
+        <div class="px-window">
+            <cdk-virtual-scroll-viewport [itemSize]="56">
+                <app-file-list-item *cdkVirtualFor="let item of props.datasource" [file]="item"></app-file-list-item>
+            </cdk-virtual-scroll-viewport>
+        </div>
+        
+    </div>
+
+    
+
+    <!-- <div class="w-full h-full overflow-y-auto" #viewport>
         
         <ng-container *ngIf="props.datasource">
             <div class="px-window py-2" *uiScroll="let item of props.datasource; index as i">
@@ -65,6 +79,6 @@
         </ng-container>
 
         <div class="pb-bottom"></div>
-    </div>
+    </div> -->
 
 </ng-container>

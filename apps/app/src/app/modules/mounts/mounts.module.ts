@@ -3,13 +3,14 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Routes } from '@angular/router';
 import { MountInfoComponent } from './views/mount-info/mount-info.component';
 import { SCDKFileModule, SCSDKMountModule } from '@soundcore/sdk';
-import { SCNGXButtonModule, SCNGXBytesPipeModule, SCNGXLoadingBtnModule, SCNGXMountStatusPipeModule, SCNGXScrollingModule, SCNGXSkeletonModule, SCNGXStatusIndicatorModule, SCNGXUiTitleModule } from '@soundcore/ngx';
+import { SCNGXButtonModule, SCNGXBytesPipeModule, SCNGXIconBtnModule, SCNGXLoadingBtnModule, SCNGXMountStatusPipeModule, SCNGXScrollingModule, SCNGXSkeletonModule, SCNGXStatusIndicatorModule, SCNGXUiTitleModule } from '@soundcore/ngx';
 import { chartPie, collection, HeroIconModule, pencil, plus, refresh, star, trash } from 'ng-heroicon';
 import { Error404Module } from 'src/app/shared/error404/error404.module';
-import { FileListItemModule } from 'src/app/components/list-items/file-list-item/file-list-item.module';
+import { SCNGXFileListItemModule } from 'src/app/components/list-items/file-list-item/file-list-item.module';
 import { VirtualScrollerModule } from '@tsalliance/ngx-virtual-scroller';
 import { AppMountCreateDialogModule } from 'src/app/dialogs/mount-create-dialog/mount-create-dialog.module';
 import {MatSnackBarModule} from '@angular/material/snack-bar';
+import { SCNGXTabsModule } from 'src/app/components/navigation-tabs';
 
 const routes: Routes = [
   { path: "", component: MountInfoComponent },
@@ -24,7 +25,6 @@ const routes: Routes = [
     RouterModule.forChild(routes),
     HeroIconModule.withIcons({ collection, chartPie, plus, refresh, star, trash, pencil }),
     Error404Module,
-    FileListItemModule,
     VirtualScrollerModule,
 
     SCSDKMountModule,
@@ -38,6 +38,9 @@ const routes: Routes = [
     SCNGXMountStatusPipeModule,
     SCNGXUiTitleModule,
     SCNGXScrollingModule,
+    SCNGXTabsModule,
+    SCNGXIconBtnModule,
+    SCNGXFileListItemModule,
 
     AppMountCreateDialogModule,
 

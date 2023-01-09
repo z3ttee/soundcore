@@ -37,10 +37,10 @@ export class MountQueueService {
             const { payload } = job;
             const { mount, flag } = payload;
 
-            if(flag === MountScanFlag.DOCKER_LOOKUP) {
-                this.logger.verbose(`Application running in docker container. Looking for mounted volumes...`);
-            } else {
-                this.logger.verbose(`Looking for files on mount '${mount.name}'...`);
+            if(flag !== MountScanFlag.DOCKER_LOOKUP) {
+                if(Environment.isDebug) {
+                    this.logger.verbose(`Looking for files on mount '${mount.name}'...`);
+                }
                 this.mountService.setMountStatus(mount, MountStatus.SCANNING);
             }
         });
@@ -51,7 +51,6 @@ export class MountQueueService {
             const { flag } = payload;
 
             if(job.payload.flag === MountScanFlag.DOCKER_LOOKUP) {
-                this.logger.verbose(`Successfully looked up mounted directories inside /mnt/. Next step is preparing the mounts for scanning.`);
                 this.mountService.checkMountsStandaloneMode();
                 return;
             }

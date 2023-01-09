@@ -1,5 +1,4 @@
-<div class="select-none p-4 rounded bg-body-light bg-opacity-60 cursor-pointer transition-all active:bg-opacity-80 active:scale-99 transform-gpu will-change-transform">
-    <!-- Bucket description -->
+<!-- <div class="select-none p-4 rounded bg-body-light bg-opacity-60 cursor-pointer transition-all active:bg-opacity-80 active:scale-99 transform-gpu will-change-transform">
     <div class="w-full">
         <h6 class="cursor-text select-text">{{ file.name }}</h6>
 
@@ -13,5 +12,81 @@
 
         <ul class="flex flex-wrap items-start w-full gap-2">
         </ul>
+    </div>
+</div> -->
+
+<div class="flex items-center justify-start py-1 w-full overflow-hidden" [style.height]="itemHeight + 'px'">
+    <div 
+        class="flex flex-1 items-center justify-start gap-4 rounded-sm w-full h-full px-3 pointer-events-none select-none"
+        [ngClass]="{'hover:border-opacity-100 active:border-opacity-100 border border-body-lighter border-opacity-0 transition-all bg-opacity-0 hover:bg-opacity-30 bg-body-light cursor-pointer pointer-events-auto active:bg-opacity-50': !!file}">
+        
+        <!-- File artwork -->
+        <div class="h-10 min-w-10 w-10 rounded-sm overflow-hidden">
+            <scngx-skeleton [class]="'h-full aspect-square'" *ngIf="!file; else itemArtwork"></scngx-skeleton>
+            <ng-template #itemArtwork>
+                <img *ngIf="!file?.song; else songArtwork" src="/assets/img/icon_mount.png" />
+                <ng-template #songArtwork>
+                    <scngx-artwork [artwork]="file?.song?.artwork"></scngx-artwork>
+                </ng-template>
+            </ng-template>
+        </div>
+
+        <!-- File description -->
+        <div class="flex-grow overflow-hidden">
+            <div class="flex flex-col" *ngIf="!file; else mountInfo">
+                <scngx-skeleton [class]="'h-5 w-40'"></scngx-skeleton>
+                <scngx-skeleton [class]="'h-3 w-24'"></scngx-skeleton>
+            </div>
+
+            <ng-template #mountInfo>
+                <p class="line-clamp-1 break-words">{{ file?.song?.name ?? file?.name }}</p>
+
+                <div class="line-clamp-1" *ngIf="file?.song; else fileId">
+                    <ul class="">
+                        <li *ngIf="file?.song?.explicit" class="inline mr-2"><scngx-explicit-badge [extended]="false"></scngx-explicit-badge></li>
+                        <li *ngIf="file?.song?.primaryArtist" class="inline text-font text-opacity-70"><span class="text-sm hover:underline pointer-events-all cursor-pointer" [routerLink]="['/artist', file?.song?.primaryArtist.slug ?? file?.song?.primaryArtist.id]">{{ file?.song?.primaryArtist.name }}</span>{{ file?.song?.featuredArtists?.length > 0 ? ", " : "" }}</li>
+                        <li *ngFor="let artist of (file?.song?.featuredArtists ?? []); index as i" class="inline text-font text-opacity-70"><span class="text-sm hover:underline pointer-events-all cursor-pointer" [routerLink]="['/artist', artist.slug ?? artist.id]">{{ artist.name }}</span>{{ i + 1 < file?.song?.featuredArtists?.length ? ", " : "" }}</li>
+                    </ul>
+                </div>
+
+                <ng-template #fileId>
+                    <p class="line-clamp-1 break-words text-xs opacity-60 font-light">ID: {{ file?.id }}</p>
+                </ng-template>
+            </ng-template>
+        </div>
+
+        <div class="min-w-36 w-36 hidden md:block">
+            <scngx-skeleton [class]="'h-5 w-36'" *ngIf="!file; else mountUsedSpace"></scngx-skeleton>
+
+            <ng-template #mountUsedSpace>
+                <div class="flex items-center gap-2 justify-end">
+                    <span class="text-sm">{{ file?.size | scngxBytesPipe:"mb" }}</span>
+                </div>
+            </ng-template>
+        </div>
+
+        <div class="min-w-36 w-36 hidden sm:block">
+            <!-- <scngx-skeleton [class]="'h-5 w-36'" *ngIf="!file; else mountMountCount"></scngx-skeleton>
+
+            <ng-template #mountMountCount>
+                <div class="flex items-center justify-end gap-2">
+                    <hero-icon class="h-5 w-5" name="collection"></hero-icon>
+                    <span class="text-sm">{{ file?.filesCount ?? 0 }} Datei{{ file?.filesCount != 1 ? 'en' : '' }}</span>
+                </div>
+            </ng-template> -->
+        </div>
+
+        <div class="min-w-4 w-4" *ngIf="file">
+            <div class="flex items-center justify-center w-full h-full">
+                <div class="w-3 h-3 rounded-full bg-info"></div>
+            </div>
+        </div>
+
+        <div class="min-w-6 w-6" *ngIf="file">
+            <!-- <div class="flex items-center justify-center w-full h-full">
+                <hero-icon class="h-5 w-5" name="star" *ngIf="!mount.isDefault"></hero-icon>
+                <hero-icon class="h-5 w-5 text-accent fill-accent" name="star" [type]="'solid'" *ngIf="mount.isDefault"></hero-icon>
+            </div> -->
+        </div>
     </div>
 </div>

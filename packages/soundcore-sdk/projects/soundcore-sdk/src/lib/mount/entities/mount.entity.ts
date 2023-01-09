@@ -1,4 +1,4 @@
-import { Bucket } from "../../bucket/entities/bucket.entity";
+import { Zone } from "../../zone/entities/zone.entity";
 
 export enum MountStatus {
     UP = 0,
@@ -16,8 +16,9 @@ export class Mount {
     public lastScannedAt: Date;
     public status: MountStatus;
     public isDefault: boolean;
+    public discriminator: string;
 
-    public bucket: Bucket;
+    public bucket: Zone;
 
     // Below fields may only be populated
     // after custom database queries.

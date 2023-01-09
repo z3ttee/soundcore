@@ -2,7 +2,7 @@ import path from 'node:path';
 import { BadRequestException, Injectable, InternalServerErrorException, Logger, NotFoundException } from '@nestjs/common';
 import { Page, Pageable } from 'nestjs-pager';
 import { Repository } from 'typeorm';
-import { Bucket } from '../../bucket/entities/bucket.entity';
+import { Zone } from '../../zone/entities/zone.entity';
 import { CreateMountDTO } from '../dtos/create-mount.dto';
 import { UpdateMountDTO } from '../dtos/update-mount.dto';
 import { Mount, MountStatus } from '../entities/mount.entity';
@@ -15,6 +15,7 @@ import { MountRegistryService } from './mount-registry.service';
 import { MountScanFlag, MountScanProcessDTO } from '../dtos/scan-process.dto';
 import { FileFlag } from '../../file/entities/file.entity';
 import { Environment } from '@soundcore/common';
+import { MOUNTNAME_MAX_LENGTH } from '../../constants';
 
 @Injectable()
 export class MountService {
@@ -37,7 +38,7 @@ export class MountService {
         if(!pageable) throw new BadRequestException("Missing page settings");
 
         const query = await this.repository.createQueryBuilder("mount")
-            .leftJoin("mount.bucket", "bucket")
+            .leftJoin("mount.zone", "bucket")
             .leftJoin("mount.files", "file")
             .loadRelationCountAndMap("mount.filesCount", "mount.files")
 
@@ -60,7 +61,7 @@ export class MountService {
      */
     public async findById(mountId: string): Promise<Mount> {
         return await this.repository.createQueryBuilder("mount")
-            .leftJoinAndSelect("mount.bucket", "bucket")
+            .leftJoinAndSelect("mount.zone", "bucket")
             .leftJoin("mount.files", "file")
             .loadRelationCountAndMap("mount.filesCount", "mount.files")
             .addSelect("SUM(file.size) AS mount_usedSpace")
@@ -77,7 +78,7 @@ export class MountService {
      */
     public async findOneInBucket(exclude: string[]): Promise<Mount> {
         return await this.repository.createQueryBuilder("mount")
-            .leftJoinAndSelect("mount.bucket", "bucket")
+            .leftJoinAndSelect("mount.zone", "bucket")
             .leftJoin("mount.files", "file")
             .loadRelationCountAndMap("mount.filesCount", "mount.files")
             .addSelect("SUM(file.size) AS mount_usedSpace")
@@ -93,7 +94,7 @@ export class MountService {
      * @returns Mount
      */
     public async findByNameInBucket(bucketId: string, name: string): Promise<Mount> {
-        return await this.repository.findOne({ where: { name, bucket: { id: bucketId } }, relations: ["bucket"]});
+        return await this.repository.findOne({ where: { name, zone: { id: bucketId } }, relations: ["bucket"]});
     }
 
     /**
@@ -103,7 +104,7 @@ export class MountService {
      * @returns Mount
      */
     public async findByDirectoryInBucket(bucketId: string, directory: string): Promise<Mount> {
-        return await this.repository.findOne({ where: { directory: path.resolve(directory), bucket: { id: bucketId } }, relations: ["bucket"]});
+        return await this.repository.findOne({ where: { directory: path.resolve(directory), zone: { id: bucketId } }, relations: ["bucket"]});
     }
 
     /**
@@ -113,7 +114,7 @@ export class MountService {
      */
     public async findDefaultOfBucket(bucketId: string): Promise<Mount> {
         return this.repository.createQueryBuilder("mount")
-            .leftJoinAndSelect("mount.bucket", "bucket")
+            .leftJoinAndSelect("mount.zone", "bucket")
             .where("bucket.id = :bucketId AND mount.isDefault = :isDefault", { bucketId: bucketId, isDefault: 1 })
             .getOne();
     }
@@ -146,7 +147,7 @@ export class MountService {
      * @returns True or False
      */
     public async existsByNameInBucket(bucketId: string, name: string): Promise<boolean> {
-        return !!(await this.repository.findOne({ where: { name, bucket: { id: bucketId } }}));
+        return !!(await this.repository.findOne({ where: { name, zone: { id: bucketId } }}));
     }
 
     /**
@@ -156,7 +157,7 @@ export class MountService {
      * @returns True or False
      */
     public async existsByPathInBucket(bucketId: string, directory: string): Promise<boolean> {
-        return !!(await this.repository.findOne({ where: { directory, bucket: { id: bucketId } }}));
+        return !!(await this.repository.findOne({ where: { directory, zone: { id: bucketId } }}));
     }
 
     /**
@@ -207,7 +208,8 @@ export class MountService {
         const mount = this.repository.create();
         mount.name = createMountDto.name;
         mount.directory = directory;
-        mount.bucket = createMountDto.bucket as Bucket;
+        mount.zone = createMountDto.bucket as Zone;
+        mount.discriminator = Random.randomString(4);
 
         return this.repository.createQueryBuilder()
             .insert()
@@ -240,7 +242,7 @@ export class MountService {
             .returning(["id"])
             .execute().then((insertResult) => {
                 return this.repository.createQueryBuilder("mount")
-                    .leftJoinAndSelect("mount.bucket", "bucket")
+                    .leftJoinAndSelect("mount.zone", "bucket")
                     .whereInIds(insertResult.raw)
                     .getMany();
             });
@@ -256,11 +258,11 @@ export class MountService {
         updateMountDto.name = updateMountDto.name?.trim();
         const mount = await this.findById(mountId);
 
-        if(!mount || !mount.bucket) {
+        if(!mount || !mount.zone) {
             throw new NotFoundException("Mount not found.")
         }
 
-        if(updateMountDto.name && updateMountDto.name != mount.name && await this.existsByNameInBucket(mount.bucket.id, updateMountDto.name)) {
+        if(updateMountDto.name && updateMountDto.name != mount.name && await this.existsByNameInBucket(mount.zone.id, updateMountDto.name)) {
             throw new BadRequestException("Mount with that name already exists inside this bucket.");
         }
 
@@ -310,7 +312,7 @@ export class MountService {
             return this.createIfNotExists({
                 bucket: { id: this.fileSystem.getInstanceId() },
                 directory: this.fileSystem.resolveInitialMountPath(),
-                name: this.generateName("Default Mount"),
+                name: this.formatName("Default Mount"),
                 isDefault: true,
                 doScan: false
             }).then((result) => result.data);
@@ -330,7 +332,7 @@ export class MountService {
 
         mount.isDefault = true;
         return this.repository.manager.transaction<Mount>(async (manager) => {
-            await manager.createQueryBuilder().update(Mount).set({ isDefault: false }).where("isDefault = :isDefault AND bucketId = :bucketId", { isDefault: true, bucketId: mount.bucket.id }).execute();
+            await manager.createQueryBuilder().update(Mount).set({ isDefault: false }).where("isDefault = :isDefault AND bucketId = :bucketId", { isDefault: true, bucketId: mount.zone.id }).execute();
             return manager.save(mount).then((m) => {
                 this.logger.log(`Set mount '${mount.name}' as default mount.`);
                 return m;
@@ -348,7 +350,7 @@ export class MountService {
         if(!mount) return null;
 
         return this.setDefaultMount(mount).then((result) => {
-            this.logger.verbose(`Mount '${mount.name}' was set to be new default mount for bucket '${mount.bucket?.id}'.`)
+            this.logger.verbose(`Mount '${mount.name}' was set to be new default mount for bucket '${mount.zone?.id}'.`)
             return result;
         }).catch(() => {
             return null;
@@ -414,8 +416,8 @@ export class MountService {
         })
     }
 
-    public generateName(name: string): string {
-        return `${name.slice(0, Math.min(27, name.length))}#${Random.randomString(4)}`;
+    public formatName(name: string): string {
+        return `${name.slice(0, Math.min(MOUNTNAME_MAX_LENGTH, name.length))}`;
     }
 
     /**

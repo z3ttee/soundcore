@@ -1,5 +1,8 @@
 import path from "node:path"
 
+// Validation
+export const MOUNTNAME_MAX_LENGTH = 32
+
 // Roles
 export const ROLE_ADMIN = "admin";
 export const ROLE_MOD = "mod";

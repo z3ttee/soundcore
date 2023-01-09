@@ -1,25 +1,29 @@
-import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { File, FileFlag } from '@soundcore/sdk';
 import { StatusIndicatorAppearance } from "@soundcore/ngx";
 
 @Component({
   selector: 'app-file-list-item',
   templateUrl: './file-list-item.component.html',
-  styleUrls: ['./file-list-item.component.scss']
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class FileListItemComponent implements OnInit, OnChanges {
+export class SCNGXFileListItemComponent implements OnInit, OnChanges {
 
-  @Input() public file: File;
+  @Input() 
+  public file: File;
+
+  @Input()
+  public itemHeight: number = 64;
 
   public indicatorAppearance: StatusIndicatorAppearance;
 
   constructor() { }
 
   public ngOnInit(): void {
-    this.init();
+    // this.init();
   }
   public ngOnChanges(changes: SimpleChanges): void {
-    this.init();
+    // this.init();
   }
 
   private init() {

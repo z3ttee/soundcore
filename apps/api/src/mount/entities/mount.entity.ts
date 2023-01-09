@@ -1,5 +1,6 @@
 import { Column, CreateDateColumn, Entity, Index, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
-import { Bucket } from "../../bucket/entities/bucket.entity";
+import { Zone } from "../../zone/entities/zone.entity";
+import { MOUNTNAME_MAX_LENGTH } from "../../constants";
 import { File } from "../../file/entities/file.entity";
 
 export enum MountStatus {
@@ -10,14 +11,17 @@ export enum MountStatus {
 }
 
 @Entity()
-@Index(["name", "directory", "bucket"], { unique: true })
+@Index(["directory", "zone"], { unique: true })
 export class Mount {
 
     @PrimaryGeneratedColumn("uuid")
     public id: string;
 
-    @Column({ length: 32 })
+    @Column({ length: MOUNTNAME_MAX_LENGTH, nullable: false })
     public name: string;
+
+    @Column({ length: 4, nullable: false, unique: true })
+    public discriminator: string;
 
     @Column({ nullable: false, type: "text" })
     public directory: string;
@@ -37,9 +41,9 @@ export class Mount {
     @Column({ default: false })
     public isDefault: boolean;
 
-    @ManyToOne(() => Bucket, { onDelete: "CASCADE", nullable: false })
+    @ManyToOne(() => Zone, { onDelete: "CASCADE", nullable: false })
     @JoinColumn()
-    public bucket: Bucket;
+    public zone: Zone;
 
     @OneToMany(() => File, (i) => i.mount)
     public files: File[];

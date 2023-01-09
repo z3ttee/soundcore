@@ -15,6 +15,7 @@ import { CreateMountDTO } from "../dtos/create-mount.dto";
 import Database from "../../utils/database/database-worker-client";
 import { Mount } from "../entities/mount.entity";
 import { MountService } from "../services/mount.service";
+import { Random } from "@tsalliance/utilities";
 
 const logger = new Logger("MountWorker");
 const filesystem = new FileSystemService();
@@ -162,14 +163,18 @@ async function lookupDockerMountedVolumes(job: WorkerJobRef<MountScanProcessDTO>
     
                 const mountDtos: CreateMountDTO[] = files.filter((dirent) => dirent.isDirectory()).map((dirent) => ({
                     bucket: { id: fsService.getInstanceId() },
-                    name: service.generateName(dirent.name),
+                    name: service.formatName(dirent.name),
                     directory: path.join(rootDir, dirent.name),
                     isDefault: false,
-                    doScan: false
+                    doScan: false,
+                    discriminator: Random.randomString(4)
                 }));
 
                 service.createMultipleIfNotExists(mountDtos).then((mounts) => {
-                    logger.verbose(`Registered ${mounts.length} mounted directories.`);
+                    if(mounts.length > 0) {
+                        logger.log(`Registered ${mounts.length} mounted directories inside '${rootDir}'.`);
+                    }
+
                     resolve(<MountScanResultDTO>{
                         timeMs: Date.now() - startedAtMs
                     });

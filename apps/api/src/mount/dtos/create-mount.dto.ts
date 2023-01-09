@@ -1,3 +1,5 @@
+import { Random } from "@tsalliance/utilities";
+import { Transform } from "class-transformer";
 import { IsBoolean, IsNotEmpty, IsNumber, IsObject, IsOptional, Length, Max, Min } from "class-validator";
 import { Mount } from "../entities/mount.entity";
 
@@ -27,5 +29,9 @@ export class CreateMountDTO implements
     @Max(1)
     @Min(0)
     public isDefault: boolean = false;
+
+    @IsOptional()
+    @Transform(() => Random.randomString(4))
+    public discriminator?: string = Random.randomString(4);
 
 }
