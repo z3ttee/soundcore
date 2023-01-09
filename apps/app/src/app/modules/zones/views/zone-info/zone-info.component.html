@@ -39,7 +39,7 @@
                     <div class="p-4 rounded-sm bg-body-light border border-body-lighter shadow-md">
                         <h6>Status</h6>
                         <ul class="flex flex-col items-start w-full gap-2 mt-4">
-                            <li class="inline-flex items-center gap-2 opacity-80"><span class="w-2 h-2 rounded-full bg-success-light"></span><span class="text-xs">{{ props.zone?.flag | scngxBucketFlagPipe }}</span></li>
+                            <li class="inline-flex items-center gap-2 opacity-80"><span class="w-2 h-2 rounded-full bg-success-light"></span><span class="text-xs">{{ props.zone?.status | scngxZoneStatus }}</span></li>
                         </ul>
                     </div>
                 </ng-template>

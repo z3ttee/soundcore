@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { ArtistModule } from './artist/artist.module';
-import { BucketModule } from './bucket/bucket.module';
+import { ZoneModule } from './zone/zone.module';
 import { AlbumModule } from './album/album.module';
 import { SongModule } from './song/song.module';
 import { GeniusModule } from './genius/genius.module';
@@ -73,7 +73,7 @@ import { TracklistModule } from './tracklist/tracklist.module';
     }),
     EventEmitterModule.forRoot({ global: true, ignoreErrors: true }),
     ArtistModule,
-    BucketModule,
+    ZoneModule,
     AlbumModule,
     SongModule,
     LabelModule,

@@ -2,9 +2,9 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Routes } from '@angular/router';
 import { ZonesIndexComponent } from './views/zones-index/zones-index.component';
-import { SCDKBucketModule, SCSDKGatewayModule, SCSDKMountModule } from '@soundcore/sdk';
+import { SCSDKGatewayModule, SCSDKMountModule, SCSDKZoneModule } from '@soundcore/sdk';
 import { chartPie, collection, HeroIconModule, plus } from 'ng-heroicon';
-import { SCNGXBucketFlagPipeModule, SCNGXButtonModule, SCNGXBytesPipeModule, SCNGXScrollingModule, SCNGXSkeletonModule, SCNGXUiSectionTitleModule, SCNGXUiTitleModule } from '@soundcore/ngx';
+import { SCNGXButtonModule, SCNGXBytesPipeModule, SCNGXScrollingModule, SCNGXSkeletonModule, SCNGXUiSectionTitleModule, SCNGXUiTitleModule, SCNGXZoneStatusPipeModule } from '@soundcore/ngx';
 import { ZoneInfoComponent } from './views/zone-info/zone-info.component';
 import { BucketListItemModule } from 'src/app/components/list-items/bucket-list-item/bucket-list-item.module';
 import { MountListItemModule } from 'src/app/components/list-items/mount-list-item/mount-list-item.module';
@@ -30,13 +30,13 @@ const routes: Routes = [
     VirtualScrollerModule,
     HeroIconModule.withIcons({ collection, chartPie, plus }),
 
-    SCDKBucketModule,
+    SCSDKZoneModule,
     SCSDKMountModule,
     SCSDKGatewayModule,
     
     SCNGXSkeletonModule,
     SCNGXBytesPipeModule,
-    SCNGXBucketFlagPipeModule,
+    SCNGXZoneStatusPipeModule,
     SCNGXUiTitleModule,
     SCNGXUiSectionTitleModule,
     SCNGXButtonModule,

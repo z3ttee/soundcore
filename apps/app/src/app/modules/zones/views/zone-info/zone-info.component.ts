@@ -1,9 +1,9 @@
 import { HttpClient } from '@angular/common/http';
-import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { BehaviorSubject, combineLatest, filter, map, Observable, Subject, switchMap, takeUntil } from 'rxjs';
 import { SCNGXDatasource, SCNGXDialogService } from '@soundcore/ngx';
-import { ApiError, ApplicationInfo, Bucket, Future, Mount, SCDKBucketService, SCSDKAdminGateway, SCSDKAppService, toFuture } from '@soundcore/sdk';
+import { ApiError, ApplicationInfo, Zone, Future, Mount, SCSDKAdminGateway, SCSDKAppService, SCSDKZoneService, toFuture } from '@soundcore/sdk';
 import { AppMountCreateDialog, MountCreateDialogOptions } from 'src/app/dialogs/mount-create-dialog/mount-create-dialog.component';
 import { environment } from 'src/environments/environment';
 
@@ -11,7 +11,7 @@ interface ZoneInfoProps {
   loading?: boolean;
   datasource?: SCNGXDatasource<Mount>;
   error?: ApiError;
-  zone?: Bucket;
+  zone?: Zone;
   appInfo?: ApplicationInfo;
 }
 
@@ -22,7 +22,7 @@ interface ZoneInfoProps {
 export class ZoneInfoComponent implements OnDestroy {
 
   constructor(
-    private readonly zoneService: SCDKBucketService,
+    private readonly zoneService: SCSDKZoneService,
     private readonly activatedRoute: ActivatedRoute,
     private readonly dialog: SCNGXDialogService,
     private readonly httpClient: HttpClient,
@@ -31,7 +31,7 @@ export class ZoneInfoComponent implements OnDestroy {
   ) { }
 
   private readonly _destroy: Subject<void> = new Subject();
-  private readonly _zoneSubject: BehaviorSubject<Bucket> = new BehaviorSubject(null);
+  private readonly _zoneSubject: BehaviorSubject<Zone> = new BehaviorSubject(null);
 
   public readonly $loading = new BehaviorSubject(false);
   public readonly $zone = this._zoneSubject.asObservable();
@@ -42,10 +42,10 @@ export class ZoneInfoComponent implements OnDestroy {
   public readonly $props: Observable<ZoneInfoProps> = combineLatest([
     this.activatedRoute.paramMap.pipe(
       map((params) => params.get("zoneId")),
-      switchMap((zoneId): Observable<[Future<Bucket>, SCNGXDatasource<Mount>]> => {
+      switchMap((zoneId): Observable<[Future<Zone>, SCNGXDatasource<Mount>]> => {
         return this.zoneService.findById(zoneId).pipe(
           toFuture(),
-          map((request): [Future<Bucket>, SCNGXDatasource<Mount>] => {
+          map((request): [Future<Zone>, SCNGXDatasource<Mount>] => {
             if(request.data) return [request, new SCNGXDatasource(this.httpClient, `${environment.api_base_uri}/v1/mounts/bucket/${zoneId}`, 8)]
             return [request, null]
           })
@@ -69,7 +69,7 @@ export class ZoneInfoComponent implements OnDestroy {
       this._destroy.complete();
   }
 
-  public openMountCreateDialog(zone: Bucket, datasource: SCNGXDatasource<Mount>) {
+  public openMountCreateDialog(zone: Zone, datasource: SCNGXDatasource<Mount>) {
     this.dialog.open<any, MountCreateDialogOptions, Mount>(AppMountCreateDialog, {
       data: {
         bucketId: zone.id

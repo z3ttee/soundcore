@@ -120,8 +120,6 @@ export * from "./lib/pipes/song-duration/song-duration.module";
 export * from "./lib/pipes/song-duration/song-duration.pipe";
 export * from "./lib/pipes/added-to-playlist/added-to-playlist.module";
 export * from "./lib/pipes/added-to-playlist/added-to-playlist.pipe";
-export * from "./lib/pipes/bucket-flag-pipe/bucket-flag-pipe.module";
-export * from "./lib/pipes/bucket-flag-pipe/bucket-flag-pipe.pipe";
 export * from "./lib/pipes/bytes-pipe/bytes-pipe.module";
 export * from "./lib/pipes/bytes-pipe/bytes-pipe.pipe";
 export * from "./lib/pipes/file-flag-pipe/file-flag-pipe.module";
@@ -130,6 +128,8 @@ export * from "./lib/pipes/mount-status-pipe/mount-status-pipe.module";
 export * from "./lib/pipes/mount-status-pipe/mount-status-pipe.pipe";
 export * from "./lib/pipes/resource-type-pipe/resource-type-pipe.module";
 export * from "./lib/pipes/resource-type-pipe/resource-type-pipe.pipe";
+
+export * from "./lib/pipes";
 
 // Notifications
 export * from "./lib/components/notification/notification-list-item/notification-list-item.module";

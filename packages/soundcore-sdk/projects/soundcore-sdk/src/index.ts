@@ -43,6 +43,8 @@ export * from "./lib/collection";
 // Search Module
 export * from "./lib/search";
 
+// Zone Module
+export * from "./lib/zone";
 
 
 
@@ -61,13 +63,6 @@ export * from "./lib/meilisearch/entities/meili-artist.entity";
 export * from "./lib/meilisearch/entities/meili-album.entity";
 export * from "./lib/meilisearch/entities/meili-song.entity";
 export * from "./lib/meilisearch/entities/meili-genre.entity";
-
-// Bucket Module
-export * from "./lib/bucket/bucket.module";
-export * from "./lib/bucket/services/bucket.service";
-export * from "./lib/bucket/entities/bucket.entity";
-
-
 
 // File Module
 export * from "./lib/file/file.module";

@@ -1,5 +1,5 @@
-import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
-import { Bucket } from "@soundcore/sdk";
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { Zone } from "@soundcore/sdk";
 
 @Component({
   selector: 'app-bucket-list-item',
@@ -9,7 +9,7 @@ import { Bucket } from "@soundcore/sdk";
 export class BucketListItemComponent {
 
   @Input() 
-  public bucket: Bucket;
+  public bucket: Zone;
 
   @Input()
   public itemHeight: number = 64;

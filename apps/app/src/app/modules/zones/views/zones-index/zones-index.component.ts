@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
 import { Subject } from 'rxjs';
-import { Bucket } from '@soundcore/sdk';
+import { Zone } from '@soundcore/sdk';
 import { environment } from 'src/environments/environment';
 import { SCNGXDatasource } from '@soundcore/ngx';
 
@@ -16,7 +16,7 @@ export class ZonesIndexComponent implements OnInit, OnDestroy {
   ) { }
 
   private readonly _destroy: Subject<void> = new Subject();
-  public readonly datasource: SCNGXDatasource<Bucket> = new SCNGXDatasource(this.httpClient, `${environment.api_base_uri}/v1/buckets`, 8)
+  public readonly datasource: SCNGXDatasource<Zone> = new SCNGXDatasource(this.httpClient, `${environment.api_base_uri}/v1/zones`, 8)
 
   public ngOnInit(): void {}
   public ngOnDestroy(): void {

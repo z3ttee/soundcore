@@ -1,16 +1,16 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { SCNGXBucketFlagPipe } from './bucket-flag-pipe.pipe';
+import { SCNGXZoneStatusPipe } from './zone-status-pipe.pipe';
 
 @NgModule({
   declarations: [
-    SCNGXBucketFlagPipe
+    SCNGXZoneStatusPipe
   ],
   imports: [
     CommonModule
   ],
   exports: [
-    SCNGXBucketFlagPipe
+    SCNGXZoneStatusPipe
   ]
 })
-export class SCNGXBucketFlagPipeModule { }
+export class SCNGXZoneStatusPipeModule { }
