@@ -4,8 +4,29 @@ on:
   push:
     branches:
       - 'main'
+      - 'experimental'
 
 jobs:          
+  check_branch:
+    runs-on: ubuntu:latest
+    outputs: 
+      - branch: ${{ steps.exportBranchName.outputs.branch }}
+      - tag: ${{ steps.dockerTag.outputs.tag }}
+    steps:
+      - name: Export branch name
+        id: exportBranchName
+        run: echo "BRANCH=${GITHUB_REF##*/}" >> $GITHUB_ENV
+
+      - name: Output Docker tag
+        id: dockerTag
+        run: |
+          echo "branch=$BRANCH" >> $GITHUB_OUTPUT
+          if [[ $BRANCH == 'main' ]]; then
+              echo "tag=latest" >> "$GITHUB_OUTPUT"
+          else
+              echo "tag=preview" >> "$GITHUB_OUTPUT"
+          fi
+
   check_version:
     runs-on: ubuntu:latest
     steps:
@@ -16,16 +37,18 @@ jobs:
         id: read-version
         uses: martinbeentjes/npm-get-version-action@main
         with:
-          path: ./apps/api
+          path: apps/api
           
       - name: Output version
-        run: echo "version=${{ steps.read-version.outputs.current-version}}" >> $GITHUB_OUTPUT
+        run: echo "version=${{ steps.read-version.outputs.current-version}}-${{  }}" >> $GITHUB_OUTPUT
 
       - name: Get current timestamp
         run: echo "date=$(date +'%Y%m%d%H%M')" >> $GITHUB_OUTPUT
 
   build-api:
-    needs: check_version
+    needs: 
+      - check_version
+      - check_branch
     runs-on: ubuntu-latest
     steps:
       
@@ -48,4 +71,4 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/soundcore:${{ needs.check_version.outputs.version }}.${{ needs.check_version.outputs.date }}
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/soundcore:${{ needs.check_branch.outputs.tag }}
