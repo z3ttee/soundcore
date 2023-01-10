@@ -336,7 +336,7 @@ export class MountService {
 
         mount.isDefault = true;
         return this.repository.manager.transaction<Mount>(async (manager) => {
-            await manager.createQueryBuilder().update(Mount).set({ isDefault: false }).where("isDefault = :isDefault AND zoneId = :bucketId", { isDefault: true, zoneId: mount.zone.id }).execute();
+            await manager.createQueryBuilder().update(Mount).set({ isDefault: false }).where("isDefault = :isDefault AND zoneId = :zoneId", { isDefault: true, zoneId: mount.zone.id }).execute();
             return manager.save(mount).then((m) => {
                 this.logger.log(`Set mount '${mount.name}' as default mount.`);
                 return m;
