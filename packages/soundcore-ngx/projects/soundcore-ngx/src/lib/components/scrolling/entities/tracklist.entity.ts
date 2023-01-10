@@ -60,7 +60,7 @@ export class SCNGXTracklist<T = any, C = any> extends SCNGXBaseDatasource<SCNGXT
             switchMap(([tracklist]) => {
                 if(typeof tracklist === "undefined" || tracklist == null) return of([]);
 
-                return this.service.getHttpClient().get<Page<T>>(`${tracklist.relativeMetaUrl}${pageable.toQuery()}`).pipe(
+                return this.service.getHttpClient().get<Page<T>>(`${tracklist.baseUrl}${pageable.toQuery()}`).pipe(
                     toFuture(),
                     filter((request) => !request.loading),
                     map((request) => {
