@@ -27,7 +27,7 @@ export class TracklistService {
      */
     public async findListByArtist(artistId: string, hostname: string, authentication?: User): Promise<Tracklist> {
         const result = await this.buildFindByArtistQuery(artistId, null, authentication).select(["song.id"]).getManyAndCount();
-        const metadataUrl = `${hostname}/v1/tracklists/artist/${artistId}/meta`;
+        const metadataUrl = `/meta`;
         return new Tracklist(result[1], TracklistType.ARTIST, result[0], metadataUrl);
     }
 
@@ -57,7 +57,7 @@ export class TracklistService {
      */
     public async findListByArtistTop(artistId: string, hostname: string, authentication?: User): Promise<Tracklist> {
         const result = await this.buildFindByArtistTopQuery(artistId, authentication).select(["song.id"]).getMany();
-        const metadataUrl = `${hostname}/v1/tracklists/artist/top/${artistId}/meta`;
+        const metadataUrl = `/meta`;
         return new Tracklist(result.length, TracklistType.ARTIST, result, metadataUrl);
     }
 
@@ -88,7 +88,7 @@ export class TracklistService {
      */
     public async findListByAlbum(albumId: string, hostname: string, authentication?: User): Promise<Tracklist> {
         const result = await this.buildFindByAlbumQuery(albumId, null, authentication).select(["song.id"]).getMany();
-        const metadataUrl = `${hostname}/v1/tracklists/album/${albumId}/meta`;
+        const metadataUrl = `/meta`;
         return new Tracklist(result.length, TracklistType.ALBUM, result as unknown as TracklistItem[], metadataUrl);   
     }
 
@@ -127,7 +127,7 @@ export class TracklistService {
             .addOrderBy("item.createdAt", "ASC")
             .getMany();
 
-        const metadataUrl = `${hostname}/v1/tracklists/playlist/${playlistId}/meta`;
+        const metadataUrl = `/meta`;
         return new Tracklist(result.length, TracklistType.PLAYLIST, result, metadataUrl);    
     }
 
@@ -169,7 +169,7 @@ export class TracklistService {
      * @returns Tracklist
      */
     public async findByLikedSongs(authentication: User, hostname: string): Promise<Tracklist> {
-        const metadataUrl = `${hostname}/v1/tracklists/liked_songs/meta`;
+        const metadataUrl = `/meta`;
         const result = await this.likeService.getRepository().createQueryBuilder("like")
             .leftJoin("like.user", "user")
             .leftJoin("like.song", "song")

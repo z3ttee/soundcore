@@ -1,6 +1,6 @@
 import { HttpClient } from "@angular/common/http";
 import { Inject, Injectable } from "@angular/core";
-import { Observable } from "rxjs";
+import { map, Observable } from "rxjs";
 import { SCDKOptions, SCDK_OPTIONS } from "../../scdk.module";
 import { ApiResponse } from "../../utils/responses/api-response";
 import { apiResponse } from "../../utils/rxjs/operators/api-response";
@@ -26,7 +26,13 @@ export class SCSDKTracklistService {
      * @returns Tracklist
      */
     public findByArtist(artistId: string): Observable<ApiResponse<SCSDKTracklist>> {
-        return this.httpClient.get<SCSDKTracklist>(`${this.options.api_base_uri}/v1/tracklists/artist/${artistId}`).pipe(apiResponse());
+        const baseUrl = `${this.options.api_base_uri}/v1/tracklists/artist/${artistId}`
+        return this.httpClient.get<SCSDKTracklist>(baseUrl).pipe(apiResponse(), map((response) => {
+            if(!response || !response.payload) return response;
+
+            response.payload.baseUrl = baseUrl;
+            return response;
+        }));
     }
 
     /**
@@ -35,7 +41,13 @@ export class SCSDKTracklistService {
      * @returns Tracklist
      */
     public findByArtistTop(artistId: string): Observable<ApiResponse<SCSDKTracklist>> {
-        return this.httpClient.get<SCSDKTracklist>(`${this.options.api_base_uri}/v1/tracklists/artist/top/${artistId}`).pipe(apiResponse());
+        const baseUrl = `${this.options.api_base_uri}/v1/tracklists/artist/top/${artistId}`;
+        return this.httpClient.get<SCSDKTracklist>(baseUrl).pipe(apiResponse(), map((response) => {
+            if(!response || !response.payload) return response;
+
+            response.payload.baseUrl = baseUrl;
+            return response;
+        }));
     }
 
     /**
@@ -44,7 +56,13 @@ export class SCSDKTracklistService {
      * @returns Tracklist
      */
     public findByAlbum(albumId: string): Observable<ApiResponse<SCSDKTracklist>> {
-        return this.httpClient.get<SCSDKTracklist>(`${this.options.api_base_uri}/v1/tracklists/album/${albumId}`).pipe(apiResponse());
+        const baseUrl = `${this.options.api_base_uri}/v1/tracklists/album/${albumId}`;
+        return this.httpClient.get<SCSDKTracklist>(baseUrl).pipe(apiResponse(), map((response) => {
+            if(!response || !response.payload) return response;
+
+            response.payload.baseUrl = baseUrl;
+            return response;
+        }));
     }
 
     /**
@@ -53,7 +71,13 @@ export class SCSDKTracklistService {
      * @returns Tracklist
      */
     public findByPlaylist(playlistId: string): Observable<ApiResponse<SCSDKTracklist>> {
-        return this.httpClient.get<SCSDKTracklist>(`${this.options.api_base_uri}/v1/tracklists/playlist/${playlistId}`).pipe(apiResponse());
+        const baseUrl = `${this.options.api_base_uri}/v1/tracklists/playlist/${playlistId}`;
+        return this.httpClient.get<SCSDKTracklist>(baseUrl).pipe(apiResponse(), map((response) => {
+            if(!response || !response.payload) return response;
+
+            response.payload.baseUrl = baseUrl;
+            return response;
+        }));
     }
 
     /**
@@ -61,7 +85,13 @@ export class SCSDKTracklistService {
      * @returns Tracklist
      */
     public findByLikedSongs(): Observable<ApiResponse<SCSDKTracklist>> {
-        return this.httpClient.get<SCSDKTracklist>(`${this.options.api_base_uri}/v1/tracklists/liked_songs`).pipe(apiResponse());
+        const baseUrl = `${this.options.api_base_uri}/v1/tracklists/liked_songs`;
+        return this.httpClient.get<SCSDKTracklist>(baseUrl).pipe(apiResponse(), map((response) => {
+            if(!response || !response.payload) return response;
+
+            response.payload.baseUrl = baseUrl;
+            return response;
+        }));
     }
 
 }

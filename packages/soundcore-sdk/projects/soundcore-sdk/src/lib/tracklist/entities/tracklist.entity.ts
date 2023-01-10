@@ -51,7 +51,9 @@ export class SCSDKTracklist {
          * to the metadata endpoint for that list.
          * Default: /meta
          */
-        public readonly metadataLocation: string
+        public readonly relativeMetaUrl: string,
+
+        public baseUrl?: string
     ) {}
 
 }
