@@ -7,7 +7,9 @@ import { SCDKOptions, SCDK_OPTIONS } from "../../scdk.module";
 import { ImportTaskUpdateEvent } from "../events/importtask-update.event";
 import { SCSDKAuthenticatedGateway } from "./gateway";
 
-@Injectable()
+@Injectable({
+  providedIn: "root"
+})
 export class SCSDKGeneralGateway extends SCSDKAuthenticatedGateway {
 
   private readonly _importTaskUpdateSubj: Subject<ImportTask> = new Subject();

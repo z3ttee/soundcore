@@ -1,7 +1,11 @@
 import path from "node:path"
+import { MountProgressInfo } from "./mount/entities/mount.entity";
 
 // Validation
 export const MOUNTNAME_MAX_LENGTH = 32
+
+// Display stats
+export const MOUNT_MAX_STEPS = 3;
 
 // Roles
 export const ROLE_ADMIN = "admin";
@@ -35,8 +39,16 @@ export const EVENT_TRIGGER_FILE_PROCESS_BY_FLAG = "trigger-file-process-by-flag-
 
 export const EVENT_METADATA_CREATED = "metadata-created-event"
 
+export const EVENT_MOUNT_PROCESS_UPDATE = "internal-mount-process-update"
+
 // TypeORM
 export const TYPEORM_ENTITY_GLOB = path.join(process.cwd(), "**/*.entity{ .ts,.js}");
 
 // Gateway events
 export const GATEWAY_EVENT_IMPORTTASK_UPDATE = "gateway-importtask-update";
+
+// Step messages
+export const MOUNT_STEP_WAITING: MountProgressInfo = {
+    title: "Waiting",
+    description: "Waiting for next step to continue"
+}

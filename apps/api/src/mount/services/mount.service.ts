@@ -5,7 +5,7 @@ import { Repository } from 'typeorm';
 import { Zone } from '../../zone/entities/zone.entity';
 import { CreateMountDTO } from '../dtos/create-mount.dto';
 import { UpdateMountDTO } from '../dtos/update-mount.dto';
-import { Mount, MountStatus } from '../entities/mount.entity';
+import { Mount, MountProgress, MountStatus } from '../entities/mount.entity';
 import { Random } from '@tsalliance/utilities';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateResult } from '../../utils/results/creation.result';
@@ -15,7 +15,9 @@ import { MountRegistryService } from './mount-registry.service';
 import { MountScanFlag, MountScanProcessDTO } from '../dtos/scan-process.dto';
 import { FileFlag } from '../../file/entities/file.entity';
 import { Environment } from '@soundcore/common';
-import { MOUNTNAME_MAX_LENGTH } from '../../constants';
+import { EVENT_MOUNT_PROCESS_UPDATE, MOUNTNAME_MAX_LENGTH, MOUNT_MAX_STEPS, MOUNT_STEP_WAITING } from '../../constants';
+import { AdminGateway } from '../../gateway/gateways/admin-gateway.gateway';
+import { OnEvent } from '@nestjs/event-emitter';
 
 @Injectable()
 export class MountService {
@@ -25,7 +27,8 @@ export class MountService {
         @InjectRepository(Mount) private readonly repository: Repository<Mount>,
         private readonly fileSystem: FileSystemService,
         private readonly mountRegistryService: MountRegistryService,
-        private readonly queue: WorkerQueue<MountScanProcessDTO>
+        private readonly queue: WorkerQueue<MountScanProcessDTO>,
+        private readonly gateway?: AdminGateway
     ) {}
 
     /**
@@ -170,10 +173,7 @@ export class MountService {
         const mount = await this.resolveMount(idOrObject);
         if(!mount) throw new NotFoundException("Mount not found");
 
-        return this.queue.enqueue({
-            mount: mount,
-            flag: MountScanFlag.RESCAN
-        });
+        return this.enqueue(mount, MountScanFlag.RESCAN);
     }
 
     /**
@@ -186,10 +186,24 @@ export class MountService {
         const mount = await this.resolveMount(idOrObject);
         if(!mount) throw new NotFoundException("Mount not found");
 
+        return this.enqueue(mount, MountScanFlag.DEFAULT_SCAN);
+    }
+
+    private async enqueue(mount: Mount, flag: MountScanFlag) {
+        await this.setProgressInfoAndEmit(mount, {
+            mountId: mount.id,
+            maxSteps: MOUNT_MAX_STEPS,
+            currentStep: 0,
+            info: MOUNT_STEP_WAITING,
+            progress: -1
+        }, MountStatus.ENQUEUED);
+
         return this.queue.enqueue({
             mount: mount,
-            flag: MountScanFlag.DEFAULT_SCAN
+            flag: flag
         });
+
+        return 0
     }
 
     /**
@@ -285,16 +299,6 @@ export class MountService {
         });
     }
 
-    public async setMountStatus(idOrObject: string | Mount, status: MountStatus): Promise<Mount> {
-        const mount = await this.resolveMount(idOrObject);
-        if(!mount) throw new NotFoundException("Mount not found");
-
-        mount.status = status;
-        return this.repository.update(mount.id, {
-            status: status
-        }).then(() => mount);
-    }
-
     /**
      * Check if there is a default mount existing
      * for the current bucket.
@@ -354,6 +358,33 @@ export class MountService {
             return result;
         }).catch(() => {
             return null;
+        });
+    }
+
+    /**
+     * Set a progress object on the database entry of a mount.
+     * @param idOrObject Id or Mount
+     * @param progress Progress info. Can be null to clear info
+     */
+    public async setProgressInfo(idOrObject: string | Mount, progress: MountProgress, status: MountStatus = MountStatus.BUSY): Promise<Mount> {
+        const mount = await this.resolveMount(idOrObject);
+        if(!mount) throw new NotFoundException("Mount not found.");
+
+        mount.progressInfo = progress;
+        return this.repository.update(mount.id, {
+            status: status,
+            progressInfo: progress
+        }).then(() => mount);
+    }
+
+    /**
+     * Set a progress object on the database entry of a mount.
+     * @param idOrObject Id or Mount
+     * @param progress Progress info. Can be null to clear info
+     */
+    public async setProgressInfoAndEmit(idOrObject: string | Mount, progress: MountProgress, status: MountStatus = MountStatus.BUSY): Promise<Mount> {
+        return this.setProgressInfo(idOrObject, progress, status).then((mount) => {
+            return this.gateway?.sendMountStatusUpdate(mount, status, progress).then(() => mount);
         });
     }
 
@@ -446,6 +477,11 @@ export class MountService {
         return this.repository.update(mount.id, {
             lastScannedAt: mount.lastScannedAt
         }).then(() => mount);
+    }
+
+    @OnEvent(EVENT_MOUNT_PROCESS_UPDATE)
+    public async onMountProcessUpdate(mount: Mount, status: MountStatus, progress: MountProgress) {
+        this.setProgressInfoAndEmit(mount, progress, status);
     }
 
 }

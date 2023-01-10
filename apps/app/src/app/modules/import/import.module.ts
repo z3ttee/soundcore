@@ -4,7 +4,7 @@ import { MatInputModule } from "@angular/material/input";
 import { RouterModule, Routes } from "@angular/router";
 import { FaIconLibrary, FontAwesomeModule } from "@fortawesome/angular-fontawesome";
 import { SCNGXArtworkModule, SCNGXButtonModule, SCNGXDialogModule, SCNGXLabelModule, SCNGXScrollingModule, SCNGXSkeletonModule, SCNGXUiRowModule, SCNGXUiTitleModule } from "@soundcore/ngx";
-import { SCSDKGatewayModule, SCSDKImportModule } from "@soundcore/sdk";
+import { SCSDKImportModule } from "@soundcore/sdk";
 import { SCNGXTabsModule } from "src/app/components/navigation-tabs";
 import { AppImportSpotifyCreateDialogModule } from "src/app/dialogs/import-spotify-create-dialog/import-spotify-create-dialog.module";
 import { SpotifyImportItemComponent } from "./components/spotify-import-item/spotify-import-item.component";
@@ -56,8 +56,6 @@ const routes: Routes = [
         SCNGXDialogModule,
         SCNGXScrollingModule,
         SCNGXSkeletonModule,
-
-        SCSDKGatewayModule,
 
         SCSDKImportModule,
         AppImportSpotifyCreateDialogModule

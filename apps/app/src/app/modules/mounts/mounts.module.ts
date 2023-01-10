@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Routes } from '@angular/router';
 import { MountInfoComponent } from './views/mount-info/mount-info.component';
 import { SCDKFileModule, SCSDKMountModule } from '@soundcore/sdk';
-import { SCNGXButtonModule, SCNGXBytesPipeModule, SCNGXIconBtnModule, SCNGXLoadingBtnModule, SCNGXMountStatusPipeModule, SCNGXScrollingModule, SCNGXSkeletonModule, SCNGXStatusIndicatorModule, SCNGXUiTitleModule } from '@soundcore/ngx';
+import { SCNGXButtonModule, SCNGXBytesPipeModule, SCNGXIconBtnModule, SCNGXLoadingBtnModule, SCNGXMountStatusPipeModule, SCNGXProgressbarModule, SCNGXScrollingModule, SCNGXSkeletonModule, SCNGXStatusIndicatorModule, SCNGXUiTitleModule } from '@soundcore/ngx';
 import { chartPie, collection, HeroIconModule, pencil, plus, refresh, star, trash } from 'ng-heroicon';
 import { Error404Module } from 'src/app/shared/error404/error404.module';
 import { SCNGXFileListItemModule } from 'src/app/components/list-items/file-list-item/file-list-item.module';
@@ -41,6 +41,7 @@ const routes: Routes = [
     SCNGXTabsModule,
     SCNGXIconBtnModule,
     SCNGXFileListItemModule,
+    SCNGXProgressbarModule,
 
     AppMountCreateDialogModule,
 

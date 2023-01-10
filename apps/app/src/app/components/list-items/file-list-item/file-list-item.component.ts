@@ -13,7 +13,7 @@ export class SCNGXFileListItemComponent implements OnInit, OnChanges {
   public file: File;
 
   @Input()
-  public itemHeight: number = 64;
+  public itemHeight: number = 56;
 
   public indicatorAppearance: StatusIndicatorAppearance;
 

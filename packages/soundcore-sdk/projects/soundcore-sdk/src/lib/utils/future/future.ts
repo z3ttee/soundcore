@@ -34,4 +34,15 @@ export class Future<T = any> {
             loading: true
         }
     }
+
+    public static merge<D = any>(dst: Future<D>, src: D): Future<D> {
+        return {
+            loading: dst.loading,
+            error: dst.error,
+            data: {
+                ...dst.data ?? {} as D,
+                ...src ?? {} as D
+            }
+        }
+    }
 }

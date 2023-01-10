@@ -2,16 +2,20 @@ import { HttpClient } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
-import { BehaviorSubject, combineLatest, map, Observable, startWith, Subject, switchMap, takeUntil } from 'rxjs';
-import { ApplicationInfo, File, Future, Mount, SCDKFileService, SCSDKAdminGateway, SCSDKAppService, SCSDKMountService } from '@soundcore/sdk';
+import { BehaviorSubject, combineLatest, debounceTime, filter, map, Observable, startWith, Subject, switchMap, takeUntil, tap } from 'rxjs';
+import { ApplicationInfo, File, Future, Mount, MountProgress, MountStatus, MountStatusUpdateEvent, SCDKFileService, SCSDKAdminGateway, SCSDKAppService, SCSDKMountService } from '@soundcore/sdk';
 import { AppMountCreateDialog, MountCreateDialogOptions } from 'src/app/dialogs/mount-create-dialog/mount-create-dialog.component';
 import { SCNGXDatasource, SCNGXDialogService } from '@soundcore/ngx';
 
 interface MountInfoProps {
   mount?: Mount;
+  status?: MountStatus;
+
   loading?: boolean;
   datasource?: SCNGXDatasource<File>;
   appInfo?: ApplicationInfo;
+  process?: MountProgress;
+  processEvent?: MountStatusUpdateEvent;
 }
 
 @Component({
@@ -34,51 +38,93 @@ export class MountInfoComponent implements OnInit, OnDestroy {
 
   @ViewChild("container") public containerRef: ElementRef<HTMLDivElement>;
   
-  private readonly _destroy: Subject<void> = new Subject();
+  private readonly $destroy: Subject<void> = new Subject();
+  private readonly $reload: Subject<void> = new Subject();
+
   private readonly $onMountUpdated: Subject<Mount> = new Subject();
+  private readonly $onMountStatusUpdate: Subject<MountStatusUpdateEvent> = new Subject();
 
   public readonly $deletingStatus: BehaviorSubject<boolean> = new BehaviorSubject(false);
   public readonly $setAsDefaultStatus: BehaviorSubject<boolean> = new BehaviorSubject(false);
   public readonly $refreshStatus: BehaviorSubject<boolean> = new BehaviorSubject(false);
 
+  private currentMountId: string;
+  private lastMountStatus: MountStatus;
+
+  /**
+   * Observable that emits current
+   * mount id.
+   */
+  public $mountId: Observable<string> = combineLatest([
+    this.$reload.pipe(startWith(null), takeUntil(this.$destroy)),
+    this.activatedRoute.paramMap.pipe(map((params) => params.get("mountId")), takeUntil(this.$destroy))
+  ]).pipe(map(([_, mountId]) => mountId), tap(() => console.log(`[${MountInfoComponent.name}] Reloading page data...`)));
+
+  /**
+   * Observable that emits current
+   * mount data.
+   */
+  public $mount: Observable<Future<Mount>> = this.$mountId.pipe(
+    switchMap((mountId) => this.mountService.findById(mountId)),
+    switchMap((request) => this.$onMountUpdated.pipe(
+      startWith(null), 
+      map((updated) => Future.merge(request, updated)),
+      takeUntil(this.$destroy)
+    ))
+  );
+
+  /**
+   * Observable that emits current datasource
+   * fitting to the mountId
+   */
+  public $datasource: Observable<SCNGXDatasource<File>> = this.$mountId.pipe(
+    map((mountId) => new SCNGXDatasource<File>(this.httpClient, this.fileService.findByMountIdBaseURL(mountId))),
+  );
+
+  public $processEvent: Observable<MountStatusUpdateEvent> = this.$mount.pipe(
+    switchMap((request) => this.adminGateway.$mountStatusUpdate.pipe(
+      filter((event) => event?.mountId === request?.data?.id),
+      startWith(null),
+      takeUntil(this.$destroy)
+    ))
+  );
+
   public $props: Observable<MountInfoProps> = combineLatest([
-    this.activatedRoute.paramMap.pipe(
-      takeUntil(this._destroy),
-      map((paramMap) => paramMap.get("mountId")),
-      switchMap((mountId) => this.mountService.findById(mountId)),
-      map((request): [Future<Mount>, SCNGXDatasource] => ([
-        request,
-        request.loading ? null : new SCNGXDatasource(this.httpClient, this.fileService.findByMountIdBaseURL(request.data?.id))
-      ]))
-    ),
-    this.$onMountUpdated.asObservable().pipe(startWith(null)),
-    this.appService.$appInfo.pipe(takeUntil(this._destroy))
+    this.appService.$appInfo.pipe(takeUntil(this.$destroy)),
+    this.$mount,
+    this.$datasource,
+    this.$processEvent
   ]).pipe(
-    map(([[request, datasource], onMountUpdated, appInfo]): MountInfoProps => ({
-      loading: request.loading,
-      mount: onMountUpdated ?? request.data,
+    map(([appInfo, request, datasource, processEvent]): MountInfoProps => ({
+      appInfo: appInfo,
       datasource: datasource,
-      appInfo: appInfo
+      loading: request.loading,
+      mount: request.data,
+      process: processEvent?.progressPayload,
+      processEvent: processEvent
     })),
-    takeUntil(this._destroy)
+    tap(({ processEvent }) => {
+      !!processEvent?.status && processEvent?.status != MountStatus.ENQUEUED && processEvent?.status != MountStatus.BUSY && this.reload()
+    })
   );
 
   public ngOnInit(): void {
-    this.adminGateway.$mountStatusUpdate.pipe(takeUntil(this._destroy)).subscribe((event) => {
-      console.log(event);
+    this.adminGateway.$mountStatusUpdate.pipe(takeUntil(this.$destroy)).subscribe((event) => {
+      if(this.currentMountId !== event.mountId) return;
+      this.$onMountStatusUpdate.next(event);
     });
   }
   public ngOnDestroy(): void {
-      this._destroy.next();
-      this._destroy.complete();
+      this.$destroy.next();
+      this.$destroy.complete();
   }
 
   public deleteMount(mount: Mount) {
     this.setDeleting(true);
 
-    this.dialog.confirm("Möchtest du den Mountpunkt wirklich löschen?", "Mount löschen").$afterClosed.pipe(takeUntil(this._destroy)).subscribe((confirmed) => {
+    this.dialog.confirm("Möchtest du den Mountpunkt wirklich löschen?", "Mount löschen").$afterClosed.pipe(takeUntil(this.$destroy)).subscribe((confirmed) => {
       if(confirmed) {
-        this.mountService.deleteById(mount.id).pipe(takeUntil(this._destroy)).subscribe((request) => {
+        this.mountService.deleteById(mount.id).pipe(takeUntil(this.$destroy)).subscribe((request) => {
           this.setDeleting(request.loading);
 
           if(request.loading) return;
@@ -106,7 +152,7 @@ export class MountInfoComponent implements OnInit, OnDestroy {
         data: mount,
         mode: "edit"
       }
-    }).$afterClosed.pipe(takeUntil(this._destroy)).subscribe((result) => {
+    }).$afterClosed.pipe(takeUntil(this.$destroy)).subscribe((result) => {
       if(!!result) {
         this.$onMountUpdated.next({
           ...mount,
@@ -120,7 +166,7 @@ export class MountInfoComponent implements OnInit, OnDestroy {
   public triggerReindex(mount: Mount) {
     if(!mount) return;
 
-    this.mountService.rescanMount(mount.id).pipe(takeUntil(this._destroy)).subscribe((request) => {
+    this.mountService.rescanMount(mount.id).pipe(takeUntil(this.$destroy)).subscribe((request) => {
       this.setRefreshing(request.loading);
       if(!request.loading) console.log("triggered mount re-index: ", request?.data);
     });
@@ -129,7 +175,7 @@ export class MountInfoComponent implements OnInit, OnDestroy {
   public setAsDefault(mount: Mount) {
     if(!mount) return;
 
-    this.mountService.setDefault(mount.id).pipe(takeUntil(this._destroy)).subscribe((request) => {
+    this.mountService.setDefault(mount.id).pipe(takeUntil(this.$destroy)).subscribe((request) => {
       this.setSettingAsDefault(request.loading);
       if(!request.loading) console.log("set default: ", request?.data);
     });
@@ -146,6 +192,10 @@ export class MountInfoComponent implements OnInit, OnDestroy {
 
   private setSettingAsDefault(isPending: boolean) {
     this.$setAsDefaultStatus.next(isPending);
+  }
+
+  public reload() {
+    this.$reload.next();
   }
 
 }

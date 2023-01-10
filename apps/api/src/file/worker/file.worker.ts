@@ -48,8 +48,6 @@ export default async function (job: WorkerJobRef<FileProcessDTO>): Promise<FileP
 async function processGivenFiles(job: WorkerJobRef<FileProcessDTO>, datasource: DataSource): Promise<FileID[]> {
     const { mount, files, scanFlag } = job.payload;
 
-    // TODO: Implement rescans
-
     const fileSystem = new FileSystemService();
     const service = new FileService(datasource.getRepository(File));
 
@@ -118,6 +116,14 @@ async function processGivenFiles(job: WorkerJobRef<FileProcessDTO>, datasource: 
     }).start().catch(() => []);
 }
 
+/**
+ * Worker function that looks for mounts in the database that have files with status of PENDING_ANALYSIS.
+ * This usually means, the scanning or indexing process was aborted by either a server crash or an
+ * unexpected error.
+ * Upon completion, the queue service receives a list of mounts that need to be scanned.
+ * @param job Job data
+ * @returns List of mounts.
+ */
 async function continueAwaitingFiles(job: WorkerJobRef<FileProcessDTO>): Promise<FileProcessResultDTO[]> {
     const startedAtMs = Date.now();
     const { flag, scanFlag } = job.payload;

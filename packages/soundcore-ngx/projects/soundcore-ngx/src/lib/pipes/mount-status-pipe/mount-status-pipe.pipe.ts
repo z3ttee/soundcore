@@ -10,10 +10,10 @@ export class SCNGXMountStatusPipe implements PipeTransform {
     switch(status) {
       case MountStatus.ENQUEUED:
         return "Eingereiht"
-      case MountStatus.SCANNING:
-        return "Wird überprüft"
-      case MountStatus.INDEXING:
-        return "Wird indexiert"
+      case MountStatus.BUSY:
+        return "Wird gescannt"
+      case MountStatus.ERRORED:
+        return "Fehler aufgetreten"
       default:
         return "Verfügbar"
     }

@@ -6,8 +6,43 @@ import { File } from "../../file/entities/file.entity";
 export enum MountStatus {
     UP = 0,
     ENQUEUED = 1,
-    SCANNING = 2,
-    INDEXING = 3
+    BUSY = 2,
+    ERRORED = 3
+}
+
+export interface MountProgressInfo {
+    title: string;
+    description: string;
+}
+
+export interface MountProgress {
+    /**
+     * Id of the mount
+     */
+    mountId: string;
+
+    /**
+     * Number of the current step
+     */
+    currentStep: number;
+
+    /**
+     * Max number of steps of
+     * this process
+     */
+    maxSteps: number;
+
+    /**
+     * Progress in %
+     * Set to -1, if progress cannot be calculated (indeterminate)
+     */
+    progress?: number;
+
+    /**
+     * Define title and description
+     * of the current step
+     */
+    info: MountProgressInfo;
 }
 
 @Entity()
@@ -25,6 +60,9 @@ export class Mount {
 
     @Column({ nullable: false, type: "text" })
     public directory: string;
+
+    @Column({ type: "json", nullable: true })
+    public progressInfo: MountProgress;
 
     @CreateDateColumn()
     public createdAt: Date;

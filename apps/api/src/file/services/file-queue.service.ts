@@ -1,15 +1,21 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { EventEmitter2, OnEvent } from "@nestjs/event-emitter";
 import { WorkerJob, WorkerJobRef, WorkerQueue } from "@soundcore/nest-queue";
-import { EVENT_FILES_FOUND, EVENT_FILES_PROCESSED } from "../../constants";
+import { EVENT_FILES_FOUND, EVENT_FILES_PROCESSED, EVENT_MOUNT_PROCESS_UPDATE, MOUNT_MAX_STEPS, MOUNT_STEP_WAITING } from "../../constants";
 import { FilesFoundEvent } from "../../events/files-found.event";
 import { FileDTO } from "../dto/file.dto";
-import { Mount } from "../../mount/entities/mount.entity";
+import { Mount, MountProgress, MountProgressInfo, MountStatus } from "../../mount/entities/mount.entity";
 import { Environment } from "@soundcore/common";
 import { FileProcessResultDTO } from "../dto/file-process-result.dto";
 import { FileProcessDTO, FileProcessFlag } from "../dto/file-process.dto";
 import { MountScanFlag } from "../../mount/dtos/scan-process.dto";
 import { FilesProcessedEvent } from "../../events/files-processed.event";
+
+const CURRENT_STEP = 2;
+const STEP_INFO: MountProgressInfo = {
+    title: "Registering files",
+    description: "All found files are currently registered in the database"
+}
 
 @Injectable()
 export class FileQueueService {
@@ -61,6 +67,14 @@ export class FileQueueService {
 
         if(flag == FileProcessFlag.DEFAULT) {
             this.logger.verbose(`Creating database entries for files on mount '${mount.name}'`);
+
+            this.eventEmitter.emit(EVENT_MOUNT_PROCESS_UPDATE, mount, MountStatus.BUSY, {
+                mountId: mount.id,
+                currentStep: CURRENT_STEP,
+                maxSteps: MOUNT_MAX_STEPS,
+                info: STEP_INFO,
+                progress: 0
+            } as MountProgress);
         } else {
             this.logger.verbose(`Checking for files that await analysis...`);
         }
@@ -78,6 +92,9 @@ export class FileQueueService {
             } else {
                 this.logger.error(`Could not process batch of files for mount '${mount?.name}': ${error?.message}`);
             }
+
+            // Emit mount status update
+            this.eventEmitter.emit(EVENT_MOUNT_PROCESS_UPDATE, mount, MountStatus.ERRORED, null);
         } else {
             if(Environment.isDebug) {
                 this.logger.error(`Failed checking for file that await analysis: ${error.message}`, error.stack)
@@ -100,6 +117,7 @@ export class FileQueueService {
             if(flag == FileProcessFlag.DEFAULT) {
                 if(filesProcessed.length <= 0) {
                     this.logger.verbose(`No new files were created on mount '${mount?.name}'. Took ${timeTookMs}ms.`);
+                    this.eventEmitter.emit(EVENT_MOUNT_PROCESS_UPDATE, mount, MountStatus.UP, null);
                     return;
                 }
         
@@ -107,11 +125,20 @@ export class FileQueueService {
             } else {
                 if(filesProcessed.length <= 0) {
                     this.logger.verbose(`No waiting files found. Took ${timeTookMs}ms.`);
+                    this.eventEmitter.emit(EVENT_MOUNT_PROCESS_UPDATE, mount, MountStatus.UP, null);
                     return;
                 }
         
                 this.logger.verbose(`${filesProcessed.length} files have been enqueued for analysis. Took ${timeTookMs}ms.`);
             }
+
+            this.eventEmitter.emit(EVENT_MOUNT_PROCESS_UPDATE, mount, MountStatus.BUSY, {
+                mountId: mount.id,
+                currentStep: CURRENT_STEP,
+                maxSteps: MOUNT_MAX_STEPS,
+                info: MOUNT_STEP_WAITING,
+                progress: -1
+            } as MountProgress);
 
             // Emit event for the next step
             this.eventEmitter.emit(EVENT_FILES_PROCESSED, new FilesProcessedEvent(filesProcessed, mount, scanFlag));
@@ -122,6 +149,9 @@ export class FileQueueService {
      * Handle worker progress event
      */
     private async handleOnWorkerProgress(job: WorkerJobRef<FileProcessDTO>) {
+        const { payload, progress } = job;
+        if(typeof payload?.mount === "undefined" || payload?.mount == null) return;
+
         if(Environment.isDebug) {
             this.logger.debug(`Progress on mount ${job.payload.mount?.name}: ${job.progress}%`);
         }

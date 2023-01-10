@@ -3,8 +3,43 @@ import { Zone } from "../../zone/entities/zone.entity";
 export enum MountStatus {
     UP = 0,
     ENQUEUED = 1,
-    SCANNING = 2,
-    INDEXING = 3
+    BUSY = 2,
+    ERRORED = 3
+}
+
+export interface MountProgressInfo {
+    title: string;
+    description: string;
+}
+
+export interface MountProgress {
+    /**
+     * Id of the mount
+     */
+    mountId: string;
+
+    /**
+     * Number of the current step
+     */
+    currentStep: number;
+
+    /**
+     * Max number of steps of
+     * this process
+     */
+    maxSteps: number;
+
+    /**
+     * Progress in %
+     * Set to -1, if progress cannot be calculated (indeterminate)
+     */
+    progress?: number;
+
+    /**
+     * Define title and description
+     * of the current step
+     */
+    info: MountProgressInfo;
 }
 
 export class Mount {
@@ -19,6 +54,7 @@ export class Mount {
     public discriminator: string;
 
     public bucket: Zone;
+    public progressInfo: MountProgress;
 
     // Below fields may only be populated
     // after custom database queries.

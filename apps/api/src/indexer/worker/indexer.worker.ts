@@ -8,7 +8,7 @@ import { IndexerProcessDTO } from "../dtos/indexer-process.dto";
 import { Artist } from "../../artist/entities/artist.entity";
 import { AlbumService } from "../../album/services/album.service";
 import { ArtworkService } from "../../artwork/services/artwork.service";
-import { Artwork, ArtworkID } from "../../artwork/entities/artwork.entity";
+import { Artwork } from "../../artwork/entities/artwork.entity";
 import { InternalServerErrorException, Logger } from "@nestjs/common";
 import { FileService } from "../../file/services/file.service";
 import { EventEmitter2 } from "@nestjs/event-emitter";
@@ -34,13 +34,6 @@ import { CreateArtworkDTO } from "../../artwork/dtos/create-artwork.dto";
 
 const logger = new Logger("IndexWorker");
 const BATCH_SIZE = 100;
-
-class BatchResult {
-    constructor(
-        public readonly entries: IndexerResultEntry[],
-        public readonly resources: IndexerCreatedResources
-    ) {}
-}
 
 export interface ID3Album {
     name: string;
@@ -310,8 +303,6 @@ export default function (job: WorkerJobRef<IndexerProcessDTO>): Promise<IndexerR
             }
         });
     });
-
-    
 }
 
 

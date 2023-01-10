@@ -7,7 +7,9 @@ import { SSOService } from "@soundcore/sso";
 import { MountStatusUpdateEvent } from "../events";
 import { Observable, Subject } from "rxjs";
 
-@Injectable()
+@Injectable({
+  providedIn: "root"
+})
 export class SCSDKAdminGateway extends SCSDKAuthenticatedGateway {
 
   private readonly _mountStatusUpdateSubj: Subject<MountStatusUpdateEvent> = new Subject();
@@ -15,7 +17,7 @@ export class SCSDKAdminGateway extends SCSDKAuthenticatedGateway {
 
   constructor(
     ssoService: SSOService,
-    @Inject(SCDK_OPTIONS) private readonly options: SCDKOptions
+    @Inject(SCDK_OPTIONS) options: SCDKOptions
   ) {
       super(new URL(`${options.api_base_uri}/admin`), ssoService);
   }
