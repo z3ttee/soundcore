@@ -6,7 +6,7 @@ on:
       - 'main'
 
 jobs:
-  docker:
+  build-api:
     runs-on: ubuntu-latest
     steps:
       -
@@ -26,4 +26,4 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           push: true
-          tags: user/soundcore:$(date +%s)
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/soundcore:$(date +%s)
