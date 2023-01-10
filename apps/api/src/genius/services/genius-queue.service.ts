@@ -1,9 +1,5 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { WorkerJob, WorkerQueue } from "@soundcore/nest-queue";
-import { Job, Queue } from "bull";
-import { QUEUE_GENIUS_NAME } from "../../constants";
-import { Resource } from "../../utils/entities/resource";
-import { BullQueueService } from "../../utils/services/bull-queue.service";
 import { GeniusProcessDTO } from "../dtos/genius-process.dto";
 
 @Injectable()

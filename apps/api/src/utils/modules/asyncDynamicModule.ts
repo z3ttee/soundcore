@@ -5,8 +5,6 @@ export interface AsyncDynamicModuleOptions<T> extends Pick<ModuleMetadata, 'impo
 }
 
 export function createOptionsProviderFromAsync<T>(injectionToken: any, asyncOptions: AsyncDynamicModuleOptions<T>): Provider<T> {
-    console.log(asyncOptions);
-
     return {
         provide: injectionToken,
         useFactory: async (...args) => {
