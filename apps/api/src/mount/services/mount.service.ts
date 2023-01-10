@@ -97,7 +97,7 @@ export class MountService {
      * @returns Mount
      */
     public async findByNameInBucket(bucketId: string, name: string): Promise<Mount> {
-        return await this.repository.findOne({ where: { name, zone: { id: bucketId } }, relations: ["bucket"]});
+        return await this.repository.findOne({ where: { name, zone: { id: bucketId } }, relations: ["zone"]});
     }
 
     /**
@@ -107,7 +107,7 @@ export class MountService {
      * @returns Mount
      */
     public async findByDirectoryInBucket(bucketId: string, directory: string): Promise<Mount> {
-        return await this.repository.findOne({ where: { directory: path.resolve(directory), zone: { id: bucketId } }, relations: ["bucket"]});
+        return await this.repository.findOne({ where: { directory: path.resolve(directory), zone: { id: bucketId } }, relations: ["zone"]});
     }
 
     /**
