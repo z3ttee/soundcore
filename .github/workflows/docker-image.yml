@@ -43,7 +43,7 @@ jobs:
           path: apps/api
           
       - name: Output version
-        run: echo "version=${{ steps.read-version.outputs.current-version}}-${{  }}" >> $GITHUB_OUTPUT
+        run: echo "version=${{ steps.read-version.outputs.current-version }}" >> $GITHUB_OUTPUT
 
       - name: Get current timestamp
         run: echo "date=$(date +'%Y%m%d%H%M')" >> $GITHUB_OUTPUT
@@ -74,4 +74,5 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/soundcore:${{ needs.check_branch.outputs.tag }}
+          tags: 
+            ${{ secrets.DOCKERHUB_USERNAME }}/soundcore:${{ needs.check_branch.outputs.tag }}
