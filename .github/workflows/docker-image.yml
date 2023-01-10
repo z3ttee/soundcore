@@ -17,6 +17,8 @@ jobs:
         uses: martinbeentjes/npm-get-version-action@main
         with:
           path: ./apps/api
+          
+      - name: Output version
         run: echo "version=${{ steps.read-version.outputs.current-version}}" >> $GITHUB_OUTPUT
 
       - name: Get current timestamp
