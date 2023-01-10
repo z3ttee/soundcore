@@ -30,7 +30,7 @@ export class SCSDKTracklistService {
         return this.httpClient.get<SCSDKTracklist>(baseUrl).pipe(apiResponse(), map((response) => {
             if(!response || !response.payload) return response;
 
-            response.payload.baseUrl = baseUrl;
+            response.payload.baseUrl = baseUrl + response.payload.relativeMetaUrl;
             return response;
         }));
     }
@@ -45,7 +45,7 @@ export class SCSDKTracklistService {
         return this.httpClient.get<SCSDKTracklist>(baseUrl).pipe(apiResponse(), map((response) => {
             if(!response || !response.payload) return response;
 
-            response.payload.baseUrl = baseUrl;
+            response.payload.baseUrl = baseUrl + response.payload.relativeMetaUrl;
             return response;
         }));
     }
@@ -60,7 +60,7 @@ export class SCSDKTracklistService {
         return this.httpClient.get<SCSDKTracklist>(baseUrl).pipe(apiResponse(), map((response) => {
             if(!response || !response.payload) return response;
 
-            response.payload.baseUrl = baseUrl;
+            response.payload.baseUrl = baseUrl + response.payload.relativeMetaUrl;
             return response;
         }));
     }
@@ -75,7 +75,7 @@ export class SCSDKTracklistService {
         return this.httpClient.get<SCSDKTracklist>(baseUrl).pipe(apiResponse(), map((response) => {
             if(!response || !response.payload) return response;
 
-            response.payload.baseUrl = baseUrl;
+            response.payload.baseUrl = baseUrl + response.payload.relativeMetaUrl;
             return response;
         }));
     }
@@ -89,7 +89,7 @@ export class SCSDKTracklistService {
         return this.httpClient.get<SCSDKTracklist>(baseUrl).pipe(apiResponse(), map((response) => {
             if(!response || !response.payload) return response;
 
-            response.payload.baseUrl = baseUrl;
+            response.payload.baseUrl = baseUrl + response.payload.relativeMetaUrl;
             return response;
         }));
     }
