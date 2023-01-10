@@ -9,7 +9,7 @@ jobs:
   read_version:
     runs-on: ubuntu-latest
     outputs:
-      packageVersion: ${{ steps.packageVersion.outputs.test }}
+      packageVersion: ${{ steps.packageVersion.outputs.current-version }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
