@@ -8,7 +8,7 @@ on:
 
 jobs:          
   check_branch:
-    runs-on: ubuntu:latest
+    runs-on: ubuntu-latest
     outputs: 
       branch: ${{ steps.exportBranchName.outputs.branch }}
       tag: ${{ steps.dockerTag.outputs.tag }}
@@ -31,7 +31,7 @@ jobs:
           fi
 
   check_version:
-    runs-on: ubuntu:latest
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
