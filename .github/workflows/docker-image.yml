@@ -10,13 +10,15 @@ jobs:
   check_branch:
     runs-on: ubuntu:latest
     outputs: 
-      - branch: ${{ steps.exportBranchName.outputs.branch }}
-      - tag: ${{ steps.dockerTag.outputs.tag }}
+      branch: ${{ steps.exportBranchName.outputs.branch }}
+      tag: ${{ steps.dockerTag.outputs.tag }}
     steps:
-      - name: Export branch name
-        id: exportBranchName
+      - name: Set branch env
         run: echo "BRANCH=${GITHUB_REF##*/}" >> $GITHUB_ENV
-        run: echo "branch=${GITHUB_REF##*/}" >> $GITHUB_OUTPUT
+      
+      - name: Export branch name 
+        id: exportBranchName
+        run: echo "branch=$BRANCH" >> $GITHUB_OUTPUT
 
       - name: Output Docker tag
         id: dockerTag
