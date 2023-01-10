@@ -5,21 +5,7 @@ on:
     branches:
       - 'main'
 
-jobs:
-  read_version:
-    runs-on: ubuntu-latest
-    outputs:
-      packageVersion: ${{ steps.packageVersion.outputs.current-version }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        
-      - name: Read version from package.json
-        id: packageVersion
-        uses: martinbeentjes/npm-get-version-action@main
-        with:
-          path: apps/api
-          
+jobs:          
   build-api:
     runs-on: ubuntu-latest
     steps:
@@ -45,4 +31,4 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/soundcore:${{ needs.read_version.outputs.packageVersion }}
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/soundcore:${{ env.date }}
