@@ -32,6 +32,8 @@ jobs:
 
   check_version:
     runs-on: ubuntu-latest
+    outputs: 
+      version: ${{ steps.outputVersion.outputs.version }}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
@@ -43,6 +45,7 @@ jobs:
           path: apps/api
           
       - name: Output version
+        id: outputVersion
         run: echo "version=${{ steps.read-version.outputs.current-version }}" >> $GITHUB_OUTPUT
 
       - name: Get current timestamp
@@ -75,4 +78,4 @@ jobs:
         with:
           push: true
           tags: 
-            ${{ secrets.DOCKERHUB_USERNAME }}/soundcore:${{ needs.check_branch.outputs.tag }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/soundcore:${{ needs.check_branch.outputs.tag }},${{ secrets.DOCKERHUB_USERNAME }}/soundcore:${{ needs.check_branch.outputs.tag }}-${{ needs.check_version.outputs.version }}

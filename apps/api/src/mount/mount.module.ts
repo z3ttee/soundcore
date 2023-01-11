@@ -40,7 +40,7 @@ export class MountModule implements OnModuleInit {
   ) {}
 
   public async onModuleInit() {
-    return this.service.checkForDefaultMount().then(() => {
+    return this.service.checkForDefaultMount().then((result) => {
       if(Environment.isDockerized) {
         return this.service.checkMountsDockerMode();
       } else {

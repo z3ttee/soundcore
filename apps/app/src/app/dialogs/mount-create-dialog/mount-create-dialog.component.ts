@@ -74,7 +74,7 @@ export class AppMountCreateDialog implements OnDestroy {
         // Handle editor mode == "create"
         this.mountService.create({
             name: this.form.get("name").value,
-            bucket: { id: this.dialogRef.config.data.bucketId },
+            zone: { id: this.dialogRef.config.data.bucketId },
             directory: this.form.get("directory").value,
             isDefault: this.form.get("setAsDefault").value,
             doScan: this.form.get("doScan").value

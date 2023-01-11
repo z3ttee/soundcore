@@ -153,16 +153,18 @@ async function lookupDockerMountedVolumes(job: WorkerJobRef<MountScanProcessDTO>
         const service = new MountService(repository, filesystem, registryService, null);
 
         return new Promise<MountScanResultDTO>((resolve, reject) => {
+            logger.log(`Application is running in docker mode: Checking for mounted volumes.`);
             const rootDir = "/mnt/";
     
             fs.readdir(rootDir, { withFileTypes: true }, (err, files) => {
                 if(err) {
+                    console.error(err)
                     reject(err);
                     return;
                 }
     
                 const mountDtos: CreateMountDTO[] = files.filter((dirent) => dirent.isDirectory()).map((dirent) => ({
-                    bucket: { id: fsService.getInstanceId() },
+                    zone: { id: fsService.getInstanceId() },
                     name: service.formatName(dirent.name),
                     directory: path.join(rootDir, dirent.name),
                     isDefault: false,

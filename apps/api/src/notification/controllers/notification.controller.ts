@@ -16,7 +16,6 @@ export class NotificationController {
 
     @Post("test")
     public async sendTest() {
-        console.log("sending test")
         return this.notificationService.createNotification({
             title: "This is a test",
             message: "This notification was just a test to see how the system works.",

@@ -10,10 +10,11 @@ import { MatRippleModule } from '@angular/material/core';
 import { Error404Module } from 'src/app/shared/error404/error404.module';
 import { SCNGXSongListItemModule } from 'src/app/components/list-items/song-list-item/song-list-item.module';
 import { SongContextMenuModule } from 'src/app/components/menus/song-context-menu/song-context-menu.module';
+import { Error404Component } from 'src/app/shared/error404/error404.component';
 
 const routes: Routes = [
   { path: ":albumId", component: AlbumInfoComponent },
-  { path: "**", redirectTo: "/"}
+  { path: "**", component: Error404Component}
 ]
 
 @NgModule({

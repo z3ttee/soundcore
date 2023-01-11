@@ -97,7 +97,7 @@ export class MountService {
      * @returns Mount
      */
     public async findByNameInBucket(bucketId: string, name: string): Promise<Mount> {
-        return await this.repository.findOne({ where: { name, zone: { id: bucketId } }, relations: ["bucket"]});
+        return await this.repository.findOne({ where: { name, zone: { id: bucketId } }, relations: ["zone"]});
     }
 
     /**
@@ -107,7 +107,7 @@ export class MountService {
      * @returns Mount
      */
     public async findByDirectoryInBucket(bucketId: string, directory: string): Promise<Mount> {
-        return await this.repository.findOne({ where: { directory: path.resolve(directory), zone: { id: bucketId } }, relations: ["bucket"]});
+        return await this.repository.findOne({ where: { directory: path.resolve(directory), zone: { id: bucketId } }, relations: ["zone"]});
     }
 
     /**
@@ -216,14 +216,13 @@ export class MountService {
         createMountDto.directory = this.fileSystem.resolveMountDirectory(createMountDto.directory);
         const directory = createMountDto.directory
 
-        const existingMount = await this.findByNameInBucket(createMountDto.bucket.id, createMountDto.name) || await this.findByDirectoryInBucket(createMountDto.bucket.id, createMountDto.directory);
+        const existingMount = await this.findByNameInBucket(createMountDto.zone.id, createMountDto.name) || await this.findByDirectoryInBucket(createMountDto.zone.id, createMountDto.directory);
         if(existingMount) return new CreateResult(existingMount, true);
 
         const mount = this.repository.create();
         mount.name = createMountDto.name;
         mount.directory = directory;
-        mount.zone = createMountDto.bucket as Zone;
-        mount.discriminator = Random.randomString(4);
+        mount.zone = createMountDto.zone as Zone;
 
         return this.repository.createQueryBuilder()
             .insert()
@@ -231,7 +230,7 @@ export class MountService {
             .orIgnore()
             .execute().then((insertResult) => {
                 if(insertResult.identifiers.length < 0) {
-                    return this.findByNameInBucket(createMountDto.bucket.id, createMountDto.name).then((existingMount) => {
+                    return this.findByNameInBucket(createMountDto.zone.id, createMountDto.name).then((existingMount) => {
                         return new CreateResult(existingMount, false);
                     });
                 }
@@ -314,7 +313,7 @@ export class MountService {
             // Create the default mount, should always
             // be the default mount if no other default mount exists.
             return this.createIfNotExists({
-                bucket: { id: this.fileSystem.getInstanceId() },
+                zone: { id: this.fileSystem.getInstanceId() },
                 directory: this.fileSystem.resolveInitialMountPath(),
                 name: this.formatName("Default Mount"),
                 isDefault: true,
@@ -336,7 +335,7 @@ export class MountService {
 
         mount.isDefault = true;
         return this.repository.manager.transaction<Mount>(async (manager) => {
-            await manager.createQueryBuilder().update(Mount).set({ isDefault: false }).where("isDefault = :isDefault AND bucketId = :bucketId", { isDefault: true, bucketId: mount.zone.id }).execute();
+            await manager.createQueryBuilder().update(Mount).set({ isDefault: false }).where("isDefault = :isDefault AND zoneId = :zoneId", { isDefault: true, zoneId: mount.zone.id }).execute();
             return manager.save(mount).then((m) => {
                 this.logger.log(`Set mount '${mount.name}' as default mount.`);
                 return m;
@@ -396,9 +395,11 @@ export class MountService {
     public async checkMountsDockerMode() {
         if(!Environment.isDockerized) throw new InternalServerErrorException(`Tried checking mounts in docker mode, but application is in standalone mode.`);
         
-        this.queue.enqueue(<MountScanProcessDTO>{
+        return this.queue.enqueue(<MountScanProcessDTO>{
             flag: MountScanFlag.DOCKER_LOOKUP,
             mount: null
+        }).then(() => {
+            return null;
         });
     }
 
