@@ -31,7 +31,7 @@ services:
     environment:
       - MEILI_MASTER_KEY=super_secret_master_key
     volumes:
-      - "./docker/meilisearch:/meili_data"
+      - "~/volumes/meilisearch:/meili_data"
     entrypoint: ["meilisearch", "--env=development"]
     networks:
       - soundcore_dev
@@ -54,7 +54,7 @@ services:
     networks:
       - soundcore_dev
     volumes:
-      - /home/soundcore:/data
+      - ~/volumes/soundcore/data:/data
 
 networks:
   soundcore_dev:
