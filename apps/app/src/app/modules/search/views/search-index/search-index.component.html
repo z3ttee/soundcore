@@ -1,6 +1,5 @@
-<section class="h-full w-full overflow-hidden" #page>
-    <!-- <scngx-infinite-list class="w-full h-full" [dataSource]="dataSource" [parentScroll]="page" #list> -->
-        <div class="w-full" scngx-content>
+<section class="h-full w-full overflow-hidden overflow-y-auto" #page>
+    <div class="w-full" scngx-content>
             <!-- Toolbar (touch devices only) -->
             <scngx-toolbar [showNavigation]="false" [transparent]="true" *ngIf="(screenService.$isTouch | async)">
                 <div class="flex items-center">
@@ -125,19 +124,7 @@
                     </scngx-ui-row>
                 </ng-container>
             </section>
-        </div>
-
-        <!-- <ng-container scngx-list *ngIf="!query">
-            <h6 class="px-window mb-4">Alle Genres</h6>
-
-            <div class="px-window grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div *ngFor="let item of list.viewPortItems" class="flex items-center justify-center text-center p-4 rounded transition-all cursor-pointer bg-body-light bg-opacity-60 border border-body-light border-opacity-0 transform-gpu will-change-transform hover:border-opacity-100 hover:bg-opacity-40 active:bg-opacity-20 active:scale-[98%]">
-                    {{ item.name }}
-                </div>
-            </div>
-            
-        </ng-container> -->
-    <!-- </scngx-infinite-list> -->
+    </div>
 </section>
 
 <ng-template #songContextMenu let-song>
