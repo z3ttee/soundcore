@@ -51,7 +51,6 @@ export class Mount {
     public lastScannedAt: Date;
     public status: MountStatus;
     public isDefault: boolean;
-    public discriminator: string;
 
     public bucket: Zone;
     public progressInfo: MountProgress;

@@ -55,9 +55,6 @@ export class Mount {
     @Column({ length: MOUNTNAME_MAX_LENGTH, nullable: false })
     public name: string;
 
-    @Column({ length: 4, nullable: false, unique: true })
-    public discriminator: string;
-
     @Column({ nullable: false, type: "text" })
     public directory: string;
 

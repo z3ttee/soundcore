@@ -18,7 +18,7 @@ export class CreateMountDTO implements
 
     @IsNotEmpty()
     @IsObject()
-    public bucket: { id: string };
+    public zone: { id: string };
 
     @IsOptional()
     @IsBoolean()
@@ -29,9 +29,5 @@ export class CreateMountDTO implements
     @Max(1)
     @Min(0)
     public isDefault: boolean = false;
-
-    @IsOptional()
-    @Transform(() => Random.randomString(4))
-    public discriminator?: string = Random.randomString(4);
 
 }

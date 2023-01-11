@@ -32,19 +32,16 @@ export class MeiliQueueService {
 
     @OnEvent(EVENT_SONGS_CHANGED)
     public async handleSongsChanged(songs: Song[]) {
-        console.log("event: EVENT_SONGS_CHANGED")
         this.syncSongs(songs);
     }
 
     @OnEvent(EVENT_ARTISTS_CHANGED)
     public async handleArtistsChanged(artists: Artist[]) {
-        console.log("event: EVENT_ARTISTS_CHANGED")
         this.syncArtists(artists);
     }
 
     @OnEvent(EVENT_ALBUMS_CHANGED)
     public async handleAlbumsChanged(albums: Album[]) {
-        console.log("event: EVENT_ALBUMS_CHANGED")
         this.syncAlbums(albums);
     }
 
@@ -54,29 +51,21 @@ export class MeiliQueueService {
     }
     
     public async syncSongs(songs: Song[]) {
-        console.log(`syncing ${songs.length} songs`);
-
         const job = new MeiliJob(songs, MeiliJobType.SYNC_SONGS);
         return this.queue.enqueue(job);
     }
 
     public async syncAlbums(albums: Album[]) {
-        console.log(`syncing ${albums.length} albums`);
-
         const job = new MeiliJob(albums, MeiliJobType.SYNC_ALBUMS);
         return this.queue.enqueue(job);
     }
 
     public async syncArtists(artists: Artist[]) {
-        console.log(`syncing ${artists.length} artists`);
-
         const job = new MeiliJob(artists, MeiliJobType.SYNC_ARTISTS);
         return this.queue.enqueue(job);
     }
 
     public async syncPlaylists(playlists: Playlist[]) {
-        console.log(`syncing ${playlists.length} playlists`);
-
         const job = new MeiliJob(playlists, MeiliJobType.SYNC_PLAYLISTS);
         return this.queue.enqueue(job);
     }

@@ -114,7 +114,7 @@ export default function (job: WorkerJobRef<IndexerProcessDTO>): Promise<IndexerR
 
                     // Collect artists for building batched database query
                     for(const id3Artist of id3Artists) {
-                        if(!artists.has(id3Artist.name)) {
+                        if(typeof id3Artist !== "undefined" && id3Artist != null && !artists.has(id3Artist.name)) {
                             artists.set(id3Artist.name, id3Artist);
                         }
                     }
@@ -172,7 +172,7 @@ export default function (job: WorkerJobRef<IndexerProcessDTO>): Promise<IndexerR
                 // Create database entries for collected albums
                 const albumCreationResult = await albumService.createIfNotExists(Array.from(albums.values()).map((album) => {    
                     // Map previous primaryArtist data with the created data from above                
-                    album.primaryArtist = createdArtists.get(album.primaryArtist.name);
+                    album.primaryArtist = createdArtists.get(album.primaryArtist?.name);
                     return album;
                 }));
                 const createdAlbums = new Map<string, Album>();
@@ -187,7 +187,7 @@ export default function (job: WorkerJobRef<IndexerProcessDTO>): Promise<IndexerR
                     const album = createdAlbums.get(getAlbumMapKey(song.album?.name, song.album?.primaryArtist));
 
                     // Map previous primaryArtist and album data with the created data from above      
-                    song.primaryArtist = createdArtists.get(song.primaryArtist.name);
+                    song.primaryArtist = createdArtists.get(song.primaryArtist?.name);
                     song.album = album;          
                     return song;
                 }));
