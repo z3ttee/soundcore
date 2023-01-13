@@ -52,7 +52,7 @@ export class OIDCService {
                     // Check if the kid on the jwt exists
                     // as signing key in the keystore
                     if(!this._keystore.hasSigKey(kid)) {
-                        throw new BadRequestException("Invalid access token.");
+                        throw new BadRequestException("Invalid access token. Did you configure the oidc issuer correctly? If not, a malicious jwt was successfully blocked.");
                     }
                 }), map(() => token));
             }),

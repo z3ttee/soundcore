@@ -1,8 +1,10 @@
 import { APP_INITIALIZER, ModuleWithProviders, NgModule } from "@angular/core";
 import { KeycloakAngularModule, KeycloakOptions, KeycloakService } from "keycloak-angular";
 import { KeycloakInitOptions } from "keycloak-js";
+import { Subject } from "rxjs";
 import { SSOService } from "./services/sso.service";
 
+const $keycloakInitializeError: Subject<Error> = new Subject();
 function initializeKeycloak(keycloak: KeycloakService, options: SSOModuleOptionsImpl) {
   return () =>
     keycloak.init({
@@ -13,10 +15,8 @@ function initializeKeycloak(keycloak: KeycloakService, options: SSOModuleOptions
       },
       loadUserProfileAtStartUp: options.loadUserProfileAtStartUp,
       initOptions: options.initOptions
-      // initOptions: {
-      //   onLoad: 'check-sso',
-      //   silentCheckSsoRedirectUri: window.location.origin + '/assets/silent-check-sso.html'
-      // }
+    }).catch((error: Error) => {
+      $keycloakInitializeError.next(error);
     });
 }
 
@@ -66,6 +66,10 @@ export class SSOModule {
         {
           provide: SSOModuleOptionsImpl,
           useValue: options
+        },
+        {
+          provide: "keycloakInitializeError",
+          useValue: $keycloakInitializeError
         },
         {
           provide: APP_INITIALIZER,

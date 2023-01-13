@@ -1,2 +1,5 @@
-<scngx-dialog-section></scngx-dialog-section>
-<router-outlet></router-outlet>
+<ng-container *ngIf="($props | async) as props">
+    <scngx-dialog-section></scngx-dialog-section>
+
+    <router-outlet *ngIf="props.ready"></router-outlet>
+</ng-container>
