@@ -1,7 +1,7 @@
 <app-error404 *ngIf="!loading && !profile"></app-error404>
 
 <section class="h-full w-full overflow-y-auto pb-window" #parent>
-    <virtual-scroller #pageScroll [parentScroll]="parent" [enableUnequalChildrenSizes]="true">
+    <!-- <virtual-scroller #pageScroll [parentScroll]="parent" [enableUnequalChildrenSizes]="true"> -->
         <app-list-view [resource]="profile" [artwork]="null" [isLoading]="loading" [title]="profile?.name">
 
             <ng-container scngx-stats>
@@ -27,14 +27,14 @@
         <!-- Playlists row -->
         <scngx-ui-row [route]="['./playlists']" [headline]="'Öffentliche Playlists'">
             <div class="w-full" #scrollArea>
-                <virtual-scroller class="w-full h-64" #scroll [parentScroll]="scrollArea" [items]="playlists" [horizontal]="true" [scrollbarWidth]="0" [scrollbarHeight]="0">
-                    <div class="w-48 h-full mx-2 first:ml-window last:mr-window" *ngFor="let playlist of scroll.viewPortItems">
+                <!-- <virtual-scroller class="w-full h-64" #scroll [parentScroll]="scrollArea" [items]="playlists" [horizontal]="true" [scrollbarWidth]="0" [scrollbarHeight]="0"> -->
+                    <!-- <div class="w-48 h-full mx-2 first:ml-window last:mr-window" *ngFor="let playlist of scroll.viewPortItems">
                         <scngx-playlist-grid-item 
                             [routerLink]="['/playlist', playlist.slug || playlist.id]"
                             [item]="playlist">
                         </scngx-playlist-grid-item>
-                    </div>
-                </virtual-scroller>
+                    </div> -->
+                <!-- </virtual-scroller> -->
             </div>
         </scngx-ui-row>
 
@@ -48,5 +48,5 @@
         <!-- Songs row -->
         <scngx-ui-row [headline]="'Meistgehörte Songs'" [subtitle]="'Der letzten 30 Tage'" [route]="null">
         </scngx-ui-row>
-    </virtual-scroller>
+    <!-- </virtual-scroller> -->
 </section>
