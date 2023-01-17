@@ -4,14 +4,19 @@
             <ng-content></ng-content>
             <span class="flex items-center justify-center w-full h-full">
                 <ng-content select="hero-icon"></ng-content>
+                <ng-content select="ng-icon"></ng-content>
             </span>
         </div>
         <div [ngClass]="{'opacity-100': loading}" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0">
-            <ng-lottie
-                width="24px"
-                height="24px"
-                [options]="options">
-            </ng-lottie>
+            <ng-container *ngIf="loading">
+                <div *ngIf="!loaderRef; else loaderRef">
+                    <ng-lottie
+                        width="24px"
+                        height="24px"
+                        [options]="options">
+                    </ng-lottie>
+                </div>
+            </ng-container>
         </div>
     </div>
 </button>
