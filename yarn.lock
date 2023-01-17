@@ -1862,6 +1862,20 @@
   dependencies:
     glob "7.1.7"
 
+"@ng-icons/core@^22.0.4":
+  version "22.4.0"
+  resolved "https://registry.yarnpkg.com/@ng-icons/core/-/core-22.4.0.tgz#381e4032e4abe62e97be00be5e81fc0e26c10ef5"
+  integrity sha512-sOACYxjGuJ7TQEARD7XhLF0mZGTTkEF8o2yNl3J+KXTPz+A5CptkT/57S+UNdXXeKuw9c6xlYpxUWu3tISkp/Q==
+  dependencies:
+    tslib "^2.2.0"
+
+"@ng-icons/heroicons@^22.0.4":
+  version "22.4.0"
+  resolved "https://registry.yarnpkg.com/@ng-icons/heroicons/-/heroicons-22.4.0.tgz#f5365d35c8dac83f9386ab001932e4077e087aaf"
+  integrity sha512-ITdxeTGsitxRYhz+gK9Ttmheti/dAz3gI2BLuuD9veQRkR+F0IbXGTf0u6k5+tX4i2MnjtDae8h4u/pDNniPbw==
+  dependencies:
+    tslib "^2.2.0"
+
 "@ngtools/webpack@14.2.6":
   version "14.2.6"
   resolved "https://registry.yarnpkg.com/@ngtools/webpack/-/webpack-14.2.6.tgz#74866e04d380b36e30844d10e8eb3694b4032d09"
@@ -9586,7 +9600,7 @@ tslib@^1.8.1, tslib@^1.9.0:
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-1.14.1.tgz#cf2d38bdc34a134bcaf1091c41f6619e2f672d00"
   integrity sha512-Xni35NKzjgMrwevysHTCArtLDpPvye8zV/0E4EyYn43P7/7qvQwPh9BGkHewbMulVntbigmcT7rdX3BNo9wRJg==
 
-tslib@^2.4.0:
+tslib@^2.2.0, tslib@^2.4.0:
   version "2.4.1"
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-2.4.1.tgz#0d0bfbaac2880b91e22df0768e55be9753a5b17e"
   integrity sha512-tGyy4dAjRIEwI7BzsB0lynWgOpfqjUdq91XXAlIWD2OwKBH7oCl/GZG/HT4BOHrTlPMOASlMQ7veyTqpmRcrNA==

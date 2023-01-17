@@ -67,6 +67,11 @@
                 <!-- Duration -->
                 <span class="text-font-tertiary text-sm w-24 md:w-min text-center">{{ props.currentTime | durationPipe }}/{{ props.song?.duration || 0 | durationPipe }}</span>
     
+                <!-- Speaker button -->
+                <scngx-ibtn-text class="hidden md:inline-block">
+                    <ng-icon [size]="'21px'" name="heroSpeakerWave"></ng-icon>
+                </scngx-ibtn-text>
+
                 <!-- Queue button -->
                 <scngx-ibtn-text class="hidden md:inline-block">
                     <span class="flex items-center justify-center w-full h-full"><hero-icon name="collection" class="h-6 w-6"></hero-icon></span>

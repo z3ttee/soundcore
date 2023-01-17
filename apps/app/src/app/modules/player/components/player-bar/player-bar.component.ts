@@ -25,7 +25,7 @@ interface ResponsiveOptions {
 @Component({
     selector: "scngx-player-bar",
     templateUrl: "./player-bar.component.html",
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppPlayerBarComponent implements OnInit, OnDestroy {
 

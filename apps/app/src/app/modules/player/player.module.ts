@@ -4,6 +4,8 @@ import { ReactiveFormsModule } from "@angular/forms";
 import { MatRippleModule } from "@angular/material/core";
 import { MatSnackBarModule } from "@angular/material/snack-bar";
 import { RouterModule } from "@angular/router";
+import { NgIconsModule } from "@ng-icons/core";
+import { heroSpeakerWave } from "@ng-icons/heroicons/outline";
 import { SCNGXArtworkModule, SCNGXExplicitBadgeModule, SCNGXIconBtnModule } from "@soundcore/ngx";
 import { SCSDKCollectionModule } from "@soundcore/sdk";
 import { arrowsExpand, collection, fastForward, heart, HeroIconModule } from "ng-heroicon";
@@ -20,6 +22,7 @@ import { AppPlayerBarComponent } from "./components/player-bar/player-bar.compon
         CommonModule,
         ReactiveFormsModule,
         HeroIconModule.withIcons({ arrowsExpand, collection, fastForward, heart }),
+        NgIconsModule.withIcons({ heroSpeakerWave }),
 
         MatRippleModule,
         MatSnackBarModule,
