@@ -1,7 +1,12 @@
 import { Injectable } from "@angular/core";
+import { SCCDKScreenService } from "@soundcore/cdk";
 import { Logger, SCSDKStreamService } from "@soundcore/sdk";
-import { BehaviorSubject, from, map, Observable, of, Subject } from "rxjs";
+import { BehaviorSubject, combineLatest, filter, from, map, Observable, of, Subject } from "rxjs";
 import { PlayerItem } from "../entities/player-item.entity";
+
+const MAX_VOLUME = 100;
+const DEFAULT_VOLUME = 30;
+const VOLUME_STORAGE_KEY = "soundcore.player.volume";
 
 @Injectable({
     providedIn: "root"
@@ -19,8 +24,18 @@ export class AppAudioService {
     private readonly _currenTimeSubject: BehaviorSubject<number> = new BehaviorSubject(0);
     public readonly $currentTime: Observable<number> = this._currenTimeSubject.asObservable();
 
+    private readonly _volumeSubject: BehaviorSubject<number> = new BehaviorSubject(null);
+    public readonly $volume: Observable<number> = this._volumeSubject.asObservable().pipe(filter((val) => typeof val === "number"));
+
+    private readonly _mutedSubject: BehaviorSubject<boolean> = new BehaviorSubject(false);
+    public readonly $muted: Observable<boolean> = combineLatest([
+        this._volumeSubject.asObservable(),
+        this._mutedSubject.asObservable()
+    ]).pipe(map(([volume, isMuted]) => volume <= 0 || isMuted));
+
     constructor(
-        private readonly streamService: SCSDKStreamService
+        private readonly streamService: SCSDKStreamService,
+        private readonly screen: SCCDKScreenService
     ) {
         this._audioElement.onabort = (event) => this.handleOnAbort(event);
         this._audioElement.onerror = (event) => this.handleOnError(event);
@@ -30,6 +45,14 @@ export class AppAudioService {
         this._audioElement.onplay = () => this._isPausedSubject.next(false);
 
         this._audioElement.ontimeupdate = () => this._currenTimeSubject.next(Math.ceil(this._audioElement.currentTime));
+        this.screen.$isTouch.subscribe((isTouch) => {
+            if(isTouch) {
+                this.setVolume(MAX_VOLUME);
+                return;
+            }
+
+            this.setVolume(this.readPersistedVolume() ?? DEFAULT_VOLUME);
+        });
     }
 
     /**
@@ -76,7 +99,37 @@ export class AppAudioService {
      */
     public pause(): Observable<void> {
         this._audioElement.pause()
-        return of(null);
+        return of();
+    }
+
+    /**
+     * Mute the player
+     */
+    public toggleMute() {
+        const isMuted = this._mutedSubject.getValue();
+
+        if(isMuted) {
+            // Reset to previous volume and
+            // push new muted state
+            this._audioElement.volume = this._volumeSubject.getValue() / 100;
+            this._mutedSubject.next(false);
+            return;
+        }
+        
+        // Otherwise set volume to 0 and
+        // push new muted state
+        this._audioElement.volume = 0;
+        this._mutedSubject.next(true);
+    }
+
+    public setVolume(volume: number): Observable<void> {
+        const validatedVolume = Math.min(MAX_VOLUME, Math.max(0, volume));
+
+        this._volumeSubject.next(validatedVolume);
+        this._audioElement.volume = validatedVolume / 100;
+
+        this.persistVolume(volume);
+        return of();
     }
 
     /**
@@ -124,6 +177,22 @@ export class AppAudioService {
     private handleOnEnded(event: Event) {
         this.logger.verbose(`Current audio ended.`);
         this._onNextSubject.next();
+    }
+
+    private persistVolume(volume: number) {
+        const validatedVolume = Math.min(MAX_VOLUME, Math.max(0, volume));
+        if(!localStorage) return;
+
+        localStorage.setItem(VOLUME_STORAGE_KEY, `${validatedVolume}`);
+    }
+
+    private readPersistedVolume(): number {
+        if(!localStorage) return null;
+
+        const storageItem = localStorage.getItem(VOLUME_STORAGE_KEY);
+        if(typeof storageItem === "undefined" || storageItem == null) return null;
+        
+        return  Math.min(MAX_VOLUME, Math.max(0, Number(storageItem)));
     }
 
 }
