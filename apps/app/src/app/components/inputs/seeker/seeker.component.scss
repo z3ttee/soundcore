@@ -1,8 +1,6 @@
 :host {  
 
     input[type=range] {
-        @apply bg-body-lighter absolute top-0 left-0 w-full appearance-none bg-opacity-70 h-[2px] transform-gpu origin-bottom transition-[height] hover:h-[6px] hover:lg:h-[4px] cursor-pointer will-change-auto;
-
         background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #FFBF50), color-stop(100%, #FFBF50));
         background-size: 0% 100%;
         background-repeat: no-repeat;

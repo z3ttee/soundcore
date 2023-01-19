@@ -16,6 +16,7 @@ const routes: Routes = [
     { path: "more", canActivate: [SSOGuard], loadChildren: () => import("./modules/admin-more/admin-more.module").then((m) => m.AdminMoreModule) },
     { path: "**", redirectTo: "/admin/zones", pathMatch: "full" }
   ]},
+  { path: "bigpicture", canActivate: [SSOGuard], loadChildren: () => import("./modules/bigpicture/bigpicture.module").then((m) => m.BigPictureModule) },
   { path: "", component: AscMainLayoutComponent, canActivate: [SSOGuard], children: [
     { path: "", canActivate: [SSOGuard], loadChildren: () => import("./modules/home/home.module").then((m) => m.HomeModule) },
     { path: "album", canActivate: [SSOGuard], loadChildren: () => import("./modules/album/album.module").then((m) => m.AlbumModule) },

@@ -114,7 +114,9 @@ export class AppPlayerBarComponent implements OnInit, OnDestroy {
     }
 
     public openBigPicture() {
+        // TODO: Just for testing
         console.log("TODO: Bigpicture")
+        this.openBigPictureMobile();
     }
 
     public openBigPictureMobile() {

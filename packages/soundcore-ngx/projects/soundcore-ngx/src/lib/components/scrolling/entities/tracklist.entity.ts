@@ -1,6 +1,6 @@
 import { CollectionViewer } from "@angular/cdk/collections";
 import { Future, LikedSong, Page, Pageable, PlaylistItem, SCSDKTracklist, SCSDKTracklistService, Song, toFuture, toFutureCompat, TracklistType } from "@soundcore/sdk";
-import { catchError, combineLatest, filter, map, Observable, of, Subscription, switchMap, takeUntil } from "rxjs";
+import { catchError, filter, map, Observable, of, switchMap, takeUntil } from "rxjs";
 import { Queue } from "../../../utils/queue/queue.entity";
 import { TRACKLIST_REGISTRY } from "../utils/tracklist-builder";
 import { SCNGXBaseDatasource, SCNGXDatasourceFreeHandler } from "./datasource.entity";
@@ -16,7 +16,7 @@ export class SCNGXTracklist<T = any, C = any> extends SCNGXBaseDatasource<SCNGXT
 
     constructor(
         private readonly service: SCSDKTracklistService,
-        private readonly tracklistType: TracklistType,
+        public readonly contextType: TracklistType,
         private readonly assocResId: string,
         private readonly _context?: C,
         initialSize?: number,
@@ -37,7 +37,7 @@ export class SCNGXTracklist<T = any, C = any> extends SCNGXBaseDatasource<SCNGXT
     }
 
     public get id(): string {
-        return `${this.tracklistType}-${this.assocResId}`;
+        return `${this.contextType}-${this.assocResId}`;
     }
 
     public static buildId(assocResId: string, tracklistType: TracklistType) {
@@ -106,7 +106,7 @@ export class SCNGXTracklist<T = any, C = any> extends SCNGXBaseDatasource<SCNGXT
             // Fetch tracklist from api
             // First, build the request variable
             let request: Observable<Future<SCSDKTracklist>>;
-            switch(this.tracklistType) {
+            switch(this.contextType) {
                 case TracklistType.PLAYLIST:
                     request = this.service.findByPlaylist(this.assocResId).pipe(toFutureCompat());
                     break;
@@ -125,7 +125,7 @@ export class SCNGXTracklist<T = any, C = any> extends SCNGXBaseDatasource<SCNGXT
 
                 default:
                     // Unexpected type, throw error
-                    subscriber.error(new Error(`Received attempt to initialize tracklist with an invalid type. Received '${this.tracklistType}', expected one of [${Object.values(TracklistType).join(", ")}].`));
+                    subscriber.error(new Error(`Received attempt to initialize tracklist with an invalid type. Received '${this.contextType}', expected one of [${Object.values(TracklistType).join(", ")}].`));
                     subscriber.complete();
                     return;
             }
