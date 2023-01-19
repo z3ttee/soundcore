@@ -8,7 +8,6 @@ import { SCNGXButtonModule, SCNGXBytesPipeModule, SCNGXScrollingModule, SCNGXSke
 import { ZoneInfoComponent } from './views/zone-info/zone-info.component';
 import { BucketListItemModule } from 'src/app/components/list-items/bucket-list-item/bucket-list-item.module';
 import { MountListItemModule } from 'src/app/components/list-items/mount-list-item/mount-list-item.module';
-import { VirtualScrollerModule } from '@tsalliance/ngx-virtual-scroller';
 import { AppMountCreateDialogModule } from 'src/app/dialogs/mount-create-dialog/mount-create-dialog.module';
 import { Error404Module } from 'src/app/shared/error404/error404.module';
 import { SSOGuard } from '@soundcore/sso';
@@ -27,7 +26,6 @@ const routes: Routes = [
   imports: [
     CommonModule,
     RouterModule.forChild(routes),
-    VirtualScrollerModule,
     HeroIconModule.withIcons({ collection, chartPie, plus }),
 
     SCSDKZoneModule,

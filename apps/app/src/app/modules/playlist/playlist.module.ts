@@ -8,7 +8,6 @@ import { MatRippleModule } from '@angular/material/core';
 import { ScrollingModule } from '@angular/cdk/scrolling';
 import { SCNGXButtonModule, SCNGXIconBtnModule, SCNGXScrollingModule, SCNGXSkeletonModule, SCNGXSongDurationPipeModule, SCNGXTableModule } from '@soundcore/ngx';
 import { ListViewModule } from 'src/app/components/resource-views/list-view/list-view.module';
-import { VirtualScrollerModule } from '@tsalliance/ngx-virtual-scroller';
 import { SCSDKPlaylistModule } from '@soundcore/sdk';
 import { FaIconLibrary, FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faPlay } from '@fortawesome/free-solid-svg-icons';
@@ -31,9 +30,6 @@ const routes: Routes = [
     HeroIconModule.withIcons({ play, heart, dotsVertical }),
     MatRippleModule,
     FontAwesomeModule,
-
-    VirtualScrollerModule,
-
     ListViewModule,
 
     SCSDKPlaylistModule,

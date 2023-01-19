@@ -5,8 +5,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { SCDKUserModule, SCSDKProfileModule } from '@soundcore/sdk';
 import { Error404Module } from 'src/app/shared/error404/error404.module';
 import { ListViewModule } from 'src/app/components/resource-views/list-view/list-view.module';
-import { SCNGXPlaylistGridItemModule, SCNGXTooltipModule, SCNGXUiRowModule } from '@soundcore/ngx';
-import { VirtualScrollerModule } from '@tsalliance/ngx-virtual-scroller';
+import { SCNGXPlaylistGridItemModule, SCNGXScrollingModule, SCNGXTooltipModule, SCNGXUiRowModule } from '@soundcore/ngx';
 import { SCNGXArtistListItemModule } from 'src/app/components/list-items/artist-list-item/artist-list-item.module';
 
 const routes: Routes = [
@@ -21,8 +20,6 @@ const routes: Routes = [
   imports: [
     CommonModule,
     RouterModule.forChild(routes),
-    VirtualScrollerModule,
-    
     Error404Module,
     ListViewModule,
 
@@ -30,6 +27,7 @@ const routes: Routes = [
     SCNGXTooltipModule,
     SCNGXUiRowModule,
     SCNGXArtistListItemModule,
+    SCNGXScrollingModule,
 
     SCSDKProfileModule,
     SCDKUserModule

@@ -1,6 +1,6 @@
-import { Injectable } from "@angular/core";
+import { Inject, Injectable } from "@angular/core";
 import { KeycloakEvent, KeycloakEventType, KeycloakService } from "keycloak-angular";
-import { BehaviorSubject, map, Observable } from "rxjs";
+import { BehaviorSubject, map, Observable, Subject } from "rxjs";
 import { SSOUser } from "../entities/user.entity";
 import { SSOModuleOptionsImpl } from "../sso.module";
 
@@ -16,13 +16,15 @@ export class SSOService {
     public $token: Observable<string> = this._tokenSubject.asObservable(); 
     public $user: Observable<SSOUser> = this._userSubject.asObservable();
     public $ready: Observable<boolean> = this._readSubject.asObservable();
+    public $onInitError: Observable<Error> = this.$keycloakInitializeError.asObservable();
 
     public $isAdmin: Observable<boolean> = this._userSubject.asObservable().pipe(map((user) => user.roles.includes(this.options.roleMapping?.admin || "admin")));
     public $isMod: Observable<boolean> = this._userSubject.asObservable().pipe(map((user) => user.roles.includes(this.options.roleMapping?.mod || "mod")));
 
     constructor(
         private readonly keycloakService: KeycloakService,
-        private readonly options: SSOModuleOptionsImpl
+        private readonly options: SSOModuleOptionsImpl,
+        @Inject("keycloakInitializeError") private readonly $keycloakInitializeError: Subject<Error>
     ) {
         this.reloadSessionDetails();
 
@@ -46,9 +48,7 @@ export class SSOService {
             } else {
                 console.log(event)
             }
-        })
-
-        
+        });
     }
 
     public async getAccessToken() {
