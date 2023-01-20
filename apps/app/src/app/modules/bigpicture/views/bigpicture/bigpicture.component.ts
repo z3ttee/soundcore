@@ -1,5 +1,5 @@
 import { Location } from "@angular/common";
-import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, OnDestroy, ViewChild } from "@angular/core";
+import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, HostListener, OnDestroy, ViewChild } from "@angular/core";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { ActivatedRoute, Router } from "@angular/router";
 import { SCCDKScreenService } from "@soundcore/cdk";
@@ -122,6 +122,18 @@ export class BigPictureComponent implements OnDestroy, AfterViewInit {
                 this.snackbar.open(`Song aus Lieblingssongs entfernt`, null, { duration: 3000 });
             }
         });
+    }
+
+    @HostListener("fullscreenchange", ['$event'])
+    @HostListener('webkitfullscreenchange', ['$event'])
+    @HostListener('mozfullscreenchange', ['$event'])
+    public onFullscreenChange(event: Event) {
+        const fullscreenElement = document.fullscreenElement;
+        if(typeof fullscreenElement === "undefined" || fullscreenElement == null) {
+            this.closeBigPicture();
+        } else {
+            console.log(event)
+        }
     }
 
 }

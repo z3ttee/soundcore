@@ -12,36 +12,56 @@
         <div class="vignette absolute h-full w-full top-0 left-0 overflow-hidden z-30 pointer-events-none"></div>
     
         <!-- Player content -->
-        <div class="relative z-50 flex flex-col container w-full h-full overflow-hidden p-12 mx-auto gap-4">
+        <div class="relative z-50 flex flex-col w-full md:container h-full overflow-hidden p-window md:p-12 mx-auto gap-4">
             <!-- Player top bar -->
-            <div class="flex items-center justify-start gap-4">
-                <img src="assets/branding/soundcore_logo_full.svg" class="w-16 h-16 block cursor-pointer" [routerLink]="['/']">
+            <div class="flex items-center justify-between md:justify-start gap-4">
+                <span class="flex md:hidden relative items-center justify-start w-full" *ngIf="!props.isMobile">
+                    <scngx-ibtn-text (click)="toggleMute()">
+                        <ng-icon [size]="'32px'" name="heroSpeakerWave" *ngIf="!props.isMuted; else mutedIcon"></ng-icon>
+                        <ng-template #mutedIcon><ng-icon [size]="'32px'" name="heroSpeakerXMark"></ng-icon></ng-template>
+                    </scngx-ibtn-text>
+
+                    <span class="inline-block pl-1 pr-2 -mt-1 max-w-28">
+                        <scngx-range [max]="100" [current]="props.volume" (onChanged)="setVolume($event)"></scngx-range>
+                    </span>
+                </span>
+
+                <div class="hidden md:inline-block w-16 h-16">
+                    <img src="assets/branding/soundcore_logo_full.svg" class="w-full h-full" [routerLink]="['/']">
+                </div>
     
-                <div class="flex-grow">
+                <div class="text-center md:text-left flex-grow w-full">
                     <p class="text-base font-semi opacity-70">Wiedergabe von {{ props.playlist ? 'Playlist' : props.album ? 'Album' : props.artist ? 'Künstler' : 'Titel' }}</p>
                     <h5 *ngIf="props.artist || props.album || props.playlist">{{ props.artist?.name ?? props.album?.name ?? props.playlist?.name ?? 'Unbekannt' }}</h5>
                 </div>
 
-                <scngx-ibtn-text (click)="closeBigPicture()">
-                    <ng-icon name="heroXMarkSolid" [size]="'32px'"></ng-icon>
-                </scngx-ibtn-text>
+                <div class="w-full text-right">
+                    <scngx-ibtn-text class="hidden md:inline-block" (click)="closeBigPicture()">
+                        <ng-icon name="heroXMarkSolid" [size]="'32px'"></ng-icon>
+                    </scngx-ibtn-text>
+                    <scngx-ibtn-text class="inline-block md:hidden" (click)="closeBigPicture()">
+                        <ng-icon name="heroChevronDown" [size]="'32px'"></ng-icon>
+                    </scngx-ibtn-text>
+                </div>         
             </div>
 
             <!-- Placeholder content -->
-            <div class="flex-grow"></div>
+            <div class="flex-shrink md:flex-grow"></div>
 
             <!-- Artwork and Song Info -->
-            <div class="flex items-end justify-start gap-4">
-                <div class="h-36 w-36 rounded-md overflow-hidden">
-                    <ng-container *ngTemplateOutlet="songArtwork"></ng-container>
+            <div class="flex flex-col items-start justify-end flex-grow md:flex-shrink md:flex-row md:items-end md:justify-start gap-4">
+                <div class="flex items-center justify-center text-center w-full flex-grow md:w-max md:flex-shrink">
+                    <div class="w-4/5 max-w-80 sm:w-full aspect-square md:min-h-36 md:h-36 md:min-w-36 md:w-36 md:m-0 rounded-md overflow-hidden">
+                        <ng-container *ngTemplateOutlet="songArtwork"></ng-container>
+                    </div>
                 </div>
 
-                <div class="flex-grow">
+                <div class="flex-shrink w-full md:flex-grow">
                     <scngx-explicit-badge *ngIf="props.song?.explicit" [extended]="true"></scngx-explicit-badge>
-                    <h3 class="line-clamp-1">{{ props.song?.name || "Unbekannter Titel" }}</h3>
+                    <p class="text-md sm:text-lg md:text-2xl font-bold line-clamp-1 break-words">{{ props.song?.name || "Unbekannter Titel" }}</p>
                     <ul class="line-clamp-1 w-full">
                         <li class="inline text-font text-opacity-70">
-                            <span class="text-md hover:underline pointer-events-all cursor-pointer" [routerLink]="props.song?.primaryArtist ? ['/artist', props.song?.primaryArtist?.slug || props.song?.primaryArtist?.id] : []">
+                            <span class="text-sm sm:text-base font-light md:text-md md:font-normal hover:underline pointer-events-all cursor-pointer" [routerLink]="props.song?.primaryArtist ? ['/artist', props.song?.primaryArtist?.slug || props.song?.primaryArtist?.id] : []">
                                 {{ props.song?.primaryArtist.name ?? "Unbekannter Künstler" }}
                             </span>
                             {{ props.song?.featuredArtists.length > 0 ? ", " : "" }}
@@ -52,57 +72,72 @@
             </div>
 
             <!-- Seeker -->
-            <div class="w-full pt-12">
-                <div class="flex items-center justify-start w-full pb-row gap-4">
-                    <p class="opacity-80">{{ props.currentTime | durationPipe }}</p>
-                    <span class="flex-grow -mt-1.5">
+            <div class="w-full md:pt-12">
+                <div class="flex flex-col md:flex-row items-center justify-start w-full py-6 md:pb md:pt-0 row gap-4">
+                    <span class="hidden md:inline-block"><ng-container *ngTemplateOutlet="durationLeft"></ng-container></span>
+                    <span class="w-full md:w-max md:flex-grow -mt-1.5">
                         <scngx-seeker [size]="'large'" [duration]="props.song?.duration ?? 0" [current]="props.currentTime" (seek)="onSeek($event)"></scngx-seeker>
                     </span>
-                    <p class="opacity-80">- {{ ((props.song?.duration ?? 0) - (props.currentTime ?? 0)) | durationPipe }}</p>
+                    <span class="hidden md:inline-block"><ng-container *ngTemplateOutlet="durationRight"></ng-container></span>
+
+                    <div class="flex md:hidden items-center justify-between w-full">
+                        <ng-container *ngTemplateOutlet="durationLeft"></ng-container>
+                        <ng-container *ngTemplateOutlet="durationRight"></ng-container>
+                    </div>
+
+                    <ng-template #durationLeft>
+                        <p class="text-sm font-light md:text-base md:font-normal opacity-80">{{ props.currentTime | durationPipe }}</p>
+                    </ng-template>
+                    <ng-template #durationRight>
+                        <p class="text-sm font-light md:text-base md:font-normal opacity-80">- {{ ((props.song?.duration ?? 0) - (props.currentTime ?? 0)) | durationPipe }}</p>
+                    </ng-template>
+                </div>
+
+                <!-- Additional elements on mobile -->
+                <div class="flex sm:hidden items-center justify-between w-full mt-2">
+                    <ng-container *ngTemplateOutlet="likeButton"></ng-container>
+                    <ng-container *ngTemplateOutlet="queueButton"></ng-container>
                 </div>
 
                 <!-- Player controls -->
-                <div class="flex items-center justify-start">
-                    <div class="w-full">
-                        <scngx-ibtn-text class="hidden sm:inline-block pointer-events-auto" (click)="toggleLike($event, props.song)">
-                            <ng-icon name="heroHeartSolid" class="text-accent fill-accent" [size]="'32px'" *ngIf="props.song?.liked"></ng-icon>
-                            <ng-icon name="heroHeart" [size]="'32px'" *ngIf="!props.song?.liked"></ng-icon>
-                        </scngx-ibtn-text>
+                <div class="flex items-center justify-center sm:justify-start mt-2">
+                    <div class="w-full hidden sm:block">
+                        <ng-container *ngTemplateOutlet="likeButton"></ng-container>
                     </div>
 
-                    <div class="inline-flex items-center justify-center w-full">
+                    <div class="inline-flex items-center justify-between sm:justify-center w-full gap-2">
                         <!-- Shuffle button -->
-                        <scngx-ibtn-text class="hidden md:inline-block">
-
+                        <scngx-ibtn-text>
+                            <!-- featherShuffle -->
+                            <ng-icon name="featherShuffle" [size]="'26px'"></ng-icon>
                         </scngx-ibtn-text>
                         
                         <!-- Prev button -->
-                        <scngx-ibtn-text class="hidden sm:inline-block" (click)="player.prev()">
+                        <scngx-ibtn-text class="" (click)="player.prev()">
                             <ng-icon name="heroBackward" [size]="'32px'"></ng-icon>
                         </scngx-ibtn-text>
             
                         <!-- Play button -->
-                        <scngx-ibtn size="md" (click)="controls.toggle()">
-                            <img *ngIf="!props.playing" class="w-10 h-10 text-body" src="assets/icons/play.svg">
-                            <img *ngIf="props.playing" class="w-10 h-10 text-body" src="assets/icons/pause.svg">
+                        <scngx-ibtn size="lg" (click)="controls.toggle()">
+                            <ng-icon *ngIf="!props.playing" name="heroPlaySolid" [size]="'32px'"></ng-icon>
+                            <ng-icon *ngIf="props.playing" name="heroPauseSolid" [size]="'32px'" [strokeWidth]="4"></ng-icon>
                         </scngx-ibtn>
             
                         <!-- Skip button -->
-                        <scngx-ibtn-text class="hidden sm:inline-block" (click)="player.skip()">
+                        <scngx-ibtn-text class="" (click)="player.skip()">
                             <ng-icon name="heroForward" [size]="'32px'"></ng-icon>
                         </scngx-ibtn-text>
 
                         <!-- Repeat button -->
-                        <scngx-ibtn-text class="hidden md:inline-block">
-
+                        <scngx-ibtn-text>
+                            <ng-icon name="heroArrowPathRoundedSquare" [size]="'32px'" [strokeWidth]="1.5"></ng-icon>
                         </scngx-ibtn-text>
                     </div>
 
-                    <div class="flex items-center justify-end w-full">     
+                    <div class="hidden sm:flex items-center justify-end w-full">     
                         <!-- Queue button -->
-                        <scngx-ibtn-text class="hidden md:inline-block">
-                            <ng-icon name="heroRectangleStack" [size]="'32px'"></ng-icon>
-                        </scngx-ibtn-text>
+                        <ng-container *ngTemplateOutlet="queueButton"></ng-container>
+
 
                         <!-- Speaker button -->
                         <span class="hidden md:flex relative items-center justify-start" *ngIf="!props.isMobile">
@@ -121,6 +156,19 @@
         </div>
 
     </div>
+
+    <ng-template #likeButton>
+        <scngx-ibtn-text class="pointer-events-auto" (click)="toggleLike($event, props.song)">
+            <ng-icon name="heroHeartSolid" class="text-accent fill-accent" [size]="'32px'" *ngIf="props.song?.liked"></ng-icon>
+            <ng-icon name="heroHeart" [size]="'32px'" *ngIf="!props.song?.liked"></ng-icon>
+        </scngx-ibtn-text>
+    </ng-template>
+
+    <ng-template #queueButton>
+        <scngx-ibtn-text>
+            <ng-icon name="heroRectangleStack" [size]="'32px'"></ng-icon>
+        </scngx-ibtn-text>
+    </ng-template>
 
     <ng-template #songArtwork>
         <scngx-artwork [artwork]="props.song?.artwork"></scngx-artwork>

@@ -1869,6 +1869,13 @@
   dependencies:
     tslib "^2.2.0"
 
+"@ng-icons/feather-icons@^23.1.0":
+  version "23.1.0"
+  resolved "https://registry.yarnpkg.com/@ng-icons/feather-icons/-/feather-icons-23.1.0.tgz#d91fc26c57bd8be04f76c73f6bfe03630d8548c6"
+  integrity sha512-eHUVAaxgO2P4Bhc2KDysJDdgx021EXnlkjml7TcmnYqbUVf46HIMxtE74vhfwB3jmfDYw0T+oAR2xI70eyBhSA==
+  dependencies:
+    tslib "^2.2.0"
+
 "@ng-icons/heroicons@^22.0.4":
   version "22.4.0"
   resolved "https://registry.yarnpkg.com/@ng-icons/heroicons/-/heroicons-22.4.0.tgz#f5365d35c8dac83f9386ab001932e4077e087aaf"

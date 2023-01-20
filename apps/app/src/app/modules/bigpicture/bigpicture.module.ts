@@ -2,8 +2,10 @@ import { CommonModule } from "@angular/common";
 import { NgModule } from "@angular/core";
 import { RouterModule, Routes } from "@angular/router";
 import { NgIconsModule } from "@ng-icons/core";
-import { heroXMarkSolid, heroHeartSolid } from "@ng-icons/heroicons/solid";
-import { heroForward, heroBackward, heroRectangleStack, heroHeart } from "@ng-icons/heroicons/outline";
+import { heroXMarkSolid, heroHeartSolid, heroPlaySolid, heroPauseSolid } from "@ng-icons/heroicons/solid";
+import { heroForward, heroBackward, heroRectangleStack, heroHeart, heroChevronDown, heroArrowPathRoundedSquare } from "@ng-icons/heroicons/outline";
+import { featherShuffle } from "@ng-icons/feather-icons";
+
 import { SCNGXArtworkModule, SCNGXExplicitBadgeModule, SCNGXIconBtnModule } from "@soundcore/ngx";
 import { SCNGXRangeModule } from "src/app/components/inputs/range/range.module";
 import { SCNGXSeekerModule } from "src/app/components/inputs/seeker";
@@ -23,7 +25,7 @@ const routes: Routes = [
     imports: [
         CommonModule,
         RouterModule.forChild(routes),
-        NgIconsModule.withIcons({ heroXMarkSolid, heroForward, heroBackward, heroRectangleStack, heroHeart, heroHeartSolid }),
+        NgIconsModule.withIcons({ heroXMarkSolid, heroForward, heroBackward, heroRectangleStack, heroHeart, heroHeartSolid, heroChevronDown, heroArrowPathRoundedSquare, heroPlaySolid, heroPauseSolid, featherShuffle }),
 
         MatSnackBarModule,
 
