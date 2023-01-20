@@ -8,6 +8,8 @@ import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild }
 export class SCNGXSeekerComponent implements OnInit {
   
     @ViewChild("inputElement") public range: ElementRef<HTMLInputElement>;
+
+    @Input() public size: "default" | "large" = "default";
   
     private _duration: number = 0;
     @Input() public set duration(val: number){

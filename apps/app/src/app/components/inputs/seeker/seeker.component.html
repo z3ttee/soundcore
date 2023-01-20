@@ -1,3 +1,8 @@
 <div class="block w-full relative bg-primary pointer-events-none transition-all">
-    <input class="pointer-events-auto rounded-full" #inputElement [max]="duration ?? 0" [min]="0" step="1" [value]="value" (input)="onInput()" (change)="onInputChanged($event)" type="range">
+    <input 
+        [ngClass]="{
+            'h-2 hover:h-2 hover:lg:h-2': size === 'large',
+            'h-[2px] hover:h-[6px] hover:lg:h-[4px] ': size === 'default'
+        }"
+        class="pointer-events-auto rounded-full bg-body-lighter absolute top-0 left-0 w-full appearance-none bg-opacity-70 transform-gpu origin-bottom transition-[height] cursor-pointer will-change-auto" #inputElement [max]="duration ?? 0" [min]="0" step="1" [value]="value" (input)="onInput()" (change)="onInputChanged($event)" type="range">
 </div>

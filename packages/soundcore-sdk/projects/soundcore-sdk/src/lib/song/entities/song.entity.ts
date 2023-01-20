@@ -13,6 +13,7 @@ export class Song implements SCDKResource {
     public released: Date;
     public description: string;
     public explicit: boolean;
+    public youtubeUrl: string;
 
     public artwork: Artwork;
     public primaryArtist: Artist;
