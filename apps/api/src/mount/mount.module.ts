@@ -9,6 +9,7 @@ import { WorkerQueueModule } from '@soundcore/nest-queue';
 import { MountRegistryService } from './services/mount-registry.service';
 import { GatewayModule } from '../gateway/gateway.module';
 import { Environment } from '@soundcore/common';
+import { PipelineModule } from '@soundcore/worker';
 
 @Module({
   controllers: [
@@ -25,6 +26,23 @@ import { Environment } from '@soundcore/common';
       script: path.join(__dirname, "worker", "mount.worker.js"),
       concurrent: 2
     }),
+    PipelineModule.registerPipelines({
+    },[
+      { 
+        id: "scan-pipeline", 
+        name: "Mount Scan", 
+        stages: [
+          { 
+            id: "test", 
+            name: "Test 1", 
+            scriptPath: path.join(__dirname, "pipeline", "scan.pipeline.js"),
+            steps: [
+              { id: "123", name: "Test Step 1" }
+            ]
+          }
+        ]
+      }
+    ]),
     GatewayModule,
   ],
   exports: [
@@ -41,6 +59,8 @@ export class MountModule implements OnModuleInit {
 
   public async onModuleInit() {
     return this.service.checkForDefaultMount().then((result) => {
+      this.service.pipelineService.enqueue("scan-pipeline").then(() => console.log("dispatched"));
+
       if(Environment.isDockerized) {
         return this.service.checkMountsDockerMode();
       } else {

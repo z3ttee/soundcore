@@ -34,6 +34,7 @@ import { CronModule } from './cron/cron.module';
 import { CommonConfigModule } from '@soundcore/common';
 import { WorkerQueueModule } from '@soundcore/nest-queue';
 import { TracklistModule } from './tracklist/tracklist.module';
+import { WorkerModule } from '@soundcore/worker';
 
 @Module({
   imports: [
@@ -69,6 +70,11 @@ import { TracklistModule } from './tracklist/tracklist.module';
           workerType: "thread",
           debounceMs: 500
         }
+      })
+    }),
+    WorkerModule.forRootAsync({
+      useFactory: () => ({
+        debug: true
       })
     }),
     EventEmitterModule.forRoot({ global: true, ignoreErrors: true }),

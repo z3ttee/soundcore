@@ -6,7 +6,6 @@ import { Zone } from '../../zone/entities/zone.entity';
 import { CreateMountDTO } from '../dtos/create-mount.dto';
 import { UpdateMountDTO } from '../dtos/update-mount.dto';
 import { Mount, MountProgress, MountStatus } from '../entities/mount.entity';
-import { Random } from '@tsalliance/utilities';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateResult } from '../../utils/results/creation.result';
 import { FileSystemService } from '../../filesystem/services/filesystem.service';
@@ -18,6 +17,7 @@ import { Environment } from '@soundcore/common';
 import { EVENT_MOUNT_PROCESS_UPDATE, MOUNTNAME_MAX_LENGTH, MOUNT_MAX_STEPS, MOUNT_STEP_WAITING } from '../../constants';
 import { AdminGateway } from '../../gateway/gateways/admin-gateway.gateway';
 import { OnEvent } from '@nestjs/event-emitter';
+import { PipelineService } from '@soundcore/worker';
 
 @Injectable()
 export class MountService {
@@ -28,7 +28,8 @@ export class MountService {
         private readonly fileSystem: FileSystemService,
         private readonly mountRegistryService: MountRegistryService,
         private readonly queue: WorkerQueue<MountScanProcessDTO>,
-        private readonly gateway?: AdminGateway
+        private readonly gateway?: AdminGateway,
+        public readonly pipelineService?: PipelineService
     ) {}
 
     /**

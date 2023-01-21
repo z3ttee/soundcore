@@ -1741,6 +1741,15 @@
     webpack "5.74.0"
     webpack-node-externals "3.0.0"
 
+"@nestjs/common@^9.0.0":
+  version "9.2.1"
+  resolved "https://registry.yarnpkg.com/@nestjs/common/-/common-9.2.1.tgz#24de19ee85a8f1747288980fe517b12753cf66ea"
+  integrity sha512-nZuo3oDsSSlC5mti/M2aCWTEIfHPGDXmBwWgPeCpRbrNz3IWd109rkajll+yxgidVjznAdBS9y00JkAVJblNYw==
+  dependencies:
+    iterare "1.2.1"
+    tslib "2.4.1"
+    uuid "9.0.0"
+
 "@nestjs/common@^9.0.8":
   version "9.1.5"
   resolved "https://registry.yarnpkg.com/@nestjs/common/-/common-9.1.5.tgz#8784e036701270347ceec7308d3068b5b5d5fee4"
@@ -1759,6 +1768,19 @@
     dotenv-expand "8.0.3"
     lodash "4.17.21"
     uuid "8.3.2"
+
+"@nestjs/core@^9.0.0":
+  version "9.2.1"
+  resolved "https://registry.yarnpkg.com/@nestjs/core/-/core-9.2.1.tgz#598e51a421a0aaafc568c1a02499f7c1f9491caf"
+  integrity sha512-a9GkXuu8uXgNgCVW+17iI8kLCltO+HwHpU2IhR+32JKnN2WEQ1YEWU4t3GJ2MNq44YkjIw9zrKvFkjJBlYrNbQ==
+  dependencies:
+    "@nuxtjs/opencollective" "0.3.2"
+    fast-safe-stringify "2.1.1"
+    iterare "1.2.1"
+    object-hash "3.0.0"
+    path-to-regexp "3.2.0"
+    tslib "2.4.1"
+    uuid "9.0.0"
 
 "@nestjs/core@^9.0.8":
   version "9.1.5"
@@ -9602,15 +9624,15 @@ tslib@2.4.0, tslib@^2.0.0, tslib@^2.1.0, tslib@^2.3.0, tslib@^2.3.1:
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-2.4.0.tgz#7cecaa7f073ce680a05847aa77be941098f36dc3"
   integrity sha512-d6xOpEDfsi2CZVlPQzGeux8XMwLT9hssAsaPYExaQMuYskwb+x1x7J371tWlbBdWHroy99KnVB6qIkUbs5X3UQ==
 
+tslib@2.4.1, tslib@^2.2.0, tslib@^2.4.0:
+  version "2.4.1"
+  resolved "https://registry.yarnpkg.com/tslib/-/tslib-2.4.1.tgz#0d0bfbaac2880b91e22df0768e55be9753a5b17e"
+  integrity sha512-tGyy4dAjRIEwI7BzsB0lynWgOpfqjUdq91XXAlIWD2OwKBH7oCl/GZG/HT4BOHrTlPMOASlMQ7veyTqpmRcrNA==
+
 tslib@^1.8.1, tslib@^1.9.0:
   version "1.14.1"
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-1.14.1.tgz#cf2d38bdc34a134bcaf1091c41f6619e2f672d00"
   integrity sha512-Xni35NKzjgMrwevysHTCArtLDpPvye8zV/0E4EyYn43P7/7qvQwPh9BGkHewbMulVntbigmcT7rdX3BNo9wRJg==
-
-tslib@^2.2.0, tslib@^2.4.0:
-  version "2.4.1"
-  resolved "https://registry.yarnpkg.com/tslib/-/tslib-2.4.1.tgz#0d0bfbaac2880b91e22df0768e55be9753a5b17e"
-  integrity sha512-tGyy4dAjRIEwI7BzsB0lynWgOpfqjUdq91XXAlIWD2OwKBH7oCl/GZG/HT4BOHrTlPMOASlMQ7veyTqpmRcrNA==
 
 tsutils@^3.21.0:
   version "3.21.0"
