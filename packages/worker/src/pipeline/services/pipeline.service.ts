@@ -83,7 +83,7 @@ export class PipelineService {
                 handler(...Object.values(args));
             }
         }).then((pipeline: Pipeline) => {
-            const handler = this.eventHandlers.get("pipeline:failed") as PipelineCompletedEventHandler;
+            const handler = this.eventHandlers.get("pipeline:completed") as PipelineCompletedEventHandler;
             if(typeof handler !== "function") return;
             handler(pipeline);
         }).catch((error: Error) => {
