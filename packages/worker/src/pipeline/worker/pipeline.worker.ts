@@ -1,39 +1,46 @@
 import path from "node:path";
-import { Environment, Pipeline, Stage, StageEmitter, StageExecutor, StageRunner } from "../entities/pipeline.entity";
-import workerpool from "workerpool";
+import { Pipeline, Stage, StageExecutor, StageRunner } from "../entities/pipeline.entity";
+import workerpool, { workerEmit } from "workerpool";
+import { EventName } from "../event/event";
 
 async function executePipeline(pipeline: Pipeline): Promise<Pipeline> {
-    // Initialize outputs object
-    pipeline.outputs = {};
+    emitEvent("pipeline:started", { pipeline });
 
     // For loop through stages
     for(const stage of pipeline.stages) {
-        try {
-            // Initialize outputs for stage
-            await executeStage(stage, pipeline.environment);
+        const stageId = stage.id;
 
-            // Write outputs to stage id in pipeline
-            // outputs
-            pipeline.outputs[stage.id] = stage.outputs;
-        } catch (error) {
-            console.error(error);
-            // Do not continue with pipeline
-            break;
-        }
+        // Register progress emitter for stage
+        stage.progress = (progress: number) => emitEvent("stage:progress", { progress, stage, pipeline });
+        // Register message emitter for stage
+        stage.message = (message: string) => emitEvent("stage:message", { message, stage, pipeline });
+        // Register write emitter for stage
+        stage.write = (key: string, value: any) => stage.outputs[key] = value;
+
+        // Initialize outputs for stage
+        await executeStage(pipeline, stage).then(() => {
+            emitEvent("stage:completed", { stage, pipeline });
+        }).catch((error: Error) => {
+            emitEvent("stage:failed", { error, stage, pipeline });
+            throw error;
+        });
+
+        // Write outputs to stage id in pipeline
+        // outputs
+        pipeline.outputs[stageId] = stage.outputs;
     }
 
     return pipeline;
 }
 
-async function executeStage(stage: Stage, environment: Readonly<Environment>) {
+async function executeStage(pipeline: Pipeline, stage: Stage) {
+    emitEvent("stage:started", { stage, pipeline });
+
     const script = path.resolve(stage.scriptPath);
     const stageExecutor: StageExecutor = require(script)?.default;
 
-    // Initialize outputs object
-    stage.outputs = {};
-
     // Execute runner to retrieve steps handler
-    const runner: StageRunner = await stageExecutor(environment, stageEmit).catch((error) => {
+    const runner: StageRunner = await stageExecutor(stage, pipeline.environment).catch((error) => {
         throw error;
     });
 
@@ -46,21 +53,38 @@ async function executeStage(stage: Stage, environment: Readonly<Environment>) {
             throw new Error(`A valid runner for step ${stepId} does not exist.`)
         }
 
-        // Execute step
-        await runner.steps?.[stepId]?.(step, environment, stage.outputs);
+        // Register progress emitter for step
+        step.progress = (progress: number) => emitEvent("step:progress", { progress, step, stage, pipeline });
+        // Register message emitter for step
+        step.message = (message: string) => emitEvent("step:message", { message, step, stage, pipeline });
+        // Register write emitter for step
+        step.write = (key: string, value: any) => step.outputs[key] = value;
+
+        // Build executor
+        const executor = async () => {
+            emitEvent("step:started", { step, stage, pipeline });
+            await runner.steps?.[stepId]?.(step);
+        };
+
+        // Execute and catch errors
+        await executor().then(() => {
+            // Complete event
+            emitEvent("step:completed", { step, stage, pipeline });
+        }).catch((error: Error) => {
+            // Failed event
+            emitEvent("step:failed", { error, step, stage, pipeline });
+            throw error;
+        });
+
         // Write step output to stage outputs
         stage.outputs[stepId] = step.outputs ?? {};
-
-        console.log(`step ${stepId} completed. Outputs: `, step.outputs);
     }
 }
 
-const stageEmit: StageEmitter = (event: string, data: any) => {
-    console.log(`stage emitting event ${event}: `, data);
-
-    workerpool.workerEmit({
-        event: event,
-        data: data
+async function emitEvent(name: EventName, args: { [key: string]: any }) {
+    workerEmit({
+        name,
+        ...args
     });
 }
 

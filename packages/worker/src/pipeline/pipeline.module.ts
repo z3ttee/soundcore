@@ -1,6 +1,6 @@
 import { DynamicModule, Logger, Module } from "@nestjs/common";
 import { PIPELINES_MODULE_OPTIONS, PIPELINES_TOKEN } from "../constants";
-import { Pipeline, PipelineOptions } from "./entities/pipeline.entity";
+import { Pipeline, PipelineOptions, Stage, Step } from "./entities/pipeline.entity";
 import { PipelineService } from "./services/pipeline.service";
 
 export type Pipelines = { [id: string]: Pipeline };
@@ -32,7 +32,12 @@ export class PipelineModule {
                 logger.warn(`Pipelines must have unique ids: Pipeline with id '${pipelineOptions.id}' is already registered.`);
                 continue;
             }
-            initializedPipelines[pipelineOptions.id] = pipelineOptions;
+            
+            initializedPipelines[pipelineOptions.id] = new Pipeline(pipelineOptions.id, pipelineOptions.name, pipelineOptions.stages.map((stageOptions) => {
+                return new Stage(stageOptions.id, stageOptions.name, stageOptions.scriptPath, stageOptions.steps.map((stepOptions) => {
+                    return new Step(stepOptions.id, stepOptions.name, {});
+                }), {});
+            }), {});
         }
 
         return {

@@ -30,7 +30,17 @@ export class MountService {
         private readonly queue: WorkerQueue<MountScanProcessDTO>,
         private readonly gateway?: AdminGateway,
         public readonly pipelineService?: PipelineService
-    ) {}
+    ) {
+        this.pipelineService?.on("pipeline:started", (pipeline) => {
+            // console.log("started",pipeline);
+        })
+        this.pipelineService?.on("pipeline:completed", (pipeline) => {
+            // console.log("completed",pipeline);
+        })
+        this.pipelineService?.on("pipeline:failed", (error, pipeline) => {
+            console.error(error);
+        })
+    }
 
     /**
      * Find a list of mounts inside a bucket.

@@ -8,28 +8,42 @@ export interface Outputs {
 }
 
 export class Stage {
-    public readonly id: string;
-    public readonly name: string;
-    public readonly scriptPath: string;
-    public readonly steps: Step[];
-    public outputs?: Outputs;
+    public progress: (progress: number) => void;
+    public message: (...args: any[]) => void;
+    public write: (key: string, value: any) => void;
+
+    constructor(
+        public readonly id: string,
+        public readonly name: string,
+        public readonly scriptPath: string,
+        public readonly steps: Step[],
+        public readonly outputs: Outputs
+    ) {}
 }
 
-export class Step {
-    public readonly id: string;
-    public readonly name: string;
-    public outputs?: Outputs;
+export class Step {    
+    public progress: (progress: number) => void;
+    public message: (...args: any[]) => void;
+    public write: (key: string, value: any) => void;
+
+    constructor(
+        public readonly id: string,
+        public readonly name: string,
+        public readonly outputs: Outputs
+    ) {}
 }
 
 export class Pipeline {
-    public readonly id: string;
-    public readonly name: string;
-    public readonly stages: Stage[];
-    public environment?: Environment;
-    public outputs?: Outputs;
+    constructor(
+        public readonly id: string,
+        public readonly name: string,
+        public readonly stages: Stage[],
+        public readonly outputs: Outputs,
+        public environment?: Environment
+    ) {}
 }
 
-export type StepRunner = (step: Step, environment: Readonly<Environment>, outputs: Readonly<Outputs>) => Promise<void> | void;
+export type StepRunner = (step: Step) => Promise<void> | void;
 export interface StageRunnerSteps {
     [key: string]: StepRunner
 }
@@ -44,17 +58,20 @@ export class PipelineOptions implements Omit<Pipeline, "outputs" | "stages" | "e
     public stages: StageOptions[];
 }
 
-export class StageOptions implements Omit<Stage, "outputs"> {
+export class StageOptions implements Omit<Stage, "outputs" | "progress" | "message" | "steps" | "write"> {
     public name: string;
     public id: string;
     public scriptPath: string;
     public steps: StepOptions[];
 }
 
-export class StepOptions implements Omit<Step, "outputs"> {
+export class StepOptions implements Omit<Step, "outputs" | "progress" | "message" | "write"> {
     public id: string;
     public name: string;
 }
 
-export type StageEmitter = (event: string, data: any) => void;
-export type StageExecutor = (environment: Readonly<Environment>, emit: StageEmitter) => Promise<StageRunner>
+export type StageEmitter = (event: string, ...args: any[]) => void;
+export type StepEmitter = (event: string, ...args: any[]) => void;
+
+export type StageExecutor = (stage: Stage, environment: Readonly<Environment>) => Promise<StageRunner>
+

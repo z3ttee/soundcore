@@ -40,10 +40,9 @@ import { runner, StageExecutor } from "@soundcore/worker";
 
 const executor: StageExecutor = async (env, emit) => {
     return runner().step("123", async (step) => {
-        console.log(`executing step ${step.id}`);
-        step.outputs = { success: true };
-
-        emit("hello-world", { emitted: true })
+        step.progress(0.3);
+        step.write("success", true);
+        step.message("hello world");
     }).build()
 }
 
@@ -53,7 +52,8 @@ export default executor;
 This function declared here returns a `StageExecutor`. The executor contains all the handlers for the steps.
 Using the builder-pattern you can register every handler for the steps. Note, that the referenced stepId must be one of the
 previously registered steps in your module. Inside the handler you can do anything. Besides writing to the output of a step via
-`step.outputs = { /** Your data */ }` you can also emit custom events using the `emit` function that this stage received as parameter.
+`step.write()` you can also emit custom messages using the `step.message()` function that this stage received as parameter. It is also
+possible to provide progress updates with `step.progress()`.
 Accessing your environment variables is as easy as calling `process.env`. Note, that the `env` parameter in the stage function only contains the
 environment data passed to the pipeline in the module registration or when using `enqueue()` via the service.
 
@@ -65,4 +65,21 @@ for new requested pipeline processes.
 
 ### 4. Listening for events
 
-TODO
+After injecting the service in your classes, you can register events using `service.on()` function.
+
+## Outputs
+
+Every pipeline, stage or step has its own object containing the output data. Using for example `step.write()` you can write to that object.
+The structure of the outputs object is similar to the configuration of the pipeline. For example, when accessing the outputs object
+on the pipeline (`pipeline.outputs`) the structure could be like this:
+```json
+{
+    stage1: {
+        step1: { ... }
+        step2: { ... }
+    },
+    stage2: {
+        step1: { ... }
+    }
+}
+```

@@ -1,11 +1,11 @@
 import { runner, StageExecutor } from "@soundcore/worker";
 
-const executor: StageExecutor = async (env, emit) => {
+const executor: StageExecutor = async (stage, env) => {
     return runner().step("123", async (step) => {
-        console.log(`executing step ${step.id}`);
-        step.outputs = { success: true };
-
-        emit("hello-world", { emitted: true })
+        step.progress(0.3);
+        step.write("success", true);
+        step.progress(1.0);
+        step.message("Message: Hello World!");
     }).build()
 }
 
