@@ -40,6 +40,7 @@ export class MountService {
         })
         this.pipelineService?.on("pipeline:failed", (error, pipeline) => {
             console.log("pipeline failed");
+            console.error(error);
             //console.error(error);
         })
     }

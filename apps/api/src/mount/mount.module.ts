@@ -27,6 +27,8 @@ import { PipelineModule } from '@soundcore/worker';
       concurrent: 2
     }),
     PipelineModule.registerPipelines({
+      concurrent: 2,
+      disableLogging: process.env.PRODUCTION == "false"
     },[
       { 
         id: "scan-pipeline", 

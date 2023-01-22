@@ -3,11 +3,11 @@ import path from "node:path";
 import workerpool, { workerEmit } from "workerpool";
 import { Pipeline, Stage, StageExecutor, StageRunner, Step } from "../entities/pipeline.entity";
 import { EventName } from "../event/event";
-import { createLogger } from "../logging/logger";
+import { createEmptyLogger, createLogger } from "../logging/logger";
 import { PipelineModuleOptions } from "../pipeline.module";
 
 async function executePipeline(pipeline: Pipeline, options: PipelineModuleOptions): Promise<Pipeline> {
-    const logger = options.disableLogging ? null : createLogger(pipeline.id, pipeline.runId);
+    const logger = options.disableLogging ? createEmptyLogger() : createLogger(pipeline.id, pipeline.runId);
     emitEvent("pipeline:started", { pipeline }, logger);
     if(logger) logger.info(`Using additional environment: `, pipeline.environment ?? {});
 

@@ -21,3 +21,11 @@ export function createLogger(pipelineId: string, pipelineRunId: string) {
         ]
     });
 }
+
+export function createEmptyLogger() {
+    return winston.createLogger({
+        transports: [new winston.transports.Console({
+            silent: true
+        })]
+    });
+}
