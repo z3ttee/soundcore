@@ -1,3 +1,4 @@
+import winston from "winston";
 
 export interface Environment {
     [key: string]: any;
@@ -34,6 +35,8 @@ export class Step {
 }
 
 export class Pipeline {
+    public readonly runId: string;
+
     constructor(
         public readonly id: string,
         public readonly name: string,
@@ -43,7 +46,10 @@ export class Pipeline {
     ) {}
 }
 
-export type StepRunner = (step: Step) => Promise<void> | void;
+/**
+ * Logger is only available, if logging is not disabled in module options
+ */
+export type StepRunner = (step: Step, logger?: winston.Logger) => Promise<void> | void;
 export interface StageRunnerSteps {
     [key: string]: StepRunner
 }
@@ -52,20 +58,20 @@ export interface StageRunner {
     steps: StageRunnerSteps;
 }
 
-export class PipelineOptions implements Omit<Pipeline, "outputs" | "stages" | "environment"> {
+export class PipelineOptions implements Pick<Pipeline, "id" | "name"> {
     public id: string;
     public name: string;
     public stages: StageOptions[];
 }
 
-export class StageOptions implements Omit<Stage, "outputs" | "progress" | "message" | "steps" | "write"> {
+export class StageOptions implements Pick<Stage, "id" | "name" | "scriptPath"> {
     public name: string;
     public id: string;
     public scriptPath: string;
     public steps: StepOptions[];
 }
 
-export class StepOptions implements Omit<Step, "outputs" | "progress" | "message" | "write"> {
+export class StepOptions implements Pick<Step, "id" | "name"> {
     public id: string;
     public name: string;
 }

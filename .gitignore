@@ -6,6 +6,7 @@ docker-compose.dev.yml
 # NestJS
 dist/
 .angular/
+logs/
 
 # Next.js
 .next/

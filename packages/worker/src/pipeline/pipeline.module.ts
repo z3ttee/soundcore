@@ -5,6 +5,13 @@ import { PipelineService } from "./services/pipeline.service";
 
 export type Pipelines = { [id: string]: Pipeline };
 export interface PipelineModuleOptions {
+
+    /**
+     * Disable automatic file logging.
+     * @default false
+     */
+    disableLogging?: boolean;
+
     /**
      * Amount of concurrently running pipelines in this module
      * @default 1

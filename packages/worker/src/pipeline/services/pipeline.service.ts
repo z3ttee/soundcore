@@ -1,6 +1,8 @@
+import path from "node:path";
+import crypto from "node:crypto";
+
 import { Inject, Injectable, Logger } from "@nestjs/common";
 import { Cron } from "@nestjs/schedule";
-import path from "node:path";
 import { WorkerPool, pool } from "workerpool";
 import { PIPELINES_MODULE_OPTIONS, PIPELINES_TOKEN } from "../../constants";
 import { Environment, Pipeline } from "../entities/pipeline.entity";
@@ -11,20 +13,18 @@ import { PipelineModuleOptions, Pipelines } from "../pipeline.module";
 
 @Injectable()
 export class PipelineService {
-    private readonly logger = new Logger(PipelineService.name);
 
     private readonly pool: WorkerPool;
     private readonly queue: PipelineQueue = new PipelineQueue();
 
     private readonly running: Pipeline[] = [];
 
-    private readonly eventHandlers: Map<EventName, EventHandler<EventName>> = new Map();
+    private readonly eventHandlers: Map<EventName, EventHandler<EventName>[]> = new Map();
 
     constructor(
         @Inject(PIPELINES_MODULE_OPTIONS) private readonly options: PipelineModuleOptions,
         @Inject(PIPELINES_TOKEN) private readonly registeredPipelines: Pipelines
     ) {
-
         // Create worker pool
         this.pool = pool(path.resolve(__dirname, "..", "worker", "pipeline.worker.js"), {
             workerType: this.options.workerType ?? "process",
@@ -46,9 +46,18 @@ export class PipelineService {
         this.dispatch(nextItem);
     }
 
+    /**
+     * Enqueue a pipeline by its id.
+     * @param pipelineId Id of the pipeline to trigger
+     * @param environment Additional environmental data
+     * @returns Position in queue
+     */
     public async enqueue(pipelineId: string, environment?: Environment): Promise<number> {
         // Copy object
-        const pipeline = {...this.registeredPipelines[pipelineId]};
+        const pipeline: Pipeline = {
+            ...this.registeredPipelines[pipelineId],
+            runId: crypto.randomUUID()
+        };
 
         // Merge environments, global env overwrites
         pipeline.environment = {
@@ -59,22 +68,48 @@ export class PipelineService {
         return this.queue.enqueue(pipeline);
     }
 
+    /**
+     * Register an event handler.
+     * @param eventName Name of the event
+     * @param handler Handler for the event
+     */
     public on<T extends EventName>(eventName: T, handler: EventHandler<T>) {
-        if(this.eventHandlers.has(eventName)) {
-            this.logger.warn(`Cannot register events twice.`);
-            return;
-        }
-
-        this.eventHandlers.set(eventName, handler);
+        const handlers = this.eventHandlers.get(eventName) ?? [];
+        handlers.push(handler);
+        this.eventHandlers.set(eventName, handlers);
     }
 
+    /**
+     * Unregister an event handler
+     * @param eventName Name of the event to unregister
+     * @param handler Handler to remove
+     */
+    public off<T extends EventName>(eventName: T, handler: EventHandler<T>) {
+        const handlers = this.eventHandlers.get(eventName) ?? [];
+        const index = handlers.findIndex((h) => h == handler);
+        if(index == -1) return;
+
+        handlers.splice(index, 1);
+        this.eventHandlers.set(eventName, handlers);
+    }
+
+    /**
+     * Dispatch a new pipeline. This will send the pipeline information and environment to a
+     * worker. This function subscribes to events and translates them for further event handlers.
+     * This is done before any handler is called that was registered via on() function.
+     * Note: If this function was called falsely (workers are busy), the pipeline will be re-enqueued.
+     * @param pipeline Pipeline information
+     */
     private async dispatch(pipeline: Pipeline): Promise<void> {
+        // Check if workers are busy, if so enqueue the pipeline
         if(!this.canExecuteNext()){
             await this.queue.enqueue(pipeline);
             return;
         }
 
-        this.pool.exec("default", [ pipeline ], {
+        // Execute the pipeline in the worker pool
+        this.pool.exec("default", [ pipeline, this.options ], {
+            // Subscribe to any event
             on: (payload: { name: EventName, [key: string]: any }) => {
                 const { name, ...args } = payload;
 
@@ -83,13 +118,17 @@ export class PipelineService {
                 handler(...Object.values(args));
             }
         }).then((pipeline: Pipeline) => {
-            const handler = this.eventHandlers.get("pipeline:completed") as PipelineCompletedEventHandler;
-            if(typeof handler !== "function") return;
-            handler(pipeline);
+            // Handle successful completion
+            const handlers = this.eventHandlers.get("pipeline:completed") as PipelineCompletedEventHandler[] ?? [];
+            for(const handler of handlers) {
+                handler(pipeline);
+            }
         }).catch((error: Error) => {
-            const handler = this.eventHandlers.get("pipeline:failed") as PipelineFailedEventHandler;
-            if(typeof handler !== "function") return;
-            handler(error, pipeline);
+            // Handle errored completion
+            const handlers = this.eventHandlers.get("pipeline:failed") as PipelineFailedEventHandler[] ?? [];
+            for(const handler of handlers) {
+                handler(error, pipeline);
+            }
         });
     }
 

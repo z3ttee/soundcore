@@ -10,7 +10,9 @@ PipelineModule.registerPipelines({
     // How many pipelines can run concurrently in this module?
     concurrent: 1,
     // What should the type of the workers inside the pipelines be?
-    workerType: "process"
+    workerType: "process",
+    // Disable automatic logging to file
+    disableLogging: false
 },[
     { 
         id: "scan-pipeline", 
@@ -39,7 +41,10 @@ See how the file "scan.pipeline.ts" may look like:
 import { runner, StageExecutor } from "@soundcore/worker";
 
 const executor: StageExecutor = async (env, emit) => {
-    return runner().step("123", async (step) => {
+    // The logger can be used to write logs to a file.
+    // This is only available if logging is not disabled in module options
+    return runner().step("123", async (step, logger) => {
+        logger.info("This is a log from step 123");
         step.progress(0.3);
         step.write("success", true);
         step.message("hello world");

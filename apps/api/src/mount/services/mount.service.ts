@@ -32,13 +32,15 @@ export class MountService {
         public readonly pipelineService?: PipelineService
     ) {
         this.pipelineService?.on("pipeline:started", (pipeline) => {
+            console.log("pipeline started");
             // console.log("started",pipeline);
         })
         this.pipelineService?.on("pipeline:completed", (pipeline) => {
-            // console.log("completed",pipeline);
+            console.log("pipeline completed");
         })
         this.pipelineService?.on("pipeline:failed", (error, pipeline) => {
-            console.error(error);
+            console.log("pipeline failed");
+            //console.error(error);
         })
     }
 
