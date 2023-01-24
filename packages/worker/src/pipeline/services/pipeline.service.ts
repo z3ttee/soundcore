@@ -1,16 +1,14 @@
 import path from "node:path";
-import crypto from "node:crypto";
 
 import { Inject, Injectable } from "@nestjs/common";
 import { Cron } from "@nestjs/schedule";
 import { WorkerPool, pool } from "workerpool";
 import { PIPELINES_MODULE_OPTIONS, PIPELINES_TOKEN } from "../../constants";
-import { Environment, Pipeline } from "../entities/pipeline.entity";
+import { Environment, Pipeline, PipelineStatus } from "../entities/pipeline.entity";
 import { PipelineQueue } from "../entities/queue.entity";
 import { EventHandler, EventName } from "../event/event";
 import { PipelineCompletedEventHandler, PipelineFailedEventHandler } from "../event/pipeline-events";
 import { PipelineModuleOptions, Pipelines } from "../pipeline.module";
-import { Observable, Subject } from "rxjs";
 
 @Injectable()
 export class PipelineService {
@@ -21,9 +19,6 @@ export class PipelineService {
     private readonly running: Pipeline[] = [];
 
     private readonly eventHandlers: Map<EventName, EventHandler<EventName>[]> = new Map();
-
-    private readonly _onPipelineStatusSubject: Subject<Pipeline> = new Subject();
-    public readonly $onPipelineStatusUpdated: Observable<Pipeline> = this._onPipelineStatusSubject.asObservable();
 
     constructor(
         @Inject(PIPELINES_MODULE_OPTIONS) private readonly options: PipelineModuleOptions,
@@ -114,17 +109,25 @@ export class PipelineService {
             on: (payload: { name: EventName, [key: string]: any }) => {
                 const { name, ...args } = payload;
 
-                const handler = this.eventHandlers.get(name) as unknown;
-                if(typeof handler !== "function") return;
-                handler(...Object.values(args));
+                const handlers = this.eventHandlers.get(name) as ((...args: any[]) => void)[] ?? [];
+                for(const handler of handlers) {
+                    handler(...Object.values(args));
+                }
             }
         }).then((pipeline: Pipeline) => {
+            // Update pipeline status
+            pipeline.status = PipelineStatus.COMPLETED;
+            pipeline.currentStage = null;
+
             // Handle successful completion
             const handlers = this.eventHandlers.get("pipeline:completed") as PipelineCompletedEventHandler[] ?? [];
             for(const handler of handlers) {
                 handler(pipeline);
             }
         }).catch((error: Error) => {
+            // Update pipeline status
+            pipeline.status = PipelineStatus.FAILED;
+
             // Handle errored completion
             const handlers = this.eventHandlers.get("pipeline:failed") as PipelineFailedEventHandler[] ?? [];
             for(const handler of handlers) {

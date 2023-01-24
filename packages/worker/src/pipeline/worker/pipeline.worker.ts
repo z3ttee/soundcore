@@ -1,7 +1,7 @@
 import winston from "winston";
 import path from "node:path";
 import workerpool, { workerEmit } from "workerpool";
-import { Pipeline } from "../entities/pipeline.entity";
+import { Pipeline, PipelineStatus } from "../entities/pipeline.entity";
 import { EventName } from "../event/event";
 import { createEmptyLogger, createLogger } from "../logging/logger";
 import { PipelineModuleOptions } from "../pipeline.module";
@@ -9,18 +9,41 @@ import { Stage, StageExecutor, StageRef, StageRunner } from "../entities/stage.e
 import { Step, StepRef } from "../entities/step.entity";
 
 async function executePipeline(pipeline: Pipeline, options: PipelineModuleOptions): Promise<Pipeline> {
+    // Initialize logger
     const logger = options.disableLogging ? createEmptyLogger() : createLogger(pipeline.id, pipeline.runId);
+
+    // Emit pipeline status
+    pipeline.status = PipelineStatus.WORKING;
     emitEvent("pipeline:started", { pipeline }, logger);
-    if(logger) logger.info(`Using additional environment: `, pipeline.environment ?? {});
+
+    // Log used env variables
+    logger.info(`Using additional environment: `, pipeline.environment ?? {});
 
     // For loop through stages
     for(const stage of pipeline.stages) {
 
+        // Update pipeline status
+        pipeline.status = PipelineStatus.WORKING;
+        pipeline.currentStage = stage;
+
         // Initialize outputs for stage
         await executeStage(pipeline, stage, logger).then(() => {
+            // Update stage
+            stage.status = PipelineStatus.COMPLETED;
+            stage.currentStep = null;
+
+            // Emit completion
             emitEvent("stage:completed", { stage, pipeline }, logger);
+            // Emit pipeline status update
+            emitEvent("pipeline:status", { pipeline });
         }).catch((error: Error) => {
+            // Update stage
+            stage.status = PipelineStatus.FAILED;
+
+            // Emit failure
             emitEvent("stage:failed", { error, stage, pipeline }, logger);
+            // Emit pipeline status update
+            emitEvent("pipeline:status", { pipeline });
             throw error;
         });
 
@@ -32,17 +55,26 @@ async function executePipeline(pipeline: Pipeline, options: PipelineModuleOption
     return pipeline;
 }
 
-async function executeStage(pipeline: Pipeline, stage: Stage, logger?: winston.Logger) {
+async function executeStage(pipeline: Pipeline, stage: Stage, logger: winston.Logger) {
+    // Update stage
+    stage.status = PipelineStatus.WORKING;
     // Emit started event
     emitEvent("stage:started", { stage, pipeline }, logger);
+    // Emit pipeline status
+    emitEvent("pipeline:status", { pipeline });
 
     // Create the ref with helper functions
     const stageRef: StageRef = new StageRef(
         stage.id, 
         stage.name,
+        // Emit progress
         (progress: number) => emitEvent("stage:progress", { progress, stage, pipeline }, logger),
+        // Emit custom message
         (message: string) => emitEvent("stage:message", { message, stage, pipeline }, logger),
-        (key: string, value: any) => stage.outputs[key] = value
+        // Write to outputs
+        (key: string, value: any) => stage.outputs[key] = value,
+        // Read from outputs
+        (key: string) => stage.outputs[key]
     );
 
     // Load script file
@@ -56,16 +88,26 @@ async function executeStage(pipeline: Pipeline, stage: Stage, logger?: winston.L
 
     // Execute every step 
     for(const step of stage.steps) {
+        // Updated current step on stage
+        stage.currentStep = step;
+
         // Create the ref with helper functions
         const stepRef: StepRef = new StepRef(
             step.id, 
             step.name,
+            // Emit progress
             (progress: number) => {
                 step.progress = progress ?? 0;
                 emitEvent("step:progress", { progress, step, stage, pipeline }, logger);
+                // Emit pipeline status
+                emitEvent("pipeline:status", { pipeline });
             },
+            // Emit custom message
             (message: string) => emitEvent("step:message", { message, step, stage, pipeline }, logger),
-            (key: string, value: any) => step.outputs[key] = value
+            // Write to output
+            (key: string, value: any) => step.outputs[key] = value,
+            // Read from output
+            (key: string) => step.outputs[key],
         );
         const stepId = stepRef.id;
 
@@ -76,26 +118,40 @@ async function executeStage(pipeline: Pipeline, stage: Stage, logger?: winston.L
 
         // Build executor
         const executor = async () => {
+            // Update step status
+            step.status = PipelineStatus.WORKING;
             emitEvent("step:started", { step, stage, pipeline }, logger);
+            // Emit pipeline status
+            emitEvent("pipeline:status", { pipeline });
             await runner.steps?.[stepId]?.(stepRef, logger);
         };
 
         // Execute and catch errors
         await executor().then(() => {
+            // Update step status
+            step.status = PipelineStatus.COMPLETED;
+            step.progress = 0;
+
             // Write step output to stage outputs
             stage.outputs[stepId] = step.outputs ?? {};
 
-            if(logger) logger?.info(`Outputted data by step '${stepId}': `, stage.outputs[stepId]);
+            // Log outputs
+            logger.info(`Outputted data by step '${stepId}': `, stage.outputs[stepId]);
 
             // Complete event
             emitEvent("step:completed", { step, stage, pipeline }, logger);
+            // Emit pipeline status
+            emitEvent("pipeline:status", { pipeline });
         }).catch((error: Error) => {
+            // Update step status
+            step.status = PipelineStatus.FAILED;
+            step.progress = 0;
             // Failed event
             emitEvent("step:failed", { error, step, stage, pipeline }, logger);
+            // Emit pipeline status
+            emitEvent("pipeline:status", { pipeline });
             throw error;
         });
-
-        
     }
 }
 
@@ -132,8 +188,8 @@ async function logPipelineEvents(logger: winston.Logger, name: EventName, args: 
     if(name == "pipeline:started") {
         logger.info(`Pipeline '${pipeline?.id}' started`);
         return;
-    } else if(name == "pipeline:progress") {
-        logger.info(`Pipeline '${pipeline?.id}' posted progress updated: ${progress}`);
+    } else if(name == "pipeline:status") {
+        logger.info(`Pipeline '${pipeline?.id}' posted status update.`);
         return;
     } else if(name == "pipeline:message") {
         logger.info(`Pipeline '${pipeline?.id}' published a message: ${message}`);
