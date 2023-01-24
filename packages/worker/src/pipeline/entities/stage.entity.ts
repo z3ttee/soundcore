@@ -1,3 +1,4 @@
+import winston from "winston";
 import { Environment, Outputs, PipelineInteractable, PipelineStatus } from "./pipeline.entity";
 import { Step, StepOptions, StepRunner } from "./step.entity";
 
@@ -47,7 +48,7 @@ export type StageEmitter = (event: string, ...args: any[]) => void;
 /**
  * Function definition for the stage script files
  */
-export type StageExecutor = (stage: StageRef, environment: Readonly<Environment>) => Promise<StageRunner>
+export type StageExecutor = (stage: StageRef, environment: Environment, logger: winston.Logger) => Promise<StageRunner>
 
 /**
  * Object definition of the steps in a stage runner

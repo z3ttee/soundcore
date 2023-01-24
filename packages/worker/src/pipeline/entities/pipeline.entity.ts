@@ -1,13 +1,8 @@
 import crypto from "node:crypto";
 import { Stage, StageOptions } from "./stage.entity";
 
-export interface Environment {
-    [key: string]: any;
-}
-
-export interface Outputs {
-    [key: string]: any;
-}
+export type Environment = any;
+export type Outputs = any;
 
 export enum PipelineStatus {
     ENQUEUED = "enqueued",
@@ -56,5 +51,5 @@ export abstract class PipelineInteractable {
     public progress(progress: number): void {};
     public message(...args: any[]): void {};
     public write(key: string, value: any): void {};
-    public read(key: string): void {};
+    public read(key: string): any {};
 }
