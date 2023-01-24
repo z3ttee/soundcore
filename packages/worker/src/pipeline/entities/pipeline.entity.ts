@@ -37,14 +37,11 @@ export class Pipeline {
  * It also includes helper functions to write to outputs or emit messages
  * as well as posting progress updates.
  */
-export class PipelineRef {
+export class PipelineRef implements Pick<Pipeline, "id" | "runId" | "name">, Partial<Pick<Pipeline, "environment">> {
     constructor(
         public readonly id: string,
         public readonly runId: string,
         public readonly name: string,
-        public progress: (progress: number) => void,
-        public message: (...args: any[]) => void,
-        public write: (key: string, value: any) => void,
         public readonly environment?: Environment,
     ) {}
 }
@@ -55,7 +52,9 @@ export class PipelineOptions implements Pick<Pipeline, "id" | "name"> {
     public stages: StageOptions[];
 }
 
-
-
-
-
+export abstract class PipelineInteractable {
+    public progress(progress: number): void {};
+    public message(...args: any[]): void {};
+    public write(key: string, value: any): void {};
+    public read(key: string): void {};
+}
