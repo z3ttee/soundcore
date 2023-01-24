@@ -1,7 +1,7 @@
 import path from "node:path";
 import crypto from "node:crypto";
 
-import { Inject, Injectable, Logger } from "@nestjs/common";
+import { Inject, Injectable } from "@nestjs/common";
 import { Cron } from "@nestjs/schedule";
 import { WorkerPool, pool } from "workerpool";
 import { PIPELINES_MODULE_OPTIONS, PIPELINES_TOKEN } from "../../constants";
@@ -10,6 +10,7 @@ import { PipelineQueue } from "../entities/queue.entity";
 import { EventHandler, EventName } from "../event/event";
 import { PipelineCompletedEventHandler, PipelineFailedEventHandler } from "../event/pipeline-events";
 import { PipelineModuleOptions, Pipelines } from "../pipeline.module";
+import { Observable, Subject } from "rxjs";
 
 @Injectable()
 export class PipelineService {
@@ -20,6 +21,9 @@ export class PipelineService {
     private readonly running: Pipeline[] = [];
 
     private readonly eventHandlers: Map<EventName, EventHandler<EventName>[]> = new Map();
+
+    private readonly _onPipelineStatusSubject: Subject<Pipeline> = new Subject();
+    public readonly $onPipelineStatusUpdated: Observable<Pipeline> = this._onPipelineStatusSubject.asObservable();
 
     constructor(
         @Inject(PIPELINES_MODULE_OPTIONS) private readonly options: PipelineModuleOptions,
@@ -53,17 +57,14 @@ export class PipelineService {
      * @returns Position in queue
      */
     public async enqueue(pipelineId: string, environment?: Environment): Promise<number> {
-        // Copy object
-        const pipeline: Pipeline = {
-            ...this.registeredPipelines[pipelineId],
-            runId: crypto.randomUUID()
-        };
+        const origin: Pipeline = this.registeredPipelines[pipelineId];
 
-        // Merge environments, global env overwrites
-        pipeline.environment = {
+        // Copy object
+        const pipeline: Pipeline = new Pipeline(origin.id, origin.name, origin.stages, {}, <Environment>{
+            // Merge environments, global env overwrites
             ...environment,
-            ...pipeline.environment
-        }
+            ...origin.environment ?? {}
+        });
 
         return this.queue.enqueue(pipeline);
     }

@@ -1,10 +1,12 @@
 import winston from "winston";
 import path from "node:path";
 import workerpool, { workerEmit } from "workerpool";
-import { Pipeline, Stage, StageExecutor, StageRunner, Step } from "../entities/pipeline.entity";
+import { Pipeline } from "../entities/pipeline.entity";
 import { EventName } from "../event/event";
 import { createEmptyLogger, createLogger } from "../logging/logger";
 import { PipelineModuleOptions } from "../pipeline.module";
+import { Stage, StageExecutor, StageRef, StageRunner } from "../entities/stage.entity";
+import { Step, StepRef } from "../entities/step.entity";
 
 async function executePipeline(pipeline: Pipeline, options: PipelineModuleOptions): Promise<Pipeline> {
     const logger = options.disableLogging ? createEmptyLogger() : createLogger(pipeline.id, pipeline.runId);
@@ -13,14 +15,6 @@ async function executePipeline(pipeline: Pipeline, options: PipelineModuleOption
 
     // For loop through stages
     for(const stage of pipeline.stages) {
-        const stageId = stage.id;
-
-        // Register progress emitter for stage
-        stage.progress = (progress: number) => emitEvent("stage:progress", { progress, stage, pipeline }, logger);
-        // Register message emitter for stage
-        stage.message = (message: string) => emitEvent("stage:message", { message, stage, pipeline }, logger);
-        // Register write emitter for stage
-        stage.write = (key: string, value: any) => stage.outputs[key] = value;
 
         // Initialize outputs for stage
         await executeStage(pipeline, stage, logger).then(() => {
@@ -32,43 +26,58 @@ async function executePipeline(pipeline: Pipeline, options: PipelineModuleOption
 
         // Write outputs to stage id in pipeline
         // outputs
-        pipeline.outputs[stageId] = stage.outputs;
+        pipeline.outputs[stage.id] = stage.outputs;
     }
 
     return pipeline;
 }
 
 async function executeStage(pipeline: Pipeline, stage: Stage, logger?: winston.Logger) {
+    // Emit started event
     emitEvent("stage:started", { stage, pipeline }, logger);
 
+    // Create the ref with helper functions
+    const stageRef: StageRef = new StageRef(
+        stage.id, 
+        stage.name,
+        (progress: number) => emitEvent("stage:progress", { progress, stage, pipeline }, logger),
+        (message: string) => emitEvent("stage:message", { message, stage, pipeline }, logger),
+        (key: string, value: any) => stage.outputs[key] = value
+    );
+
+    // Load script file
     const script = path.resolve(stage.scriptPath);
     const stageExecutor: StageExecutor = require(script)?.default;
 
     // Execute runner to retrieve steps handler
-    const runner: StageRunner = await stageExecutor(stage, pipeline.environment).catch((error) => {
+    const runner: StageRunner = await stageExecutor(stageRef, pipeline.environment).catch((error) => {
         throw error;
     });
 
     // Execute every step 
     for(const step of stage.steps) {
-        const stepId = step.id;
+        // Create the ref with helper functions
+        const stepRef: StepRef = new StepRef(
+            step.id, 
+            step.name,
+            (progress: number) => {
+                step.progress = progress ?? 0;
+                emitEvent("step:progress", { progress, step, stage, pipeline }, logger);
+            },
+            (message: string) => emitEvent("step:message", { message, step, stage, pipeline }, logger),
+            (key: string, value: any) => step.outputs[key] = value
+        );
+        const stepId = stepRef.id;
 
         // Check if runner exists
         if(typeof runner.steps?.[stepId] !== "function") {
             throw new Error(`A valid runner for step ${stepId} does not exist.`)
         }
 
-        // Register progress emitter for step
-        step.progress = (progress: number) => emitEvent("step:progress", { progress, step, stage, pipeline }, logger);
-        // Register message emitter for step
-        step.message = (message: string) => emitEvent("step:message", { message, step, stage, pipeline }, logger);
-        // Register write emitter for step
-        step.write = (key: string, value: any) => step.outputs[key] = value;
-
         // Build executor
         const executor = async () => {
             emitEvent("step:started", { step, stage, pipeline }, logger);
-            await runner.steps?.[stepId]?.(step, logger);
+            await runner.steps?.[stepId]?.(stepRef, logger);
         };
 
         // Execute and catch errors
@@ -113,6 +122,7 @@ async function logEvent(logger: winston.Logger, name: EventName, args: { [key: s
 }
 
 async function logPipelineEvents(logger: winston.Logger, name: EventName, args: { [key: string]: any }) {
+    // TODO: Set pipeline status and emit progress
     if(!logger) return;
     const pipeline: Pipeline = args["pipeline"];
     const progress: number = args["progress"];
@@ -138,6 +148,7 @@ async function logPipelineEvents(logger: winston.Logger, name: EventName, args: 
 }
 
 async function logStageEvents(logger: winston.Logger, name: EventName, args: { [key: string]: any }) {
+    // TODO: Set stage status and emit progress
     if(!logger) return;
     const stage: Stage = args["stage"];
     const progress: number = args["progress"];

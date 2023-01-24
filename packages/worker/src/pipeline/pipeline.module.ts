@@ -1,6 +1,8 @@
 import { DynamicModule, Logger, Module } from "@nestjs/common";
 import { PIPELINES_MODULE_OPTIONS, PIPELINES_TOKEN } from "../constants";
-import { Pipeline, PipelineOptions, Stage, Step } from "./entities/pipeline.entity";
+import { Pipeline, PipelineOptions } from "./entities/pipeline.entity";
+import { Stage } from "./entities/stage.entity";
+import { Step } from "./entities/step.entity";
 import { PipelineService } from "./services/pipeline.service";
 
 export type Pipelines = { [id: string]: Pipeline };
