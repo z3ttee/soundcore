@@ -1,9 +1,10 @@
-import winston from "winston";
+import { PipelineLogger } from "../logging/logger";
 import { Outputs, PipelineInteractable, PipelineStatus } from "./pipeline.entity";
 
 export class Step {    
     public progress: number = 0;
     public status: PipelineStatus = PipelineStatus.WAITING;
+    public skipReason?: string;
     
     constructor(
         public readonly id: string,
@@ -24,7 +25,8 @@ export class StepRef extends PipelineInteractable implements Pick<Step, "id" | "
         progress: (progress: number) => void,
         message: (...args: any[]) => void,
         write: (key: string, value: any) => void,
-        read: (key: string) => void
+        read: (key: string) => void,
+        skip: (reason: string) => void
     ) {
         super();
 
@@ -32,6 +34,7 @@ export class StepRef extends PipelineInteractable implements Pick<Step, "id" | "
         this.message = message;
         this.write = write;
         this.read = read;
+        this.skip = skip;
     }
 }
 
@@ -42,7 +45,7 @@ export type StepEmitter = (event: string, ...args: any[]) => void;
 /**
  * Logger is only available, if logging is not disabled in module options
  */
-export type StepRunner = (step: StepRef, logger?: winston.Logger) => Promise<void> | void;
+export type StepRunner = (step: StepRef, logger: PipelineLogger) => Promise<void> | void;
 
 /**
  * Configuration object used to define steps in a pipeline.

@@ -11,3 +11,4 @@ export type { Pipelines } from "./pipeline.module";
 export type { Environment, Outputs } from "./entities/pipeline.entity";
 export type { StageExecutor, StageRunner } from "./entities/stage.entity";
 export type { StepRunner } from "./entities/step.entity";
+export type { PipelineLogger } from "./logging/logger";

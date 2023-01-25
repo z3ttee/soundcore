@@ -1,10 +1,11 @@
-import winston from "winston";
+import { PipelineLogger } from "../logging/logger";
 import { Environment, Outputs, PipelineInteractable, PipelineStatus } from "./pipeline.entity";
 import { Step, StepOptions, StepRunner } from "./step.entity";
 
 export class Stage {
     public currentStep: Step = null;
     public status: PipelineStatus = PipelineStatus.WAITING;
+    public skipReason?: string;
 
     constructor(
         public readonly id: string,
@@ -30,7 +31,8 @@ export class StageRef extends PipelineInteractable implements Pick<Step, "id" | 
         progress: (progress: number) => void,
         message: (...args: any[]) => void,
         write: (key: string, value: any) => void,
-        read: (key: string) => void
+        read: (key: string) => void,
+        skip: (reason: string) => void
     ) {
         super();
 
@@ -38,6 +40,7 @@ export class StageRef extends PipelineInteractable implements Pick<Step, "id" | 
         this.message = message;
         this.write = write;
         this.read = read;
+        this.skip = skip;
     }
 }
 
@@ -48,7 +51,7 @@ export type StageEmitter = (event: string, ...args: any[]) => void;
 /**
  * Function definition for the stage script files
  */
-export type StageExecutor = (stage: StageRef, environment: Environment, logger: winston.Logger) => Promise<StageRunner>
+export type StageExecutor = (stage: StageRef, environment: Environment, logger: PipelineLogger) => Promise<StageRunner>
 
 /**
  * Object definition of the steps in a stage runner

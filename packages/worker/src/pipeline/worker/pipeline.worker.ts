@@ -1,12 +1,12 @@
-import winston from "winston";
 import path from "node:path";
 import workerpool, { workerEmit } from "workerpool";
 import { Pipeline, PipelineStatus } from "../entities/pipeline.entity";
 import { EventName } from "../event/event";
-import { createEmptyLogger, createLogger } from "../logging/logger";
+import { createEmptyLogger, createLogger, PipelineLogger } from "../logging/logger";
 import { PipelineModuleOptions } from "../pipeline.module";
 import { Stage, StageExecutor, StageRef, StageRunner } from "../entities/stage.entity";
 import { Step, StepRef } from "../entities/step.entity";
+import { SkippedException } from "../exceptions/skipped.exception";
 
 async function executePipeline(pipeline: Pipeline, options: PipelineModuleOptions): Promise<Pipeline> {
     // Initialize logger
@@ -35,15 +35,25 @@ async function executePipeline(pipeline: Pipeline, options: PipelineModuleOption
             // Emit completion
             emitEvent("stage:completed", { stage, pipeline }, logger);
             // Emit pipeline status update
-            emitEvent("pipeline:status", { pipeline });
+            emitEvent("pipeline:status", { pipeline }, logger);
         }).catch((error: Error) => {
+            // Check if error is skipped exception
+            if(error instanceof SkippedException) {
+                stage.status = PipelineStatus.SKIPPED;
+                stage.skipReason = error.reason;
+                emitEvent("stage:skipped", { reason: error.reason, stage, pipeline }, logger);
+                // Emit pipeline status update
+                emitEvent("pipeline:status", { pipeline }, logger);
+                return;
+            }
+
             // Update stage
             stage.status = PipelineStatus.FAILED;
 
             // Emit failure
             emitEvent("stage:failed", { error, stage, pipeline }, logger);
             // Emit pipeline status update
-            emitEvent("pipeline:status", { pipeline });
+            emitEvent("pipeline:status", { pipeline }, logger);
             throw error;
         });
 
@@ -55,13 +65,19 @@ async function executePipeline(pipeline: Pipeline, options: PipelineModuleOption
     return pipeline;
 }
 
-async function executeStage(pipeline: Pipeline, stage: Stage, logger: winston.Logger) {
+/**
+ * Execute the given stage.
+ * @param pipeline Pipeline information
+ * @param stage Stage to execute
+ * @param logger Logger instance
+ */
+async function executeStage(pipeline: Pipeline, stage: Stage, logger: PipelineLogger) {
     // Update stage
     stage.status = PipelineStatus.WORKING;
     // Emit started event
     emitEvent("stage:started", { stage, pipeline }, logger);
     // Emit pipeline status
-    emitEvent("pipeline:status", { pipeline });
+    emitEvent("pipeline:status", { pipeline }, logger);
 
     // Create the ref with helper functions
     const stageRef: StageRef = new StageRef(
@@ -74,7 +90,9 @@ async function executeStage(pipeline: Pipeline, stage: Stage, logger: winston.Lo
         // Write to outputs
         (key: string, value: any) => stage.outputs[key] = value,
         // Read from outputs
-        (key: string) => stage.outputs[key]
+        (key: string) => stage.outputs[key],
+        // Skip function
+        (reason: string) => { throw new SkippedException(reason) },
     );
 
     // Load script file
@@ -100,7 +118,7 @@ async function executeStage(pipeline: Pipeline, stage: Stage, logger: winston.Lo
                 step.progress = progress ?? 0;
                 emitEvent("step:progress", { progress, step, stage, pipeline }, logger);
                 // Emit pipeline status
-                emitEvent("pipeline:status", { pipeline });
+                emitEvent("pipeline:status", { pipeline }, logger);
             },
             // Emit custom message
             (message: string) => emitEvent("step:message", { message, step, stage, pipeline }, logger),
@@ -108,6 +126,8 @@ async function executeStage(pipeline: Pipeline, stage: Stage, logger: winston.Lo
             (key: string, value: any) => step.outputs[key] = value,
             // Read from output
             (key: string) => step.outputs[key],
+            // Skip function
+            (reason: string) => { throw new SkippedException(reason) },
         );
         const stepId = stepRef.id;
 
@@ -122,7 +142,7 @@ async function executeStage(pipeline: Pipeline, stage: Stage, logger: winston.Lo
             step.status = PipelineStatus.WORKING;
             emitEvent("step:started", { step, stage, pipeline }, logger);
             // Emit pipeline status
-            emitEvent("pipeline:status", { pipeline });
+            emitEvent("pipeline:status", { pipeline }, logger);
             await runner.steps?.[stepId]?.(stepRef, logger);
         };
 
@@ -141,21 +161,32 @@ async function executeStage(pipeline: Pipeline, stage: Stage, logger: winston.Lo
             // Complete event
             emitEvent("step:completed", { step, stage, pipeline }, logger);
             // Emit pipeline status
-            emitEvent("pipeline:status", { pipeline });
+            emitEvent("pipeline:status", { pipeline }, logger);
         }).catch((error: Error) => {
+            // Reset progress
+            step.progress = 0;
+
+            // Check if error is skipped exception
+            if(error instanceof SkippedException) {
+                step.status = PipelineStatus.SKIPPED;
+                step.skipReason = error.reason;
+                emitEvent("step:skipped", { reason: error.reason, step, stage, pipeline }, logger);
+                emitEvent("pipeline:status", { pipeline }, logger);
+                return;
+            }
+
             // Update step status
             step.status = PipelineStatus.FAILED;
-            step.progress = 0;
             // Failed event
             emitEvent("step:failed", { error, step, stage, pipeline }, logger);
             // Emit pipeline status
-            emitEvent("pipeline:status", { pipeline });
+            emitEvent("pipeline:status", { pipeline }, logger);
             throw error;
         });
     }
 }
 
-async function emitEvent(name: EventName, args: { [key: string]: any }, logger?: winston.Logger) {
+async function emitEvent(name: EventName, args: { [key: string]: any }, logger: PipelineLogger) {
     if(logger) logEvent(logger, name, args);
 
     workerEmit({
@@ -164,7 +195,7 @@ async function emitEvent(name: EventName, args: { [key: string]: any }, logger?:
     });
 }
 
-async function logEvent(logger: winston.Logger, name: EventName, args: { [key: string]: any }) {
+async function logEvent(logger: PipelineLogger, name: EventName, args: { [key: string]: any }) {
     if(!logger) return;
     const prefix = name.split(":")[0];
 
@@ -177,7 +208,7 @@ async function logEvent(logger: winston.Logger, name: EventName, args: { [key: s
     }
 }
 
-async function logPipelineEvents(logger: winston.Logger, name: EventName, args: { [key: string]: any }) {
+async function logPipelineEvents(logger: PipelineLogger, name: EventName, args: { [key: string]: any }) {
     // TODO: Set pipeline status and emit progress
     if(!logger) return;
     const pipeline: Pipeline = args["pipeline"];
@@ -187,9 +218,6 @@ async function logPipelineEvents(logger: winston.Logger, name: EventName, args: 
 
     if(name == "pipeline:started") {
         logger.info(`Pipeline '${pipeline?.id}' started`);
-        return;
-    } else if(name == "pipeline:status") {
-        logger.info(`Pipeline '${pipeline?.id}' posted status update.`);
         return;
     } else if(name == "pipeline:message") {
         logger.info(`Pipeline '${pipeline?.id}' published a message: ${message}`);
@@ -203,13 +231,14 @@ async function logPipelineEvents(logger: winston.Logger, name: EventName, args: 
     }
 }
 
-async function logStageEvents(logger: winston.Logger, name: EventName, args: { [key: string]: any }) {
+async function logStageEvents(logger: PipelineLogger, name: EventName, args: { [key: string]: any }) {
     // TODO: Set stage status and emit progress
     if(!logger) return;
     const stage: Stage = args["stage"];
     const progress: number = args["progress"];
     const message: string = args["message"];
     const error: Error = args["error"];
+    const reason: string = args["reason"];
 
     if(name == "stage:started") {
         logger.info(`Stage '${stage?.id}' started`);
@@ -226,15 +255,19 @@ async function logStageEvents(logger: winston.Logger, name: EventName, args: { [
     } else if(name == "stage:failed") {
         logger.error(`Stage '${stage?.id}' failed: ${error.message}`, error.stack);
         return;
+    } else if(name == "stage:skipped") {
+        logger.warn(`Stage '${stage?.id}' skipped: ${reason}`);
+        return;
     }
 }
 
-async function logStepEvents(logger: winston.Logger, name: EventName, args: { [key: string]: any }) {
+async function logStepEvents(logger: PipelineLogger, name: EventName, args: { [key: string]: any }) {
     if(!logger) return;
     const step: Step = args["step"];
     const progress: number = args["progress"];
     const message: string = args["message"];
     const error: Error = args["error"];
+    const reason: string = args["reason"];
 
     if(name == "step:started") {
         logger.info(`Step '${step?.id}' started`);
@@ -250,6 +283,9 @@ async function logStepEvents(logger: winston.Logger, name: EventName, args: { [k
         return;
     } else if(name == "step:failed") {
         logger.error(`Step '${step?.id}' failed: ${error.message}`, error.stack);
+        return;
+    } else if(name == "step:skipped") {
+        logger.warn(`Step '${step?.id}' skipped: ${reason}`);
         return;
     }
 }

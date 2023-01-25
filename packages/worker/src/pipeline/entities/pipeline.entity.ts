@@ -10,7 +10,8 @@ export enum PipelineStatus {
     WORKING = "working",
     FAILED = "failed",
     WARNING = "warning",
-    COMPLETED = "completed"
+    COMPLETED = "completed",
+    SKIPPED = "skipped"
 }
 
 export class Pipeline {
@@ -52,4 +53,5 @@ export abstract class PipelineInteractable {
     public message(...args: any[]): void {};
     public write(key: string, value: any): void {};
     public read(key: string): any {};
+    public skip(reason: string): void {};
 }

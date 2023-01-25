@@ -68,3 +68,5 @@ export function createEmptyLogger() {
         })]
     });
 }
+
+export type PipelineLogger = winston.Logger;
