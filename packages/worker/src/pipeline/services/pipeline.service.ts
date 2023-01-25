@@ -1,7 +1,8 @@
 import path from "node:path";
+import crypto from "node:crypto";
 
 import { Inject, Injectable } from "@nestjs/common";
-import { Cron } from "@nestjs/schedule";
+import { SchedulerRegistry } from "@nestjs/schedule";
 import { WorkerPool, pool } from "workerpool";
 import { PIPELINES_MODULE_OPTIONS, PIPELINES_TOKEN } from "../../constants";
 import { Environment, Pipeline, PipelineStatus } from "../entities/pipeline.entity";
@@ -22,7 +23,8 @@ export class PipelineService {
 
     constructor(
         @Inject(PIPELINES_MODULE_OPTIONS) private readonly options: PipelineModuleOptions,
-        @Inject(PIPELINES_TOKEN) private readonly registeredPipelines: Pipelines
+        @Inject(PIPELINES_TOKEN) private readonly registeredPipelines: Pipelines,
+        private readonly scheduler: SchedulerRegistry
     ) {
         // Create worker pool
         this.pool = pool(path.resolve(__dirname, "..", "worker", "pipeline.worker.js"), {
@@ -35,10 +37,17 @@ export class PipelineService {
                 }
             }
         });
+
+        // Register polling interval
+        const intervalName = "pipeline-queue-lookup-"+crypto.randomUUID()
+        if(!this.scheduler.doesExist("interval", intervalName)) {
+            this.scheduler.addInterval(intervalName, setInterval(() => {
+                this.processNextInQueue();
+            }, Math.max(1000, Math.min(60000, this.options.pollingRateMs ?? 10000))));
+        }
     }
 
-    @Cron("*/10 * * * * *")
-    public processNextInQueue() {
+    private processNextInQueue() {
         if(this.queue.isEmpty() || !this.canExecuteNext()) return;
 
         const nextItem = this.queue.dequeue();

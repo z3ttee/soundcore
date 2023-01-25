@@ -10,7 +10,7 @@ import { Step, StepRef } from "../entities/step.entity";
 
 async function executePipeline(pipeline: Pipeline, options: PipelineModuleOptions): Promise<Pipeline> {
     // Initialize logger
-    const logger = options.disableLogging ? createEmptyLogger() : createLogger(pipeline.id, pipeline.runId);
+    const logger = options.disableLogging ? createEmptyLogger() : createLogger(pipeline.id, pipeline.runId, options.enableConsoleLogging ?? false);
 
     // Emit pipeline status
     pipeline.status = PipelineStatus.WORKING;
@@ -82,7 +82,7 @@ async function executeStage(pipeline: Pipeline, stage: Stage, logger: winston.Lo
     const stageExecutor: StageExecutor = require(script)?.default;
 
     // Execute runner to retrieve steps handler
-    const runner: StageRunner = await stageExecutor(stageRef, pipeline.environment).catch((error) => {
+    const runner: StageRunner = await stageExecutor(stageRef, pipeline.environment, logger).catch((error) => {
         throw error;
     });
 
