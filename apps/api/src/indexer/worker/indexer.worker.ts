@@ -110,7 +110,7 @@ export default function (job: WorkerJobRef<IndexerProcessDTO>): Promise<IndexerR
                     });
 
                     // Extract artists
-                    const id3Artists: CreateArtistDTO[] = id3TagsDto?.artists || [];
+                    const id3Artists: CreateArtistDTO[] = id3TagsDto?.artists as CreateArtistDTO[] || [];
 
                     // Collect artists for building batched database query
                     for(const id3Artist of id3Artists) {

@@ -19,7 +19,7 @@ import { SyncFlag } from "../../meilisearch/interfaces/syncable.interface";
 import { CreateSongDTO } from "../dtos/create-song.dto";
 import { Artwork, ArtworkID } from "../../artwork/entities/artwork.entity";
 import { GeniusFlag, ResourceFlag } from "../../utils/entities/resource";
-import { ID3TagsDTO } from "../dtos/id3-tags.dto";
+import { ID3Artist, ID3TagsDTO } from "../dtos/id3-tags.dto";
 import { SongUniqueFindDTO } from "../dtos/unique-find.dto";
 import { FileFlag } from "../../file/entities/file.entity";
 import { Slug } from "@tsalliance/utilities";
@@ -272,9 +272,9 @@ export class SongService implements SyncableService<Song> {
      * the existing one will be returned.
      * Existing song contains following relations: primaryArtist, featuredArtist, album
      * @param createSongDto Song data to be saved
-     * @returns [Song, hasExistedBefore]
+     * @returns Song[]
      */
-    public async createIfNotExists(dtos: CreateSongDTO[]): Promise<Song[]> {
+    public async createIfNotExists(dtos: (CreateSongDTO | Song)[]): Promise<Song[]> {
         if(dtos.length <= 0) throw new BadRequestException("Cannot create resources for empty list.");
 
         return this.repository.createQueryBuilder()
@@ -283,6 +283,8 @@ export class SongService implements SyncableService<Song> {
             .returning(["id"])
             .orUpdate(["name"], ["id"], { skipUpdateIfNoValuesChanged: false })
             .execute().then((insertResult) => {
+                console.log(insertResult);
+
                 return this.repository.createQueryBuilder("song")
                     .leftJoinAndSelect("song.primaryArtist", "primaryArtist")
                     .leftJoinAndSelect("song.album", "album")
@@ -427,13 +429,15 @@ export class SongService implements SyncableService<Song> {
             }
         }
 
+        const title = id3Tags.title?.trim() || path.basename(filepath).replace(/\.[^/.]+$/, "").trim();
+
         // Get artists
-        const artists: string[] = [];
+        const artists: ID3Artist[] = [];
         if (id3Tags.artist) {
             const splitted = id3Tags.artist.split(",") || [];
 
             for (const index in splitted) {
-                artists.push(splitted[index]?.trim());
+                artists.push({ name: splitted[index]?.trim() });
             }
         }
 
@@ -452,15 +456,12 @@ export class SongService implements SyncableService<Song> {
         // Build result DTO
         const result: ID3TagsDTO = {
             filepath,
-            title: id3Tags.title?.trim() || path.basename(filepath).replace(/\.[^/.]+$/, "").trim(),
+            title: title,
             duration: durationInSeconds,
-            artists: artists.map((name) => ({
-                name: name?.trim(),
-                slug: Slug.create(name?.trim())
-            })),
-            album: id3Tags.album?.trim(),
+            artists: artists,
+            album: id3Tags.album?.trim() ?? title,
             cover: artworkBuffer,
-            orderNr: parseInt(id3Tags.trackNumber?.split("/")?.[0]) || null
+            orderNr: parseInt(id3Tags.trackNumber?.split("/")?.[0]) ?? 0
         }
 
         return result

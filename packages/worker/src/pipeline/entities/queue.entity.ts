@@ -1,18 +1,20 @@
-import { Pipeline } from "./pipeline.entity";
+import { PipelineRun, PipelineWithScript } from "./pipeline.entity";
 
 export class PipelineQueue {
 
-    private readonly pipelines: Pipeline[] = [];
+    private readonly pipelines: PipelineRun[] = [];
 
-    public enqueue(pipeline: Pipeline): number {
-        return this.pipelines.push(pipeline);
+    public enqueue(pipeline: PipelineWithScript | PipelineRun): number {
+        if(pipeline["runId"]) return this.pipelines.push(pipeline as PipelineRun);
+        const run = new PipelineRun(pipeline.script, pipeline.options, pipeline.id, pipeline.name, pipeline.stages, pipeline.environment);
+        return this.pipelines.push(run);
     }
 
-    public dequeue(): Pipeline {
+    public dequeue(): PipelineRun {
         return this.pipelines.splice(0, 1)?.[0];
     }
 
-    public peek(): Pipeline {
+    public peek(): PipelineRun {
         return this.pipelines[0];
     }
 

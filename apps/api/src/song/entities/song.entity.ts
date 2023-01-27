@@ -105,13 +105,17 @@ export class Song implements SongID, Resource, Syncable, GeniusResource, Trackli
     @JoinColumn()
     public artwork: Artwork;
 
-    @ManyToOne(() => Artist)
+    @ManyToOne(() => Artist, { cascade: ["insert", "update"] })
     @JoinColumn()
     public primaryArtist: Artist;
 
-    @ManyToMany(() => Artist)
+    @ManyToMany(() => Artist, { cascade: ["insert", "update"] })
     @JoinTable({ name: "featuring2song" })
     public featuredArtists: Artist[];
+
+    @ManyToOne(() => Album, { cascade: ["insert", "update"] })
+    @JoinColumn()
+    public album: Album;
 
     @ManyToMany(() => Publisher)
     @JoinTable({ name: "song2publisher" })
@@ -124,10 +128,6 @@ export class Song implements SongID, Resource, Syncable, GeniusResource, Trackli
     @ManyToMany(() => Label)
     @JoinTable({ name: "song2label" })
     public labels: Label[];
-
-    @ManyToOne(() => Album)
-    @JoinColumn()
-    public album: Album;
 
     @ManyToMany(() => Genre)
     @JoinTable({ name: "song2genre" })

@@ -29,21 +29,7 @@ export class MountService {
         private readonly mountRegistryService: MountRegistryService,
         private readonly queue: WorkerQueue<MountScanProcessDTO>,
         private readonly gateway?: AdminGateway,
-        public readonly pipelineService?: PipelineService
-    ) {
-        this.pipelineService?.on("pipeline:started", (pipeline) => {
-            console.log("pipeline started");
-            // console.log("started",pipeline);
-        })
-        this.pipelineService?.on("pipeline:completed", (pipeline) => {
-            console.log("pipeline completed");
-        })
-        this.pipelineService?.on("pipeline:failed", (error, pipeline) => {
-            console.log("pipeline failed");
-            console.error(error);
-            //console.error(error);
-        })
-    }
+    ) {}
 
     /**
      * Find a list of mounts inside a bucket.

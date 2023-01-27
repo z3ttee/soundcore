@@ -5,7 +5,7 @@ import { Inject, Injectable } from "@nestjs/common";
 import { SchedulerRegistry } from "@nestjs/schedule";
 import { WorkerPool, pool } from "workerpool";
 import { PIPELINES_MODULE_OPTIONS, PIPELINES_TOKEN } from "../../constants";
-import { Environment, Pipeline, PipelineStatus } from "../entities/pipeline.entity";
+import { Environment, Pipeline, PipelineRun, PipelineStatus, PipelineWithScript } from "../entities/pipeline.entity";
 import { PipelineQueue } from "../entities/queue.entity";
 import { EventHandler, EventName } from "../event/event";
 import { PipelineCompletedEventHandler, PipelineFailedEventHandler } from "../event/pipeline-events";
@@ -61,10 +61,13 @@ export class PipelineService {
      * @returns Position in queue
      */
     public async enqueue(pipelineId: string, environment?: Environment): Promise<number> {
-        const origin: Pipeline = this.registeredPipelines[pipelineId];
+        const origin: PipelineWithScript = this.registeredPipelines[pipelineId];
+        if(typeof origin === "undefined" || origin == null) {
+            throw new Error(`No pipeline found for id '${pipelineId}'`);
+        }
 
         // Copy object
-        const pipeline: Pipeline = new Pipeline(origin.id, origin.name, origin.stages, {}, <Environment>{
+        const pipeline: PipelineWithScript = new PipelineWithScript(origin.script, origin.options, origin.id, origin.name, origin.stages, <Environment>{
             // Merge environments, global env overwrites
             ...environment,
             ...origin.environment ?? {}
@@ -105,7 +108,7 @@ export class PipelineService {
      * Note: If this function was called falsely (workers are busy), the pipeline will be re-enqueued.
      * @param pipeline Pipeline information
      */
-    private async dispatch(pipeline: Pipeline): Promise<void> {
+    private async dispatch(pipeline: PipelineRun): Promise<void> {
         // Check if workers are busy, if so enqueue the pipeline
         if(!this.canExecuteNext()){
             await this.queue.enqueue(pipeline);
@@ -125,8 +128,8 @@ export class PipelineService {
             }
         }).then((pipeline: Pipeline) => {
             // Update pipeline status
-            pipeline.status = PipelineStatus.COMPLETED;
-            pipeline.currentStage = null;
+            // pipeline.status = PipelineStatus.COMPLETED;
+            // pipeline.currentStage = null;
 
             // Handle successful completion
             const handlers = this.eventHandlers.get("pipeline:completed") as PipelineCompletedEventHandler[] ?? [];

@@ -1,5 +1,5 @@
 
-export type BatchingHandler<I = any, T = I> = (batch: I[], batchNr?: number, maxBatches?: number) => Promise<T[]> | T[];
+export type BatchingHandler<I = any, T = I> = (batch: I[], currentBatch?: number, totalBatches?: number) => Promise<T[]> | T[];
 export type ErrorHandler = (batchNr: number, error: Error) => Promise<void> | void;
 export type ThenHandler<T> = (result: T[]) => Promise<void> | void;
 export type ProgressHandler = (batches: number, current: number) => Promise<void> | void;
@@ -16,25 +16,55 @@ export class Batch<I = any, R = I> {
         private readonly batchSize: number = 100
     ) {}
 
+    /**
+     * Initialize batching process.
+     * @param list Dataset to make batches of
+     * @param batchSize Size of each batch, defaults to 100
+     * @returns Batch<T, R>
+     */
+    public static useDataset<T = any, R = T>(list: T[], batchSize?: number): Batch<T, R> {
+        return new Batch<T, R>(list, batchSize ?? 100);
+    }
+
+    /**
+     * @deprecated
+     */
     public static of<T = any, R = T>(list: T[], batchSize: number = 100): Batch<T, R> {
         return new Batch<T, R>(list, batchSize);
     }
 
+    public forEach(handler: BatchingHandler<I, R>): Promise<R[]> {
+        this._handler = handler;
+        return this.start();
+    }
+
+    /**
+     * @deprecated Use
+     */
     public do(handler: BatchingHandler<I, R>) {
         this._handler = handler;
         return this;
     }
 
+    /**
+     * @deprecated
+     */
     public catch(handler: ErrorHandler) {
         this._errorHandler = handler;
         return this;
     }
 
+    /**
+     * @deprecated
+     */
     public then(handler: ThenHandler<R>) {
         this._thenHandler = handler;
         return this;
     }
 
+    /**
+     * @deprecated
+     */
     public progress(handler: ProgressHandler) {
         this._progressHandler = handler;
         return this;

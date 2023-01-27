@@ -129,7 +129,7 @@ export class ArtistService {
      * @param createArtistDto Data to create artist from
      * @returns Artist
      */
-    public async createIfNotExists(dtos: CreateArtistDTO[]): Promise<Artist[]> {
+    public async createIfNotExists(dtos: (CreateArtistDTO | Artist)[]): Promise<Artist[]> {
         if(dtos.length <= 0) throw new BadRequestException("Cannot create resources for empty list.");
 
         return await this.repository.createQueryBuilder()

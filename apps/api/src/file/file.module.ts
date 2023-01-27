@@ -32,7 +32,7 @@ export class FileModule implements OnModuleInit {
   constructor(private readonly queue: FileQueueService) {}
 
   public async onModuleInit() {
-    await this.queue.processAwaitingFiles();
+    // await this.queue.processAwaitingFiles();
   }
   
 }

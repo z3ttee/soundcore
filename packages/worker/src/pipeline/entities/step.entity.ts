@@ -1,15 +1,17 @@
 import { PipelineLogger } from "../logging/logger";
-import { Outputs, PipelineInteractable, PipelineStatus } from "./pipeline.entity";
+import { Environment, Outputs, PipelineStatus } from "./pipeline.entity";
+import { StageBuilder, StageRef } from "./stage.entity";
 
 export class Step {    
     public progress: number = 0;
     public status: PipelineStatus = PipelineStatus.WAITING;
     public skipReason?: string;
-    
+    public readonly outputs: Outputs = {};
+
     constructor(
         public readonly id: string,
         public readonly name: string,
-        public readonly outputs: Outputs
+        public readonly runner: StepRunner
     ) {}
 }
 
@@ -18,7 +20,7 @@ export class Step {
  * It also includes helper functions to write to outputs or emit messages
  * as well as posting progress updates.
  */
-export class StepRef extends PipelineInteractable implements Pick<Step, "id" | "name"> {
+export class StepRef implements Pick<Step, "id" | "name"> {
     constructor(
         public readonly id: string,
         public readonly name: string,
@@ -28,13 +30,33 @@ export class StepRef extends PipelineInteractable implements Pick<Step, "id" | "
         read: (key: string) => void,
         skip: (reason: string) => void
     ) {
-        super();
-
         this.progress = progress;
         this.message = message;
         this.write = write;
         this.read = read;
         this.skip = skip;
+    }
+
+    public write(key: string, value: any): void {};
+    public progress(progress: number): void {};
+    public message(...args: any[]): void {};
+    public read(key: string): any {};
+    public skip(reason: string): void {};
+}
+
+export class StepBuilder {
+    private _runner: StepRunner;
+
+    constructor(
+        private readonly stageBuilder: StageBuilder,
+        private readonly id: string,
+        private readonly name: string,
+        private readonly description?: string
+    ) {}
+
+    public run(runner: StepRunner): StageBuilder {
+        this._runner = runner;
+        return this.stageBuilder;
     }
 }
 
@@ -45,12 +67,4 @@ export type StepEmitter = (event: string, ...args: any[]) => void;
 /**
  * Logger is only available, if logging is not disabled in module options
  */
-export type StepRunner = (step: StepRef, logger: PipelineLogger) => Promise<void> | void;
-
-/**
- * Configuration object used to define steps in a pipeline.
- */
-export class StepOptions implements Pick<Step, "id" | "name"> {
-    public id: string;
-    public name: string;
-}
+export type StepRunner = (params: { step: StepRef, stage: StageRef, environment: Environment, logger: PipelineLogger }) => Promise<void> | void;

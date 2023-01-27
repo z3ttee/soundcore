@@ -1,21 +1,21 @@
-import { PipelineLogger } from "../logging/logger";
-import { Environment, Outputs, PipelineInteractable, PipelineStatus } from "./pipeline.entity";
-import { Step, StepOptions, StepRunner } from "./step.entity";
+import { Outputs, PipelineBuilder, PipelineStatus } from "./pipeline.entity";
+import { Step, StepBuilder } from "./step.entity";
+
+export type StageResources = { [key: string]: any }
 
 export class Stage {
     public currentStep: Step = null;
     public status: PipelineStatus = PipelineStatus.WAITING;
     public skipReason?: string;
+    public readonly outputs: Outputs = {};
 
     constructor(
         public readonly id: string,
         public readonly name: string,
-        public readonly scriptPath: string,
         public readonly steps: Step[],
-        public readonly outputs: Outputs,
+        public readonly resources: StageResources = {}
     ) {}
 }
-
 
 
 /**
@@ -23,55 +23,58 @@ export class Stage {
  * It also includes helper functions to write to outputs or emit messages
  * as well as posting progress updates.
  */
-export class StageRef extends PipelineInteractable implements Pick<Step, "id" | "name"> {
+export class StageRef implements Pick<Stage, "id" | "name"> {
 
     constructor(
         public readonly id: string,
         public readonly name: string,
-        progress: (progress: number) => void,
+        private readonly resources: StageResources,
         message: (...args: any[]) => void,
-        write: (key: string, value: any) => void,
         read: (key: string) => void,
-        skip: (reason: string) => void
+        skip: (reason: string) => void,
+        resource: (key: string) => any
     ) {
-        super();
-
-        this.progress = progress;
         this.message = message;
-        this.write = write;
         this.read = read;
         this.skip = skip;
+        this.resource = resource;
     }
+
+    public message(...args: any[]): void {};
+    public resource(key: string): any {};
+    public read(key: string): any {};
+    public skip(reason: string): void {};
 }
 
 /**
  * Function that emits an event of the stage
  */
 export type StageEmitter = (event: string, ...args: any[]) => void;
-/**
- * Function definition for the stage script files
- */
-export type StageExecutor = (stage: StageRef, environment: Environment, logger: PipelineLogger) => Promise<StageRunner>
 
-/**
- * Object definition of the steps in a stage runner
- */
-export interface StageRunnerSteps {
-    [key: string]: StepRunner
-}
-/**
- * Object definition returned by the StageExecutor
- */
-export interface StageRunner {
-    steps: StageRunnerSteps;
-}
+export type StageInitializer = () => Promise<any> | any;
+export class StageBuilder {
+    private readonly _steps: StepBuilder[] = [];
+    private _initializer?: StageInitializer;
 
-/**
- * Configuration object used to define stages in a pipeline.
- */
-export class StageOptions implements Pick<Stage, "id" | "name" | "scriptPath"> {
-    public name: string;
-    public id: string;
-    public scriptPath: string;
-    public steps: StepOptions[];
+    constructor(
+        private readonly pipelineBuilder: PipelineBuilder,
+        private readonly id: string,
+        private readonly name: string,
+        private readonly description?: string
+    ) {}
+
+    public step(stepId: string, name: string, description?: string): StepBuilder {
+        const builder = new StepBuilder(this, stepId, name, description);
+        this._steps.push(builder);
+        return builder;
+    }
+
+    public useResources(initializer: StageInitializer): StageBuilder {
+        this._initializer = initializer;
+        return this;
+    }
+
+    public done(): PipelineBuilder {
+        return this.pipelineBuilder;
+    }
 }
