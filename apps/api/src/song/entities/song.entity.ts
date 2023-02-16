@@ -97,23 +97,23 @@ export class Song implements SongID, Resource, Syncable, GeniusResource, Trackli
     /**
      * ENTITY RELATIONS
      */
-    @OneToOne(() => File, (file) => file.song, { onDelete: "CASCADE" })
+    @OneToOne(() => File, (file) => file.song, { onDelete: "CASCADE", nullable: false })
     @JoinColumn()
     public file: File;
 
-    @ManyToOne(() => Artwork, { onDelete: "SET NULL" })
+    @ManyToOne(() => Artwork, { onDelete: "SET NULL", nullable: true })
     @JoinColumn()
     public artwork: Artwork;
 
-    @ManyToOne(() => Artist, { cascade: ["insert", "update"] })
+    @ManyToOne(() => Artist, { onDelete: "SET NULL", nullable: true })
     @JoinColumn()
     public primaryArtist: Artist;
 
-    @ManyToMany(() => Artist, { cascade: ["insert", "update"] })
+    @ManyToMany(() => Artist, { onDelete: "CASCADE", nullable: true })
     @JoinTable({ name: "featuring2song" })
     public featuredArtists: Artist[];
 
-    @ManyToOne(() => Album, { cascade: ["insert", "update"] })
+    @ManyToOne(() => Album, { onDelete: "SET NULL", nullable: true })
     @JoinColumn()
     public album: Album;
 

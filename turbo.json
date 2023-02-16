@@ -7,7 +7,12 @@
       "cache": true
     },
     "build:api": {
-      "dependsOn": ["^build:api"],
+      "dependsOn": ["^build:api", "^build:packages"],
+      "outputs": ["dist/**"],
+      "cache": true
+    },
+    "build:packages": {
+      "dependsOn": ["^build:packages"],
       "outputs": ["dist/**"],
       "cache": true
     },

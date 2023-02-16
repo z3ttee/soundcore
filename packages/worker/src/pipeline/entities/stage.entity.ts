@@ -13,7 +13,6 @@ export class Stage {
         public readonly id: string,
         public readonly name: string,
         public readonly steps: Step[],
-        public readonly resources: StageResources = {}
     ) {}
 }
 
@@ -28,20 +27,17 @@ export class StageRef implements Pick<Stage, "id" | "name"> {
     constructor(
         public readonly id: string,
         public readonly name: string,
-        private readonly resources: StageResources,
+        public readonly resources: StageResources,
         message: (...args: any[]) => void,
         read: (key: string) => void,
         skip: (reason: string) => void,
-        resource: (key: string) => any
     ) {
         this.message = message;
         this.read = read;
         this.skip = skip;
-        this.resource = resource;
     }
 
     public message(...args: any[]): void {};
-    public resource(key: string): any {};
     public read(key: string): any {};
     public skip(reason: string): void {};
 }
@@ -51,10 +47,10 @@ export class StageRef implements Pick<Stage, "id" | "name"> {
  */
 export type StageEmitter = (event: string, ...args: any[]) => void;
 
-export type StageInitializer = () => Promise<any> | any;
+export type StageInitializer = () => Promise<StageResources>;
 export class StageBuilder {
     private readonly _steps: StepBuilder[] = [];
-    private _initializer?: StageInitializer;
+    private _initializer: StageInitializer;
 
     constructor(
         private readonly pipelineBuilder: PipelineBuilder,

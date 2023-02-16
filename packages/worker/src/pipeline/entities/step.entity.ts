@@ -1,5 +1,5 @@
 import { PipelineLogger } from "../logging/logger";
-import { Environment, Outputs, PipelineStatus } from "./pipeline.entity";
+import { Environment, Outputs, PipelineRef, PipelineStatus } from "./pipeline.entity";
 import { StageBuilder, StageRef } from "./stage.entity";
 
 export class Step {    
@@ -11,7 +11,6 @@ export class Step {
     constructor(
         public readonly id: string,
         public readonly name: string,
-        public readonly runner: StepRunner
     ) {}
 }
 
@@ -28,13 +27,15 @@ export class StepRef implements Pick<Step, "id" | "name"> {
         message: (...args: any[]) => void,
         write: (key: string, value: any) => void,
         read: (key: string) => void,
-        skip: (reason: string) => void
+        skip: (reason: string) => void,
+        abortFatal: (reason: string) => void
     ) {
         this.progress = progress;
         this.message = message;
         this.write = write;
         this.read = read;
         this.skip = skip;
+        this.abortFatal = abortFatal;
     }
 
     public write(key: string, value: any): void {};
@@ -42,6 +43,8 @@ export class StepRef implements Pick<Step, "id" | "name"> {
     public message(...args: any[]): void {};
     public read(key: string): any {};
     public skip(reason: string): void {};
+    public abortFatal(reason: string): void {};
+
 }
 
 export class StepBuilder {
@@ -67,4 +70,4 @@ export type StepEmitter = (event: string, ...args: any[]) => void;
 /**
  * Logger is only available, if logging is not disabled in module options
  */
-export type StepRunner = (params: { step: StepRef, stage: StageRef, environment: Environment, logger: PipelineLogger }) => Promise<void> | void;
+export type StepRunner = (params: { step: StepRef, stage: StageRef, pipeline: PipelineRef, environment: Environment, logger: PipelineLogger }) => Promise<void> | void;

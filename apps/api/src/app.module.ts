@@ -34,7 +34,9 @@ import { CronModule } from './cron/cron.module';
 import { CommonConfigModule } from '@soundcore/common';
 import { WorkerQueueModule } from '@soundcore/nest-queue';
 import { TracklistModule } from './tracklist/tracklist.module';
-import { WorkerModule } from '@soundcore/worker';
+// import { WorkerModule } from '@soundcore/worker';
+import { PipelineModule } from '@soundcore/pipelines';
+import path from 'node:path';
 
 @Module({
   imports: [
@@ -72,10 +74,8 @@ import { WorkerModule } from '@soundcore/worker';
         }
       })
     }),
-    WorkerModule.forRootAsync({
-      useFactory: () => ({
-        debug: true
-      })
+    PipelineModule.forRoot({
+      enableStdout: true,
     }),
     EventEmitterModule.forRoot({ global: true, ignoreErrors: true }),
     ArtistModule,

@@ -20,7 +20,7 @@ export class Pipeline {
         public readonly id: string,
         public readonly name: string,
         public readonly stages: Stage[],
-        public readonly environment: Environment = {}
+        public readonly environment: Environment = {},
     ) {}
 }
 
@@ -103,7 +103,6 @@ export class PipelineBuilder {
     public stage(stageId: string, name: string, description?: string): StageBuilder {
         const builder = new StageBuilder(this, stageId, name, description);
         this._stages.push(builder);
-        console.log(builder);
         return builder;
     }
 }

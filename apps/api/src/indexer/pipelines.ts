@@ -14,61 +14,32 @@ export const STEP_LOOKUP_FILES_NAME = "Searching files";
 export const STEP_INDEX_FILES_ID = "index-files";
 export const STEP_INDEX_FILES_NAME = "Sync with database";
 
-export const STEP_READ_TAGS = "read-id3-tags";
-export const STEP_SAVE_ARTISTS = "create-artists";
-export const STEP_SAVE_ALBUMS = "create-albums";
-export const STEP_SAVE_SONGS = "create-songs";
+export const STAGE_METADATA_ID = "extract-metadata"
+export const STAGE_METADATA_NAME = "Extract metadata"
 
-// export const pipelines: PipelineOptions[] = [
-//     {
-//         id: INDEX_PIPELINE_ID,
-//         name: "Index Library",
-//         stages: [
-//             // Scan mount
-//             {
-//                 id: STAGE_SCAN,
-//                 name: "Scan Mount",
-//                 scriptPath: path.join(__dirname, "pipelines", "scan.stage.js"),
-//                 steps: [
-//                     {
-//                         id: STEP_CHECKOUT_MOUNT,
-//                         name: "Checkout mount"
-//                     },
-//                     {
-//                         id: STEP_LOOKUP_FILES,
-//                         name: "Lookup files"
-//                     },
-//                     {
-//                         id: STEP_INDEX_FILES,
-//                         name: "Create database entries"
-//                     }
-//                 ]
-//             },
-//             // Extract metadata
-//             {
-//                 id: "extract-metadata",
-//                 name: "Extract metadata",
-//                 scriptPath: path.join(__dirname, "pipelines", "metadata.stage.js"),
-//                 steps: [
-//                     {
-//                         id: STEP_READ_TAGS,
-//                         name: "Read mp3 tags"
-//                     },
-//                     {
-//                         id: STEP_SAVE_ARTISTS,
-//                         name: "Creating artists"
-//                     },
-//                     {
-//                         id: STEP_SAVE_ALBUMS,
-//                         name: "Creating albums"
-//                     },
-//                     {
-//                         id: STEP_SAVE_SONGS,
-//                         name: "Creating songs"
-//                     }
-//                 ]
-//             },
-//             // TODO: Search metadata online
-//         ]
-//     }
-// ]
+export const STEP_READ_TAGS_ID = "read-id3-tags";
+export const STEP_READ_TAGS_NAME = "Read ID3 Tags";
+
+export const STEP_CREATE_ARTISTS_ID = "create-artists";
+export const STEP_CREATE_ARTISTS_NAME = "Create artist entities";
+
+export const STEP_CREATE_ALBUMS_ID = "create-albums";
+export const STEP_CREATE_ALBUMS_NAME = "Create album entities";
+
+export const STEP_CREATE_SONGS_ID = "create-songs";
+export const STEP_CREATE_SONGS_NAME = "Create song entities";
+
+export const STEP_CHECK_FILES_ID = "check-files";
+export const STEP_CHECK_FILES_NAME = "Check files";
+
+export const STAGE_CLEANUP_ID = "cleanup-files";
+export const STAGE_CLEANUP_NAME = "Updating files";
+
+export const STEP_CLEANUP_FAILED_ID = "cleanup-failed-files";
+export const STEP_CLEANUP_FAILED_NAME = "Update status of failed files";
+
+export const STEP_CLEANUP_DUPLICATES_ID = "cleanup-duplicate-files";
+export const STEP_CLEANUP_DUPLICATES_NAME = "Update status of duplicate files";
+
+export const STEP_CLEANUP_SUCCEEDED_ID = "cleanup-succeeded-files";
+export const STEP_CLEANUP_SUCCEEDED_NAME = "Update status of succeeded files";

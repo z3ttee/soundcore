@@ -129,7 +129,7 @@ export class ArtistService {
      * @param createArtistDto Data to create artist from
      * @returns Artist
      */
-    public async createIfNotExists(dtos: (CreateArtistDTO | Artist)[]): Promise<Artist[]> {
+    public async createIfNotExists(dtos: (CreateArtistDTO | Artist)[], qb?: (query: SelectQueryBuilder<Artist>, alias: string, ids: ObjectLiteral[]) => Promise<Artist[]> ): Promise<Artist[]> {
         if(dtos.length <= 0) throw new BadRequestException("Cannot create resources for empty list.");
 
         return await this.repository.createQueryBuilder()
@@ -138,10 +138,14 @@ export class ArtistService {
             .returning(["id"])
             .orUpdate(["name"], ["name"], { skipUpdateIfNoValuesChanged: false })
             .execute().then((insertResult) => {
-                return this.repository.createQueryBuilder("artist")
-                    .leftJoinAndSelect("artist.artwork", "artwork")
-                    .whereInIds(insertResult.raw)
+                if(typeof qb !== "function") {
+                    return this.repository.createQueryBuilder("artist")
+                    .leftJoin("artist.artwork", "artwork").addSelect(["artwork.id"])
+                    .whereInIds(insertResult.identifiers)
                     .getMany();
+                }
+                    
+                return qb(this.repository.createQueryBuilder("artist"), "artist", insertResult.identifiers);
             });
     }
 

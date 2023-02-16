@@ -1,7 +1,8 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { BasePageable, Page } from 'nestjs-pager';
-import { Repository, UpdateResult } from 'typeorm';
+import { Repository, SelectQueryBuilder, UpdateResult } from 'typeorm';
+import { Artist } from '../../artist/entities/artist.entity';
 import { Mount } from '../../mount/entities/mount.entity';
 import { Song } from '../../song/entities/song.entity';
 import { CreateResult } from '../../utils/results/creation.result';
@@ -206,6 +207,24 @@ export class FileService {
             }).catch((error: Error) => {
                 this.logger.error(`Failed creating database entries for files batch: ${error.message}`, error.stack);
                 return [];
+            });
+    }
+
+    public async createIfNotExists(files: File[], qb?: (query: SelectQueryBuilder<File>, alias: string) => SelectQueryBuilder<File> ): Promise<File[]> {
+        return this.repository.createQueryBuilder()
+            .insert()
+            .values(files)
+            .orUpdate(["name", "flag"], ["name", "flag"])
+            .returning(["id"])
+            .execute().then((insertResult) => {
+                if(typeof qb !== "function") {
+                    return this.repository.createQueryBuilder("file")
+                    .leftJoin("file.mount", "mount").addSelect(["mount.id", "mount.directory"])
+                    .whereInIds(insertResult.identifiers)
+                    .getMany();
+                }
+                    
+                return qb(this.repository.createQueryBuilder("file"), "file").whereInIds(insertResult.identifiers).getMany();
             });
     }
 

@@ -1,195 +1,12 @@
-import path from "node:path";
 import workerpool, { workerEmit } from "workerpool";
 import { Pipeline, PipelineRef, PipelineRun, PipelineStatus } from "../entities/pipeline.entity";
 import { EventName } from "../event/event";
-import { createEmptyLogger, createLogger, PipelineLogger } from "../logging/logger";
-import { PipelineModuleOptions } from "../pipeline.module";
-import { Stage, StageRef } from "../entities/stage.entity";
-import { Step, StepRef } from "../entities/step.entity";
+import { createLogger, PipelineLogger } from "../logging/logger";
+import { createPipelineFromBuilder, PipelineModuleOptions, readFromScript } from "../pipeline.module";
+import { Stage, StageBuilder, StageInitializer, StageRef, StageResources } from "../entities/stage.entity";
+import { Step, StepRef, StepRunner } from "../entities/step.entity";
 import { SkippedException } from "../exceptions/skipped.exception";
-
-// async function executePipeline(pipeline: Pipeline, options: PipelineModuleOptions): Promise<Pipeline> {
-//     // Initialize logger
-//     const logger = options.disableLogging ? createEmptyLogger() : createLogger(pipeline.id, pipeline.runId, options.enableConsoleLogging ?? false);
-
-//     // Emit pipeline status
-//     pipeline.status = PipelineStatus.WORKING;
-//     emitEvent("pipeline:started", { pipeline }, logger);
-
-//     // Log used env variables
-//     logger.info(`Using additional environment: `, pipeline.environment ?? {});
-
-//     // For loop through stages
-//     for(const stage of pipeline.stages) {
-
-//         // Update pipeline status
-//         pipeline.status = PipelineStatus.WORKING;
-//         pipeline.currentStage = stage;
-
-//         // Initialize outputs for stage
-//         await executeStage(pipeline, stage, logger).then(() => {
-//             // Update stage
-//             stage.status = PipelineStatus.COMPLETED;
-//             stage.currentStep = null;
-
-//             // Emit completion
-//             emitEvent("stage:completed", { stage, pipeline }, logger);
-//             // Emit pipeline status update
-//             emitEvent("pipeline:status", { pipeline }, logger);
-//         }).catch((error: Error) => {
-//             // Check if error is skipped exception
-//             if(error instanceof SkippedException) {
-//                 stage.status = PipelineStatus.SKIPPED;
-//                 stage.skipReason = error.reason;
-//                 emitEvent("stage:skipped", { reason: error.reason, stage, pipeline }, logger);
-//                 // Emit pipeline status update
-//                 emitEvent("pipeline:status", { pipeline }, logger);
-//                 return;
-//             }
-
-//             // Update stage
-//             stage.status = PipelineStatus.FAILED;
-
-//             // Emit failure
-//             emitEvent("stage:failed", { error, stage, pipeline }, logger);
-//             // Emit pipeline status update
-//             emitEvent("pipeline:status", { pipeline }, logger);
-//             throw error;
-//         });
-
-//         // Write outputs to stage id in pipeline
-//         // outputs
-//         pipeline.outputs[stage.id] = stage.outputs;
-//     }
-
-//     return pipeline;
-// }
-
-// /**
-//  * Execute the given stage.
-//  * @param pipeline Pipeline information
-//  * @param stage Stage to execute
-//  * @param logger Logger instance
-//  */
-// async function executeStage(pipeline: Pipeline, stage: Stage, logger: PipelineLogger) {
-//     // Update stage
-//     stage.status = PipelineStatus.WORKING;
-//     // Emit started event
-//     emitEvent("stage:started", { stage, pipeline }, logger);
-//     // Emit pipeline status
-//     emitEvent("pipeline:status", { pipeline }, logger);
-
-//     const pipelineRef: PipelineRef = new PipelineRef(
-//         pipeline.id,
-//         pipeline.runId,
-//         pipeline.name,
-//         (key: string) => pipeline.outputs[key],
-//         pipeline.environment
-//     );
-
-//     // Create the ref with helper functions
-//     const stageRef: StageRef = new StageRef(
-//         stage.id, 
-//         stage.name,
-//         // Emit progress
-//         (progress: number) => emitEvent("stage:progress", { progress, stage, pipeline }, logger),
-//         // Emit custom message
-//         (message: string) => emitEvent("stage:message", { message, stage, pipeline }, logger),
-//         // Write to outputs
-//         (key: string, value: any) => stage.outputs[key] = value,
-//         // Read from outputs
-//         (key: string) => stage.outputs[key],
-//         // Skip function
-//         (reason: string) => { throw new SkippedException(reason) },
-//     );
-
-//     // Load script file
-//     const script = path.resolve(stage.scriptPath);
-//     const stageExecutor: StageExecutor = require(script)?.default;
-
-//     // Execute runner to retrieve steps handler
-//     const runner: StageRunner = await stageExecutor(pipelineRef, stageRef, logger).catch((error) => {
-//         throw error;
-//     });
-
-//     // Execute every step 
-//     for(const step of stage.steps) {
-//         // Updated current step on stage
-//         stage.currentStep = step;
-
-//         // Create the ref with helper functions
-//         const stepRef: StepRef = new StepRef(
-//             step.id, 
-//             step.name,
-//             // Emit progress
-//             (progress: number) => {
-//                 step.progress = progress ?? 0;
-//                 emitEvent("step:progress", { progress, step, stage, pipeline }, logger);
-//                 // Emit pipeline status
-//                 emitEvent("pipeline:status", { pipeline }, logger);
-//             },
-//             // Emit custom message
-//             (message: string) => emitEvent("step:message", { message, step, stage, pipeline }, logger),
-//             // Write to output
-//             (key: string, value: any) => step.outputs[key] = value,
-//             // Read from output
-//             (key: string) => step.outputs[key],
-//             // Skip function
-//             (reason: string) => { throw new SkippedException(reason) },
-//         );
-//         const stepId = stepRef.id;
-
-//         // Check if runner exists
-//         if(typeof runner.steps?.[stepId] !== "function") {
-//             throw new Error(`A valid runner for step ${stepId} does not exist.`)
-//         }
-
-//         // Build executor
-//         const executor = async () => {
-//             // Update step status
-//             step.status = PipelineStatus.WORKING;
-//             emitEvent("step:started", { step, stage, pipeline }, logger);
-//             // Emit pipeline status
-//             emitEvent("pipeline:status", { pipeline }, logger);
-//             await runner.steps?.[stepId]?.(stepRef, logger);
-//         };
-
-//         // Execute and catch errors
-//         await executor().then(() => {
-//             // Update step status
-//             step.status = PipelineStatus.COMPLETED;
-//             step.progress = 0;
-
-//             // Write step output to stage outputs
-//             stage.outputs[stepId] = step.outputs ?? {};
-
-//             // Complete event
-//             emitEvent("step:completed", { step, stage, pipeline }, logger);
-//             // Emit pipeline status
-//             emitEvent("pipeline:status", { pipeline }, logger);
-//         }).catch((error: Error) => {
-//             // Reset progress
-//             step.progress = 0;
-
-//             // Check if error is skipped exception
-//             if(error instanceof SkippedException) {
-//                 step.status = PipelineStatus.SKIPPED;
-//                 step.skipReason = error.reason;
-//                 emitEvent("step:skipped", { reason: error.reason, step, stage, pipeline }, logger);
-//                 emitEvent("pipeline:status", { pipeline }, logger);
-//                 return;
-//             }
-
-//             // Update step status
-//             step.status = PipelineStatus.FAILED;
-//             // Failed event
-//             emitEvent("step:failed", { error, step, stage, pipeline }, logger);
-//             // Emit pipeline status
-//             emitEvent("pipeline:status", { pipeline }, logger);
-//             throw error;
-//         });
-//     }
-// }
+import { AbortException } from "../exceptions/abort.exception";
 
 async function emitEvent(name: EventName, args: { [key: string]: any }, logger: PipelineLogger) {
     if(logger) logEvent(logger, name, args);
@@ -294,7 +111,196 @@ async function logStepEvents(logger: PipelineLogger, name: EventName, args: { [k
 
 // Create a worker and register public functions
 workerpool.worker({
-    default: async (pipeline: PipelineRun) => {
-        console.log(pipeline);
+    default: async (pipeline: PipelineRun, options: PipelineModuleOptions) => {
+        // Initialize logger
+        const logger = createLogger(pipeline.id, pipeline.runId, options.logging?.enableConsoleLogging ?? false, options.logging?.enableFileLogging ?? true);
+
+        const [builder, pipelineOptions] = readFromScript(pipeline.script);
+        
+        const stageResources: Map<string, StageInitializer> = new Map();
+        builder["_stages"].forEach((stage) => {
+            stageResources.set(stage["id"], stage["_initializer"]);
+        });
+
+        const stageBuilders = builder["_stages"];
+
+        // Emit pipeline status
+        pipeline.status = PipelineStatus.WORKING;
+        emitEvent("pipeline:started", { pipeline }, logger);
+
+        // Log used env variables
+        logger.info(`Using additional environment: `, pipeline.environment ?? {});
+
+        // Create pipeline ref
+        const pipelineRef: PipelineRef = new PipelineRef(
+            pipeline.id,
+            pipeline.runId,
+            pipeline.name,
+            // Read outputs
+            (key: string) => pipeline.outputs[key],
+            // Skip
+            (reason: string) => { throw new SkippedException(reason) },
+            // Message
+            (...args: any[]) => emitEvent("pipeline:message", { ...args }, logger),
+            pipeline.environment
+        );
+
+        // For loop through stages
+        for(const stage of pipeline.stages) {
+
+            // Update pipeline status
+            pipeline.status = PipelineStatus.WORKING;
+            pipeline.currentStage = stage;
+
+            // Initialize stage
+            let resources: StageResources = {};
+            if(stageResources.has(stage.id)) {
+                resources = await stageResources.get(stage.id)();
+            }
+            
+            await executeStage(pipelineRef, stage, resources, stageBuilders, logger).then(() => {
+                // Stage completed
+                stage.status = PipelineStatus.COMPLETED;
+                stage.currentStep = null;
+
+                emitEvent("stage:completed", { stage, pipeline }, logger);
+                emitEvent("pipeline:status", { pipeline }, logger);
+            }).catch((error: Error) => {
+                // Stage failed 
+                if(error instanceof SkippedException || error instanceof AbortException) {
+                    stage.status = PipelineStatus.SKIPPED;
+                    stage.skipReason = error.reason;
+
+                    emitEvent("stage:skipped", { reason: error.reason, stage, pipeline }, logger);
+                    emitEvent("pipeline:status", { pipeline }, logger);   
+                    
+                    // Propagate error to pipeline
+                    if(error instanceof AbortException) {
+                        throw new AbortException(error.reason);
+                    }
+                } else {
+                    emitEvent("stage:failed", { error, stage, pipeline }, logger);
+                    emitEvent("pipeline:status", { pipeline }, logger);      
+                    throw error;
+                }
+            });
+
+            // Write outputs to stage id in pipeline
+            // outputs
+            pipeline.outputs[stage.id] = stage.outputs;
+        }
+
+        return pipeline;
     }
 });
+
+/**
+ * Execute the given stage.
+ * @param pipeline Pipeline information
+ * @param stage Stage to execute
+ * @param logger Logger instance
+ */
+async function executeStage(pipeline: PipelineRef, stage: Stage, resources: StageResources, stageBuilders: StageBuilder[], logger: PipelineLogger) {
+    // Update stage
+    stage.status = PipelineStatus.WORKING;
+    emitEvent("stage:started", { stage, pipeline }, logger);
+    emitEvent("pipeline:status", { pipeline }, logger);
+
+    // Create the ref with helper functions
+    const stageRef: StageRef = new StageRef(
+        stage.id, 
+        stage.name,
+        resources,
+        // Emit custom message
+        (message: string) => emitEvent("stage:message", { message, stage, pipeline }, logger),
+        // Read from outputs
+        (key: string) => stage.outputs[key],
+        // Skip function
+        (reason: string) => { throw new SkippedException(reason) },
+    );
+
+    const stepRunners: Map<string, StepRunner> = new Map();
+    stageBuilders.find((stageBuilder) => stageBuilder["id"] === stage.id)?.["_steps"].forEach((stepsBuilder) => {
+        stepRunners.set(stepsBuilder["id"], stepsBuilder["_runner"]);
+    })
+
+    // Execute every step 
+    for(const step of stage.steps) {
+        // Updated current step on stage
+        stage.currentStep = step;
+
+        // Create the ref with helper functions
+        const stepRef: StepRef = new StepRef(
+            step.id, 
+            step.name,
+            // Emit progress
+            (progress: number) => {
+                step.progress = progress ?? 0;
+                emitEvent("step:progress", { progress, step, stage, pipeline }, logger);
+                // Emit pipeline status
+                emitEvent("pipeline:status", { pipeline }, logger);
+            },
+            // Emit custom message
+            (message: string) => emitEvent("step:message", { message, step, stage, pipeline }, logger),
+            // Write to output
+            (key: string, value: any) => step.outputs[key] = value,
+            // Read from output
+            (key: string) => step.outputs[key],
+            // Skip function
+            (reason: string) => { throw new SkippedException(reason) },
+            (reason: string) => { throw new AbortException(reason) },
+        );
+        const stepId = stepRef.id;
+
+        if(!stepRunners.has(stepId)) {
+            throw new SkippedException(`Invalid runner for step '${stepId}'`);
+        }
+
+        // Build executor
+        const executor = async () => {
+            // Update step status
+            step.status = PipelineStatus.WORKING;
+            emitEvent("step:started", { step, stage, pipeline }, logger);
+            // Emit pipeline status
+            emitEvent("pipeline:status", { pipeline }, logger);
+
+            const runner = stepRunners.get(stepId);
+            return await runner({ step: stepRef, stage: stageRef, pipeline: pipeline, environment: pipeline.environment ?? {}, logger: logger });
+        };
+
+        // Execute and catch errors
+        await executor().then(() => {
+            // Step completed
+            step.status = PipelineStatus.COMPLETED;
+            step.progress = 0;
+
+            // Write step output to stage outputs
+            stage.outputs[stepId] = step.outputs ?? {};
+
+            emitEvent("step:completed", { step, stage, pipeline }, logger);
+            emitEvent("pipeline:status", { pipeline }, logger);
+        }).catch((error: Error) => {
+            // Reset progress
+            step.progress = 0;
+
+            // Check if error is skipped exception
+            if(error instanceof SkippedException || error instanceof AbortException) {
+                step.status = PipelineStatus.SKIPPED;
+                step.skipReason = error.reason;
+                emitEvent("step:skipped", { reason: error.reason, step, stage, pipeline }, logger);
+                emitEvent("pipeline:status", { pipeline }, logger);
+
+                // Propagate error to stage
+                if(error instanceof AbortException) {
+                    throw new AbortException(error.reason);
+                }
+            } else {
+                step.status = PipelineStatus.FAILED;
+                emitEvent("step:failed", { error, step, stage, pipeline }, logger);
+                emitEvent("pipeline:status", { pipeline }, logger);
+                throw error;
+            }
+            
+        });
+    }
+}

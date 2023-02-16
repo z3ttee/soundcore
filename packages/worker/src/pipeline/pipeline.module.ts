@@ -10,6 +10,22 @@ import { PipelineService } from "./services/pipeline.service";
 // TODO: Make service global to share queue, do that by creating a global pipelines registry
 
 export type Pipelines = { [id: string]: PipelineWithScript };
+
+export interface PipelineLoggingOptions {
+    /**
+     * Enable writing pipeline outputs to console of
+     * main application. This requires setting disableLogging
+     * to false
+     * @default false
+     */
+    enableConsoleLogging?: boolean;
+
+    /**
+     * Enable writing pipeline stdout to file.
+     * @default true
+     */
+    enableFileLogging?: boolean;
+}
 export interface PipelineModuleOptions {
 
     /**
@@ -23,18 +39,9 @@ export interface PipelineModuleOptions {
     pollingRateMs?: number;
 
     /**
-     * Disable automatic file logging.
-     * @default false
+     * Define custom logging options.
      */
-    disableLogging?: boolean;
-
-    /**
-     * Enable writing pipeline outputs to console of
-     * main application. This requires setting disableLogging
-     * to false
-     * @default false
-     */
-    enableConsoleLogging?: boolean;
+    logging?: PipelineLoggingOptions;
 
     /**
      * Amount of concurrently running pipelines in this module
@@ -72,8 +79,6 @@ export class PipelineModule {
             pipelines[pipeline.id] = pipeline;
         }
 
-        console.log(pipelines);
-
         return {
             module: PipelineModule,
             providers: [
@@ -95,28 +100,28 @@ export class PipelineModule {
 
 }
 
-function createPipelineFromBuilder(filepath: string): PipelineWithScript {
-    const builderFn: () => PipelineBuilder = require(filepath)?.default;
-    console.log(builderFn);
+export function createPipelineFromBuilder(filepath: string): PipelineWithScript {
+    const [builder, options] = readFromScript(filepath);
 
+    const stages: Stage[] = builder["_stages"].map((builder) => {
+        return new Stage(builder["id"], builder["name"], builder["_steps"].map((stepBuilder) => {
+            return new Step(stepBuilder["id"], stepBuilder["name"]);
+        }));
+    });
+
+    return new PipelineWithScript(filepath, options, builder["id"], builder["name"], stages, builder["_environment"]);
+}
+
+export function readFromScript(filepath: string): [PipelineBuilder, PipelineOptions] {
+    const builderFn: () => PipelineBuilder = require(filepath)?.default;
 
     if(typeof builderFn !== "function") throw new Error(`Invalid pipeline. Script file must have a function as default export returning an instance of PipelineBuilder.`);
     if(builderFn["then"]) throw new Error(`Invalid pipeline. The default export cannot be a Promise.`);
 
     const builder = builderFn();
-
-    console.log(builder);
-    console.log("==================")
-
     const options: PipelineOptions = {
         concurrent: builder["_concurrent"] ?? 1
     };
 
-    const stages: Stage[] = builder["_stages"].map((builder) => {
-        return new Stage(builder["id"], builder["name"], builder["_steps"].map((stepBuilder) => {
-            return new Step(stepBuilder["id"], stepBuilder["name"], stepBuilder["_runner"]);
-        }))
-    });
-
-    return new PipelineWithScript(filepath, options, builder["id"], builder["name"], stages, builder["_environment"]);
+    return [builder, options];
 }

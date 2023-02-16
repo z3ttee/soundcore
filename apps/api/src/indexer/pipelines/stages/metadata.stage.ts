@@ -1,10 +1,8 @@
-import path from "node:path";
 import fs from "node:fs/promises";
 import { Batch } from "@soundcore/common";
-import { PipelineLogger, PipelineRef, StageRef, StepRef } from "@soundcore/worker";
-import { File } from "../../../file/entities/file.entity";
+import { File, FileFlag } from "../../../file/entities/file.entity";
 import { Mount } from "../../../mount/entities/mount.entity";
-import { STAGE_SCAN_ID, STEP_CHECKOUT_MOUNT_ID, STEP_INDEX_FILES_ID, STEP_READ_TAGS, STEP_SAVE_ALBUMS, STEP_SAVE_ARTISTS } from "../../pipelines";
+import { STAGE_SCAN_ID, STEP_CHECKOUT_MOUNT_ID, STEP_CREATE_ALBUMS_ID, STEP_CREATE_ARTISTS_ID, STEP_INDEX_FILES_ID, STEP_READ_TAGS_ID } from "../../pipelines";
 import { ID3TagsDTO } from "../../../song/dtos/id3-tags.dto";
 import { Song } from "../../../song/entities/song.entity";
 import { SongService } from "../../../song/services/song.service";
@@ -14,14 +12,22 @@ import { Slug } from "@tsalliance/utilities";
 import { DataSource } from "typeorm";
 import { ArtistService } from "../../../artist/artist.service";
 import { AlbumService } from "../../../album/services/album.service";
+import { FileSystemService } from "../../../filesystem/services/filesystem.service";
+import { get, getOrDefault, set, StepParams } from "@soundcore/pipelines";
 
+export async function step_read_mp3_tags(params: StepParams) {
+    const { step, resources, logger } = params;
 
-export async function read_mp3_tags(pipeline: PipelineRef, step: StepRef, songService: SongService, logger: PipelineLogger) {
+    const datasource: DataSource = resources.datasource;
+    const repository = datasource.getRepository(Song);
+    const fsService = new FileSystemService();
+    const songService = new SongService(repository, null, null);
+    
     // Prepare step
-    const files: File[] = pipeline.read(STAGE_SCAN_ID)?.[STEP_INDEX_FILES_ID]?.files;
-    const mount: Mount = pipeline.read(STAGE_SCAN_ID)?.[STEP_CHECKOUT_MOUNT_ID]?.mount;
+    const files: Map<string, File> = getOrDefault(`${STAGE_SCAN_ID}.${STEP_INDEX_FILES_ID}.files`, new Map());
+    const mount: Mount = get(`${STAGE_SCAN_ID}.${STEP_CHECKOUT_MOUNT_ID}.mount`).mount;
 
-    if(!files || files.length <= 0) {
+    if(!files || files.size <= 0) {
         step.skip("No new files were created in database.");
     }
 
@@ -29,58 +35,87 @@ export async function read_mp3_tags(pipeline: PipelineRef, step: StepRef, songSe
         step.skip("Invalid mount checked out.")
     }
 
-    const artists: Artist[] = [];
-    const albums: Album[] = [];
-    const songs: Song[] = [];
-    const readFiles: File[] = [];
+    // Map resources using keys consisting of unique properties,
+    // like name, album name etc. This prevents duplicate insertions
+    // and reduces the load of insert queries
+    const artists: Map<string, Artist> = new Map();
+    const albums: Map<string, Album> = new Map();
+    const songs: Map<string, Song> = new Map();
 
-    return Batch.useDataset<File, File>(files).forEach(async (batch, currentBatch, totalBatches) => {
+    return Batch.useDataset<File, File>(Array.from(files.values())).onError((error: Error, batch, batchNr: number) => {
+        for(const file of batch) {
+            if(typeof file === "undefined" || file == null) continue;
+            file.flag = FileFlag.ERROR;
+        }
+
+        // Handle errors
+        logger.error(`Failed processing songs in batch #${batchNr}: ${error.message}`, error.stack);
+    }).forEach(async (batch, currentBatch, totalBatches) => {
         const progress = currentBatch / totalBatches;
         step.progress(progress);
 
         for(const file of batch) {
             // Set mount for file context
-            file.mount = mount ?? file.mount;
+            file.mount = mount;
 
             // Build filepath
-            const filepath = path.resolve(path.join(file.mount.directory, file.directory, file.name));
+            const filepath = fsService.resolveFilepath(file);
             logger.info(`Reading ID3 Tags of '${filepath}'`);
             
+            // Remove mount from file, because it is not needed anymore
+            delete file.mount;
+
             // Check if file can be accessed
             const canAccessFile: boolean = await fs.access(filepath).then(() => true).catch((error: Error) => {
                 logger.error(`Failed accessing file ${filepath}: ${error?.message}`, error);
                 return false;
             });
             // Skip this file if not accessable
-            if(!canAccessFile) continue;
+            if(!canAccessFile) {
+                file.flag = FileFlag.ERROR;
+                continue;
+            }
 
             // Read id3 tags from file
             const id3TagsDto: ID3TagsDTO = await songService.readID3TagsFromFile(filepath).catch((error: Error) => {
                 logger.error(`Failed reading id3 tags from file ${filepath}: ${error?.message}`, error);
                 return null;
             });
-            if(typeof id3TagsDto === "undefined" || id3TagsDto == null) continue;
+            if(typeof id3TagsDto === "undefined" || id3TagsDto == null) {
+                file.flag = FileFlag.ERROR;
+                continue;
+            }
 
             // Create primary artist
             let primaryArtist: Artist;
             if(id3TagsDto?.artists?.length > 0) {
                 const artist = id3TagsDto.artists.splice(0, 1)?.[0];
-                primaryArtist = { name: artist?.name } as Artist;
+                if(typeof artist !== "undefined" && artist != null) {
+                    primaryArtist = { name: artist?.name } as Artist;
+                    artists.set(getArtistKey(primaryArtist), primaryArtist);
+                }
             }
 
             // Create featured artists
             const featuredArtists: Artist[] = [];
             for(const artistDto of id3TagsDto.artists) {
-                featuredArtists.push({ name: artistDto.name } as Artist);
+                const featuredArtist = { name: artistDto.name } as Artist;
+                featuredArtists.push(featuredArtist);
+                artists.set(getArtistKey(featuredArtist), featuredArtist);
             }
 
             // Create album
             let album: Album;
             if(id3TagsDto?.album) {
-                album = { 
-                    name: id3TagsDto.album, 
-                    primaryArtist: primaryArtist
-                } as Album;
+                const albumName = id3TagsDto.album;
+                if(typeof albumName !== "undefined" && albumName != null) {
+                    album = { 
+                        name: albumName, 
+                        primaryArtist: primaryArtist ?? undefined
+                    } as Album;
+
+                    albums.set(getAlbumKey(album), album);
+                }
             }
 
             const song: Song = {
@@ -94,18 +129,20 @@ export async function read_mp3_tags(pipeline: PipelineRef, step: StepRef, songSe
                 file: { id: file.id } as File
             } as Song;
 
-            readFiles.push(file);
-            songs.push(song);
-            if(primaryArtist) artists.push(primaryArtist, ...featuredArtists);
-            if(album) albums.push(album);
+            const songKey = getSongKey(song);
+            if(songs.has(songKey)) {
+                file.flag = FileFlag.POTENTIAL_DUPLICATE;
+            } else {
+                songs.set(songKey, song);
+            }
         }
 
-        return readFiles;
-    }).then((readFiles) => {
-        step.write("songs", songs);
-        step.write("albums", albums);
-        step.write("artists", artists);
-        logger.info(`Successfully extracted metadata from ${readFiles.length} files: ${songs.length} Songs, ${albums.length} albums, ${artists.length} artists`);
+        return batch;
+    }).then((processedFiles) => {
+        set("songs", songs);
+        set("albums", albums);
+        set("artists", artists);
+        logger.info(`Successfully extracted metadata from ${processedFiles.length} files: ${songs.size} Songs, ${albums.size} albums, ${artists.size} artists`);
     }).catch((error) => {
         throw error;
     });
@@ -118,135 +155,224 @@ export async function read_mp3_tags(pipeline: PipelineRef, step: StepRef, songSe
  * @param datasource Datasource
  * @param logger Logger instance
  */
-export async function create_artists(stage: StageRef, step: StepRef, datasource: DataSource, logger: PipelineLogger) {
+export async function step_create_artists(params: StepParams) {
+    const { resources, step, logger } = params;
+
     // Prepare step
+    const datasource: DataSource = resources.datasource;
     const repository = datasource.getRepository(Artist);
     const service = new ArtistService(repository, null);
-    const artists: Artist[] = stage.read(STEP_READ_TAGS)?.artists;
+    const artists: Map<string, Artist> = getOrDefault(`${STEP_READ_TAGS_ID}.artists`, new Map());
 
     // Check if there are any artists to create them,
     // if not, skip the step
-    if(!artists || artists.length <= 0) {
+    if(!artists || artists.size <= 0) {
         step.skip("No artists found.");
         return;
     }
 
-    return Batch.useDataset(artists).forEach((batch, currentBatch, totalBatches) => {
+    // Create batching process
+    return Batch.useDataset(Array.from(artists.values())).onError((error: Error, batch, batchNr: number) => {
+        // Handle errors
+        logger.error(`Failed processing artists in batch #${batchNr}: ${error.message}`, error.stack);
+    }).map((batch, currentBatch, totalBatches) => {
         return service.createIfNotExists(batch.map((artist) => {
             // Map slug
             artist.slug = Slug.create(artist.name);
             return artist;
-        })).then((createdArtists) => {
+        }), (query, alias, ids) => query.select([`${alias}.id`, `${alias}.name`]).whereInIds(ids).getMany()).then((createdArtists) => {
             step.progress(currentBatch / totalBatches);
-            return createdArtists;
+            return new Map(createdArtists.map((artist) => ([getArtistKey(artist), artist])));
         }).catch((error) => {
             throw error;
         });
     }).then((createdArtists) => {
-        logger.info(`Created and fetched ${createdArtists.length} artists.`);
-        step.write("artists", createdArtists);
+        // Processing all batches done.
+        // Write logs and create output
+        logger.info(`Created and fetched ${Object.keys(createdArtists).length} artists.`);
+        set("artists", createdArtists);
     }).catch((error: Error) => {
+        // Batching process failed
         logger.error(`Failed creating artists: ${error.message}`, error);
         throw error;
     });
 }
 
-export async function create_albums(stage: StageRef, step: StepRef, datasource: DataSource, logger: PipelineLogger) {
+/**
+ * Create albums in database step.
+ * @param stage Current stage
+ * @param step Current step
+ * @param datasource Datasource
+ * @param logger Logger instance
+ */
+export async function step_create_albums(params: StepParams) {
+    const { resources, logger, step } = params;
+
     // Prepare step
+    const datasource: DataSource = resources.datasource;
     const repository = datasource.getRepository(Album);
     const service = new AlbumService(repository, null, null);
-    const artists: Artist[] = stage.read(STEP_SAVE_ARTISTS)?.artists ?? [];
-    const albums: Album[] = stage.read(STEP_READ_TAGS)?.albums ?? [];
+    const artists: Map<string, Artist> = getOrDefault(`${STEP_CREATE_ARTISTS_ID}.artists`, new Map());
+    const albums: Map<string, Album> = getOrDefault(`${STEP_CREATE_ARTISTS_ID}.albums`, new Map());
 
     // Check if there are any albums to create them,
     // if not, skip the step
-    if(!albums || albums.length <= 0) {
+    if(!albums || albums.size <= 0) {
         step.skip("No albums found.");
         return;
     }
 
-    return Batch.useDataset(albums).forEach((batch, currentBatch, totalBatches) => {
+    return Batch.useDataset(Array.from(albums.values())).onError((error: Error, batch, batchNr: number) => {
+        // Handle errors
+        logger.error(`Failed processing albums in batch #${batchNr}: ${error.message}`, error.stack);
+    }).map((batch, currentBatch, totalBatches) => {
         // Create database entries
         return service.createIfNotExists(batch.map((album) => {
-            // Map artist ids
-            const artistId = artists.find((artist) => artist.name.toLowerCase() === album.primaryArtist?.name.toLowerCase())?.id;
             // Map slug
             album.slug = Slug.create(album.name);
-
-            album.primaryArtist = artistId ? { id: artistId } as Artist : undefined;
+            // Map primaryArtist
+            album.primaryArtist = artists.get(getArtistKey(album.primaryArtist)) ?? undefined;
             return album;
         })).then((createdAlbums) => {
-            logger.info(`Created and fetched ${createdAlbums.length} albums.`);
+            logger.info(`Batch #${currentBatch}: Created ${createdAlbums.length} albums.`);
             step.progress(currentBatch / totalBatches);
-            return createdAlbums;
+
+            return new Map(createdAlbums.map((album) => ([getAlbumKey(album), album])));
         }).catch((error: Error) => {
             logger.error(`Failed creating albums: ${error.message}`, error);
             throw error;
         });
     }).then((createdAlbums) => {
-        logger.info(`Created and fetched ${createdAlbums.length} albums.`);
-        step.write("albums", createdAlbums);
+        // Processing all batches done.
+        // Write logs and create output
+        logger.info(`Created and fetched ${createdAlbums.size} albums.`);
+        set("albums", createdAlbums);
     }).catch((error: Error) => {
+        // Batching process failed
+        logger.error(`Failed creating albums: ${error.message}`, error);
         throw error;
     });
 }
 
-export async function create_songs(stage: StageRef, step: StepRef, datasource: DataSource, logger: PipelineLogger) {
+export async function step_create_songs(params: StepParams) {
+    const { logger, resources, step } = params;
+
     // Prepare step
+    const datasource: DataSource = resources.datasource;
     const repository = datasource.getRepository(Song);
     const service = new SongService(repository, null, null);
-    const artists: Artist[] = stage.read(STEP_SAVE_ARTISTS)?.artists ?? [];
-    const albums: Album[] = stage.read(STEP_SAVE_ALBUMS)?.albums ?? [];
-    const songs: Song[] = stage.read(STEP_READ_TAGS)?.songs ?? [];
+    const artists: Map<string, Artist> = getOrDefault(`${STEP_CREATE_ARTISTS_ID}.artists`, new Map());
+    const albums: Map<string, Album> = getOrDefault(`${STEP_CREATE_ALBUMS_ID}.albums`, new Map());
+    const songs: Map<string, Song> = getOrDefault(`${STEP_READ_TAGS_ID}.songs`, new Map());
+    const files: Map<string, File> = getOrDefault(`${STAGE_SCAN_ID}.${STEP_INDEX_FILES_ID}.files`, new Map());
 
     // Check if there are any albums to create them,
     // if not, skip the step
-    if(!songs || songs.length <= 0) {
+    if(!songs || songs.size <= 0) {
         step.skip("No songs found.");
         return;
     }
 
-    return Batch.useDataset(songs).forEach((batch, currentBatch, totalBatches) => {
-        console.log(currentBatch);
+    return Batch.useDataset(Array.from(songs.values())).onError((error: Error, batch, batchNr: number) => {
+        for(const song of batch) {
+            const file = files.get(song.file?.id);
+            if(typeof file === "undefined" || file == null) continue;
+            file.flag = FileFlag.ERROR;
+        }
 
-        // Create database entries
-        return service.createIfNotExists(batch.map((song) => {
-            // Map primaryArtist
-            const primaryArtistId: string = artists.find((artist) => artist.name.toLowerCase() === song.primaryArtist?.name?.toLowerCase())?.id;
+        // Handle errors
+        logger.error(`Failed processing songs in batch #${batchNr}: ${error.message}`, error.stack);
+    }).map((batch, currentBatch, totalBatches) => {
+        const mappedSongs = batch.map((song) => {
+            const s = {...song};
+            s.primaryArtist = artists.get(getArtistKey(song.primaryArtist)) ?? undefined;
+            s.album = albums.get(getAlbumKey(song.album)) ?? undefined;
 
-            // Map album
-            const albumId: string = albums.find((album) => album.name.toLowerCase() === song.album?.name?.toLowerCase() && album.primaryArtist?.name.toLowerCase() === song.album?.primaryArtist?.name.toLowerCase())?.id;
+            if(song.featuredArtists?.length > 0) {
+                s.featuredArtists = (song.featuredArtists ?? []).map((artist) => artists.get(getArtistKey(artist)) ?? undefined) ?? undefined;
+            console.log(song.featuredArtists);
 
-            // Map featured artists
-            const featuredArtists: Artist[] = [];
-            const songFeaturedArtistNames: string[] = song.featuredArtists.map((a) => a.name.toLowerCase());
-            for(const artist of artists) {
-                if(artist.id === primaryArtistId) continue;
-                if(!songFeaturedArtistNames.includes(artist.name.toLowerCase())) continue;
-                featuredArtists.push({ id: artist.id } as Artist);
+            } else {
+                s.featuredArtists = undefined;
             }
 
-            // Map slug
-            song.slug = Slug.create(song.name);
-            
-            song.primaryArtist = { id: primaryArtistId } as Artist;
-            song.album = { id: albumId } as Album;
-            song.featuredArtists = featuredArtists;
+            return s;
+        });
 
-            console.log(song);
-
-            return song;
-        })).then((createdSongs) => {
+        // Create database entries
+        return service.createIfNotExists(mappedSongs, (query, alias) => {
+            // Custom query select
+            return query
+                .select([`${alias}.id`, `${alias}.name`])
+                .leftJoin(`${alias}.file`, "file").addSelect(["file.id"])
+                .leftJoin(`${alias}.primaryArtist`, "primaryArtist").addSelect(["primaryArtist.id"])
+                .leftJoin(`${alias}.album`, "album").addSelect(["album.id"])
+                .leftJoin(`${alias}.featuredArtists`, "featuredArtists").addSelect(["featuredArtists.id"]);
+        }).then((createdSongs) => {
+            logger.info(`Batch #${currentBatch}: Created ${createdSongs.length} database entries.`);
             step.progress(currentBatch / totalBatches);
-            return createdSongs;
+
+            // Map created artists back to map
+            const map: Map<string, Song> = new Map();
+            for(const song of createdSongs) {
+                map.set(getSongKey(song), song);
+
+                const file = files.get(song.file?.id);
+                if(typeof file === "undefined" || file == null) continue;
+                file.flag = FileFlag.OK;
+            }
+
+            const keys = Array.from(map.keys());
+            for(const song of batch) {
+                if(keys.findIndex((s) => s === getSongKey(song)) <= -1) {
+                    // Song was not created, maybe due to being a duplicate
+                    const file = files.get(song.file?.id);
+
+                    console.log("did not create song: ", song.name);
+
+                    if(typeof file === "undefined" || file == null) continue;
+                    file.flag = FileFlag.POTENTIAL_DUPLICATE;
+                }
+            }
+
+            return map;
+
+            // return service.saveAll(createdSongs.map((song) => {
+            //     const s = map.get(getSongKey(song));
+            //     s.featuredArtists = (song.featuredArtists ?? []).map((a) => artists.get(getArtistKey(a)));
+
+            //     console.log()
+
+            //     return song;
+            // })).then((result) => {
+                
+
+            //     return map
+            // });
         }).catch((error: Error) => {
-            logger.error(`Failed creating songs: ${error.message}`, error);
+            logger.error(`Failed creating songs in database: ${error.message}`, error.stack);
             throw error;
         });
     }).then((createdSongs) => {
-        logger.info(`Created and fetched ${createdSongs.length} songs.`);
-        step.write("songs", createdSongs);
+        // Processing all batches done.
+        // Write logs and create output
+        logger.info(`Created and fetched ${createdSongs.size} songs.`);
+        set("songs", createdSongs);
     }).catch((error: Error) => {
+        // Batching process failed
+        logger.error(`Failed creating songs: ${error.message}`, error);
         throw error;
     });
+}
+
+function getArtistKey(artist: Artist): string {
+    return `${artist?.name}`;
+}
+
+function getAlbumKey(album: Album): string {
+    return `${album?.name}${album?.primaryArtist?.name}`;
+}
+
+function getSongKey(song: Song): string {
+    return `${song?.name}${song?.primaryArtist?.name}${song?.album?.name}`;
 }

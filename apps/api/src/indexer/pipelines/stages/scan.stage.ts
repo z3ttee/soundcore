@@ -2,7 +2,6 @@ import fs from "node:fs";
 import path from "node:path";
 import crypto from "node:crypto";
 import glob from "glob";
-import { Environment, PipelineLogger, StageRef, StepRef } from "@soundcore/worker";
 import { DataSource } from "typeorm";
 import { Mount } from "../../../mount/entities/mount.entity";
 import { FileSystemService } from "../../../filesystem/services/filesystem.service";
@@ -12,7 +11,8 @@ import { FileDTO } from "../../../file/dto/file.dto";
 import { Batch } from "@soundcore/common";
 import { File } from "../../../file/entities/file.entity";
 import { FileService } from "../../../file/services/file.service";
-import { STEP_CHECKOUT_MOUNT_ID, STEP_LOOKUP_FILES_ID } from "../../pipelines";
+import { STAGE_SCAN_ID, STEP_CHECKOUT_MOUNT_ID } from "../../pipelines";
+import { get, getOrDefault, set, StepParams } from "@soundcore/pipelines";
 
 /**
  * Checkout mount using the id provided via env.
@@ -21,21 +21,31 @@ import { STEP_CHECKOUT_MOUNT_ID, STEP_LOOKUP_FILES_ID } from "../../pipelines";
  * @param datasource Datasource used for database connection
  * @param logger Logger instance
  */
-export async function step_checkout_mount(step: StepRef, env: Environment, datasource: DataSource, logger: PipelineLogger) {
+export async function step_checkout_mount(params: StepParams) {
+    const { environment, logger, resources, step } = params;
+    const datasource: DataSource = resources.datasource;
+
     // Step preparation
-    const mountId = env.mountId;
+    const mountId = environment.mountId;
     logger.info(`Checking out mount using id '${mountId}'`);
     const repository = datasource.getRepository(Mount);
+
+    if(typeof mountId === "undefined" || mountId == null) {
+        step.abort(`mountId is a required environment variable. Received: ${mountId}`);
+        return;
+    }
             
     // Find mount in database
     const mount = await repository.findOneOrFail({
         where: { id: mountId },
         relations: ["zone"]
+    }).catch((error: Error) => {
+        throw error;
     });
 
     // Step cleanup
-    logger.info(`Checked out mount '${mount.name}'`);
-    step.write("mount", mount);
+    const result = set("mount", mount);
+    logger.info(`Checked out mount '${result?.name}'`);
 }
 
 /**
@@ -45,10 +55,14 @@ export async function step_checkout_mount(step: StepRef, env: Environment, datas
  * @param env Environment
  * @param logger Logger instance
  */
-export async function step_search_files(stage: StageRef, step: StepRef, logger: PipelineLogger) {
+export async function step_search_files(params: StepParams) {
+    const { environment, logger, step } = params;
+    
     // Step preparation
-    const previousOutputs = stage.read(STEP_CHECKOUT_MOUNT_ID);
-    const mount = previousOutputs.mount;
+    const mount = get(`${STAGE_SCAN_ID}.${STEP_CHECKOUT_MOUNT_ID}.mount`);
+
+    return;
+
     const fsService = new FileSystemService();
     const registryService = new MountRegistryService(fsService);
     logger.info(`Started file lookup on mount '${mount.name}'`);
@@ -65,7 +79,11 @@ export async function step_search_files(stage: StageRef, step: StepRef, logger: 
 
     const files = await new Promise<FileDTO[]>(async (resolve, reject) => {
         // Read registry
-        const registry: MountRegistry = await registryService.readRegistry(mount);
+        let registry: MountRegistry = await registryService.readRegistry(mount);
+
+        if(environment.force) {
+            registry = await registryService.resetRegistry(registry);
+        }
 
         // Execute scan
         const files: FileDTO[] = [];
@@ -111,7 +129,7 @@ export async function step_search_files(stage: StageRef, step: StepRef, logger: 
     });
 
     // Step cleanup
-    step.write("files", files ?? []);
+    set("files", files ?? []);
 }
 
 /**
@@ -121,32 +139,41 @@ export async function step_search_files(stage: StageRef, step: StepRef, logger: 
  * @param env 
  * @param logger Logger instance
  */
-export async function step_create_database_entries(stage: StageRef, step: StepRef, datasource: DataSource, logger: PipelineLogger) {
+export async function step_create_database_entries(params: StepParams) {
+    const { environment, logger, step, resources } = params;
+    
     // Step preparation
+    const datasource: DataSource = resources.datasource;
     const repository = datasource.getRepository(File);
     const fsService = new FileSystemService();
     const service = new FileService(repository);
 
-    const mount: Mount = stage.read(STEP_CHECKOUT_MOUNT_ID)?.mount;
-    const files: FileDTO[] = stage.read(STEP_LOOKUP_FILES_ID)?.files ?? [];
+    const mount: Mount = get(`${STEP_CHECKOUT_MOUNT_ID}.mount`);
+    const files: FileDTO[] = getOrDefault(`${STEP_CHECKOUT_MOUNT_ID}.files`, []);
 
     if(files.length <= 0) {
         step.skip("No files were found in previous steps");
     }
 
-    return Batch.useDataset<FileDTO, File>(files).forEach(async (batch, currentBatch, totalBatches) => {
+    const mappedFiles: Map<string, File> = new Map();
+
+    return Batch.useDataset<FileDTO, File>(files).onError((error: Error, batch, batchNr) => {
+        logger.error(`Error occured whilst processing batch #${batchNr}: ${error.message}`, error.stack);
+    }).forEach(async (batch, currentBatch, totalBatches) => {
         // Prepare batch
         const collectedFiles: File[] = [];
 
         // Update progress
-        const progress = currentBatch/totalBatches;
-        step.progress(progress);
+        step.progress(currentBatch/totalBatches);
 
         for(const fileDto of batch) {
             const file = new File();
             file.name = fileDto.filename;
             file.directory = fileDto.directory;
-            file.mount = mount;
+            file.mount = {
+                id: mount.id,
+                directory: mount.directory
+            } as Mount;
 
             // Resolving absolute filepath
             const filepath = fsService.resolveFilepath(file);
@@ -174,17 +201,30 @@ export async function step_create_database_entries(stage: StageRef, step: StepRe
 
         // This will create files in database but only returns entities that were created
         // via this query and did not exist before
-        return service.createFiles(collectedFiles).then((results) => {
+        return service.createIfNotExists(
+            collectedFiles, 
+            (query, alias) => query.select([`${alias}.id`, `${alias}.name`, `${alias}.directory`, `${alias}.flag`])
+        ).then((results) => {
             logger.info(`Successfully created files for batch ${currentBatch} in database`);
+
+            // Create a map of all created files
+            for(const file of results) {
+                mappedFiles.set(file.id, file);
+            }
+
             return results;
         }).catch((error: Error) => {
-            logger.error(`Error occured whilst processing batch ${currentBatch}: ${error.message}`, error.stack);
+            // Somehow creating database entries failed, the only reason can be database connection errors
+            // TODO: Remove files from registry to scan them again on next scan
+            logger.error(`Failed creating files in database: ${error.message}`, error.stack);
             return [];
         });
     }).then((files) => {
+        // Batching completed
         logger.info(`Created ${files.length} files in the database`);
-        step.write("files", files);
+        set("files", mappedFiles);
     }).catch((error: Error) => {
+        // Batching failed
         logger.error(`Error occured while creating database entries: ${error.message}`, error.stack);
         throw error;
     });

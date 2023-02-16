@@ -8,7 +8,7 @@ import { Page, BasePageable } from 'nestjs-pager';
 import path from "path";
 
 import { InjectRepository } from "@nestjs/typeorm";
-import { In, Repository, UpdateResult } from "typeorm";
+import { In, ObjectLiteral, Repository, SelectQueryBuilder, UpdateResult } from "typeorm";
 import { EventEmitter2 } from "@nestjs/event-emitter";
 import { Environment } from "@soundcore/common";
 import { SyncableService } from "../../utils/services/syncing.service";
@@ -23,6 +23,7 @@ import { ID3Artist, ID3TagsDTO } from "../dtos/id3-tags.dto";
 import { SongUniqueFindDTO } from "../dtos/unique-find.dto";
 import { FileFlag } from "../../file/entities/file.entity";
 import { Slug } from "@tsalliance/utilities";
+import { Artist } from "../../artist/entities/artist.entity";
 
 @Injectable()
 export class SongService implements SyncableService<Song> {
@@ -274,7 +275,7 @@ export class SongService implements SyncableService<Song> {
      * @param createSongDto Song data to be saved
      * @returns Song[]
      */
-    public async createIfNotExists(dtos: (CreateSongDTO | Song)[]): Promise<Song[]> {
+    public async createIfNotExists(dtos: (CreateSongDTO | Song)[], qb?: (query: SelectQueryBuilder<Song>, alias: string) => SelectQueryBuilder<Song> ): Promise<Song[]> {
         if(dtos.length <= 0) throw new BadRequestException("Cannot create resources for empty list.");
 
         return this.repository.createQueryBuilder()
@@ -283,17 +284,19 @@ export class SongService implements SyncableService<Song> {
             .returning(["id"])
             .orUpdate(["name"], ["id"], { skipUpdateIfNoValuesChanged: false })
             .execute().then((insertResult) => {
-                console.log(insertResult);
+                if(typeof qb !== "function") {
+                    return this.repository.createQueryBuilder("song")
+                        .leftJoinAndSelect("song.primaryArtist", "primaryArtist")
+                        .leftJoinAndSelect("song.album", "album")
+                        .leftJoinAndSelect("song.file", "file")
+                        .leftJoinAndSelect("song.artwork", "artwork")
+                        .whereInIds(insertResult.raw)
+                        .getMany().then((songs) => {
+                            return songs;
+                        });
+                }
 
-                return this.repository.createQueryBuilder("song")
-                    .leftJoinAndSelect("song.primaryArtist", "primaryArtist")
-                    .leftJoinAndSelect("song.album", "album")
-                    .leftJoinAndSelect("song.file", "file")
-                    .leftJoinAndSelect("song.artwork", "artwork")
-                    .whereInIds(insertResult.raw)
-                    .getMany().then((songs) => {
-                        return songs;
-                    });
+                return qb(this.repository.createQueryBuilder("song"), "song").whereInIds(insertResult.raw).getMany();
             })
     }
 

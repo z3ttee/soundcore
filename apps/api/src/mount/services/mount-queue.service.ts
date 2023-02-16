@@ -23,55 +23,54 @@ export class MountQueueService {
         private readonly mountService: MountService,
         private readonly adminGateway: AdminGateway,
         private readonly events: EventEmitter2,
-        private readonly queue: WorkerQueue<MountScanProcessDTO>
     ) {
-        this.queue.on("completed", (job) => this.handleOnCompleted(job));
-        this.queue.on("failed", (job, error) => this.handleOnFailed(job, error));
+        // this.queue.on("completed", (job) => this.handleOnCompleted(job));
+        // this.queue.on("failed", (job, error) => this.handleOnFailed(job, error));
 
-        this.queue.on("waiting", async () => {
-            if(Environment.isDebug) {
-                this.logger.debug(`Received jobs concerning scanning for new files. Distributing among workers...`);
-            }
-        });
+        // this.queue.on("waiting", async () => {
+        //     if(Environment.isDebug) {
+        //         this.logger.debug(`Received jobs concerning scanning for new files. Distributing among workers...`);
+        //     }
+        // });
 
-        this.queue.on("drained", async () => {
-            if(Environment.isDebug) {
-                this.logger.debug(`All jobs concerning scanning for new files have been distributed to workers. Waiting for new jobs...`);
-            }
-        });
+        // this.queue.on("drained", async () => {
+        //     if(Environment.isDebug) {
+        //         this.logger.debug(`All jobs concerning scanning for new files have been distributed to workers. Waiting for new jobs...`);
+        //     }
+        // });
 
-        this.queue.on("started", async (job: WorkerJob<MountScanProcessDTO>) => {
-            const { payload } = job;
-            const { mount, flag } = payload;
+        // this.queue.on("started", async (job: WorkerJob<MountScanProcessDTO>) => {
+        //     const { payload } = job;
+        //     const { mount, flag } = payload;
 
-            if(flag !== MountScanFlag.DOCKER_LOOKUP) {
-                if(Environment.isDebug) {
-                    this.logger.verbose(`Looking for files on mount '${mount.name}'...`);
-                }
+        //     if(flag !== MountScanFlag.DOCKER_LOOKUP) {
+        //         if(Environment.isDebug) {
+        //             this.logger.verbose(`Looking for files on mount '${mount.name}'...`);
+        //         }
 
-                // Send progress update
-                this.mountService.setProgressInfoAndEmit(mount, {
-                    mountId: mount.id,
-                    maxSteps: MOUNT_MAX_STEPS,
-                    currentStep: 1,
-                    info: STEP_INFO,
-                    progress: -1
-                });
-            }
-        });
+        //         // Send progress update
+        //         this.mountService.setProgressInfoAndEmit(mount, {
+        //             mountId: mount.id,
+        //             maxSteps: MOUNT_MAX_STEPS,
+        //             currentStep: 1,
+        //             info: STEP_INFO,
+        //             progress: -1
+        //         });
+        //     }
+        // });
 
 
-        // Progress
-        this.queue.on("progress", async (job: WorkerJobRef<MountScanProcessDTO>) => {
-            const { mount, flag } = job.payload;
+        // // Progress
+        // this.queue.on("progress", async (job: WorkerJobRef<MountScanProcessDTO>) => {
+        //     const { mount, flag } = job.payload;
 
-            // Unavailable if in docker lookup mode
-            if(flag === MountScanFlag.DOCKER_LOOKUP) return;
+        //     // Unavailable if in docker lookup mode
+        //     if(flag === MountScanFlag.DOCKER_LOOKUP) return;
 
-            if(Environment.isDebug) {
-                this.logger.debug(`Received progress update from mount ${mount.name}: ${job.progress}`);
-            }
-        });        
+        //     if(Environment.isDebug) {
+        //         this.logger.debug(`Received progress update from mount ${mount.name}: ${job.progress}`);
+        //     }
+        // });        
     }
 
     /**

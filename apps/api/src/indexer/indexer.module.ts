@@ -1,30 +1,21 @@
 import path from 'path';
 import { Logger, Module, OnModuleInit } from '@nestjs/common';
-import { WorkerQueueModule } from '@soundcore/nest-queue';
 import { IndexerService } from './services/indexer.service';
-import { IndexerQueueService } from './services/indexer-queue.service';
-import { PipelineModule, PipelineService } from '@soundcore/worker';
-import { PIPELINE_INDEX_ID } from './pipelines';
+import { PipelineModule, PipelineService } from '@soundcore/pipelines';
 
 @Module({
     providers: [
-        IndexerService,
-        IndexerQueueService
+        IndexerService
     ],
     imports: [
-        WorkerQueueModule.forFeature({
-            script: path.join(__dirname, "worker", "indexer.worker.js"),
-            concurrent: 2
-        }),
-        PipelineModule.forFeature({
-            pipelineScripts: [
+        PipelineModule.registerPipelines({
+            pipelines: [
                 path.join(__dirname, "pipelines", "indexer.pipeline.js")
             ]
         })
     ],
     exports: [
-        IndexerService,
-        IndexerQueueService
+        IndexerService
     ]
 })
 export class IndexerModule implements OnModuleInit {
@@ -35,11 +26,11 @@ export class IndexerModule implements OnModuleInit {
     onModuleInit() {
         const mountId = "71514b33-48cf-4864-9368-14ce6b6cf992";
 
-        this.pipelineService.enqueue(PIPELINE_INDEX_ID, { mountId: mountId }).then((position) => {
-            this.logger.verbose(`Enqueued pipeline. Position: ${position}`);
-        }).catch((error: Error) => {
-            this.logger.error(`Failed: ${error.message}`);
-        })
+        // this.pipelineService.enqueue(PIPELINE_INDEX_ID, { mountId: mountId }).then((position) => {
+        //     this.logger.verbose(`Enqueued pipeline. Position: ${position}`);
+        // }).catch((error: Error) => {
+        //     this.logger.error(`Failed: ${error.message}`);
+        // })
     }
 
 }

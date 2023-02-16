@@ -8,6 +8,7 @@
   "scripts": {
     "start": "nest start",
     "dev": "nest start --watch",
+    "resetAndStart": "yarn resetDb && yarn dev",
     "resetDb": "node ./scripts/resetDevDatabase.js",
     "build:api": "nest build && npm run bundle",
     "bundle": "node bundle/bundle-packagejson.js && node bundle/bundle-env.js && node bundle/bundle-info.js",
@@ -29,6 +30,7 @@
     "@nestjs/typeorm": "^9.0.0",
     "@nestjs/websockets": "^9.0.8",
     "@soundcore/bootstrap": "*",
+    "@soundcore/pipelines": "*",
     "@soundcore/common": "*",
     "@soundcore/constants": "*",
     "@soundcore/nest-queue": "*",

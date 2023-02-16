@@ -1,7 +1,7 @@
 import path from "node:path";
 import crypto from "node:crypto";
 
-import { Inject, Injectable } from "@nestjs/common";
+import { Inject, Injectable, Logger } from "@nestjs/common";
 import { SchedulerRegistry } from "@nestjs/schedule";
 import { WorkerPool, pool } from "workerpool";
 import { PIPELINES_MODULE_OPTIONS, PIPELINES_TOKEN } from "../../constants";
@@ -10,9 +10,12 @@ import { PipelineQueue } from "../entities/queue.entity";
 import { EventHandler, EventName } from "../event/event";
 import { PipelineCompletedEventHandler, PipelineFailedEventHandler } from "../event/pipeline-events";
 import { PipelineModuleOptions, Pipelines } from "../pipeline.module";
+import { SkippedException } from "../exceptions/skipped.exception";
+import { AbortException } from "../exceptions/abort.exception";
 
 @Injectable()
 export class PipelineService {
+    private readonly logger = new Logger(PipelineService.name);
 
     private readonly pool: WorkerPool;
     private readonly queue: PipelineQueue = new PipelineQueue();
@@ -49,7 +52,6 @@ export class PipelineService {
 
     private processNextInQueue() {
         if(this.queue.isEmpty() || !this.canExecuteNext()) return;
-
         const nextItem = this.queue.dequeue();
         this.dispatch(nextItem);
     }
@@ -73,7 +75,9 @@ export class PipelineService {
             ...origin.environment ?? {}
         });
 
-        return this.queue.enqueue(pipeline);
+        const position = this.queue.enqueue(pipeline);
+        this.logger.log(`Enqueued new run for pipeline '${pipelineId}'. Position in queue: ${position}`);
+        return position;
     }
 
     /**
@@ -126,10 +130,10 @@ export class PipelineService {
                     handler(...Object.values(args));
                 }
             }
-        }).then((pipeline: Pipeline) => {
+        }).then((pipeline: PipelineRun) => {
             // Update pipeline status
-            // pipeline.status = PipelineStatus.COMPLETED;
-            // pipeline.currentStage = null;
+            pipeline.status = PipelineStatus.COMPLETED;
+            pipeline.currentStage = null;
 
             // Handle successful completion
             const handlers = this.eventHandlers.get("pipeline:completed") as PipelineCompletedEventHandler[] ?? [];
@@ -138,7 +142,19 @@ export class PipelineService {
             }
         }).catch((error: Error) => {
             // Update pipeline status
+            pipeline.currentStage = null;
             pipeline.status = PipelineStatus.FAILED;
+
+            if(error instanceof SkippedException || error instanceof AbortException) {
+                pipeline.status = error instanceof AbortException ? PipelineStatus.WARNING : PipelineStatus.COMPLETED;
+
+                // Handle successful completion
+                const handlers = this.eventHandlers.get("pipeline:completed") as PipelineCompletedEventHandler[] ?? [];
+                for(const handler of handlers) {
+                    handler(pipeline);
+                }
+                return;
+            }
 
             // Handle errored completion
             const handlers = this.eventHandlers.get("pipeline:failed") as PipelineFailedEventHandler[] ?? [];

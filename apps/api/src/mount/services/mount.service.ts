@@ -9,15 +9,16 @@ import { Mount, MountProgress, MountStatus } from '../entities/mount.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateResult } from '../../utils/results/creation.result';
 import { FileSystemService } from '../../filesystem/services/filesystem.service';
-import { WorkerQueue } from '@soundcore/nest-queue';
 import { MountRegistryService } from './mount-registry.service';
-import { MountScanFlag, MountScanProcessDTO } from '../dtos/scan-process.dto';
+import { MountScanFlag } from '../dtos/scan-process.dto';
 import { FileFlag } from '../../file/entities/file.entity';
 import { Environment } from '@soundcore/common';
 import { EVENT_MOUNT_PROCESS_UPDATE, MOUNTNAME_MAX_LENGTH, MOUNT_MAX_STEPS, MOUNT_STEP_WAITING } from '../../constants';
 import { AdminGateway } from '../../gateway/gateways/admin-gateway.gateway';
 import { OnEvent } from '@nestjs/event-emitter';
-import { PipelineService } from '@soundcore/worker';
+import { PIPELINE_INDEX_ID } from '../../indexer/pipelines';
+import { PipelineRun } from '@soundcore/pipelines';
+import { IndexerService } from '../../indexer/services/indexer.service';
 
 @Injectable()
 export class MountService {
@@ -27,7 +28,7 @@ export class MountService {
         @InjectRepository(Mount) private readonly repository: Repository<Mount>,
         private readonly fileSystem: FileSystemService,
         private readonly mountRegistryService: MountRegistryService,
-        private readonly queue: WorkerQueue<MountScanProcessDTO>,
+        private readonly indexService: IndexerService,
         private readonly gateway?: AdminGateway,
     ) {}
 
@@ -169,7 +170,7 @@ export class MountService {
      * @param idOrObject Mount ID or Object
      * @returns Job<Mount>
      */
-    public async rescanMount(idOrObject: string | Mount): Promise<number> {
+    public async rescanMount(idOrObject: string | Mount): Promise<PipelineRun> {
         const mount = await this.resolveMount(idOrObject);
         if(!mount) throw new NotFoundException("Mount not found");
 
@@ -182,7 +183,7 @@ export class MountService {
      * @param idOrObject Mount ID or Object
      * @returns Job<Mount>
      */
-    private async scanMountInternal(idOrObject: string | Mount): Promise<number> {
+    private async scanMountInternal(idOrObject: string | Mount): Promise<PipelineRun> {
         const mount = await this.resolveMount(idOrObject);
         if(!mount) throw new NotFoundException("Mount not found");
 
@@ -190,20 +191,7 @@ export class MountService {
     }
 
     private async enqueue(mount: Mount, flag: MountScanFlag) {
-        await this.setProgressInfoAndEmit(mount, {
-            mountId: mount.id,
-            maxSteps: MOUNT_MAX_STEPS,
-            currentStep: 0,
-            info: MOUNT_STEP_WAITING,
-            progress: -1
-        }, MountStatus.ENQUEUED);
-
-        return this.queue.enqueue({
-            mount: mount,
-            flag: flag
-        });
-
-        return 0
+        return this.indexService.indexMount(mount.id, flag == MountScanFlag.RESCAN);
     }
 
     /**
@@ -395,12 +383,12 @@ export class MountService {
     public async checkMountsDockerMode() {
         if(!Environment.isDockerized) throw new InternalServerErrorException(`Tried checking mounts in docker mode, but application is in standalone mode.`);
         
-        return this.queue.enqueue(<MountScanProcessDTO>{
-            flag: MountScanFlag.DOCKER_LOOKUP,
-            mount: null
-        }).then(() => {
-            return null;
-        });
+        // return this.queue.enqueue(<MountScanProcessDTO>{
+        //     flag: MountScanFlag.DOCKER_LOOKUP,
+        //     mount: null
+        // }).then(() => {
+        //     return null;
+        // });
     }
 
     /**

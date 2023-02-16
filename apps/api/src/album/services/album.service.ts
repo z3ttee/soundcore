@@ -197,11 +197,11 @@ export class AlbumService implements SyncableService<Album> {
             .insert()
             .values(dtos)
             .returning(["id"])
-            .orUpdate(["name"], ["name"], { skipUpdateIfNoValuesChanged: false })
+            .orUpdate(["name"], ["id", "name", "primaryArtistId"], { skipUpdateIfNoValuesChanged: false })
             .execute().then((insertResult) => {
                 return this.repository.createQueryBuilder("album")
                     .leftJoinAndSelect("album.primaryArtist", "primaryArtist")
-                    .whereInIds(insertResult.raw)
+                    .whereInIds(insertResult.identifiers)
                     .getMany();
             });
     }
