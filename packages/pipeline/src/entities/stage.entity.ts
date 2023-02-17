@@ -1,3 +1,4 @@
+import { RunStatus } from "./common.entity";
 import { Pipeline } from "./pipeline.entity";
 import { IStep, Step } from "./step.entity";
 
@@ -14,13 +15,15 @@ export interface IStage {
 }
 
 export class Stage implements IStage {
-    public readonly id: string;
-    public readonly name: string;
-    public readonly description: string;
-    public readonly steps: Step[];
-    public readonly dependsOn: string[];
-
-    public readonly currentStep: Step;
+    constructor(
+        public readonly id: string,
+        public readonly name: string,
+        public readonly description: string,
+        public readonly dependsOn: string[],
+        public readonly steps: Step[],
+        public status: RunStatus,
+        public currentStepId: string
+    ) {}
 }
 
 export class StageRef implements Omit<IStage, "dependsOn" | "steps"> {

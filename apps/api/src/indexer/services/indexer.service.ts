@@ -1,5 +1,6 @@
 import { Injectable, Logger } from "@nestjs/common";
-import { PipelineRun, PipelineService } from "@soundcore/pipelines";
+import { PipelineRun, PipelineService, RunStatus } from "@soundcore/pipelines";
+import { inspect } from "util";
 import { PIPELINE_INDEX_ID } from "../pipelines";
 
 @Injectable()
@@ -9,13 +10,12 @@ export class IndexerService {
     constructor(
         private readonly pipelines: PipelineService
     ) {
-        this.pipelines.on("status", (params) => {
-            console.log(params);
-        });
-
-        this.pipelines.on("failed", (error, params) => {
+        this.pipelines.on("failed", (error, { pipeline }) => {
             console.error(error);
-            console.log("pipeline failed");
+            console.log("Pipeline " + pipeline.id + " failed");
+        })
+        this.pipelines.on("completed", ({ pipeline }) => {
+            console.log("Pipeline " + pipeline.id + " completed");
         })
         // this.pipelines.on("pipeline:started", (pipeline) => {
         //     console.log("pipeline started");

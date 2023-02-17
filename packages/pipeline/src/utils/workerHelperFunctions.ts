@@ -1,8 +1,20 @@
 import { workerEmit } from "workerpool";
-import { PipelineRun } from "../entities/pipeline.entity";
-import { IStage } from "../entities/stage.entity";
-import { IStep } from "../entities/step.entity";
+import { Outputs } from "../entities/common.entity";
+import { IPipeline, PipelineRun } from "../entities/pipeline.entity";
+import { Stage } from "../entities/stage.entity";
+import { Step } from "../entities/step.entity";
 import { EventHandlerParams, EventName, WorkerEmitEvent } from "../event/event";
+
+class PipelineGlobal {
+    definition: IPipeline;
+    pipeline: PipelineRun;
+    stage: Stage;
+    step: Step;
+    outputs: Outputs = {};
+}
+
+const globals = new PipelineGlobal();
+export const globalThis = globals;
 
 /**
  * Emit a message in a pipeline.
@@ -16,7 +28,7 @@ export function message(message: string) {
         throw new Error(`Message was emitted outside the scope of a pipeline.`);
     }
 
-    emit("pipeline:message", message, {
+    emit("message", message, {
         pipeline: globalThis.pipeline
     });
 }
@@ -27,15 +39,16 @@ export function message(message: string) {
  * @param progress Progress value to emit
  */
 export function progress(progress: number) {
-    if(!globalThis.pipeline || !globalThis.stage || !globalThis.step) {
+    const step: Step = globalThis.step;
+    const stage: Stage = globalThis.stage;
+    const pipeline: PipelineRun = globalThis.pipeline;
+
+    if(!step || !stage || !pipeline) {
         throw new Error(`Progress was emitted outside the scope of step in a pipeline.`);
     }
 
-    emit("step:progress", progress, {
-        pipeline: globalThis.pipeline as PipelineRun,
-        stage: globalThis.stage,
-        step: globalThis.step
-    });
+    step.progress = progress;
+    emit("status", { pipeline: pipeline });
 }
 
 /**
@@ -54,9 +67,13 @@ export function emit<T extends EventName>(eventName: T, ...args: EventHandlerPar
  * @returns Written value
  */
 export function set<T = any>(key: string, value: T) {
-    const step: IStep = globalThis.step;
-    const stage: IStage = globalThis.stage;
+    const step: Step = globalThis.step;
+    const stage: Stage = globalThis.stage;
     const pipeline: PipelineRun = globalThis.pipeline;
+
+    if(!step || !stage || !pipeline) {
+        throw new Error(`set() was called outside the scope of step in a pipeline.`);
+    }
 
     return writeOutput<T>(pipeline, `${stage.id}.${step.id}.${key}`, value);
 }
@@ -83,10 +100,11 @@ export function get<T = any>(path: string) {
  * @param defaultValue Default value to return
  */
 export function getOrDefault<T = any>(path: string, defaultValue: T) {
-    const step: IStep = globalThis.step;
-    const stage: IStage = globalThis.stage;
     const pipeline: PipelineRun = globalThis.pipeline;
 
+    if(!pipeline) {
+        throw new Error(`GetOrDefault() was called outside the scope of a pipeline.`);
+    }
     return readOutput<T>(pipeline, path, defaultValue);
 }
 
@@ -94,7 +112,7 @@ export function getOrDefault<T = any>(path: string, defaultValue: T) {
 function writeOutput<T = any>(pipeline: PipelineRun, path: string, value: T) {
     const parts = path.split(".");
 
-    let currentObj = pipeline.outputs;
+    let currentObj = globalThis.outputs;
     for(let index = 0; index < parts.length; index++) {
         const key = parts[index];
 
@@ -119,7 +137,7 @@ function writeOutput<T = any>(pipeline: PipelineRun, path: string, value: T) {
 function readOutput<T = any>(pipeline: PipelineRun, path: string, defaultValue: T): T {
     const parts = path.split(".");
 
-    let currentObj = pipeline.outputs;
+    let currentObj = {...globalThis.outputs};
     for(let index = 0; index < parts.length; index++) {
         const key = parts[index];
 

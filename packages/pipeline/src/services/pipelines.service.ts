@@ -14,6 +14,9 @@ import { RunStatus } from "../entities/common.entity";
 import { EventHandler, EventName, WorkerEmitEvent } from "../event/event";
 import { PipelineEventService } from "./pipeline-event.service";
 import { PipelineGlobalOptions, PipelineLocalOptions } from "../pipelines.module";
+import { Stage } from "../entities/stage.entity";
+import { Step } from "../entities/step.entity";
+import { inspect } from "node:util";
 
 @Injectable()
 export class PipelineService {
@@ -96,7 +99,15 @@ export class PipelineService {
         pipeline.name = definition.name;
         pipeline.description = definition.description;
         pipeline.status = RunStatus.ENQUEUED;
-        pipeline.stages = definition.stages;
+        pipeline.stages = definition.stages.map((stage) => new Stage(
+            stage.id,
+            stage.name,
+            stage.description,
+            stage.dependsOn,
+            stage.steps.map((step) => new Step(step.id, step.name, step.description, RunStatus.ENQUEUED, 0)),
+            RunStatus.ENQUEUED,
+            stage.steps?.[0]?.id
+        ));
 
         return this.repository.createQueryBuilder()
             .insert()
@@ -155,12 +166,12 @@ export class PipelineService {
         }).then((pipelineRun: PipelineRun) => {
             // Update pipeline status
             pipelineRun.status = RunStatus.COMPLETED;
-            pipelineRun.currentStage = null;
+            pipelineRun.currentStageId = null;
 
             this.events.fireEvent("completed", { pipeline: pipelineRun });
         }).catch((error: Error) => {
             // Update pipeline status
-            pipelineRun.currentStage = null;
+            pipelineRun.currentStageId = null;
             pipelineRun.status = RunStatus.FAILED;
 
             this.events.fireEvent("failed", error, { pipeline: pipelineRun });

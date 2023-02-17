@@ -59,14 +59,12 @@ export class PipelineRun implements Omit<IPipeline, "scriptFile"> {
     public environment: Environment;
 
     @Column({ type: "json", nullable: false })
-    public stages: IStage[];
+    public stages: Stage[];
 
-    @Column({ type: "json", nullable: true })
-    public currentStage: IStage;
+    @Column({ nullable: true })
+    public currentStageId: string;
 
     @CreateDateColumn()
     public createdAt: number;
-
-    public outputs: Outputs = {};
 
 }

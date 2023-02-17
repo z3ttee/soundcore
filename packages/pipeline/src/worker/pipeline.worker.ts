@@ -9,13 +9,17 @@ import { StepSkippedException } from "../exceptions/skippedException";
 import { createLogger } from "../logging/logger";
 import { PipelineGlobalOptions } from "../pipelines.module";
 import { readConfiguratorFromFile } from "../utils/registerPipelines";
-import { getOrDefault } from "../utils/workerHelperFunctions";
+import { emit, getOrDefault, globalThis } from "../utils/workerHelperFunctions";
 
 worker({
     default: async (pipeline: PipelineRun, definition: IPipeline, globalOptions: PipelineGlobalOptions) => {
         // Instantiate logger
         const logger = createLogger(pipeline.id, pipeline.runId, globalOptions.enableStdout ?? false, true);
         logger.info(`Worker picked up pipeline run. Preparing...`);
+
+        // Update pipeline status
+        pipeline.status = RunStatus.WORKING;
+        emit("status", { pipeline });
 
         // Initialize global variables for helper functions
         globalThis.pipeline = pipeline;
@@ -33,13 +37,10 @@ worker({
 
         // Execute all stages
         for(const stage of pipeline.stages) {
-            globalThis.stage = stage;
-
             logger.info(`Preparing stage '${stage.id}'...`);
 
-            // Set currently active stage on the pipeline
-            pipeline.currentStage = stage;
-            pipeline.status = RunStatus.WORKING;
+            // Update global object
+            globalThis.stage = stage;
 
             // Extract step executors
             const stageConfigurator = stageConfigurators.get(stage.id)?.["_steps"];
@@ -76,6 +77,11 @@ worker({
             }
 
             try {
+                // Update pipeline status
+                pipeline.currentStageId = stage.id;
+                stage.status = RunStatus.WORKING;
+                emit("status", { pipeline });
+
                 // Execute steps
                 for(let index = 0; index < stage.steps.length; index++) {
                     const step = stage.steps[index];
@@ -91,6 +97,11 @@ worker({
                     }
 
                     try {
+                        // Update pipeline status
+                        stage.currentStepId = step.id;
+                        step.status = RunStatus.WORKING;
+                        emit("status", { pipeline });
+
                         // Evaluate condition, if not met, skip the step
                         if(stepCondEvaluators.has(step.id)) {
                             const conditionEvaluator = async (prevOutput: Outputs) => await stepCondEvaluators.get(step.id)(prevOutput);
@@ -99,16 +110,21 @@ worker({
                                 logger.warn(`Could not evaluate condition for step '${step.id}': ${error.message}`);
                                 throw new StepSkippedException(`Could not evaluate condition: ${error.message}`);
                             }).then((canContinue) => {
-                                if(!canContinue) throw new StepSkippedException(`Skipped because condition was not met. Received 'false'`);
+                                if(!canContinue) {
+                                    step.status = RunStatus.SKIPPED;
+                                    throw new StepSkippedException(`Skipped because condition was not met. Received 'false'`);
+                                }
                             });
                         }
 
                         // Instantiate step ref functions
                         const abort = (error: string): never => {
+                            step.status = RunStatus.ABORTED;
                             throw new PipelineAbortedException(error, step);
                         }
 
                         const skip = (reason: string): never => {
+                            step.status = RunStatus.SKIPPED;
                             throw new StepSkippedException(reason);
                         }
 
@@ -124,30 +140,55 @@ worker({
                             })
                         ]).catch((error) => {
                             throw error;
+                        }).then(() => {
+                            // Update pipeline status
+                            stage.currentStepId = step.id;
+                            step.status = RunStatus.COMPLETED;
+                            step.progress = 100;
+                            emit("status", { pipeline });
                         })
                     } catch (error) {
                         if(error instanceof StepSkippedException) {
                             logger.warn(`Skipped step '${step.id}': ${error.reason}`);
+                            step.status = step.status != RunStatus.WORKING ? step.status : RunStatus.SKIPPED;
+                            emit("status", { pipeline });
                         } else {
+                            step.status = step.status != RunStatus.WORKING ? step.status : RunStatus.FAILED;
+                            emit("status", { pipeline });
                             throw error;
                         }
                     }
                 }
+
+                // Update pipeline status
+                pipeline.currentStageId = stage.id;
+                stage.status = RunStatus.COMPLETED;
+                stage.currentStepId = null;
+                emit("status", { pipeline });
             } catch (error: any) {                
                 if(error instanceof PipelineAbortedException) {
                     pipeline.status = RunStatus.ABORTED;
+                    stage.status = RunStatus.ABORTED;
                     logger.error(`Pipeline aborted by step '${error.issuer.id}': ${error.message}`);
+                    emit("status", { pipeline });
                     throw new Error(`Pipeline aborted by step '${error.issuer.id}': ${error.message}`);
-                } else {
-                    pipeline.status = RunStatus.FAILED;
-                    logger.error(`Step execution failed: ${error?.message}`, error?.stack)
                 }
+
+                pipeline.status = RunStatus.FAILED;
+                stage.status = stage.status != RunStatus.WORKING ? stage.status : RunStatus.FAILED;
+                logger.error(`Step execution failed: ${error?.message}`, error?.stack)
+                emit("status", { pipeline });
 
                 // Unresolvable error was thrown, that breaks the flow of the pipeline, abort the execution of the pipeline
                 // For that, break the stage for-loop to end the pipeline run.
                 throw error;
             }
         }
+
+        // Emit completion
+        pipeline.status = RunStatus.COMPLETED;
+        pipeline.currentStageId = null;
+        emit("status", { pipeline });
 
         return pipeline;
     }

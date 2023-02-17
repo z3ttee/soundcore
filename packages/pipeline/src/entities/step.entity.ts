@@ -1,6 +1,6 @@
 import { PipelineAbortedException } from "../exceptions/abortedException";
 import { StepSkippedException } from "../exceptions/skippedException";
-import { Environment, Outputs, PipelineLogger, Resources } from "./common.entity";
+import { Environment, Outputs, PipelineLogger, Resources, RunStatus } from "./common.entity";
 import { IPipeline } from "./pipeline.entity";
 import { IStage } from "./stage.entity";
 
@@ -19,6 +19,8 @@ export class Step implements IStep {
         public readonly id: string,
         public readonly name: string,
         public readonly description: string,
+        public status: RunStatus,
+        public progress: number
     ) {}
 }
 
