@@ -73,11 +73,11 @@ worker({
 
                 // Evaluate if stage can run based on condition
                 if(typeof stageConfigurators.get(stage.id)?.["_conditionEvaluator"] === "function") {
-                    const conditionEvaluator = async (prevOutput: Outputs) => await stageConfigurators.get(stage.id)?.["_conditionEvaluator"](prevOutput, {...globalThis.sharedOutputs}) ;
+                    const conditionEvaluator = async (prevOutput: Outputs, shared: Outputs) => await stageConfigurators.get(stage.id)?.["_conditionEvaluator"](prevOutput, shared) ;
                     const outputs = getOrDefault(`${prevStage.id}`, {});
 
                     // Execute evaluator
-                    await conditionEvaluator(outputs).catch((error: Error) => {
+                    await conditionEvaluator(outputs, {...globalThis.sharedOutputs}).catch((error: Error) => {
                         logger.warn(`Could not evaluate condition for step '${stage.id}': ${error.message}`);
                         throw new SkippedException(`Could not evaluate condition: ${error.message}`);
                     }).then((canContinue) => {

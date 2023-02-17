@@ -2,7 +2,7 @@ import fs from "node:fs/promises";
 import { Batch } from "@soundcore/common";
 import { File, FileFlag } from "../../../file/entities/file.entity";
 import { Mount } from "../../../mount/entities/mount.entity";
-import { STAGE_SCAN_ID, STEP_CHECKOUT_MOUNT_ID, STEP_CREATE_ALBUMS_ID, STEP_CREATE_ARTISTS_ID, STEP_INDEX_FILES_ID, STEP_READ_TAGS_ID } from "../../pipelines";
+import { STAGE_METADATA_ID, STAGE_SCAN_ID, STEP_CHECKOUT_MOUNT_ID, STEP_CREATE_ALBUMS_ID, STEP_CREATE_ARTISTS_ID, STEP_INDEX_FILES_ID, STEP_READ_TAGS_ID } from "../../pipelines";
 import { ID3TagsDTO } from "../../../song/dtos/id3-tags.dto";
 import { Song } from "../../../song/entities/song.entity";
 import { SongService } from "../../../song/services/song.service";
@@ -24,8 +24,8 @@ export async function step_read_mp3_tags(params: StepParams) {
     const songService = new SongService(repository, null, null);
     
     // Prepare step
-    const files: Map<string, File> = getOrDefault(`${STAGE_SCAN_ID}.${STEP_INDEX_FILES_ID}.files`, new Map());
-    const mount: Mount = getSharedOrDefault(`mount`).mount;
+    const files: Map<string, File> = getSharedOrDefault("targetFiles", new Map());
+    const mount: Mount = getSharedOrDefault(`mount`);
 
     if(!files || files.size <= 0) {
         step.skip("No new files were created in database.");
@@ -162,7 +162,7 @@ export async function step_create_artists(params: StepParams) {
     const datasource: DataSource = resources.datasource;
     const repository = datasource.getRepository(Artist);
     const service = new ArtistService(repository, null);
-    const artists: Map<string, Artist> = getOrDefault(`${STEP_READ_TAGS_ID}.artists`, new Map());
+    const artists: Map<string, Artist> = getOrDefault(`${STAGE_METADATA_ID}.${STEP_READ_TAGS_ID}.artists`, new Map());
 
     // Check if there are any artists to create them,
     // if not, skip the step
@@ -180,7 +180,7 @@ export async function step_create_artists(params: StepParams) {
             // Map slug
             artist.slug = Slug.create(artist.name);
             return artist;
-        }), (query, alias, ids) => query.select([`${alias}.id`, `${alias}.name`]).whereInIds(ids).getMany()).then((createdArtists) => {
+        }), (query, alias) => query.select([`${alias}.id`, `${alias}.name`])).then((createdArtists) => {
             progress(currentBatch / totalBatches);
             return new Map(createdArtists.map((artist) => ([getArtistKey(artist), artist])));
         }).catch((error) => {
@@ -189,7 +189,7 @@ export async function step_create_artists(params: StepParams) {
     }).then((createdArtists) => {
         // Processing all batches done.
         // Write logs and create output
-        logger.info(`Created and fetched ${Object.keys(createdArtists).length} artists.`);
+        logger.info(`Created and fetched ${createdArtists.size} artists.`);
         set("artists", createdArtists);
     }).catch((error: Error) => {
         // Batching process failed
@@ -212,8 +212,8 @@ export async function step_create_albums(params: StepParams) {
     const datasource: DataSource = resources.datasource;
     const repository = datasource.getRepository(Album);
     const service = new AlbumService(repository, null, null);
-    const artists: Map<string, Artist> = getOrDefault(`${STEP_CREATE_ARTISTS_ID}.artists`, new Map());
-    const albums: Map<string, Album> = getOrDefault(`${STEP_CREATE_ARTISTS_ID}.albums`, new Map());
+    const artists: Map<string, Artist> = getOrDefault(`${STAGE_METADATA_ID}.${STEP_CREATE_ARTISTS_ID}.artists`, new Map());
+    const albums: Map<string, Album> = getOrDefault(`${STAGE_METADATA_ID}.${STEP_READ_TAGS_ID}.albums`, new Map());
 
     // Check if there are any albums to create them,
     // if not, skip the step
@@ -261,10 +261,10 @@ export async function step_create_songs(params: StepParams) {
     const datasource: DataSource = resources.datasource;
     const repository = datasource.getRepository(Song);
     const service = new SongService(repository, null, null);
-    const artists: Map<string, Artist> = getOrDefault(`${STEP_CREATE_ARTISTS_ID}.artists`, new Map());
-    const albums: Map<string, Album> = getOrDefault(`${STEP_CREATE_ALBUMS_ID}.albums`, new Map());
-    const songs: Map<string, Song> = getOrDefault(`${STEP_READ_TAGS_ID}.songs`, new Map());
-    const files: Map<string, File> = getOrDefault(`${STAGE_SCAN_ID}.${STEP_INDEX_FILES_ID}.files`, new Map());
+    const artists: Map<string, Artist> = getOrDefault(`${STAGE_METADATA_ID}.${STEP_CREATE_ARTISTS_ID}.artists`, new Map());
+    const albums: Map<string, Album> = getOrDefault(`${STAGE_METADATA_ID}.${STEP_CREATE_ALBUMS_ID}.albums`, new Map());
+    const songs: Map<string, Song> = getOrDefault(`${STAGE_METADATA_ID}.${STEP_READ_TAGS_ID}.songs`, new Map());
+    const files: Map<string, File> = getSharedOrDefault("targetFiles", new Map());
 
     // Check if there are any albums to create them,
     // if not, skip the step

@@ -21,7 +21,7 @@ export default pipeline(PIPELINE_INDEX_ID, PIPELINE_INDEX_NAME)
     /**
      * Stage: Metadata
      */
-    .stage(STAGE_METADATA_ID, STAGE_METADATA_NAME).condition((prevStageOutputs) => prevStageOutputs[`${STEP_INDEX_FILES_ID}.files`]?.length > 0).useResources(() => {
+    .stage(STAGE_METADATA_ID, STAGE_METADATA_NAME).condition((_, shared) => shared["targetFiles"]?.size > 0).useResources(() => {
         return Database.connect().then((datasource) => ({ datasource: datasource }));
     }).step(STEP_READ_TAGS_ID, STEP_READ_TAGS_NAME).run((params) => {
         return step_read_mp3_tags(params);

@@ -18,7 +18,9 @@ export class PipelineQueue {
     }
 
     public dequeue(): PipelineRun {
-        return this.queue.shift();
+        const next = this.queue.shift();
+        console.log("dequed run: ", next);
+        return next;
     }
 
     public removeById(runId: string): PipelineRun {

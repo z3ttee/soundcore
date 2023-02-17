@@ -161,9 +161,6 @@ export async function step_create_database_entries(params: StepParams) {
         // Prepare batch
         const collectedFiles: File[] = [];
 
-        // Update progress
-        progress(currentBatch/totalBatches);
-
         for(const fileDto of batch) {
             const file = new File();
             file.name = fileDto.filename;
@@ -216,11 +213,14 @@ export async function step_create_database_entries(params: StepParams) {
             // TODO: Remove files from registry to scan them again on next scan
             logger.error(`Failed creating files in database: ${error.message}`, error.stack);
             return [];
+        }).finally(() => {
+            // Update progress
+            progress(currentBatch/totalBatches);
         });
     }).then((files) => {
         // Batching completed
         logger.info(`Created ${files.length} files in the database`);
-        set("files", mappedFiles);
+        setShared("targetFiles", mappedFiles);
     }).catch((error: Error) => {
         // Batching failed
         logger.error(`Error occured while creating database entries: ${error.message}`, error.stack);

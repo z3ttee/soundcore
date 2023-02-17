@@ -214,17 +214,17 @@ export class FileService {
         return this.repository.createQueryBuilder()
             .insert()
             .values(files)
-            .orUpdate(["name", "flag"], ["name", "flag"])
+            .orUpdate(["name", "flag"], ["id"])
             .returning(["id"])
             .execute().then((insertResult) => {
                 if(typeof qb !== "function") {
                     return this.repository.createQueryBuilder("file")
                     .leftJoin("file.mount", "mount").addSelect(["mount.id", "mount.directory"])
-                    .whereInIds(insertResult.identifiers)
+                    .whereInIds(insertResult.raw)
                     .getMany();
                 }
                     
-                return qb(this.repository.createQueryBuilder("file"), "file").whereInIds(insertResult.identifiers).getMany();
+                return qb(this.repository.createQueryBuilder("file"), "file").whereInIds(insertResult.raw).getMany();
             });
     }
 

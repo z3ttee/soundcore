@@ -82,6 +82,8 @@ export function progress(progress: number) {
     }
 
     step.progress = progress;
+
+    globalThis.logger?.info(`Step '${step.id}' posted progress: ${progress}`);
     emit("status", { pipeline: pipeline });
 }
 
