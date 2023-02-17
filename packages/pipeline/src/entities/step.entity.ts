@@ -38,22 +38,13 @@ export class StepRef implements IStep {
 
     constructor(
         private readonly definition: IStep,
-        progress: (progress: number) => void,
-        message: (message: string) => void,
         abort: (error: string) => never,
         skip: (reason: string) => never
     ) {
-        this.progress = progress;
-        this.message = message;
         this.skip = skip;
         this.abort = abort;
     }
 
-    /**
-     * Emit progress event
-     * @param progress Progress value
-     */
-    public progress(progress: number): void {}
     /**
      * Abort the pipeline run
      * @param error Error to throw to abort pipeline
@@ -72,11 +63,6 @@ export class StepRef implements IStep {
     public skip(reason: string): never {
         throw new StepSkippedException(reason);
     }
-    /**
-     * Post a message. Use this to emit custom events
-     * @param message Message to post
-     */
-    public message(message: string): void {}
 }
 
 export interface StepParams {

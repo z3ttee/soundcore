@@ -59,7 +59,7 @@ export class PipelineService {
         }
 
         // Listen on enqueued event
-        this.on("pipeline:enqueued", (position, { pipeline }) => {
+        this.on("enqueued", (position, { pipeline }) => {
             this.logger.log(`Enqueued pipeline '${pipeline.id}' with run id '${pipeline.runId}' (${position})`);
         })
     }
@@ -157,13 +157,13 @@ export class PipelineService {
             pipelineRun.status = RunStatus.COMPLETED;
             pipelineRun.currentStage = null;
 
-            this.events.fireEvent("pipeline:completed", { pipeline: pipelineRun });
+            this.events.fireEvent("completed", { pipeline: pipelineRun });
         }).catch((error: Error) => {
             // Update pipeline status
             pipelineRun.currentStage = null;
             pipelineRun.status = RunStatus.FAILED;
 
-            this.events.fireEvent("pipeline:failed", error, { pipeline: pipelineRun });
+            this.events.fireEvent("failed", error, { pipeline: pipelineRun });
             // if(error instanceof SkippedException || error instanceof AbortException) {
             //     pipeline.status = error instanceof AbortException ? RunStatus.WARNING : RunStatus.COMPLETED;
 

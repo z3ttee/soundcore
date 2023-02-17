@@ -12,7 +12,7 @@ import { Batch } from "@soundcore/common";
 import { File } from "../../../file/entities/file.entity";
 import { FileService } from "../../../file/services/file.service";
 import { STAGE_SCAN_ID, STEP_CHECKOUT_MOUNT_ID } from "../../pipelines";
-import { get, getOrDefault, set, StepParams } from "@soundcore/pipelines";
+import { get, getOrDefault, progress, set, StepParams } from "@soundcore/pipelines";
 
 /**
  * Checkout mount using the id provided via env.
@@ -164,7 +164,7 @@ export async function step_create_database_entries(params: StepParams) {
         const collectedFiles: File[] = [];
 
         // Update progress
-        step.progress(currentBatch/totalBatches);
+        progress(currentBatch/totalBatches);
 
         for(const fileDto of batch) {
             const file = new File();

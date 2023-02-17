@@ -13,7 +13,7 @@ import { DataSource } from "typeorm";
 import { ArtistService } from "../../../artist/artist.service";
 import { AlbumService } from "../../../album/services/album.service";
 import { FileSystemService } from "../../../filesystem/services/filesystem.service";
-import { get, getOrDefault, set, StepParams } from "@soundcore/pipelines";
+import { get, getOrDefault, progress, set, StepParams } from "@soundcore/pipelines";
 
 export async function step_read_mp3_tags(params: StepParams) {
     const { step, resources, logger } = params;
@@ -51,8 +51,8 @@ export async function step_read_mp3_tags(params: StepParams) {
         // Handle errors
         logger.error(`Failed processing songs in batch #${batchNr}: ${error.message}`, error.stack);
     }).forEach(async (batch, currentBatch, totalBatches) => {
-        const progress = currentBatch / totalBatches;
-        step.progress(progress);
+        const p = currentBatch / totalBatches;
+        progress(p);
 
         for(const file of batch) {
             // Set mount for file context
@@ -181,7 +181,7 @@ export async function step_create_artists(params: StepParams) {
             artist.slug = Slug.create(artist.name);
             return artist;
         }), (query, alias, ids) => query.select([`${alias}.id`, `${alias}.name`]).whereInIds(ids).getMany()).then((createdArtists) => {
-            step.progress(currentBatch / totalBatches);
+            progress(currentBatch / totalBatches);
             return new Map(createdArtists.map((artist) => ([getArtistKey(artist), artist])));
         }).catch((error) => {
             throw error;
@@ -235,7 +235,7 @@ export async function step_create_albums(params: StepParams) {
             return album;
         })).then((createdAlbums) => {
             logger.info(`Batch #${currentBatch}: Created ${createdAlbums.length} albums.`);
-            step.progress(currentBatch / totalBatches);
+            progress(currentBatch / totalBatches);
 
             return new Map(createdAlbums.map((album) => ([getAlbumKey(album), album])));
         }).catch((error: Error) => {
@@ -310,7 +310,7 @@ export async function step_create_songs(params: StepParams) {
                 .leftJoin(`${alias}.featuredArtists`, "featuredArtists").addSelect(["featuredArtists.id"]);
         }).then((createdSongs) => {
             logger.info(`Batch #${currentBatch}: Created ${createdSongs.length} database entries.`);
-            step.progress(currentBatch / totalBatches);
+            progress(currentBatch / totalBatches);
 
             // Map created artists back to map
             const map: Map<string, Song> = new Map();

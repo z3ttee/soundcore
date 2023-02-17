@@ -1,17 +1,15 @@
 import path from "node:path";
 import { worker } from "workerpool";
 import { StageConfigurator, StageInitializer } from "../builder/stage.builder";
-import { StepConfigurator } from "../builder/step.builder";
 import { Outputs, Resources, RunStatus } from "../entities/common.entity";
 import { IPipeline, PipelineRun } from "../entities/pipeline.entity";
 import { StepConditionEvaluator, StepExecutor, StepRef } from "../entities/step.entity";
-import { StepEventParams } from "../event/step-events";
 import { PipelineAbortedException } from "../exceptions/abortedException";
 import { StepSkippedException } from "../exceptions/skippedException";
 import { createLogger } from "../logging/logger";
 import { PipelineGlobalOptions } from "../pipelines.module";
 import { readConfiguratorFromFile } from "../utils/registerPipelines";
-import { emit, get, getOrDefault } from "../utils/workerHelperFunctions";
+import { getOrDefault } from "../utils/workerHelperFunctions";
 
 worker({
     default: async (pipeline: PipelineRun, definition: IPipeline, globalOptions: PipelineGlobalOptions) => {
@@ -105,17 +103,7 @@ worker({
                             });
                         }
 
-                        // Build params for step events
-                        const eventParams: StepEventParams = {
-                            pipeline: pipeline,
-                            stage: stage,
-                            step: step
-                        }
-
                         // Instantiate step ref functions
-                        const progress = (progress: number) => emit("step:progress", progress, eventParams);
-                        const message = (message: string) => emit("step:message", message, eventParams);
-
                         const abort = (error: string): never => {
                             throw new PipelineAbortedException(error, step);
                         }
@@ -132,7 +120,7 @@ worker({
                                 logger: logger,
                                 resources: resources,
                                 stage: stage,
-                                step: new StepRef(step, progress, message, abort, skip)
+                                step: new StepRef(step, abort, skip)
                             })
                         ]).catch((error) => {
                             throw error;

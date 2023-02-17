@@ -9,11 +9,11 @@ export class IndexerService {
     constructor(
         private readonly pipelines: PipelineService
     ) {
-        this.pipelines.on("step:progress", (progress, params) => {
-            console.log(progress, params);
+        this.pipelines.on("status", (params) => {
+            console.log(params);
         });
 
-        this.pipelines.on("pipeline:failed", (error, params) => {
+        this.pipelines.on("failed", (error, params) => {
             console.error(error);
             console.log("pipeline failed");
         })

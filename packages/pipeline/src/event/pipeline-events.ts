@@ -11,11 +11,11 @@ export type PipelineFailedEventHandler = (error: Error, params: PipelineEventPar
 export type PipelineStatusEventHandler = (params: PipelineEventParams) => Promise<void> | void;
 export type PipelineMessageEventHandler = (message: string, params: PipelineEventParams) => Promise<void> | void;
 
-export type PipelineEventNames = "pipeline:enqueued" | "pipeline:started" | "pipeline:completed" | "pipeline:failed" | "pipeline:status" | "pipeline:message"
+export type PipelineEventNames = "enqueued" | "started" | "completed" | "failed" | "status" | "message"
 export type PipelineEventHandler<T extends PipelineEventNames> = 
-    T extends "pipeline:enqueued" ? PipelineEnqueuedEventHandler :
-    T extends "pipeline:started" ? PipelineStartedEventHandler :
-    T extends "pipeline:completed" ? PipelineCompletedEventHandler :
-    T extends "pipeline:failed" ? PipelineFailedEventHandler :
-    T extends "pipeline:status" ? PipelineStatusEventHandler :
-    T extends "pipeline:message" ? PipelineMessageEventHandler : never;
+    T extends "enqueued" ? PipelineEnqueuedEventHandler :
+    T extends "started" ? PipelineStartedEventHandler :
+    T extends "completed" ? PipelineCompletedEventHandler :
+    T extends "failed" ? PipelineFailedEventHandler :
+    T extends "status" ? PipelineStatusEventHandler :
+    T extends "message" ? PipelineMessageEventHandler : never;
