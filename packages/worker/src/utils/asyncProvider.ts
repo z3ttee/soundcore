@@ -1,5 +1,5 @@
 import { Provider } from "@nestjs/common";
-import { MODULE_OPTIONS_TOKEN } from "../../constants";
+import { MODULE_OPTIONS_TOKEN } from "../constants";
 import { WorkerModuleAsyncOptions, WorkerModuleOptions } from "../worker.module";
 
 export function createModuleOptionsProviderAsync(asyncOptions: WorkerModuleAsyncOptions): Provider<WorkerModuleOptions> {

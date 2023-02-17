@@ -1,5 +1,5 @@
 import { Inject, Injectable, Logger } from "@nestjs/common";
-import { MODULE_OPTIONS_TOKEN } from "../../constants";
+import { MODULE_OPTIONS_TOKEN } from "../constants";
 import { WorkerModuleOptions } from "../worker.module";
 
 @Injectable()

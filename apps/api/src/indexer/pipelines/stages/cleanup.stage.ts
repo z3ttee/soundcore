@@ -2,7 +2,6 @@ import fs from "node:fs";
 import path from "node:path";
 import crypto from "node:crypto";
 import glob from "glob";
-import { PipelineLogger, PipelineRef, StageRef, StepRef } from "@soundcore/worker";
 import { DataSource } from "typeorm";
 import { Mount } from "../../../mount/entities/mount.entity";
 import { FileSystemService } from "../../../filesystem/services/filesystem.service";
