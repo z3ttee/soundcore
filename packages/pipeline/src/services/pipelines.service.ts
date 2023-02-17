@@ -165,32 +165,18 @@ export class PipelineService {
             }
         }).then((pipelineRun: PipelineRun) => {
             // Update pipeline status
-            pipelineRun.status = RunStatus.COMPLETED;
+            pipelineRun.status = pipelineRun.status != RunStatus.COMPLETED ? pipelineRun.status : RunStatus.COMPLETED;
             pipelineRun.currentStageId = null;
 
+            this.events.fireEvent("status", { pipeline: pipelineRun });
             this.events.fireEvent("completed", { pipeline: pipelineRun });
         }).catch((error: Error) => {
             // Update pipeline status
             pipelineRun.currentStageId = null;
-            pipelineRun.status = RunStatus.FAILED;
+            pipelineRun.status = pipelineRun.status != RunStatus.COMPLETED ? pipelineRun.status : RunStatus.FAILED;
 
+            this.events.fireEvent("status", { pipeline: pipelineRun });
             this.events.fireEvent("failed", error, { pipeline: pipelineRun });
-            // if(error instanceof SkippedException || error instanceof AbortException) {
-            //     pipeline.status = error instanceof AbortException ? RunStatus.WARNING : RunStatus.COMPLETED;
-
-            //     // Handle successful completion
-            //     const handlers = this.eventHandlers.get("pipeline:completed") as PipelineCompletedEventHandler[] ?? [];
-            //     for(const handler of handlers) {
-            //         handler(pipeline);
-            //     }
-            //     return;
-            // }
-
-            // // Handle errored completion
-            // const handlers = this.eventHandlers.get("pipeline:failed") as PipelineFailedEventHandler[] ?? [];
-            // for(const handler of handlers) {
-            //     handler(error, pipeline);
-            // }
         });
     }
 
