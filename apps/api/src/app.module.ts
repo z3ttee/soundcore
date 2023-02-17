@@ -36,7 +36,6 @@ import { WorkerQueueModule } from '@soundcore/nest-queue';
 import { TracklistModule } from './tracklist/tracklist.module';
 // import { WorkerModule } from '@soundcore/worker';
 import { PipelineModule } from '@soundcore/pipelines';
-import path from 'node:path';
 
 @Module({
   imports: [
