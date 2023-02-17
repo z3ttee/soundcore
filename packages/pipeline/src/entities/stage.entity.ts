@@ -1,4 +1,4 @@
-import { RunStatus } from "./common.entity";
+import { Outputs, RunStatus } from "./common.entity";
 import { Pipeline } from "./pipeline.entity";
 import { IStep, Step } from "./step.entity";
 
@@ -33,3 +33,5 @@ export class StageRef implements Omit<IStage, "dependsOn" | "steps"> {
         public readonly description: string
     ) {}
 }
+
+export type StageConditionEvaluator = (prevOutput: Outputs) => boolean | Promise<boolean>;

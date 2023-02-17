@@ -1,5 +1,5 @@
 import { PipelineAbortedException } from "../exceptions/abortedException";
-import { StepSkippedException } from "../exceptions/skippedException";
+import { SkippedException } from "../exceptions/skippedException";
 import { Environment, Outputs, PipelineLogger, Resources, RunStatus } from "./common.entity";
 import { IPipeline } from "./pipeline.entity";
 import { IStage } from "./stage.entity";
@@ -63,7 +63,7 @@ export class StepRef implements IStep {
      * @param reason Reason why the step is skipped
      */
     public skip(reason: string): never {
-        throw new StepSkippedException(reason);
+        throw new SkippedException(reason);
     }
 }
 

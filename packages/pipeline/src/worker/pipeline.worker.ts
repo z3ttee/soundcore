@@ -4,9 +4,10 @@ import { StageConfigurator, StageInitializer } from "../builder/stage.builder";
 import { DEFAULT_STATUS_EVENT_DEBOUNCE_MS } from "../constants";
 import { Outputs, Resources, RunStatus } from "../entities/common.entity";
 import { IPipeline, PipelineRun } from "../entities/pipeline.entity";
+import { StageConditionEvaluator } from "../entities/stage.entity";
 import { StepConditionEvaluator, StepExecutor, StepRef } from "../entities/step.entity";
 import { PipelineAbortedException } from "../exceptions/abortedException";
-import { StepSkippedException } from "../exceptions/skippedException";
+import { SkippedException } from "../exceptions/skippedException";
 import { createLogger } from "../logging/logger";
 import { PipelineGlobalOptions, PipelineLocalOptions } from "../pipelines.module";
 import { readConfiguratorFromFile } from "../utils/registerPipelines";
@@ -33,14 +34,14 @@ worker({
         const pipelineConfigurator = readConfiguratorFromFile(path.resolve(definition.scriptFile));
         // Extract stage initializers pipeline script
         const stageConfigurators: Map<string, StageConfigurator> = new Map();
-        const stageInitializers: Map<string, StageInitializer> = new Map();
         for(const stageConfigurator of pipelineConfigurator["_stages"]) {
             stageConfigurators.set(stageConfigurator["_id"], stageConfigurator);
-            if(typeof stageConfigurator["_initializer"] === "function") stageInitializers.set(stageConfigurator["_id"], stageConfigurator["_initializer"]);
         }
 
         // Execute all stages
-        for(const stage of pipeline.stages) {
+        for(let stageIndex = 0; stageIndex < pipeline.stages.length; stageIndex++) {
+            const stage = pipeline.stages[stageIndex];
+            const prevStage = stageIndex > 0 ? pipeline.stages[stageIndex - 1] : stage;
             logger.info(`Preparing stage '${stage.id}'...`);
 
             // Update global object
@@ -55,36 +56,47 @@ worker({
                 if(typeof stepConfigurator["_runner"] === "function") stepExecutors.set(stepConfigurator["_id"], stepConfigurator["_runner"])
             }
 
-            // Check if there are any executors registered, otherwise skip stage
-            if(stepExecutors.size <= 0) {
-                logger.warn(`Stage '${stage.id}' has no steps. Skipping...`);
-                continue;
-            }
-
-            // Instantiate default resources and execute
-            // optional initializer to build resources object
-            let resources: Resources = {};
-            if(stageInitializers.has(stage.id)) {
-                const initializer: StageInitializer = stageInitializers.get(stage.id);
-                // Validate initializer function
-                if(typeof initializer !== "function") {
-                    const error = new Error(`Invalid initializer function on stage '${stage.id}'`);
-                    logger.error(`Failed initializing stage: ${error.message}`, error.stack);
-                    throw error;
-                }
-
-                // Execute initializer
-                resources = await initializer().then((val) => val ?? {}).catch((error: Error) => {
-                    logger.error(`Failed initializing stage: ${error.message}`, error.stack);
-                    throw error;
-                });
-            }
-
             try {
                 // Update pipeline status
                 pipeline.currentStageId = stage.id;
                 stage.status = RunStatus.WORKING;
                 emit("status", { pipeline });
+
+                // Check if there are any executors registered, otherwise skip stage
+                if(stepExecutors.size <= 0) {
+                    logger.warn(`Stage '${stage.id}' has no steps. Skipping...`);
+                    continue;
+                }
+
+                // Evaluate if stage can run based on condition
+                if(typeof stageConfigurators.get(stage.id)?.["_conditionEvaluator"] === "function") {
+                    const conditionEvaluator = async (prevOutput: Outputs) => await stageConfigurators.get(stage.id)?.["_conditionEvaluator"](prevOutput) ;
+                    const outputs = getOrDefault(`${prevStage.id}`, {});
+
+                    // Execute evaluator
+                    await conditionEvaluator(outputs).catch((error: Error) => {
+                        logger.warn(`Could not evaluate condition for step '${stage.id}': ${error.message}`);
+                        throw new SkippedException(`Could not evaluate condition: ${error.message}`);
+                    }).then((canContinue) => {
+                        if(!canContinue) {
+                            stage.status = RunStatus.SKIPPED;
+                            throw new SkippedException(`Skipped because condition was not met. Received 'false'`);
+                        }
+                    });
+                }
+
+                // Instantiate default resources and execute
+                // optional initializer to build resources object
+                let resources: Resources = {};
+                if(typeof stageConfigurators.get(stage.id)?.["_initializer"] === "function") {
+                    const initializer: StageInitializer = stageConfigurators.get(stage.id)?.["_initializer"];
+
+                    // Execute initializer
+                    resources = await initializer().then((val) => val ?? {}).catch((error: Error) => {
+                        logger.error(`Failed initializing stage: ${error.message}`, error.stack);
+                        throw error;
+                    });
+                }
 
                 // Execute steps
                 for(let index = 0; index < stage.steps.length; index++) {
@@ -112,11 +124,11 @@ worker({
                             const outputs = !!prevStep ? getOrDefault(`${stage.id}.${prevStep.id}`, {}) : {};
                             await conditionEvaluator(outputs).catch((error: Error) => {
                                 logger.warn(`Could not evaluate condition for step '${step.id}': ${error.message}`);
-                                throw new StepSkippedException(`Could not evaluate condition: ${error.message}`);
+                                throw new SkippedException(`Could not evaluate condition: ${error.message}`);
                             }).then((canContinue) => {
                                 if(!canContinue) {
                                     step.status = RunStatus.SKIPPED;
-                                    throw new StepSkippedException(`Skipped because condition was not met. Received 'false'`);
+                                    throw new SkippedException(`Skipped because condition was not met. Received 'false'`);
                                 }
                             });
                         }
@@ -129,7 +141,7 @@ worker({
 
                         const skip = (reason: string): never => {
                             step.status = RunStatus.SKIPPED;
-                            throw new StepSkippedException(reason);
+                            throw new SkippedException(reason);
                         }
 
                         const executor = stepExecutors.get(step.id);
@@ -152,7 +164,7 @@ worker({
                             emit("status", { pipeline });
                         })
                     } catch (error) {
-                        if(error instanceof StepSkippedException) {
+                        if(error instanceof SkippedException) {
                             logger.warn(`Skipped step '${step.id}': ${error.reason}`);
                             step.status = step.status != RunStatus.WORKING ? step.status : RunStatus.SKIPPED;
                             emit("status", { pipeline });
@@ -171,11 +183,19 @@ worker({
                 emit("status", { pipeline });
             } catch (error: any) {                
                 if(error instanceof PipelineAbortedException) {
+                    // Pipeline was aborted
                     pipeline.status = RunStatus.ABORTED;
                     stage.status = RunStatus.ABORTED;
                     logger.error(`Pipeline aborted by step '${error.issuer.id}': ${error.message}`);
                     emit("status", { pipeline });
                     throw new Error(`Pipeline aborted by step '${error.issuer.id}': ${error.message}`);
+                } else if(error instanceof SkippedException) {
+                    // Stage was skipped
+                    logger.warn(`Skipped stage '${stage.id}': ${error.reason}`);
+                    stage.status = stage.status != RunStatus.WORKING ? stage.status : RunStatus.SKIPPED;
+                    emit("status", { pipeline });
+                    // Continue with next stage
+                    continue;
                 }
 
                 pipeline.status = RunStatus.FAILED;
