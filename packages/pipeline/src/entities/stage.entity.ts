@@ -34,4 +34,4 @@ export class StageRef implements Omit<IStage, "dependsOn" | "steps"> {
     ) {}
 }
 
-export type StageConditionEvaluator = (prevOutput: Outputs) => boolean | Promise<boolean>;
+export type StageConditionEvaluator = (prevOutput: Outputs, shared: Outputs) => boolean | Promise<boolean>;

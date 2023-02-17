@@ -77,4 +77,4 @@ export interface StepParams {
 }
 
 export type StepExecutor = (params: StepParams) => any | Promise<any>;
-export type StepConditionEvaluator = (prevOutput: Outputs) => boolean | Promise<boolean>;
+export type StepConditionEvaluator = (prevOutput: Outputs, shared: Outputs) => boolean | Promise<boolean>;

@@ -13,7 +13,7 @@ export default pipeline(PIPELINE_INDEX_ID, PIPELINE_INDEX_NAME)
         return Database.connect().then((datasource) => ({ datasource: datasource }));
     }).step(STEP_CHECKOUT_MOUNT_ID, STEP_CHECKOUT_MOUNT_NAME).run((params) => {
         return step_checkout_mount(params);
-    }).step(STEP_LOOKUP_FILES_ID, STEP_LOOKUP_FILES_NAME).condition((outputs) => !!outputs["mount"]).run((params) => {
+    }).step(STEP_LOOKUP_FILES_ID, STEP_LOOKUP_FILES_NAME).condition((_, shared) => !!shared["mount"]).run((params) => {
         return step_search_files(params);
     }).step(STEP_INDEX_FILES_ID, STEP_INDEX_FILES_NAME).condition((outputs) => outputs["files"]?.length > 0).run((params) => {
         return step_create_database_entries(params);
