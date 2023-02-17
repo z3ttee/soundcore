@@ -1,4 +1,5 @@
 # NestJS Pipeline Module
+Package for implementing workflows using the pipeline pattern.
 
 ## Usage
 
