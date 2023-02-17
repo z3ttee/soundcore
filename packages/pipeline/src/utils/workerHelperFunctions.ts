@@ -1,4 +1,6 @@
+import { debounceTime, Subject } from "rxjs";
 import { workerEmit } from "workerpool";
+import { DEFAULT_STATUS_EVENT_DEBOUNCE_MS } from "../constants";
 import { Outputs } from "../entities/common.entity";
 import { IPipeline, PipelineRun } from "../entities/pipeline.entity";
 import { Stage } from "../entities/stage.entity";
@@ -11,10 +13,39 @@ class PipelineGlobal {
     stage: Stage;
     step: Step;
     outputs: Outputs = {};
+    statusEventDebounceMs: number = DEFAULT_STATUS_EVENT_DEBOUNCE_MS
 }
 
 const globals = new PipelineGlobal();
 export const globalThis = globals;
+
+const collectedStatusEvents: Map<string, Subject<EventHandlerParams<"status">>> = new Map();
+const statusEventSubject = new Subject<EventHandlerParams<"status">>();
+const statusEvent = statusEventSubject.asObservable();
+
+statusEvent.subscribe((eventParams) => {
+    const pipeline = eventParams[0].pipeline;
+    let subject: Subject<EventHandlerParams<"status">>;
+
+    if(!collectedStatusEvents.has(pipeline.id)) {
+        const debounceMs = Math.max(0, getDebounceMs());
+
+        subject = new Subject();
+        collectedStatusEvents.set(pipeline.id, subject);
+
+        subject.pipe(debounceTime(debounceMs)).subscribe((args) => {
+            emitDebouncedStatus(args);
+        });
+    } else {
+        subject = collectedStatusEvents.get(pipeline.id);
+    }
+
+    subject.next(eventParams);
+});
+
+function getDebounceMs() {
+    return globalThis.statusEventDebounceMs ?? 0;
+}
 
 /**
  * Emit a message in a pipeline.
@@ -57,7 +88,21 @@ export function progress(progress: number) {
  * @param args Parameters to pass to handler
  */
 export function emit<T extends EventName>(eventName: T, ...args: EventHandlerParams<T>) {
-    workerEmit({ name: eventName, args } as WorkerEmitEvent<T>);
+
+    if(eventName === "status") {
+        debounceStatus((args as EventHandlerParams<"status">));
+    } else {
+        workerEmit({ name: eventName, args } as WorkerEmitEvent<T>);
+    }
+
+}
+
+function debounceStatus(args: EventHandlerParams<"status">) {
+    statusEventSubject.next(args);
+}
+
+function emitDebouncedStatus(args: EventHandlerParams<"status">) {
+    workerEmit({ name: "status", args: args } as WorkerEmitEvent<"status">);
 }
 
 /**

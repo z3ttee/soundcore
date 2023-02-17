@@ -26,7 +26,7 @@ export interface PipelineLocalOptions {
 
     /**
      * Maximum amount of concurrently running pipelines
-     * @default 10
+     * @default 1
      */
     concurrent?: number;
 
@@ -39,6 +39,14 @@ export interface PipelineLocalOptions {
      * @default 10000
      */
     pollingRateMs?: number;
+
+    /**
+     * Time in milliseconds used to debounce status events of pipelines.
+     * This will collect the latest status updates (during the given time frame) and push them in a single
+     * event.
+     * @default 300
+     */
+    debounceStatus?: number;
 }
 
 const globalRegistry = new PipelineRegistry();

@@ -17,6 +17,9 @@ export class IndexerService {
         this.pipelines.on("completed", ({ pipeline }) => {
             console.log("Pipeline " + pipeline.id + " completed");
         })
+        this.pipelines.on("status", ({ pipeline }) => {
+            console.log("Pipeline status: ", pipeline.status);
+        })
         // this.pipelines.on("pipeline:started", (pipeline) => {
         //     console.log("pipeline started");
         //     // TODO: Send update to gateway

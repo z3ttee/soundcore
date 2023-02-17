@@ -1,21 +1,25 @@
 import path from "node:path";
 import { worker } from "workerpool";
 import { StageConfigurator, StageInitializer } from "../builder/stage.builder";
+import { DEFAULT_STATUS_EVENT_DEBOUNCE_MS } from "../constants";
 import { Outputs, Resources, RunStatus } from "../entities/common.entity";
 import { IPipeline, PipelineRun } from "../entities/pipeline.entity";
 import { StepConditionEvaluator, StepExecutor, StepRef } from "../entities/step.entity";
 import { PipelineAbortedException } from "../exceptions/abortedException";
 import { StepSkippedException } from "../exceptions/skippedException";
 import { createLogger } from "../logging/logger";
-import { PipelineGlobalOptions } from "../pipelines.module";
+import { PipelineGlobalOptions, PipelineLocalOptions } from "../pipelines.module";
 import { readConfiguratorFromFile } from "../utils/registerPipelines";
 import { emit, getOrDefault, globalThis } from "../utils/workerHelperFunctions";
 
 worker({
-    default: async (pipeline: PipelineRun, definition: IPipeline, globalOptions: PipelineGlobalOptions) => {
+    default: async (pipeline: PipelineRun, definition: IPipeline, globalOptions: PipelineGlobalOptions, localOptions: PipelineLocalOptions) => {
         // Instantiate logger
         const logger = createLogger(pipeline.id, pipeline.runId, globalOptions.enableStdout ?? false, true);
         logger.info(`Worker picked up pipeline run. Preparing...`);
+
+        // Update debounce time
+        globalThis.statusEventDebounceMs = localOptions.debounceStatus ?? DEFAULT_STATUS_EVENT_DEBOUNCE_MS;
 
         // Update pipeline status
         pipeline.status = RunStatus.WORKING;

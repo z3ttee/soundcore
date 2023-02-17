@@ -157,7 +157,7 @@ export class PipelineService {
         const definition = this.registry.get(pipelineRun.id);
 
         // Execute the pipeline in the worker pool
-        this.pool.exec("default", [ pipelineRun, definition, this.globalOptions ], {
+        this.pool.exec("default", [ pipelineRun, definition, this.globalOptions, this.localOptions ], {
             // Subscribe to any event
             on: (payload: WorkerEmitEvent<any>) => {
                 const { name, args } = payload;
