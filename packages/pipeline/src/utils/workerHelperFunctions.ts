@@ -1,7 +1,8 @@
+import sizeof from "object-sizeof";
 import { debounceTime, Subject } from "rxjs";
 import { workerEmit } from "workerpool";
 import { DEFAULT_STATUS_EVENT_DEBOUNCE_MS } from "../constants";
-import { Outputs } from "../entities/common.entity";
+import { Outputs, PipelineLogger } from "../entities/common.entity";
 import { IPipeline, PipelineRun } from "../entities/pipeline.entity";
 import { Stage } from "../entities/stage.entity";
 import { Step } from "../entities/step.entity";
@@ -13,6 +14,8 @@ class PipelineGlobal {
     stage: Stage;
     step: Step;
     outputs: Outputs = {};
+    sharedOutputs: Outputs = {}
+    logger: PipelineLogger;
     statusEventDebounceMs: number = DEFAULT_STATUS_EVENT_DEBOUNCE_MS
 }
 
@@ -120,7 +123,26 @@ export function set<T = any>(key: string, value: T) {
         throw new Error(`set() was called outside the scope of step in a pipeline.`);
     }
 
+    const outputsMemSize = sizeof(globalThis.outputs);
+    const valueMemSize = sizeof(value);
+    globalThis.logger?.info(`Writing ${valueMemSize} bytes to output (Total: ${valueMemSize+outputsMemSize} bytes)`);
+
     return writeOutput<T>(pipeline, `${stage.id}.${step.id}.${key}`, value);
+}
+
+/**
+ * Write a value to the shared output of the current pipeline.
+ * @param key Key to write to
+ * @param value Value to write
+ * @returns Written value
+ */
+export function setShared<T = any>(key: string, value: T) {
+    const outputsMemSize = sizeof(globalThis.sharedOutputs);
+    const valueMemSize = sizeof(value);
+    globalThis.logger?.info(`Writing ${valueMemSize} bytes to shared output (Total: ${valueMemSize+outputsMemSize} bytes)`);
+
+    globalThis.sharedOutputs[key] = value;
+    return value;
 }
 
 /**
@@ -153,6 +175,15 @@ export function getOrDefault<T = any>(path: string, defaultValue: T) {
     return readOutput<T>(pipeline, path, defaultValue);
 }
 
+/**
+ * Get a value by the key in the pipelin's shared outputs object
+ * @param key Key of the value
+ * @param defaultValue Default value to return
+ */
+export function getSharedOrDefault<T = any>(key: string, defaultValue?: T) {
+    const shared = globalThis.sharedOutputs ?? {};
+    return shared[key] ?? defaultValue ?? undefined;
+}
 
 function writeOutput<T = any>(pipeline: PipelineRun, path: string, value: T) {
     const parts = path.split(".");

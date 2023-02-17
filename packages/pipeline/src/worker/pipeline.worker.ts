@@ -2,9 +2,8 @@ import path from "node:path";
 import { worker } from "workerpool";
 import { StageConfigurator, StageInitializer } from "../builder/stage.builder";
 import { DEFAULT_STATUS_EVENT_DEBOUNCE_MS } from "../constants";
-import { Outputs, Resources, RunStatus } from "../entities/common.entity";
+import { Outputs, PipelineLogger, Resources, RunStatus } from "../entities/common.entity";
 import { IPipeline, PipelineRun } from "../entities/pipeline.entity";
-import { StageConditionEvaluator } from "../entities/stage.entity";
 import { StepConditionEvaluator, StepExecutor, StepRef } from "../entities/step.entity";
 import { PipelineAbortedException } from "../exceptions/abortedException";
 import { SkippedException } from "../exceptions/skippedException";
@@ -15,12 +14,16 @@ import { emit, getOrDefault, globalThis } from "../utils/workerHelperFunctions";
 
 worker({
     default: async (pipeline: PipelineRun, definition: IPipeline, globalOptions: PipelineGlobalOptions, localOptions: PipelineLocalOptions) => {
+        const startedAtMs: number = Date.now();
+
         // Instantiate logger
         const logger = createLogger(pipeline.id, pipeline.runId, globalOptions.enableStdout ?? false, true);
         logger.info(`Worker picked up pipeline run. Preparing...`);
 
         // Update debounce time
         globalThis.statusEventDebounceMs = localOptions.debounceStatus ?? DEFAULT_STATUS_EVENT_DEBOUNCE_MS;
+        // Update logger
+        globalThis.logger = logger;
 
         // Update pipeline status
         pipeline.status = RunStatus.WORKING;
@@ -188,6 +191,7 @@ worker({
                     stage.status = RunStatus.ABORTED;
                     logger.error(`Pipeline aborted by step '${error.issuer.id}': ${error.message}`);
                     emit("status", { pipeline });
+                    logDurationMs(startedAtMs, logger);
                     throw new Error(`Pipeline aborted by step '${error.issuer.id}': ${error.message}`);
                 } else if(error instanceof SkippedException) {
                     // Stage was skipped
@@ -205,6 +209,7 @@ worker({
 
                 // Unresolvable error was thrown, that breaks the flow of the pipeline, abort the execution of the pipeline
                 // For that, break the stage for-loop to end the pipeline run.
+                logDurationMs(startedAtMs, logger);
                 throw error;
             }
         }
@@ -214,7 +219,12 @@ worker({
         pipeline.currentStageId = null;
         emit("status", { pipeline });
 
+        logDurationMs(startedAtMs, logger);
         return pipeline;
     }
 });
+
+function logDurationMs(startedAtMs: number, logger: PipelineLogger) {
+    logger.info(`Pipeline ran for ${Date.now() - startedAtMs}ms`);
+}
 

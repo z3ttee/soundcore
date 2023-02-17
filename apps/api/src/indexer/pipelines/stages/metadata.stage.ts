@@ -13,7 +13,7 @@ import { DataSource } from "typeorm";
 import { ArtistService } from "../../../artist/artist.service";
 import { AlbumService } from "../../../album/services/album.service";
 import { FileSystemService } from "../../../filesystem/services/filesystem.service";
-import { get, getOrDefault, progress, set, StepParams } from "@soundcore/pipelines";
+import { get, getOrDefault, getSharedOrDefault, progress, set, StepParams } from "@soundcore/pipelines";
 
 export async function step_read_mp3_tags(params: StepParams) {
     const { step, resources, logger } = params;
@@ -25,7 +25,7 @@ export async function step_read_mp3_tags(params: StepParams) {
     
     // Prepare step
     const files: Map<string, File> = getOrDefault(`${STAGE_SCAN_ID}.${STEP_INDEX_FILES_ID}.files`, new Map());
-    const mount: Mount = get(`${STAGE_SCAN_ID}.${STEP_CHECKOUT_MOUNT_ID}.mount`).mount;
+    const mount: Mount = getSharedOrDefault(`mount`).mount;
 
     if(!files || files.size <= 0) {
         step.skip("No new files were created in database.");

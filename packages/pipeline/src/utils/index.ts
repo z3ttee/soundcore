@@ -1,2 +1,2 @@
 
-export { message, progress, set, get, getOrDefault } from "./workerHelperFunctions";
+export { message, progress, set, get, getOrDefault, setShared, getSharedOrDefault } from "./workerHelperFunctions";

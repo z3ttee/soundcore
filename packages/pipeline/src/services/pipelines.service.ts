@@ -16,7 +16,6 @@ import { PipelineEventService } from "./pipeline-event.service";
 import { PipelineGlobalOptions, PipelineLocalOptions } from "../pipelines.module";
 import { Stage } from "../entities/stage.entity";
 import { Step } from "../entities/step.entity";
-import { inspect } from "node:util";
 
 @Injectable()
 export class PipelineService {
@@ -173,7 +172,7 @@ export class PipelineService {
         }).catch((error: Error) => {
             // Update pipeline status
             pipelineRun.currentStageId = null;
-            pipelineRun.status = pipelineRun.status != RunStatus.COMPLETED ? pipelineRun.status : RunStatus.FAILED;
+            pipelineRun.status = RunStatus.FAILED;
 
             this.events.fireEvent("status", { pipeline: pipelineRun });
             this.events.fireEvent("failed", error, { pipeline: pipelineRun });

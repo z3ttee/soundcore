@@ -11,8 +11,8 @@ import { FileDTO } from "../../../file/dto/file.dto";
 import { Batch } from "@soundcore/common";
 import { File } from "../../../file/entities/file.entity";
 import { FileService } from "../../../file/services/file.service";
-import { STAGE_SCAN_ID, STEP_CHECKOUT_MOUNT_ID } from "../../pipelines";
-import { get, getOrDefault, progress, set, StepParams } from "@soundcore/pipelines";
+import { STAGE_SCAN_ID, STEP_CHECKOUT_MOUNT_ID, STEP_LOOKUP_FILES_ID } from "../../pipelines";
+import { get, getOrDefault, getSharedOrDefault, progress, set, setShared, StepParams } from "@soundcore/pipelines";
 
 /**
  * Checkout mount using the id provided via env.
@@ -44,7 +44,7 @@ export async function step_checkout_mount(params: StepParams) {
     });
 
     // Step cleanup
-    const result = set("mount", mount);
+    const result = setShared("mount", mount);
     logger.info(`Checked out mount '${result?.name}'`);
 }
 
@@ -57,11 +57,9 @@ export async function step_checkout_mount(params: StepParams) {
  */
 export async function step_search_files(params: StepParams) {
     const { environment, logger, step } = params;
-    
-    // Step preparation
-    const mount = get(`${STAGE_SCAN_ID}.${STEP_CHECKOUT_MOUNT_ID}.mount`);
 
-    return;
+    // Step preparation
+    const mount = getSharedOrDefault(`mount`);
 
     const fsService = new FileSystemService();
     const registryService = new MountRegistryService(fsService);
@@ -148,8 +146,8 @@ export async function step_create_database_entries(params: StepParams) {
     const fsService = new FileSystemService();
     const service = new FileService(repository);
 
-    const mount: Mount = get(`${STEP_CHECKOUT_MOUNT_ID}.mount`);
-    const files: FileDTO[] = getOrDefault(`${STEP_CHECKOUT_MOUNT_ID}.files`, []);
+    const mount: Mount = getSharedOrDefault(`mount`);
+    const files: FileDTO[] = getOrDefault(`${STAGE_SCAN_ID}.${STEP_LOOKUP_FILES_ID}.files`, []);
 
     if(files.length <= 0) {
         step.skip("No files were found in previous steps");
