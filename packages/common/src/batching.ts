@@ -64,7 +64,7 @@ export class Batch<I = any, R = I> extends BaseBatch<I> {
             let length = list.length;
 
             // Get amount of batches to process (used for stats and progress)
-            const batches = Math.round(list.length / this.batchSize);
+            const totalBatches = Math.ceil(list.length / this.batchSize);
     
             while(length) {
                 currentBatch++;
@@ -77,7 +77,7 @@ export class Batch<I = any, R = I> extends BaseBatch<I> {
     
                 // Build executer
                 const runHandler = async () => {
-                    return this._handler(batch, currentBatch, batches);
+                    return this._handler(batch, currentBatch, totalBatches);
                 }
     
                 // Execute handler and get result.
@@ -114,7 +114,7 @@ export class Batch<I = any, R = I> extends BaseBatch<I> {
             let length = list.length;
 
             // Get amount of batches to process (used for stats and progress)
-            const batches = Math.round(list.length / this.batchSize);
+            const totalBatches = Math.ceil(list.length / this.batchSize);
     
             while(length) {
                 currentBatch++;
@@ -127,7 +127,7 @@ export class Batch<I = any, R = I> extends BaseBatch<I> {
     
                 // Build executer
                 const runHandler = async () => {
-                    return this._mapHandler(batch, currentBatch, batches);
+                    return this._mapHandler(batch, currentBatch, totalBatches);
                 }
     
                 // Execute handler and get result.
