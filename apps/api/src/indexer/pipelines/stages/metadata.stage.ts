@@ -2,7 +2,7 @@ import fs from "node:fs/promises";
 import { Batch } from "@soundcore/common";
 import { File, FileFlag } from "../../../file/entities/file.entity";
 import { Mount } from "../../../mount/entities/mount.entity";
-import { STAGE_METADATA_ID, STAGE_SCAN_ID, STEP_CHECKOUT_MOUNT_ID, STEP_CREATE_ALBUMS_ID, STEP_CREATE_ARTISTS_ID, STEP_INDEX_FILES_ID, STEP_READ_TAGS_ID } from "../../pipelines";
+import { STAGE_METADATA_ID, STEP_CREATE_ALBUMS_ID, STEP_CREATE_ARTISTS_ID, STEP_READ_TAGS_ID } from "../../pipelines";
 import { ID3TagsDTO } from "../../../song/dtos/id3-tags.dto";
 import { Song } from "../../../song/entities/song.entity";
 import { SongService } from "../../../song/services/song.service";
@@ -13,7 +13,7 @@ import { DataSource } from "typeorm";
 import { ArtistService } from "../../../artist/artist.service";
 import { AlbumService } from "../../../album/services/album.service";
 import { FileSystemService } from "../../../filesystem/services/filesystem.service";
-import { get, getOrDefault, getSharedOrDefault, progress, set, StepParams } from "@soundcore/pipelines";
+import { getOrDefault, getSharedOrDefault, progress, set, StepParams } from "@soundcore/pipelines";
 
 export async function step_read_mp3_tags(params: StepParams) {
     const { step, resources, logger } = params;
@@ -176,6 +176,7 @@ export async function step_create_artists(params: StepParams) {
         // Handle errors
         logger.error(`Failed processing artists in batch #${batchNr}: ${error.message}`, error.stack);
     }).map((batch, currentBatch, totalBatches) => {
+        // Execute insert query
         return service.createIfNotExists(batch.map((artist) => {
             // Map slug
             artist.slug = Slug.create(artist.name);
@@ -236,7 +237,6 @@ export async function step_create_albums(params: StepParams) {
         })).then((createdAlbums) => {
             logger.info(`Batch #${currentBatch}: Created ${createdAlbums.length} albums.`);
             progress(currentBatch / totalBatches);
-
             return new Map(createdAlbums.map((album) => ([getAlbumKey(album), album])));
         }).catch((error: Error) => {
             logger.error(`Failed creating albums: ${error.message}`, error);
@@ -254,7 +254,12 @@ export async function step_create_albums(params: StepParams) {
     });
 }
 
+/**
+ * Create songs in database step.
+ * @param params Parameters used for the current step
+ */
 export async function step_create_songs(params: StepParams) {
+    // Deconstruct params
     const { logger, resources, step } = params;
 
     // Prepare step
@@ -273,82 +278,80 @@ export async function step_create_songs(params: StepParams) {
         return;
     }
 
+    // Split the songs of previous steps into chunks
+    // of 100 items each
     return Batch.useDataset(Array.from(songs.values())).onError((error: Error, batch, batchNr: number) => {
+        // Log errors
+        logger.error(`Failed processing songs in batch #${batchNr}: ${error.message}`, error.stack);
+
+        // Set file flag to ERROR for songs
         for(const song of batch) {
             const file = files.get(song.file?.id);
             if(typeof file === "undefined" || file == null) continue;
             file.flag = FileFlag.ERROR;
         }
-
-        // Handle errors
-        logger.error(`Failed processing songs in batch #${batchNr}: ${error.message}`, error.stack);
     }).map((batch, currentBatch, totalBatches) => {
-        const mappedSongs = batch.map((song) => {
-            const s = {...song};
+
+        const songMappedByFiles: Map<string, Song> = new Map();
+
+        // Map the songs from previous outputs using valid data.
+        // Because artists and albums have been created previously, we can
+        // now map their ids to the song dtos. This will create the songs in the database
+        // using the correct relations.
+        const mappedSongs: Song[] = batch.map((song) => {
+            const s = {...song} as Song;
             s.primaryArtist = artists.get(getArtistKey(song.primaryArtist)) ?? undefined;
             s.album = albums.get(getAlbumKey(song.album)) ?? undefined;
 
-            if(song.featuredArtists?.length > 0) {
-                s.featuredArtists = (song.featuredArtists ?? []).map((artist) => artists.get(getArtistKey(artist)) ?? undefined) ?? undefined;
-            console.log(song.featuredArtists);
-
-            } else {
-                s.featuredArtists = undefined;
-            }
-
+            songMappedByFiles.set(s.file.id, s);
             return s;
         });
 
         // Create database entries
-        return service.createIfNotExists(mappedSongs, (query, alias) => {
-            // Custom query select
-            return query
-                .select([`${alias}.id`, `${alias}.name`])
-                .leftJoin(`${alias}.file`, "file").addSelect(["file.id"])
-                .leftJoin(`${alias}.primaryArtist`, "primaryArtist").addSelect(["primaryArtist.id"])
-                .leftJoin(`${alias}.album`, "album").addSelect(["album.id"])
-                .leftJoin(`${alias}.featuredArtists`, "featuredArtists").addSelect(["featuredArtists.id"]);
-        }).then((createdSongs) => {
+        return service.createIfNotExists(mappedSongs, (query, alias) => query.select([`${alias}.id`]).leftJoin(`${alias}.file`, "file").addSelect(["file.id"])).then((createdSongs) => {
             logger.info(`Batch #${currentBatch}: Created ${createdSongs.length} database entries.`);
-            progress(currentBatch / totalBatches);
 
-            // Map created artists back to map
-            const map: Map<string, Song> = new Map();
-            for(const song of createdSongs) {
-                map.set(getSongKey(song), song);
+            const mappedCreatedSongs: Song[] = [];
+            // Map the created songs in the database and apply featuredArtists as they
+            // were not saved using the standard insert-query.
+            for(const s of createdSongs) {
+                // We have to use the song dto from before the query, as the
+                // query result has no featuredArtists
+                const mappedSong = songMappedByFiles.get(s.file.id);
 
-                const file = files.get(song.file?.id);
-                if(typeof file === "undefined" || file == null) continue;
-                file.flag = FileFlag.OK;
-            }
-
-            const keys = Array.from(map.keys());
-            for(const song of batch) {
-                if(keys.findIndex((s) => s === getSongKey(song)) <= -1) {
-                    // Song was not created, maybe due to being a duplicate
-                    const file = files.get(song.file?.id);
-
-                    console.log("did not create song: ", song.name);
-
-                    if(typeof file === "undefined" || file == null) continue;
-                    file.flag = FileFlag.POTENTIAL_DUPLICATE;
+                // Check if there are any featured artists
+                // If not, continue with next as we do not have to add it to
+                // the save-query
+                if(mappedSong.featuredArtists?.length <= 0) {
+                    continue;
                 }
+
+                // Map featured artists
+                s.featuredArtists = (mappedSong.featuredArtists ?? []).map((artist) => artists.get(getArtistKey(artist)) ?? undefined) ?? undefined;
+                // Return the new mapped song
+                mappedCreatedSongs.push(s);
             }
+            
+            // Perform a save-query using the mapped data
+            return repository.save(mappedCreatedSongs).catch((error: Error) => {
+                logger.error(`Failed saving featured artists on songs: ${error.message}`, error.stack);
+                return [];
+            }).then((list) => {
+                logger.info(`Batch #${currentBatch}: Saved featured artists for ${list.length} song entries.`);
+                progress(currentBatch / totalBatches);
 
-            return map;
+                // Map created artists back to map
+                const map: Map<string, Song> = new Map();
+                for(const song of createdSongs) {
+                    map.set(song.id, song);
 
-            // return service.saveAll(createdSongs.map((song) => {
-            //     const s = map.get(getSongKey(song));
-            //     s.featuredArtists = (song.featuredArtists ?? []).map((a) => artists.get(getArtistKey(a)));
+                    const file = files.get(song.file?.id);
+                    if(typeof file === "undefined" || file == null) continue;
+                    file.flag = FileFlag.OK;
+                }
 
-            //     console.log()
-
-            //     return song;
-            // })).then((result) => {
-                
-
-            //     return map
-            // });
+                return map;
+            })
         }).catch((error: Error) => {
             logger.error(`Failed creating songs in database: ${error.message}`, error.stack);
             throw error;
@@ -357,7 +360,7 @@ export async function step_create_songs(params: StepParams) {
         // Processing all batches done.
         // Write logs and create output
         logger.info(`Created and fetched ${createdSongs.size} songs.`);
-        set("songs", createdSongs);
+        // set("songs", createdSongs);
     }).catch((error: Error) => {
         // Batching process failed
         logger.error(`Failed creating songs: ${error.message}`, error);
@@ -370,9 +373,9 @@ function getArtistKey(artist: Artist): string {
 }
 
 function getAlbumKey(album: Album): string {
-    return `${album?.name}${album?.primaryArtist?.name}`;
+    return `${album?.name}.${album?.primaryArtist?.name}`;
 }
 
 function getSongKey(song: Song): string {
-    return `${song?.name}${song?.primaryArtist?.name}${song?.album?.name}`;
+    return `${song?.name}.${song?.primaryArtist?.name}.${song?.album?.name}`;
 }

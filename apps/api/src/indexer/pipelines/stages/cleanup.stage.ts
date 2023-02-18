@@ -1,32 +1,46 @@
-import fs from "node:fs";
-import path from "node:path";
-import crypto from "node:crypto";
-import glob from "glob";
-import { DataSource } from "typeorm";
-import { Mount } from "../../../mount/entities/mount.entity";
-import { FileSystemService } from "../../../filesystem/services/filesystem.service";
-import { MountRegistryService } from "../../../mount/services/mount-registry.service";
-import { MountRegistry } from "../../../mount/entities/mount-registry.entity";
-import { FileDTO } from "../../../file/dto/file.dto";
 import { Batch } from "@soundcore/common";
+import { get, getOrDefault, getSharedOrDefault, progress, set, StepParams } from "@soundcore/pipelines";
+import { DataSource } from "typeorm";
 import { File, FileFlag } from "../../../file/entities/file.entity";
-import { FileService } from "../../../file/services/file.service";
-import { STAGE_SCAN_ID, STEP_CHECKOUT_MOUNT_ID, STEP_INDEX_FILES_ID, STEP_LOOKUP_FILES_ID } from "../../pipelines";
-import { StepParams } from "@soundcore/pipelines";
+import { STAGE_CLEANUP_ID, STAGE_METADATA_ID, STEP_CHECK_FILES_ID, STEP_CREATE_SONGS_ID, STEP_INDEX_FILES_ID } from "../../pipelines";
 
 export async function step_check_files(params: StepParams) {
-    // Prepare step
-    // const files: Map<string, File> = pipeline.read(STAGE_SCAN_ID)?.[STEP_INDEX_FILES_ID]?.files ?? new Map();
+    const { logger } = params;
+    const files: Map<string, File> = getSharedOrDefault(`targetFiles`, new Map());
 
-    // const succeededFiles: File[] = stage.read(STEP_CREATE_SONGS_ID)?.succeededFiles ?? [];
-    // const failedFiles: File[] = stage.read(STEP_CREATE_SONGS_ID)?.failedFiles ?? [];
-    // const duplicateFiles: File[] = stage.read(STEP_CREATE_SONGS_ID)?.duplicateFiles ?? [];
+    const succeededFiles: string[] = [];
+    const duplicateFiles: string[] = [];
+    const failedFiles: string[] = [];
 
-    // step.write("failed", failedFiles);
-    // step.write("duplicates", duplicateFiles);
-    // step.write("succeeded", succeededFiles);
+    logger.info(`Checking flags of ${files.size} files`);
+    return Batch.useDataset(Array.from(files.values())).forEach((batch, current, total) => {
 
-    // console.log(files.size);
+        for(const file of batch) {    
+            if(file.flag == FileFlag.OK) {
+                succeededFiles.push(file.id);
+            } else if(file.flag == FileFlag.POTENTIAL_DUPLICATE) {
+                duplicateFiles.push(file.id);
+            } else if(file.flag == FileFlag.ERROR) {
+                failedFiles.push(file.id);
+            } else {
+                // Mark as duplicate. If they are not failed, ok, or already marked as duplicate,
+                // then this usually means, that the song has not been created without throwing error.
+                // If there was actually an error with the query, than the file would have been marked failed.
+    
+                file.flag = FileFlag.POTENTIAL_DUPLICATE;
+                duplicateFiles.push(file.id);
+            }
+        }
+
+        progress(current/total);
+        return batch;
+    }).then(() => {
+        logger.info(`Checked flags of ${files.size} files`);
+
+        set("failed", failedFiles);
+        set("duplicates", duplicateFiles);
+        set("succeeded", succeededFiles);
+    });
 }
 
 /**
@@ -36,20 +50,24 @@ export async function step_check_files(params: StepParams) {
  * @param logger Logger instance
  */
 export async function step_update_failed_files(params: StepParams) {
-    // await Batch.useDataset(files).forEach(async (batch, currentBatch, totalBatches) => {
-    //     step.progress(currentBatch/totalBatches);
+    const { logger, resources } = params;
+    const datasource: DataSource = resources.datasource;
+    const repository = datasource.getRepository(File);
+    const fileIds: string[] = getOrDefault(`${STAGE_CLEANUP_ID}.${STEP_CHECK_FILES_ID}.failed`, []);
 
-    //     const repository = datasource.getRepository(File);
-        
-    //     await repository.createQueryBuilder().update()
-    //         .set({ flag: FileFlag.ERROR })
-    //         .whereInIds(batch.map((file) => file.id ))
-    //         .execute().then((updateResult) => {
-    //             logger.info(`Batch #${currentBatch}: Updated ${updateResult.affected}/${batch.length} files.`); 
-    //         });
-
-    //     return batch;
-    // })
+    return Batch.useDataset(fileIds).forEach((batch, currentBatch, totalBatches) => {
+        progress(currentBatch/totalBatches);
+    
+        return repository.createQueryBuilder().update()
+            .set({ flag: FileFlag.ERROR })
+            .whereInIds(batch)
+            .execute().then((updateResult) => {
+                logger.info(`Batch #${currentBatch}: Updated ${updateResult.affected}/${batch.length} files.`); 
+                return batch;
+            });
+    }).then(() => {
+        logger.info(`Set status to 'ERROR' for ${fileIds.length} files`);
+    });
 }
 
 /**
@@ -60,20 +78,24 @@ export async function step_update_failed_files(params: StepParams) {
  * @param logger Logger instance
  */
 export async function step_update_duplicate_files(params: StepParams) {
-    // await Batch.useDataset(files).forEach(async (batch, currentBatch, totalBatches) => {
-    //     step.progress(currentBatch/totalBatches);
+    const { logger, resources } = params;
+    const datasource: DataSource = resources.datasource;
+    const repository = datasource.getRepository(File);
+    const fileIds: string[] = getOrDefault(`${STAGE_CLEANUP_ID}.${STEP_CHECK_FILES_ID}.duplicates`, []);
 
-    //     const repository = datasource.getRepository(File);
-        
-    //     await repository.createQueryBuilder().update()
-    //         .set({ flag: FileFlag.POTENTIAL_DUPLICATE })
-    //         .whereInIds(batch.map((file) => file.id ))
-    //         .execute().then((updateResult) => {
-    //             logger.info(`Batch #${currentBatch}: Updated ${updateResult.affected}/${batch.length} files.`); 
-    //         });
-
-    //     return batch;
-    // });
+    return Batch.useDataset(fileIds).forEach((batch, currentBatch, totalBatches) => {
+        progress(currentBatch/totalBatches);
+    
+        return repository.createQueryBuilder().update()
+            .set({ flag: FileFlag.POTENTIAL_DUPLICATE })
+            .whereInIds(batch)
+            .execute().then((updateResult) => {
+                logger.info(`Batch #${currentBatch}: Updated ${updateResult.affected}/${batch.length} files.`); 
+                return batch;
+            });
+    }).then(() => {
+        logger.info(`Set status to 'DUPLICATE' for ${fileIds.length} files`);
+    });
 }
 
 /**
@@ -84,22 +106,22 @@ export async function step_update_duplicate_files(params: StepParams) {
  * @param logger Logger instance
  */
 export async function step_update_succeeded_files(params: StepParams) {
+    const { logger, resources } = params;
+    const datasource: DataSource = resources.datasource;
+    const repository = datasource.getRepository(File);
+    const fileIds: string[] = getOrDefault(`${STAGE_CLEANUP_ID}.${STEP_CHECK_FILES_ID}.succeeded`, []);
 
-
-    // await Batch.useDataset(files).forEach(async (batch, currentBatch, totalBatches) => {
-    //     step.progress(currentBatch/totalBatches);
-
-    //     const repository = datasource.getRepository(File);
-        
-    //     await repository.createQueryBuilder().update()
-    //         .set({ flag: FileFlag.OK })
-    //         .whereInIds(batch.map((file) => file.id ))
-    //         .execute().then((updateResult) => {
-    //             logger.info(`Batch #${currentBatch}: Updated ${updateResult.affected}/${batch.length} files.`); 
-    //         });
-
-    //     return batch;
-    // }).then(() => {
-    //     logger.info(`Successfully updated files.`);
-    // });
+    return Batch.useDataset(fileIds).forEach((batch, currentBatch, totalBatches) => {
+        progress(currentBatch/totalBatches);
+    
+        return repository.createQueryBuilder().update()
+            .set({ flag: FileFlag.OK })
+            .whereInIds(batch)
+            .execute().then((updateResult) => {
+                logger.info(`Batch #${currentBatch}: Updated ${updateResult.affected}/${batch.length} files.`); 
+                return batch;
+            });
+    }).then(() => {
+        logger.info(`Set status to 'OK' for ${fileIds.length} files`);
+    })
 }

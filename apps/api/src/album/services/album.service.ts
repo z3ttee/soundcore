@@ -186,26 +186,32 @@ export class AlbumService implements SyncableService<Album> {
     }
 
     /**
-     * Create an album if not exists.
-     * @param dtos Data to create album from
-     * @returns Album
+     * Create albums if not exists.
+     * @param dtos Data to create albums from
+     * @param qb Define a custom select query for returning created items
+     * @returns Album[]
      */
-    public async createIfNotExists(dtos: CreateAlbumDTO[]): Promise<Album[]> {
+    public async createIfNotExists(dtos: (CreateAlbumDTO | Album)[], qb?: (query: SelectQueryBuilder<Album>, alias: string) => SelectQueryBuilder<Album> ): Promise<Album[]> {
         if(dtos.length <= 0) throw new BadRequestException("Cannot create resources for empty list.");
 
         return await this.repository.createQueryBuilder()
             .insert()
             .values(dtos)
+            .orUpdate(["name", "primaryArtistId"], ["id"], { skipUpdateIfNoValuesChanged: false })
             .returning(["id"])
-            .orUpdate(["name"], ["id", "name", "primaryArtistId"], { skipUpdateIfNoValuesChanged: false })
             .execute().then((insertResult) => {
-                return this.repository.createQueryBuilder("album")
-                    .leftJoinAndSelect("album.primaryArtist", "primaryArtist")
-                    .whereInIds(insertResult.identifiers)
-                    .getMany();
+                const alias = "album";
+                let query: SelectQueryBuilder<Album> = this.repository.createQueryBuilder(alias)
+                    .leftJoin(`${alias}.artwork`, "artwork").addSelect(["artwork.id"])
+                    .leftJoin(`${alias}.primaryArtist`, "primaryArtist").addSelect(["primaryArtist.id", "primaryArtist.name", "primaryArtist.slug"]);
+
+                if(typeof qb === "function") {
+                    query = qb(this.repository.createQueryBuilder(alias), alias);
+                }
+                    
+                return query.whereInIds(insertResult.raw).getMany();
             });
     }
-
     /**
      * Update an existing album.
      * @param albumId Album's id

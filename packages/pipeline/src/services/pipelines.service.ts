@@ -4,12 +4,11 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Page, Pageable } from "nestjs-pager";
 import { Repository } from "typeorm";
 import { WorkerPool, pool } from "workerpool";
-import { DEFAULT_CONCURRENT_PIPELINES, GLOBAL_OPTIONS_TOKEN, LOCAL_OPTIONS_TOKEN, MODULE_POLLING_INTERVAL_NAME } from "../constants";
+import { DEFAULT_CONCURRENT_PIPELINES, GLOBAL_OPTIONS_TOKEN, LOCAL_OPTIONS_TOKEN } from "../constants";
 import { CreatePipelineRunDTO } from "../dtos/create-run.dto";
 import { IPipeline, PipelineRun } from "../entities/pipeline.entity";
 import { PipelineQueue } from "./pipeline-queue.service";
 import { PipelineRegistry } from "./pipeline-registry.service";
-import { SchedulerRegistry } from "@nestjs/schedule";
 import { RunStatus } from "../entities/common.entity";
 import { EventHandler, EventName, WorkerEmitEvent } from "../event/event";
 import { PipelineEventService } from "./pipeline-event.service";
@@ -29,7 +28,6 @@ export class PipelineService {
     constructor(
         private readonly queue: PipelineQueue,
         private readonly registry: PipelineRegistry,
-        private readonly scheduler: SchedulerRegistry,
         private readonly events: PipelineEventService,
         @Inject(GLOBAL_OPTIONS_TOKEN) private readonly globalOptions: PipelineGlobalOptions,
         @Inject(LOCAL_OPTIONS_TOKEN) private readonly localOptions: PipelineLocalOptions,
@@ -48,17 +46,22 @@ export class PipelineService {
         });
 
         // Register polling interval
-        if(!this.scheduler.doesExist("interval", MODULE_POLLING_INTERVAL_NAME)) {
-            this.scheduler.addInterval(MODULE_POLLING_INTERVAL_NAME, setInterval(() => {
-                // Check if previous polling interval is still busy dispatching worker
-                if(!this.isDispatching) {
-                    // If not, dispatch next run and
-                    // update status accordingly
-                    this.isDispatching = true;
-                    this.dispatchNextRun().finally(() => this.isDispatching = false);
-                }
-            }, Math.max(1000, Math.min(60000, this.localOptions.pollingRateMs ?? 10000))));
+        const intervalHandler = () => {
+            console.log("is dispatching? ", this.isDispatching);
+
+            // Check if previous polling interval is still busy dispatching worker
+            if(!this.isDispatching) {
+                // If not, dispatch next run and
+                // update status accordingly
+                this.isDispatching = true;
+                this.dispatchNextRun().then((run) => {
+                    console.log("dispatched: ", run?.id);
+                }).catch((error) => {
+                    console.log("dispatch failed", error);
+                }).finally(() => this.isDispatching = false);
+            }
         }
+        setInterval(intervalHandler, Math.max(1000, Math.min(60000, this.localOptions.pollingRateMs ?? 10000)))
 
         // Listen on enqueued event
         this.on("enqueued", (position, { pipeline }) => {
@@ -142,14 +145,23 @@ export class PipelineService {
     }
 
     private async dispatchNextRun(): Promise<PipelineRun> {
+        const peek = this.queue.peek();
         // No runs enqueued
-        if(this.queue.isEmpty) return null;
+        if(typeof peek === "undefined" || peek == null) {
+            console.log("queue is empty");
+            return null;
+        }
 
         const currentlyRunning: number = this.pool.stats().busyWorkers;
         const totalCapacity: number = this.localOptions.concurrent ?? DEFAULT_CONCURRENT_PIPELINES;
 
+        console.log(currentlyRunning, totalCapacity);
+
         // Max concurrently running pipelines reached
-        if(currentlyRunning >= totalCapacity) return null;
+        if(currentlyRunning >= totalCapacity) {
+            console.log("max concurrent reached");
+            return null;
+        }
 
         // Dequeue next run
         const pipelineRun = this.queue.dequeue();

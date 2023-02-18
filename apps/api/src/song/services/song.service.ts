@@ -278,26 +278,25 @@ export class SongService implements SyncableService<Song> {
     public async createIfNotExists(dtos: (CreateSongDTO | Song)[], qb?: (query: SelectQueryBuilder<Song>, alias: string) => SelectQueryBuilder<Song> ): Promise<Song[]> {
         if(dtos.length <= 0) throw new BadRequestException("Cannot create resources for empty list.");
 
-        return this.repository.createQueryBuilder()
+        return await this.repository.createQueryBuilder()
             .insert()
             .values(dtos)
+            .orUpdate(["name", "primaryArtistId", "albumId", "order", "duration", "fileId"], ["id"], { skipUpdateIfNoValuesChanged: false })
             .returning(["id"])
-            .orUpdate(["name"], ["id"], { skipUpdateIfNoValuesChanged: false })
             .execute().then((insertResult) => {
-                if(typeof qb !== "function") {
-                    return this.repository.createQueryBuilder("song")
-                        .leftJoinAndSelect("song.primaryArtist", "primaryArtist")
-                        .leftJoinAndSelect("song.album", "album")
-                        .leftJoinAndSelect("song.file", "file")
-                        .leftJoinAndSelect("song.artwork", "artwork")
-                        .whereInIds(insertResult.raw)
-                        .getMany().then((songs) => {
-                            return songs;
-                        });
-                }
+                const alias = "song";
+                let query: SelectQueryBuilder<Song> = this.repository.createQueryBuilder("song")
+                    .leftJoinAndSelect("song.primaryArtist", "primaryArtist")
+                    .leftJoinAndSelect("song.album", "album")
+                    .leftJoinAndSelect("song.file", "file")
+                    .leftJoinAndSelect("song.artwork", "artwork")
 
-                return qb(this.repository.createQueryBuilder("song"), "song").whereInIds(insertResult.raw).getMany();
-            })
+                if(typeof qb === "function") {
+                    query = qb(this.repository.createQueryBuilder(alias), alias);
+                }
+                    
+                return query.whereInIds(insertResult.raw).getMany();
+            });
     }
 
     public async saveAll(songs: Song[]) {

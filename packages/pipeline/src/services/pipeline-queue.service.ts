@@ -14,6 +14,7 @@ export class PipelineQueue {
     public enqueue(run: PipelineRun): number {
         const position = this.queue.push(run);
         this.events.fireEvent("enqueued", position, { pipeline: run })
+        console.log("enqueued: ", this.queue.length)
         return position;
     }
 
