@@ -1,4 +1,5 @@
-import { Environment, RunStatus, Stage } from "@soundcore/pipelines";
+import { Environment, RunStatus } from "./common.entity";
+import { Stage } from "./stage.entity";
 
 export class Task {
     public readonly runId: string;
