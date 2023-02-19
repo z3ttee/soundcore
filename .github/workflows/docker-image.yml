@@ -1,10 +1,13 @@
 name: Soundcore Image Build
       
 on:
-  push:
+  workflow_dispatch:
+  pull_request:
+    types:
+      - closed
     branches:
-      - 'main'
-      - 'experimental'
+      - main
+      - experimental
 
 jobs:          
   check_branch:
