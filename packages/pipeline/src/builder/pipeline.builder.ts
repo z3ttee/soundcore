@@ -1,8 +1,10 @@
+import { PipelineEntityResolver } from "../entities/pipeline.entity";
 import { StageConfigurator } from "./stage.builder";
 
 export class PipelineConfigurator {
     private _maxConcurrentStages: number = 1;
     private readonly _stages: StageConfigurator[] = [];
+    private _resolver: PipelineEntityResolver;
 
     constructor(
         private readonly _id: string,
@@ -31,6 +33,17 @@ export class PipelineConfigurator {
         const builder = new StageConfigurator(this, stageId, name, description);
         this._stages.push(builder);
         return builder;
+    }
+
+    /**
+     * Method to resolve a custom pipeline entity. The resolved entity
+     * must implement the PipelineRun interface to function with the
+     * internals
+     * @param resolver Function to resolve entity
+     */
+    public resolveEntity(resolver: PipelineEntityResolver) {
+        this._resolver = resolver;
+        return this;
     }
 }
 

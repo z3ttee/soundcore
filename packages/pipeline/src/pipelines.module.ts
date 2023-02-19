@@ -1,8 +1,6 @@
 import { DynamicModule, Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { GLOBAL_OPTIONS_TOKEN, LOCAL_OPTIONS_TOKEN } from "./constants";
-import { PipelineController } from "./controllers/pipelines.controller";
-import { PipelineRun } from "./entities/pipeline.entity";
 import { PipelineEventService } from "./services/pipeline-event.service";
 import { PipelineQueue } from "./services/pipeline-queue.service";
 import { PipelineRegistry } from "./services/pipeline-registry.service";
@@ -58,12 +56,6 @@ export class PipelineModule {
         return {
             module: PipelineModule,
             global: true,
-            imports: [
-                TypeOrmModule.forFeature([ PipelineRun ])
-            ],
-            controllers: [
-                PipelineController
-            ],
             providers: [
                 {
                     provide: PipelineRegistry,
@@ -76,8 +68,7 @@ export class PipelineModule {
             ],
             exports: [
                 GLOBAL_OPTIONS_TOKEN,
-                PipelineRegistry,
-                TypeOrmModule
+                PipelineRegistry
             ]
         }
     }

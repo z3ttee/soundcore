@@ -25,6 +25,18 @@ worker({
         // Update logger
         globalThis.logger = logger;
 
+        // Extract pipeline script configuration from file
+        const pipelineConfigurator = readConfiguratorFromFile(path.resolve(definition.scriptFile));
+
+        // Resolve pipeline entity
+        if(typeof pipelineConfigurator["_resolver"] === "function") {
+            const resolver = async () => pipelineConfigurator["_resolver"](pipeline);
+            pipeline = await resolver().catch((error: Error) => {
+                logger.error(`Could not resolve custom pipeline entity: ${error.message}`, error.stack);
+                throw error;
+            });
+        }
+
         // Update pipeline status
         pipeline.status = RunStatus.WORKING;
         emit("status", { pipeline });
@@ -33,8 +45,6 @@ worker({
         globalThis.pipeline = pipeline;
         globalThis.definition = definition;
 
-        // Extract pipeline script configuration from file
-        const pipelineConfigurator = readConfiguratorFromFile(path.resolve(definition.scriptFile));
         // Extract stage initializers pipeline script
         const stageConfigurators: Map<string, StageConfigurator> = new Map();
         for(const stageConfigurator of pipelineConfigurator["_stages"]) {

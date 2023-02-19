@@ -1,15 +1,13 @@
 import path from "node:path";
+import crypto from "node:crypto";
 import { Inject, Injectable, Logger } from "@nestjs/common";
-import { InjectRepository } from "@nestjs/typeorm";
-import { Page, Pageable } from "nestjs-pager";
-import { Repository } from "typeorm";
 import { WorkerPool, pool } from "workerpool";
 import { DEFAULT_CONCURRENT_PIPELINES, GLOBAL_OPTIONS_TOKEN, LOCAL_OPTIONS_TOKEN } from "../constants";
 import { CreatePipelineRunDTO } from "../dtos/create-run.dto";
-import { IPipeline, PipelineRun } from "../entities/pipeline.entity";
+import { PipelineRun } from "../entities/pipeline.entity";
 import { PipelineQueue } from "./pipeline-queue.service";
 import { PipelineRegistry } from "./pipeline-registry.service";
-import { RunStatus } from "../entities/common.entity";
+import { Environment, RunStatus } from "../entities/common.entity";
 import { EventHandler, EventName, WorkerEmitEvent } from "../event/event";
 import { PipelineEventService } from "./pipeline-event.service";
 import { PipelineGlobalOptions, PipelineLocalOptions } from "../pipelines.module";
@@ -31,7 +29,6 @@ export class PipelineService {
         private readonly events: PipelineEventService,
         @Inject(GLOBAL_OPTIONS_TOKEN) private readonly globalOptions: PipelineGlobalOptions,
         @Inject(LOCAL_OPTIONS_TOKEN) private readonly localOptions: PipelineLocalOptions,
-        @InjectRepository(PipelineRun) private readonly repository: Repository<PipelineRun>,
     ) {
         // Create worker pool
         this.pool = pool(path.resolve(__dirname, "..", "worker", "pipeline.worker.js"), {
@@ -66,24 +63,10 @@ export class PipelineService {
         // Listen on enqueued event
         this.on("enqueued", (position, { pipeline }) => {
             this.logger.log(`Enqueued pipeline '${pipeline.id}' with run id '${pipeline.runId}' (${position})`);
-        })
-    }
-
-    /**
-     * Find a full list of registered pipeline definitions
-     * @returns IPipeline[]
-     */
-    public async findPipelineDefinitions(): Promise<IPipeline[]> {
-        return this.registry.listAll();
-    }
-
-    public async findRunningPipelines(pageable: Pageable): Promise<Page<PipelineRun>> {
-        return this.repository.createQueryBuilder("pipeline")
-            .offset(pageable.offset)
-            .limit(pageable.limit)
-            .getManyAndCount().then(([entities, total]) => {
-                return Page.of(entities, total, pageable.offset);
-            });
+        });
+        // this.on("status", (params) => {
+        //     this.savePipelineRun(params.pipeline);
+        // })
     }
 
     /**
@@ -92,39 +75,34 @@ export class PipelineService {
      * @param createPipelineRunDto Options for creating the pipeline run
      * @returns PipelineRun
      */
-    public async createRun(createPipelineRunDto: CreatePipelineRunDTO): Promise<PipelineRun> {
-        const definition = this.registry.get(createPipelineRunDto.id);
+    public async createRun(pipelineId: string, environment?: Environment): Promise<PipelineRun> {
+        const definition = this.registry.get(pipelineId);
+        const pipeline: PipelineRun = {
+            id: definition.id,
+            runId: crypto.randomUUID(),
+            name: definition.name,
+            description: definition.description,
+            status: RunStatus.ENQUEUED,
+            environment: environment ?? {},
+            currentStageId: undefined,
+            stages: definition.stages.map((stage) => new Stage(
+                stage.id,
+                stage.name,
+                stage.description,
+                stage.dependsOn,
+                stage.steps.map((step) => new Step(step.id, step.name, step.description, RunStatus.ENQUEUED, 0)),
+                RunStatus.ENQUEUED,
+                stage.steps?.[0]?.id
+            ))
+        }
 
-        const pipeline = new PipelineRun();
-        pipeline.environment = createPipelineRunDto.environment ?? undefined;
-        pipeline.id = definition.id;
-        pipeline.name = definition.name;
-        pipeline.description = definition.description;
-        pipeline.status = RunStatus.ENQUEUED;
-        pipeline.stages = definition.stages.map((stage) => new Stage(
-            stage.id,
-            stage.name,
-            stage.description,
-            stage.dependsOn,
-            stage.steps.map((step) => new Step(step.id, step.name, step.description, RunStatus.ENQUEUED, 0)),
-            RunStatus.ENQUEUED,
-            stage.steps?.[0]?.id
-        ));
-
-        return this.repository.createQueryBuilder()
-            .insert()
-            .values(pipeline)
-            .returning(["id"])
-            .execute().then((insertResult) => {
-                if(insertResult.identifiers.length <= 0) return null;
-                return this.repository.createQueryBuilder("run")
-                    .whereInIds(insertResult.identifiers)
-                    .getOne().then((result) => {
-                        this.queue.enqueue(result);
-                        return result;
-                    });
-            });
+        this.queue.enqueue(pipeline);
+        return pipeline;
     }
+
+    // private async savePipelineRun(run: PipelineRun): Promise<PipelineRun> {
+    //     return this.repository.save(run);
+    // }
 
     /**
      * Register an event handler.
