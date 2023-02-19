@@ -8,6 +8,7 @@ import { UpdateMountDTO } from "../dtos/update-mount.dto";
 import { Mount } from "../entities/mount.entity";
 import { Page, Pageable } from "../../pagination";
 import { Future, toFuture } from "../../utils/future";
+import { Task } from "../../tasks/entities/task.entity";
 
 @Injectable()
 export class SCSDKMountService {
@@ -86,9 +87,9 @@ export class SCSDKMountService {
      * @param mountId Mount's id
      * @returns Position in queue
      */
-    public rescanMount(mountId: string): Observable<Future<number>> {
+    public rescanMount(mountId: string): Observable<Future<Task>> {
         if(!mountId) return of(Future.notfound());
-        return this.httpClient.get<number>(`${this.options.api_base_uri}/v1/mounts/${mountId}/rescan`).pipe(toFuture());
+        return this.httpClient.get<Task>(`${this.options.api_base_uri}/v1/mounts/${mountId}/rescan`).pipe(toFuture());
     }
 
 }

@@ -11,6 +11,11 @@
       "outputs": ["dist/**"],
       "cache": true
     },
+    "build:packages": {
+      "dependsOn": ["^build:packages"],
+      "outputs": ["dist/**"],
+      "cache": true
+    },
     "dockerize:api": {
       "dependsOn": ["^build:api"],
       "outputs": ["dist/**"],

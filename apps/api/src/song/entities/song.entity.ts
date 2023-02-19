@@ -97,21 +97,25 @@ export class Song implements SongID, Resource, Syncable, GeniusResource, Trackli
     /**
      * ENTITY RELATIONS
      */
-    @OneToOne(() => File, (file) => file.song, { onDelete: "CASCADE" })
+    @OneToOne(() => File, (file) => file.song, { onDelete: "CASCADE", nullable: false })
     @JoinColumn()
     public file: File;
 
-    @ManyToOne(() => Artwork, { onDelete: "SET NULL" })
+    @ManyToOne(() => Artwork, { onDelete: "SET NULL", nullable: true })
     @JoinColumn()
     public artwork: Artwork;
 
-    @ManyToOne(() => Artist)
+    @ManyToOne(() => Artist, { onDelete: "SET NULL", nullable: true })
     @JoinColumn()
     public primaryArtist: Artist;
 
-    @ManyToMany(() => Artist)
+    @ManyToMany(() => Artist, { onDelete: "CASCADE", nullable: true })
     @JoinTable({ name: "featuring2song" })
     public featuredArtists: Artist[];
+
+    @ManyToOne(() => Album, { onDelete: "SET NULL", nullable: true })
+    @JoinColumn()
+    public album: Album;
 
     @ManyToMany(() => Publisher)
     @JoinTable({ name: "song2publisher" })
@@ -124,10 +128,6 @@ export class Song implements SongID, Resource, Syncable, GeniusResource, Trackli
     @ManyToMany(() => Label)
     @JoinTable({ name: "song2label" })
     public labels: Label[];
-
-    @ManyToOne(() => Album)
-    @JoinColumn()
-    public album: Album;
 
     @ManyToMany(() => Genre)
     @JoinTable({ name: "song2genre" })

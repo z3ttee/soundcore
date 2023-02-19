@@ -58,7 +58,7 @@ export class Artist implements Resource, Syncable, GeniusResource {
     @JoinColumn()
     public artwork: Artwork;
 
-    @OneToMany(() => Song, (song) => song.primaryArtist)
+    @OneToMany(() => Song, (song) => song.primaryArtist, { cascade: ["insert", "update"] })
     public songs: Song[];
 
     public songCount?: number = 0;

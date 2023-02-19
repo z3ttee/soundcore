@@ -46,6 +46,7 @@ export const TYPEORM_ENTITY_GLOB = path.join(process.cwd(), "**/*.entity{ .ts,.j
 
 // Gateway events
 export const GATEWAY_EVENT_IMPORTTASK_UPDATE = "gateway-importtask-update";
+export const GATEWAY_EVENT_TASK_EMIT = "gateway-task-emit";
 
 // Step messages
 export const MOUNT_STEP_WAITING: MountProgressInfo = {

@@ -55,17 +55,18 @@ async function syncSongs(datasource: DataSource, client: MeiliSearch, resources:
     const service = new MeiliSongService(client);
     const songService = new SongService(datasource.getRepository(Song), new EventEmitter2(), service);
     
-    return Batch.of<Song>(resources).do((batch) => {
-        return service.setSongs(batch).then((task) => {
-            return songService.setLastSyncedDetails(batch, SyncFlag.OK).then((result) => {
-                return batch;
-            });
-        }).catch((error: Error) => {
-            songService.setLastSyncedDetails(resources, SyncFlag.ERROR);
-            logger.error(`Could not sync songs with meilisearch: ${error.message}`, Environment.isDebug ? error.stack : null);
-            throw error;
-        });
-    }).start();
+    // return Batch.of<Song>(resources).do((batch) => {
+    //     return service.setSongs(batch).then((task) => {
+    //         return songService.setLastSyncedDetails(batch, SyncFlag.OK).then((result) => {
+    //             return batch;
+    //         });
+    //     }).catch((error: Error) => {
+    //         songService.setLastSyncedDetails(resources, SyncFlag.ERROR);
+    //         logger.error(`Could not sync songs with meilisearch: ${error.message}`, Environment.isDebug ? error.stack : null);
+    //         throw error;
+    //     });
+    // }).start();
+    return null;
 }
 
 async function syncAlbums(datasource: DataSource, client: MeiliSearch, resources: Album[]): Promise<any> {
@@ -73,49 +74,52 @@ async function syncAlbums(datasource: DataSource, client: MeiliSearch, resources
     const service = new MeiliAlbumService(client);
     const albumService = new AlbumService(datasource.getRepository(Album), eventEmitter, service);
     
-    return Batch.of<Album>(resources).do((batch) => {
-        return service.setAlbums(batch).then((task) => {
-            return albumService.setLastSyncedDetails(batch, SyncFlag.OK).then((result) => {
-                return batch;
-            });
-        }).catch((error: Error) => {
-            albumService.setLastSyncedDetails(resources, SyncFlag.ERROR);
-            logger.error(`Could not sync albums with meilisearch: ${error.message}`, Environment.isDebug ? error.stack : null);
-            throw error;
-        });
-    }).start();
+    // return Batch.of<Album>(resources).do((batch) => {
+    //     return service.setAlbums(batch).then((task) => {
+    //         return albumService.setLastSyncedDetails(batch, SyncFlag.OK).then((result) => {
+    //             return batch;
+    //         });
+    //     }).catch((error: Error) => {
+    //         albumService.setLastSyncedDetails(resources, SyncFlag.ERROR);
+    //         logger.error(`Could not sync albums with meilisearch: ${error.message}`, Environment.isDebug ? error.stack : null);
+    //         throw error;
+    //     });
+    // }).start();
+    return null;
 }
 
 async function syncArtists(datasource: DataSource, client: MeiliSearch, resources: Artist[]): Promise<any> {
     const service = new MeiliArtistService(client);
     const artistService = new ArtistService(datasource.getRepository(Artist), service);
     
-    return Batch.of<Artist>(resources).do((batch) => {
-        return service.setArtists(batch).then((task) => {
-            return artistService.setLastSyncedDetails(batch, SyncFlag.OK).then((result) => {
-                return batch;
-            });
-        }).catch((error: Error) => {
-            artistService.setLastSyncedDetails(resources, SyncFlag.ERROR);
-            logger.error(`Could not sync artists with meilisearch: ${error.message}`, Environment.isDebug ? error.stack : null);
-            throw error;
-        });
-    }).start();
+    // return Batch.of<Artist>(resources).do((batch) => {
+    //     return service.setArtists(batch).then((task) => {
+    //         return artistService.setLastSyncedDetails(batch, SyncFlag.OK).then((result) => {
+    //             return batch;
+    //         });
+    //     }).catch((error: Error) => {
+    //         artistService.setLastSyncedDetails(resources, SyncFlag.ERROR);
+    //         logger.error(`Could not sync artists with meilisearch: ${error.message}`, Environment.isDebug ? error.stack : null);
+    //         throw error;
+    //     });
+    // }).start();
+    return null;
 }
 
 async function syncPlaylists(datasource: DataSource, client: MeiliSearch, resources: Playlist[]): Promise<any> {
     const service = new MeiliPlaylistService(client);
     const playlistService = new PlaylistService(datasource.getRepository(Playlist), datasource.getRepository(PlaylistItem), new EventEmitter2(), service);
     
-    return Batch.of<Playlist>(resources).do((batch) => {
-        return service.setPlaylists(batch).then((task) => {
-            return playlistService.setLastSyncedDetails(batch, SyncFlag.OK).then((result) => {
-                return batch;
-            });
-        }).catch((error: Error) => {
-            playlistService.setLastSyncedDetails(resources, SyncFlag.ERROR);
-            logger.error(`Could not sync playlists with meilisearch: ${error.message}`, Environment.isDebug ? error.stack : null);
-            throw error;
-        });
-    }).start();
+    // return Batch.of<Playlist>(resources).do((batch) => {
+    //     return service.setPlaylists(batch).then((task) => {
+    //         return playlistService.setLastSyncedDetails(batch, SyncFlag.OK).then((result) => {
+    //             return batch;
+    //         });
+    //     }).catch((error: Error) => {
+    //         playlistService.setLastSyncedDetails(resources, SyncFlag.ERROR);
+    //         logger.error(`Could not sync playlists with meilisearch: ${error.message}`, Environment.isDebug ? error.stack : null);
+    //         throw error;
+    //     });
+    // }).start();
+    return null;
 }

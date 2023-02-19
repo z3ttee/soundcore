@@ -1,6 +1,7 @@
 
 class EnvironmentImpl {
 
+    public isProduction: boolean = process.env.PRODUCTION == "true";
     public isDebug: boolean = process.env.DEBUG == "true";
     public isDockerized: boolean = process.env.DOCKERIZED == "true";
 

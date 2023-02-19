@@ -31,9 +31,12 @@ import { AppService } from './app.service';
 import { PipesModule } from '@tsalliance/utilities';
 import { HostnameModule } from './hostname/hostname.module';
 import { CronModule } from './cron/cron.module';
-import { CommonConfigModule } from '@soundcore/common';
+import { CommonConfigModule, Environment } from '@soundcore/common';
 import { WorkerQueueModule } from '@soundcore/nest-queue';
 import { TracklistModule } from './tracklist/tracklist.module';
+// import { WorkerModule } from '@soundcore/worker';
+import { PipelineModule } from '@soundcore/pipelines';
+import { TasksModule } from './tasks/tasks.module';
 
 @Module({
   imports: [
@@ -71,6 +74,12 @@ import { TracklistModule } from './tracklist/tracklist.module';
         }
       })
     }),
+    PipelineModule.forRoot({
+      // Enable stdout on debug mode
+      enableStdout: Environment.isDebug,
+      // Disable file logs on dev environment
+      disableFileLogs: !Environment.isProduction
+    }),
     EventEmitterModule.forRoot({ global: true, ignoreErrors: true }),
     ArtistModule,
     ZoneModule,
@@ -103,7 +112,8 @@ import { TracklistModule } from './tracklist/tracklist.module';
         clientToken: process.env.GENIUS_TOKEN
       }),
     }),
-    TracklistModule
+    TracklistModule,
+    TasksModule
   ],
   controllers: [
     AppController

@@ -125,23 +125,28 @@ export class ArtistService {
     }
 
     /**
-     * Create an artist if not exists.
-     * @param createArtistDto Data to create artist from
-     * @returns Artist
+     * Create artists if not exists.
+     * @param dtos Data to create artists from
+     * @param qb Define a custom select query for returning created items
+     * @returns Artist[]
      */
-    public async createIfNotExists(dtos: CreateArtistDTO[]): Promise<Artist[]> {
+    public async createIfNotExists(dtos: (CreateArtistDTO | Artist)[], qb?: (query: SelectQueryBuilder<Artist>, alias: string) => SelectQueryBuilder<Artist> ): Promise<Artist[]> {
         if(dtos.length <= 0) throw new BadRequestException("Cannot create resources for empty list.");
 
         return await this.repository.createQueryBuilder()
             .insert()
             .values(dtos)
+            .orUpdate(["name"], ["id"], { skipUpdateIfNoValuesChanged: false })
             .returning(["id"])
-            .orUpdate(["name"], ["name"], { skipUpdateIfNoValuesChanged: false })
             .execute().then((insertResult) => {
-                return this.repository.createQueryBuilder("artist")
-                    .leftJoinAndSelect("artist.artwork", "artwork")
-                    .whereInIds(insertResult.raw)
-                    .getMany();
+                const alias = "artist";
+                let query: SelectQueryBuilder<Artist> = this.repository.createQueryBuilder(alias).leftJoin(`${alias}.artwork`, "artwork").addSelect(["artwork.id"]);
+
+                if(typeof qb === "function") {
+                    query = qb(this.repository.createQueryBuilder(alias), alias);
+                }
+                    
+                return query.whereInIds(insertResult.raw).getMany();
             });
     }
 

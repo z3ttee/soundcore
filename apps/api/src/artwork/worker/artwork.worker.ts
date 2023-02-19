@@ -39,66 +39,67 @@ async function createFromSong(artworkIds: string[]): Promise<ArtworkProcessResul
         const artworkService = new ArtworkService(artworkRepo, fsService);
         const songService = new SongService(songRepo, null, null);
 
-        return Batch.of(artworkIds, 10).do(async (batch) => {
-            const songs = await songService.findByArtworkIds(batch).catch((err) => {
-                console.error(err)
-                return [];
-            });
+        // return Batch.of(artworkIds, 10).do(async (batch) => {
+        //     const songs = await songService.findByArtworkIds(batch).catch((err) => {
+        //         console.error(err)
+        //         return [];
+        //     });
 
-            const succeededArtworks: string[] = [];
-            const erroredArtworks: string[] = [];
+        //     const succeededArtworks: string[] = [];
+        //     const erroredArtworks: string[] = [];
 
-            const succeededArtworkEntities: Artwork[] = [];
+        //     const succeededArtworkEntities: Artwork[] = [];
 
-            for(const song of songs) {
-                const file = song.file;
-                const filepath = fsService.resolveFilepath(file);
+        //     for(const song of songs) {
+        //         const file = song.file;
+        //         const filepath = fsService.resolveFilepath(file);
 
-                if(typeof file === "undefined" || file == null) {
-                    throw new InternalServerErrorException(`Could not find file entity on song object.`);
-                }
+        //         if(typeof file === "undefined" || file == null) {
+        //             throw new InternalServerErrorException(`Could not find file entity on song object.`);
+        //         }
 
-                const tags = await songService.readID3TagsFromFile(filepath);
-                const buffer = tags.cover;
+        //         const tags = await songService.readID3TagsFromFile(filepath);
+        //         const buffer = tags.cover;
 
-                await artworkService.writeFromBufferOrFile(buffer, song.artwork).then(async (artwork) => {
-                    // TODO: Better logging
-                    const color = await artworkService.extractAccentColor(artwork).catch((error: Error) => {
-                        console.error(error);
-                        return null;
-                    });
+        //         await artworkService.writeFromBufferOrFile(buffer, song.artwork).then(async (artwork) => {
+        //             // TODO: Better logging
+        //             const color = await artworkService.extractAccentColor(artwork).catch((error: Error) => {
+        //                 console.error(error);
+        //                 return null;
+        //             });
 
-                    artwork.accentColor = color ?? artwork.accentColor;
-                    artwork.flag = ArtworkFlag.OK;
+        //             artwork.accentColor = color ?? artwork.accentColor;
+        //             artwork.flag = ArtworkFlag.OK;
 
-                    succeededArtworks.push(artwork.id);
-                    succeededArtworkEntities.push(artwork);
-                }).catch((error: Error) => {
-                    erroredArtworks.push(song.artwork.id);
-                    console.error(error);
-                    throw new InternalServerErrorException(`Failed writing artwork to file ${filepath}: ${error.message}`, error.stack);
-                });
-            }
+        //             succeededArtworks.push(artwork.id);
+        //             succeededArtworkEntities.push(artwork);
+        //         }).catch((error: Error) => {
+        //             erroredArtworks.push(song.artwork.id);
+        //             console.error(error);
+        //             throw new InternalServerErrorException(`Failed writing artwork to file ${filepath}: ${error.message}`, error.stack);
+        //         });
+        //     }
                     
-            return artworkService.setFlags([...erroredArtworks], ArtworkFlag.ERROR).then(() => {
-                // TODO: Set flags and update accentColor with just one query
-                // return artworkService.setFlags(succeededArtworks, ArtworkFlag.OK).then((updated) => {
-                //     return batch;
-                // });
-                // Because artwork flag and color are updated above, we save it using this function
-                return artworkService.saveAll(succeededArtworkEntities).then(() => {
-                    return batch;
-                })
-            });
-        }).catch(async (_, error: Error) => {
-            await artworkService.setFlags(artworkIds, ArtworkFlag.ERROR);
-            throw error;
-        }).start().then((value): ArtworkProcessResultDTO => {
-            return {
-                artworks: value,
-                timeTookMs: Date.now() - startedAtMs
-            }
-        });
+        //     return artworkService.setFlags([...erroredArtworks], ArtworkFlag.ERROR).then(() => {
+        //         // TODO: Set flags and update accentColor with just one query
+        //         // return artworkService.setFlags(succeededArtworks, ArtworkFlag.OK).then((updated) => {
+        //         //     return batch;
+        //         // });
+        //         // Because artwork flag and color are updated above, we save it using this function
+        //         return artworkService.saveAll(succeededArtworkEntities).then(() => {
+        //             return batch;
+        //         })
+        //     });
+        // }).catch(async (_, error: Error) => {
+        //     await artworkService.setFlags(artworkIds, ArtworkFlag.ERROR);
+        //     throw error;
+        // }).start().then((value): ArtworkProcessResultDTO => {
+        //     return {
+        //         artworks: value,
+        //         timeTookMs: Date.now() - startedAtMs
+        //     }
+        // });
+        return null;
     });
 }
 

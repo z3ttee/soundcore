@@ -4,17 +4,18 @@ import { GeniusProcessDTO } from "../dtos/genius-process.dto";
 import { Batch } from "@soundcore/common";
 
 export default async function (job: WorkerJobRef<GeniusProcessDTO>): Promise<any> {
-    return Batch.of(job.payload.payload).do((batch) => {
-        const results = [];
+    // return Batch.of(job.payload.payload).do((batch) => {
+    //     const results = [];
 
-        return results;
-    }).catch((batchNr, error) => {
-        console.error(error);
-    }).progress((batches, current) => {
-        console.log("progress: ", ((current / batches) * 100).toFixed(2));
-    }).start().then((resources) => {
+    //     return results;
+    // }).catch((batchNr, error) => {
+    //     console.error(error);
+    // }).progress((batches, current) => {
+    //     console.log("progress: ", ((current / batches) * 100).toFixed(2));
+    // }).start().then((resources) => {
 
-    });
+    // });
+    return null;
 }
 
 // export default function (job: Job<GeniusProcessDTO>, dc: DoneCallback) {

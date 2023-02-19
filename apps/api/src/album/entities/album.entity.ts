@@ -68,7 +68,7 @@ export class Album implements Resource, Syncable, GeniusResource {
     @JoinColumn()
     public primaryArtist: Artist;
 
-    @OneToMany(() => Song, (song) => song.album)
+    @OneToMany(() => Song, (song) => song.album, { cascade: ["insert", "update"] })
     public songs: Song[];
 
     @ManyToOne(() => Artwork, { onDelete: "SET NULL" })

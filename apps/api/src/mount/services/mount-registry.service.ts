@@ -43,7 +43,7 @@ export class MountRegistryService {
      * @param registry Registry data
      * @returns Saved MountRegistry
      */
-    public async saveRegistry(registry: MountRegistry): Promise<MountRegistry> {
+    public async saveRegistry(registry: MountRegistry): Promise<MountRegistry> {        
         if(Environment.isDebug) {
             this.logger.debug(`Saving registry file ${registry.filepath}...`);
         }

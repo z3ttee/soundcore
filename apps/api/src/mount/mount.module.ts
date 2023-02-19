@@ -1,13 +1,12 @@
-import path from 'path';
 import { Logger, Module, OnModuleInit } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { MountService } from './services/mount.service'
 import { MountController } from './controllers/mount.controller';
 import { Mount } from './entities/mount.entity';
 import { MountQueueService } from './services/mount-queue.service';
-import { WorkerQueueModule } from '@soundcore/nest-queue';
 import { MountRegistryService } from './services/mount-registry.service';
 import { GatewayModule } from '../gateway/gateway.module';
+import { IndexerModule } from '../indexer/indexer.module';
 import { Environment } from '@soundcore/common';
 
 @Module({
@@ -21,11 +20,8 @@ import { Environment } from '@soundcore/common';
   ],
   imports: [
     TypeOrmModule.forFeature([ Mount ]),
-    WorkerQueueModule.forFeature({
-      script: path.join(__dirname, "worker", "mount.worker.js"),
-      concurrent: 2
-    }),
     GatewayModule,
+    IndexerModule
   ],
   exports: [
     MountService,
