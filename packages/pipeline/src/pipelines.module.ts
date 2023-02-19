@@ -49,7 +49,7 @@ export interface PipelineLocalOptions {
      * Time in milliseconds used to debounce status events of pipelines.
      * This will collect the latest status updates (during the given time frame) and push them in a single
      * event.
-     * @default 300
+     * @default 100
      */
     debounceStatus?: number;
 }

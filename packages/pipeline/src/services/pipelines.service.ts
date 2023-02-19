@@ -3,7 +3,7 @@ import crypto from "node:crypto";
 import { Inject, Injectable, Logger } from "@nestjs/common";
 import { WorkerPool, pool } from "workerpool";
 import { DEFAULT_CONCURRENT_PIPELINES, GLOBAL_OPTIONS_TOKEN, LOCAL_OPTIONS_TOKEN } from "../constants";
-import { PipelineRun } from "../entities/pipeline.entity";
+import { PipelineRun, PipelineWorkerResult } from "../entities/pipeline.entity";
 import { PipelineQueue } from "./pipeline-queue.service";
 import { PipelineRegistry } from "./pipeline-registry.service";
 import { Environment, RunStatus } from "../entities/common.entity";
@@ -43,17 +43,14 @@ export class PipelineService {
 
         // Register polling interval
         const intervalHandler = () => {
-            console.log("is dispatching? ", this.isDispatching);
 
             // Check if previous polling interval is still busy dispatching worker
             if(!this.isDispatching) {
                 // If not, dispatch next run and
                 // update status accordingly
                 this.isDispatching = true;
-                this.dispatchNextRun().then((run) => {
-                    console.log("dispatched: ", run?.id);
-                }).catch((error) => {
-                    console.log("dispatch failed", error);
+                this.dispatchNextRun().catch((error: Error) => {
+                    this.logger.error(`Could not dispatch pipeline run: ${error.message}`, error.stack);
                 }).finally(() => this.isDispatching = false);
             }
         }
@@ -61,7 +58,10 @@ export class PipelineService {
 
         // Listen on enqueued event
         this.on("enqueued", (position, { pipeline }) => {
-            this.logger.log(`Enqueued pipeline '${pipeline.id}' with run id '${pipeline.runId}' (${position})`);
+            this.logger.log(`Enqueued pipeline '${pipeline.id}' with run id '${pipeline.runId}' (Position: ${position})`);
+        });
+        this.on("dequeued", ({ pipeline }) => {
+            this.logger.log(`Dequeued pipeline '${pipeline.id}' with run id '${pipeline.runId}' (Queue size: ${this.queue.size})`);
         });
     }
 
@@ -123,18 +123,14 @@ export class PipelineService {
         const peek = this.queue.peek();
         // No runs enqueued
         if(typeof peek === "undefined" || peek == null) {
-            console.log("queue is empty");
             return null;
         }
 
         const currentlyRunning: number = this.pool.stats().busyWorkers;
         const totalCapacity: number = this.localOptions.concurrent ?? DEFAULT_CONCURRENT_PIPELINES;
 
-        console.log(currentlyRunning, totalCapacity);
-
         // Max concurrently running pipelines reached
         if(currentlyRunning >= totalCapacity) {
-            console.log("max concurrent reached");
             return null;
         }
 
@@ -149,13 +145,14 @@ export class PipelineService {
                 const { name, args } = payload;
                 this.events.firePureEvent(name, ...args);
             }
-        }).then((pipelineRun: PipelineRun) => {
+        }).then((result: PipelineWorkerResult) => {
             // Update pipeline status
+            const pipelineRun = result.pipeline;
             pipelineRun.status = pipelineRun.status != RunStatus.COMPLETED ? pipelineRun.status : RunStatus.COMPLETED;
             pipelineRun.currentStageId = null;
 
             this.events.fireEvent("status", { pipeline: pipelineRun });
-            this.events.fireEvent("completed", { pipeline: pipelineRun });
+            this.events.fireEvent("completed", result);
         }).catch((error: Error) => {
             // Update pipeline status
             pipelineRun.currentStageId = null;

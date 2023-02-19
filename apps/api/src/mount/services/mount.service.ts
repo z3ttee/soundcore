@@ -19,6 +19,7 @@ import { OnEvent } from '@nestjs/event-emitter';
 import { PIPELINE_INDEX_ID } from '../../indexer/pipelines';
 import { PipelineRun } from '@soundcore/pipelines';
 import { IndexerService } from '../../indexer/services/indexer.service';
+import { Task } from '../../tasks/entities/task.entity';
 
 @Injectable()
 export class MountService {
@@ -170,7 +171,7 @@ export class MountService {
      * @param idOrObject Mount ID or Object
      * @returns Job<Mount>
      */
-    public async rescanMount(idOrObject: string | Mount): Promise<PipelineRun> {
+    public async rescanMount(idOrObject: string | Mount): Promise<Task> {
         const mount = await this.resolveMount(idOrObject);
         if(!mount) throw new NotFoundException("Mount not found");
 
@@ -183,7 +184,7 @@ export class MountService {
      * @param idOrObject Mount ID or Object
      * @returns Job<Mount>
      */
-    private async scanMountInternal(idOrObject: string | Mount): Promise<PipelineRun> {
+    private async scanMountInternal(idOrObject: string | Mount): Promise<Task> {
         const mount = await this.resolveMount(idOrObject);
         if(!mount) throw new NotFoundException("Mount not found");
 

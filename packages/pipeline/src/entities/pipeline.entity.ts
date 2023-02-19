@@ -45,6 +45,12 @@ export interface PipelineRun extends Omit<IPipeline, "scriptFile"> {
     currentStageId: string;
 }
 
+export interface PipelineWorkerResult {
+    pipeline: PipelineRun;
+    outputs: Outputs;
+    sharedOutputs: Outputs;
+}
+
 export type PipelineEntityResolver = (pipeline: PipelineRun) => PipelineRun | Promise<PipelineRun>;
 
 // @Entity()

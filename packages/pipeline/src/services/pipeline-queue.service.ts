@@ -13,14 +13,13 @@ export class PipelineQueue {
     
     public enqueue(run: PipelineRun): number {
         const position = this.queue.push(run);
-        this.events.fireEvent("enqueued", position, { pipeline: run })
-        console.log("enqueued: ", this.queue.length)
+        this.events.fireEvent("enqueued", position, { pipeline: run });
         return position;
     }
 
     public dequeue(): PipelineRun {
         const next = this.queue.shift();
-        console.log("dequed run: ", next);
+        this.events.fireEvent("dequeued", { pipeline: next });
         return next;
     }
 

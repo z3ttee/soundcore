@@ -3,7 +3,7 @@ import { worker } from "workerpool";
 import { StageConfigurator, StageInitializer } from "../builder/stage.builder";
 import { DEFAULT_STATUS_EVENT_DEBOUNCE_MS } from "../constants";
 import { Outputs, PipelineLogger, Resources, RunStatus } from "../entities/common.entity";
-import { IPipeline, PipelineRun } from "../entities/pipeline.entity";
+import { IPipeline, PipelineRun, PipelineWorkerResult } from "../entities/pipeline.entity";
 import { StepConditionEvaluator, StepExecutor, StepRef } from "../entities/step.entity";
 import { PipelineAbortedException } from "../exceptions/abortedException";
 import { SkippedException } from "../exceptions/skippedException";
@@ -13,7 +13,7 @@ import { readConfiguratorFromFile } from "../utils/registerPipelines";
 import { emit, getOrDefault, globalThis } from "../utils/workerHelperFunctions";
 
 worker({
-    default: async (pipeline: PipelineRun, definition: IPipeline, globalOptions: PipelineGlobalOptions, localOptions: PipelineLocalOptions) => {
+    default: async (pipeline: PipelineRun, definition: IPipeline, globalOptions: PipelineGlobalOptions, localOptions: PipelineLocalOptions): Promise<PipelineWorkerResult> => {
         const startedAtMs: number = Date.now();
 
         // Instantiate logger
@@ -230,7 +230,11 @@ worker({
         emit("status", { pipeline });
 
         logDurationMs(startedAtMs, logger);
-        return pipeline;
+        return {
+            pipeline: pipeline,
+            outputs: globalThis.outputs ?? {},
+            sharedOutputs: globalThis.sharedOutputs ?? {}
+        };
     }
 });
 
