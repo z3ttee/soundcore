@@ -10,8 +10,15 @@ import { buildDefinitionsFromFiles } from "./utils/registerPipelines";
 export interface PipelineGlobalOptions {    
     /**
      * Enable printing the logs of a pipeline run to the console.
+     * @default false
      */
     enableStdout?: boolean;
+
+    /**
+     * Disable printing logs to a log file
+     * @default false
+     */
+    disableFileLogs?: boolean;
 }
 
 export interface PipelineLocalOptions {

@@ -17,7 +17,7 @@ worker({
         const startedAtMs: number = Date.now();
 
         // Instantiate logger
-        const logger = createLogger(pipeline.id, pipeline.runId, globalOptions.enableStdout ?? false, true);
+        const logger = createLogger(pipeline.id, pipeline.runId, globalOptions.enableStdout ?? false, globalOptions.disableFileLogs ?? true);
         logger.info(`Worker picked up pipeline run. Preparing...`);
 
         // Update debounce time
