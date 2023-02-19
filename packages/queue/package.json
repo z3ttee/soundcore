@@ -25,6 +25,8 @@
     "workerpool": "^6.2.1"
   },
   "devDependencies": {
+    "@nestjs/common": "^9.0.0",
+    "@nestjs/core": "^9.0.0",
     "@types/node": "^16.0.0",
     "eslint": "^8.0.1",
     "eslint-config-nestjs": "*",
