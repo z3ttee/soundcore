@@ -3,7 +3,6 @@ import crypto from "node:crypto";
 import { Inject, Injectable, Logger } from "@nestjs/common";
 import { WorkerPool, pool } from "workerpool";
 import { DEFAULT_CONCURRENT_PIPELINES, GLOBAL_OPTIONS_TOKEN, LOCAL_OPTIONS_TOKEN } from "../constants";
-import { CreatePipelineRunDTO } from "../dtos/create-run.dto";
 import { PipelineRun } from "../entities/pipeline.entity";
 import { PipelineQueue } from "./pipeline-queue.service";
 import { PipelineRegistry } from "./pipeline-registry.service";
@@ -64,9 +63,6 @@ export class PipelineService {
         this.on("enqueued", (position, { pipeline }) => {
             this.logger.log(`Enqueued pipeline '${pipeline.id}' with run id '${pipeline.runId}' (${position})`);
         });
-        // this.on("status", (params) => {
-        //     this.savePipelineRun(params.pipeline);
-        // })
     }
 
     /**
@@ -77,7 +73,7 @@ export class PipelineService {
      */
     public async createRun(pipelineId: string, environment?: Environment): Promise<PipelineRun> {
         const definition = this.registry.get(pipelineId);
-        const pipeline: PipelineRun = {
+        return {
             id: definition.id,
             runId: crypto.randomUUID(),
             name: definition.name,
@@ -95,9 +91,10 @@ export class PipelineService {
                 stage.steps?.[0]?.id
             ))
         }
+    }
 
-        this.queue.enqueue(pipeline);
-        return pipeline;
+    public async enqueueRun(run: PipelineRun): Promise<number> {
+        return this.queue.enqueue(run);
     }
 
     // private async savePipelineRun(run: PipelineRun): Promise<PipelineRun> {
