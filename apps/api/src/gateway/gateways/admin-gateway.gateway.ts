@@ -2,10 +2,10 @@ import { WebSocketGateway } from "@nestjs/websockets";
 import { Mount, MountProgress, MountStatus } from "../../mount/entities/mount.entity";
 import { AuthGateway } from "../../utils/gateway/auth-gateway";
 
-import { GATEWAY_MOUNT_UPDATE } from "@soundcore/constants";
 import { UserService } from "../../user/user.service";
 import { OIDCService } from "../../authentication/services/oidc.service";
 import { MountStatusUpdateEvent } from "../events/mount-status-update.event";
+import { GATEWAY_MOUNT_UPDATE } from "../../constants";
 
 @WebSocketGateway({
     cors: {

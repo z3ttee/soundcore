@@ -49,9 +49,6 @@ COPY --from=BUILDER ${CWD}/packages/bootstrap/package.json ${CWD}/packages/boots
 COPY --from=BUILDER ${CWD}/packages/common/dist ${CWD}/packages/common/dist
 COPY --from=BUILDER ${CWD}/packages/common/package.json ${CWD}/packages/common/package.json
 
-COPY --from=BUILDER ${CWD}/packages/constants/dist ${CWD}/packages/constants/dist
-COPY --from=BUILDER ${CWD}/packages/constants/package.json ${CWD}/packages/constants/package.json
-
 COPY --from=BUILDER ${CWD}/packages/queue/dist ${CWD}/packages/queue/dist
 COPY --from=BUILDER ${CWD}/packages/queue/package.json ${CWD}/packages/queue/package.json
 

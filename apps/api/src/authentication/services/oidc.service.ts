@@ -100,11 +100,18 @@ export class OIDCService {
     
                     this._issuer = issuer;
                     sub.next(issuer);
+                }).catch((error: Error) => {
+                    sub.error(error);
+                }).finally(() => {
                     sub.complete();
                 });
             })
 
-            subscriber.add(discoverObservable.subscribe((issuer) => {
+            subscriber.add(discoverObservable.pipe(catchError((err, caught) => {
+                subscriber.error(err);
+                return caught;
+            })).subscribe((issuer) => {
+                console.log(issuer);
                 subscriber.next(issuer);
                 subscriber.complete();
             }));
