@@ -106,7 +106,6 @@ export class OIDCService {
                 subscriber.complete();
                 return of(null);
             })).subscribe((issuer) => {
-                console.log(issuer);
                 subscriber.next(issuer);
                 subscriber.complete();
             }));
