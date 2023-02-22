@@ -78,7 +78,8 @@ import { TasksModule } from './tasks/tasks.module';
       // Enable stdout on debug mode
       enableStdout: Environment.isDebug,
       // Disable file logs on dev environment
-      disableFileLogs: !Environment.isProduction
+      disableFileLogs: !Environment.isProduction,
+      logsDirectory:
     }),
     EventEmitterModule.forRoot({ global: true, ignoreErrors: true }),
     ArtistModule,

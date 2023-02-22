@@ -19,6 +19,8 @@ export interface PipelineGlobalOptions {
      * @default false
      */
     disableFileLogs?: boolean;
+
+    logsDirectory?: string;
 }
 
 export interface PipelineLocalOptions {

@@ -37,6 +37,14 @@ export class FileSystemService {
     }
 
     /**
+     * Get the main config directory of the application.
+     * @returns {string} Root directory path
+     */
+    public getLogsDir(): string {
+        return path.join(this.getInstanceDir(), "logs");
+    }
+
+    /**
      * Get temporary directory of the application.
      * @returns {string} Filepath to temporary directory
      */

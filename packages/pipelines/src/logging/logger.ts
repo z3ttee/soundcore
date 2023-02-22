@@ -46,7 +46,7 @@ function useFileFormat(): winston.Logform.Format {
     );
 }
 
-export function createLogger(pipelineId: string, pipelineRunId: string, enableConsoleLogging: boolean, enableFileLogging: boolean) {
+export function createLogger(logsDirectory: string, pipelineId: string, pipelineRunId: string, enableConsoleLogging: boolean, enableFileLogging: boolean) {
     const cwd = process.cwd();
     const transports: winston.transport[] = [];
 
@@ -56,7 +56,7 @@ export function createLogger(pipelineId: string, pipelineRunId: string, enableCo
 
     if(enableConsoleLogging) transports.push(new winston.transports.Console({ format: useConsoleFormat(pipelineId) }));
     if(enableFileLogging) transports.push(new winston.transports.File({
-        dirname: path.join(cwd, "logs", "pipelines", pipelineId),
+        dirname: !!logsDirectory ? path.join(logsDirectory, "pipelines", pipelineId) : path.join(cwd, "logs", "pipelines", pipelineId),
         filename: `${pipelineRunId}.log`,
         format: useFileFormat(),
     }));
@@ -64,7 +64,7 @@ export function createLogger(pipelineId: string, pipelineRunId: string, enableCo
     return winston.createLogger({ transports: transports, levels: winston.config.npm.levels });
 }
 
-export function createEmptyLogger() {
+function createEmptyLogger() {
     return winston.createLogger({
         transports: [new winston.transports.Console({
             silent: true
