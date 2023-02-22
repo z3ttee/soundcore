@@ -37,6 +37,8 @@ import { TracklistModule } from './tracklist/tracklist.module';
 // import { WorkerModule } from '@soundcore/worker';
 import { PipelineModule } from '@soundcore/pipelines';
 import { TasksModule } from './tasks/tasks.module';
+import { FileSystemService } from './filesystem/services/filesystem.service';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
@@ -74,12 +76,17 @@ import { TasksModule } from './tasks/tasks.module';
         }
       })
     }),
-    PipelineModule.forRoot({
-      // Enable stdout on debug mode
-      enableStdout: Environment.isDebug,
-      // Disable file logs on dev environment
-      disableFileLogs: !Environment.isProduction,
-      logsDirectory:
+    PipelineModule.forRootAsync({
+      inject: [ FileSystemService ],
+      useFactory: async (fsService: FileSystemService) => {
+        return {
+          // Enable stdout on debug mode
+          enableStdout: Environment.isDebug,
+          // Disable file logs on dev environment
+          disableFileLogs: !Environment.isProduction,
+          logsDirectory: fsService.getLogsDir()
+        }
+      }
     }),
     EventEmitterModule.forRoot({ global: true, ignoreErrors: true }),
     ArtistModule,

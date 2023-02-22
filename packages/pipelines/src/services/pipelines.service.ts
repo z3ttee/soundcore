@@ -2,16 +2,17 @@ import path from "node:path";
 import crypto from "node:crypto";
 import { Inject, Injectable, Logger } from "@nestjs/common";
 import { WorkerPool, pool } from "workerpool";
-import { DEFAULT_CONCURRENT_PIPELINES, GLOBAL_OPTIONS_TOKEN, LOCAL_OPTIONS_TOKEN } from "../constants";
+import { DEFAULT_CONCURRENT_PIPELINES, LOCAL_OPTIONS_TOKEN } from "../constants";
 import { PipelineRun, PipelineWorkerResult } from "../entities/pipeline.entity";
 import { PipelineQueue } from "./pipeline-queue.service";
 import { PipelineRegistry } from "./pipeline-registry.service";
 import { Environment, RunStatus } from "../entities/common.entity";
 import { EventHandler, EventName, WorkerEmitEvent } from "../event/event";
 import { PipelineEventService } from "./pipeline-event.service";
-import { PipelineGlobalOptions, PipelineLocalOptions } from "../pipelines.module";
+import { PipelineGlobalOptions, PipelineLocalOptions } from "../options";
 import { Stage } from "../entities/stage.entity";
 import { Step } from "../entities/step.entity";
+import { MODULE_OPTIONS_TOKEN } from "../pipelines.module-definition";
 
 @Injectable()
 export class PipelineService {
@@ -26,7 +27,7 @@ export class PipelineService {
         private readonly queue: PipelineQueue,
         private readonly registry: PipelineRegistry,
         private readonly events: PipelineEventService,
-        @Inject(GLOBAL_OPTIONS_TOKEN) private readonly globalOptions: PipelineGlobalOptions,
+        @Inject(MODULE_OPTIONS_TOKEN) private readonly globalOptions: PipelineGlobalOptions,
         @Inject(LOCAL_OPTIONS_TOKEN) private readonly localOptions: PipelineLocalOptions,
     ) {
         // Create worker pool

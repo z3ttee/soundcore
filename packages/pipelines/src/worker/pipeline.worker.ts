@@ -8,7 +8,7 @@ import { StepConditionEvaluator, StepExecutor, StepRef } from "../entities/step.
 import { PipelineAbortedException } from "../exceptions/abortedException";
 import { SkippedException } from "../exceptions/skippedException";
 import { createLogger } from "../logging/logger";
-import { PipelineGlobalOptions, PipelineLocalOptions } from "../pipelines.module";
+import { PipelineGlobalOptions, PipelineLocalOptions } from "../options";
 import { readConfiguratorFromFile } from "../utils/registerPipelines";
 import { emit, getOrDefault, globalThis } from "../utils/workerHelperFunctions";
 
