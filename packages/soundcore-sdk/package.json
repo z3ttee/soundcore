@@ -39,6 +39,7 @@
     "@angular/router": "^14.2.0",
     "ngx-indexed-db": "^11.0.0",
     "@soundcore/sso": "*",
+    "@soundcore/constants": "*",
     "rxjs": "~7.5.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.11.4"

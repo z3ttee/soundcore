@@ -1,11 +1,11 @@
 
+import { GATEWAY_MOUNT_UPDATE } from "@soundcore/constants";
 import { SCSDKAuthenticatedGateway } from "./gateway";
 import { Inject, Injectable } from "@angular/core";
 import { SCDKOptions, SCDK_OPTIONS } from "../../scdk.module";
 import { SSOService } from "@soundcore/sso";
 import { MountStatusUpdateEvent } from "../events";
 import { Observable, Subject } from "rxjs";
-import { GATEWAY_MOUNT_UPDATE } from "../../constants";
 
 @Injectable({
   providedIn: "root"

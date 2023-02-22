@@ -37,7 +37,6 @@
     "@angular/platform-browser": "^14.2.0",
     "@angular/platform-browser-dynamic": "^14.2.0",
     "@angular/router": "^14.2.0",
-    "@angular/material": "^14.2.7",
     "@soundcore/cdk": "*",
     "@soundcore/sdk": "*",
     "@soundcore/tailwind": "*",

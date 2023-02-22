@@ -34,9 +34,11 @@ import { CronModule } from './cron/cron.module';
 import { CommonConfigModule, Environment } from '@soundcore/common';
 import { WorkerQueueModule } from '@soundcore/nest-queue';
 import { TracklistModule } from './tracklist/tracklist.module';
+// import { WorkerModule } from '@soundcore/worker';
 import { PipelineModule } from '@soundcore/pipelines';
 import { TasksModule } from './tasks/tasks.module';
 import { FileSystemService } from './filesystem/services/filesystem.service';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [

@@ -1,0 +1,17 @@
+{
+  "name": "@soundcore/constants",
+  "version": "0.0.1",
+  "private": true,
+  "main": "dist/index.js",
+  "files": [
+    "dist/**/*"
+  ],
+  "scripts": {
+    "dev": "tsc --watch",
+    "build:api": "tsc",
+    "build:app": "tsc"
+  },
+  "devDependencies": {
+    "typescript": "^4.3.5"
+  }
+}
