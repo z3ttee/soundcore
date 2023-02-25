@@ -15,26 +15,30 @@
                 </div>
 
                 <div class="w-1/2 text-right">
-                    <button (click)="navigateBack()" class="inline-flex items-center justify-center bg-body-light rounded-full w-9 h-9 mr-1.5 transform-gpu transition-all will-change-transform active:scale-95"><ng-icon name="heroChevronDown" class="h-5 w-5 transform-gpu rotate-90"></ng-icon></button>
-                    <button (click)="navigateNext()" class="inline-flex items-center justify-center bg-body-light rounded-full w-9 h-9 transform-gpu transition-all will-change-transform active:scale-95"><ng-icon name="heroChevronDown" class="h-5 w-5 transform-gpu -rotate-90"></ng-icon></button>
+                    <button (click)="navigateBack()" class="inline-flex items-center justify-center bg-body-light rounded-full w-9 h-9 mr-1.5 transform-gpu transition-all will-change-transform active:scale-95"><ng-icon name="heroChevronDown" size="20" class="h-5 w-5 transform-gpu rotate-90"></ng-icon></button>
+                    <button (click)="navigateNext()" class="inline-flex items-center justify-center bg-body-light rounded-full w-9 h-9 transform-gpu transition-all will-change-transform active:scale-95"><ng-icon name="heroChevronDown" size="20" class="h-5 w-5 transform-gpu -rotate-90"></ng-icon></button>
                 </div>
             </div>
 
-            <div class="mt-4 flex items-center cursor-pointer gap-4 p-2.5 transition-all bg-body-light bg-opacity-0 active:bg-opacity-80 rounded-sm" [ngClass]="{'hover:bg-opacity-50': !(screenService.$isTouch | async)}" [routerLink]="['/']">
-                <ng-icon name="heroArrowLeft" class="h-5 w-5"></ng-icon> 
-                <span>Zurück zur App</span>
+            <div class="mt-4">
+                <scngx-nav-list-item [routerLink]="['/']" [routerLinkActiveOptions]="{exact: true}" iconName="heroArrowLeft">Zurück zur App</scngx-nav-list-item>
             </div>
         </div>
 
         <hr class="my-row bg-divider min-h-[3px] max-h-[3px] rounded-full appearance-none border-none w-[90%] mx-auto">
 
-        <div class="block h-full">
-            <ul class="flex flex-col select-none">
-                <li [routerLink]="['./zones']" routerLinkActive="text-accent" class="relative flex gap-4 px-window py-3 cursor-pointer hover:opacity-100 transition-all"><ng-icon name="heroCubeTransparent" class="h-6 w-6"></ng-icon><span>Speicherzonen</span></li>
-                <li [routerLink]="['./import']" routerLinkActive="text-accent" class="relative flex gap-4 px-window py-3 cursor-pointer hover:opacity-100 transition-all"><ng-icon name="heroDocumentPlus" class="h-6 w-6"></ng-icon><span>Importieren</span></li>
-                <li [routerLink]="['./tasks']" routerLinkActive="text-accent" class="relative flex gap-4 px-window py-3 cursor-pointer hover:opacity-100 transition-all"><ng-icon name="heroBolt" class="h-6 w-6"></ng-icon><span>Tasks</span></li>
-                <li [routerLink]="['./settings']" routerLinkActive="text-accent" class="relative flex gap-4 px-window py-3 cursor-pointer hover:opacity-100 transition-all"><ng-icon name="heroCog6Tooth" class="h-6 w-6"></ng-icon><span>Konfiguration</span></li>
-            </ul>
+        <div class="block h-full px-window">
+            <div class="flex flex-col gap-1 select-none">
+                <scngx-nav-list-item [routerLink]="['./zones']" iconName="heroCubeTransparent">Speicherzonen</scngx-nav-list-item>
+                <scngx-nav-list-item [routerLink]="['./import']" iconName="heroDocumentPlus">Importieren</scngx-nav-list-item>
+                <scngx-nav-list-item [routerLink]="['./tasks']" iconName="heroBolt">Prozesse</scngx-nav-list-item>
+                <scngx-nav-list-item [routerLink]="['./settings']" iconName="heroCog6Tooth">Einstellungen</scngx-nav-list-item>
+
+                <!-- <li [routerLink]="['./zones']" routerLinkActive="text-accent" class="relative flex gap-4 px-window py-3 cursor-pointer hover:opacity-100 transition-all"><ng-icon name="heroCubeTransparent" class="h-6 w-6"></ng-icon><span>Speicherzonen</span></li> -->
+                <!-- <li [routerLink]="['./import']" routerLinkActive="text-accent" class="relative flex gap-4 px-window py-3 cursor-pointer hover:opacity-100 transition-all"><ng-icon name="heroDocumentPlus" class="h-6 w-6"></ng-icon><span>Importieren</span></li> -->
+                <!-- <li [routerLink]="['./tasks']" routerLinkActive="text-accent" class="relative flex gap-4 px-window py-3 cursor-pointer hover:opacity-100 transition-all"><ng-icon name="heroBolt" class="h-6 w-6"></ng-icon><span>Tasks</span></li> -->
+                <!-- <li [routerLink]="['./settings']" routerLinkActive="text-accent" class="relative flex gap-4 px-window py-3 cursor-pointer hover:opacity-100 transition-all"><ng-icon name="heroCog6Tooth" class="h-6 w-6"></ng-icon><span>Konfiguration</span></li> -->
+            </div>
         </div>
 
         <hr class="bg-divider min-h-[3px] max-h-[3px] rounded-full appearance-none border-none w-[90%] mx-auto">

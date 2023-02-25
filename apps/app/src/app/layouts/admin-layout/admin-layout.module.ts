@@ -7,7 +7,8 @@ import { SCNGXBottomNavModule, SCNGXDrawerModule, SCNGXProgressbarModule, SCNGXT
 import { SCSDKImportModule } from '@soundcore/sdk';
 import { NgIconsModule } from '@ng-icons/core';
 import { heroPlusSolid, heroEllipsisVerticalSolid } from '@ng-icons/heroicons/solid';
-import { heroHome, heroShieldExclamation, heroArrowRightOnRectangle, heroCog6Tooth, heroBell, heroMagnifyingGlass, heroUser, heroBookmarkSquare, heroChevronDown } from '@ng-icons/heroicons/outline';
+import { heroHome, heroShieldExclamation, heroCubeTransparent, heroArrowRightOnRectangle, heroCog6Tooth, heroDocumentPlus, heroBell, heroMagnifyingGlass, heroUser, heroBookmarkSquare, heroChevronDown } from '@ng-icons/heroicons/outline';
+import { NavListItemModule } from 'src/app/components/list-items/nav-list-item/nav-list-item.module';
 
 @NgModule({
   declarations: [
@@ -17,6 +18,7 @@ import { heroHome, heroShieldExclamation, heroArrowRightOnRectangle, heroCog6Too
     CommonModule,
     RouterModule,
     ProfileBarModule,
+    NavListItemModule,
         
     SCNGXDrawerModule,
     SCNGXBottomNavModule,
@@ -36,7 +38,9 @@ import { heroHome, heroShieldExclamation, heroArrowRightOnRectangle, heroCog6Too
       heroEllipsisVerticalSolid,
       heroCog6Tooth,
       heroArrowRightOnRectangle,
-      heroShieldExclamation
+      heroShieldExclamation,
+      heroCubeTransparent,
+      heroDocumentPlus
     })
   ]
 })
