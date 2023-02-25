@@ -16,4 +16,10 @@ export class TasksController {
         return this.service.findAll(pageable);
     }
 
+    @Roles("admin")
+    @Get("definitions")
+    public async findDefinitions(@Pagination() pageable: Pageable) {
+        return this.service.findDefinitions(pageable);
+    }
+
 }

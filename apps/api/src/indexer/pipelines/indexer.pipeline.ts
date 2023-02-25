@@ -5,7 +5,7 @@ import { step_check_files, step_update_duplicate_files, step_update_failed_files
 import { step_create_albums, step_create_artists, step_create_songs, step_read_mp3_tags } from "./stages/metadata.stage";
 import { step_checkout_mount, step_create_database_entries, step_search_files } from "./stages/scan.stage";
 
-export default pipeline(PIPELINE_INDEX_ID, PIPELINE_INDEX_NAME)
+export default pipeline(PIPELINE_INDEX_ID, PIPELINE_INDEX_NAME, "Scan a library and extract metadata from audio files.")
     /**
      * Stage: Scanning
      */

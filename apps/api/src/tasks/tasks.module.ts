@@ -1,5 +1,7 @@
 import { Module, OnModuleInit } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
+import { OIDCModule } from "../authentication/oidc.module";
+import { UserModule } from "../user/user.module";
 import { TasksController } from "./controllers/tasks.controller";
 import { Task } from "./entities/task.entity";
 import { TasksGateway } from "./gateway/tasks.gateway";
@@ -14,6 +16,8 @@ import { TasksService } from "./services/tasks.service";
         TasksGateway
     ],
     imports: [
+        UserModule,
+        OIDCModule,
         TypeOrmModule.forFeature([ Task ])
     ],
     exports: [

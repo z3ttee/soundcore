@@ -1,5 +1,6 @@
 
 export { SCSDKTasksModule } from "./tasks.module";
 export { SCSDKTasksService } from "./services/tasks.service";
-export { Task } from "./entities/task.entity";
+export { SCSDKTaskGateway } from "./gateway/tasks.gateway";
+export { Task, TaskDefinition } from "./entities/task.entity";
 

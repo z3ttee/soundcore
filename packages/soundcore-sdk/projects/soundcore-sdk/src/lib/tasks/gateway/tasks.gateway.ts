@@ -9,7 +9,7 @@ import { Task } from "../entities/task.entity";
 @Injectable({
     providedIn: "root"
 })
-export class SCSDKGeneralGateway extends SCSDKAuthenticatedGateway {
+export class SCSDKTaskGateway extends SCSDKAuthenticatedGateway {
   
     private readonly _tasksUpdateSubj: Subject<Task[]> = new Subject();
     public readonly $onTasksUpdated: Observable<Task[]> = this._tasksUpdateSubj.asObservable();

@@ -2736,6 +2736,13 @@
   dependencies:
     tslib "^2.2.0"
 
+"@ng-icons/ux-aspects@^23.1.0":
+  version "23.1.0"
+  resolved "https://registry.yarnpkg.com/@ng-icons/ux-aspects/-/ux-aspects-23.1.0.tgz#ae8f1eb9452a721010df9ba1ca453a939cad10fb"
+  integrity sha512-NtQFHFQNl7G9JgbRX8I3Ry1lLcS3xVamZ3zVqc/DHcMFHvV7weSocxYbdGiBBe1pyjXFone+2gCt3zlEpP82yQ==
+  dependencies:
+    tslib "^2.2.0"
+
 "@ngtools/webpack@15.2.0":
   version "15.2.0"
   resolved "https://registry.yarnpkg.com/@ngtools/webpack/-/webpack-15.2.0.tgz#86df4d03f4acc30bc3cf1571664ddb2935a92d45"

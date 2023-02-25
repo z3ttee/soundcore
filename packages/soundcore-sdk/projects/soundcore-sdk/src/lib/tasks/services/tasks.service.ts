@@ -4,7 +4,7 @@ import { Observable } from "rxjs";
 import { Page, Pageable } from "../../pagination";
 import { SCDKOptions, SCDK_OPTIONS } from "../../scdk.module";
 import { Future, toFuture } from "../../utils/future";
-import { Task } from "../entities/task.entity";
+import { Task, TaskDefinition } from "../entities/task.entity";
 
 @Injectable()
 export class SCSDKTasksService {
@@ -21,7 +21,24 @@ export class SCSDKTasksService {
      * @returns Future<Page<Task>>
      */
     public findAll(pageable: Pageable): Observable<Future<Page<Task>>> {
-        return this.httpClient.get<Page<Task>>(`${this.options.api_base_uri}/v1/tasks${pageable.toQuery()}`).pipe(toFuture());
+        return this.httpClient.get<Page<Task>>(`${this.findAllUrl()}${pageable.toQuery()}`).pipe(toFuture());
+    }
+
+    /**
+     * Find a list of task definitions
+     * @param pageable Page settings
+     * @returns Future<Page<TaskDefinition>>
+     */
+    public findDefinitions(pageable: Pageable): Observable<Future<Page<TaskDefinition>>> {
+        return this.httpClient.get<Page<TaskDefinition>>(`${this.options.api_base_uri}/v1/tasks/definitions${pageable.toQuery()}`).pipe(toFuture());
+    }
+
+    /**
+     * Get the URL used to contact the endpoint for fetching all tasks
+     * @returns string
+     */
+    public findAllUrl(): string {
+        return `${this.options.api_base_uri}/v1/tasks`;
     }
 
 }

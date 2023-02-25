@@ -1,5 +1,14 @@
-import { Environment, PipelineRun, RunStatus, Stage } from "@soundcore/pipelines";
+import { Environment, IPipeline, PipelineRun, RunStatus, Stage } from "@soundcore/pipelines";
+import { IStage } from "@soundcore/pipelines/dist/entities/stage.entity";
 import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+
+export class TaskDefinition implements IPipeline {
+    id: string;
+    name: string;
+    description: string;
+    stages: IStage[];
+    scriptFile: string;
+}
 
 @Entity()
 export class Task implements PipelineRun {

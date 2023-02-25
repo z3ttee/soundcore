@@ -1,0 +1,45 @@
+<ng-container *ngIf="($props | async) as props">
+    <div class="pt-window w-full h-full" cdkVirtualScrollingElement>
+        <!-- Page title -->
+        <div class="mb-row px-window ">
+            <scngx-ui-title>
+                Prozesse<div scngxSubtitle>Verwaltung laufender Hintergrundprozesse</div>
+            </scngx-ui-title>
+        </div>
+
+        <scngx-ui-row headline="Prozesse" [route]="['./definitions']" routeText="Alle anzeigen">
+            <scngx-horizontal-list>
+                <!-- Task definition item -->
+                <div class="select-none p-4 rounded-sm bg-body-light border border-body-lighter w-64 h-full cursor-pointer hover:bg-body-lighter hover:bg-opacity-80 active:bg-body-lighter active:bg-opacity-100 [&>div]:active:scale-95 transition-all" *ngFor="let item of (props.definitions.data?.elements ?? [])">
+                    <div class="transform-gpu will-change-transform transition-all">
+                        <div class="flex items-center justify-start gap-2">
+                            <ng-icon size="24" name="heroArrowTopRightOnSquare"></ng-icon>
+                            <p class="line-clamp-1">{{ item.name }}</p>
+                        </div>
+
+                        <p class="mt-4 text-sm opacity-60 line-clamp-3">{{ item.description }}</p>
+                    </div>
+                </div>
+            </scngx-horizontal-list>
+        </scngx-ui-row>
+
+        <scngx-ui-row headline="Zuletzt ausgeführt">
+            <cdk-virtual-scroll-viewport [itemSize]="56">
+                <div class="px-window" *cdkVirtualFor="let item of props.datasource">
+                    <scngx-task-list-item [task]="item"></scngx-task-list-item>
+                </div>
+            </cdk-virtual-scroll-viewport>
+        </scngx-ui-row>
+    
+        <!-- <div class="mt-row px-window ">
+            <cdk-virtual-scroll-viewport [itemSize]="56">
+                <div *cdkVirtualFor="let item of props.datasource">
+                    {{ item | json }}
+                </div>
+            </cdk-virtual-scroll-viewport>
+        </div> -->
+    
+        <!-- Page bottom padding -->
+        <div class="pb-window"></div>
+    </div>
+</ng-container>

@@ -1,6 +1,6 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { PipelineRun, RunStatus } from "@soundcore/pipelines";
+import { PipelineRegistry, PipelineRun, RunStatus, IPipeline } from "@soundcore/pipelines";
 import { Page, Pageable } from "nestjs-pager";
 import { Repository } from "typeorm";
 import { Task } from "../entities/task.entity";
@@ -12,6 +12,7 @@ export class TasksService {
 
     constructor(
         private readonly gateway: TasksGateway,
+        private readonly registry: PipelineRegistry,
         @InjectRepository(Task) private readonly repository: Repository<Task>
     ) {}
 
@@ -30,6 +31,17 @@ export class TasksService {
             .getManyAndCount().then(([tasks, total]) => {
                 return Page.of(tasks, total, pageable.offset);
             })
+    }
+
+    /**
+     * Find a page with task definitions that are currently registered
+     * @param pageable Page settings
+     * @returns Page<IPipeline>
+     */
+    public async findDefinitions(pageable: Pageable): Promise<Page<IPipeline>> {
+        return this.registry.listAll().then((definitions) => {
+            return Page.of( definitions.splice(pageable.offset, pageable.limit), definitions.length, pageable.offset);
+        });
     }
 
     public async emitTasks(tasks: Task[]) {
