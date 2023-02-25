@@ -31,7 +31,9 @@ export class TasksModule implements OnModuleInit {
     ) {}
 
     async onModuleInit() {
-        return this.service.clearEnqueuedTasks();
+        return this.service.clearOldTasks().then(() => {
+            return this.service.clearEnqueuedTasks();
+        });
     }
 
 }
