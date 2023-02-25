@@ -1,0 +1,13 @@
+<div 
+    [routerLink]="routerLink"
+    [routerLinkActiveOptions]="routerLinkActiveOptions ?? { exact: false }"
+    routerLinkActive="bg-opacity-80 hover:bg-opacity-80 active:bg-opacity-80 border-opacity-60"
+    class="px-3 py-2 border border-body-lighter border-opacity-0 rounded-sm bg-body-light bg-opacity-0 hover:bg-opacity-60 active:bg-opacity-80 transition-all cursor-pointer active:border-opacity-60 [&>div]:active:scale-95">
+    <div class="flex justify-start items-center gap-4 select-none origin-center transform-gpu transition-transform will-change-transform">
+        <img *ngIf="iconSrc && !artwork && !iconName" [src]="iconSrc" class="w-7 h-7 rounded-sm" />
+        <ng-icon [name]="iconName" *ngIf="iconName && !iconSrc && !artwork" size="24" strokeWidth="2"></ng-icon>
+        <span class="w-7 h-7 rounded-sm overflow-hidden" *ngIf="artwork && !iconName && !iconSrc"><scngx-artwork [artwork]="artwork"></scngx-artwork></span>
+        
+        <span class=""><ng-content></ng-content></span>
+    </div>
+</div>

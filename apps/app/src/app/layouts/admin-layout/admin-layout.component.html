@@ -15,13 +15,13 @@
                 </div>
 
                 <div class="w-1/2 text-right">
-                    <button (click)="navigateBack()" class="inline-flex items-center justify-center bg-body-light rounded-full w-9 h-9 mr-1.5 transform-gpu transition-all will-change-transform active:scale-95"><hero-icon [name]="'chevron-down'" [class]="'h-5 w-5 transform-gpu rotate-90'"></hero-icon></button>
-                    <button (click)="navigateNext()" class="inline-flex items-center justify-center bg-body-light rounded-full w-9 h-9 transform-gpu transition-all will-change-transform active:scale-95"><hero-icon [name]="'chevron-down'" [class]="'h-5 w-5 transform-gpu -rotate-90'"></hero-icon></button>
+                    <button (click)="navigateBack()" class="inline-flex items-center justify-center bg-body-light rounded-full w-9 h-9 mr-1.5 transform-gpu transition-all will-change-transform active:scale-95"><ng-icon name="heroChevronDown" class="h-5 w-5 transform-gpu rotate-90"></ng-icon></button>
+                    <button (click)="navigateNext()" class="inline-flex items-center justify-center bg-body-light rounded-full w-9 h-9 transform-gpu transition-all will-change-transform active:scale-95"><ng-icon name="heroChevronDown" class="h-5 w-5 transform-gpu -rotate-90"></ng-icon></button>
                 </div>
             </div>
 
             <div class="mt-4 flex items-center cursor-pointer gap-4 p-2.5 transition-all bg-body-light bg-opacity-0 active:bg-opacity-80 rounded-sm" [ngClass]="{'hover:bg-opacity-50': !(screenService.$isTouch | async)}" [routerLink]="['/']">
-                <hero-icon name="arrow-left" [class]="'h-5 w-5'"></hero-icon> 
+                <ng-icon name="heroArrowLeft" class="h-5 w-5"></ng-icon> 
                 <span>Zurück zur App</span>
             </div>
         </div>
@@ -30,10 +30,10 @@
 
         <div class="block h-full">
             <ul class="flex flex-col select-none">
-                <li [routerLink]="['./zones']" routerLinkActive="text-accent" class="relative flex gap-4 px-window py-3 cursor-pointer hover:opacity-100 transition-all"><hero-icon name="cube-transparent" [class]="'h-6 w-6'"></hero-icon><span>Speicherzonen</span></li>
-                <li [routerLink]="['./import']" routerLinkActive="text-accent" class="relative flex gap-4 px-window py-3 cursor-pointer hover:opacity-100 transition-all"><hero-icon name="document-add" [class]="'h-6 w-6'"></hero-icon><span>Importieren</span></li>
-                <li [routerLink]="['./tasks']" routerLinkActive="text-accent" class="relative flex gap-4 px-window py-3 cursor-pointer hover:opacity-100 transition-all"><hero-icon name="lightning-bolt" [class]="'h-6 w-6'"></hero-icon><span>Tasks</span></li>
-                <li [routerLink]="['./settings']" routerLinkActive="text-accent" class="relative flex gap-4 px-window py-3 cursor-pointer hover:opacity-100 transition-all"><hero-icon name="cog" [class]="'h-6 w-6'"></hero-icon><span>Konfiguration</span></li>
+                <li [routerLink]="['./zones']" routerLinkActive="text-accent" class="relative flex gap-4 px-window py-3 cursor-pointer hover:opacity-100 transition-all"><ng-icon name="heroCubeTransparent" class="h-6 w-6"></ng-icon><span>Speicherzonen</span></li>
+                <li [routerLink]="['./import']" routerLinkActive="text-accent" class="relative flex gap-4 px-window py-3 cursor-pointer hover:opacity-100 transition-all"><ng-icon name="heroDocumentPlus" class="h-6 w-6"></ng-icon><span>Importieren</span></li>
+                <li [routerLink]="['./tasks']" routerLinkActive="text-accent" class="relative flex gap-4 px-window py-3 cursor-pointer hover:opacity-100 transition-all"><ng-icon name="heroBolt" class="h-6 w-6"></ng-icon><span>Tasks</span></li>
+                <li [routerLink]="['./settings']" routerLinkActive="text-accent" class="relative flex gap-4 px-window py-3 cursor-pointer hover:opacity-100 transition-all"><ng-icon name="heroCog6Tooth" class="h-6 w-6"></ng-icon><span>Konfiguration</span></li>
             </ul>
         </div>
 
@@ -41,18 +41,18 @@
         <app-profile-bar [user]="(authService.$user | async)">
             <ul>
                 <li class="flex items-center cursor-pointer gap-4 p-2.5 transition-all bg-body-light bg-opacity-0 active:bg-opacity-80 rounded-sm" [ngClass]="{'hover:bg-opacity-50': !(screenService.$isTouch | async)}" [routerLink]="['/notifications']">
-                    <hero-icon [name]="'bell'" [class]="'h-5 w-5'"></hero-icon> 
+                    <ng-icon name="heroBell" class="h-5 w-5"></ng-icon> 
                     <span>Benachrichtungen</span>
                 </li>
                 <li class="flex items-center cursor-pointer gap-4 p-2.5 transition-all bg-body-light bg-opacity-0 active:bg-opacity-80 rounded-sm" [ngClass]="{'hover:bg-opacity-50': !(screenService.$isTouch | async)}" [routerLink]="['/settings']">
-                    <hero-icon [name]="'cog'" [class]="'h-5 w-5'"></hero-icon> 
+                    <ng-icon name="heroCog6Tooth" class="h-5 w-5"></ng-icon> 
                     <span>Einstellungen</span>
                 </li>
 
                 <hr class="appearance-none border-none bg-divider h-[2px] my-2">
 
                 <li class="flex items-center cursor-pointer gap-4 p-2.5 transition-all bg-error-light bg-opacity-0 active:bg-opacity-20 rounded-sm text-error-light" [ngClass]="{'hover:bg-opacity-10': !(screenService.$isTouch | async)}" (click)="authService.logout()">
-                    <hero-icon [name]="'logout'" [class]="'h-5 w-5'"></hero-icon> 
+                    <ng-icon name="heroArrowRightOnRectangle" class="h-5 w-5"></ng-icon> 
                     <span>Abmelden</span>
                 </li>
             </ul>
@@ -70,16 +70,16 @@
 <scngx-bottom-nav *ngIf="(screenService.$isTouch | async)">
     <!-- Bottom navigation items -->
     <scngx-nav-item [label]="'Speicherzonen'" [routerLink]="['./zones']" routerLinkActive #rla="routerLinkActive" [active]="rla.isActive">
-        <hero-icon name="cube-transparent" [class]="'h-5 w-5 transition-all'"></hero-icon>
+        <ng-icon name="heroCubeTransparent" class="h-5 w-5 transition-all"></ng-icon>
     </scngx-nav-item>
     <scngx-nav-item [label]="'Importieren'" [routerLink]="['./import']" routerLinkActive #rla1="routerLinkActive" [active]="rla1.isActive">
-        <hero-icon name="document-add" [class]="'h-5 w-5 transition-all'"></hero-icon>
+        <ng-icon name="heroDocumentPlus" class="h-5 w-5 transition-all"></ng-icon>
     </scngx-nav-item>
     <scngx-nav-item [label]="'Tasks'" [routerLink]="['./tasks']" routerLinkActive #rla2="routerLinkActive" [active]="rla2.isActive">
-        <hero-icon name="lightning-bolt" [class]="'h-5 w-5 transition-all'"></hero-icon>
+        <ng-icon name="heroBolt" class="h-5 w-5 transition-all"></ng-icon>
     </scngx-nav-item>
     <scngx-nav-item [label]="'Mehr'" [routerLink]="['./more']" routerLinkActive #rla3="routerLinkActive" [active]="rla3.isActive">
-        <hero-icon name="dots-vertical" [class]="'h-5 w-5 transition-all'"></hero-icon>
+        <ng-icon name="heroEllipsisVerticalSolid" class="h-5 w-5 transition-all"></ng-icon>
     </scngx-nav-item>
 
     <!-- Page contents -->

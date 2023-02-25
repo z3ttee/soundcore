@@ -16,8 +16,8 @@
                     </div>
 
                     <div class="w-1/2 text-right">
-                        <button (click)="navigateBack()" class="inline-flex items-center justify-center bg-body-light rounded-full w-9 h-9 mr-1.5 transform-gpu transition-all will-change-transform active:scale-95"><hero-icon [name]="'chevron-down'" [class]="'h-5 w-5 transform-gpu rotate-90'"></hero-icon></button>
-                        <button (click)="navigateNext()" class="inline-flex items-center justify-center bg-body-light rounded-full w-9 h-9 transform-gpu transition-all will-change-transform active:scale-95"><hero-icon [name]="'chevron-down'" [class]="'h-5 w-5 transform-gpu -rotate-90'"></hero-icon></button>
+                        <button (click)="navigateBack()" class="inline-flex items-center justify-center bg-body-light rounded-full w-9 h-9 mr-1.5 transform-gpu transition-all will-change-transform active:scale-95"><ng-icon size="20" name="heroChevronDown" class="transform-gpu rotate-90"></ng-icon></button>
+                        <button (click)="navigateNext()" class="inline-flex items-center justify-center bg-body-light rounded-full w-9 h-9 transform-gpu transition-all will-change-transform active:scale-95"><ng-icon size="20" name="heroChevronDown" class="transform-gpu -rotate-90"></ng-icon></button>
                     </div>
                 </div>
 
@@ -28,82 +28,59 @@
 
             <hr class="my-row bg-divider min-h-[3px] max-h-[3px] rounded-full appearance-none border-none w-[90%] mx-auto">
 
-            <div class="block">
-                <ul class="flex flex-col select-none">
-                    <li [routerLink]="['/']" [routerLinkActiveOptions]="{exact: true}" routerLinkActive="text-accent" class="relative flex gap-4 px-window py-3 cursor-pointer hover:opacity-100 transition-all"><hero-icon [name]="'home'" [class]="'h-6 w-6'"></hero-icon><span>Startseite</span></li>
-                    <li [routerLink]="['/library']" routerLinkActive="text-accent" class="relative flex gap-4 px-window py-3 cursor-pointer hover:opacity-100 transition-all"><hero-icon [name]="'bookmark-alt'" [class]="'h-6 w-6'"></hero-icon><span>Bibliothek</span></li>
-                    <li [routerLink]="['/profile/@me']" [routerLinkActiveOptions]="{exact: true}" routerLinkActive="text-accent" class="relative flex gap-4 px-window py-3 cursor-pointer hover:opacity-100 transition-all"><hero-icon [name]="'user'" [class]="'h-6 w-6'"></hero-icon><span>Dein Profil</span></li>
-                </ul>
+            <!-- Main menu -->
+            <div class="block px-window">
+                <div class="flex flex-col select-none gap-1">
+                    <scngx-nav-list-item [routerLink]="['/']" [routerLinkActiveOptions]="{exact: true}" iconName="heroHome">Startseite</scngx-nav-list-item>
+                    <scngx-nav-list-item [routerLink]="['/library']" iconName="heroBookmarkSquare">Bibliothek</scngx-nav-list-item>
+                    <scngx-nav-list-item [routerLink]="['/profile/@me']" iconName="heroUser">Dein Profil</scngx-nav-list-item>
+                </div>
             </div>
 
             <hr class="mt-row bg-divider min-h-[3px] max-h-[3px] rounded-full appearance-none border-none w-[90%] mx-auto">
 
-            <cdk-virtual-scroll-viewport [itemSize]="36" class="w-full h-full flex-grow">
-                <ul class="w-full">
+            <div class="block px-window flex-grow" cdkVirtualScrollingElement>
+                <cdk-virtual-scroll-viewport [itemSize]="36">
+                    <div class="flex flex-col gap-1 select-none py-row">
+                        <!-- Create playlist button -->
+                        <scngx-nav-list-item (click)="openCreatePlaylistDialog()" iconName="heroPlusSolid">Playlist erstellen</scngx-nav-list-item>
+                        <scngx-nav-list-item [routerLink]="['/collection']" iconSrc="assets/img/collection_cover.png">Lieblingssongs</scngx-nav-list-item>
 
-                    <!-- Create playlist button -->
-                    <li (click)="openCreatePlaylistDialog()" class="relative flex gap-4 mt-row py-2 px-window cursor-pointer hover:opacity-100 transition-all">
-                        <hero-icon [name]="'plus'" class="h-6 w-7"></hero-icon>
-                        <span>Playlist erstellen</span>
-                    </li>
-
-                    <!-- Liked songs -->
-                    <li [style.height]="'36px'" [routerLink]="['/collection']" routerLinkActive="text-accent" class="relative flex items-center gap-4 px-window py-3 cursor-pointer hover:opacity-100 transition-all">
-                        <div class="inline-block min-w-7 max-w-7 h-7 rounded-sm overflow-hidden">
-                            <img src="assets/img/collection_cover.png"> 
-                        </div>
-                        <div class="w-full line-clamp-1">
-                            Lieblingssongs
-                        </div>
-                    </li>
-
-                    <!-- Playlist items -->
-                    <li *cdkVirtualFor="let playlist of props.playlists">
-                        <scngx-playlist-list-item 
-                            class="cursor-pointer" 
-                            [playlist]="playlist" 
-                            [routerLink]="['/playlist', playlist?.slug || playlist?.id]" 
-                            routerLinkActive="text-accent">
-                        </scngx-playlist-list-item>
-                    </li>
-                </ul>
-            </cdk-virtual-scroll-viewport>
-
-            <!-- <div class="block h-full overflow-hidden overflow-y-scroll py-row">
-                
-
-                
-
-                <div cdkDropList class="list" (cdkDropListDropped)="onPlaylistItemDrop($event)">
-                    <div *ngFor="let playlist of (playlistService.$library | async)" cdkDrag cdkDragLockAxis="y" cdkDragBoundary=".list">
-                        <scngx-playlist-list-item class="cursor-pointer" [playlist]="playlist" [routerLink]="['/playlist', playlist.slug || playlist.id]" routerLinkActive="text-accent"></scngx-playlist-list-item>
+                        <!-- Playlist items -->
+                        <scngx-nav-list-item 
+                            *cdkVirtualFor="let playlist of props.playlists"
+                            [routerLink]="['/playlist', playlist?.slug || playlist?.id]"
+                            [artwork]="playlist.artwork ?? {}">
+                            {{ playlist.name }}
+                        </scngx-nav-list-item>
                     </div>
-                </div>
-            </div> -->
+                </cdk-virtual-scroll-viewport>
+            </div>
 
             <hr class="bg-divider min-h-[3px] max-h-[3px] rounded-full appearance-none border-none w-[90%] mx-auto">
             <app-profile-bar [user]="props.account">
                 <ul>
+                    
                     <li *ngIf="props.isAdminAccount" class="flex items-center cursor-pointer gap-4 p-2.5 transition-all bg-body-light bg-opacity-0 active:bg-opacity-80 rounded-sm" [ngClass]="{'hover:bg-opacity-50': !(screenService.$isTouch | async)}" [routerLink]="['/admin']">
-                        <hero-icon [name]="'shield-exclamation'" [class]="'h-5 w-5'"></hero-icon> 
+                        <ng-icon name="heroShieldExclamation" class="h-5 w-5"></ng-icon> 
                         <span>Administration</span>
                     </li>
 
                     <hr *ngIf="props.isAdminAccount" class="appearance-none border-none bg-divider h-[2px] my-2">
 
                     <li class="flex items-center cursor-pointer gap-4 p-2.5 transition-all bg-body-light bg-opacity-0 active:bg-opacity-80 rounded-sm" [ngClass]="{'hover:bg-opacity-50': !(screenService.$isTouch | async)}" [routerLink]="['/notifications']">
-                        <hero-icon [name]="'bell'" [class]="'h-5 w-5'"></hero-icon> 
+                        <ng-icon name="heroBell" class="h-5 w-5"></ng-icon> 
                         <span>Benachrichtungen</span>
                     </li>
                     <li class="flex items-center cursor-pointer gap-4 p-2.5 transition-all bg-body-light bg-opacity-0 active:bg-opacity-80 rounded-sm" [ngClass]="{'hover:bg-opacity-50': !(screenService.$isTouch | async)}" [routerLink]="['/settings']">
-                        <hero-icon [name]="'cog'" [class]="'h-5 w-5'"></hero-icon> 
+                        <ng-icon name="heroCog6Tooth" class="h-5 w-5"></ng-icon> 
                         <span>Einstellungen</span>
                     </li>
 
                     <hr class="appearance-none border-none bg-divider h-[2px] my-2">
 
                     <li class="flex items-center cursor-pointer gap-4 p-2.5 transition-all bg-error-light bg-opacity-0 active:bg-opacity-20 rounded-sm text-error-light" [ngClass]="{'hover:bg-opacity-10': !(screenService.$isTouch | async)}" (click)="logout()">
-                        <hero-icon [name]="'logout'" [class]="'h-5 w-5'"></hero-icon> 
+                        <ng-icon name="heroArrowRightOnRectangle" class="h-5 w-5"></ng-icon> 
                         <span>Abmelden</span>
                     </li>
                 </ul>
@@ -123,13 +100,13 @@
     <scngx-bottom-nav *ngIf="(screenService.$isTouch | async)">
         <!-- Bottom navigation items -->
         <scngx-nav-item [label]="'Home'" [routerLink]="['/']" [routerLinkActiveOptions]="{exact: true}" routerLinkActive #rla="routerLinkActive" [active]="rla.isActive">
-            <hero-icon [name]="'home'" [class]="'h-5 w-5 transition-all'"></hero-icon>
+            <ng-icon name="heroHome" class="h-5 w-5 transition-all"></ng-icon>
         </scngx-nav-item>
         <scngx-nav-item [label]="'Suchen'" [routerLink]="['/search']" routerLinkActive #rla1="routerLinkActive" [active]="rla1.isActive">
-            <hero-icon [name]="'search'" [class]="'h-5 w-5 transition-all'"></hero-icon>
+            <ng-icon name="heroMagnifyingGlass" class="h-5 w-5 transition-all"></ng-icon>
         </scngx-nav-item>
         <scngx-nav-item [label]="'Bibliothek'" [routerLink]="['/library']" routerLinkActive #rla2="routerLinkActive" [active]="rla2.isActive">
-            <hero-icon [name]="'bookmark-alt'" [class]="'h-5 w-5 transition-all'"></hero-icon>
+            <ng-icon name="heroBookmarkSquare" class="h-5 w-5 transition-all"></ng-icon>
         </scngx-nav-item>
         <!-- Page contents -->
         <div class="h-full overflow-hidden relative" scngx-content>

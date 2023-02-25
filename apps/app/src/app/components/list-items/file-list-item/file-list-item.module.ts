@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { chartPie, HeroIconModule } from 'ng-heroicon';
 import { SCNGXArtworkModule, SCNGXBytesPipeModule, SCNGXExplicitBadgeModule, SCNGXFileFlagPipeModule, SCNGXSkeletonModule, SCNGXStatusIndicatorModule } from '@soundcore/ngx';
 import { SCNGXFileListItemComponent } from './file-list-item.component';
 import { RouterModule } from '@angular/router';
@@ -12,7 +11,6 @@ import { RouterModule } from '@angular/router';
   imports: [
     CommonModule,
     RouterModule,
-    HeroIconModule.withIcons({ chartPie }),
 
     SCNGXSkeletonModule,
     SCNGXBytesPipeModule,

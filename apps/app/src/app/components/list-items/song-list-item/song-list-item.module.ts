@@ -4,11 +4,10 @@ import { SCNGXSongListItemComponent } from './song-list-item.component';
 import { LottieModule } from 'ngx-lottie';
 import { MatRippleModule } from '@angular/material/core';
 import { RouterModule } from '@angular/router';
-import { HeroIconModule, heart } from 'ng-heroicon';
 import { SCNGXAddedToPlaylistPipeModule, SCNGXArtworkModule, SCNGXExplicitBadgeModule, SCNGXIconBtnModule, SCNGXSkeletonModule, SCNGXSongDurationPipeModule, SCNGXTooltipModule } from '@soundcore/ngx';
-import { FaIconLibrary, FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faEllipsisV, faHeart, faPause, faPlay } from '@fortawesome/free-solid-svg-icons';
-
+import { NgIconsModule } from '@ng-icons/core';
+import { heroPlaySolid, heroPauseSolid, heroEllipsisVerticalSolid, heroHeartSolid } from '@ng-icons/heroicons/solid';
+import { heroHeart } from '@ng-icons/heroicons/outline';
 @NgModule({
   declarations: [
     SCNGXSongListItemComponent
@@ -17,8 +16,7 @@ import { faEllipsisV, faHeart, faPause, faPlay } from '@fortawesome/free-solid-s
     CommonModule,
     RouterModule,
     LottieModule,
-    HeroIconModule.withIcons({ heart }),
-    FontAwesomeModule,
+    NgIconsModule.withIcons({ heroHeart, heroHeartSolid, heroPlaySolid, heroPauseSolid, heroEllipsisVerticalSolid }),
 
     MatRippleModule,
 
@@ -35,8 +33,4 @@ import { faEllipsisV, faHeart, faPause, faPlay } from '@fortawesome/free-solid-s
     LottieModule
   ]
 })
-export class SCNGXSongListItemModule {
-  constructor(library: FaIconLibrary) {
-    library.addIcons(faPlay, faPause, faEllipsisV, faHeart);
-  }
-}
+export class SCNGXSongListItemModule {}

@@ -1,9 +1,9 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ProfileBarComponent } from './profile-bar.component';
-import { chevronDown, HeroIconModule, cog, bell, logout, shieldExclamation } from 'ng-heroicon';
-import { SCNGXNavListItemModule } from '@soundcore/ngx';
 import { RouterModule } from '@angular/router';
+import { NgIconsModule } from '@ng-icons/core';
+import { heroChevronDown } from '@ng-icons/heroicons/outline';
 
 @NgModule({
   declarations: [
@@ -12,8 +12,7 @@ import { RouterModule } from '@angular/router';
   imports: [
     CommonModule,
     RouterModule,
-    HeroIconModule.withIcons({ chevronDown, cog, bell, logout, shieldExclamation }, { defaultHostDisplay: 'inlineBlock', attachDefaultDimensionsIfNoneFound: true }),
-    SCNGXNavListItemModule
+    NgIconsModule.withIcons({ heroChevronDown }),
   ],
   exports: [
     ProfileBarComponent

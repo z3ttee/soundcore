@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { ListViewComponent } from './list-view.component';
 import { SCNGXSkeletonModule, SCNGXSongDurationPipeModule, SCNGXArtworkModule } from '@soundcore/ngx';
 import { MatRippleModule } from '@angular/material/core';
-import { HeroIconModule, heart, dotsVertical } from 'ng-heroicon';
 
 @NgModule({
   declarations: [
@@ -12,7 +11,6 @@ import { HeroIconModule, heart, dotsVertical } from 'ng-heroicon';
   imports: [
     CommonModule,
     MatRippleModule,
-    HeroIconModule.withIcons({ heart, dotsVertical }),
 
     SCNGXSkeletonModule,
     SCNGXArtworkModule,

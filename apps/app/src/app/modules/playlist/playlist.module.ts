@@ -3,16 +3,16 @@ import { CommonModule } from '@angular/common';
 import { PlaylistInfoComponent } from './views/playlist-info/playlist-info.component';
 import { RouterModule, Routes } from '@angular/router';
 import { Error404Module } from 'src/app/shared/error404/error404.module';
-import { HeroIconModule, play, heart, dotsVertical } from 'ng-heroicon';
 import { MatRippleModule } from '@angular/material/core';
 import { ScrollingModule } from '@angular/cdk/scrolling';
 import { SCNGXButtonModule, SCNGXIconBtnModule, SCNGXScrollingModule, SCNGXSkeletonModule, SCNGXSongDurationPipeModule, SCNGXTableModule } from '@soundcore/ngx';
 import { ListViewModule } from 'src/app/components/resource-views/list-view/list-view.module';
 import { SCSDKPlaylistModule } from '@soundcore/sdk';
-import { FaIconLibrary, FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faPlay } from '@fortawesome/free-solid-svg-icons';
 import { SCNGXSongListItemModule } from 'src/app/components/list-items/song-list-item/song-list-item.module';
 import { SongContextMenuModule } from 'src/app/components/menus/song-context-menu/song-context-menu.module';
+import { NgIconsModule } from '@ng-icons/core';
+import { heroPlaySolid, heroEllipsisVerticalSolid } from '@ng-icons/heroicons/solid';
+import { heroHeart } from '@ng-icons/heroicons/outline';
 
 const routes: Routes = [
   { path: ":playlistId", component: PlaylistInfoComponent }
@@ -27,9 +27,8 @@ const routes: Routes = [
     CommonModule,
     RouterModule.forChild(routes),
     Error404Module,
-    HeroIconModule.withIcons({ play, heart, dotsVertical }),
+    NgIconsModule.withIcons({ heroPlaySolid, heroHeart, heroEllipsisVerticalSolid }),
     MatRippleModule,
-    FontAwesomeModule,
     ListViewModule,
 
     SCSDKPlaylistModule,
@@ -45,8 +44,4 @@ const routes: Routes = [
     SongContextMenuModule
   ]
 })
-export class PlaylistModule {
-  constructor(faLibrary: FaIconLibrary) {
-    faLibrary.addIcons(faPlay)
-  }
-}
+export class PlaylistModule {}

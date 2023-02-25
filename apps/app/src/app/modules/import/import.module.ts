@@ -2,7 +2,6 @@ import { CommonModule } from "@angular/common";
 import { NgModule } from "@angular/core";
 import { MatInputModule } from "@angular/material/input";
 import { RouterModule, Routes } from "@angular/router";
-import { FaIconLibrary, FontAwesomeModule } from "@fortawesome/angular-fontawesome";
 import { SCNGXArtworkModule, SCNGXButtonModule, SCNGXDialogModule, SCNGXLabelModule, SCNGXScrollingModule, SCNGXSkeletonModule, SCNGXUiRowModule, SCNGXUiTitleModule } from "@soundcore/ngx";
 import { SCSDKImportModule } from "@soundcore/sdk";
 import { SCNGXTabsModule } from "src/app/components/navigation-tabs";
@@ -13,9 +12,11 @@ import { SpotifyImportView } from "./views/spotify-import/spotify-import.compone
 import { SpotifyCompletedTabComponent } from "./views/spotify-import/tabs/spotify-completed-tab/spotify-completed-tab.component";
 import { SpotifyFailedTabComponent } from "./views/spotify-import/tabs/spotify-failed-tab/spotify-failed-tab.component";
 import { SpotifyPendingTabComponent } from "./views/spotify-import/tabs/spotify-pending-tab/spotify-pending-tab.component";
-import { faSpotify } from '@fortawesome/free-brands-svg-icons';
 import { ReportDialogComponent } from "./dialog/report-dialog/report-dialog.component";
 import { FailedReasonPipe } from "./pipes/failed-reason.pipe";
+import { NgIconsModule } from "@ng-icons/core";
+import { simpleSpotify } from "@ng-icons/simple-icons";
+
 
 const routes: Routes = [
     { path: "spotify", component: SpotifyImportView, children: [
@@ -43,7 +44,7 @@ const routes: Routes = [
     imports: [
         CommonModule,
         RouterModule.forChild(routes),
-        FontAwesomeModule,
+        NgIconsModule.withIcons({ simpleSpotify }),
 
         MatInputModule,
 
@@ -61,8 +62,4 @@ const routes: Routes = [
         AppImportSpotifyCreateDialogModule
     ]
 })
-export class ImportModule {
-    constructor(library: FaIconLibrary) {
-        library.addIcons(faSpotify)
-    }
-}
+export class ImportModule {}

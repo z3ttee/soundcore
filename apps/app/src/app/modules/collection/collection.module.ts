@@ -5,7 +5,6 @@ import { RouterModule, Routes } from '@angular/router';
 import { SCSDKCollectionModule } from '@soundcore/sdk';
 import { Error404Module } from 'src/app/shared/error404/error404.module';
 import { SCNGXSongListItemModule } from 'src/app/components/list-items/song-list-item/song-list-item.module';
-import { UiScrollModule } from 'ngx-ui-scroll';
 import { ListViewModule } from 'src/app/components/resource-views/list-view/list-view.module';
 import { SCNGXIconBtnModule, SCNGXScrollingModule } from '@soundcore/ngx';
 import { SCNGXCollectionViewModule } from 'src/app/components/resource-views/collection-view/collection-view.module';
@@ -24,7 +23,6 @@ const routes: Routes = [
     RouterModule.forChild(routes),
 
     Error404Module,
-    UiScrollModule,
     ListViewModule,
 
     MatSnackBarModule,

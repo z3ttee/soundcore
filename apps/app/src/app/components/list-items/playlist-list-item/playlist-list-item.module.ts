@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SCNGXPlaylistListItemComponent } from './playlist-list-item.component';
-import { SCNGXArtworkModule, SCNGXNavListItemModule } from '@soundcore/ngx';
+import { SCNGXArtworkModule } from '@soundcore/ngx';
 
 @NgModule({
   declarations: [
@@ -11,7 +11,6 @@ import { SCNGXArtworkModule, SCNGXNavListItemModule } from '@soundcore/ngx';
     CommonModule,
 
     SCNGXArtworkModule,
-    SCNGXNavListItemModule
   ],
   exports: [
     SCNGXPlaylistListItemComponent
