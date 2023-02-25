@@ -23,7 +23,7 @@
             </scngx-horizontal-list>
         </scngx-ui-row>
 
-        <scngx-ui-row headline="Zuletzt ausgeführt">
+        <scngx-ui-row headline="Zuletzt ausgeführt" subtitle="Letzte 7 Tage">
             <cdk-virtual-scroll-viewport [itemSize]="56">
                 <div class="px-window" *cdkVirtualFor="let item of props.datasource">
                     <scngx-task-list-item [task]="item"></scngx-task-list-item>

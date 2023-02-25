@@ -24,7 +24,7 @@ export class TasksService {
      */
     public async findAll(pageable: Pageable): Promise<Page<Task>> {
         return this.repository.createQueryBuilder("task")
-            .select(["task.id", "task.runId", "task.name", "task.currentStageId", "task.status", "task.stages", "task.createdAt"])
+            .select(["task.id", "task.runId", "task.name", "task.description", "task.currentStageId", "task.status", "task.stages", "task.createdAt", "task.updatedAt"])
             .offset(pageable.offset)
             .limit(pageable.limit)
             .orderBy("task.updatedAt", "DESC")

@@ -4,7 +4,7 @@ import { SCNGXSkeletonModule, SCNGXStatusIndicatorModule, SCNGXTooltipModule } f
 import { SCNGXTaskListItemComponent } from './task-list-item.component';
 import { RouterModule } from '@angular/router';
 import { NgIconsModule } from '@ng-icons/core';
-import { heroCheckCircle, heroQueueList, heroArrowPath, heroXCircle, heroExclamationTriangle } from '@ng-icons/heroicons/outline';
+import { heroCheckCircle, heroQueueList, heroArrowPath, heroXCircle, heroExclamationTriangle, heroChevronRight, heroCalendarDays, heroClock } from '@ng-icons/heroicons/outline';
 
 @NgModule({
   declarations: [
@@ -13,7 +13,7 @@ import { heroCheckCircle, heroQueueList, heroArrowPath, heroXCircle, heroExclama
   imports: [
     CommonModule,
     RouterModule,
-    NgIconsModule.withIcons({ heroCheckCircle, heroQueueList, heroArrowPath, heroXCircle, heroExclamationTriangle }),
+    NgIconsModule.withIcons({ heroCheckCircle, heroQueueList, heroArrowPath, heroXCircle, heroExclamationTriangle, heroChevronRight, heroCalendarDays, heroClock }),
 
     SCNGXSkeletonModule,
     SCNGXStatusIndicatorModule

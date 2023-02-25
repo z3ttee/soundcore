@@ -20,24 +20,25 @@ export class TasksIndexView implements OnInit, OnDestroy {
         private readonly taskGateway: SCSDKTaskGateway
     ) {}
 
-    private currentProps: TasksIndexViewProps;
+    private readonly datasource = new SCNGXDatasource<Task>(this.httpClient, this.taskService.findAllUrl(), 8);
 
     private readonly $destroy: Subject<void> = new Subject();
 
     public readonly $props: Observable<TasksIndexViewProps> = combineLatest([
-        of(new SCNGXDatasource<Task>(this.httpClient, this.taskService.findAllUrl(), 8)),
         this.taskService.findDefinitions(new Pageable(0, 10))
     ]).pipe(
-        map(([datasource, definitions]): TasksIndexViewProps => ({
-            datasource: datasource,
+        map(([definitions]): TasksIndexViewProps => ({
+            datasource: this.datasource,
             definitions: definitions
-        })),
-        tap((val) => this.currentProps = val)
+        }))
     );
 
     public ngOnInit(): void {
         this.taskGateway.$onTasksUpdated.pipe(takeUntil(this.$destroy)).subscribe((tasks) => {
             console.log(tasks);
+            for(const task of tasks){
+                this.datasource.updateOrPrependById(task.id, task);
+            }
         });
     }
 
