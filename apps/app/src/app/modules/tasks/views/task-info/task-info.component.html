@@ -1,5 +1,5 @@
 <ng-container *ngIf="($props | async) as props">
-    <div class="pt-window w-full h-full overflow-y-auto" cdkVirtualScrollingElement>
+    <div class="pt-window w-full h-full overflow-y-auto overflow-x-hidden" cdkVirtualScrollingElement>
         <!-- Task title -->
         <div class="mb-row px-window flex items-center justify-start gap-4">
             <div class="min-w-9 w-9 overflow-hidden">
@@ -23,7 +23,7 @@
 
         <scngx-ui-row headline="Umgebungsvariablen" subtitle="Mit diesen Eingaben wurde der Prozess gestartet">
             <div class="px-window">
-                <div class="p-4 rounded-sm bg-body-light border border-body-lighter font-mono">
+                <div class="p-4 rounded-sm bg-body-light border border-body-lighter font-mono overflow-x-auto">
                     <pre>{{ props.task.data?.environment | json }}</pre>
                 </div>
             </div>
