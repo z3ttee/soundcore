@@ -14,9 +14,9 @@ export class SCNGXTaskListItemComponent {
   @Input()
   public itemHeight: number = 56;
 
-  public getCurrentStageNr() {
-    return this.task?.stages?.findIndex((stage) => stage.id === this.task?.currentStageId) + 1;
-  }
+  // public getCurrentStageNr() {
+  //   return this.task?.stages?.findIndex((stage) => stage.id === this.task?.currentStageId) + 1;
+  // }
 
   public getDuration(): string {
     if(!this.task?.createdAt || !this.task?.updatedAt) return "---";

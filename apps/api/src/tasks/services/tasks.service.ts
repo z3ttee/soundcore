@@ -24,7 +24,7 @@ export class TasksService {
      */
     public async findAll(pageable: Pageable): Promise<Page<Task>> {
         return this.repository.createQueryBuilder("task")
-            .select(["task.id", "task.runId", "task.name", "task.description", "task.currentStageId", "task.status", "task.stages", "task.createdAt", "task.updatedAt"])
+            .select(["task.id", "task.runId", "task.name", "task.description", "task.status", "task.createdAt", "task.updatedAt"])
             .offset(pageable.offset)
             .limit(pageable.limit)
             .orderBy("task.updatedAt", "DESC")
@@ -41,6 +41,19 @@ export class TasksService {
     public async findDefinitions(pageable: Pageable): Promise<Page<IPipeline>> {
         return this.registry.listAll().then((definitions) => {
             return Page.of( definitions.splice(pageable.offset, pageable.limit), definitions.length, pageable.offset);
+        });
+    }
+
+    /**
+     * Find a task by its run Id
+     * @param runId Run-Id of the task
+     * @returns 
+     */
+    public async findTaskByRunId(runId: string): Promise<Task> {
+        return this.repository.findOne({
+            where: {
+                runId: runId
+            }
         });
     }
 

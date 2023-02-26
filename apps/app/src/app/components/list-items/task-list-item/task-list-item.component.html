@@ -4,12 +4,8 @@
     [ngClass]="{'hover:border-opacity-100 active:border-opacity-100 border border-body-lighter border-opacity-0 transition-all bg-opacity-0 hover:bg-opacity-30 bg-body-light cursor-pointer pointer-events-auto active:bg-opacity-50': !!task}">
         
     <!-- Task Status -->
-    <div class="h-7 min-w-7 w-7 rounded-sm overflow-hidden">
-        <ng-icon name="heroQueueList" size="22" class="opacity-60" *ngIf="task?.status == 'enqueued'"></ng-icon>
-        <ng-icon name="heroArrowPath" size="22" class="text-accent animate-spin" *ngIf="task?.status == 'working'"></ng-icon>
-        <ng-icon name="heroXCircle" size="22" class="text-error-light" *ngIf="task?.status == 'failed'"></ng-icon>
-        <ng-icon name="heroExclamationTriangle" size="22" class="text-warn-light" *ngIf="task?.status == 'aborted'"></ng-icon>
-        <ng-icon name="heroCheckCircle" size="22" class="text-success-light" *ngIf="task?.status == 'completed'"></ng-icon>
+    <div class="min-w-7 w-7 rounded-sm overflow-hidden">
+        <scngx-task-status-icon [status]="task?.status" size="22"></scngx-task-status-icon>
     </div>
 
     <!-- Task description -->
@@ -18,18 +14,18 @@
         <p class="text-sm opacity-60 line-clamp-1">{{ task?.description }}</p>
     </div>
 
-    <div class="min-w-28 w-28" *ngIf="task?.status === 'working'">
+    <!-- <div class="min-w-28 w-28" *ngIf="task?.status === 'working'">
         <p class="text-sm opacity-60 font-light">Stage {{ getCurrentStageNr() }}/{{ task?.stages?.length }}</p>
-    </div>
+    </div> -->
 
-    <div class="min-w-32 w-32">
+    <div class="min-w-32 w-32 hidden sm:block">
         <div class="flex items-center opacity-70 gap-2">
             <ng-icon name="heroCalendarDays" size="20"></ng-icon>
             <span class="text-sm">{{ task?.createdAt | date:"HH:mm', 'dd.MM." }}</span>
         </div>
     </div>
 
-    <div class="min-w-32 w-32">
+    <div class="min-w-32 w-32 hidden lg:block">
         <div class="flex items-center opacity-70 gap-2">
             <ng-icon name="heroClock" size="20"></ng-icon>
             <span class="text-sm">{{ getDuration() }}</span>

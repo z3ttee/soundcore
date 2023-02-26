@@ -1,10 +1,11 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { SCNGXSkeletonModule, SCNGXStatusIndicatorModule, SCNGXTooltipModule } from '@soundcore/ngx';
+import { SCNGXSkeletonModule, SCNGXStatusIndicatorModule } from '@soundcore/ngx';
 import { SCNGXTaskListItemComponent } from './task-list-item.component';
 import { RouterModule } from '@angular/router';
 import { NgIconsModule } from '@ng-icons/core';
-import { heroCheckCircle, heroQueueList, heroArrowPath, heroXCircle, heroExclamationTriangle, heroChevronRight, heroCalendarDays, heroClock } from '@ng-icons/heroicons/outline';
+import { heroChevronRight, heroCalendarDays, heroClock } from '@ng-icons/heroicons/outline';
+import { SCNGXTaskStatusIconModule } from '../../icons/task-status-icon/task-status-icon.module';
 
 @NgModule({
   declarations: [
@@ -13,9 +14,10 @@ import { heroCheckCircle, heroQueueList, heroArrowPath, heroXCircle, heroExclama
   imports: [
     CommonModule,
     RouterModule,
-    NgIconsModule.withIcons({ heroCheckCircle, heroQueueList, heroArrowPath, heroXCircle, heroExclamationTriangle, heroChevronRight, heroCalendarDays, heroClock }),
+    NgIconsModule.withIcons({ heroChevronRight, heroCalendarDays, heroClock }),
 
     SCNGXSkeletonModule,
+    SCNGXTaskStatusIconModule,
     SCNGXStatusIndicatorModule
   ],
   exports: [

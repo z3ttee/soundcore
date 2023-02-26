@@ -30,7 +30,8 @@ export class TasksIndexView implements OnInit, OnDestroy {
         map(([definitions]): TasksIndexViewProps => ({
             datasource: this.datasource,
             definitions: definitions
-        }))
+        })),
+        takeUntil(this.$destroy)
     );
 
     public ngOnInit(): void {

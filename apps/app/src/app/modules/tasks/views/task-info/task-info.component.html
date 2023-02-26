@@ -1,0 +1,98 @@
+<ng-container *ngIf="($props | async) as props">
+    <div class="pt-window w-full h-full overflow-y-auto" cdkVirtualScrollingElement>
+        <!-- Task title -->
+        <div class="mb-row px-window flex items-center justify-start gap-4">
+            <div class="min-w-9 w-9 overflow-hidden">
+                <scngx-task-status-icon [status]="props.task.data?.status" size="32"></scngx-task-status-icon>
+            </div>
+
+            <scngx-ui-title [inverted]="true">
+                {{ props.task.data?.name }}<div scngxSubtitle>Prozess</div>
+            </scngx-ui-title>
+        </div>
+
+        <!-- Task description -->
+        <div class="my-row px-window" *ngIf="props.task.data?.description">
+            <p>{{ props.task.data?.description }}</p>
+        </div>
+
+        <!-- Task Environment -->
+        <div class="my-row px-window">
+
+        </div>
+
+        <scngx-ui-row headline="Umgebungsvariablen" subtitle="Mit diesen Eingaben wurde der Prozess gestartet">
+            <div class="px-window">
+                <div class="p-4 rounded-sm bg-body-light border border-body-lighter font-mono">
+                    <pre>{{ props.task.data?.environment | json }}</pre>
+                </div>
+            </div>
+        </scngx-ui-row>
+
+        <scngx-ui-row headline="Stages" subtitle="Stages und Steps des Prozesses">
+            <div class="px-window">
+                <div class="p-4 rounded-sm bg-body-light border border-body-lighter">
+                    <mat-tree [dataSource]="dataSource" [treeControl]="stageControl" class="bg-transparent">
+                        <!-- This is the tree node template for leaf nodes -->
+                        <!-- There is inline padding applied to this node using styles.
+                          This padding value depends on the mat-icon-button width. -->
+                        <mat-tree-node *matTreeNodeDef="let node" matTreeNodeToggle class="min-h-0 h-min w-full p-2 my-1 flex flex-1 items-center justify-start gap-2 rounded-sm bg-body-lighter bg-opacity-0 hover:bg-opacity-60 active:bg-opacity-80 cursor-pointer select-none">
+                            <div class="hidden md:block">
+                                <p class="text-sm opacity-60">#{{ node.index + 1 }}</p>
+                            </div>
+                            
+                            <div class="flex-grow">
+                                <p class="line-clamp-1">{{ node.data?.name }}</p>
+                                <p class="line-clamp-1 text-sm opacity-60">{{ node.data?.description }}</p>
+                            </div>
+
+                            <div class="min-w-16 w-16 hidden md:block">
+                                <p class="text-sm opacity-60">{{ (node.data?.progress ?? 0) }} %</p>
+                            </div>
+
+                            <span>
+                                <scngx-task-status-icon [status]="node.data?.status"></scngx-task-status-icon>
+                            </span>
+                        </mat-tree-node>
+
+                        <!-- This is the tree node template for expandable nodes -->
+                        <mat-nested-tree-node *matTreeNodeDef="let node; when: hasChild">
+                            <div 
+                                class="flex flex-1 items-center justify-start gap-2 p-2 rounded-sm bg-body-lighter bg-opacity-0 hover:bg-opacity-60 active:bg-opacity-80 cursor-pointer select-none" 
+                                [ngClass]="{'bg-opacity-80 hover:bg-opacity-80 active:bg-opacity-80': stageControl.isExpanded(node)}"
+                                matTreeNodeToggle>
+
+                                <mat-icon class="mat-icon-rtl-mirror">{{ stageControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}</mat-icon>
+
+                                <div class="hidden md:block">
+                                    <p class="text-sm opacity-60">#{{ node.index + 1 }}</p>
+                                </div>
+
+                                <div class="flex-grow">
+                                    <p class="line-clamp-1">{{ node.data?.name }}</p>
+                                    <p class="line-clamp-1 text-sm opacity-60">{{ node.data?.description }}</p>
+                                </div>
+
+                                <div class="min-w-16 w-16 hidden md:block" *ngIf="isWorking(node.data)">
+                                    <p class="text-sm opacity-60">{{ getCurrentStepIndex(node.data) ?? 0 }}/{{ node.data?.steps?.length }}</p>
+                                </div>
+
+                                <span>
+                                    <scngx-task-status-icon [status]="node.data?.status"></scngx-task-status-icon>
+                                </span>
+                            </div>
+                            <!-- There is inline padding applied to this div using styles.
+                                This padding value depends on the mat-icon-button width.  -->
+                            <div [class.stage-tree-invisible]="!stageControl.isExpanded(node)" role="group">
+                                <ng-container matTreeNodeOutlet></ng-container>
+                            </div>
+                        </mat-nested-tree-node>
+                    </mat-tree>
+                </div>
+            </div>
+        </scngx-ui-row>
+    
+        <!-- Page bottom padding -->
+        <div class="pb-window"></div>
+    </div>
+</ng-container>

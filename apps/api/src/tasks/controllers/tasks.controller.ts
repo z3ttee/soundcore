@@ -1,4 +1,4 @@
-import { Controller, Get } from "@nestjs/common";
+import { Controller, Get, Param } from "@nestjs/common";
 import { Pageable, Pagination } from "nestjs-pager";
 import { Roles } from "../../authentication/decorators/role.decorator";
 import { TasksService } from "../services/tasks.service";
@@ -20,6 +20,12 @@ export class TasksController {
     @Get("definitions")
     public async findDefinitions(@Pagination() pageable: Pageable) {
         return this.service.findDefinitions(pageable);
+    }
+
+    @Roles("admin")
+    @Get("run/:runId")
+    public async findByRunId(@Param("runId") runId: string) {
+        return this.service.findTaskByRunId(runId);
     }
 
 }

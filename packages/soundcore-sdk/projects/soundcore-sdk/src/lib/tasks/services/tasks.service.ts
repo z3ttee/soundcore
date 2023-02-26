@@ -34,6 +34,15 @@ export class SCSDKTasksService {
     }
 
     /**
+     * Find a task by its run Id
+     * @param runId Run-Id of the task
+     * @returns Future<Task>
+     */
+    public findTaskByRunId(runId: string): Observable<Future<Task>> {
+        return this.httpClient.get<Task>(`${this.options.api_base_uri}/v1/tasks/run/${runId}`).pipe(toFuture());
+    }
+
+    /**
      * Get the URL used to contact the endpoint for fetching all tasks
      * @returns string
      */

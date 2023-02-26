@@ -1,0 +1,8 @@
+<span>
+    <ng-icon name="heroQueueList" [size]="size ?? '22'" class="opacity-60" *ngIf="status == 'enqueued'"></ng-icon>
+    <ng-icon name="heroArrowPath" [size]="size ?? '22'" class="text-accent animate-spin" *ngIf="status == 'working'"></ng-icon>
+    <ng-icon name="heroXCircle" [size]="size ?? '22'" class="text-error-light" *ngIf="status == 'failed'"></ng-icon>
+    <ng-icon name="heroForward" [size]="size ?? '22'" class="text-warn-light" *ngIf="status == 'skipped'"></ng-icon>
+    <ng-icon name="heroExclamationTriangle" [size]="size ?? '22'" class="text-warn-light" *ngIf="status == 'aborted'"></ng-icon>
+    <ng-icon name="heroCheckCircle" [size]="size ?? '22'" class="text-success-light" *ngIf="status == 'completed'"></ng-icon>
+</span>
