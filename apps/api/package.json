@@ -56,7 +56,7 @@
     "socket.io": "^4.5.1",
     "sqlstring": "^2.3.3",
     "typeorm": "^0.3.10",
-    "workerpool": "^6.2.1",
+    "workerpool": "^6.4.0",
     "ytdl-core": "^4.11.0",
     "ytpl": "^2.3.0"
   },

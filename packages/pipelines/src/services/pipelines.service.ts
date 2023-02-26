@@ -32,14 +32,15 @@ export class PipelineService {
     ) {
         // Create worker pool
         this.pool = pool(path.resolve(__dirname, "..", "worker", "pipeline.worker.js"), {
-            workerType: "process",
+            workerType: "auto",
             minWorkers: 1,
             maxWorkers: Math.max(1, Math.min(0, this.localOptions.concurrent ?? DEFAULT_CONCURRENT_PIPELINES)),
             forkOpts: {
                 env: {
                     ...process.env
                 }
-            }
+            },
+            
         });
 
         // Register polling interval
