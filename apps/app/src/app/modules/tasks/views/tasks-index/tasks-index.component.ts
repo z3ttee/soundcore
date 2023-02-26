@@ -2,7 +2,7 @@ import { HttpClient } from "@angular/common/http";
 import { Component, OnDestroy, OnInit } from "@angular/core";
 import { SCNGXDatasource } from "@soundcore/ngx";
 import { Future, Page, Pageable, SCSDKTaskGateway, SCSDKTasksService, Task, TaskDefinition } from "@soundcore/sdk";
-import { combineLatest, map, Observable, of, Subject, takeUntil, tap } from "rxjs";
+import { combineLatest, map, Observable, Subject, takeUntil } from "rxjs";
 
 interface TasksIndexViewProps {
     datasource?: SCNGXDatasource;
@@ -20,8 +20,7 @@ export class TasksIndexView implements OnInit, OnDestroy {
         private readonly taskGateway: SCSDKTaskGateway
     ) {}
 
-    private readonly datasource = new SCNGXDatasource<Task>(this.httpClient, this.taskService.findAllUrl(), 8);
-
+    private readonly datasource = new SCNGXDatasource<Task>(this.httpClient, this.taskService.findAllUrl(), 8, null, "runId");
     private readonly $destroy: Subject<void> = new Subject();
 
     public readonly $props: Observable<TasksIndexViewProps> = combineLatest([
@@ -36,9 +35,8 @@ export class TasksIndexView implements OnInit, OnDestroy {
 
     public ngOnInit(): void {
         this.taskGateway.$onTasksUpdated.pipe(takeUntil(this.$destroy)).subscribe((tasks) => {
-            console.log(tasks);
             for(const task of tasks){
-                this.datasource.updateOrPrependById(task.id, task);
+                this.datasource.updateOrPrependById(task.runId, task);
             }
         });
     }

@@ -65,7 +65,7 @@
                                 </div>
         
                                 <div class="min-w-16 w-16 hidden md:block">
-                                    <p class="text-sm opacity-60">{{ (step.progress ?? 0)*100 }} %</p>
+                                    <p class="text-sm opacity-60">{{ ((step.progress ?? 0)*100).toFixed(2) }} %</p>
                                 </div>
         
                                 <span>

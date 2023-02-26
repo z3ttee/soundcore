@@ -48,7 +48,8 @@ export abstract class SCNGXBaseDatasource<T = any> extends DataSource<T> {
 
     constructor(
         protected readonly pageSize: number = 30,
-        protected readonly initialSize: number = pageSize
+        protected readonly initialSize: number = pageSize,
+        protected readonly primaryKey: (keyof T) = "id" as (keyof T)
     ) {
         super();
 
@@ -280,7 +281,7 @@ export abstract class SCNGXBaseDatasource<T = any> extends DataSource<T> {
      * @param id Id of the item
      */
     public removeById(id: any) {
-        this.cachedData = [...this.cachedData.filter((element) => element?.["id"] !== id)];
+        this.cachedData = [...this.cachedData.filter((element) => element?.[this.primaryKey] !== id)];
         this.updateStream();
         this.setTotalSize(this._totalSize - 1);
     }
@@ -300,7 +301,7 @@ export abstract class SCNGXBaseDatasource<T = any> extends DataSource<T> {
      * @returns Index (-1 if the item does not exist)
      */
     public getIndexByItemId(id: any): number {
-        return this.cachedData.findIndex((element) => element?.["id"] === id);
+        return this.cachedData.findIndex((element) => element?.[this.primaryKey] === id);
     }
 
     /**
@@ -351,9 +352,10 @@ export class SCNGXDatasource<T = any> extends SCNGXBaseDatasource<T> {
         private readonly httpClient: HttpClient,
         private readonly pageableUrl: string,
         initialSize?: number,
-        pageSize?: number
+        pageSize?: number,
+        primaryKey?: keyof T,
     ) {
-        super(pageSize ?? 30, initialSize);
+        super(pageSize ?? 30, initialSize, primaryKey);
     }
 
     protected fetchPage(pageIndex: number): Observable<T[]> {
