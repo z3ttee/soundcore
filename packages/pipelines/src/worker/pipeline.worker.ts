@@ -10,7 +10,7 @@ import { SkippedException } from "../exceptions/skippedException";
 import { createLogger } from "../logging/logger";
 import { PipelineGlobalOptions, PipelineLocalOptions } from "../options";
 import { readConfiguratorFromFile } from "../utils/registerPipelines";
-import { emit, getOrDefault, globalThis } from "../utils/workerHelperFunctions";
+import { emit, getOrDefault, globalThis, PipelineGlobal, resetGlobals } from "../utils/workerHelperFunctions";
 
 worker({
     default: async (pipeline: PipelineRun, definition: IPipeline, globalOptions: PipelineGlobalOptions, localOptions: PipelineLocalOptions): Promise<PipelineWorkerResult> => {
@@ -230,10 +230,18 @@ worker({
         emit("status", { pipeline });
 
         logDurationMs(startedAtMs, logger);
+
+        const pipelineResult = {...pipeline};
+        const outputsResult = {...globalThis.outputs};
+        const sharedResult = {...globalThis.sharedOutputs};
+
+        // Free resources by deleting globalThis and setting it to empty obj
+        resetGlobals();
+
         return {
-            pipeline: pipeline,
-            outputs: globalThis.outputs ?? {},
-            sharedOutputs: globalThis.sharedOutputs ?? {}
+            pipeline: pipelineResult,
+            outputs: outputsResult,
+            sharedOutputs: sharedResult
         };
     }
 });

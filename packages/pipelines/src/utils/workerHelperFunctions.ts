@@ -8,7 +8,7 @@ import { Stage } from "../entities/stage.entity";
 import { Step } from "../entities/step.entity";
 import { EventHandlerParams, EventName, WorkerEmitEvent } from "../event/event";
 
-class PipelineGlobal {
+export class PipelineGlobal {
     definition: IPipeline;
     pipeline: PipelineRun;
     stage: Stage;
@@ -20,7 +20,19 @@ class PipelineGlobal {
 }
 
 const globals = new PipelineGlobal();
-export const globalThis = globals;
+export let globalThis = globals;
+
+export function resetGlobals() {
+    const logger = globalThis.logger;
+    const memUsed = process.memoryUsage().heapUsed / 1024 / 1024;
+    logger.info(`Process is using ${Math.round(memUsed * 100) / 100} MB of memory.`);
+
+    delete globalThis.sharedOutputs;
+    delete globalThis.outputs;
+    globalThis = new PipelineGlobal();
+
+    logger.info(`Memory usage after clearing unused data: ${Math.round(memUsed * 100) / 100} MB`);
+}
 
 const collectedStatusEvents: Map<string, Subject<EventHandlerParams<"status">>> = new Map();
 const statusEventSubject = new Subject<EventHandlerParams<"status">>();
