@@ -173,7 +173,7 @@ worker({
                             // Update pipeline status
                             stage.currentStepId = step.id;
                             step.status = RunStatus.COMPLETED;
-                            step.progress = 100;
+                            step.progress = 1;
                             emit("status", { pipeline });
                         })
                     } catch (error) {
