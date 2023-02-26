@@ -1,7 +1,5 @@
-import { NestedTreeControl } from "@angular/cdk/tree";
 import { HttpClient } from "@angular/common/http";
 import { Component, OnDestroy, OnInit } from "@angular/core";
-import { MatTreeNestedDataSource } from "@angular/material/tree";
 import { ActivatedRoute } from "@angular/router";
 import { Future, RunStatus, SCSDKTaskGateway, SCSDKTasksService, Stage, Step, Task } from "@soundcore/sdk";
 import { combineLatest, filter, map, Observable, startWith, Subject, switchMap, takeUntil, tap } from "rxjs";
@@ -10,23 +8,10 @@ interface TaskInfoViewProps {
     task?: Future<Task>;
 }
 
-interface StageTreeNode {
-    isStage: boolean;
-    data: Stage | Step;
-    index: number;
-    children?: StageTreeNode[];
-}
-
 @Component({
     templateUrl: "./task-info.component.html",
-    styleUrls: [ "./task-info.component.scss" ]
 })
 export class TaskInfoView implements OnInit, OnDestroy {
-
-    stageControl = new NestedTreeControl<StageTreeNode>(node => node.children);
-    dataSource = new MatTreeNestedDataSource<StageTreeNode>();
-
-    hasChild = (_: number, node: StageTreeNode) => !!node.children && node.children.length > 0;
     
     constructor(
         private readonly httpClient: HttpClient,
@@ -51,24 +36,6 @@ export class TaskInfoView implements OnInit, OnDestroy {
         map(([task, taskUpdate]): TaskInfoViewProps => ({
             task: Future.merge(task, taskUpdate),
         })),
-        tap((props) => {
-            this.dataSource.data = props.task.data?.stages?.map((stage, index): StageTreeNode => {
-                return {
-                    isStage: true,
-                    data: stage,
-                    index: index,
-                    children: [
-                        ...(stage.steps.map((step, i): StageTreeNode => {
-                            return {
-                                isStage: false,
-                                index: i,
-                                data: step,
-                            }
-                        }))
-                    ]
-                }
-            });
-        }),
         takeUntil(this.$destroy)
     );
 

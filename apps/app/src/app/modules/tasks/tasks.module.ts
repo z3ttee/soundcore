@@ -9,7 +9,6 @@ import { NgIconsModule } from "@ng-icons/core";
 import { heroArrowTopRightOnSquare } from '@ng-icons/heroicons/outline';
 import { TaskInfoView } from "./views/task-info/task-info.component";
 import { SCNGXTaskStatusIconModule } from "src/app/components/icons/task-status-icon/task-status-icon.module";
-import { MatTreeModule } from '@angular/material/tree';
 import { MatIconModule } from '@angular/material/icon';
 
 const routes: Routes = [
@@ -28,7 +27,6 @@ const routes: Routes = [
         RouterModule.forChild(routes),
         NgIconsModule.withIcons({ heroArrowTopRightOnSquare }),
 
-        MatTreeModule,
         MatIconModule,
 
         SCNGXScrollingModule,
