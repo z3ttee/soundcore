@@ -60,7 +60,7 @@ export default function (job: WorkerJobRef<IndexerProcessDTO>): Promise<IndexerR
             const artworkRepo = dataSource.getRepository(Artwork);
             const fileRepo = dataSource.getRepository(File);
     
-            const songService = new SongService(songRepo, new EventEmitter2(), new MeiliSongService(meiliClient));
+            const songService = new SongService(songRepo, new MeiliSongService(meiliClient));
             const artistService = new ArtistService(artistRepo, new MeiliArtistService(meiliClient));
             const albumService = new AlbumService(albumRepo, eventEmitter, new MeiliAlbumService(meiliClient));
             const artworkService = new ArtworkService(artworkRepo, fileSystem);
@@ -312,9 +312,9 @@ async function createArtworks(songs: Song[], artworkService: ArtworkService, son
     const collectedArtworks: CreateArtworkDTO[] = [];
 
     for(const song of songs) {
-        const artworkDto = artworkService.createDTOOnlyForSong(song);
-        collectedArtworks.push(artworkDto);
-        song2artwork.set(song.id, artworkDto.id);
+        // const artworkDto = artworkService.createDTOOnlyForSong(song);
+        // collectedArtworks.push(artworkDto);
+        // song2artwork.set(song.id, artworkDto.id);
     }
 
     return artworkService.createIfNotExists(collectedArtworks).then((artworks) => {

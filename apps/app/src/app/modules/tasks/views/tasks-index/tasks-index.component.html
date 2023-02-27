@@ -10,8 +10,8 @@
         <scngx-ui-row headline="Prozesse" [route]="['./definitions']" routeText="Alle anzeigen">
             <scngx-horizontal-list>
                 <!-- Task definition item -->
-                <div class="select-none p-4 rounded-sm bg-body-light border border-body-lighter w-64 h-full cursor-pointer hover:bg-body-lighter hover:bg-opacity-80 active:bg-body-lighter active:bg-opacity-100 [&>div]:active:scale-95 transition-all" *ngFor="let item of (props.definitions.data?.elements ?? [])">
-                    <div class="transform-gpu will-change-transform transition-all">
+                <div class="select-none p-4 rounded-sm bg-body-light border border-body-lighter w-64 cursor-pointer hover:bg-body-lighter hover:bg-opacity-80 active:bg-body-lighter active:bg-opacity-100 [&>div]:active:scale-95 transition-all" *ngFor="let item of (props.definitions.data?.elements ?? [])">
+                    <div class="transform-gpu will-change-transform transition-all h-24">
                         <div class="flex items-center justify-start gap-2">
                             <ng-icon size="24" name="heroArrowTopRightOnSquare"></ng-icon>
                             <p class="line-clamp-1">{{ item.name }}</p>

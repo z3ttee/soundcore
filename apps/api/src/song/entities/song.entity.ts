@@ -20,6 +20,8 @@ export interface SongID {
     id: string;
 }
 
+export const SONG_ARTWORK_RELATION_FK = "artworkId"
+
 @Entity()
 @Index(["name", "primaryArtist", "album", "duration", "order"], { unique: true })
 export class Song implements SongID, Resource, Syncable, GeniusResource, TracklistItem {
@@ -102,7 +104,7 @@ export class Song implements SongID, Resource, Syncable, GeniusResource, Trackli
     public file: File;
 
     @ManyToOne(() => Artwork, { onDelete: "SET NULL", nullable: true })
-    @JoinColumn()
+    @JoinColumn({ name: SONG_ARTWORK_RELATION_FK })
     public artwork: Artwork;
 
     @ManyToOne(() => Artist, { onDelete: "SET NULL", nullable: true })

@@ -130,7 +130,7 @@ export class ArtistService {
      * @param qb Define a custom select query for returning created items
      * @returns Artist[]
      */
-    public async createIfNotExists(dtos: (CreateArtistDTO | Artist)[], qb?: (query: SelectQueryBuilder<Artist>, alias: string) => SelectQueryBuilder<Artist> ): Promise<Artist[]> {
+    public async createIfNotExists(dtos: (CreateArtistDTO | Artist)[], qb?: (query: SelectQueryBuilder<Artist>, alias: string) => SelectQueryBuilder<Artist>): Promise<Artist[]> {
         if(dtos.length <= 0) throw new BadRequestException("Cannot create resources for empty list.");
 
         return await this.repository.createQueryBuilder()

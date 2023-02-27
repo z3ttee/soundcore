@@ -8,7 +8,7 @@ import { Page, BasePageable } from 'nestjs-pager';
 import path from "path";
 
 import { InjectRepository } from "@nestjs/typeorm";
-import { In, ObjectLiteral, Repository, SelectQueryBuilder, UpdateResult } from "typeorm";
+import { In, Repository, SelectQueryBuilder, UpdateResult } from "typeorm";
 import { EventEmitter2 } from "@nestjs/event-emitter";
 import { Environment } from "@soundcore/common";
 import { SyncableService } from "../../utils/services/syncing.service";
@@ -17,13 +17,11 @@ import { MeiliSongService } from "../../meilisearch/services/meili-song.service"
 import { User } from "../../user/entities/user.entity";
 import { SyncFlag } from "../../meilisearch/interfaces/syncable.interface";
 import { CreateSongDTO } from "../dtos/create-song.dto";
-import { Artwork, ArtworkID } from "../../artwork/entities/artwork.entity";
+import { Artwork } from "../../artwork/entities/artwork.entity";
 import { GeniusFlag, ResourceFlag } from "../../utils/entities/resource";
 import { ID3Artist, ID3TagsDTO } from "../dtos/id3-tags.dto";
 import { SongUniqueFindDTO } from "../dtos/unique-find.dto";
 import { FileFlag } from "../../file/entities/file.entity";
-import { Slug } from "@tsalliance/utilities";
-import { Artist } from "../../artist/entities/artist.entity";
 
 @Injectable()
 export class SongService implements SyncableService<Song> {
@@ -31,7 +29,6 @@ export class SongService implements SyncableService<Song> {
 
     constructor(
         @InjectRepository(Song) private readonly repository: Repository<Song>,
-        eventEmitter: EventEmitter2,
         private readonly meilisearch: MeiliSongService
     ){}
 
@@ -315,6 +312,10 @@ export class SongService implements SyncableService<Song> {
 
         song.artwork = artwork;
         return this.repository.save(song);
+    }
+
+    public async setArtworks(objects: (Pick<Song, "artwork"> & Pick<Song, "id">)[]): Promise<Song[]> {
+        return this.repository.save(objects);
     }
 
     /**

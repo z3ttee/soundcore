@@ -37,7 +37,7 @@ async function createFromSong(artworkIds: string[]): Promise<ArtworkProcessResul
         const songRepo = datasource.getRepository(Song);
 
         const artworkService = new ArtworkService(artworkRepo, fsService);
-        const songService = new SongService(songRepo, null, null);
+        const songService = new SongService(songRepo, null);
 
         // return Batch.of(artworkIds, 10).do(async (batch) => {
         //     const songs = await songService.findByArtworkIds(batch).catch((err) => {

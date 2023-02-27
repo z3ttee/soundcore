@@ -62,7 +62,7 @@ async function importSpotifyPlaylist(job: WorkerJobRef<ImportTask>): Promise<Imp
             const reportRepo = datasource.getRepository(ImportReport);
 
             // Instantiate services
-            const songService = new SongService(songRepo, eventEmitter, new MeiliSongService(meilisearch));
+            const songService = new SongService(songRepo, new MeiliSongService(meilisearch));
             const playlistService = new PlaylistService(playlistRepo, song2playlistRepo, eventEmitter, meiliPlaylistClient);
             const importService = new ImportService(importRepo);
             const reportService = new ImportReportService(reportRepo);

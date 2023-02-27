@@ -80,8 +80,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
       inject: [ FileSystemService ],
       useFactory: async (fsService: FileSystemService) => {
         return {
-          // Enable stdout on debug mode
-          enableStdout: Environment.isDebug,
+          // Enable stdout on dev mode
+          enableStdout: !Environment.isProduction,
           // Disable file logs on dev environment
           disableFileLogs: !Environment.isProduction,
           logsDirectory: fsService.getLogsDir()

@@ -53,7 +53,7 @@ export default async function (job: WorkerJobRef<MeiliJob>): Promise<MeiliSyncRe
 
 async function syncSongs(datasource: DataSource, client: MeiliSearch, resources: Song[]): Promise<any> {
     const service = new MeiliSongService(client);
-    const songService = new SongService(datasource.getRepository(Song), new EventEmitter2(), service);
+    const songService = new SongService(datasource.getRepository(Song), service);
     
     // return Batch.of<Song>(resources).do((batch) => {
     //     return service.setSongs(batch).then((task) => {

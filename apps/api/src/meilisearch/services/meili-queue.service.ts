@@ -15,19 +15,19 @@ export class MeiliQueueService {
     private readonly logger = new Logger(MeiliQueueService.name);
 
     constructor(
-        private readonly queue: WorkerQueue<MeiliJob>
+        // private readonly queue: WorkerQueue<MeiliJob>
     ) {
-        this.queue.on("started", (job: WorkerJob<MeiliJob, MeiliSyncResultDTO>) => {
-            this.logger.verbose(`Syncing ${job.payload.resources.length} resources with meilisearch.`);
-        });
+        // this.queue.on("started", (job: WorkerJob<MeiliJob, MeiliSyncResultDTO>) => {
+        //     this.logger.verbose(`Syncing ${job.payload.resources.length} resources with meilisearch.`);
+        // });
 
-        this.queue.on("completed", (job: WorkerJob<MeiliJob, MeiliSyncResultDTO>) => {
-            this.logger.verbose(`Synced resources with meilisearch. Took ${job.result.timeTookMs}ms.`);
-        });
+        // this.queue.on("completed", (job: WorkerJob<MeiliJob, MeiliSyncResultDTO>) => {
+        //     this.logger.verbose(`Synced resources with meilisearch. Took ${job.result.timeTookMs}ms.`);
+        // });
 
-        this.queue.on("failed", (_, error: Error) => {
-            this.logger.error(`Failed syncing resources with meilisearch: ${error.message}`, Environment.isDebug ? error.stack : null);
-        });
+        // this.queue.on("failed", (_, error: Error) => {
+        //     this.logger.error(`Failed syncing resources with meilisearch: ${error.message}`, Environment.isDebug ? error.stack : null);
+        // });
     }
 
     @OnEvent(EVENT_SONGS_CHANGED)
@@ -51,23 +51,23 @@ export class MeiliQueueService {
     }
     
     public async syncSongs(songs: Song[]) {
-        const job = new MeiliJob(songs, MeiliJobType.SYNC_SONGS);
-        return this.queue.enqueue(job);
+        // const job = new MeiliJob(songs, MeiliJobType.SYNC_SONGS);
+        // return this.queue.enqueue(job);
     }
 
     public async syncAlbums(albums: Album[]) {
-        const job = new MeiliJob(albums, MeiliJobType.SYNC_ALBUMS);
-        return this.queue.enqueue(job);
+        // const job = new MeiliJob(albums, MeiliJobType.SYNC_ALBUMS);
+        // return this.queue.enqueue(job);
     }
 
     public async syncArtists(artists: Artist[]) {
-        const job = new MeiliJob(artists, MeiliJobType.SYNC_ARTISTS);
-        return this.queue.enqueue(job);
+        // const job = new MeiliJob(artists, MeiliJobType.SYNC_ARTISTS);
+        // return this.queue.enqueue(job);
     }
 
     public async syncPlaylists(playlists: Playlist[]) {
-        const job = new MeiliJob(playlists, MeiliJobType.SYNC_PLAYLISTS);
-        return this.queue.enqueue(job);
+        // const job = new MeiliJob(playlists, MeiliJobType.SYNC_PLAYLISTS);
+        // return this.queue.enqueue(job);
     }
 
 }

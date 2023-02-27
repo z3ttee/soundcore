@@ -21,7 +21,7 @@ export async function step_read_mp3_tags(params: StepParams) {
     const datasource: DataSource = resources.datasource;
     const repository = datasource.getRepository(Song);
     const fsService = new FileSystemService();
-    const songService = new SongService(repository, null, null);
+    const songService = new SongService(repository, null);
     
     // Prepare step
     const files: Map<string, File> = getSharedOrDefault("targetFiles", new Map());
@@ -60,7 +60,6 @@ export async function step_read_mp3_tags(params: StepParams) {
 
             // Build filepath
             const filepath = fsService.resolveFilepath(file);
-            logger.info(`Reading ID3 Tags of '${filepath}'`);
             
             // Remove mount from file, because it is not needed anymore
             delete file.mount;
@@ -265,7 +264,7 @@ export async function step_create_songs(params: StepParams) {
     // Prepare step
     const datasource: DataSource = resources.datasource;
     const repository = datasource.getRepository(Song);
-    const service = new SongService(repository, null, null);
+    const service = new SongService(repository, null);
     const artists: Map<string, Artist> = getOrDefault(`${STAGE_METADATA_ID}.${STEP_CREATE_ARTISTS_ID}.artists`, new Map());
     const albums: Map<string, Album> = getOrDefault(`${STAGE_METADATA_ID}.${STEP_CREATE_ALBUMS_ID}.albums`, new Map());
     const songs: Map<string, Song> = getOrDefault(`${STAGE_METADATA_ID}.${STEP_READ_TAGS_ID}.songs`, new Map());
@@ -280,7 +279,7 @@ export async function step_create_songs(params: StepParams) {
 
     // Split the songs of previous steps into chunks
     // of 100 items each
-    return Batch.useDataset(Array.from(songs.values())).onError((error: Error, batch, batchNr: number) => {
+    return Batch.useDataset<Song, Song>(Array.from(songs.values())).onError((error: Error, batch, batchNr: number) => {
         // Log errors
         logger.error(`Failed processing songs in batch #${batchNr}: ${error.message}`, error.stack);
 
@@ -290,8 +289,7 @@ export async function step_create_songs(params: StepParams) {
             if(typeof file === "undefined" || file == null) continue;
             file.flag = FileFlag.ERROR;
         }
-    }).map((batch, currentBatch, totalBatches) => {
-
+    }).forEach((batch, currentBatch, totalBatches) => {
         const songMappedByFiles: Map<string, Song> = new Map();
 
         // Map the songs from previous outputs using valid data.
@@ -308,7 +306,14 @@ export async function step_create_songs(params: StepParams) {
         });
 
         // Create database entries
-        return service.createIfNotExists(mappedSongs, (query, alias) => query.select([`${alias}.id`]).leftJoin(`${alias}.file`, "file").addSelect(["file.id"])).then((createdSongs) => {
+        return service.createIfNotExists(mappedSongs, (query, alias) => {
+            return query
+                .select([`${alias}.id`])
+                // Following two relations are for creating artworks
+                .leftJoin(`${alias}.primaryArtist`, "primaryArtist").addSelect(["primaryArtist.id"])
+                .leftJoin(`${alias}.album`, "album").addSelect(["album.id"])
+                .leftJoin(`${alias}.file`, "file").addSelect(["file.id"])
+        }).then((createdSongs) => {
             logger.info(`Batch #${currentBatch}: Created ${createdSongs.length} database entries.`);
 
             const mappedCreatedSongs: Song[] = [];
@@ -340,17 +345,14 @@ export async function step_create_songs(params: StepParams) {
                 logger.info(`Batch #${currentBatch}: Saved featured artists for ${list.length} song entries.`);
                 progress(currentBatch / totalBatches);
 
-                // Map created artists back to map
-                const map: Map<string, Song> = new Map();
+                // Set file status
                 for(const song of createdSongs) {
-                    map.set(song.id, song);
-
                     const file = files.get(song.file?.id);
                     if(typeof file === "undefined" || file == null) continue;
                     file.flag = FileFlag.OK;
                 }
 
-                return map;
+                return createdSongs;
             })
         }).catch((error: Error) => {
             logger.error(`Failed creating songs in database: ${error.message}`, error.stack);
@@ -359,8 +361,8 @@ export async function step_create_songs(params: StepParams) {
     }).then((createdSongs) => {
         // Processing all batches done.
         // Write logs and create output
-        logger.info(`Created and fetched ${createdSongs.size} songs.`);
-        // set("songs", createdSongs);
+        logger.info(`Created and fetched ${createdSongs.length} songs.`);
+        set("songs", createdSongs);
     }).catch((error: Error) => {
         // Batching process failed
         logger.error(`Failed creating songs: ${error.message}`, error);

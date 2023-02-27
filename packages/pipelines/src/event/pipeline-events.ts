@@ -4,7 +4,6 @@ export interface PipelineEventParams {
     pipeline: PipelineRun
 }
 
-
 export type PipelineEnqueuedEventHandler = (position: number, params: PipelineEventParams) => Promise<void> | void;
 export type PipelineDequeuedEventHandler = (params: PipelineEventParams) => Promise<void> | void;
 export type PipelineStartedEventHandler = (params: PipelineEventParams) => Promise<void> | void;

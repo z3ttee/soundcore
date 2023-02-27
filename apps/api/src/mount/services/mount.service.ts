@@ -400,23 +400,23 @@ export class MountService {
      * are registered as mounts.
      */
     public async checkMountsStandaloneMode() {
-        const options: Pageable = new Pageable(0, 30);
+        // const options: Pageable = new Pageable(0, 30);
 
-        let page: Page<Mount>;
-        let fetchedElements = 0;
-        let pageIndex = options.page;
+        // let page: Page<Mount>;
+        // let fetchedElements = 0;
+        // let pageIndex = options.page;
     
-        while(fetchedElements < page?.totalElements || page == null) {
-            page = await this.findByBucketId(this.fileSystem.getInstanceId(), options);
-            pageIndex++;
-            fetchedElements += page.size;
+        // while(fetchedElements < page?.totalElements || page == null) {
+        //     page = await this.findByBucketId(this.fileSystem.getInstanceId(), options);
+        //     pageIndex++;
+        //     fetchedElements += page.size;
 
-            for(const mount of page.elements) {
-                this.scanMountInternal(mount).catch((error: Error) => {
-                    this.logger.error(`Could not trigger scanning process for mount '${mount?.name}': ${error.message}`);
-                });
-            }
-        }
+        //     for(const mount of page.elements) {
+        //         this.scanMountInternal(mount).catch((error: Error) => {
+        //             this.logger.error(`Could not trigger scanning process for mount '${mount?.name}': ${error.message}`);
+        //         });
+        //     }
+        // }
     }
 
     /**

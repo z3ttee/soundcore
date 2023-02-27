@@ -1,6 +1,6 @@
 import path from 'path';
 
-import { DynamicModule, Logger, Module } from '@nestjs/common';
+import { DynamicModule, Logger, Module, OnModuleInit } from '@nestjs/common';
 import { ScheduleModule } from '@nestjs/schedule';
 import { WorkerQueueModule } from '@soundcore/nest-queue';
 import MeiliSearch, { Config } from 'meilisearch';
@@ -13,6 +13,9 @@ import { MeiliPublisherService } from './services/meili-publisher.service';
 import { MeiliSongService } from './services/meili-song.service';
 import { MeiliUserService } from './services/meili-user.service';
 import { MeiliQueueService } from './services/meili-queue.service';
+import { PipelineModule, PipelineService } from '@soundcore/pipelines';
+import { PIPELINE_ID } from './pipeline.constants';
+import { TasksModule } from '../tasks/tasks.module';
 
 export interface MeilisearchOptions {
     host: string;
@@ -25,8 +28,16 @@ export interface MeilisearchOptions {
 }
 
 @Module({})
-export class MeilisearchModule {
+export class MeilisearchModule implements OnModuleInit {
     private static logger: Logger = new Logger(MeilisearchModule.name);
+
+    constructor(private readonly pipeline: PipelineService) {}
+
+    onModuleInit() {
+        this.pipeline.createRun(PIPELINE_ID).then(() => {
+            
+        })
+    }
 
     public static forRoot(options: MeilisearchOptions): DynamicModule {
         const isDisabled = typeof options?.host === "undefined" || options?.host == null;
@@ -59,10 +70,17 @@ export class MeilisearchModule {
             global: true,
             imports: [
                 ScheduleModule,
-                WorkerQueueModule.forFeature({
-                    script: path.resolve(__dirname, "worker", "meilisearch.worker.js"),
-                    workerType: "thread",
-                    concurrent: 20
+                TasksModule,
+                // WorkerQueueModule.forFeature({
+                //     script: path.resolve(__dirname, "worker", "meilisearch.worker.js"),
+                //     workerType: "thread",
+                //     concurrent: 20
+                // }),
+                PipelineModule.registerPipelines({
+                    concurrent: 10,
+                    pipelines: [
+                        path.join(__dirname, "pipelines", "meilisearch-sync.pipeline.js")
+                    ]
                 })
             ],
             providers: [

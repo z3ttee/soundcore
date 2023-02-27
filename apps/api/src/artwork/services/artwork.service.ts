@@ -7,7 +7,7 @@ import path from "path";
 import Vibrant from "node-vibrant";
 import { Random } from "@tsalliance/utilities";
 import axios from "axios";
-import { DeleteResult, Repository, UpdateResult } from "typeorm";
+import { DeleteResult, Repository, SelectQueryBuilder, UpdateResult } from "typeorm";
 import { Artist } from "../../artist/entities/artist.entity";
 import { Album } from "../../album/entities/album.entity";
 import { Song } from "../../song/entities/song.entity";
@@ -61,23 +61,22 @@ export class ArtworkService {
      * @param createArtworkDto Creation and Find options
      * @returns Artwork
      */
-    public async createIfNotExists(createArtworkDtos: CreateArtworkDTO[]): Promise<Artwork[]> {
+    public async createIfNotExists(createArtworkDtos: CreateArtworkDTO[], qb?: (query: SelectQueryBuilder<Artwork>, alias: string) => SelectQueryBuilder<Artwork> ): Promise<Artwork[]> {
         return this.repository.createQueryBuilder()
             .insert()
             .values(createArtworkDtos)
+            .orUpdate(["sourceType", "flag", "sourceUri"], ["id"], { skipUpdateIfNoValuesChanged: false })
             .returning(["id"])
-            .orUpdate(["sourceType", "flag", "sourceUri"], ["id"])
-            .execute().then((result) => {
-                return this.repository.createQueryBuilder("artwork")
-                    .where(result.identifiers)
-                    .getMany().then((artworks) => {
-                        return artworks;
-                    })
-            }).catch((error) => {
-                this.logger.error(`Could not create database entry for artwork: ${error.message}`, error.stack);
-                console.error()
-                return null
-            });
+            .execute().then((insertResult) => {
+                const alias = "artwork";
+                let query: SelectQueryBuilder<Artwork> = this.repository.createQueryBuilder(alias)
+                    
+                if(typeof qb === "function") {
+                    query = qb(this.repository.createQueryBuilder(alias), alias);
+                }
+                    
+                return query.whereInIds(insertResult.raw).getMany();
+            })
     }
 
     /**
@@ -189,10 +188,10 @@ export class ArtworkService {
      * @returns Artwork
      */
     public async createForSongIfNotExists(song: Song): Promise<Artwork> {
-        return this.createIfNotExists([this.createDTOOnlyForSong(song)])?.[0]
+        return this.createIfNotExists([this.createDTOForSong(song)])?.[0]
     }
 
-    public createDTOOnlyForSong(song: Song): CreateArtworkDTO {
+    public createDTOForSong(song: Song): CreateArtworkDTO {
         const name = `${ArtworkService.createSongCoverNameSchema(song)}`;
         const type = ArtworkType.SONG;
         const sourceType = ArtworkSourceType.SONG;
@@ -201,7 +200,7 @@ export class ArtworkService {
             type,
             sourceType,
             id: this.createHash(`${name}:${type}:${sourceType}`)
-        }
+        };
     }
 
     public createHash(input: string): string {
@@ -211,14 +210,14 @@ export class ArtworkService {
     public static createSongCoverNameSchema(song: Song): string {
         if(!song) return null;
 
-        const primaryArtistName = song.primaryArtist?.name || Random.randomString(8);      
+        const primaryArtistName = song.primaryArtist?.id || Random.randomString(8);      
         const album = song.album;
 
         if(typeof album != "undefined" && album != null) {
             return `${album.id}`
         }
 
-        return `${song.name} ${primaryArtistName}`;
+        return `${song.id} ${primaryArtistName}`;
     }
 
     /**
