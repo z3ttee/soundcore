@@ -1,15 +1,12 @@
-import fs from "fs";
+import fs from "node:fs";
+import path from "node:path";
 import NodeID3 from "node-id3";
 import ffprobe from 'ffprobe';
 import ffprobeStatic from "ffprobe-static";
-
 import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { Page, BasePageable } from 'nestjs-pager';
-import path from "path";
-
 import { InjectRepository } from "@nestjs/typeorm";
 import { In, Repository, SelectQueryBuilder, UpdateResult } from "typeorm";
-import { EventEmitter2 } from "@nestjs/event-emitter";
 import { Environment } from "@soundcore/common";
 import { SyncableService } from "../../utils/services/syncing.service";
 import { Song } from "../entities/song.entity";
@@ -411,7 +408,9 @@ export class SongService implements SyncableService<Song> {
      * @param filepath Path to mp3 file
      * @returns ID3TagsDTO
      */
-    public async readID3TagsFromFile(filepath: string): Promise<ID3TagsDTO> {
+    public async readID3TagsFromFile(absolutePath: string): Promise<ID3TagsDTO> {
+        const filepath = path.resolve(absolutePath);
+        
         // Get duration in seconds
         const probe = await ffprobe(filepath, { path: ffprobeStatic.path });
         const durationInSeconds = Math.round(probe.streams[0].duration || 0);

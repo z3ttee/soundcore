@@ -1,4 +1,4 @@
-import { Column, Entity, Index, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, Index, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { Mount } from "../../mount/entities/mount.entity";
 import { Song } from "../../song/entities/song.entity";
 
@@ -44,4 +44,9 @@ export class File {
     @ManyToOne(() => Mount, { onDelete: "CASCADE", nullable: false })
     public mount: Mount;
 
+    @CreateDateColumn()
+    public createdAt: number;
+
+    @UpdateDateColumn()
+    public updatedAt: number;
 }

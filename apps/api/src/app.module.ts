@@ -58,7 +58,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
       synchronize: true,
       entityPrefix: process.env.DB_PREFIX ?? "sc_",
       retryAttempts: Number.MAX_VALUE,
-      retryDelay: 10000
+      retryDelay: 10000,
+      charset: "utf8mb4_unicode_ci",
     }),
     MeilisearchModule.forRoot({
       host: process.env.MEILISEARCH_HOST,
