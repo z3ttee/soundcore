@@ -122,7 +122,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
       }),
     }),
     TracklistModule,
-    TasksModule
+    TasksModule.forRoot()
   ],
   controllers: [
     AppController

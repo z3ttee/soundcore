@@ -36,7 +36,7 @@ async function createFromSong(artworkIds: string[]): Promise<ArtworkProcessResul
         const artworkRepo = datasource.getRepository(Artwork);
         const songRepo = datasource.getRepository(Song);
 
-        const artworkService = new ArtworkService(artworkRepo, fsService);
+        const artworkService = new ArtworkService(artworkRepo, fsService, null);
         const songService = new SongService(songRepo, null);
 
         // return Batch.of(artworkIds, 10).do(async (batch) => {
@@ -118,7 +118,7 @@ async function continueProcessing(job: WorkerJobRef<ArtworkProcessDTO>): Promise
         const fsService = new FileSystemService();
 
         const artworkRepo = datasource.getRepository(Artwork);
-        const artworkService = new ArtworkService(artworkRepo, fsService);
+        const artworkService = new ArtworkService(artworkRepo, fsService, null);
         const processResult: ArtworkProcessResultDTO = {
             artworks: [],
             timeTookMs: -1

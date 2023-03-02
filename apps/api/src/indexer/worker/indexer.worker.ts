@@ -63,7 +63,7 @@ export default function (job: WorkerJobRef<IndexerProcessDTO>): Promise<IndexerR
             const songService = new SongService(songRepo, new MeiliSongService(meiliClient));
             const artistService = new ArtistService(artistRepo, new MeiliArtistService(meiliClient));
             const albumService = new AlbumService(albumRepo, eventEmitter, new MeiliAlbumService(meiliClient));
-            const artworkService = new ArtworkService(artworkRepo, fileSystem);
+            const artworkService = new ArtworkService(artworkRepo, fileSystem, null);
             const fileService = new FileService(fileRepo);
 
             const createdResources: IndexerCreatedResources = new IndexerCreatedResources();

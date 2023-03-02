@@ -1,13 +1,14 @@
+import fs from "fs";
+import sharp from "sharp";
+import crypto from "node:crypto";
+import path from "path";
+import Vibrant from "node-vibrant";
+import axios from "axios";
 import { Injectable, InternalServerErrorException, Logger, NotFoundException } from "@nestjs/common";
 import { CreateArtworkDTO } from "../dtos/create-artwork.dto";
 import { Artwork, ArtworkFlag, ArtworkID, ArtworkType } from "../entities/artwork.entity";
-import fs from "fs";
-import sharp from "sharp";
-import path from "path";
-import Vibrant from "node-vibrant";
 import { Random } from "@tsalliance/utilities";
-import axios from "axios";
-import { DeleteResult, Repository, SelectQueryBuilder, UpdateResult } from "typeorm";
+import { DeleteResult, Repository, SelectQueryBuilder } from "typeorm";
 import { Artist } from "../../artist/entities/artist.entity";
 import { Album } from "../../album/entities/album.entity";
 import { Song } from "../../song/entities/song.entity";
@@ -18,7 +19,7 @@ import { Response } from "express";
 import { InjectRepository } from "@nestjs/typeorm";
 import { FileSystemService } from "../../filesystem/services/filesystem.service";
 import { ArtworkSourceType } from "../dtos/artwork-process.dto";
-import crypto from "node:crypto";
+import { TasksService } from "../../tasks/services/tasks.service";
 
 @Injectable()
 export class ArtworkService {
@@ -26,8 +27,17 @@ export class ArtworkService {
 
     constructor(
         @InjectRepository(Artwork) private readonly repository: Repository<Artwork>,
-        private readonly fileSystem: FileSystemService
-    ) { }
+        private readonly fileSystem: FileSystemService,
+        private readonly taskService: TasksService,
+    ) {}
+
+    /**
+     * Get the repository used by the service
+     * @returns Repository<Artwork>
+     */
+    public getRepository() {
+        return this.repository;
+    }
 
     /**
      * Find an artwork by its id.
@@ -189,6 +199,20 @@ export class ArtworkService {
      */
     public async createForSongIfNotExists(song: Song): Promise<Artwork> {
         return this.createIfNotExists([this.createDTOForSong(song)])?.[0]
+    }
+
+    /**
+     * Check if there are aborted artworks.
+     * @returns True or False
+     */
+    public async hasAbortedArtworks(): Promise<boolean> {
+        return this.repository.createQueryBuilder("artwork")
+            .where("artwork.flag = :flag", { flag: ArtworkFlag.ABORTED })
+            .limit(1)
+            .select(["artwork.id"])
+            .getOne().then((artwork) => {
+                return typeof artwork !== "undefined" && artwork != null;
+            });
     }
 
     public createDTOForSong(song: Song): CreateArtworkDTO {

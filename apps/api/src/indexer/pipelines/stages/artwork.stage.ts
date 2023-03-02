@@ -44,7 +44,7 @@ export async function step_create_artwork_entities(params: StepParams) {
         const songRepo = manager.getRepository(Song);
 
         // Create service instances
-        const artworkService = new ArtworkService(artworkRepo, fsService);
+        const artworkService = new ArtworkService(artworkRepo, fsService, null);
 
         const artwork2song: Map<string, string[]> = new Map();
         const result: Map<string, Song> = new Map();

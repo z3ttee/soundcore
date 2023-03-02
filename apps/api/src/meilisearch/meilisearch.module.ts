@@ -15,7 +15,6 @@ import { MeiliUserService } from './services/meili-user.service';
 import { MeiliQueueService } from './services/meili-queue.service';
 import { PipelineModule, PipelineService } from '@soundcore/pipelines';
 import { PIPELINE_ID } from './pipeline.constants';
-import { TasksModule } from '../tasks/tasks.module';
 
 export interface MeilisearchOptions {
     host: string;
@@ -28,16 +27,16 @@ export interface MeilisearchOptions {
 }
 
 @Module({})
-export class MeilisearchModule implements OnModuleInit {
+export class MeilisearchModule {
     private static logger: Logger = new Logger(MeilisearchModule.name);
 
-    constructor(private readonly pipeline: PipelineService) {}
+    // constructor(private readonly pipeline: PipelineService) {}
 
-    onModuleInit() {
-        this.pipeline.createRun(PIPELINE_ID).then(() => {
+    // onModuleInit() {
+    //     this.pipeline.createRun(PIPELINE_ID).then(() => {
             
-        })
-    }
+    //     })
+    // }
 
     public static forRoot(options: MeilisearchOptions): DynamicModule {
         const isDisabled = typeof options?.host === "undefined" || options?.host == null;
@@ -70,18 +69,18 @@ export class MeilisearchModule implements OnModuleInit {
             global: true,
             imports: [
                 ScheduleModule,
-                TasksModule,
+                // TasksModule,
                 // WorkerQueueModule.forFeature({
                 //     script: path.resolve(__dirname, "worker", "meilisearch.worker.js"),
                 //     workerType: "thread",
                 //     concurrent: 20
                 // }),
-                PipelineModule.registerPipelines({
-                    concurrent: 10,
-                    pipelines: [
-                        path.join(__dirname, "pipelines", "meilisearch-sync.pipeline.js")
-                    ]
-                })
+                // PipelineModule.registerPipelines({
+                //     concurrent: 10,
+                //     pipelines: [
+                //         path.join(__dirname, "pipelines", "meilisearch-sync.pipeline.js")
+                //     ]
+                // })
             ],
             providers: [
                 {

@@ -17,6 +17,7 @@ export enum ArtworkFlag {
     AWAITING = 0,
     OK = 1,
     ERROR = 2,
+    ABORTED = 3
 }
 
 export interface ArtworkID {
