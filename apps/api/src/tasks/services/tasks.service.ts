@@ -108,10 +108,10 @@ export class TasksService {
     public async clearOldTasks(): Promise<void> {
         await this.repository.createQueryBuilder()
             .delete()
-            .where("createdAt <= :pivotDate", { pivotDate: (Date.now() - 1000*60*60*24*7) })
+            .where("createdAt <= :pivotDate", { pivotDate: new Date(Date.now() - 1000*60*60*24*7) })
             .execute().then((updateResult) => {
                 if(updateResult.affected <= 0) return;
-                this.logger.log(`Marked ${updateResult.affected} enqueued tasks as 'ABORTED'`);
+                this.logger.log(`Cleared ${updateResult.affected} tasks older than 7 days`);
             })
     }
 
