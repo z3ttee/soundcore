@@ -76,5 +76,11 @@ export interface StepParams {
     readonly logger: PipelineLogger;
 }
 
+export type StageConditionParams = {
+    prevOutput: Outputs;
+    shared: Outputs;
+    environment: Environment
+}
+
 export type StepExecutor = (params: StepParams) => any | Promise<any>;
-export type StepConditionEvaluator = (prevOutput: Outputs, shared: Outputs) => boolean | Promise<boolean>;
+export type StepConditionEvaluator = (params: StageConditionParams) => boolean | Promise<boolean>;
