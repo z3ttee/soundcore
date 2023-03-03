@@ -1,5 +1,7 @@
 import { Injectable, Logger } from "@nestjs/common";
+import { EventEmitter2 } from "@nestjs/event-emitter";
 import { PipelineService } from "@soundcore/pipelines";
+import { EVENT_TRIGGER_ARTWORK_PROCESS } from "../../constants";
 import { Task } from "../../tasks/entities/task.entity";
 import { TasksService } from "../../tasks/services/tasks.service";
 import { PIPELINE_INDEX_ID } from "../pipelines";
@@ -10,7 +12,8 @@ export class IndexerService {
 
     constructor(
         private readonly pipelines: PipelineService,
-        private readonly taskService: TasksService
+        private readonly taskService: TasksService,
+        private readonly emitter: EventEmitter2
     ) {
         this.pipelines.on("failed", (error, { pipeline }) => {
             console.error(error);
@@ -18,6 +21,7 @@ export class IndexerService {
         })
         this.pipelines.on("completed", ({ pipeline }) => {
             console.log("Pipeline " + pipeline.id + " completed");
+            this.emitter.emit(EVENT_TRIGGER_ARTWORK_PROCESS);
         })
         this.pipelines.on("status", (params) => {
             const task: Task = params.pipeline as Task;

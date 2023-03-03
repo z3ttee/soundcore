@@ -1,4 +1,4 @@
-import { get, getOrDefault, pipeline } from "@soundcore/pipelines";
+import { getOrDefault, pipeline } from "@soundcore/pipelines";
 import Database from "../../utils/database/database-worker-client";
 import { PIPELINE_INDEX_ID, PIPELINE_INDEX_NAME, STAGE_ARTWORK_ID, STAGE_ARTWORK_NAME, STAGE_CLEANUP_ID, STAGE_CLEANUP_NAME, STAGE_METADATA_ID, STAGE_METADATA_NAME, STAGE_SCAN_ID, STAGE_SCAN_NAME, STEP_CHECKOUT_MOUNT_ID, STEP_CHECKOUT_MOUNT_NAME, STEP_CHECK_FILES_ID, STEP_CHECK_FILES_NAME, STEP_CLEANUP_DUPLICATES_ID, STEP_CLEANUP_DUPLICATES_NAME, STEP_CLEANUP_FAILED_ID, STEP_CLEANUP_FAILED_NAME, STEP_CLEANUP_SUCCEEDED_ID, STEP_CLEANUP_SUCCEEDED_NAME, STEP_CREATE_ALBUMS_ID, STEP_CREATE_ALBUMS_NAME, STEP_CREATE_ARTISTS_ID, STEP_CREATE_ARTISTS_NAME, STEP_CREATE_ARTWORK_ENTITIES_ID, STEP_CREATE_ARTWORK_ENTITIES_NAME, STEP_CREATE_SONGS_ID, STEP_CREATE_SONGS_NAME, STEP_INDEX_FILES_ID, STEP_INDEX_FILES_NAME, STEP_LOOKUP_FILES_ID, STEP_LOOKUP_FILES_NAME, STEP_READ_TAGS_ID, STEP_READ_TAGS_NAME } from "../pipelines";
 import { step_create_artwork_entities } from "./stages/artwork.stage";
@@ -14,15 +14,15 @@ export default pipeline(PIPELINE_INDEX_ID, PIPELINE_INDEX_NAME, "Scan a library 
         return Database.connect().then((datasource) => ({ datasource: datasource }));
     }).step(STEP_CHECKOUT_MOUNT_ID, STEP_CHECKOUT_MOUNT_NAME).run((params) => {
         return step_checkout_mount(params);
-    }).step(STEP_LOOKUP_FILES_ID, STEP_LOOKUP_FILES_NAME).condition((_, shared) => !!shared["mount"]).run((params) => {
+    }).step(STEP_LOOKUP_FILES_ID, STEP_LOOKUP_FILES_NAME).condition(({ shared }) => !!shared["mount"]).run((params) => {
         return step_search_files(params);
-    }).step(STEP_INDEX_FILES_ID, STEP_INDEX_FILES_NAME).condition((outputs) => outputs["files"]?.length > 0).run((params) => {
+    }).step(STEP_INDEX_FILES_ID, STEP_INDEX_FILES_NAME).condition(({ prevOutput }) => prevOutput["files"]?.length > 0).run((params) => {
         return step_create_database_entries(params);
     }).next()
     /**
      * Stage: Metadata
      */
-    .stage(STAGE_METADATA_ID, STAGE_METADATA_NAME).condition((_, shared) => shared["targetFiles"]?.size > 0).useResources(() => {
+    .stage(STAGE_METADATA_ID, STAGE_METADATA_NAME).condition(({ shared }) => shared["targetFiles"]?.size > 0).useResources(() => {
         return Database.connect().then((datasource) => ({ datasource: datasource }));
     }).step(STEP_READ_TAGS_ID, STEP_READ_TAGS_NAME).run((params) => {
         return step_read_mp3_tags(params);

@@ -1,5 +1,7 @@
 import { Injectable, Logger } from "@nestjs/common";
+import { OnEvent } from "@nestjs/event-emitter";
 import { PipelineService } from "@soundcore/pipelines";
+import { EVENT_TRIGGER_ARTWORK_PROCESS } from "../../constants";
 import { Task } from "../../tasks/entities/task.entity";
 import { TasksService } from "../../tasks/services/tasks.service";
 import { ArtworkFlag } from "../entities/artwork.entity";
@@ -34,7 +36,6 @@ export class ArtworkBackgroundService {
      * Such abortions usually occur when the application crashes
      * or restarts
      */
-    // @Interval(30000)
     public async checkAbortedArtworks() {
         return this.service.hasAbortedArtworks().then((hasAborted) => {
             if(!hasAborted) return;
@@ -69,11 +70,25 @@ export class ArtworkBackgroundService {
             })
     }
 
+    /**
+     * Create a new pipeline run to process artworks
+     * @param env Custom env data
+     */
     public async createPipelineRun(env?: ArtworkPipelineEnv) {
         return this.pipelines.createRun(ARTWORK_PIPELINE_ID, env).then((run) => {
             return this.taskService.createTaskFromPipelineRun(run).then((task) => {
                 return this.pipelines.enqueueRun(task).then(() => task);
             });
         });
+    }
+
+    /**
+     * Trigger artwork pipeline run
+     * fetching all artworks with AWAITING flag
+     * to process them.
+     */
+    @OnEvent(EVENT_TRIGGER_ARTWORK_PROCESS)
+    public triggerArtworkProcess() {
+        this.createPipelineRun();
     }
 }
