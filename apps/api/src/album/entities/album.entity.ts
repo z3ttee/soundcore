@@ -1,7 +1,7 @@
 
 import { BeforeInsert, BeforeUpdate, Column, CreateDateColumn, Entity, Index, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { Artist } from "../../artist/entities/artist.entity";
-import { Artwork } from "../../artwork/entities/artwork.entity";
+import { AlbumArtwork, Artwork } from "../../artwork/entities/artwork.entity";
 import { LikedAlbum } from "../../collection/entities/like.entity";
 import { Distributor } from "../../distributor/entities/distributor.entity";
 import { Label } from "../../label/entities/label.entity";
@@ -71,9 +71,9 @@ export class Album implements Resource, Syncable, GeniusResource {
     @OneToMany(() => Song, (song) => song.album, { cascade: ["insert", "update"] })
     public songs: Song[];
 
-    @ManyToOne(() => Artwork, { onDelete: "SET NULL" })
+    @ManyToOne(() => AlbumArtwork, { onDelete: "SET NULL", nullable: true })
     @JoinColumn()
-    public artwork?: Artwork;
+    public artwork: AlbumArtwork;
 
     @ManyToMany(() => Distributor)
     @JoinTable({ name: "album2distributor" })

@@ -14,7 +14,7 @@ import { MeiliSongService } from "../../meilisearch/services/meili-song.service"
 import { User } from "../../user/entities/user.entity";
 import { SyncFlag } from "../../meilisearch/interfaces/syncable.interface";
 import { CreateSongDTO } from "../dtos/create-song.dto";
-import { Artwork } from "../../artwork/entities/artwork.entity";
+import { Artwork, SongArtwork } from "../../artwork/entities/artwork.entity";
 import { GeniusFlag, ResourceFlag } from "../../utils/entities/resource";
 import { ID3Artist, ID3TagsDTO } from "../dtos/id3-tags.dto";
 import { SongUniqueFindDTO } from "../dtos/unique-find.dto";
@@ -303,11 +303,11 @@ export class SongService implements SyncableService<Song> {
      * @param artwork Artwork to set
      * @returns Song
      */
-    public async setArtwork(idOrObject: string | Song, artwork: Artwork): Promise<Song> {
+    public async setArtwork(idOrObject: string | Song, artwork: Artwork | SongArtwork): Promise<Song> {
         const song = await this.resolveSong(idOrObject);
         if(!song) throw new NotFoundException("Could not find song.");
 
-        song.artwork = artwork;
+        song.artwork = artwork as SongArtwork;
         return this.repository.save(song);
     }
 

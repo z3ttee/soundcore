@@ -5,7 +5,7 @@ import path from "path";
 import Vibrant from "node-vibrant";
 import axios from "axios";
 import { Injectable, InternalServerErrorException, Logger, NotFoundException } from "@nestjs/common";
-import { CreateArtworkDTO } from "../dtos/create-artwork.dto";
+import { CreateArtistArtworkDTO, CreateArtworkDTO, CreateDownloadableArtworkDTO, CreateSongArtworkDTO } from "../dtos/create-artwork.dto";
 import { Artwork, ArtworkFlag, ArtworkID, ArtworkType } from "../entities/artwork.entity";
 import { Random } from "@tsalliance/utilities";
 import { DeleteResult, Repository, SelectQueryBuilder } from "typeorm";
@@ -56,11 +56,11 @@ export class ArtworkService {
             .getOne();
     }
 
+    /**
+     * @deprecated 
+     */
     public async findByFlagAndSourceTypeIdOnly(flag: ArtworkFlag, sourceType: ArtworkSourceType): Promise<Artwork[]> {
-        return this.repository.createQueryBuilder("artwork")
-            .where("artwork.flag = :flag AND artwork.sourceType = :sourceType", { flag, sourceType })
-            .select(["id"])
-            .getMany();
+        return [];
     }
 
     /**
@@ -71,11 +71,11 @@ export class ArtworkService {
      * @param createArtworkDto Creation and Find options
      * @returns Artwork
      */
-    public async createIfNotExists(createArtworkDtos: CreateArtworkDTO[], qb?: (query: SelectQueryBuilder<Artwork>, alias: string) => SelectQueryBuilder<Artwork> ): Promise<Artwork[]> {
+    public async createIfNotExists<T extends CreateArtworkDTO = CreateArtworkDTO>(createArtworkDtos: T[], qb?: (query: SelectQueryBuilder<Artwork>, alias: string) => SelectQueryBuilder<Artwork> ): Promise<Artwork[]> {
         return this.repository.createQueryBuilder()
             .insert()
             .values(createArtworkDtos)
-            .orUpdate(["sourceType", "flag", "sourceUri"], ["id"], { skipUpdateIfNoValuesChanged: false })
+            .orUpdate(["dstType", "flag", "srcUrl"], ["id"], { skipUpdateIfNoValuesChanged: false })
             .returning(["id"])
             .execute().then((insertResult) => {
                 const alias = "artwork";
@@ -101,12 +101,13 @@ export class ArtworkService {
         const name = artist.name;
         const type = ArtworkType.ARTIST;
 
-        return this.createIfNotExists([{ 
-            type, 
-            sourceUri: sourceUri, 
-            sourceType: ArtworkSourceType.URL, 
-            id: this.createHash(`${name}:${type}`)
-        }])?.[0];
+        const dto = new CreateDownloadableArtworkDTO(
+            this.createHash(`${name}:${type}`),
+            sourceUri,
+            type                
+        );
+
+        return this.createIfNotExists([dto])?.[0];
     }
 
     /**
@@ -121,12 +122,13 @@ export class ArtworkService {
         const name = `${album.name} ${album.primaryArtist?.name || Random.randomString(8)}`;
         const type = ArtworkType.ALBUM;
 
-        return this.createIfNotExists([{ 
-            type, 
-            sourceUri: sourceUri, 
-            sourceType: ArtworkSourceType.URL, 
-            id: this.createHash(`${name}:${type}`)
-        }])?.[0];
+        const dto = new CreateDownloadableArtworkDTO(
+            this.createHash(`${name}:${type}`),
+            sourceUri,
+            type                
+        );
+
+        return this.createIfNotExists([dto])?.[0];
     }
 
     /**
@@ -141,12 +143,13 @@ export class ArtworkService {
         const name = label.name;
         const type = ArtworkType.LABEL;
 
-        return this.createIfNotExists([{ 
-            type, 
-            sourceUri: sourceUri, 
-            sourceType: ArtworkSourceType.URL, 
-            id: this.createHash(`${name}:${type}`)
-        }])?.[0]
+        const dto = new CreateDownloadableArtworkDTO(
+            this.createHash(`${name}:${type}`),
+            sourceUri,
+            type                
+        );
+
+        return this.createIfNotExists([dto])?.[0]
     }
 
     /**
@@ -161,12 +164,13 @@ export class ArtworkService {
         const name = distributor.name;
         const type = ArtworkType.DISTRIBUTOR;
 
-        return this.createIfNotExists([{ 
-            type, 
-            sourceUri: sourceUri, 
-            sourceType: ArtworkSourceType.URL, 
-            id: this.createHash(`${name}:${type}`)
-        }])?.[0];
+        const dto = new CreateDownloadableArtworkDTO(
+            this.createHash(`${name}:${type}`),
+            sourceUri,
+            type                
+        );
+
+        return this.createIfNotExists([dto])?.[0];
     }
 
     /**
@@ -181,12 +185,13 @@ export class ArtworkService {
         const name = publisher.name;
         const type = ArtworkType.PUBLISHER;
 
-        return this.createIfNotExists([{ 
-            type, 
-            sourceUri: sourceUri, 
-            sourceType: ArtworkSourceType.URL, 
-            id: this.createHash(`${name}:${type}`)
-        }])?.[0]
+        const dto = new CreateDownloadableArtworkDTO(
+            this.createHash(`${name}:${type}`),
+            sourceUri,
+            type                
+        );
+
+        return this.createIfNotExists([dto])?.[0]
     }
 
     /**
@@ -215,16 +220,11 @@ export class ArtworkService {
             });
     }
 
-    public createDTOForSong(song: Song): CreateArtworkDTO {
+    public createDTOForSong(song: Song): CreateSongArtworkDTO {
         const name = `${ArtworkService.createSongCoverNameSchema(song)}`;
         const type = ArtworkType.SONG;
-        const sourceType = ArtworkSourceType.SONG;
-
-        return {
-            type,
-            sourceType,
-            id: this.createHash(`${name}:${type}:${sourceType}`)
-        };
+        const dto = new CreateSongArtworkDTO(this.createHash(`${name}:${type}`));
+        return dto;
     }
 
     public createHash(input: string): string {
@@ -391,14 +391,6 @@ export class ArtworkService {
             .where("id IN (:artworkIds)", { artworkIds })
             .execute().then((updateResult) => updateResult.affected > 0);
     }
-
-    // public async removeSourceInfos(artworkIds: string[]): Promise<boolean> {
-    //     return this.repository.createQueryBuilder()
-    //         .update()
-    //         .set({ sourceType: null, sourceUri: null })
-    //         .where("id IN (:artworkIds)", { artworkIds })
-    //         .execute().then((updateResult) => updateResult.affected > 0)
-    // }
 
     /**
      * Resolve the parameter to an artwork entity.

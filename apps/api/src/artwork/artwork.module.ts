@@ -3,7 +3,7 @@ import { Module, OnModuleInit } from '@nestjs/common';
 import { ArtworkController } from './controllers/artwork.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ArtworkService } from './services/artwork.service';
-import { Artwork } from './entities/artwork.entity';
+import { AlbumArtwork, ArtistArtwork, Artwork, DownloadableArtwork, SongArtwork } from './entities/artwork.entity';
 import { PipelineModule } from '@soundcore/pipelines';
 import { ScheduleModule } from '@nestjs/schedule';
 import { ArtworkBackgroundService } from './services/background.service';
@@ -16,7 +16,13 @@ import { ArtworkBackgroundService } from './services/background.service';
   ],
   imports: [
     ScheduleModule,
-    TypeOrmModule.forFeature([ Artwork ]),
+    TypeOrmModule.forFeature([ 
+      Artwork, 
+      SongArtwork, 
+      AlbumArtwork, 
+      ArtistArtwork, 
+      DownloadableArtwork 
+    ]),
     PipelineModule.registerPipelines({
       pipelines: [
         path.join(__dirname, "pipelines", "artwork.pipeline.js")

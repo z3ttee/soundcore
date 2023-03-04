@@ -12,7 +12,7 @@ import { Slug } from "@tsalliance/utilities";
 import { GeniusFlag, GeniusResource, Resource, ResourceFlag, ResourceType } from "../../utils/entities/resource";
 import { LikedSong } from "../../collection/entities/like.entity";
 import { File } from "../../file/entities/file.entity";
-import { Artwork } from "../../artwork/entities/artwork.entity";
+import { Artwork, SongArtwork } from "../../artwork/entities/artwork.entity";
 import { Syncable, SyncFlag } from "../../meilisearch/interfaces/syncable.interface";
 import { TracklistItem } from "../../tracklist/entities/tracklist.entity";
 
@@ -103,9 +103,9 @@ export class Song implements SongID, Resource, Syncable, GeniusResource, Trackli
     @JoinColumn()
     public file: File;
 
-    @ManyToOne(() => Artwork, { onDelete: "SET NULL", nullable: true })
+    @ManyToOne(() => SongArtwork, { onDelete: "SET NULL", nullable: true })
     @JoinColumn({ name: SONG_ARTWORK_RELATION_FK })
-    public artwork: Artwork;
+    public artwork: SongArtwork;
 
     @ManyToOne(() => Artist, { onDelete: "SET NULL", nullable: true })
     @JoinColumn()

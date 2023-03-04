@@ -1,6 +1,6 @@
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { Album } from "../../album/entities/album.entity";
-import { Artwork } from "../../artwork/entities/artwork.entity";
+import { ArtistArtwork, Artwork } from "../../artwork/entities/artwork.entity";
 import { GeniusFlag, GeniusResource, Resource, ResourceFlag, ResourceType } from "../../utils/entities/resource";
 import { Syncable, SyncFlag } from "../../meilisearch/interfaces/syncable.interface";
 import { Song } from "../../song/entities/song.entity";
@@ -54,9 +54,9 @@ export class Artist implements Resource, Syncable, GeniusResource {
     @OneToMany(() => Album, (a) => a.primaryArtist)
     public albums: Album[];
 
-    @ManyToOne(() => Artwork, { onDelete: "SET NULL" })
+    @ManyToOne(() => ArtistArtwork, { onDelete: "SET NULL" })
     @JoinColumn()
-    public artwork: Artwork;
+    public artwork: ArtistArtwork;
 
     @OneToMany(() => Song, (song) => song.primaryArtist, { cascade: ["insert", "update"] })
     public songs: Song[];

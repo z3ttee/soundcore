@@ -8,7 +8,7 @@ import { IndexerProcessDTO } from "../dtos/indexer-process.dto";
 import { Artist } from "../../artist/entities/artist.entity";
 import { AlbumService } from "../../album/services/album.service";
 import { ArtworkService } from "../../artwork/services/artwork.service";
-import { Artwork } from "../../artwork/entities/artwork.entity";
+import { Artwork, SongArtwork } from "../../artwork/entities/artwork.entity";
 import { InternalServerErrorException, Logger } from "@nestjs/common";
 import { FileService } from "../../file/services/file.service";
 import { EventEmitter2 } from "@nestjs/event-emitter";
@@ -320,7 +320,7 @@ async function createArtworks(songs: Song[], artworkService: ArtworkService, son
     return artworkService.createIfNotExists(collectedArtworks).then((artworks) => {
         for(let i = 0; i < songs.length; i++) {
             // Update artwork relation for song
-            songs[i].artwork = <Artwork>{ 
+            songs[i].artwork = <SongArtwork>{ 
                 id: song2artwork.get(songs[i].id)
             };
         }
