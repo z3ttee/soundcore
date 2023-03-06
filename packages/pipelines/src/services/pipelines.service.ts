@@ -60,6 +60,7 @@ export class PipelineService {
 
         // Listen on enqueued event
         this.on("enqueued", (position, { pipeline }) => {
+            this.events.fireEvent("status", { pipeline });
             this.logger.log(`Enqueued pipeline '${pipeline.id}' with run id '${pipeline.runId}' (Position: ${position})`);
         });
         this.on("dequeued", ({ pipeline }) => {
