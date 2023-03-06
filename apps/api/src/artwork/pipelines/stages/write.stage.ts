@@ -5,15 +5,8 @@ import { File } from "../../../file/entities/file.entity";
 import { FileService } from "../../../file/services/file.service";
 import { FileSystemService } from "../../../filesystem/services/filesystem.service";
 import { SongService } from "../../../song/services/song.service";
-import { Artwork, ArtworkFlag, ArtworkType, SongArtwork } from "../../entities/artwork.entity";
+import { ArtworkDTO, ArtworkFlag, ArtworkType, ArtworkWithColorDTO, ArtworkWriteResult } from "../../entities/artwork.entity";
 import { ArtworkService } from "../../services/artwork.service";
-
-type ArtworkDTO = Pick<Artwork, "id"> & Pick<Artwork, "type"> & Partial<Pick<SongArtwork, "songs">>;
-type ArtworkWithColorDTO = Pick<Artwork, "id"> & Pick<Artwork, "type"> & Pick<Artwork, "accentColor"> & Pick<Artwork, "flag"> & Partial<Pick<SongArtwork, "songs">>;
-export type ArtworkWriteResult = {
-    succeeded: ArtworkWithColorDTO[];
-    errored: ArtworkDTO[];
-}
 
 /**
  * Writing artworks step. This will download or extract the artwork

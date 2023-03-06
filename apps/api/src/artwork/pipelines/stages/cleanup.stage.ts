@@ -1,9 +1,8 @@
 import { Batch } from "@soundcore/common";
 import { getOrDefault, progress, StepParams } from "@soundcore/pipelines";
 import { DataSource } from "typeorm";
-import { Artwork, ArtworkFlag } from "../../entities/artwork.entity";
+import { Artwork, ArtworkFlag, ArtworkWriteResult } from "../../entities/artwork.entity";
 import { ARTWORK_STAGE_PROCESS_ARTWORKS_ID, ARTWORK_STEP_WRITE_ARTWORKS_ID } from "../constants";
-import { ArtworkWriteResult } from "./write.stage";
 
 export async function step_update_succeeded_artworks(params: StepParams) {
     const { resources, logger } = params;

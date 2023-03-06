@@ -27,6 +27,13 @@ export interface ArtworkID {
     id: string;
 }
 
+export type ArtworkDTO = Pick<Artwork, "id"> & Pick<Artwork, "type"> & Partial<Pick<SongArtwork, "songs">>;
+export type ArtworkWithColorDTO = Pick<Artwork, "id"> & Pick<Artwork, "type"> & Pick<Artwork, "accentColor"> & Pick<Artwork, "flag"> & Partial<Pick<SongArtwork, "songs">>;
+export type ArtworkWriteResult = {
+    succeeded: ArtworkWithColorDTO[];
+    errored: ArtworkDTO[];
+}
+
 @Entity()
 @TableInheritance({ column: "type" })
 export abstract class Artwork {

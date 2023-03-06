@@ -18,7 +18,6 @@ import { Publisher } from "../../publisher/entities/publisher.entity";
 import { Response } from "express";
 import { InjectRepository } from "@nestjs/typeorm";
 import { FileSystemService } from "../../filesystem/services/filesystem.service";
-import { ArtworkSourceType } from "../dtos/artwork-process.dto";
 import { TasksService } from "../../tasks/services/tasks.service";
 
 @Injectable()
@@ -56,13 +55,6 @@ export class ArtworkService {
         return this.repository.createQueryBuilder("artwork")
             .whereInIds(ids)
             .getOne();
-    }
-
-    /**
-     * @deprecated 
-     */
-    public async findByFlagAndSourceTypeIdOnly(flag: ArtworkFlag, sourceType: ArtworkSourceType): Promise<Artwork[]> {
-        return [];
     }
 
     /**

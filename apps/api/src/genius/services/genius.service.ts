@@ -3,7 +3,6 @@ import { OnEvent } from '@nestjs/event-emitter';
 import { Album } from '../../album/entities/album.entity';
 import { Artist } from '../../artist/entities/artist.entity';
 import { EVENT_METADATA_CREATED } from '../../constants';
-import { IndexerResultDTO } from '../../indexer/dtos/indexer-result.dto';
 import { Song } from '../../song/entities/song.entity';
 
 @Injectable()
@@ -13,7 +12,7 @@ export class GeniusService {
     constructor() {}
     
     @OnEvent(EVENT_METADATA_CREATED)
-    public async handleMetadataCreatedEvent(payload: IndexerResultDTO) {
+    public async handleMetadataCreatedEvent(payload: any) {
         // if(payload?.createdSong) this.createSongLookupJob(payload.createdSong);
         // if(payload?.createdAlbum) this.createAlbumLookupJob(payload.createdAlbum);
         // if(payload?.createdArtists && payload.createdArtists.length > 0) {
