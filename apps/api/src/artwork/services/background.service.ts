@@ -1,10 +1,10 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { OnEvent } from "@nestjs/event-emitter";
 import { PipelineService } from "@soundcore/pipelines";
-import { EVENT_TRIGGER_ARTWORK_PROCESS } from "../../constants";
+import { EVENT_TRIGGER_ARTWORK_PROCESS_SONGS } from "../../constants";
 import { Task } from "../../tasks/entities/task.entity";
 import { TasksService } from "../../tasks/services/tasks.service";
-import { ArtworkFlag } from "../entities/artwork.entity";
+import { ArtworkFlag, ArtworkType } from "../entities/artwork.entity";
 import { ArtworkPipelineEnv } from "../pipelines/artwork.pipeline";
 import { ARTWORK_PIPELINE_ID } from "../pipelines/constants";
 import { ArtworkService } from "./artwork.service";
@@ -87,8 +87,8 @@ export class ArtworkBackgroundService {
      * fetching all artworks with AWAITING flag
      * to process them.
      */
-    @OnEvent(EVENT_TRIGGER_ARTWORK_PROCESS)
+    @OnEvent(EVENT_TRIGGER_ARTWORK_PROCESS_SONGS)
     public triggerArtworkProcess() {
-        this.createPipelineRun();
+        this.createPipelineRun({ withTypesOnly: [ ArtworkType.SONG ] });
     }
 }

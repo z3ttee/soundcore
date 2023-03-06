@@ -3,10 +3,9 @@ import { FileSystemService } from "../../../filesystem/services/filesystem.servi
 import { Batch } from "@soundcore/common";
 import { STAGE_METADATA_ID, STEP_CREATE_SONGS_ID } from "../../pipelines";
 import { getOrDefault, progress, StepParams } from "@soundcore/pipelines";
-import { Artwork } from "../../../artwork/entities/artwork.entity";
+import { Artwork, SongArtwork } from "../../../artwork/entities/artwork.entity";
 import { ArtworkService } from "../../../artwork/services/artwork.service";
 import { Song, SONG_ARTWORK_RELATION_FK } from "../../../song/entities/song.entity";
-import { CreateArtworkDTO } from "../../../artwork/dtos/create-artwork.dto";
 import { ResultSetHeader } from "mysql2";
 
 /**
@@ -41,14 +40,15 @@ export async function step_create_artwork_entities(params: StepParams) {
 
         // Get repositories
         const artworkRepo = manager.getRepository(Artwork);
+        const songArtworkRepo = manager.getRepository(SongArtwork);
         const songRepo = manager.getRepository(Song);
 
         // Create service instances
-        const artworkService = new ArtworkService(artworkRepo, fsService, null);
+        const artworkService = new ArtworkService(artworkRepo, songArtworkRepo, fsService, null);
 
         const artwork2song: Map<string, string[]> = new Map();
         const result: Map<string, Song> = new Map();
-        const dtos: CreateArtworkDTO[] = [];    
+        const dtos: SongArtwork[] = [];    
         
         // Loop through songs in batch to create artwork dtos
         // that are then saved in the database.
@@ -72,7 +72,7 @@ export async function step_create_artwork_entities(params: StepParams) {
         try {
             // Insert dtos into database if they do not exist 
             // and return artworks only with their id
-            await artworkService.createIfNotExists(dtos, (query, alias) => query.select([`${alias}.id`])).then((artworks) => {
+            await artworkService.createForSongsIfNotExists(dtos, (query, alias) => query.select([`${alias}.id`])).then((artworks) => {
                 // Loop through created artworks and map
                 // artwork ids to song
                 for(const artwork of artworks) {

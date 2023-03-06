@@ -43,6 +43,15 @@ export class FileService {
             .getOne();
     }
 
+    public async findBySongIdsForArtworkProcessing(songIds: string[]): Promise<File[]> {
+        return this.repository.createQueryBuilder("file")
+            .leftJoin("file.song", "song").addSelect(["song.id"])
+            .leftJoin("file.mount", "mount").addSelect(["mount.id", "mount.name", "mount.directory"])
+            .leftJoin("song.artwork", "artwork").addSelect(["artwork.id"])
+            .where("song.id IN(:songIds)", { songIds: songIds })
+            .getMany();
+    }
+
     public async findByFlag(flag: FileFlag) {
         return this.repository.createQueryBuilder("file")
             .leftJoin("file.mount", "mount").addSelect(["mount.id", "mount.name", "mount.directory"])

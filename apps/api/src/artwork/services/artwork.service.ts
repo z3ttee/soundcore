@@ -5,8 +5,8 @@ import path from "path";
 import Vibrant from "node-vibrant";
 import axios from "axios";
 import { Injectable, InternalServerErrorException, Logger, NotFoundException } from "@nestjs/common";
-import { CreateArtistArtworkDTO, CreateArtworkDTO, CreateDownloadableArtworkDTO, CreateSongArtworkDTO } from "../dtos/create-artwork.dto";
-import { Artwork, ArtworkFlag, ArtworkID, ArtworkType } from "../entities/artwork.entity";
+import { CreateArtworkDTO, CreateDownloadableArtworkDTO } from "../dtos/create-artwork.dto";
+import { Artwork, ArtworkFlag, ArtworkID, ArtworkType, SongArtwork } from "../entities/artwork.entity";
 import { Random } from "@tsalliance/utilities";
 import { DeleteResult, Repository, SelectQueryBuilder } from "typeorm";
 import { Artist } from "../../artist/entities/artist.entity";
@@ -27,6 +27,8 @@ export class ArtworkService {
 
     constructor(
         @InjectRepository(Artwork) private readonly repository: Repository<Artwork>,
+        @InjectRepository(SongArtwork) private readonly songArtworkRepo: Repository<SongArtwork>,
+
         private readonly fileSystem: FileSystemService,
         private readonly taskService: TasksService,
     ) {}
@@ -70,6 +72,7 @@ export class ArtworkService {
      * Should always be called in separate process, as its blocking.
      * @param createArtworkDto Creation and Find options
      * @returns Artwork
+     * @deprecated Use createIfNotExistsV2()
      */
     public async createIfNotExists<T extends CreateArtworkDTO = CreateArtworkDTO>(createArtworkDtos: T[], qb?: (query: SelectQueryBuilder<Artwork>, alias: string) => SelectQueryBuilder<Artwork> ): Promise<Artwork[]> {
         return this.repository.createQueryBuilder()
@@ -83,6 +86,24 @@ export class ArtworkService {
                     
                 if(typeof qb === "function") {
                     query = qb(this.repository.createQueryBuilder(alias), alias);
+                }
+                    
+                return query.whereInIds(insertResult.raw).getMany();
+            })
+    }
+
+    public async createIfNotExistsV2<T extends Artwork = Artwork>(repository: Repository<T>, values: T[], overwrite: (keyof T)[], qb?: (query: SelectQueryBuilder<T>, alias: string) => SelectQueryBuilder<T> ): Promise<T[]> {
+        return repository.createQueryBuilder()
+            .insert()
+            .values(values as any)
+            .orUpdate(overwrite as any[], ["id"], { skipUpdateIfNoValuesChanged: false })
+            .returning(["id"])
+            .execute().then((insertResult) => {
+                const alias = "artwork";
+                let query: SelectQueryBuilder<T> = repository.createQueryBuilder(alias)
+                    
+                if(typeof qb === "function") {
+                    query = qb(query, alias);
                 }
                     
                 return query.whereInIds(insertResult.raw).getMany();
@@ -138,6 +159,7 @@ export class ArtworkService {
      * @param label Label's data
      * @param fromSource (Optional) Filepath or buffer. If not set, no artwork will be written during creation.
      * @returns Artwork
+     * @deprecated 
      */
     public async createForLabelIfNotExists(label: Label, sourceUri: string): Promise<Artwork> {
         const name = label.name;
@@ -159,6 +181,7 @@ export class ArtworkService {
      * @param distributor Distributor's data
      * @param fromSource (Optional) Filepath or buffer. If not set, no artwork will be written during creation.
      * @returns Artwork
+     * @deprecated 
      */
     public async createForDistributorIfNotExists(distributor: Distributor, sourceUri: string): Promise<Artwork> {
         const name = distributor.name;
@@ -180,6 +203,7 @@ export class ArtworkService {
      * @param publisher Publisher's data
      * @param fromSource (Optional) Filepath or buffer. If not set, no artwork will be written during creation.
      * @returns Artwork
+     * @deprecated 
      */
      public async createForPublisherIfNotExists(publisher: Publisher, sourceUri: string): Promise<Artwork> {
         const name = publisher.name;
@@ -195,15 +219,12 @@ export class ArtworkService {
     }
 
     /**
-     * Function that calls the native createIfNotExists() function but with 
-     * preconfigured options to fit requirements for song artworks.
-     * Should always be called in separate process, as its blocking.
-     * @param song Song's data
-     * @param fromSource (Optional) Filepath or buffer. If not set, no artwork will be written during creation.
-     * @returns Artwork
+     * Create artworks in the database that belong to a song. Those artworks have special attributes.
+     * @param artworks Set of artworks to create
+     * @param qb Custom select query to customize returned entities after creation
      */
-    public async createForSongIfNotExists(song: Song): Promise<Artwork> {
-        return this.createIfNotExists([this.createDTOForSong(song)])?.[0]
+    public async createForSongsIfNotExists(artworks: SongArtwork[], qb?: (query: SelectQueryBuilder<SongArtwork>, alias: string) => SelectQueryBuilder<SongArtwork> ): Promise<SongArtwork[]> {
+        return this.createIfNotExistsV2(this.songArtworkRepo, artworks, ["flag"], qb);
     }
 
     /**
@@ -220,11 +241,14 @@ export class ArtworkService {
             });
     }
 
-    public createDTOForSong(song: Song): CreateSongArtworkDTO {
+    public createDTOForSong(song: Song): SongArtwork {
         const name = `${ArtworkService.createSongCoverNameSchema(song)}`;
         const type = ArtworkType.SONG;
-        const dto = new CreateSongArtworkDTO(this.createHash(`${name}:${type}`));
-        return dto;
+
+        const artwork = this.songArtworkRepo.create();
+        artwork.id = this.createHash(`${name}:${type}`);
+
+        return artwork;
     }
 
     public createHash(input: string): string {
@@ -264,8 +288,8 @@ export class ArtworkService {
      * @param artwork Destination artwork object
      * @returns Artwork
      */
-    public async writeFromBufferOrFile(bufferOrFile: string | Buffer, artwork: Artwork): Promise<Artwork> {
-        return new Promise<Artwork>((resolve, reject) => {
+    public async writeFromBufferOrFile(bufferOrFile: string | Buffer, artwork: ArtworkID): Promise<ArtworkID> {
+        return new Promise((resolve, reject) => {
             const dstFile = this.fileSystem.resolveArtworkDir(artwork);
             let srcBuffer: Buffer;
 
@@ -305,10 +329,8 @@ export class ArtworkService {
      * @param idOrObject Artwork id or object to extract colors from
      * @returns ArtworkColors
      */
-     public async extractAccentColor(idOrObject: Artwork): Promise<string> {
-        const artwork = await this.resolveArtwork(idOrObject);
+     public async extractAccentColor(artwork: Pick<Artwork, "id">): Promise<string> {
         if(!artwork) return null;
-
         const filepath = this.fileSystem.resolveArtworkDir(artwork);
 
         return new Promise((resolve, reject) => {

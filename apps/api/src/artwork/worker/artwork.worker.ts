@@ -36,7 +36,7 @@ async function createFromSong(artworkIds: string[]): Promise<ArtworkProcessResul
         const artworkRepo = datasource.getRepository(Artwork);
         const songRepo = datasource.getRepository(Song);
 
-        const artworkService = new ArtworkService(artworkRepo, fsService, null);
+        const artworkService = new ArtworkService(artworkRepo, null, fsService, null);
         const songService = new SongService(songRepo, null);
 
         // return Batch.of(artworkIds, 10).do(async (batch) => {
@@ -61,23 +61,23 @@ async function createFromSong(artworkIds: string[]): Promise<ArtworkProcessResul
         //         const tags = await songService.readID3TagsFromFile(filepath);
         //         const buffer = tags.cover;
 
-        //         await artworkService.writeFromBufferOrFile(buffer, song.artwork).then(async (artwork) => {
-        //             // TODO: Better logging
-        //             const color = await artworkService.extractAccentColor(artwork).catch((error: Error) => {
-        //                 console.error(error);
-        //                 return null;
-        //             });
+                // await artworkService.writeFromBufferOrFile(buffer, song.artwork).then(async (artwork) => {
+                //     // TODO: Better logging
+                //     const color = await artworkService.extractAccentColor(artwork).catch((error: Error) => {
+                //         console.error(error);
+                //         return null;
+                //     });
 
-        //             artwork.accentColor = color ?? artwork.accentColor;
-        //             artwork.flag = ArtworkFlag.OK;
+                //     artwork.accentColor = color ?? artwork.accentColor;
+                //     artwork.flag = ArtworkFlag.OK;
 
-        //             succeededArtworks.push(artwork.id);
-        //             succeededArtworkEntities.push(artwork);
-        //         }).catch((error: Error) => {
-        //             erroredArtworks.push(song.artwork.id);
-        //             console.error(error);
-        //             throw new InternalServerErrorException(`Failed writing artwork to file ${filepath}: ${error.message}`, error.stack);
-        //         });
+                //     succeededArtworks.push(artwork.id);
+                //     succeededArtworkEntities.push(artwork);
+                // }).catch((error: Error) => {
+                //     erroredArtworks.push(song.artwork.id);
+                //     console.error(error);
+                //     throw new InternalServerErrorException(`Failed writing artwork to file ${filepath}: ${error.message}`, error.stack);
+                // });
         //     }
                     
         //     return artworkService.setFlags([...erroredArtworks], ArtworkFlag.ERROR).then(() => {
@@ -118,7 +118,7 @@ async function continueProcessing(job: WorkerJobRef<ArtworkProcessDTO>): Promise
         const fsService = new FileSystemService();
 
         const artworkRepo = datasource.getRepository(Artwork);
-        const artworkService = new ArtworkService(artworkRepo, fsService, null);
+        const artworkService = new ArtworkService(artworkRepo, null, fsService, null);
         const processResult: ArtworkProcessResultDTO = {
             artworks: [],
             timeTookMs: -1

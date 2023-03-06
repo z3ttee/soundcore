@@ -1,8 +1,7 @@
-import { Artwork, ArtworkType, DownloadableArtwork, SongArtwork } from "../entities/artwork.entity";
+import { Artwork, ArtworkType, DownloadableArtwork } from "../entities/artwork.entity";
 
 export class CreateArtworkDTO implements 
     Pick<Artwork, "id">,
-    Pick<Artwork, "type">,
     Partial<Pick<Artwork, "accentColor">>
 {
 
@@ -12,12 +11,6 @@ export class CreateArtworkDTO implements
         public accentColor?: string
     ) {}
 
-}
-
-export class CreateSongArtworkDTO extends CreateArtworkDTO {
-    constructor(id: string, accentColor?: string) {
-        super(id, ArtworkType.SONG, accentColor);
-    }
 }
 
 export class CreateArtistArtworkDTO extends CreateArtworkDTO {

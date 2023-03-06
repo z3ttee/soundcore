@@ -116,7 +116,8 @@ export class FileSystemService {
      * @param artwork Artwork database entry
      * @returns Absolute filepath
      */
-    public resolveArtworkDir(artwork: Artwork): string {
+    public resolveArtworkDir(artwork: Pick<Artwork, "id">): string {
+        console.log(artwork)
         return path.join(this.resolveArtworkRootDir(), `${artwork.id}.jpeg`);
     }
 

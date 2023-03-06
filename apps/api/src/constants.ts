@@ -27,7 +27,7 @@ export const TYPEORM_CONNECTION_INDEXER = "indexer-connection"
 export const TYPEORM_CONNECTION_GENERAL = "default"
 
 // Internal events
-export const EVENT_TRIGGER_ARTWORK_PROCESS = "trigger-artwork-process";
+export const EVENT_TRIGGER_ARTWORK_PROCESS_SONGS = "trigger-artwork-process-for-songs";
 
 export const EVENT_FILES_FOUND = "files-found-event"
 export const EVENT_FILES_PROCESSED = "files-processed-event"
