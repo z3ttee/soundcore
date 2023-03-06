@@ -5,11 +5,11 @@ import { File } from "../../../file/entities/file.entity";
 import { FileService } from "../../../file/services/file.service";
 import { FileSystemService } from "../../../filesystem/services/filesystem.service";
 import { SongService } from "../../../song/services/song.service";
-import { Artwork, ArtworkType, SongArtwork } from "../../entities/artwork.entity";
+import { Artwork, ArtworkFlag, ArtworkType, SongArtwork } from "../../entities/artwork.entity";
 import { ArtworkService } from "../../services/artwork.service";
 
 type ArtworkDTO = Pick<Artwork, "id"> & Pick<Artwork, "type"> & Partial<Pick<SongArtwork, "songs">>;
-type ArtworkWithColorDTO = Pick<Artwork, "id"> & Pick<Artwork, "type"> & Pick<Artwork, "accentColor"> & Partial<Pick<SongArtwork, "songs">>;
+type ArtworkWithColorDTO = Pick<Artwork, "id"> & Pick<Artwork, "type"> & Pick<Artwork, "accentColor"> & Pick<Artwork, "flag"> & Partial<Pick<SongArtwork, "songs">>;
 export type ArtworkWriteResult = {
     succeeded: ArtworkWithColorDTO[];
     errored: ArtworkDTO[];
@@ -56,7 +56,11 @@ export async function step_write_artworks(params: StepParams) {
     } as ArtworkWriteResult);
 }
 
-
+/**
+ * Extract artwork file embedded into a mp3 file
+ * @param dtos List of artworks to extract artwork for
+ * @param params Params of the current step
+ */
 async function extract_from_mp3_file(dtos: ArtworkDTO[], params: StepParams): Promise<ArtworkWriteResult> {
     const { logger, resources } = params;
 
@@ -103,6 +107,7 @@ async function extract_from_mp3_file(dtos: ArtworkDTO[], params: StepParams): Pr
                     });
 
                     artwork.accentColor = color ?? artwork.accentColor;
+                    artwork.flag = ArtworkFlag.OK;
                     succeededArtworks.push(artwork);
                 }).catch((error: Error) => {
                     erroredArtworks.push(artwork);

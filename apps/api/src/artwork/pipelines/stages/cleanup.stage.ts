@@ -1,20 +1,31 @@
 import { Batch } from "@soundcore/common";
-import { getOrDefault, StepParams } from "@soundcore/pipelines";
+import { getOrDefault, progress, StepParams } from "@soundcore/pipelines";
 import { DataSource } from "typeorm";
-import { Artwork } from "../../entities/artwork.entity";
+import { Artwork, ArtworkFlag } from "../../entities/artwork.entity";
 import { ARTWORK_STAGE_PROCESS_ARTWORKS_ID, ARTWORK_STEP_WRITE_ARTWORKS_ID } from "../constants";
 import { ArtworkWriteResult } from "./write.stage";
 
 export async function step_update_succeeded_artworks(params: StepParams) {
-    const resources = params.resources;
+    const { resources, logger } = params;
     const artworks: ArtworkWriteResult = getOrDefault(`${ARTWORK_STAGE_PROCESS_ARTWORKS_ID}.${ARTWORK_STEP_WRITE_ARTWORKS_ID}.artworks`, { errored: [], succeeded: [] });
 
     const datasource: DataSource = resources.datasource;
     const artworkRepo = datasource.getRepository(Artwork);
 
-    console.log(artworks);
-
-
+    return Batch.useDataset(artworks.succeeded).onError((err, _, batchNr) => {
+        logger.error(`Failed processing batch #${batchNr}: ${err.message}`);
+    }).forEach((batch, current, total) => {
+        return artworkRepo.save(batch).then((results) => {
+            return batch;
+        }).finally(() => {
+            progress(current/total);
+        })
+    }).then((result) => {
+        logger.info(`Successfully updated ${result.length} succeeded artworks`);
+    }).catch((error: Error) => {
+        logger.error(`Failed updating status for succeeded artworks: ${error.message}`);
+        throw error;
+    })
 }
 
 export async function step_update_errored_artworks(params: StepParams) {
@@ -24,18 +35,23 @@ export async function step_update_errored_artworks(params: StepParams) {
     const datasource: DataSource = resources.datasource;
     const artworkRepo = datasource.getRepository(Artwork);
 
-    console.log(artworks);
-
     return Batch.useDataset(artworks.errored).onError((err, _, batchNr) => {
         logger.error(`Failed processing batch #${batchNr}: ${err.message}`, err.stack);
     }).forEach((batch, current, total) => {
         return artworkRepo.createQueryBuilder()
             .update()
-            .set({ flag: Artw })
+            .set({ flag: ArtworkFlag.ERROR })
+            .whereInIds(artworks)
+            .execute().then((updateResult) => {
+                logger.info(`Marked ${updateResult.affected} artworks as ERRORED`);
+                return batch;
+            }).finally(() => {
+                progress(current/total);
+            })
     }).then((result) => {
-        logger.info(`Successfully updated ${result.length} succeeded artworks`);
+        logger.info(`Successfully updated ${result.length} errored artworks`);
     }).catch((error: Error) => {
-        logger.error(`Failed updating status for succeeded artworks: ${error.message}`);
+        logger.error(`Failed updating status for errored artworks: ${error.message}`);
         throw error;
     });
 }

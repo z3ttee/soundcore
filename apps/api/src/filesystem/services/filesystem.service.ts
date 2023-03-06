@@ -117,7 +117,6 @@ export class FileSystemService {
      * @returns Absolute filepath
      */
     public resolveArtworkDir(artwork: Pick<Artwork, "id">): string {
-        console.log(artwork)
         return path.join(this.resolveArtworkRootDir(), `${artwork.id}.jpeg`);
     }
 

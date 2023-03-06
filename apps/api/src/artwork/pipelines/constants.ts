@@ -26,5 +26,8 @@ export const ARTWORK_STEP_WRITE_ARTWORKS_NAME = "Write artworks";
 export const ARTWORK_STAGE_CLEANUP_ARTWORKS_ID = "cleanup-artworks";
 export const ARTWORK_STAGE_CLEANUP_ARTWORKS_NAME = "Cleanup artworks";
 
-export const ARTWORK_STEP_UPDATE_ARTWORKS_ID = "update-artworks";
-export const ARTWORK_STEP_UPDATE_ARTWORKS_NAME = "Update artwork statuses";
+export const ARTWORK_STEP_UPDATE_SUCCEEDED_ARTWORKS_ID = "update-succeeded-artworks";
+export const ARTWORK_STEP_UPDATE_SUCCEEDED_ARTWORKS_NAME = "Update succeeded artworks";
+
+export const ARTWORK_STEP_UPDATE_ERRORED_ARTWORKS_ID = "update-errored-artworks";
+export const ARTWORK_STEP_UPDATE_ERRORED_ARTWORKS_NAME = "Update errored artworks";

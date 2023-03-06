@@ -1,9 +1,9 @@
 import { pipeline } from "@soundcore/pipelines";
 import Database from "../../utils/database/database-worker-client";
 import { Artwork, ArtworkFlag, ArtworkType } from "../entities/artwork.entity";
-import { ARTWORK_PIPELINE_ID, ARTWORK_PIPELINE_NAME, ARTWORK_STAGE_CHECKOUT_ARTWORKS_ID, ARTWORK_STAGE_CHECKOUT_ARTWORKS_NAME, ARTWORK_STAGE_CLEANUP_ARTWORKS_ID, ARTWORK_STAGE_CLEANUP_ARTWORKS_NAME, ARTWORK_STAGE_PROCESS_ARTWORKS_ID, ARTWORK_STAGE_PROCESS_ARTWORKS_NAME, ARTWORK_STEP_FETCH_ARTWORKS_BY_FLAGS_ID, ARTWORK_STEP_FETCH_ARTWORKS_BY_FLAGS_NAME, ARTWORK_STEP_FETCH_ARTWORKS_BY_TYPE_ID, ARTWORK_STEP_FETCH_ARTWORKS_BY_TYPE_NAME, ARTWORK_STEP_FETCH_ARTWORKS_ID, ARTWORK_STEP_FETCH_ARTWORKS_NAME, ARTWORK_STEP_FETCH_SELECTED_ARTWORKS_ID, ARTWORK_STEP_FETCH_SELECTED_ARTWORKS_NAME, ARTWORK_STEP_WRITE_ARTWORKS_ID, ARTWORK_STEP_WRITE_ARTWORKS_NAME } from "./constants";
+import { ARTWORK_PIPELINE_ID, ARTWORK_PIPELINE_NAME, ARTWORK_STAGE_CHECKOUT_ARTWORKS_ID, ARTWORK_STAGE_CHECKOUT_ARTWORKS_NAME, ARTWORK_STAGE_CLEANUP_ARTWORKS_ID, ARTWORK_STAGE_CLEANUP_ARTWORKS_NAME, ARTWORK_STAGE_PROCESS_ARTWORKS_ID, ARTWORK_STAGE_PROCESS_ARTWORKS_NAME, ARTWORK_STEP_FETCH_ARTWORKS_BY_FLAGS_ID, ARTWORK_STEP_FETCH_ARTWORKS_BY_FLAGS_NAME, ARTWORK_STEP_FETCH_ARTWORKS_BY_TYPE_ID, ARTWORK_STEP_FETCH_ARTWORKS_BY_TYPE_NAME, ARTWORK_STEP_FETCH_ARTWORKS_ID, ARTWORK_STEP_FETCH_ARTWORKS_NAME, ARTWORK_STEP_FETCH_SELECTED_ARTWORKS_ID, ARTWORK_STEP_FETCH_SELECTED_ARTWORKS_NAME, ARTWORK_STEP_UPDATE_ERRORED_ARTWORKS_ID, ARTWORK_STEP_UPDATE_ERRORED_ARTWORKS_NAME, ARTWORK_STEP_UPDATE_SUCCEEDED_ARTWORKS_ID, ARTWORK_STEP_UPDATE_SUCCEEDED_ARTWORKS_NAME, ARTWORK_STEP_WRITE_ARTWORKS_ID, ARTWORK_STEP_WRITE_ARTWORKS_NAME } from "./constants";
 import { step_checkout_artworks, step_checkout_types_only_artworks } from "./stages/checkout.stage";
-import { step_update_artworks } from "./stages/cleanup.stage";
+import { step_update_errored_artworks, step_update_succeeded_artworks } from "./stages/cleanup.stage";
 import { step_write_artworks } from "./stages/write.stage";
 
 export interface ArtworkPipelineEnv {
@@ -53,10 +53,12 @@ export default pipeline(ARTWORK_PIPELINE_ID, ARTWORK_PIPELINE_NAME, "Extract or 
         return step_write_artworks(params);
     }).next()
     /**
-     * Write artwork
+     * Cleanup artworks
      */
     .stage(ARTWORK_STAGE_CLEANUP_ARTWORKS_ID, ARTWORK_STAGE_CLEANUP_ARTWORKS_NAME, "Update artwork statuses")
     .useResources(() => Database.connect().then((datasource) => ({ datasource })))
-    .step(ARTWORK_STEP_WRITE_ARTWORKS_ID, ARTWORK_STEP_WRITE_ARTWORKS_NAME, "Update artwork statuses").run((params) => {
-        return step_update_artworks(params);
+    .step(ARTWORK_STEP_UPDATE_SUCCEEDED_ARTWORKS_ID, ARTWORK_STEP_UPDATE_SUCCEEDED_ARTWORKS_NAME, "Update succeeded artworks").run((params) => {
+        return step_update_succeeded_artworks(params);
+    }).step(ARTWORK_STEP_UPDATE_ERRORED_ARTWORKS_ID, ARTWORK_STEP_UPDATE_ERRORED_ARTWORKS_NAME, "Update errored artworks").run((params) => {
+        return step_update_errored_artworks(params);
     }).next()
