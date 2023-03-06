@@ -11,8 +11,8 @@
       "outputs": ["dist/**"],
       "cache": true
     },
-    "build:packages": {
-      "dependsOn": ["^build:packages"],
+    "build:package": {
+      "dependsOn": ["^build:package"],
       "outputs": ["dist/**"],
       "cache": true
     },

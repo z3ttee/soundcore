@@ -24,6 +24,7 @@
     "ng": "ng",
     "start": "ng serve",
     "build:app": "ng build",
+    "build:package": "ng build",
     "watch": "ng build --watch --configuration production",
     "test": "ng test"
   },

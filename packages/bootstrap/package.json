@@ -8,6 +8,7 @@
   "main": "dist/index.js",
   "scripts": {
     "build:api": "nest build",
+    "build:package": "nest build",
     "dev": "nest build --watch",
     "publishPackage": "yarn run build:api && yarn config set version-sign-git-tag false && yarn version --patch && yarn publish --access=public"
   },
