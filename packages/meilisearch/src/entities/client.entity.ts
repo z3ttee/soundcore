@@ -15,7 +15,7 @@ export class MeiliClient extends MeiliSearch {
         this.schemas = new SchemaService(indexSchemas);
     }
 
-    public getIndexFromSchema<T extends IndexSchema = IndexSchema>(schema: IndexSchema): MeiliIndex<T> {
+    public getIndexFromSchema(schema: IndexSchema): MeiliIndex {
         return createMeiliIndex(this.config, schema) as MeiliIndex<any>;
     }
 

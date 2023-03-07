@@ -52,35 +52,6 @@ export interface PipelineWorkerResult {
 }
 
 export type PipelineEntityResolver = (pipeline: PipelineRun) => PipelineRun | Promise<PipelineRun>;
-
-// @Entity()
-// export class PipelineRun implements Omit<IPipeline, "scriptFile"> {
-
-//     // @PrimaryGeneratedColumn("uuid")
-//     public readonly runId: string;
-
-//     // @Column({ nullable: false })
-//     public id: string;
-
-//     // @Column({ nullable: false })
-//     public name: string;
-
-//     // @Column({ nullable: true })
-//     public description: string;
-
-//     // @Column({ type: "varchar", nullable: false })
-//     public status: RunStatus;
-
-//     // @Column({ type: "json", nullable: true })
-//     public environment: Environment;
-
-//     // @Column({ type: "json", nullable: false })
-//     public stages: Stage[];
-
-//     // @Column({ nullable: true })
-//     public currentStageId: string;
-
-//     @CreateDateColumn()
-//     public createdAt: number;
-
-// }
+export interface PipelineEventParams {
+    pipeline: PipelineRun
+}

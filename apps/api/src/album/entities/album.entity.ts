@@ -102,10 +102,23 @@ export class Album implements Resource {
 @IndexEntity()
 export class AlbumIndex {
 
-    @PrimaryKey()
-    public key: string;
+    @PrimaryKey({ searchable: false })
+    public id: string;
 
     @Property()
-    public test: string;
+    public name: string;
+
+    @Property()
+    public slug: string;
+
+    @Property({ searchable: false })
+    public artwork: { id: string };
+
+    @Property({ searchable: false })
+    public primaryArtist: { 
+        id: string;
+        name: string;
+        slug: string;
+    };
 
 }

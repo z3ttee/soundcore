@@ -2,9 +2,15 @@
 export const PIPELINE_ID = "meilisearch-sync-pipeline"
 export const PIPELINE_NAME = "Sync with Meilisearch"
 
-export const STAGE_CHECKOUT_ID = "checkout-resources"
-export const STAGE_CHECKOUT_NAME = "Checkout syncable resources"
+export const STAGE_SYNC_ID = "sync-resources"
+export const STAGE_SYNC_NAME = "Sync resources"
 
-export const STEP_FIND_RESOURCES_ID = "find-resources"
-export const STEP_FIND_RESOURCES_NAME = "Find syncable resources"
+export const STEP_SYNC_ARTISTS_ID = "sync-artists"
+export const STEP_SYNC_ARTISTS_NAME = "Sync artist entities"
+
+export const STEP_SYNC_ALBUMS_ID = "sync-albums"
+export const STEP_SYNC_ALBUMS_NAME = "Sync album entities"
+
+export const STEP_SYNC_SONGS_ID = "sync-songs"
+export const STEP_SYNC_SONGS_NAME = "Sync song entities"
 

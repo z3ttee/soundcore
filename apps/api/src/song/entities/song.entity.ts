@@ -16,6 +16,7 @@ import { SongArtwork } from "../../artwork/entities/artwork.entity";
 import { TracklistItem } from "../../tracklist/entities/tracklist.entity";
 import { GeniusInfo } from "../../utils/entities/genius.entity";
 import { MeilisearchInfo } from "../../utils/entities/meilisearch.entity";
+import { IndexEntity, PrimaryKey, Property } from "@soundcore/meilisearch";
 
 export interface SongID {
     id: string;
@@ -153,4 +154,44 @@ export class Song implements SongID, Resource, TracklistItem {
         if(!this.slug) Slug.create(this.name);
     }
 
+}
+
+
+@IndexEntity()
+export class SongIndex {
+    @PrimaryKey({ searchable: false })
+    public id: string;
+
+    @Property()
+    public name: string;
+
+    @Property()
+    public slug: string;
+
+    @Property()
+    public explicit: boolean;
+
+    @Property({ searchable: false })
+    public artwork: { id: string };
+
+    @Property()
+    public primaryArtist: {
+        id: string;
+        slug: string;
+        name: string;
+    };
+
+    @Property()
+    public featuredArtists: {
+        id: string;
+        slug: string;
+        name: string;
+    }[];
+
+    @Property()
+    public album: {
+        id: string;
+        slug: string;
+        name: string;
+    };
 }

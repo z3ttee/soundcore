@@ -3,18 +3,8 @@ import path from 'path';
 import { Module } from '@nestjs/common';
 import { ScheduleModule } from '@nestjs/schedule';
 import { PipelineModule } from '@soundcore/pipelines';
-import { MeilisearchGeneralService } from './services/meili.service';
+import { MeilisearchService } from './services/meili.service';
 import { EventEmitterModule } from '@nestjs/event-emitter';
-
-export interface MeilisearchOptions {
-    host: string;
-    /**
-     * Port of the meilisearch application
-     * @default 7700
-     */
-    port?: number;
-    apiKey?: string;
-}
 
 @Module({
     imports: [
@@ -28,7 +18,10 @@ export interface MeilisearchOptions {
         })
     ],
     providers: [
-        MeilisearchGeneralService
+        MeilisearchService
+    ],
+    exports: [
+        MeilisearchService
     ]
 })
 export class MeilisearchModule {}

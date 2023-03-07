@@ -5,5 +5,3 @@ export { MeiliIndex } from "./entities/index.entity";
 export { MeiliClient } from "./entities/client.entity";
 
 export * from "./decorators";
-
-export type { MeilisearchRepository } from "./repositories/meilisearch.repository";

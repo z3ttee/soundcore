@@ -1,8 +1,4 @@
-import { PipelineRun, PipelineWorkerResult } from "../entities/pipeline.entity"
-
-export interface PipelineEventParams {
-    pipeline: PipelineRun
-}
+import { PipelineEventParams, PipelineWorkerResult } from "../entities/pipeline.entity"
 
 export type PipelineEnqueuedEventHandler = (position: number, params: PipelineEventParams) => Promise<void> | void;
 export type PipelineDequeuedEventHandler = (params: PipelineEventParams) => Promise<void> | void;

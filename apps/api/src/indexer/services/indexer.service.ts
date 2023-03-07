@@ -21,7 +21,7 @@ export class IndexerService {
         })
         this.pipelines.on("completed", ({ pipeline }) => {
             console.log("Pipeline " + pipeline.id + " completed");
-            this.emitter.emit(EVENT_TRIGGER_ARTWORK_PROCESS_SONGS);
+            // this.emitter.emit(EVENT_TRIGGER_ARTWORK_PROCESS_SONGS);
             this.emitter.emit(EVENT_TRIGGER_MEILISEARCH_PROCESS_SONGS);
         })
         this.pipelines.on("status", (params) => {

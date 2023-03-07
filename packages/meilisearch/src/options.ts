@@ -1,5 +1,4 @@
 import { FactoryProvider, ModuleMetadata } from "@nestjs/common";
-import { IndexSchema } from "./definitions";
 
 export type AsyncPipelineGlobalOptions = {
     useFactory: (...args: any[]) => Promise<MeilisearchRootOptions> | MeilisearchRootOptions;
