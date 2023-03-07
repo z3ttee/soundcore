@@ -3,6 +3,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 const process = require("node:process");
 const meilisearch = require("meilisearch");
+const { off } = require("node:process");
 
 const exit = process.exit;
 
@@ -40,13 +41,13 @@ readEnvFile().then(async (buffer) => {
     let pageIndex = 0;
 
     do {
-        const limit = 5;
+        const limit = 30;
         const offset = pageIndex * limit;
 
         const page = await meiliClient.getIndexes({ limit, offset });
         if(page.results.length <= 0) break;
 
-        indexes.push(page.results[0]);
+        indexes.push(...page.results);
         pageIndex++;
     } while(true);
 

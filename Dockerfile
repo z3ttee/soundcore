@@ -58,6 +58,9 @@ COPY --from=BUILDER ${CWD}/packages/queue/package.json ${CWD}/packages/queue/pac
 COPY --from=BUILDER ${CWD}/packages/pipelines/dist ${CWD}/packages/pipelines/dist
 COPY --from=BUILDER ${CWD}/packages/pipelines/package.json ${CWD}/packages/pipelines/package.json
 
+COPY --from=BUILDER ${CWD}/packages/meilisearch/dist ${CWD}/packages/meilisearch/dist
+COPY --from=BUILDER ${CWD}/packages/meilisearch/package.json ${CWD}/packages/meilisearch/package.json
+
 # Copy root package.json because it contains workspace
 # configuration to install production deps
 COPY package.json package.json

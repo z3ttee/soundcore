@@ -39,7 +39,8 @@ export class MeilisearchModule {
     // }
 
     public static forRoot(options: MeilisearchOptions): DynamicModule {
-        const isDisabled = typeof options?.host === "undefined" || options?.host == null;
+        // const isDisabled = typeof options?.host === "undefined" || options?.host == null;
+        const isDisabled = true;
 
         const config: Config = {
             host: `${options.host}:${options.port ?? 7700}`,

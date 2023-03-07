@@ -23,7 +23,6 @@ import { ProfileModule } from './profile/profile.module';
 import { MountModule } from './mount/mount.module';
 import { FileModule } from './file/file.module';
 import { IndexerModule } from './indexer/indexer.module';
-import { MeilisearchModule } from './meilisearch/meilisearch.module';
 import { FileSystemModule } from './filesystem/filesystem.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { AppController } from './app.controller';
@@ -34,11 +33,12 @@ import { CronModule } from './cron/cron.module';
 import { CommonConfigModule, Environment } from '@soundcore/common';
 import { WorkerQueueModule } from '@soundcore/nest-queue';
 import { TracklistModule } from './tracklist/tracklist.module';
-// import { WorkerModule } from '@soundcore/worker';
 import { PipelineModule } from '@soundcore/pipelines';
 import { TasksModule } from './tasks/tasks.module';
 import { FileSystemService } from './filesystem/services/filesystem.service';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { MeilisearchModule as MeilisearchModuleNEXT } from '@soundcore/meilisearch';
+import { ConfigService } from '@nestjs/config';
+import { MeilisearchModule } from './meilisearch/meilisearch.module';
 
 @Module({
   imports: [
@@ -60,6 +60,14 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
       retryAttempts: Number.MAX_VALUE,
       retryDelay: 10000,
       charset: "utf8mb4_unicode_ci",
+    }),
+    MeilisearchModuleNEXT.forRootAsync({
+      useFactory: (configService: ConfigService) => ({
+        host: process.env.MEILISEARCH_HOST,
+        port: process.env.MEILISEARCH_PORT ? parseInt(process.env.MEILISEARCH_PORT) : null,
+        key: process.env.MEILISEARCH_KEY,
+        indexPrefix: "sc_"
+      })
     }),
     MeilisearchModule.forRoot({
       host: process.env.MEILISEARCH_HOST,

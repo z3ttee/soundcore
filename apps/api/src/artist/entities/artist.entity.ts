@@ -1,9 +1,10 @@
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { Album } from "../../album/entities/album.entity";
-import { ArtistArtwork, Artwork } from "../../artwork/entities/artwork.entity";
+import { ArtistArtwork } from "../../artwork/entities/artwork.entity";
 import { GeniusFlag, GeniusResource, Resource, ResourceFlag, ResourceType } from "../../utils/entities/resource";
 import { Syncable, SyncFlag } from "../../meilisearch/interfaces/syncable.interface";
 import { Song } from "../../song/entities/song.entity";
+import { IndexEntity } from "@soundcore/meilisearch";
 
 @Entity()
 export class Artist implements Resource, Syncable, GeniusResource {
@@ -64,5 +65,10 @@ export class Artist implements Resource, Syncable, GeniusResource {
     public songCount?: number = 0;
     public albumCount?: number = 0;
     public streamCount?: number = 0;
+
+}
+
+@IndexEntity()
+export class ArtistIndex {
 
 }

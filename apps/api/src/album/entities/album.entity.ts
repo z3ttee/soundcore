@@ -1,7 +1,7 @@
 
 import { BeforeInsert, BeforeUpdate, Column, CreateDateColumn, Entity, Index, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { Artist } from "../../artist/entities/artist.entity";
-import { AlbumArtwork, Artwork } from "../../artwork/entities/artwork.entity";
+import { AlbumArtwork } from "../../artwork/entities/artwork.entity";
 import { LikedAlbum } from "../../collection/entities/like.entity";
 import { Distributor } from "../../distributor/entities/distributor.entity";
 import { Label } from "../../label/entities/label.entity";
@@ -10,6 +10,7 @@ import { Song } from "../../song/entities/song.entity";
 import { GeniusFlag, GeniusResource, Resource, ResourceFlag, ResourceType } from "../../utils/entities/resource";
 import { Slug } from "@tsalliance/utilities";
 import { Syncable, SyncFlag } from "../../meilisearch/interfaces/syncable.interface";
+import { IndexEntity, PrimaryKey, Property } from "@soundcore/meilisearch";
 
 @Entity()
 @Index(["name", "primaryArtist"], { unique: true })
@@ -102,4 +103,15 @@ export class Album implements Resource, Syncable, GeniusResource {
     public onBeforeUpdate() {
         if(!this.slug) Slug.create(this.name);
     }
+}
+
+@IndexEntity()
+export class AlbumIndex {
+
+    @PrimaryKey()
+    public key: string;
+
+    @Property()
+    public test: string;
+
 }
