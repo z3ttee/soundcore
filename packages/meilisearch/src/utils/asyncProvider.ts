@@ -1,9 +1,10 @@
 import { Logger, Provider } from "@nestjs/common";
 import { pascalToSnakeCase } from "@soundcore/common";
-import MeiliSearch, { Config } from "meilisearch";
+import { Config, IndexObject } from "meilisearch";
 import { REFLECT_MEILIINDEX_DISPLAYABLE_ATTRS, REFLECT_MEILIINDEX_FILTERABLE_ATTRS, REFLECT_MEILIINDEX_OPTIONS, REFLECT_MEILIINDEX_PRIMARY_KEY, REFLECT_MEILIINDEX_SEARCHABLE_ATTRS, REFLECT_MEILIINDEX_SORTABLE_ATTRS } from "../constants";
 import { IndexOptions } from "../decorators/index.decorator";
 import { IndexSchema } from "../definitions";
+import { MeiliClient } from "../entities/client.entity";
 import { MeiliIndex } from "../entities/index.entity";
 import { MeilisearchRootOptions } from "../options";
 
@@ -23,10 +24,10 @@ export function createOptionsProviderAsync(providerToken: string, inject: any[],
  */
 export function createMeilisearchClient(inject: any[], logger: Logger): Provider {
   return {
-    provide: MeiliSearch,
+    provide: MeiliClient,
     inject: inject,
-    useFactory: async (options: MeilisearchRootOptions) => {
-      const client = new MeiliSearch(createMeiliConfig(options));
+    useFactory: async (options: MeilisearchRootOptions): Promise<MeiliClient> => {
+      const client = new MeiliClient(createMeiliConfig(options), []);
       return client.getVersion().catch((error: Error) => {
         logger.error(`Could not collect to meilisearch instance: ${error.message}`, error.stack);
       }).then(() => {
@@ -54,7 +55,7 @@ export function createIndexesAsyncProviders(inject: any[], schemas: IndexSchema[
   return schemas.map((schema) => ({
     provide: getSchemaToken(schema),
     inject: inject,
-    useFactory: async (client: MeiliSearch, meiliOptions: MeilisearchRootOptions): Promise<MeiliIndex<any>> => {
+    useFactory: async (client: MeiliClient, meiliOptions: MeilisearchRootOptions): Promise<MeiliIndex<any>> => {
       // Check if schema has metadata
       if(!Reflect.hasMetadata(REFLECT_MEILIINDEX_OPTIONS, schema)){
         logger.warn(`Please decorate index schemas using @MeiliIndex(). This is missing on '${schema.name}'`);
@@ -63,7 +64,11 @@ export function createIndexesAsyncProviders(inject: any[], schemas: IndexSchema[
 
       // Extract index options from decorator
       const options: IndexOptions = Reflect.getOwnMetadata(REFLECT_MEILIINDEX_OPTIONS, schema) ?? {};
-      const uid = `${meiliOptions.indexPrefix ?? ''}${options.uid}`;
+      const uid = options.uid;
+      const config = createMeiliConfig(meiliOptions);
+
+      // Register schema in client
+      client.schemas.register(uid, schema);
       
       // Extract primary key
       const primaryKey = Reflect.getOwnMetadata(REFLECT_MEILIINDEX_PRIMARY_KEY, schema) ?? "id";
@@ -87,8 +92,8 @@ export function createIndexesAsyncProviders(inject: any[], schemas: IndexSchema[
             typoTolerance: options.typoTolerance
           }).then((task) => {
             return index.waitForTask(task.taskUid).then(() => {
-              return index.getRawInfo().then((obj) => {
-                return new MeiliIndex(obj, schema);
+              return index.getRawInfo().then((metadata) => {
+                return new MeiliIndex(config, uid, primaryKey, schema, metadata);
               }).catch((error: Error) => {
                 logger.error(`Failed fetching metadata for index '${uid}: ${error.message}'`, error.stack);
                 throw error;
@@ -109,4 +114,12 @@ export function createIndexesAsyncProviders(inject: any[], schemas: IndexSchema[
 
 export function getSchemaToken(schema: IndexSchema) {
   return pascalToSnakeCase(schema.name);
+}
+
+export function createMeiliIndex(config: Config, schema: IndexSchema, metadata?: IndexObject) {
+  const options: IndexOptions = Reflect.getOwnMetadata(REFLECT_MEILIINDEX_OPTIONS, schema) ?? {};
+  const uid = options.uid;
+  const primaryKey = Reflect.getOwnMetadata(REFLECT_MEILIINDEX_PRIMARY_KEY, schema) ?? "id";
+
+  return new MeiliIndex(config, uid, primaryKey, schema, metadata);
 }

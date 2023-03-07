@@ -4,7 +4,7 @@ import { ArtistArtwork } from "../../artwork/entities/artwork.entity";
 import { GeniusFlag, GeniusResource, Resource, ResourceFlag, ResourceType } from "../../utils/entities/resource";
 import { Syncable, SyncFlag } from "../../meilisearch/interfaces/syncable.interface";
 import { Song } from "../../song/entities/song.entity";
-import { IndexEntity } from "@soundcore/meilisearch";
+import { IndexEntity, PrimaryKey, Property } from "@soundcore/meilisearch";
 
 @Entity()
 export class Artist implements Resource, Syncable, GeniusResource {
@@ -70,5 +70,13 @@ export class Artist implements Resource, Syncable, GeniusResource {
 
 @IndexEntity()
 export class ArtistIndex {
+
+    @PrimaryKey()
+    public id: string;
+
+    @Property()
+    public name: string;
+
+    public test: boolean;
 
 }

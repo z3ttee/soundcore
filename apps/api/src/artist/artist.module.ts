@@ -25,7 +25,13 @@ export class ArtistModule implements OnModuleInit {
   ) {}
 
   onModuleInit() {
-      console.log(this.artistIndex);
+      this.artistIndex.addDocuments([
+        {
+          id: "123",
+          name: "Artist",
+          test: true
+        }
+      ])
   }
 
 }

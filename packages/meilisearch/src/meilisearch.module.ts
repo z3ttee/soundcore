@@ -4,7 +4,7 @@ import { ConfigurableMeilisearchModule, MODULE_OPTIONS_TOKEN } from "./meilisear
 import { LOGGER_LABEL } from "./constants";
 import { createIndexesAsyncProviders, createMeilisearchClient } from "./utils/asyncProvider";
 import { IndexSchema } from "./definitions";
-import MeiliSearch from "meilisearch";
+import { MeiliClient } from "./entities/client.entity";
 
 @Module({})
 export class MeilisearchModule extends ConfigurableMeilisearchModule {
@@ -17,11 +17,11 @@ export class MeilisearchModule extends ConfigurableMeilisearchModule {
             global: true,
             providers: [
                 ...module.providers,
-                createMeilisearchClient([ MODULE_OPTIONS_TOKEN ], new Logger(LOGGER_LABEL))
+                createMeilisearchClient([ MODULE_OPTIONS_TOKEN ], new Logger(LOGGER_LABEL)),
             ],
             exports: [
                 MODULE_OPTIONS_TOKEN,
-                MeiliSearch
+                MeiliClient,
             ]
         }
     }
@@ -33,17 +33,17 @@ export class MeilisearchModule extends ConfigurableMeilisearchModule {
             global: true,
             providers: [
                 ...module.providers,
-                createMeilisearchClient([ MODULE_OPTIONS_TOKEN ], new Logger(LOGGER_LABEL))
+                createMeilisearchClient([ MODULE_OPTIONS_TOKEN ], new Logger(LOGGER_LABEL)),
             ],
             exports: [
                 MODULE_OPTIONS_TOKEN,
-                MeiliSearch
+                MeiliClient,                
             ]
         }
     }
 
     public static forFeature(indexes: IndexSchema[]): DynamicModule {
-        const providers = createIndexesAsyncProviders([ MeiliSearch, MODULE_OPTIONS_TOKEN ], indexes, new Logger(LOGGER_LABEL));
+        const providers = createIndexesAsyncProviders([ MeiliClient, MODULE_OPTIONS_TOKEN ], indexes, new Logger(LOGGER_LABEL));
 
         return {
             module: MeilisearchModule,

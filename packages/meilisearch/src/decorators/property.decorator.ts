@@ -1,5 +1,5 @@
 import { pascalToSnakeCase } from "@soundcore/common";
-import { REFLECT_MEILIINDEX_DISPLAYABLE_ATTRS, REFLECT_MEILIINDEX_FILTERABLE_ATTRS, REFLECT_MEILIINDEX_PROPERTY_NAME, REFLECT_MEILIINDEX_SEARCHABLE_ATTRS, REFLECT_MEILIINDEX_SORTABLE_ATTRS } from "../constants";
+import { REFLECT_MEILIINDEX_DISPLAYABLE_ATTRS, REFLECT_MEILIINDEX_FILTERABLE_ATTRS, REFLECT_MEILIINDEX_INCLUDED_PROPS, REFLECT_MEILIINDEX_PROPERTY_NAME, REFLECT_MEILIINDEX_SEARCHABLE_ATTRS, REFLECT_MEILIINDEX_SORTABLE_ATTRS } from "../constants";
 
 export interface PropertyOptions {
     /**
@@ -50,11 +50,13 @@ export function Property(options?: PropertyOptions) {
         const filterableAttrs: string[] = Reflect.getMetadata(REFLECT_MEILIINDEX_FILTERABLE_ATTRS, constructor) ?? [];
         const sortableAttrs: string[] = Reflect.getMetadata(REFLECT_MEILIINDEX_SORTABLE_ATTRS, constructor) ?? [];
         const displayableAttrs: string[] = Reflect.getMetadata(REFLECT_MEILIINDEX_DISPLAYABLE_ATTRS, constructor) ?? [];
+        const includedProps: string[] = Reflect.getMetadata(REFLECT_MEILIINDEX_INCLUDED_PROPS, constructor) ?? [];
 
         if(options?.filterable) filterableAttrs.push(propertyKey.toString());
         if(options?.searchable) searchableAttrs.push(propertyKey.toString());
         if(options?.sortable) sortableAttrs.push(propertyKey.toString());
         if(options?.selectable) displayableAttrs.push(propertyKey.toString());
+        includedProps.push(propertyKey);
 
         if(searchableAttrs.length > 0) Reflect.defineMetadata(REFLECT_MEILIINDEX_SEARCHABLE_ATTRS, searchableAttrs, constructor);
         if(filterableAttrs.length > 0) Reflect.defineMetadata(REFLECT_MEILIINDEX_FILTERABLE_ATTRS, filterableAttrs, constructor);
@@ -62,5 +64,6 @@ export function Property(options?: PropertyOptions) {
         if(displayableAttrs.length > 0) Reflect.defineMetadata(REFLECT_MEILIINDEX_DISPLAYABLE_ATTRS, displayableAttrs, constructor);
 
         Reflect.defineMetadata(REFLECT_MEILIINDEX_PROPERTY_NAME, pascalToSnakeCase(constructor["name"]), constructor, propertyKey);
+        Reflect.defineMetadata(REFLECT_MEILIINDEX_INCLUDED_PROPS, includedProps, constructor);
     };
 }

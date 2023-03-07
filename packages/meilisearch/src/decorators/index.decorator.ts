@@ -27,7 +27,6 @@ export function IndexEntity(uidOrOptions?: string | IndexOptions): ClassDecorato
             options.uid = pascalToSnakeCase(target["name"]);
         }
 
-        // Reflect.defineMetadata(REFLECT_MEILIINDEX_UID, uid ?? pascalToSnakeCase(target["name"]), target);
         Reflect.defineMetadata(REFLECT_MEILIINDEX_OPTIONS, options, target);
     };
 }

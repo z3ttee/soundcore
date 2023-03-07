@@ -12,6 +12,7 @@ export const REFLECT_MEILIINDEX_SEARCHABLE_ATTRS = "__meilisearch_index_searchab
 export const REFLECT_MEILIINDEX_FILTERABLE_ATTRS = "__meilisearch_index_filterable_attrs__";
 export const REFLECT_MEILIINDEX_SORTABLE_ATTRS = "__meilisearch_index_sortable_attrs__";
 export const REFLECT_MEILIINDEX_DISPLAYABLE_ATTRS = "__meilisearch_index_displayable_attrs__";
+export const REFLECT_MEILIINDEX_INCLUDED_PROPS = "__meilisearch_index_included_props__";
 
 export const REFLECT_MEILIINDEX_PROPERTY_NAME = "__meilisearch_index_property_options__";
 
