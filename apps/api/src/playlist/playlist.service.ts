@@ -4,10 +4,10 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Page, BasePageable } from 'nestjs-pager';
 import { Not, Repository, SelectQueryBuilder, UpdateResult } from 'typeorm';
 import { EVENT_PLAYLISTS_CHANGED } from '../constants';
-import { SyncFlag } from '../meilisearch/interfaces/syncable.interface';
 import { MeiliPlaylistService } from '../meilisearch/services/meili-playlist.service';
 import { Song } from '../song/entities/song.entity';
 import { User } from '../user/entities/user.entity';
+import { MeilisearchFlag } from '../utils/entities/meilisearch.entity';
 import { CreateResult } from '../utils/results/creation.result';
 import { AddSongDTO } from './dtos/add-song.dto';
 import { CreatePlaylistDTO } from './dtos/create-playlist.dto';
@@ -381,10 +381,15 @@ export class PlaylistService {
      * @param flag Flag to set for all resources
      * @returns UpdateResult
      */
-    public async setLastSyncedDetails(resources: Playlist[], flag: SyncFlag): Promise<UpdateResult> {
+    public async setLastSyncedDetails(resources: Playlist[], flag: MeilisearchFlag): Promise<UpdateResult> {
         return this.playlistRepository.createQueryBuilder()
             .update()
-            .set({ lastSyncedAt: new Date(), lastSyncFlag: flag })
+            .set({
+                meilisearch: {
+                    syncedAt: new Date(), 
+                    flag: flag
+                }
+            })
             .whereInIds(resources)
             .execute();
     }
@@ -396,9 +401,9 @@ export class PlaylistService {
      */
     public async sync(resources: Playlist[]) {
         return this.meiliClient.setPlaylists(resources).then(() => {
-            return this.setLastSyncedDetails(resources, SyncFlag.OK);
+            return this.setLastSyncedDetails(resources, MeilisearchFlag.OK);
         }).catch(() => {
-            return this.setLastSyncedDetails(resources, SyncFlag.ERROR);
+            return this.setLastSyncedDetails(resources, MeilisearchFlag.FAILED);
         });
     }
 

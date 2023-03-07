@@ -2,7 +2,6 @@ import { InternalServerErrorException, Logger } from "@nestjs/common";
 import { Environment } from "@soundcore/common";
 import MeiliSearch, { Index, MeiliSearchError, MeiliSearchTimeOutError, SearchParams, SearchResponse, Task } from "meilisearch";
 import { BehaviorSubject, filter, firstValueFrom, Observable } from "rxjs";
-import { Syncable, SyncFlag } from "../interfaces/syncable.interface";
 
 export const MEILI_DEFAULT_TIMEOUT_MS = 1000*60*5 // 5 Mins for background tasks
 export const MEILI_DEFAULT_INTERVAL_MS = 1000*1 // Check task every second
@@ -95,14 +94,15 @@ export abstract class MeiliService<T = any> {
      * @param syncable Object to sync.
      * @returns True or False if the recommended next date is overdue or if the last sync flag evaluates to error
      */
-    public isSyncRecommended(syncable: Syncable): boolean {
+    public isSyncRecommended(syncable: any): boolean {
         if(typeof syncable === "undefined" || syncable == null || this.isDisabled()) return false;
 
         const current = new Date().getTime();
         const lastSyncedAt = new Date(syncable.lastSyncedAt).getTime();
         const recommendedDate = lastSyncedAt + 1000*60*60 * (this._options.syncRecommendedInterval || MeiliServiceSyncInterval.DAILY);
 
-        return syncable.lastSyncFlag == SyncFlag.ERROR || current >= recommendedDate;
+        return false;
+        // return syncable.lastSyncFlag == SyncFlag.ERROR || current >= recommendedDate;
     }
 
     /**

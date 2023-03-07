@@ -1,4 +1,4 @@
-import MeiliClient from "../../utils/database/meilisearch-worker-client";
+import MeilisearchClient from "../../utils/database/meilisearch-worker-client";
 
 import { Logger } from "@nestjs/common";
 import { WorkerJobRef } from "@soundcore/nest-queue";
@@ -13,7 +13,6 @@ import { MeiliArtistService } from "../services/meili-artist.service";
 import { MeiliSongService } from "../services/meili-song.service";
 import MeiliSearch, { TaskStatus } from "meilisearch";
 import Database from "../../utils/database/database-worker-client";
-import { SyncFlag } from "../interfaces/syncable.interface";
 import { Environment } from "@soundcore/common";
 import { ArtistService } from "../../artist/artist.service";
 import { DataSource } from "typeorm";
@@ -31,7 +30,7 @@ export default async function (job: WorkerJobRef<MeiliJob>): Promise<MeiliSyncRe
     const startTime = Date.now();
 
     return Database.connect().then((datasource) => {
-        return MeiliClient.connect().then(async (meilisearch) => {
+        return MeilisearchClient.connect().then(async (meilisearch) => {
             const { payload } = job;
     
             if(payload.type == MeiliJobType.SYNC_SONGS) {

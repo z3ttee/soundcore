@@ -10,7 +10,7 @@ import { PlaylistService } from "../../playlist/playlist.service";
 import { Song } from "../../song/entities/song.entity";
 import { SongService } from "../../song/services/song.service";
 import Database from "../../utils/database/database-worker-client";
-import MeiliClient from "../../utils/database/meilisearch-worker-client";
+import MeilisearchClient from "../../utils/database/meilisearch-worker-client";
 import { ImportTask, ImportTaskStatus, ImportTaskType } from "../entities/import.entity";
 import { SpotifySong, SpotifyTrackList } from "../clients/spotify/spotify-entities";
 import { ImportService } from "../services/import.service";
@@ -41,7 +41,7 @@ async function importSpotifyPlaylist(job: WorkerJobRef<ImportTask>): Promise<Imp
     // Connect the database client
     return Database.connect().then((datasource) => {
         // Create new meilisearch instance
-        return MeiliClient.connect().then((meilisearch) => {
+        return MeilisearchClient.connect().then((meilisearch) => {
 
             // Check if spotify module is enabled
             if(!client.isEnabled) {

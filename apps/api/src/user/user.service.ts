@@ -3,8 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { BasePageable, Page } from 'nestjs-pager';
 import { ILike, In, Repository } from 'typeorm';
 import { KeycloakTokenPayload } from '../authentication/entities/oidc-token.entity';
-import { SyncFlag } from '../meilisearch/interfaces/syncable.interface';
 import { MeiliUserService } from '../meilisearch/services/meili-user.service';
+import { MeilisearchFlag } from '../utils/entities/meilisearch.entity';
 import { User } from './entities/user.entity';
 
 @Injectable()
@@ -85,13 +85,15 @@ export class UserService {
      * @param flag Updated sync flag
      * @returns User
      */
-    public async setSyncFlags(resources: User[], flag: SyncFlag) {
+    public async setSyncFlags(resources: User[], flag: MeilisearchFlag) {
         const ids = resources.map((user) => user.id);
 
         return this.repository.createQueryBuilder()
             .update({
-                lastSyncedAt: new Date(),
-                lastSyncFlag: flag
+                meilisearch: {
+                    syncedAt: new Date(),
+                    flag: flag
+                }
             })
             .where({ id: In(ids) })
             .execute();
@@ -117,9 +119,9 @@ export class UserService {
      */
     public async sync(resources: User[]) {
         return this.meiliClient.setUsers(resources).then(() => {
-            return this.setSyncFlags(resources, SyncFlag.OK);
+            return this.setSyncFlags(resources, MeilisearchFlag.OK);
         }).catch(() => {
-            return this.setSyncFlags(resources, SyncFlag.ERROR);
+            return this.setSyncFlags(resources, MeilisearchFlag.FAILED);
         });
     }
 

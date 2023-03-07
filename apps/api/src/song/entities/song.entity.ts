@@ -9,12 +9,13 @@ import { PlaylistItem } from "../../playlist/entities/playlist-item.entity";
 import { Publisher } from "../../publisher/entities/publisher.entity";
 import { Stream } from "../../stream/entities/stream.entity";
 import { Slug } from "@tsalliance/utilities";
-import { GeniusFlag, GeniusResource, Resource, ResourceFlag, ResourceType } from "../../utils/entities/resource";
+import { Resource, ResourceFlag, ResourceType } from "../../utils/entities/resource";
 import { LikedSong } from "../../collection/entities/like.entity";
 import { File } from "../../file/entities/file.entity";
-import { Artwork, SongArtwork } from "../../artwork/entities/artwork.entity";
-import { Syncable, SyncFlag } from "../../meilisearch/interfaces/syncable.interface";
+import { SongArtwork } from "../../artwork/entities/artwork.entity";
 import { TracklistItem } from "../../tracklist/entities/tracklist.entity";
+import { GeniusInfo } from "../../utils/entities/genius.entity";
+import { MeilisearchInfo } from "../../utils/entities/meilisearch.entity";
 
 export interface SongID {
     id: string;
@@ -24,29 +25,20 @@ export const SONG_ARTWORK_RELATION_FK = "artworkId"
 
 @Entity()
 @Index(["name", "primaryArtist", "album", "duration", "order"], { unique: true })
-export class Song implements SongID, Resource, Syncable, GeniusResource, TracklistItem {
+export class Song implements SongID, Resource, TracklistItem {
     public resourceType: ResourceType = "song";
 
     /**
      * MEILISEARCH RELATED ATTRIBUTES
      */
-    @Column({ nullable: true, default: null })
-    public lastSyncedAt: Date;
-
-    @Column({ default: 0, type: "tinyint" })
-    public lastSyncFlag: SyncFlag;
+    @Column(() => MeilisearchInfo)
+    public meilisearch: MeilisearchInfo;
 
     /**
      * GENIUS RELATED ATTRIBUTES
      */
-    @Column({ nullable: true })
-    public geniusId?: string;
- 
-    @Column({ type: "tinyint", default: 0 })
-    public geniusFlag: GeniusFlag;
- 
-    @Column({ nullable: false, default: 0 })
-    public geniusFailedTries: number;
+    @Column(() => GeniusInfo)
+    public genius: GeniusInfo;
 
     /**
      * DEFAULT ATTRIBUTES
@@ -159,7 +151,6 @@ export class Song implements SongID, Resource, Syncable, GeniusResource, Trackli
     @BeforeUpdate() 
     public onBeforeUpdate() {
         if(!this.slug) Slug.create(this.name);
-        this.lastSyncFlag = SyncFlag.AWAITING;
     }
 
 }

@@ -12,13 +12,14 @@ import { SyncableService } from "../../utils/services/syncing.service";
 import { Song } from "../entities/song.entity";
 import { MeiliSongService } from "../../meilisearch/services/meili-song.service";
 import { User } from "../../user/entities/user.entity";
-import { SyncFlag } from "../../meilisearch/interfaces/syncable.interface";
 import { CreateSongDTO } from "../dtos/create-song.dto";
 import { Artwork, SongArtwork } from "../../artwork/entities/artwork.entity";
-import { GeniusFlag, ResourceFlag } from "../../utils/entities/resource";
+import { ResourceFlag } from "../../utils/entities/resource";
 import { ID3Artist, ID3TagsDTO } from "../dtos/id3-tags.dto";
 import { SongUniqueFindDTO } from "../dtos/unique-find.dto";
 import { FileFlag } from "../../file/entities/file.entity";
+import { GeniusFlag } from "../../utils/entities/genius.entity";
+import { MeilisearchFlag } from "../../utils/entities/meilisearch.entity";
 
 @Injectable()
 export class SongService implements SyncableService<Song> {
@@ -245,7 +246,7 @@ export class SongService implements SyncableService<Song> {
      * @param pageable Page settings
      * @returns Page<Artist>
      */
-    public async findBySyncFlag(flag: SyncFlag, pageable: BasePageable): Promise<Page<Song>> {
+    public async findBySyncFlag(flag: MeilisearchFlag, pageable: BasePageable): Promise<Page<Song>> {
         const result = await this.repository.createQueryBuilder("song")
             .leftJoin("song.artwork", "artwork").addSelect(["artwork.id"])
             .leftJoin("song.album", "album").addSelect(["album.id", "album.slug", "album.name"])
@@ -339,7 +340,7 @@ export class SongService implements SyncableService<Song> {
         const song = await this.resolveSong(idOrObject);
         if(!song) throw new NotFoundException("Could not find song.");
 
-        song.geniusFlag = flag;
+        song.genius.flag = flag;
         return this.repository.save(song);
     }
 
@@ -349,30 +350,17 @@ export class SongService implements SyncableService<Song> {
      * @param flag Updated sync flag
      * @returns Song
      */
-    private async setSyncFlags(resources: Song[], flag: SyncFlag) {
+    private async setSyncFlags(resources: Song[], flag: MeilisearchFlag) {
         const ids = resources.map((user) => user.id);
 
         return this.repository.createQueryBuilder()
             .update({
-                lastSyncedAt: new Date(),
-                lastSyncFlag: flag
+                meilisearch: {
+                    syncedAt: new Date(),
+                    flag: flag
+                }
             })
             .where({ id: In(ids) })
-            .execute();
-    }
-
-    /**
-     * Update the last synced attributes on songs.
-     * This will update the lastSyncedAt and lastSyncedFlag attributes.
-     * @param songs List of songs which should be affected by the change
-     * @param flag Flag to set for all songs
-     * @returns UpdateResult
-     */
-    public async setLastSyncedDetails(songs: Song[], flag: SyncFlag): Promise<UpdateResult> {
-        return this.repository.createQueryBuilder()
-            .update()
-            .set({ lastSyncedAt: new Date(), lastSyncFlag: flag })
-            .whereInIds(songs)
             .execute();
     }
 
@@ -383,9 +371,9 @@ export class SongService implements SyncableService<Song> {
      */
     public async syncWithMeilisearch(resources: Song[]) {
         return this.meilisearch.setSongs(resources).then(() => {
-            return this.setSyncFlags(resources, SyncFlag.OK);
+            return this.setSyncFlags(resources, MeilisearchFlag.OK);
         }).catch(() => {
-            return this.setSyncFlags(resources, SyncFlag.ERROR);
+            return this.setSyncFlags(resources, MeilisearchFlag.FAILED);
         });
     }
 

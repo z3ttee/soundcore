@@ -6,24 +6,27 @@ import { Stream } from "../../stream/entities/stream.entity";
 import { Resource, ResourceFlag, ResourceType } from "../../utils/entities/resource";
 import { Slug } from "@tsalliance/utilities";
 import { Artwork } from "../../artwork/entities/artwork.entity";
-import { Syncable, SyncFlag } from "../../meilisearch/interfaces/syncable.interface";
 import { PlaylistItem } from "../../playlist/entities/playlist-item.entity";
 import { ImportTask } from "../../import/entities/import.entity";
+import { MeilisearchInfo } from "../../utils/entities/meilisearch.entity";
 
 // TODO: Remove attributes from Syncable object when they get sent as response
 // TODO: Split profile and users logic
 
 @Entity()
-export class User implements Resource, Syncable {
+export class User implements Resource {
     public flag: ResourceFlag = ResourceFlag.OK;
     public resourceType: ResourceType = "user";
 
-    @Column({ nullable: true, default: null})
-    public lastSyncedAt: Date;
+    /**
+     * MEILISEARCH RELATED ATTRIBUTES
+     */
+    @Column(() => MeilisearchInfo)
+    public meilisearch: MeilisearchInfo;
 
-    @Column({ default: 0 })
-    public lastSyncFlag: SyncFlag;
-
+    /**
+     * DEFAULT ATTRIBUTES
+     */
     @PrimaryColumn({ type: "varchar" })
     public id: string;
 

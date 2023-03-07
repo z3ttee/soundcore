@@ -9,11 +9,11 @@ import { Distributor } from "../../distributor/entities/distributor.entity";
 import { DistributorService } from "../../distributor/services/distributor.service";
 import { Label } from "../../label/entities/label.entity";
 import { LabelService } from "../../label/services/label.service";
-import { SyncFlag } from "../../meilisearch/interfaces/syncable.interface";
 import { Publisher } from "../../publisher/entities/publisher.entity";
 import { PublisherService } from "../../publisher/services/publisher.service";
 import { Song } from "../../song/entities/song.entity";
 import { SongService } from "../../song/services/song.service";
+import { MeilisearchFlag } from "../../utils/entities/meilisearch.entity";
 
 const SYNC_ITEMS_LIMIT = 100;
 
@@ -53,12 +53,12 @@ export class MeiliSyncer {
         // doing larger requests. This is compensated of the frequency of the cron job.
 
         const affectedEntities = await Promise.all([
-            this.artistService.findBySyncFlag(SyncFlag.ERROR, new Pageable(0, SYNC_ITEMS_LIMIT)).catch(() => Page.of<Artist>([])),
-            this.albumService.findBySyncFlag(SyncFlag.ERROR, new Pageable(0, SYNC_ITEMS_LIMIT)).catch(() => Page.of<Album>([])),
-            this.songService.findBySyncFlag(SyncFlag.ERROR, new Pageable(0, SYNC_ITEMS_LIMIT)).catch(() => Page.of<Song>([])),
-            this.labelService.findBySyncFlag(SyncFlag.ERROR, new Pageable(0, SYNC_ITEMS_LIMIT)).catch(() => Page.of<Label>([])),
-            this.publisherService.findBySyncFlag(SyncFlag.ERROR, new Pageable(0, SYNC_ITEMS_LIMIT)).catch(() => Page.of<Publisher>([])),
-            this.distributorService.findBySyncFlag(SyncFlag.ERROR, new Pageable(0, SYNC_ITEMS_LIMIT)).catch(() => Page.of<Distributor>([]))
+            this.artistService.findBySyncFlag(MeilisearchFlag.FAILED, new Pageable(0, SYNC_ITEMS_LIMIT)).catch(() => Page.of<Artist>([])),
+            this.albumService.findBySyncFlag(MeilisearchFlag.FAILED, new Pageable(0, SYNC_ITEMS_LIMIT)).catch(() => Page.of<Album>([])),
+            this.songService.findBySyncFlag(MeilisearchFlag.FAILED, new Pageable(0, SYNC_ITEMS_LIMIT)).catch(() => Page.of<Song>([])),
+            this.labelService.findBySyncFlag(MeilisearchFlag.FAILED, new Pageable(0, SYNC_ITEMS_LIMIT)).catch(() => Page.of<Label>([])),
+            this.publisherService.findBySyncFlag(MeilisearchFlag.FAILED, new Pageable(0, SYNC_ITEMS_LIMIT)).catch(() => Page.of<Publisher>([])),
+            this.distributorService.findBySyncFlag(MeilisearchFlag.FAILED, new Pageable(0, SYNC_ITEMS_LIMIT)).catch(() => Page.of<Distributor>([]))
         ]).catch(() => [])
 
         const affectedArtists = affectedEntities[0];

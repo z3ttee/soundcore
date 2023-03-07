@@ -3,8 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Page, BasePageable } from 'nestjs-pager';
 import { In, Repository } from 'typeorm';
 import { Artwork } from '../../artwork/entities/artwork.entity';
-import { SyncFlag } from '../../meilisearch/interfaces/syncable.interface';
 import { MeiliDistributorService } from '../../meilisearch/services/meili-distributor.service';
+import { MeilisearchFlag } from '../../utils/entities/meilisearch.entity';
 import { CreateResult } from '../../utils/results/creation.result';
 import { CreateDistributorDTO } from '../dtos/create-distributor.dto';
 import { UpdateDistributorDTO } from '../dtos/update-distributor.dto';
@@ -51,7 +51,7 @@ export class DistributorService {
      * @param pageable Page settings
      * @returns Page<Distributor>
      */
-     public async findBySyncFlag(flag: SyncFlag, pageable: BasePageable): Promise<Page<Distributor>> {
+     public async findBySyncFlag(flag: MeilisearchFlag, pageable: BasePageable): Promise<Page<Distributor>> {
         const result = await this.repository.createQueryBuilder("distributor")
             .leftJoin("distributor.artwork", "artwork").addSelect(["artwork.id"])
             .where("distributor.lastSyncFlag = :flag", { flag })
@@ -172,13 +172,15 @@ export class DistributorService {
      * @param flag Updated sync flag
      * @returns UpdateResult
      */
-    private async setSyncFlags(resources: Distributor[], flag: SyncFlag) {
+    private async setSyncFlags(resources: Distributor[], flag: MeilisearchFlag) {
         const ids = resources.map((user) => user.id);
 
         return this.repository.createQueryBuilder()
             .update({
-                lastSyncedAt: new Date(),
-                lastSyncFlag: flag
+                meilisearch: {
+                    syncedAt: new Date(),
+                    flag: flag
+                }
             })
             .where({ id: In(ids) })
             .execute();
@@ -191,9 +193,9 @@ export class DistributorService {
      */
     public async sync(resources: Distributor[]) {
         return this.meiliClient.setDistributors(resources).then(() => {
-            return this.setSyncFlags(resources, SyncFlag.OK);
+            return this.setSyncFlags(resources, MeilisearchFlag.OK);
         }).catch(() => {
-            return this.setSyncFlags(resources, SyncFlag.ERROR);
+            return this.setSyncFlags(resources, MeilisearchFlag.FAILED);
         });
     }
 

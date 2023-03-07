@@ -4,12 +4,12 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Page, BasePageable } from 'nestjs-pager';
 import { Repository, SelectQueryBuilder, UpdateResult } from 'typeorm';
 import { Artist } from '../../artist/entities/artist.entity';
-import { ArtworkID } from '../../artwork/entities/artwork.entity';
 import { EVENT_ALBUMS_CHANGED } from '../../constants';
-import { SyncFlag } from '../../meilisearch/interfaces/syncable.interface';
 import { MeiliAlbumService } from '../../meilisearch/services/meili-album.service';
 import { User } from '../../user/entities/user.entity';
-import { GeniusFlag, ResourceFlag } from '../../utils/entities/resource';
+import { GeniusFlag } from '../../utils/entities/genius.entity';
+import { MeilisearchFlag } from '../../utils/entities/meilisearch.entity';
+import { ResourceFlag } from '../../utils/entities/resource';
 import { SyncableService } from '../../utils/services/syncing.service';
 import { CreateAlbumDTO } from '../dto/create-album.dto';
 import { UpdateAlbumDTO } from '../dto/update-album.dto';
@@ -159,7 +159,7 @@ export class AlbumService implements SyncableService<Album> {
      * @param pageable Page settings
      * @returns Page<Album>
      */
-    public async findBySyncFlag(flag: SyncFlag, pageable: BasePageable): Promise<Page<Album>> {
+    public async findBySyncFlag(flag: MeilisearchFlag, pageable: BasePageable): Promise<Page<Album>> {
         const result = await this.repository.createQueryBuilder("album")
             .leftJoinAndSelect("album.artwork", "artwork")
             .leftJoinAndSelect("album.primaryArtist", "primaryArtist")
@@ -276,7 +276,7 @@ export class AlbumService implements SyncableService<Album> {
         const album = await this.resolveAlbum(idOrObject);
         if(!album) throw new NotFoundException("Album not found.");
 
-        album.geniusFlag = flag;
+        album.genius.flag = flag;
         return this.repository.save(album);
     }
 
@@ -287,10 +287,15 @@ export class AlbumService implements SyncableService<Album> {
      * @param flag Flag to set for all songs
      * @returns UpdateResult
      */
-    public async setLastSyncedDetails(resources: Album[], flag: SyncFlag): Promise<UpdateResult> {
+    public async setLastSyncedDetails(resources: Album[], flag: MeilisearchFlag): Promise<UpdateResult> {
         return this.repository.createQueryBuilder()
             .update()
-            .set({ lastSyncedAt: new Date(), lastSyncFlag: flag })
+            .set({ 
+                meilisearch: {
+                    syncedAt: new Date(), 
+                    flag: flag
+                }
+            })
             .whereInIds(resources)
             .execute();
     }
@@ -302,9 +307,9 @@ export class AlbumService implements SyncableService<Album> {
      */
     public async syncWithMeilisearch(resources: Album[]) {
         return this.meilisearch.setAlbums(resources).then(() => {
-            return this.setLastSyncedDetails(resources, SyncFlag.OK);
+            return this.setLastSyncedDetails(resources, MeilisearchFlag.OK);
         }).catch(() => {
-            return this.setLastSyncedDetails(resources, SyncFlag.ERROR);
+            return this.setLastSyncedDetails(resources, MeilisearchFlag.FAILED);
         });
     }
 

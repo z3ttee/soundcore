@@ -1,35 +1,27 @@
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { Album } from "../../album/entities/album.entity";
 import { ArtistArtwork } from "../../artwork/entities/artwork.entity";
-import { GeniusFlag, GeniusResource, Resource, ResourceFlag, ResourceType } from "../../utils/entities/resource";
-import { Syncable, SyncFlag } from "../../meilisearch/interfaces/syncable.interface";
+import { Resource, ResourceFlag, ResourceType } from "../../utils/entities/resource";
 import { Song } from "../../song/entities/song.entity";
 import { IndexEntity, PrimaryKey, Property } from "@soundcore/meilisearch";
+import { MeilisearchInfo } from "../../utils/entities/meilisearch.entity";
+import { GeniusInfo } from "../../utils/entities/genius.entity";
 
 @Entity()
-export class Artist implements Resource, Syncable, GeniusResource {
+export class Artist implements Resource {
     public resourceType: ResourceType = "artist";
 
     /**
      * MEILISEARCH RELATED ATTRIBUTES
      */
-    @Column({ nullable: true, default: null})
-    public lastSyncedAt: Date;
-
-    @Column({ default: 0 })
-    public lastSyncFlag: SyncFlag;
+    @Column(() => MeilisearchInfo)
+    public meilisearch: MeilisearchInfo;
 
     /**
      * GENIUS RELATED ATTRIBUTES
      */
-    @Column({ nullable: true })
-    public geniusId: string;
-
-    @Column({ type: "tinyint", default: 0 })
-    public geniusFlag: GeniusFlag;
-
-    @Column({ nullable: false, default: 0 })
-    public geniusFailedTries: number;
+    @Column(() => GeniusInfo)
+    public genius: GeniusInfo;
 
     /**
      * DEFAULT ATTRIBUTES

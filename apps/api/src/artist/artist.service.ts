@@ -3,9 +3,10 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Slug } from '@tsalliance/utilities';
 import { Page, BasePageable } from 'nestjs-pager';
 import { ObjectLiteral, Repository, SelectQueryBuilder, UpdateResult } from 'typeorm';
-import { SyncFlag } from '../meilisearch/interfaces/syncable.interface';
 import { MeiliArtistService } from '../meilisearch/services/meili-artist.service';
-import { GeniusFlag, ResourceFlag } from '../utils/entities/resource';
+import { GeniusFlag } from '../utils/entities/genius.entity';
+import { MeilisearchFlag } from '../utils/entities/meilisearch.entity';
+import { ResourceFlag } from '../utils/entities/resource';
 import { CreateArtistDTO } from './dtos/create-artist.dto';
 import { UpdateArtistDTO } from './dtos/update-artist.dto';
 import { Artist } from './entities/artist.entity';
@@ -76,22 +77,12 @@ export class ArtistService {
     }
 
     /**
-     * Count how many entities have a specific
-     * flag set while syncing with meilisearch.
-     * @param flag SyncFlag
-     * @returns number
-     */
-    public async countBySyncFlag(flag: SyncFlag): Promise<number> {
-        return this.repository.count({ where: { lastSyncFlag: flag } });
-    }
-
-    /**
      * Find a page of artists by a specific sync flag.
      * @param flag Sync Flag
      * @param pageable Page settings
      * @returns Page<Artist>
      */
-    public async findBySyncFlag(flag: SyncFlag, pageable: BasePageable): Promise<Page<Artist>> {
+    public async findBySyncFlag(flag: MeilisearchFlag, pageable: BasePageable): Promise<Page<Artist>> {
         const result = await this.repository.createQueryBuilder("artist")
             .leftJoinAndSelect("artist.artwork", "artwork")
             .where("artist.lastSyncFlag = :flag", { flag })
@@ -208,7 +199,7 @@ export class ArtistService {
         const artist = await this.resolveArtist(idOrObject);
         if(!artist) return null;
 
-        artist.geniusFlag = flag;
+        artist.genius.flag = flag;
         return this.repository.save(artist);
     }
 
@@ -232,10 +223,15 @@ export class ArtistService {
      * @param flag Flag to set for all songs
      * @returns UpdateResult
      */
-    public async setLastSyncedDetails(resources: Artist[], flag: SyncFlag): Promise<UpdateResult> {
+    public async setLastSyncedDetails(resources: Artist[], flag: MeilisearchFlag): Promise<UpdateResult> {
         return this.repository.createQueryBuilder()
             .update()
-            .set({ lastSyncedAt: new Date(), lastSyncFlag: flag })
+            .set({
+                meilisearch: {
+                    syncedAt: new Date(), 
+                    flag: flag
+                }
+            })
             .whereInIds(resources)
             .execute();
     }
@@ -247,9 +243,9 @@ export class ArtistService {
      */
     public async sync(resources: Artist[]) {
         return this.meiliClient.setArtists(resources).then(() => {
-            return this.setLastSyncedDetails(resources, SyncFlag.OK);
+            return this.setLastSyncedDetails(resources, MeilisearchFlag.OK);
         }).catch(() => {
-            return this.setLastSyncedDetails(resources, SyncFlag.ERROR);
+            return this.setLastSyncedDetails(resources, MeilisearchFlag.FAILED);
         });
     }
 

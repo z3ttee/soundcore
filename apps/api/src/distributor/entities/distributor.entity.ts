@@ -4,18 +4,28 @@ import { Artwork } from "../../artwork/entities/artwork.entity";
 import { Song } from "../../song/entities/song.entity";
 import { Resource, ResourceFlag, ResourceType } from "../../utils/entities/resource";
 import { Slug } from "@tsalliance/utilities";
-import { Syncable, SyncFlag } from "../../meilisearch/interfaces/syncable.interface";
+import { GeniusInfo } from "../../utils/entities/genius.entity";
+import { MeilisearchInfo } from "../../utils/entities/meilisearch.entity";
 
 @Entity()
-export class Distributor implements Resource, Syncable {
+export class Distributor implements Resource {
     public resourceType: ResourceType = "distributor";
 
-    @Column({ nullable: true, default: null})
-    public lastSyncedAt: Date;
+    /**
+     * MEILISEARCH RELATED ATTRIBUTES
+     */
+    @Column(() => MeilisearchInfo)
+    public meilisearch: MeilisearchInfo;
 
-    @Column({ default: 0 })
-    public lastSyncFlag: SyncFlag;
+    /**
+     * GENIUS RELATED ATTRIBUTES
+     */
+    @Column(() => GeniusInfo)
+    public genius: GeniusInfo;
 
+    /**
+     * DEFAULT ATTRIBUTES
+     */
     @PrimaryGeneratedColumn("uuid")
     public id: string;
 

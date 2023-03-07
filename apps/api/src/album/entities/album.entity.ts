@@ -7,41 +7,35 @@ import { Distributor } from "../../distributor/entities/distributor.entity";
 import { Label } from "../../label/entities/label.entity";
 import { Publisher } from "../../publisher/entities/publisher.entity";
 import { Song } from "../../song/entities/song.entity";
-import { GeniusFlag, GeniusResource, Resource, ResourceFlag, ResourceType } from "../../utils/entities/resource";
+import { Resource, ResourceFlag, ResourceType } from "../../utils/entities/resource";
 import { Slug } from "@tsalliance/utilities";
-import { Syncable, SyncFlag } from "../../meilisearch/interfaces/syncable.interface";
 import { IndexEntity, PrimaryKey, Property } from "@soundcore/meilisearch";
+import { GeniusInfo } from "../../utils/entities/genius.entity";
+import { MeilisearchInfo } from "../../utils/entities/meilisearch.entity";
 
 @Entity()
+@IndexEntity()
 @Index(["name", "primaryArtist"], { unique: true })
-export class Album implements Resource, Syncable, GeniusResource {
+export class Album implements Resource {
     public resourceType: ResourceType = "album";
 
     /**
      * MEILISEARCH RELATED ATTRIBUTES
      */
-    @Column({ nullable: true, default: null})
-    public lastSyncedAt: Date;
-
-    @Column({ default: 0 })
-    public lastSyncFlag: SyncFlag;
+    @Column(() => MeilisearchInfo)
+    public meilisearch: MeilisearchInfo;
 
     /**
      * GENIUS RELATED ATTRIBUTES
      */
-    @Column({ type: "tinyint", default: 0 })
-    public geniusFlag: GeniusFlag;
-
-    @Column({ nullable: true })
-    public geniusId: string;
-
-    @Column({ nullable: false, default: 0 })
-    public geniusFailedTries: number;
+    @Column(() => GeniusInfo)
+    public genius: GeniusInfo;
 
     /**
      * DEFAULT ATTRIBUTES
      */
     @PrimaryGeneratedColumn("uuid")
+    @PrimaryKey()
     public id: string;
 
     @Column({ nullable: false, collation: "utf8mb4_bin" })
