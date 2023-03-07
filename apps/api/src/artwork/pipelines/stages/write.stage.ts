@@ -62,7 +62,7 @@ async function extract_from_mp3_file(dtos: ArtworkDTO[], params: StepParams): Pr
 
     const fileRepo = datasource.getRepository(File);
     const fileService = new FileService(fileRepo);
-    const songService = new SongService(null, null);
+    const songService = new SongService(null);
     const artworkService = new ArtworkService(null, null, fsService, null);
 
     const song2artwork: Map<string, ArtworkDTO> = new Map();

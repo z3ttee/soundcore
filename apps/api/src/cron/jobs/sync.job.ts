@@ -3,7 +3,7 @@ import { Cron } from "@nestjs/schedule";
 import { Page, Pageable } from "nestjs-pager";
 import { AlbumService } from "../../album/services/album.service";
 import { Album } from "../../album/entities/album.entity";
-import { ArtistService } from "../../artist/artist.service";
+import { ArtistService } from "../../artist/services/artist.service";
 import { Artist } from "../../artist/entities/artist.entity";
 import { Distributor } from "../../distributor/entities/distributor.entity";
 import { DistributorService } from "../../distributor/services/distributor.service";
@@ -93,10 +93,10 @@ export class MeiliSyncer {
     }
 
     private async resolveSyncErrorsForArtists(resources: Artist[]) {
-        if(resources?.length <= 0) return;
-        return this.artistService.sync(resources).catch((error) => {
-            this.logger.error(`Failed resolving sync issues for ${resources.length} artists`, error.stack);
-        });
+        // if(resources?.length <= 0) return;
+        // return this.artistService.sync(resources).catch((error) => {
+        //     this.logger.error(`Failed resolving sync issues for ${resources.length} artists`, error.stack);
+        // });
     }
 
     private async resolveSyncErrorsForAlbums(resources: Album[]) {

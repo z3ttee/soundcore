@@ -63,12 +63,16 @@ export class Artist implements Resource {
 @IndexEntity()
 export class ArtistIndex {
 
-    @PrimaryKey()
+    @PrimaryKey({ searchable: false })
     public id: string;
 
     @Property()
     public name: string;
 
-    public test: boolean;
+    @Property()
+    public slug: string;
+
+    @Property({ searchable: false })
+    public artwork: { id: string };
 
 }

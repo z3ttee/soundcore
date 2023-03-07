@@ -5,7 +5,6 @@ import { Page, BasePageable } from 'nestjs-pager';
 import { Repository, SelectQueryBuilder, UpdateResult } from 'typeorm';
 import { Artist } from '../../artist/entities/artist.entity';
 import { EVENT_ALBUMS_CHANGED } from '../../constants';
-import { MeiliAlbumService } from '../../meilisearch/services/meili-album.service';
 import { User } from '../../user/entities/user.entity';
 import { GeniusFlag } from '../../utils/entities/genius.entity';
 import { MeilisearchFlag } from '../../utils/entities/meilisearch.entity';
@@ -21,8 +20,7 @@ export class AlbumService implements SyncableService<Album> {
 
     constructor(
         @InjectRepository(Album) private readonly repository: Repository<Album>,
-        private readonly eventEmitter: EventEmitter2,
-        private readonly meilisearch: MeiliAlbumService
+        private readonly eventEmitter: EventEmitter2
     ) { }
 
     /**
@@ -306,11 +304,13 @@ export class AlbumService implements SyncableService<Album> {
      * @returns Album
      */
     public async syncWithMeilisearch(resources: Album[]) {
-        return this.meilisearch.setAlbums(resources).then(() => {
-            return this.setLastSyncedDetails(resources, MeilisearchFlag.OK);
-        }).catch(() => {
-            return this.setLastSyncedDetails(resources, MeilisearchFlag.FAILED);
-        });
+        // return this.meilisearch.setAlbums(resources).then(() => {
+        //     return this.setLastSyncedDetails(resources, MeilisearchFlag.OK);
+        // }).catch(() => {
+        //     return this.setLastSyncedDetails(resources, MeilisearchFlag.FAILED);
+        // });
+
+        return null;
     }
 
     /**

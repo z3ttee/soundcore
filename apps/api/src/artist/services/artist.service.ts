@@ -3,13 +3,12 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Slug } from '@tsalliance/utilities';
 import { Page, BasePageable } from 'nestjs-pager';
 import { ObjectLiteral, Repository, SelectQueryBuilder, UpdateResult } from 'typeorm';
-import { MeiliArtistService } from '../meilisearch/services/meili-artist.service';
-import { GeniusFlag } from '../utils/entities/genius.entity';
-import { MeilisearchFlag } from '../utils/entities/meilisearch.entity';
-import { ResourceFlag } from '../utils/entities/resource';
-import { CreateArtistDTO } from './dtos/create-artist.dto';
-import { UpdateArtistDTO } from './dtos/update-artist.dto';
-import { Artist } from './entities/artist.entity';
+import { GeniusFlag } from '../../utils/entities/genius.entity';
+import { MeilisearchFlag } from '../../utils/entities/meilisearch.entity';
+import { ResourceFlag } from '../../utils/entities/resource';
+import { CreateArtistDTO } from '../dtos/create-artist.dto';
+import { UpdateArtistDTO } from '../dtos/update-artist.dto';
+import { Artist } from '../entities/artist.entity';
 
 @Injectable()
 export class ArtistService {
@@ -17,7 +16,6 @@ export class ArtistService {
 
     constructor(
         @InjectRepository(Artist) private readonly repository: Repository<Artist>,
-        private readonly meiliClient: MeiliArtistService,
     ){ }
 
     public getRepository() {
@@ -102,7 +100,7 @@ export class ArtistService {
      */
     public async save(artist: Artist): Promise<Artist> {
         return this.repository.save(artist).then((result) => {
-            this.sync([result]);
+            // this.sync([result]);
             return result;
         });
     }
@@ -167,13 +165,13 @@ export class ArtistService {
      * @param artistId Artist's id
      * @returns True or False
      */
-    public async deleteById(artistId: string): Promise<boolean> {
-        return this.meiliClient.deleteArtist(artistId).then(() => {
-            return this.repository.delete({ id: artistId }).then((result) => {
-                return result.affected > 0;
-            });
-        });
-    }
+    // public async deleteById(artistId: string): Promise<boolean> {
+    //     return this.meiliClient.deleteArtist(artistId).then(() => {
+    //         return this.repository.delete({ id: artistId }).then((result) => {
+    //             return result.affected > 0;
+    //         });
+    //     });
+    // }
 
     /**
      * Set resource flag of an artist.
@@ -241,13 +239,13 @@ export class ArtistService {
      * @param resource Artist data
      * @returns Artist
      */
-    public async sync(resources: Artist[]) {
-        return this.meiliClient.setArtists(resources).then(() => {
-            return this.setLastSyncedDetails(resources, MeilisearchFlag.OK);
-        }).catch(() => {
-            return this.setLastSyncedDetails(resources, MeilisearchFlag.FAILED);
-        });
-    }
+    // public async sync(resources: Artist[]) {
+    //     return this.meiliClient.setArtists(resources).then(() => {
+    //         return this.setLastSyncedDetails(resources, MeilisearchFlag.OK);
+    //     }).catch(() => {
+    //         return this.setLastSyncedDetails(resources, MeilisearchFlag.FAILED);
+    //     });
+    // }
 
     /**
      * Build general query. This includes relations for

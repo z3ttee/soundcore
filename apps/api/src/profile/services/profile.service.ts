@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Page, Pageable } from 'nestjs-pager';
-import { ArtistService } from '../../artist/artist.service';
+import { ArtistService } from '../../artist/services/artist.service';
 import { Artist } from '../../artist/entities/artist.entity';
 import { User } from '../../user/entities/user.entity';
 import { UserService } from '../../user/user.service';

@@ -34,9 +34,6 @@ export class Label implements Resource {
 
     @Column({ nullable: true, unique: true, length: 120 })
     public slug: string;
-    
-    @Column({ nullable: true })
-    public geniusId: string;
 
     @Column({ nullable: true, type: "text" })
     public description: string;

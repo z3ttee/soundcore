@@ -1,9 +1,9 @@
 import { Column } from "typeorm";
 
 export enum MeilisearchFlag {
-    NEVER = 0,
-    OK = 1,
-    FAILED = 2
+    NEVER = "never",
+    OK = "ok",
+    FAILED = "failed"
 }
 
 export class MeilisearchInfo {

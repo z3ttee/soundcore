@@ -1,5 +1,5 @@
 import { Module, OnModuleInit } from '@nestjs/common';
-import { ArtistService } from './artist.service';
+import { ArtistService } from './services/artist.service';
 import { ArtistController } from './artist.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { GeniusModule } from '../genius/genius.module';
@@ -25,13 +25,7 @@ export class ArtistModule implements OnModuleInit {
   ) {}
 
   onModuleInit() {
-      this.artistIndex.addDocuments([
-        {
-          id: "123",
-          name: "Artist",
-          test: true
-        }
-      ])
+      
   }
 
 }

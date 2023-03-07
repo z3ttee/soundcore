@@ -21,9 +21,6 @@ export class Genre {
     @Column({ nullable: true, type: "text" })
     public description: string;
 
-    @Column({ nullable: true })
-    public geniusId: string;
-
     @ManyToOne(() => Artwork, { onDelete: "SET NULL" })
     @JoinColumn()
     public artwork: Artwork;

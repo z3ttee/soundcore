@@ -1,9 +1,6 @@
 import { InternalServerErrorException, Logger } from "@nestjs/common";
 import { EventEmitter2 } from "@nestjs/event-emitter";
-import { Batch } from "@soundcore/common";
 import { WorkerJobRef } from "@soundcore/nest-queue";
-import { MeiliPlaylistService } from "../../meilisearch/services/meili-playlist.service";
-import { MeiliSongService } from "../../meilisearch/services/meili-song.service";
 import { PlaylistItem } from "../../playlist/entities/playlist-item.entity";
 import { Playlist } from "../../playlist/entities/playlist.entity";
 import { PlaylistService } from "../../playlist/playlist.service";
@@ -11,7 +8,7 @@ import { Song } from "../../song/entities/song.entity";
 import { SongService } from "../../song/services/song.service";
 import Database from "../../utils/database/database-worker-client";
 import MeilisearchClient from "../../utils/database/meilisearch-worker-client";
-import { ImportTask, ImportTaskStatus, ImportTaskType } from "../entities/import.entity";
+import { ImportTask, ImportTaskType } from "../entities/import.entity";
 import { SpotifySong, SpotifyTrackList } from "../clients/spotify/spotify-entities";
 import { ImportService } from "../services/import.service";
 import { SpotifyClient } from "../clients/spotify/spotify.client";
@@ -50,9 +47,6 @@ async function importSpotifyPlaylist(job: WorkerJobRef<ImportTask>): Promise<Imp
 
             // Create new event emitter required by services
             const eventEmitter = new EventEmitter2()
-
-            // Instantiate meilisearch client for playlist syncing
-            const meiliPlaylistClient = new MeiliPlaylistService(meilisearch);
     
             // Instantiate repositories used by the services
             const songRepo = datasource.getRepository(Song);
@@ -62,8 +56,8 @@ async function importSpotifyPlaylist(job: WorkerJobRef<ImportTask>): Promise<Imp
             const reportRepo = datasource.getRepository(ImportReport);
 
             // Instantiate services
-            const songService = new SongService(songRepo, new MeiliSongService(meilisearch));
-            const playlistService = new PlaylistService(playlistRepo, song2playlistRepo, eventEmitter, meiliPlaylistClient);
+            const songService = new SongService(songRepo);
+            const playlistService = new PlaylistService(playlistRepo, song2playlistRepo, eventEmitter);
             const importService = new ImportService(importRepo);
             const reportService = new ImportReportService(reportRepo);
             

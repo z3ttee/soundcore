@@ -10,7 +10,7 @@ import { Artist } from "../../../artist/entities/artist.entity";
 import { Album } from "../../../album/entities/album.entity";
 import { Slug } from "@tsalliance/utilities";
 import { DataSource } from "typeorm";
-import { ArtistService } from "../../../artist/artist.service";
+import { ArtistService } from "../../../artist/services/artist.service";
 import { AlbumService } from "../../../album/services/album.service";
 import { FileSystemService } from "../../../filesystem/services/filesystem.service";
 import { getOrDefault, getSharedOrDefault, progress, set, StepParams } from "@soundcore/pipelines";
@@ -21,7 +21,7 @@ export async function step_read_mp3_tags(params: StepParams) {
     const datasource: DataSource = resources.datasource;
     const repository = datasource.getRepository(Song);
     const fsService = new FileSystemService();
-    const songService = new SongService(repository, null);
+    const songService = new SongService(repository);
     
     // Prepare step
     const files: Map<string, File> = getSharedOrDefault("targetFiles", new Map());
@@ -160,7 +160,7 @@ export async function step_create_artists(params: StepParams) {
     // Prepare step
     const datasource: DataSource = resources.datasource;
     const repository = datasource.getRepository(Artist);
-    const service = new ArtistService(repository, null);
+    const service = new ArtistService(repository);
     const artists: Map<string, Artist> = getOrDefault(`${STAGE_METADATA_ID}.${STEP_READ_TAGS_ID}.artists`, new Map());
 
     // Check if there are any artists to create them,
@@ -211,7 +211,7 @@ export async function step_create_albums(params: StepParams) {
     // Prepare step
     const datasource: DataSource = resources.datasource;
     const repository = datasource.getRepository(Album);
-    const service = new AlbumService(repository, null, null);
+    const service = new AlbumService(repository, null);
     const artists: Map<string, Artist> = getOrDefault(`${STAGE_METADATA_ID}.${STEP_CREATE_ARTISTS_ID}.artists`, new Map());
     const albums: Map<string, Album> = getOrDefault(`${STAGE_METADATA_ID}.${STEP_READ_TAGS_ID}.albums`, new Map());
 
@@ -264,7 +264,7 @@ export async function step_create_songs(params: StepParams) {
     // Prepare step
     const datasource: DataSource = resources.datasource;
     const repository = datasource.getRepository(Song);
-    const service = new SongService(repository, null);
+    const service = new SongService(repository);
     const artists: Map<string, Artist> = getOrDefault(`${STAGE_METADATA_ID}.${STEP_CREATE_ARTISTS_ID}.artists`, new Map());
     const albums: Map<string, Album> = getOrDefault(`${STAGE_METADATA_ID}.${STEP_CREATE_ALBUMS_ID}.albums`, new Map());
     const songs: Map<string, Song> = getOrDefault(`${STAGE_METADATA_ID}.${STEP_READ_TAGS_ID}.songs`, new Map());

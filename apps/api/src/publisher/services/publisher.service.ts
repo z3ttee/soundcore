@@ -3,7 +3,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Page, BasePageable } from 'nestjs-pager';
 import { In, Repository } from 'typeorm';
 import { Artwork } from '../../artwork/entities/artwork.entity';
-import { MeiliPublisherService } from '../../meilisearch/services/meili-publisher.service';
 import { MeilisearchFlag } from '../../utils/entities/meilisearch.entity';
 import { CreateResult } from '../../utils/results/creation.result';
 import { CreatePublisherDTO } from '../dtos/create-publisher.dto';
@@ -16,7 +15,7 @@ export class PublisherService {
 
     constructor(
         @InjectRepository(Publisher) private readonly repository: Repository<Publisher>,
-        private readonly meiliClient: MeiliPublisherService
+        // private readonly meiliClient: MeiliPublisherService
     ){}
 
     /**
@@ -88,7 +87,7 @@ export class PublisherService {
 
         const publisher = this.repository.create();
         publisher.name = createPublisherDto.name;
-        publisher.geniusId = createPublisherDto.geniusId;
+        // publisher.geniusId = createPublisherDto.geniusId;
         publisher.description = createPublisherDto.description;
 
         return this.repository.createQueryBuilder()
@@ -120,7 +119,7 @@ export class PublisherService {
         if(!publisher) throw new NotFoundException("Publisher not found.");
 
         publisher.name = updatePublisherDto.name;
-        publisher.geniusId = updatePublisherDto.geniusId;
+        // publisher.geniusId = updatePublisherDto.geniusId;
         publisher.description = updatePublisherDto.description;
 
         return this.save(publisher);
@@ -132,11 +131,13 @@ export class PublisherService {
      * @returns boolean
      */
     public async deleteById(publisherId: string): Promise<boolean> {
-        return this.meiliClient.deletePublisher(publisherId).then(() => {
-            return this.repository.delete({ id: publisherId }).then((value) => {
-                return value.affected > 0;
-            });
-        });
+        // return this.meiliClient.deletePublisher(publisherId).then(() => {
+        //     return this.repository.delete({ id: publisherId }).then((value) => {
+        //         return value.affected > 0;
+        //     });
+        // });
+
+        return false;
     }
 
     /**
@@ -192,11 +193,11 @@ export class PublisherService {
      * @returns Publisher
      */
     public async sync(resources: Publisher[]) {
-        return this.meiliClient.setPublishers(resources).then(() => {
-            return this.setSyncFlags(resources, MeilisearchFlag.OK);
-        }).catch(() => {
-            return this.setSyncFlags(resources, MeilisearchFlag.FAILED);
-        });
+        // return this.meiliClient.setPublishers(resources).then(() => {
+        //     return this.setSyncFlags(resources, MeilisearchFlag.OK);
+        // }).catch(() => {
+        //     return this.setSyncFlags(resources, MeilisearchFlag.FAILED);
+        // });
     }
 
 }

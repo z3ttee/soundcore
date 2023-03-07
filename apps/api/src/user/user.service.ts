@@ -3,7 +3,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { BasePageable, Page } from 'nestjs-pager';
 import { ILike, In, Repository } from 'typeorm';
 import { KeycloakTokenPayload } from '../authentication/entities/oidc-token.entity';
-import { MeiliUserService } from '../meilisearch/services/meili-user.service';
 import { MeilisearchFlag } from '../utils/entities/meilisearch.entity';
 import { User } from './entities/user.entity';
 
@@ -12,7 +11,7 @@ export class UserService {
     private readonly _logger: Logger = new Logger(UserService.name);
 
     constructor(
-        private readonly meiliClient: MeiliUserService,
+        // private readonly meiliClient: MeiliUserService,
         @InjectRepository(User) public readonly repository: Repository<User>
     ) {}
 
@@ -40,9 +39,9 @@ export class UserService {
             }
 
             // Update user in meilisearch
-            if(this.meiliClient.isSyncRecommended(existingUser)) {
-                this.sync([existingUser]);
-            }
+            // if(this.meiliClient.isSyncRecommended(existingUser)) {
+            //     this.sync([existingUser]);
+            // }
             
             return existingUser
         }
@@ -118,11 +117,11 @@ export class UserService {
      * @returns User
      */
     public async sync(resources: User[]) {
-        return this.meiliClient.setUsers(resources).then(() => {
-            return this.setSyncFlags(resources, MeilisearchFlag.OK);
-        }).catch(() => {
-            return this.setSyncFlags(resources, MeilisearchFlag.FAILED);
-        });
+        // return this.meiliClient.setUsers(resources).then(() => {
+        //     return this.setSyncFlags(resources, MeilisearchFlag.OK);
+        // }).catch(() => {
+        //     return this.setSyncFlags(resources, MeilisearchFlag.FAILED);
+        // });
     }
 
     public async findBySearchQuery(query: string, pageable: BasePageable): Promise<Page<User>> {

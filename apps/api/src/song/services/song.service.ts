@@ -10,7 +10,6 @@ import { In, Repository, SelectQueryBuilder, UpdateResult } from "typeorm";
 import { Environment } from "@soundcore/common";
 import { SyncableService } from "../../utils/services/syncing.service";
 import { Song } from "../entities/song.entity";
-import { MeiliSongService } from "../../meilisearch/services/meili-song.service";
 import { User } from "../../user/entities/user.entity";
 import { CreateSongDTO } from "../dtos/create-song.dto";
 import { Artwork, SongArtwork } from "../../artwork/entities/artwork.entity";
@@ -27,7 +26,7 @@ export class SongService implements SyncableService<Song> {
 
     constructor(
         @InjectRepository(Song) private readonly repository: Repository<Song>,
-        private readonly meilisearch: MeiliSongService
+        // private readonly meilisearch: MeiliSongService
     ){}
 
     /**
@@ -370,11 +369,13 @@ export class SongService implements SyncableService<Song> {
      * @returns UpdateResult
      */
     public async syncWithMeilisearch(resources: Song[]) {
-        return this.meilisearch.setSongs(resources).then(() => {
-            return this.setSyncFlags(resources, MeilisearchFlag.OK);
-        }).catch(() => {
-            return this.setSyncFlags(resources, MeilisearchFlag.FAILED);
-        });
+        // return this.meilisearch.setSongs(resources).then(() => {
+        //     return this.setSyncFlags(resources, MeilisearchFlag.OK);
+        // }).catch(() => {
+        //     return this.setSyncFlags(resources, MeilisearchFlag.FAILED);
+        // });
+
+        return null;
     }
 
     /**

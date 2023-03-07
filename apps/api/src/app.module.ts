@@ -69,11 +69,7 @@ import { MeilisearchModule } from './meilisearch/meilisearch.module';
         indexPrefix: "sc_"
       })
     }),
-    MeilisearchModule.forRoot({
-      host: process.env.MEILISEARCH_HOST,
-      port: process.env.MEILISEARCH_PORT ? parseInt(process.env.MEILISEARCH_PORT) : null,
-      apiKey: process.env.MEILISEARCH_KEY
-    }),
+    MeilisearchModule,
     PipesModule,
     CronModule,
     WorkerQueueModule.forRootAsync({

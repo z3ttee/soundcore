@@ -3,7 +3,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Page, BasePageable } from 'nestjs-pager';
 import { In, Repository } from 'typeorm';
 import { Artwork } from '../../artwork/entities/artwork.entity';
-import { MeiliDistributorService } from '../../meilisearch/services/meili-distributor.service';
 import { MeilisearchFlag } from '../../utils/entities/meilisearch.entity';
 import { CreateResult } from '../../utils/results/creation.result';
 import { CreateDistributorDTO } from '../dtos/create-distributor.dto';
@@ -15,8 +14,7 @@ export class DistributorService {
     private logger: Logger = new Logger(DistributorService.name)
 
     constructor(
-        @InjectRepository(Distributor) private readonly repository: Repository<Distributor>,
-        private readonly meiliClient: MeiliDistributorService
+        @InjectRepository(Distributor) private readonly repository: Repository<Distributor>
     ){ }
 
     /**
@@ -88,7 +86,7 @@ export class DistributorService {
 
         const distributor = this.repository.create();
         distributor.name = createDistributorDto.name;
-        distributor.geniusId = createDistributorDto.geniusId;
+        // distributor.geniusId = createDistributorDto.geniusId;
         distributor.description = createDistributorDto.description;
 
         return this.repository.createQueryBuilder()
@@ -120,7 +118,7 @@ export class DistributorService {
         if(!distributor) throw new NotFoundException("Distributor not found.");
 
         distributor.name = updateDistributorDto.name;
-        distributor.geniusId = updateDistributorDto.geniusId;
+        // distributor.geniusId = updateDistributorDto.geniusId;
         distributor.description = updateDistributorDto.description;
 
         return this.save(distributor);
@@ -132,11 +130,13 @@ export class DistributorService {
      * @returns boolean
      */
     public async deleteById(distributorId: string): Promise<boolean> {
-        return this.meiliClient.deleteDistributor(distributorId).then(() => {
-            return this.repository.delete({ id: distributorId }).then((value) => {
-                return value.affected > 0;
-            });
-        });
+        // return this.meiliClient.deleteDistributor(distributorId).then(() => {
+        //     return this.repository.delete({ id: distributorId }).then((value) => {
+        //         return value.affected > 0;
+        //     });
+        // });
+
+        return false;
     }
 
     /**
@@ -192,11 +192,11 @@ export class DistributorService {
      * @returns UpdateResult
      */
     public async sync(resources: Distributor[]) {
-        return this.meiliClient.setDistributors(resources).then(() => {
-            return this.setSyncFlags(resources, MeilisearchFlag.OK);
-        }).catch(() => {
-            return this.setSyncFlags(resources, MeilisearchFlag.FAILED);
-        });
+        // return this.meiliClient.setDistributors(resources).then(() => {
+        //     return this.setSyncFlags(resources, MeilisearchFlag.OK);
+        // }).catch(() => {
+        //     return this.setSyncFlags(resources, MeilisearchFlag.FAILED);
+        // });
     }
 
 }

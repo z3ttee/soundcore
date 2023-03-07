@@ -4,11 +4,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Page, BasePageable } from 'nestjs-pager';
 import { Not, Repository, SelectQueryBuilder, UpdateResult } from 'typeorm';
 import { EVENT_PLAYLISTS_CHANGED } from '../constants';
-import { MeiliPlaylistService } from '../meilisearch/services/meili-playlist.service';
 import { Song } from '../song/entities/song.entity';
 import { User } from '../user/entities/user.entity';
 import { MeilisearchFlag } from '../utils/entities/meilisearch.entity';
-import { CreateResult } from '../utils/results/creation.result';
 import { AddSongDTO } from './dtos/add-song.dto';
 import { CreatePlaylistDTO } from './dtos/create-playlist.dto';
 import { UpdatePlaylistDTO } from './dtos/update-playlist.dto';
@@ -24,7 +22,6 @@ export class PlaylistService {
         @InjectRepository(Playlist) private playlistRepository: Repository<Playlist>,
         @InjectRepository(PlaylistItem)  private song2playlistRepository: Repository<PlaylistItem>,
         private readonly emitter: EventEmitter2,
-        private readonly meiliClient: MeiliPlaylistService,
     ) {}
 
     /**
@@ -349,9 +346,10 @@ export class PlaylistService {
 
         if(playlist.author?.id != authentication?.id) throw new ForbiddenException("Not allowed.");
 
-        return this.meiliClient.deletePlaylist(playlist.id).then(() => {
-            return this.playlistRepository.delete({ id: playlist?.id }).then(() => true);
-        })
+        // return this.meiliClient.deletePlaylist(playlist.id).then(() => {
+        //     return this.playlistRepository.delete({ id: playlist?.id }).then(() => true);
+        // })
+        return false;
     }
 
     private async hasUserAccessToPlaylist(playlistId: string, authentication: User): Promise<boolean> {
@@ -400,11 +398,11 @@ export class PlaylistService {
      * @returns Playlist
      */
     public async sync(resources: Playlist[]) {
-        return this.meiliClient.setPlaylists(resources).then(() => {
-            return this.setLastSyncedDetails(resources, MeilisearchFlag.OK);
-        }).catch(() => {
-            return this.setLastSyncedDetails(resources, MeilisearchFlag.FAILED);
-        });
+        // return this.meiliClient.setPlaylists(resources).then(() => {
+        //     return this.setLastSyncedDetails(resources, MeilisearchFlag.OK);
+        // }).catch(() => {
+        //     return this.setLastSyncedDetails(resources, MeilisearchFlag.FAILED);
+        // });
     }
 
     /**

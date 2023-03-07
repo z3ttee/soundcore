@@ -3,7 +3,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Page, BasePageable } from 'nestjs-pager';
 import { In, Repository } from 'typeorm';
 import { Artwork } from '../../artwork/entities/artwork.entity';
-import { MeiliLabelService } from '../../meilisearch/services/meili-label.service';
 import { MeilisearchFlag } from '../../utils/entities/meilisearch.entity';
 import { CreateResult } from '../../utils/results/creation.result';
 import { CreateLabelDTO } from '../dtos/create-label.dto';
@@ -15,8 +14,7 @@ export class LabelService {
     private readonly logger: Logger = new Logger(LabelService.name);
 
     constructor(
-        @InjectRepository(Label) private readonly repository: Repository<Label>,
-        private readonly meiliClient: MeiliLabelService
+        @InjectRepository(Label) private readonly repository: Repository<Label>
     ){ }
 
     /**
@@ -88,7 +86,7 @@ export class LabelService {
 
         const label = this.repository.create();
         label.name = createLabelDto.name;
-        label.geniusId = createLabelDto.geniusId;
+        // label.geniusId = createLabelDto.geniusId;
         label.description = createLabelDto.description;
 
         return this.repository.createQueryBuilder()
@@ -120,7 +118,7 @@ export class LabelService {
         if(!label) throw new NotFoundException("Label not found.");
 
         label.name = updateLabelDto.name;
-        label.geniusId = updateLabelDto.geniusId;
+        // label.geniusId = updateLabelDto.geniusId;
         label.description = updateLabelDto.description;
 
         return this.save(label);
@@ -132,11 +130,13 @@ export class LabelService {
      * @returns True or False
      */
     public async deleteById(labelId: string): Promise<boolean> {
-        return this.meiliClient.deleteLabel(labelId).then(() => {
-            return this.repository.delete({ id: labelId }).then((value) => {
-                return value.affected > 0;
-            });
-        });
+        // return this.meiliClient.deleteLabel(labelId).then(() => {
+        //     return this.repository.delete({ id: labelId }).then((value) => {
+        //         return value.affected > 0;
+        //     });
+        // });
+
+        return false;
     }
 
     /**
@@ -192,11 +192,11 @@ export class LabelService {
      * @returns Label
      */
     public async sync(resources: Label[]) {
-        return this.meiliClient.setLabels(resources).then(() => {
-            return this.setSyncFlags(resources, MeilisearchFlag.OK);
-        }).catch(() => {
-            return this.setSyncFlags(resources, MeilisearchFlag.FAILED);
-        });
+        // return this.meiliClient.setLabels(resources).then(() => {
+        //     return this.setSyncFlags(resources, MeilisearchFlag.OK);
+        // }).catch(() => {
+        //     return this.setSyncFlags(resources, MeilisearchFlag.FAILED);
+        // });
     }
 
 }

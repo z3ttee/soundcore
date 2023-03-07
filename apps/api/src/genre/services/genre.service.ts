@@ -88,7 +88,7 @@ export class GenreService {
 
         const genre = this.repository.create();
         genre.name = createGenreDto.name;
-        genre.geniusId = createGenreDto.geniusId;
+        // genre.geniusId = createGenreDto.geniusId;
         genre.description = createGenreDto.description;
 
         return this.repository.createQueryBuilder()
@@ -120,7 +120,7 @@ export class GenreService {
         if(!genre) throw new NotFoundException("Genre not found.");
 
         genre.name = updateGenreDto.name;
-        genre.geniusId = updateGenreDto.geniusId;
+        // genre.geniusId = updateGenreDto.geniusId;
         genre.description = updateGenreDto.description;
         return this.repository.save(genre);
     }

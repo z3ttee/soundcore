@@ -4,7 +4,7 @@ import { AccessorDecorator } from "../definitions";
 import { PropertyOptions } from "./property.decorator";
 
 export interface PrimaryKeyOptions extends PropertyOptions {
-    name: string;
+    name?: string;
 }
 
 export function PrimaryKey();
