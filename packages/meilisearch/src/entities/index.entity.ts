@@ -32,6 +32,12 @@ export class MeiliIndex<T = any> extends Index<T> {
         return super.updateDocumentsInBatches(documents.map((document) => this.buildDocument(document)), batchSize, options);
     }
 
+    /**
+     * Prepare the object for transfer to meilisearch.
+     * This will parse nested objects and will only include annotated properties
+     * @param document 
+     * @returns Modified and filtered object
+     */
     private buildDocument(document: T | Partial<T>): T {
         const whitelistedProps: string[] = Reflect.getMetadata(REFLECT_MEILIINDEX_INCLUDED_PROPS, this.schema) ?? [];
         const result = Object.fromEntries(Object.entries(document).filter(([key, _]) => whitelistedProps.includes(key))) as unknown as T;

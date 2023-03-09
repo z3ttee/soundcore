@@ -41,8 +41,12 @@ export class ArtistMeiliService {
     public async syncAndUpdateEntities(entities: Partial<Artist>[]) {
         let flag: MeilisearchFlag = MeilisearchFlag.OK;
 
-        await this.index.updateDocuments(entities).then(async (task) => {
-            return this.index.waitForTask(task.taskUid)
+        await this.index.updateDocuments(entities).then(async (enqeuedTask) => {
+            return this.index.waitForTask(enqeuedTask.taskUid).then((task) => {
+                if(task.error) {
+                    throw new Error(`(${task.error.code}) Error occured while updating documents: ${task.error.message}. See '${task.error.link}' for more information`);
+                }
+            })
         }).then(() => {
             flag = MeilisearchFlag.OK;
         }).catch((error: Error) => {

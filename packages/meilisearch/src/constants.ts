@@ -15,4 +15,5 @@ export const REFLECT_MEILIINDEX_DISPLAYABLE_ATTRS = "__meilisearch_index_display
 export const REFLECT_MEILIINDEX_INCLUDED_PROPS = "__meilisearch_index_included_props__";
 
 export const REFLECT_MEILIINDEX_PROPERTY_NAME = "__meilisearch_index_property_options__";
-
+export const REFLECT_MEILIINDEX_RELATION_HAS_ONE = "__meilisearch_index_relation_has_one__";
+export const REFLECT_MEILIINDEX_RELATION_HAS_MANY = "__meilisearch_index_relation_has_many__";

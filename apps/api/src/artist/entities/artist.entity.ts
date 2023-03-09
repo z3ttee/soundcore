@@ -1,9 +1,9 @@
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { Album } from "../../album/entities/album.entity";
-import { ArtistArtwork } from "../../artwork/entities/artwork.entity";
+import { ArtistArtwork, ArtworkIndex } from "../../artwork/entities/artwork.entity";
 import { Resource, ResourceFlag, ResourceType } from "../../utils/entities/resource";
 import { Song } from "../../song/entities/song.entity";
-import { IndexEntity, PrimaryKey, Property } from "@soundcore/meilisearch";
+import { HasOne, IndexEntity, PrimaryKey, Property } from "@soundcore/meilisearch";
 import { MeilisearchInfo } from "../../utils/entities/meilisearch.entity";
 import { GeniusInfo } from "../../utils/entities/genius.entity";
 
@@ -72,7 +72,8 @@ export class ArtistIndex {
     @Property()
     public slug: string;
 
-    @Property({ searchable: false })
-    public artwork: { id: string };
+    // @Property({ searchable: false })
+    @HasOne(ArtworkIndex)
+    public artwork: ArtworkIndex;
 
 }

@@ -1,4 +1,5 @@
 
+import { IndexEntity, PrimaryKey } from "@soundcore/meilisearch";
 import { ChildEntity, Column, CreateDateColumn, Entity, OneToMany, PrimaryColumn, TableInheritance } from "typeorm";
 import { Album } from "../../album/entities/album.entity";
 import { Artist } from "../../artist/entities/artist.entity";
@@ -82,5 +83,13 @@ export class DownloadableArtwork extends Artwork {
     
     @Column({ type: "varchar", nullable: true })
     public srcUrl: string;
+
+}
+
+@IndexEntity()
+export class ArtworkIndex {
+
+    @PrimaryKey()
+    public id: string;
 
 }

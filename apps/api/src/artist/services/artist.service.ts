@@ -125,7 +125,7 @@ export class ArtistService {
         return await this.repository.createQueryBuilder()
             .insert()
             .values(dtos)
-            .orUpdate(["name"], ["id"], { skipUpdateIfNoValuesChanged: false })
+            .orUpdate(["name", "meilisearchFlag"], ["id"], { skipUpdateIfNoValuesChanged: false })
             .returning(["id"])
             .execute().then((insertResult) => {
                 const alias = "artist";

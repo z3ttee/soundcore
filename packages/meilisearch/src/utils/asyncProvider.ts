@@ -1,7 +1,7 @@
 import { Logger, Provider } from "@nestjs/common";
 import { pascalToSnakeCase } from "@soundcore/common";
 import { Config, IndexObject } from "meilisearch";
-import { REFLECT_MEILIINDEX_DISPLAYABLE_ATTRS, REFLECT_MEILIINDEX_FILTERABLE_ATTRS, REFLECT_MEILIINDEX_OPTIONS, REFLECT_MEILIINDEX_PRIMARY_KEY, REFLECT_MEILIINDEX_SEARCHABLE_ATTRS, REFLECT_MEILIINDEX_SORTABLE_ATTRS } from "../constants";
+import { REFLECT_MEILIINDEX_DISPLAYABLE_ATTRS, REFLECT_MEILIINDEX_FILTERABLE_ATTRS, REFLECT_MEILIINDEX_INCLUDED_PROPS, REFLECT_MEILIINDEX_OPTIONS, REFLECT_MEILIINDEX_PRIMARY_KEY, REFLECT_MEILIINDEX_SEARCHABLE_ATTRS, REFLECT_MEILIINDEX_SORTABLE_ATTRS } from "../constants";
 import { IndexOptions } from "../decorators/index.decorator";
 import { IndexSchema } from "../definitions";
 import { MeiliClient } from "../entities/client.entity";
@@ -73,11 +73,16 @@ export function createIndexesAsyncProviders(inject: any[], schemas: IndexSchema[
       // Extract primary key
       const primaryKey = Reflect.getOwnMetadata(REFLECT_MEILIINDEX_PRIMARY_KEY, schema) ?? "id";
 
+      console.log(Reflect.getMetadataKeys(schema));
+
       // Extract attribute options
-      const searchableAttrs: string[] = Reflect.getMetadata(REFLECT_MEILIINDEX_SEARCHABLE_ATTRS, schema) ?? ["*"];
+      const searchableAttrs: string[] = Reflect.getMetadata(REFLECT_MEILIINDEX_SEARCHABLE_ATTRS, schema) ?? [];
       const filterableAttrs: string[] = Reflect.getMetadata(REFLECT_MEILIINDEX_FILTERABLE_ATTRS, schema) ?? [];
-      const displayableAttrs: string[] = Reflect.getMetadata(REFLECT_MEILIINDEX_DISPLAYABLE_ATTRS, schema) ?? ["*"];
+      const displayableAttrs: string[] = Reflect.getMetadata(REFLECT_MEILIINDEX_DISPLAYABLE_ATTRS, schema) ?? [];
       const sortableAttributes: string[] = Reflect.getMetadata(REFLECT_MEILIINDEX_SORTABLE_ATTRS, schema) ?? [];
+
+      const includedProps: string[] = Reflect.getMetadata(REFLECT_MEILIINDEX_INCLUDED_PROPS, schema) ?? [];
+      console.log(includedProps);
 
       const index = client.index(uid);
 
@@ -93,6 +98,7 @@ export function createIndexesAsyncProviders(inject: any[], schemas: IndexSchema[
           }).then((task) => {
             return index.waitForTask(task.taskUid).then(() => {
               return index.getRawInfo().then((metadata) => {
+                logger.log(`Updated index '${metadata.uid}' on meilisearch`);
                 return new MeiliIndex(config, uid, primaryKey, schema, metadata);
               }).catch((error: Error) => {
                 logger.error(`Failed fetching metadata for index '${uid}: ${error.message}'`, error.stack);
