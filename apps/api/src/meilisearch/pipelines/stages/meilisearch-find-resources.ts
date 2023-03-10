@@ -3,11 +3,11 @@ import { MeiliClient, MeiliIndex } from "@soundcore/meilisearch";
 import { progress, StepParams } from "@soundcore/pipelines";
 import { Page, Pageable } from "nestjs-pager";
 import { DataSource } from "typeorm";
-import { Album, AlbumIndex } from "../../../album/entities/album.entity";
+import { Album } from "../../../album/entities/album.entity";
 import { AlbumMeiliService } from "../../../album/services/album-meili.service";
-import { Artist, ArtistIndex } from "../../../artist/entities/artist.entity";
+import { Artist } from "../../../artist/entities/artist.entity";
 import { ArtistMeiliService } from "../../../artist/services/artist-meili.service";
-import { Song, SongIndex } from "../../../song/entities/song.entity";
+import { Song } from "../../../song/entities/song.entity";
 import { SongMeiliService } from "../../../song/services/song-meili.service";
 
 export async function stage_checkout_resources(params: StepParams) {    
@@ -20,7 +20,7 @@ export async function step_sync_artists(params: StepParams) {
     const meilisearch: MeiliClient = resources.meilisearch;
 
     const artistRepo = datasource.getRepository(Artist);
-    const index: MeiliIndex<ArtistIndex> = meilisearch.getIndexFromSchema(ArtistIndex);
+    const index: MeiliIndex<Artist> = meilisearch.getIndexFromSchema(Artist);
     const service = new ArtistMeiliService(index, artistRepo);
 
     const entities: Artist[] = [];
@@ -61,7 +61,7 @@ export async function step_sync_albums(params: StepParams) {
     const meilisearch: MeiliClient = resources.meilisearch;
 
     const repository = datasource.getRepository(Album);
-    const index: MeiliIndex<AlbumIndex> = meilisearch.getIndexFromSchema(AlbumIndex);
+    const index: MeiliIndex<Album> = meilisearch.getIndexFromSchema(Album);
     const service = new AlbumMeiliService(index, repository);
 
     const entities: Album[] = [];
@@ -102,7 +102,7 @@ export async function step_sync_songs(params: StepParams) {
     const meilisearch: MeiliClient = resources.meilisearch;
 
     const repository = datasource.getRepository(Song);
-    const index: MeiliIndex<SongIndex> = meilisearch.getIndexFromSchema(SongIndex);
+    const index: MeiliIndex<Song> = meilisearch.getIndexFromSchema(Song);
     const service = new SongMeiliService(index, repository);
 
     const entities: Song[] = [];

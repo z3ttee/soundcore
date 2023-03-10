@@ -7,7 +7,7 @@ import { PublisherModule } from '../publisher/publisher.module';
 import { LabelModule } from '../label/label.module';
 import { AlbumModule } from '../album/album.module';
 import { ArtworkModule } from '../artwork/artwork.module';
-import { Song, SongIndex } from './entities/song.entity';
+import { Song } from './entities/song.entity';
 import { PlaylistItem } from '../playlist/entities/playlist-item.entity';
 import { SongService } from './services/song.service';
 import { MeilisearchModule } from '@soundcore/meilisearch';
@@ -29,7 +29,7 @@ import { SongMeiliService } from './services/song-meili.service';
     AlbumModule,
     ArtworkModule,
     TypeOrmModule.forFeature([ Song, PlaylistItem ]),
-    MeilisearchModule.forFeature([ SongIndex ])
+    MeilisearchModule.forFeature([ Song ])
   ],
   exports: [
     SongService,

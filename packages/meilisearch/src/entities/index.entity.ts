@@ -1,5 +1,7 @@
 import { Config, DocumentOptions, EnqueuedTask, Index, IndexObject } from "meilisearch";
-import { REFLECT_MEILIINDEX_INCLUDED_PROPS } from "../constants";
+import { IndexSchema } from "../definitions";
+import { filterDocument } from "../utils/documentBuilder";
+import { getAllSchemaAttributes, getSchemaAttributes, getSchemaRelations } from "../utils/reflectUtils";
 
 export class MeiliIndex<T = any> extends Index<T> {
 
@@ -39,9 +41,9 @@ export class MeiliIndex<T = any> extends Index<T> {
      * @returns Modified and filtered object
      */
     private buildDocument(document: T | Partial<T>): T {
-        const whitelistedProps: string[] = Reflect.getMetadata(REFLECT_MEILIINDEX_INCLUDED_PROPS, this.schema) ?? [];
-        const result = Object.fromEntries(Object.entries(document).filter(([key, _]) => whitelistedProps.includes(key))) as unknown as T;
-        return result;
+        const attributes = getAllSchemaAttributes(this.schema as IndexSchema);
+        const includedProps = Array.from(attributes.keys());
+        return filterDocument<T>(document, includedProps);
     }
     
 }

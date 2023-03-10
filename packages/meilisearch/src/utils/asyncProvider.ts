@@ -1,12 +1,12 @@
 import { Logger, Provider } from "@nestjs/common";
-import { pascalToSnakeCase } from "@soundcore/common";
+import { isUndefined, pascalToSnakeCase } from "@soundcore/common";
 import { Config, IndexObject } from "meilisearch";
-import { REFLECT_MEILIINDEX_DISPLAYABLE_ATTRS, REFLECT_MEILIINDEX_FILTERABLE_ATTRS, REFLECT_MEILIINDEX_INCLUDED_PROPS, REFLECT_MEILIINDEX_OPTIONS, REFLECT_MEILIINDEX_PRIMARY_KEY, REFLECT_MEILIINDEX_SEARCHABLE_ATTRS, REFLECT_MEILIINDEX_SORTABLE_ATTRS } from "../constants";
-import { IndexOptions } from "../decorators/index.decorator";
+import { IndexOptions } from "../decorators/meilisearch.decorator";
 import { IndexSchema } from "../definitions";
 import { MeiliClient } from "../entities/client.entity";
 import { MeiliIndex } from "../entities/index.entity";
 import { MeilisearchRootOptions } from "../options";
+import { getAllSchemaAttributes, getIndexOptions, getPrimaryAttribute, getSchemaAttributes, getSchemaRelations } from "./reflectUtils";
 
 export function createOptionsProviderAsync(providerToken: string, inject: any[], useFactory: (...args: any[]) => Promise<MeilisearchRootOptions> | MeilisearchRootOptions): Provider<MeilisearchRootOptions> {
   return {
@@ -56,38 +56,48 @@ export function createIndexesAsyncProviders(inject: any[], schemas: IndexSchema[
     provide: getSchemaToken(schema),
     inject: inject,
     useFactory: async (client: MeiliClient, meiliOptions: MeilisearchRootOptions): Promise<MeiliIndex<any>> => {
-      // Check if schema has metadata
-      if(!Reflect.hasMetadata(REFLECT_MEILIINDEX_OPTIONS, schema)){
+      // Extract index options from reflect-metadata
+      const options: IndexOptions = getIndexOptions(schema);
+
+      // Check if schema has options
+      if(isUndefined(options)) {
         logger.warn(`Please decorate index schemas using @MeiliIndex(). This is missing on '${schema.name}'`);
         return null;
       }
 
-      // Extract index options from decorator
-      const options: IndexOptions = Reflect.getOwnMetadata(REFLECT_MEILIINDEX_OPTIONS, schema) ?? {};
-      const uid = options.uid;
-      const config = createMeiliConfig(meiliOptions);
-
-      // Register schema in client
-      client.schemas.register(uid, schema);
       
+
+      // Create meilisearch connection config
+      const config = createMeiliConfig(meiliOptions);
       // Extract primary key
-      const primaryKey = Reflect.getOwnMetadata(REFLECT_MEILIINDEX_PRIMARY_KEY, schema) ?? "id";
-
-      console.log(Reflect.getMetadataKeys(schema));
-
-      // Extract attribute options
-      const searchableAttrs: string[] = Reflect.getMetadata(REFLECT_MEILIINDEX_SEARCHABLE_ATTRS, schema) ?? [];
-      const filterableAttrs: string[] = Reflect.getMetadata(REFLECT_MEILIINDEX_FILTERABLE_ATTRS, schema) ?? [];
-      const displayableAttrs: string[] = Reflect.getMetadata(REFLECT_MEILIINDEX_DISPLAYABLE_ATTRS, schema) ?? [];
-      const sortableAttributes: string[] = Reflect.getMetadata(REFLECT_MEILIINDEX_SORTABLE_ATTRS, schema) ?? [];
-
-      const includedProps: string[] = Reflect.getMetadata(REFLECT_MEILIINDEX_INCLUDED_PROPS, schema) ?? [];
-      console.log(includedProps);
-
+      const primaryKeyAttr = getPrimaryAttribute(schema);
+      // Extract index uid
+      const uid = options.uid;
+      // Register schema in client (used to get schema instances inside services)
+      client.schemas.register(uid, schema);
+      // Build index
       const index = client.index(uid);
+      // Extract attributes
+      const attributes = getAllSchemaAttributes(schema, logger);
 
-      return index.update({ primaryKey: primaryKey }).then((task) => {
+      // Sort attributes
+      const searchableAttrs: string[] = [];
+      const filterableAttrs: string[] = [];
+      const displayableAttrs: string[] = [];
+      const sortableAttributes: string[] = [];
+
+      for(const attr of attributes.values()) {
+        if(attr.searchable) searchableAttrs.push(attr.attrName);
+        if(attr.filterable) filterableAttrs.push(attr.attrName);
+        if(attr.sortable) sortableAttributes.push(attr.attrName);
+        if(attr.displayable) displayableAttrs.push(attr.attrName);
+      }
+      
+      // Execute update task on meilisearch to update primary key
+      return index.update({ primaryKey: primaryKeyAttr.attrName }).then((task) => {
+        // Wait for changes to be done
         return index.waitForTask(task.taskUid).then(() => {
+          // Send update settings request to change attribute settings
           return index.updateSettings({
             searchableAttributes: searchableAttrs,
             displayedAttributes: displayableAttrs,
@@ -96,10 +106,11 @@ export function createIndexesAsyncProviders(inject: any[], schemas: IndexSchema[
             faceting: options.faceting,
             typoTolerance: options.typoTolerance
           }).then((task) => {
+            // Wait for changes to be done
             return index.waitForTask(task.taskUid).then(() => {
               return index.getRawInfo().then((metadata) => {
                 logger.log(`Updated index '${metadata.uid}' on meilisearch`);
-                return new MeiliIndex(config, uid, primaryKey, schema, metadata);
+                return new MeiliIndex(config, uid, primaryKeyAttr.attrName, schema, metadata);
               }).catch((error: Error) => {
                 logger.error(`Failed fetching metadata for index '${uid}: ${error.message}'`, error.stack);
                 throw error;
@@ -123,9 +134,9 @@ export function getSchemaToken(schema: IndexSchema) {
 }
 
 export function createMeiliIndex(config: Config, schema: IndexSchema, metadata?: IndexObject) {
-  const options: IndexOptions = Reflect.getOwnMetadata(REFLECT_MEILIINDEX_OPTIONS, schema) ?? {};
+  const options = getIndexOptions(schema);
   const uid = options.uid;
-  const primaryKey = Reflect.getOwnMetadata(REFLECT_MEILIINDEX_PRIMARY_KEY, schema) ?? "id";
+  const primaryKey = getPrimaryAttribute(schema)?.attrName ?? "id";
 
   return new MeiliIndex(config, uid, primaryKey, schema, metadata);
 }

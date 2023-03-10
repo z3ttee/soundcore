@@ -16,7 +16,7 @@ import { SongArtwork } from "../../artwork/entities/artwork.entity";
 import { TracklistItem } from "../../tracklist/entities/tracklist.entity";
 import { GeniusInfo } from "../../utils/entities/genius.entity";
 import { MeilisearchInfo } from "../../utils/entities/meilisearch.entity";
-import { IndexEntity, PrimaryKey, Property } from "@soundcore/meilisearch";
+import { MeilisearchHasMany, MeilisearchHasOne, MeilisearchIndex, MeilisearchPK, MeilisearchProp } from "@soundcore/meilisearch";
 
 export interface SongID {
     id: string;
@@ -26,6 +26,7 @@ export const SONG_ARTWORK_RELATION_FK = "artworkId"
 
 @Entity()
 @Index(["name", "primaryArtist", "album", "duration", "order"], { unique: true })
+@MeilisearchIndex()
 export class Song implements SongID, Resource, TracklistItem {
     public resourceType: ResourceType = "song";
 
@@ -45,18 +46,22 @@ export class Song implements SongID, Resource, TracklistItem {
      * DEFAULT ATTRIBUTES
      */
     @PrimaryGeneratedColumn("uuid")
+    @MeilisearchPK({ searchable: false })
     public id: string;
 
     @Column({ type: "tinyint", default: 0 })
     public flag: ResourceFlag;
 
     @Column({ nullable: true, length: 120 })
+    @MeilisearchProp()
     public slug: string;
 
     @Column({ nullable: false, collation: "utf8mb4_bin" })
+    @MeilisearchProp()
     public name: string;
 
     @Column({ nullable: false, default: 0 })
+    @MeilisearchProp({ searchable: false })
     public duration: number;
 
     @Column({ type: "text", nullable: true })
@@ -69,6 +74,7 @@ export class Song implements SongID, Resource, TracklistItem {
     public releasedAt?: Date;
 
     @Column({ default: false })
+    @MeilisearchProp({ searchable: false })
     public explicit: boolean;
 
     @Column({ nullable: true, type: "text" })
@@ -78,6 +84,7 @@ export class Song implements SongID, Resource, TracklistItem {
     public youtubeUrlStart?: string;
 
     @Column({ nullable: true, default: null })
+    @MeilisearchProp({ searchable: false })
     public order: number;
 
     /**
@@ -98,18 +105,22 @@ export class Song implements SongID, Resource, TracklistItem {
 
     @ManyToOne(() => SongArtwork, { onDelete: "SET NULL", nullable: true })
     @JoinColumn({ name: SONG_ARTWORK_RELATION_FK })
+    @MeilisearchHasOne(() => SongArtwork)
     public artwork: SongArtwork;
 
     @ManyToOne(() => Artist, { onDelete: "SET NULL", nullable: true })
     @JoinColumn()
+    @MeilisearchHasOne(() => Artist)
     public primaryArtist: Artist;
 
     @ManyToMany(() => Artist, { onDelete: "CASCADE", nullable: true })
     @JoinTable({ name: "featuring2song" })
+    @MeilisearchHasMany(() => Artist)
     public featuredArtists: Artist[];
 
     @ManyToOne(() => Album, { onDelete: "SET NULL", nullable: true })
     @JoinColumn()
+    @MeilisearchHasOne(() => Artist)
     public album: Album;
 
     @ManyToMany(() => Publisher)
@@ -154,44 +165,4 @@ export class Song implements SongID, Resource, TracklistItem {
         if(!this.slug) Slug.create(this.name);
     }
 
-}
-
-
-@IndexEntity()
-export class SongIndex {
-    @PrimaryKey({ searchable: false })
-    public id: string;
-
-    @Property()
-    public name: string;
-
-    @Property()
-    public slug: string;
-
-    @Property()
-    public explicit: boolean;
-
-    @Property({ searchable: false })
-    public artwork: { id: string };
-
-    @Property()
-    public primaryArtist: {
-        id: string;
-        slug: string;
-        name: string;
-    };
-
-    @Property()
-    public featuredArtists: {
-        id: string;
-        slug: string;
-        name: string;
-    }[];
-
-    @Property()
-    public album: {
-        id: string;
-        slug: string;
-        name: string;
-    };
 }

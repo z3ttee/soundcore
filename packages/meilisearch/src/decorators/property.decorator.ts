@@ -1,6 +1,5 @@
-import { pascalToSnakeCase } from "@soundcore/common";
-import { REFLECT_MEILIINDEX_PROPERTY_NAME } from "../constants";
-import { addToAttrs } from "../utils/reflectUtils";
+import { IndexAttribute } from "../entities/index-attr.entity";
+import { addSchemaAttribute } from "../utils/reflectUtils";
 
 export interface PropertyOptions {
     /**
@@ -30,7 +29,7 @@ export interface PropertyOptions {
      * @see [Displayed attributes](https://docs.meilisearch.com/reference/api/settings.html#displayed-attributes)
      * @default true
      */
-    selectable?: boolean;
+    displayable?: boolean;
 
     /**
      * Attributes that can be used when sorting search results using the sort search parameter.
@@ -42,13 +41,18 @@ export interface PropertyOptions {
 }
 
 // export function Property();
-export function Property(options?: PropertyOptions) {
+export function MeilisearchProp(options?: PropertyOptions) {
 
     return (target, propertyKey) => {
         const constructor = target.constructor;
-
-        addToAttrs(target, propertyKey, options);
-        Reflect.defineMetadata(REFLECT_MEILIINDEX_PROPERTY_NAME, pascalToSnakeCase(constructor["name"]), constructor, propertyKey);
+        addSchemaAttribute(constructor, new IndexAttribute(
+            propertyKey, // Attr name
+            false, // Is Primary?
+            options?.searchable ?? true,
+            options?.filterable,
+            options?.sortable,
+            options?.displayable
+        ));
     };
 }
 

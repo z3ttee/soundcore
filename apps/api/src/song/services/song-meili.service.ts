@@ -4,14 +4,14 @@ import { InjectIndex, MeiliIndex } from "@soundcore/meilisearch";
 import { Page, Pageable } from "nestjs-pager";
 import { Repository } from "typeorm";
 import { MeilisearchFlag } from "../../utils/entities/meilisearch.entity";
-import { Song, SongIndex } from "../entities/song.entity";
+import { Song } from "../entities/song.entity";
 
 @Injectable()
 export class SongMeiliService {
     private readonly logger = new Logger(SongMeiliService.name);
 
     constructor(
-        @InjectIndex(SongIndex) private readonly index: MeiliIndex<SongIndex>,
+        @InjectIndex(Song) private readonly index: MeiliIndex<Song>,
         @InjectRepository(Song) private readonly repository: Repository<Song>
     ) {}
 

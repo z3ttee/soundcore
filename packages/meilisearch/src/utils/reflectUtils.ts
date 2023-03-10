@@ -1,104 +1,78 @@
-import { REFLECT_MEILIINDEX_DISPLAYABLE_ATTRS, REFLECT_MEILIINDEX_FILTERABLE_ATTRS, REFLECT_MEILIINDEX_INCLUDED_PROPS, REFLECT_MEILIINDEX_OPTIONS, REFLECT_MEILIINDEX_SEARCHABLE_ATTRS, REFLECT_MEILIINDEX_SORTABLE_ATTRS } from "../constants";
-import { IndexOptions } from "../decorators/index.decorator";
-import { PropertyOptions } from "../decorators/property.decorator";
+import { Logger } from "@nestjs/common";
+import { isUndefined } from "@soundcore/common";
+import { REFLECT_MEILIINDEX_ATTRIBUTES, REFLECT_MEILIINDEX_OPTIONS, REFLECT_MEILIINDEX_RELATIONS } from "../constants";
+import { IndexOptions } from "../decorators/meilisearch.decorator";
 import { IndexSchema } from "../definitions";
+import { IndexAttribute, IndexAttributeRelation } from "../entities/index-attr.entity";
 
-export function copyMetadataToParent(parentTarget, subTarget) {
-    console.log(Reflect.getMetadataKeys(parentTarget));
-
-    // console.log(Reflect.getMetadataKeys(subTarget));
-
-    const parentOptions: IndexOptions = Reflect.getOwnMetadata(REFLECT_MEILIINDEX_OPTIONS, parentTarget) ?? {};
-
-    console.log(parentTarget, parentOptions);
-
-    const searchableAttributesSub: string[] = Reflect.getMetadata(REFLECT_MEILIINDEX_SEARCHABLE_ATTRS, subTarget) ?? [];
-    const searchableAttributesParent: string[] = Reflect.getMetadata(REFLECT_MEILIINDEX_SEARCHABLE_ATTRS, parentTarget) ?? [];
-
-
-    console.log(searchableAttributesSub, "+", searchableAttributesParent);
+export function getSchemaRelations(schema: IndexSchema): Map<string, IndexAttributeRelation> {
+    return Reflect.getMetadata(REFLECT_MEILIINDEX_RELATIONS, schema) ?? new Map();
 }
 
-export function getSearchableAttributes(schema: IndexSchema): string[] {
-    return Reflect.getMetadata(REFLECT_MEILIINDEX_SEARCHABLE_ATTRS, schema) ?? [];
+export function setSchemaRelations(schema: IndexSchema, attrs: Map<string, IndexAttributeRelation>) {
+    Reflect.defineMetadata(REFLECT_MEILIINDEX_RELATIONS, attrs, schema);
 }
 
-export function getDisplayableAttributes(schema: IndexSchema): string[] {
-    return Reflect.getMetadata(REFLECT_MEILIINDEX_DISPLAYABLE_ATTRS, schema) ?? [];
+export function addSchemaRelation(schema: IndexSchema, relation: IndexAttributeRelation) {
+    const attrs = getSchemaRelations(schema);
+    if(attrs.has(relation.attrName)) return;
+    attrs.set(relation.attrName, relation);
+    setSchemaRelations(schema, attrs);
 }
 
-export function getFilterableAttributes(schema: IndexSchema): string[] {
-    return Reflect.getMetadata(REFLECT_MEILIINDEX_FILTERABLE_ATTRS, schema) ?? [];
+export function getSchemaAttributes(schema: IndexSchema): Map<string, IndexAttribute> {
+    return Reflect.getMetadata(REFLECT_MEILIINDEX_ATTRIBUTES, schema) ?? new Map();
 }
 
-export function getSortableAttributes(schema: IndexSchema): string[] {
-    return Reflect.getMetadata(REFLECT_MEILIINDEX_SORTABLE_ATTRS, schema) ?? [];
+export function setSchemaAttributes(schema: IndexSchema, attrs: Map<string, IndexAttribute>) {
+    Reflect.defineMetadata(REFLECT_MEILIINDEX_ATTRIBUTES, attrs, schema);
 }
 
-export function getIncludedAttrs(schema: IndexSchema): string[] {
-    return Reflect.getMetadata(REFLECT_MEILIINDEX_INCLUDED_PROPS, schema) ?? [];
+export function addSchemaAttribute(schema: IndexSchema, attr: IndexAttribute) {
+    const attrs = getSchemaAttributes(schema);
+    if(attrs.has(attr.attrName)) return;
+    attrs.set(attr.attrName, attr);
+    setSchemaAttributes(schema, attrs);
 }
 
-function define(key: string, attrs: string[], schema: IndexSchema) {
-    Reflect.defineMetadata(key, attrs, schema);
+export function getPrimaryAttribute(schema: IndexSchema): IndexAttribute {
+    const attrs = getSchemaAttributes(schema);
+    return Array.from(attrs.values()).find((attr) => attr.isPrimary);
 }
 
-export function setSearchableAttrs(schema: IndexSchema, attrs: string[]) {
-    define(REFLECT_MEILIINDEX_SEARCHABLE_ATTRS, attrs, schema);
+export function getRelationOfAttr(schema: IndexSchema, propertyKey: string): IndexAttributeRelation {
+    const attrs = getSchemaRelations(schema);
+    return Array.from(attrs.values()).find((attr) => attr.attrName === propertyKey);
 }
 
-export function setDisplayableAttrs(schema: IndexSchema, attrs: string[]) {
-    define(REFLECT_MEILIINDEX_DISPLAYABLE_ATTRS, attrs, schema);
+export function setIndexOptions(schema: IndexSchema, options: IndexOptions) {
+    Reflect.defineMetadata(REFLECT_MEILIINDEX_OPTIONS, options, schema)
 }
 
-export function setFilterableAttrs(schema: IndexSchema, attrs: string[]) {
-    define(REFLECT_MEILIINDEX_FILTERABLE_ATTRS, attrs, schema);
+export function getIndexOptions(schema: IndexSchema): IndexOptions {
+    return Reflect.getOwnMetadata(REFLECT_MEILIINDEX_OPTIONS, schema)
 }
 
-export function setSortableAttrs(schema: IndexSchema, attrs: string[]) {
-    define(REFLECT_MEILIINDEX_SORTABLE_ATTRS, attrs, schema);
-}
+export function getAllSchemaAttributes(schema: IndexSchema, logger?: Logger): Map<string, IndexAttribute> {
+    const attrs = new Map(getSchemaAttributes(schema));
+    
+    for(const relation of getSchemaRelations(schema).values()) {
+        const relationSchema = relation.relationSchema;
+        if(isUndefined(relationSchema)) {
+          logger?.warn(`Cannot find schema for relation '${relation.attrName}' (${relation.type}). Did you forget to decorate the relation-class-type using @MeiliIndex()?`);
+          continue;
+        }
 
-export function setIncludedAttrs(schema: IndexSchema, attrs: string[]) {
-    define(REFLECT_MEILIINDEX_INCLUDED_PROPS, attrs, schema);
-}
+        const relationAttrs = getSchemaAttributes(relationSchema);
+        for(const attr of relationAttrs.values()) {
+            const attrCopy: IndexAttribute = {
+                ...attr,
+                isPrimary: false,
+                attrName: `${relation.attrName}.${attr.attrName}`
+            }
+            attrs.set(`${relation.attrName}.${attr.attrName}`, attrCopy);
+        }
+    }
 
-export function addSearchableAttr(schema: IndexSchema, property: string) {
-    const attrs = getSearchableAttributes(schema);
-    attrs.push(property);
-    setSearchableAttrs(schema, attrs);
-}
-
-export function addFilterableAttr(schema: IndexSchema, property: string) {
-    const attrs = getFilterableAttributes(schema);
-    attrs.push(property);
-    setFilterableAttrs(schema, attrs);
-}
-
-export function addSortableAttr(schema: IndexSchema, property: string) {
-    const attrs = getSortableAttributes(schema);
-    attrs.push(property);
-    setSortableAttrs(schema, attrs);
-}
-
-export function addDisplayableAttr(schema: IndexSchema, property: string) {
-    const attrs = getDisplayableAttributes(schema);
-    attrs.push(property);
-    setDisplayableAttrs(schema, attrs);
-}
-
-export function addIncludedAttrs(schema: IndexSchema, property: string) {
-    const attrs = getIncludedAttrs(schema);
-    attrs.push(property);
-    setIncludedAttrs(schema, attrs);
-}
-
-export function addToAttrs(target, propertyKey, options?: PropertyOptions) {
-    const constructor = target.constructor;
-
-    if(options?.filterable) addFilterableAttr(constructor, propertyKey.toString());
-    if((options?.searchable ?? true)) addSearchableAttr(constructor, propertyKey.toString());
-    if(options?.sortable) addSortableAttr(constructor, propertyKey.toString());
-    if((options?.selectable ?? true)) addDisplayableAttr(constructor, propertyKey.toString());
-    addIncludedAttrs(constructor, propertyKey.toString());
+    return attrs;
 }

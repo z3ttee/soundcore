@@ -6,14 +6,6 @@ export const OPTIONS_TOKEN = "sc-meilisearch-options-token"
 export const INDEXES_TOKEN = "sc-meilisearch-indexes-token"
 
 // export const REFLECT_MEILIINDEX_UID = "__meilisearch_index_uid__";
-export const REFLECT_MEILIINDEX_OPTIONS = "__meilisearch_index_uid__";
-export const REFLECT_MEILIINDEX_PRIMARY_KEY = "__meilisearch_index_primary_key__";
-export const REFLECT_MEILIINDEX_SEARCHABLE_ATTRS = "__meilisearch_index_searchable_attrs__";
-export const REFLECT_MEILIINDEX_FILTERABLE_ATTRS = "__meilisearch_index_filterable_attrs__";
-export const REFLECT_MEILIINDEX_SORTABLE_ATTRS = "__meilisearch_index_sortable_attrs__";
-export const REFLECT_MEILIINDEX_DISPLAYABLE_ATTRS = "__meilisearch_index_displayable_attrs__";
-export const REFLECT_MEILIINDEX_INCLUDED_PROPS = "__meilisearch_index_included_props__";
-
-export const REFLECT_MEILIINDEX_PROPERTY_NAME = "__meilisearch_index_property_options__";
-export const REFLECT_MEILIINDEX_RELATION_HAS_ONE = "__meilisearch_index_relation_has_one__";
-export const REFLECT_MEILIINDEX_RELATION_HAS_MANY = "__meilisearch_index_relation_has_many__";
+export const REFLECT_MEILIINDEX_OPTIONS = "__meilisearch_index_options__";
+export const REFLECT_MEILIINDEX_ATTRIBUTES = "__meilisearch_index_attributes__"
+export const REFLECT_MEILIINDEX_RELATIONS = "__meilisearch_index_relations__"

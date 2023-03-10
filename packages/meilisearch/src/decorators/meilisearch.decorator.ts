@@ -1,6 +1,7 @@
 import { isUndefined, pascalToSnakeCase } from "@soundcore/common";
 import { Faceting, TypoTolerance } from "meilisearch";
 import { REFLECT_MEILIINDEX_OPTIONS } from "../constants";
+import { setIndexOptions } from "../utils/reflectUtils";
 
 export interface IndexOptions {
     uid?: string;
@@ -8,10 +9,10 @@ export interface IndexOptions {
     typoTolerance?: TypoTolerance;
 }
 
-export function IndexEntity(): ClassDecorator;
-export function IndexEntity(uid: string);
-export function IndexEntity(options: IndexOptions);
-export function IndexEntity(uidOrOptions?: string | IndexOptions): ClassDecorator {
+export function MeilisearchIndex(): ClassDecorator;
+export function MeilisearchIndex(uid: string);
+export function MeilisearchIndex(options: IndexOptions);
+export function MeilisearchIndex(uidOrOptions?: string | IndexOptions): ClassDecorator {
     let options: IndexOptions = {}
 
     if(!isUndefined(uidOrOptions)) {
@@ -22,11 +23,11 @@ export function IndexEntity(uidOrOptions?: string | IndexOptions): ClassDecorato
         }
     }
 
-    return (target: object) => {
+    return (target) => {
         if(isUndefined(options.uid)) {
             options.uid = pascalToSnakeCase(target["name"]);
         }
 
-        Reflect.defineMetadata(REFLECT_MEILIINDEX_OPTIONS, options, target);
+        setIndexOptions(target, options);
     };
 }

@@ -1,13 +1,14 @@
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { Album } from "../../album/entities/album.entity";
-import { ArtistArtwork, ArtworkIndex } from "../../artwork/entities/artwork.entity";
+import { ArtistArtwork } from "../../artwork/entities/artwork.entity";
 import { Resource, ResourceFlag, ResourceType } from "../../utils/entities/resource";
 import { Song } from "../../song/entities/song.entity";
-import { HasOne, IndexEntity, PrimaryKey, Property } from "@soundcore/meilisearch";
+import { MeilisearchHasOne, MeilisearchIndex, MeilisearchPK, MeilisearchProp } from "@soundcore/meilisearch";
 import { MeilisearchInfo } from "../../utils/entities/meilisearch.entity";
 import { GeniusInfo } from "../../utils/entities/genius.entity";
 
 @Entity()
+@MeilisearchIndex()
 export class Artist implements Resource {
     public resourceType: ResourceType = "artist";
 
@@ -27,18 +28,21 @@ export class Artist implements Resource {
      * DEFAULT ATTRIBUTES
      */
     @PrimaryGeneratedColumn("uuid")
+    @MeilisearchPK({ searchable: false })
     public id: string;
  
     @Column({ type: "tinyint", default: 0 })
     public flag: ResourceFlag;
 
     @Column({ nullable: false, unique: true })
+    @MeilisearchProp()
     public slug: string;
 
     @Column({ nullable: true, type: "text" })
     public description: string;
 
     @Column({ nullable: false, unique: true, collation: "utf8mb4_bin" })
+    @MeilisearchProp()
     public name: string;
 
     @CreateDateColumn()
@@ -49,6 +53,7 @@ export class Artist implements Resource {
 
     @ManyToOne(() => ArtistArtwork, { onDelete: "SET NULL" })
     @JoinColumn()
+    @MeilisearchHasOne(() => ArtistArtwork)
     public artwork: ArtistArtwork;
 
     @OneToMany(() => Song, (song) => song.primaryArtist, { cascade: ["insert", "update"] })
@@ -60,20 +65,19 @@ export class Artist implements Resource {
 
 }
 
-@IndexEntity()
-export class ArtistIndex {
+// @IndexEntity()
+// export class ArtistIndex {
 
-    @PrimaryKey({ searchable: false })
-    public id: string;
+//     @PrimaryKey({ searchable: false })
+//     public id: string;
 
-    @Property()
-    public name: string;
+//     @Property()
+//     public name: string;
 
-    @Property()
-    public slug: string;
+//     @Property()
+//     public slug: string;
 
-    // @Property({ searchable: false })
-    @HasOne(ArtworkIndex)
-    public artwork: ArtworkIndex;
+//     @HasOne(ArtworkIndex)
+//     public artwork: Artwork;
 
-}
+// }

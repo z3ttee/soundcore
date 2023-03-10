@@ -1,16 +1,13 @@
-import { REFLECT_MEILIINDEX_RELATION_HAS_MANY } from "../constants";
-import { Class } from "../definitions";
-import { addToAttrs } from "../utils/reflectUtils";
-import { PropertyOptions } from "./property.decorator";
+import { IndexSchemaResolver } from "../definitions";
+import { IndexAttributeRelation } from "../entities/index-attr.entity";
+import { addSchemaRelation } from "../utils/reflectUtils";
 
 /**
  * Define a list of nested objects.
  * @param type Type of each element in the list
  */
-export function HasMany<T>(type: Class<T>, options?: PropertyOptions) {
+export function MeilisearchHasMany(typeResolver: IndexSchemaResolver) {
     return (target, propertyKey) => {
-        const constructor = target.constructor;
-        Reflect.defineMetadata(REFLECT_MEILIINDEX_RELATION_HAS_MANY, type, constructor, propertyKey);
-        addToAttrs(target, propertyKey, options);
+        addSchemaRelation(target.constructor, new IndexAttributeRelation(propertyKey, "many", typeResolver))
     };
 }

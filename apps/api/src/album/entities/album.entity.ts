@@ -9,12 +9,12 @@ import { Publisher } from "../../publisher/entities/publisher.entity";
 import { Song } from "../../song/entities/song.entity";
 import { Resource, ResourceFlag, ResourceType } from "../../utils/entities/resource";
 import { Slug } from "@tsalliance/utilities";
-import { IndexEntity, PrimaryKey, Property } from "@soundcore/meilisearch";
 import { GeniusInfo } from "../../utils/entities/genius.entity";
 import { MeilisearchInfo } from "../../utils/entities/meilisearch.entity";
+import { MeilisearchHasOne, MeilisearchIndex, MeilisearchPK, MeilisearchProp } from "@soundcore/meilisearch";
 
 @Entity()
-@IndexEntity()
+@MeilisearchIndex()
 @Index(["name", "primaryArtist"], { unique: true })
 export class Album implements Resource {
     public resourceType: ResourceType = "album";
@@ -35,13 +35,15 @@ export class Album implements Resource {
      * DEFAULT ATTRIBUTES
      */
     @PrimaryGeneratedColumn("uuid")
-    @PrimaryKey()
+    @MeilisearchPK({ searchable: false })
     public id: string;
 
     @Column({ nullable: false, collation: "utf8mb4_bin" })
+    @MeilisearchProp()
     public name: string;
 
     @Column({ nullable: true, unique: true, length: 120 })
+    @MeilisearchProp()
     public slug: string;
 
     @Column({ type: "tinyint", default: 0 })
@@ -61,6 +63,7 @@ export class Album implements Resource {
      */
     @ManyToOne(() => Artist)
     @JoinColumn()
+    @MeilisearchHasOne(() => Artist)
     public primaryArtist: Artist;
 
     @OneToMany(() => Song, (song) => song.album, { cascade: ["insert", "update"] })
@@ -68,6 +71,7 @@ export class Album implements Resource {
 
     @ManyToOne(() => AlbumArtwork, { onDelete: "SET NULL", nullable: true })
     @JoinColumn()
+    @MeilisearchHasOne(() => AlbumArtwork)
     public artwork: AlbumArtwork;
 
     @ManyToMany(() => Distributor)
@@ -97,28 +101,4 @@ export class Album implements Resource {
     public onBeforeUpdate() {
         if(!this.slug) Slug.create(this.name);
     }
-}
-
-@IndexEntity()
-export class AlbumIndex {
-
-    @PrimaryKey({ searchable: false })
-    public id: string;
-
-    @Property()
-    public name: string;
-
-    @Property()
-    public slug: string;
-
-    @Property({ searchable: false })
-    public artwork: { id: string };
-
-    @Property({ searchable: false })
-    public primaryArtist: { 
-        id: string;
-        name: string;
-        slug: string;
-    };
-
 }

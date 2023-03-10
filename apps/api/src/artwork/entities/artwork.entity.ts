@@ -1,5 +1,5 @@
 
-import { IndexEntity, PrimaryKey } from "@soundcore/meilisearch";
+import { MeilisearchIndex, MeilisearchPK } from "@soundcore/meilisearch";
 import { ChildEntity, Column, CreateDateColumn, Entity, OneToMany, PrimaryColumn, TableInheritance } from "typeorm";
 import { Album } from "../../album/entities/album.entity";
 import { Artist } from "../../artist/entities/artist.entity";
@@ -39,6 +39,7 @@ export type ArtworkWriteResult = {
 @TableInheritance({ column: "type" })
 export abstract class Artwork {
     @PrimaryColumn({ unique: true, nullable: false })
+    @MeilisearchPK({ searchable: false })
     public id: string;
 
     @Column({ type: "enum", enum: ArtworkFlag, nullable: false, default: ArtworkFlag.AWAITING })
@@ -55,6 +56,7 @@ export abstract class Artwork {
 }
 
 @ChildEntity(ArtworkType.SONG)
+@MeilisearchIndex()
 export class SongArtwork extends Artwork {
 
     @OneToMany(() => Song, (song) => song.artwork)
@@ -62,6 +64,7 @@ export class SongArtwork extends Artwork {
 }
 
 @ChildEntity(ArtworkType.ALBUM)
+@MeilisearchIndex()
 export class AlbumArtwork extends Artwork {
 
     @OneToMany(() => Album, (album) => album.artwork)
@@ -69,6 +72,7 @@ export class AlbumArtwork extends Artwork {
 }
 
 @ChildEntity(ArtworkType.ARTIST)
+@MeilisearchIndex()
 export class ArtistArtwork extends Artwork {
 
     @OneToMany(() => Artist, (artist) => artist.artwork)
@@ -76,6 +80,7 @@ export class ArtistArtwork extends Artwork {
 }
 
 @ChildEntity(ArtworkType.DOWNLOADABLE)
+@MeilisearchIndex()
 export class DownloadableArtwork extends Artwork {
 
     @Column({ type: "enum", enum: ArtworkType, nullable: true })
@@ -83,13 +88,5 @@ export class DownloadableArtwork extends Artwork {
     
     @Column({ type: "varchar", nullable: true })
     public srcUrl: string;
-
-}
-
-@IndexEntity()
-export class ArtworkIndex {
-
-    @PrimaryKey()
-    public id: string;
 
 }

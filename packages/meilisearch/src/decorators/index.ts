@@ -1,7 +1,7 @@
 
-export { IndexEntity } from "./index.decorator";
-export { PrimaryKey } from "./primary-key.decorator";
-export { Property } from "./property.decorator";
+export { MeilisearchIndex } from "./meilisearch.decorator";
+export { MeilisearchPK } from "./primary-key.decorator";
+export { MeilisearchProp } from "./property.decorator";
 export { InjectIndex } from "./inject.decorator";
-export { HasOne } from "./has-one.decorator";
-export { HasMany } from "./has-many.decorator";
+export { MeilisearchHasOne } from "./has-one.decorator";
+export { MeilisearchHasMany } from "./has-many.decorator";
