@@ -84,7 +84,6 @@ export class Song implements SongID, Resource, TracklistItem {
     public youtubeUrlStart?: string;
 
     @Column({ nullable: true, default: null })
-    @MeilisearchProp({ searchable: false })
     public order: number;
 
     /**

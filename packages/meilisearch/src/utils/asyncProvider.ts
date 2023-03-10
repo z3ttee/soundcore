@@ -92,6 +92,8 @@ export function createIndexesAsyncProviders(inject: any[], schemas: IndexSchema[
         if(attr.sortable) sortableAttributes.push(attr.attrName);
         if(attr.displayable) displayableAttrs.push(attr.attrName);
       }
+
+      console.log(displayableAttrs);
       
       // Execute update task on meilisearch to update primary key
       return index.update({ primaryKey: primaryKeyAttr.attrName }).then((task) => {
