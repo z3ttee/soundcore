@@ -56,6 +56,13 @@ export class SongMeiliService {
         return this.updateMeilisearchInfos(entities, flag);
     }
 
+    /**
+     * Get index used for operations on meilisearch instance
+     */
+    public getIndex() {
+        return this.index;
+    }
+
     private async updateMeilisearchInfos(entities: Partial<Song>[], flag: MeilisearchFlag) {
         return this.repository.createQueryBuilder()
             .update()

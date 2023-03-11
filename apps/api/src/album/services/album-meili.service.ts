@@ -54,6 +54,13 @@ export class AlbumMeiliService {
         return this.updateMeilisearchInfos(entities, flag);
     }
 
+    /**
+     * Get index used for operations on meilisearch instance
+     */
+    public getIndex() {
+        return this.index;
+    }
+
     private async updateMeilisearchInfos(entities: Partial<Album>[], flag: MeilisearchFlag) {
         return this.repository.createQueryBuilder()
             .update()

@@ -57,6 +57,13 @@ export class ArtistMeiliService {
         return this.updateMeilisearchInfos(entities, flag);
     }
 
+    /**
+     * Get index used for operations on meilisearch instance
+     */
+    public getIndex() {
+        return this.index;
+    }
+
     private async updateMeilisearchInfos(entities: Partial<Artist>[], flag: MeilisearchFlag) {
         return this.repository.createQueryBuilder()
             .update()
