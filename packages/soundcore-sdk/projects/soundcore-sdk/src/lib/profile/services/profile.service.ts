@@ -1,12 +1,13 @@
 import { HttpClient } from "@angular/common/http";
 import { Inject, Injectable } from "@angular/core";
-import { SCDKOptions, SCDK_OPTIONS } from "../../scdk.module";
+import { SCDKOptions } from "../../scdk.module";
 import { Observable, of } from "rxjs";
 import { User } from "../../user/entities/user.entity";
 import { ApiResponse } from "../../utils/responses/api-response";
 import { apiResponse } from "../../utils/rxjs/operators/api-response";
 import { Page } from "../../pagination/page";
 import { Artist } from "../../artist/entities/artist.entity";
+import { SCDK_OPTIONS } from "../../constants";
 
 @Injectable()
 export class SCSDKProfileService {

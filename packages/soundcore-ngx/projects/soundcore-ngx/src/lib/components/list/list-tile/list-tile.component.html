@@ -1,0 +1,12 @@
+<div class="w-full p-4 rounded-sm bg-body-dark bg-opacity-0 hover:bg-opacity-20 cursor-pointer active:bg-opacity-40 transition-all select-none [&>div]:active:scale-[0.99]">
+    <div class="flex items-center justify-start gap-4 text-left transform-gpu will-change-transform transition-transform">
+        <ng-content select="[scngx-leading]"></ng-content>
+
+        <div class="select-none">
+            <p>{{ title}}</p>
+            <p class="text-sm opacity-60">{{ subtitle }}</p>
+        </div>
+
+        <ng-content select="[scngx-trailing]"></ng-content>
+    </div>
+</div>

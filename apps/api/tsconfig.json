@@ -1,8 +1,10 @@
 {
   "extends": "tsconfig/nestjs",
   "compilerOptions": {
-    "outDir": "./dist"
+    "outDir": "./dist",
+    "allowJs": true
   },
+  "include": ["src/**/*"],
   "exclude": [
     "dist",
     "node_modules"

@@ -49,6 +49,11 @@ export * from "./lib/zone";
 // Tasks Module
 export * from "./lib/tasks";
 
+// Configure Module
+export * from "./lib/configure";
+
+
+
 
 // Utils
 export * from "./lib/utils/responses/api-response";

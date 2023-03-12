@@ -1,4 +1,4 @@
-import MeiliSearch, { Config, IndexesResults, IndexObject, Pagination } from "meilisearch";
+import MeiliSearch, { Config, Index, IndexesResults, IndexObject, Pagination } from "meilisearch";
 import { IndexSchema } from "../definitions";
 import { SchemaService } from "../services/schema.service";
 import { createMeiliIndex } from "../utils/asyncProvider";
@@ -28,13 +28,20 @@ export class MeiliClient extends MeiliSearch {
     }
 
     public async getIndexes(parameters?: Pagination): Promise<IndexesResults<MeiliIndex[]>> {
-        const rawIndexes = await this.getRawIndexes(parameters)
-        const indexes: MeiliIndex[] = rawIndexes.results.map((index) => createMeiliIndex(this.config, this.schemas.get(index.uid)));
+        const rawIndexes = await this.getRawIndexes(parameters);
+        const indexes: MeiliIndex[] = [];
+
+        rawIndexes.results.forEach((indexObject) => {
+            if(!this.schemas.has(indexObject.uid)) return;
+            const index = createMeiliIndex(this.config, this.schemas.get(indexObject.uid));
+            indexes.push(index);
+        });
+        
         return { ...rawIndexes, results: indexes }
     }
 
-    public async getRawIndex(indexUid: string): Promise<IndexObject> {
-        return this.index(indexUid).getRawInfo();
+    public async buildRawIndex(obj: IndexObject) {
+        return new Index(this.config, obj.uid, obj.primaryKey);
     }
     
 }

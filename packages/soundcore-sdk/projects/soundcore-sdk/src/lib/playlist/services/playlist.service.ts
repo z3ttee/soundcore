@@ -3,7 +3,7 @@ import { Inject, Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, of, tap } from 'rxjs';
 import { MeiliPlaylist } from '../../meilisearch/entities/meili-playlist.entity';
 import { ApiSearchResponse } from '../../meilisearch/entities/search-response.entity';
-import { SCDKOptions, SCDK_OPTIONS } from '../../scdk.module';
+import { SCDKOptions } from '../../scdk.module';
 import { ApiResponse } from '../../utils/responses/api-response';
 import { apiResponse } from '../../utils/rxjs/operators/api-response';
 import { AddSongDTO } from '../dtos/add-song.dto';
@@ -14,6 +14,7 @@ import { Page, Pageable } from "../../pagination";
 import { Logger } from '../../logging';
 import { Future } from '../../utils/future/future';
 import { toFuture } from '../../utils/future';
+import { SCDK_OPTIONS } from '../../constants';
 
 @Injectable()
 export class SCSDKPlaylistService {

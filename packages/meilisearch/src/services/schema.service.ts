@@ -13,6 +13,10 @@ export class SchemaService {
         this._schemas = new Map(schemas.map((schema) => ([ getSchemaToken(schema), schema ])));
     }
 
+    public has(uid: string): boolean {
+        return this._schemas.has(uid);
+    }
+
     public get(uid: string): IndexSchema {
         return this._schemas.get(uid);
     }

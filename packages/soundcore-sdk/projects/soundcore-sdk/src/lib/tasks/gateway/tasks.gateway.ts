@@ -1,9 +1,9 @@
 import { Inject, Injectable } from "@angular/core";
 import { SSOService } from "@soundcore/sso";
 import { Observable, Subject } from "rxjs";
-import { GATEWAY_EVENT_TASK_EMIT } from "../../constants";
+import { GATEWAY_EVENT_TASK_EMIT, SCDK_OPTIONS } from "../../constants";
 import { SCSDKAuthenticatedGateway } from "../../gateway/gateways/gateway";
-import { SCDKOptions, SCDK_OPTIONS } from "../../scdk.module";
+import { SCDKOptions } from "../../scdk.module";
 import { Task } from "../entities/task.entity";
 
 @Injectable({

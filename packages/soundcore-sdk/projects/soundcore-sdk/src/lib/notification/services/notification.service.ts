@@ -1,10 +1,11 @@
 import { HttpClient } from "@angular/common/http";
 import { Inject, Injectable } from "@angular/core";
 import { BehaviorSubject, map, Observable, tap } from "rxjs";
-import { SCDKOptions, SCDK_OPTIONS } from "../../scdk.module";
+import { SCDKOptions } from "../../scdk.module";
 import { Notification } from "../entities/notification.entity";
 import { SCDKNotificationGateway } from "../gateway/notification.gateway";
 import { Page, Pageable } from "../../pagination";
+import { SCDK_OPTIONS } from "../../constants";
 
 @Injectable()
 export class SCDKNotificationService {

@@ -4,10 +4,11 @@ import { Page, Pageable } from "../../pagination";
 import { BehaviorSubject, Observable, of } from "rxjs";
 import { MeiliAlbum } from "../../meilisearch/entities/meili-album.entity";
 import { ApiSearchResponse } from "../../meilisearch/entities/search-response.entity";
-import { SCDKOptions, SCDK_OPTIONS } from "../../scdk.module";
+import { SCDKOptions } from "../../scdk.module";
 import { ApiResponse } from "../../utils/responses/api-response";
 import { apiResponse } from "../../utils/rxjs/operators/api-response";
 import { Album } from "../entities/album.entity";
+import { SCDK_OPTIONS } from "../../constants";
 
 @Injectable()
 export class SCDKAlbumService {

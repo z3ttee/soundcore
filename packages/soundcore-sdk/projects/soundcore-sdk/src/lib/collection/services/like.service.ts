@@ -1,9 +1,10 @@
 import { HttpClient } from "@angular/common/http";
 import { Inject, Injectable } from "@angular/core";
 import { Observable, Subject, tap } from "rxjs";
+import { SCDK_OPTIONS } from "../../constants";
 import { Page } from "../../pagination/page";
 import { Pageable } from "../../pagination/pageable";
-import { SCDKOptions, SCDK_OPTIONS } from "../../scdk.module";
+import { SCDKOptions } from "../../scdk.module";
 import { Song } from "../../song";
 import { Future, toFuture } from "../../utils/future";
 import { ToggleLikedSongDTO } from "../dtos/toggle-result.dto";

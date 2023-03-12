@@ -1,10 +1,10 @@
 import { HttpClient } from "@angular/common/http";
 import { Inject, Injectable } from "@angular/core";
 import { BehaviorSubject, Observable, of, switchMap, tap } from "rxjs";
-import { SCDKOptions, SCDK_OPTIONS } from "../../scdk.module";
+import { SCDKOptions } from "../../scdk.module";
 import { SCDKResource } from "../../utils/entities/resource";
 import { NgxIndexedDBService } from 'ngx-indexed-db';
-import { SC_SEARCHHISTORY_SIZE, SC_SEARCHHISTORY_STORE } from "../../constants";
+import { SCDK_OPTIONS, SC_SEARCHHISTORY_SIZE, SC_SEARCHHISTORY_STORE } from "../../constants";
 import { SearchHistoryEntry } from "../entities/history-entry.entity";
 
 @Injectable({
