@@ -1,9 +1,10 @@
 import { HttpClient } from "@angular/common/http";
 import { Inject, Injectable } from "@angular/core";
 import { Observable, of } from "rxjs";
-import { SCDKOptions, SCDK_OPTIONS } from "../../scdk.module";
+import { SCDKOptions } from "../../scdk.module";
 import { Zone } from "../entities/zone.entity";
 import { Page, Pageable } from "../../pagination";
+import { SCDK_OPTIONS } from "../../constants";
 
 @Injectable()
 export class SCSDKZoneService {

@@ -1,6 +1,6 @@
 import { ModuleWithProviders, NgModule } from "@angular/core";
+import { SCDK_OPTIONS } from "./constants";
 
-export const SCDK_OPTIONS = "scdk_options"
 export interface SCDKOptions {
     api_base_uri: string;
 }

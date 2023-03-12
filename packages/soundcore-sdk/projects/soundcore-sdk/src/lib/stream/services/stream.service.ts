@@ -1,10 +1,11 @@
 import { Inject, Injectable } from '@angular/core';
 import { map, Observable } from 'rxjs';
-import { SCDKOptions, SCDK_OPTIONS } from '../../scdk.module';
+import { SCDKOptions } from '../../scdk.module';
 import { SCSDKStreamToken } from '../entities/token.entity';
 import { HttpClient } from '@angular/common/http';
 import { apiResponse } from '../../utils/rxjs/operators/api-response';
 import { ApiResponse } from '../../utils/responses/api-response';
+import { SCDK_OPTIONS } from '../../constants';
 
 @Injectable({
     providedIn: "root"

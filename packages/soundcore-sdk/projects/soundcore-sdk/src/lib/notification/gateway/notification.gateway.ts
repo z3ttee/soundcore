@@ -1,9 +1,10 @@
 import { Inject, Injectable } from "@angular/core";
 import { Observable, Subject, takeUntil } from "rxjs";
-import { SCDKOptions, SCDK_OPTIONS } from "../../scdk.module";
+import { SCDKOptions } from "../../scdk.module";
 import { Notification } from "../entities/notification.entity";
 import { SSOService } from "@soundcore/sso";
 import { SCSDKAuthenticatedGateway } from "../../gateway/gateways/gateway";
+import { SCDK_OPTIONS } from "../../constants";
 
 export const NOTIFICATION_EVENT_PUSH = "notification:push";
 
