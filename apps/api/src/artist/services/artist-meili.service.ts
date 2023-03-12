@@ -3,17 +3,19 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { InjectIndex, MeiliIndex } from "@soundcore/meilisearch";
 import { Page, Pageable } from "nestjs-pager";
 import { Repository } from "typeorm";
+import { MeilisearchBaseService } from "../../meilisearch/services/meili.service";
 import { MeilisearchFlag } from "../../utils/entities/meilisearch.entity";
 import { Artist } from "../entities/artist.entity";
 
 @Injectable()
-export class ArtistMeiliService {
-    private readonly logger = new Logger(ArtistMeiliService.name);
+export class ArtistMeiliService extends MeilisearchBaseService<Artist> {
 
     constructor(
-        @InjectIndex(Artist) private readonly index: MeiliIndex<Artist>,
-        @InjectRepository(Artist) private readonly repository: Repository<Artist>
-    ) {}
+        @InjectIndex(Artist) index: MeiliIndex<Artist>,
+        @InjectRepository(Artist) repository: Repository<Artist>
+    ) {
+        super(index, repository, new Logger(ArtistMeiliService.name));
+    }
 
     /**
      * Fetch entities from the database to sync. This will only fetch entities
@@ -33,48 +35,5 @@ export class ArtistMeiliService {
             });
     }
 
-    /**
-     * Sync a set of entities with meilisearch. After sync is done, the entities are
-     * updated with a flag and date of the last sync result.
-     * @param entities Set of entities to sync
-     */
-    public async syncAndUpdateEntities(entities: Partial<Artist>[]) {
-        let flag: MeilisearchFlag = MeilisearchFlag.OK;
-
-        await this.index.updateDocuments(entities).then(async (enqeuedTask) => {
-            return this.index.waitForTask(enqeuedTask.taskUid).then((task) => {
-                if(task.error) {
-                    throw new Error(`(${task.error.code}) Error occured while updating documents: ${task.error.message}. See '${task.error.link}' for more information`);
-                }
-            })
-        }).then(() => {
-            flag = MeilisearchFlag.OK;
-        }).catch((error: Error) => {
-            this.logger.error(error);
-            flag = MeilisearchFlag.FAILED;
-        });
-
-        return this.updateMeilisearchInfos(entities, flag);
-    }
-
-    /**
-     * Get index used for operations on meilisearch instance
-     */
-    public getIndex() {
-        return this.index;
-    }
-
-    private async updateMeilisearchInfos(entities: Partial<Artist>[], flag: MeilisearchFlag) {
-        return this.repository.createQueryBuilder()
-            .update()
-            .set({
-                meilisearch: {
-                    flag: flag,
-                    syncedAt: new Date()
-                }
-            })
-            .whereInIds(entities)
-            .execute();
-    }
 
 }

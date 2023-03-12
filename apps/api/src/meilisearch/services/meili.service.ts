@@ -1,42 +1,76 @@
-import { Injectable } from "@nestjs/common";
-import { OnEvent } from "@nestjs/event-emitter";
-import { PipelineEventParams, PipelineService } from "@soundcore/pipelines";
-import { EVENT_TRIGGER_MEILISEARCH_PROCESS_SONGS } from "../../constants";
-import { TasksService } from "../../tasks/services/tasks.service";
-import { PIPELINE_ID } from "../pipeline.constants";
-import { MeilisearchPipelineEnv } from "../pipelines/meilisearch.pipeline";
+import { Injectable, Logger } from "@nestjs/common";
+import { MeiliIndex } from "@soundcore/meilisearch";
+import { Page, Pageable } from "nestjs-pager";
+import { Repository } from "typeorm";
+import { MeilisearchFlag } from "../../utils/entities/meilisearch.entity";
+import { MeiliBackgroundService } from "./meili-background.service";
 
 @Injectable()
 export class MeilisearchService {
-    private readonly 
 
     constructor(
-        private readonly pipelines: PipelineService,
-        private readonly tasks: TasksService
-    ) {
-        // this.pipelines.on("enqueued")
-        this.pipelines.on("failed", this.handleOnPipelineFailed);
+        private readonly background: MeiliBackgroundService
+    ) {}
+
+}
+
+export abstract class MeilisearchBaseService<T = any> {
+
+    constructor(
+        protected readonly index: MeiliIndex<T>,
+        protected readonly repository: Repository<T>,
+        protected readonly logger: Logger
+    ) {}
+
+    /**
+     * Get index used for operations 
+     * on meilisearch instance
+     */
+    public getIndex() {
+        return this.index;
     }
 
     /**
-     * Create new pipeline run to sync resources with meilisearch
-     * @param env Environment used for the pipeline run
+     * Sync a set of entities with meilisearch. After sync is done, the entities are
+     * updated with a flag and date of the last sync result.
+     * @param entities Set of entities to sync
      */
-    public async newSyncRun(env?: MeilisearchPipelineEnv) {
-        return this.pipelines.createRun(PIPELINE_ID, env).then((run) => {
-            return this.tasks.createTaskFromPipelineRun(run).then((task) => {
-                return this.pipelines.enqueueRun(task).then(() => task);
-            });
+    public async syncAndUpdateEntities(entities: Partial<T>[]) {
+        let flag: MeilisearchFlag = MeilisearchFlag.OK;
+
+        await this.index.updateDocuments(entities).then(async (enqeuedTask) => {
+            return this.index.waitForTask(enqeuedTask.taskUid).then((task) => {
+                if(task.error) {
+                    throw new Error(`(${task.error.code}) Error occured while updating documents: ${task.error.message}. See '${task.error.link}' for more information`);
+                }
+            })
+        }).then(() => {
+            flag = MeilisearchFlag.OK;
+        }).catch((error: Error) => {
+            this.logger.error(error);
+            flag = MeilisearchFlag.FAILED;
         });
+
+        return this.updateMeilisearchInfos(entities, flag);
     }
 
-    @OnEvent(EVENT_TRIGGER_MEILISEARCH_PROCESS_SONGS)
-    public triggerMeilisearchSync() {
-        this.newSyncRun();
+    /**
+     * Update meilisearch information on a database entity
+     * @param entities List of entities to update information for
+     * @param flag Flag to set
+     */
+    protected async updateMeilisearchInfos(entities: Partial<T>[], flag: MeilisearchFlag) {
+        return this.repository.createQueryBuilder()
+            .update()
+            .set({
+                meilisearch: {
+                    flag: flag,
+                    syncedAt: new Date()
+                }
+            } as any)
+            .whereInIds(entities)
+            .execute();
     }
 
-    private handleOnPipelineFailed(error: Error, params: PipelineEventParams) {
-        
-    }
-
+    protected abstract fetchEntities(pageable: Pageable, flag: MeilisearchFlag): Promise<Page<T>>;
 }

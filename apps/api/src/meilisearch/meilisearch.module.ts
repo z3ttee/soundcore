@@ -5,6 +5,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { PipelineModule } from '@soundcore/pipelines';
 import { MeilisearchService } from './services/meili.service';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { MeiliBackgroundService } from './services/meili-background.service';
 
 @Module({
     imports: [
@@ -18,7 +19,8 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
         })
     ],
     providers: [
-        MeilisearchService
+        MeilisearchService,
+        MeiliBackgroundService
     ],
     exports: [
         MeilisearchService

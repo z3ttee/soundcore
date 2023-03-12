@@ -4,7 +4,7 @@ import { Artist } from "../../artist/entities/artist.entity";
 import { Song } from "../../song/entities/song.entity";
 import Database from "../../utils/database/database-worker-client";
 import MeilisearchClient from "../../utils/database/meilisearch-worker-client";
-import { PIPELINE_ID, PIPELINE_NAME, STAGE_SYNC_ID, STAGE_SYNC_NAME, STEP_SYNC_ALBUMS_ID, STEP_SYNC_ALBUMS_NAME, STEP_SYNC_ARTISTS_ID, STEP_SYNC_ARTISTS_NAME, STEP_SYNC_SONGS_ID, STEP_SYNC_SONGS_NAME } from "../pipeline.constants";
+import { MEILISEARCH_PIPELINE_ID, MEILISEARCH_PIPELINE_NAME, STAGE_SYNC_ID, STAGE_SYNC_NAME, STEP_SYNC_ALBUMS_ID, STEP_SYNC_ALBUMS_NAME, STEP_SYNC_ARTISTS_ID, STEP_SYNC_ARTISTS_NAME, STEP_SYNC_SONGS_ID, STEP_SYNC_SONGS_NAME } from "../pipeline.constants";
 import { step_sync_albums, step_sync_artists, step_sync_songs } from "./stages/meilisearch-find-resources";
 
 export enum MeilisearchResourceType {
@@ -17,7 +17,7 @@ export interface MeilisearchPipelineEnv {
     withTypesOnly?: MeilisearchResourceType[];
 }
 
-export default pipeline(PIPELINE_ID, PIPELINE_NAME, "Sync database entries with meilisearch for improved search results")
+export default pipeline(MEILISEARCH_PIPELINE_ID, MEILISEARCH_PIPELINE_NAME, "Sync database entries with meilisearch for improved search results")
     /**
      * Checkout stage
      */
