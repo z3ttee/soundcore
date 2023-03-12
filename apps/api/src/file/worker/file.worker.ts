@@ -51,69 +51,70 @@ async function processGivenFiles(job: WorkerJobRef<FileProcessDTO>, datasource: 
     const fileSystem = new FileSystemService();
     const service = new FileService(datasource.getRepository(File));
 
-    return Batch.of<FileDTO, FileID>(files).do(async (batch, currentBatch, batches) => {
-        const createdFiles: File[] = [];
-        const collectedFiles: File[] = [];
+    // return Batch.of<FileDTO, FileID>(files).do(async (batch, currentBatch, batches) => {
+    //     const createdFiles: File[] = [];
+    //     const collectedFiles: File[] = [];
 
-        for(const dto of batch) {
-            const file = new File();
-            file.name = dto.filename;
-            file.directory = dto.directory;
-            file.mount = mount;
+    //     for(const dto of batch) {
+    //         const file = new File();
+    //         file.name = dto.filename;
+    //         file.directory = dto.directory;
+    //         file.mount = mount;
 
-            // Resolving absolute filepath
-            const filepath = fileSystem.resolveFilepath(file);
+    //         // Resolving absolute filepath
+    //         const filepath = fileSystem.resolveFilepath(file);
 
-            try {
-                // Get file stats
-                const stats = fs.statSync(filepath, { throwIfNoEntry: true });
-                if(!stats) logger.warn(`Could not get file stats for '${filepath}'.`);
+    //         try {
+    //             // Get file stats
+    //             const stats = fs.statSync(filepath, { throwIfNoEntry: true });
+    //             if(!stats) logger.warn(`Could not get file stats for '${filepath}'.`);
 
-                // Set size of the file entity
-                file.size = stats?.size || 0;
+    //             // Set size of the file entity
+    //             file.size = stats?.size || 0;
 
-                // Calculate hash consisting of information
-                // that make the file unique
-                const pathToHash = `${mount.id}:${file.directory}:${file.name}:${file.size}`;
-                // Update hash on file entity
-                file.pathHash = crypto.createHash("md5").update(pathToHash, "binary").digest("hex");
+    //             // Calculate hash consisting of information
+    //             // that make the file unique
+    //             const pathToHash = `${mount.id}:${file.directory}:${file.name}:${file.size}`;
+    //             // Update hash on file entity
+    //             file.pathHash = crypto.createHash("md5").update(pathToHash, "binary").digest("hex");
 
-                collectedFiles.push(file);
-            } catch (error) {
-                logger.warn(`Skipping file file ${filepath} because it could not be analyzed: ${error["message"] || error}`);
-                continue;
-            }
-        }
+    //             collectedFiles.push(file);
+    //         } catch (error) {
+    //             logger.warn(`Skipping file file ${filepath} because it could not be analyzed: ${error["message"] || error}`);
+    //             continue;
+    //         }
+    //     }
 
-        // Create database entries
-        if(scanFlag == MountScanFlag.DEFAULT_SCAN) {
-            // This will create files in database but only returns entities that were created
-            // via this query and did not exist before
-            createdFiles.push(... await service.createFiles(collectedFiles).catch((error: Error) => {
-                logger.error(`Error occured whilst processing batch ${currentBatch}: ${error.message}`, error.stack);
-                return [];
-            }));
-        } else if(scanFlag == MountScanFlag.RESCAN) {
-            // This will create files in database but returns all files even those that were not created
-            // with this query but are included in the list.
-            createdFiles.push(... await service.createAndFindAll(collectedFiles).catch((error: Error) => {
-                logger.error(`Error occured whilst processing batch ${currentBatch}: ${error.message}`, error.stack);
-                return [];
-            }));
-        } else {
-            throw new Error(`Received file process task with invalid flag. Received ${scanFlag}, expected one of [${Object.values(MountScanFlag).join(", ")}]`);
-        }
+    //     // Create database entries
+    //     if(scanFlag == MountScanFlag.DEFAULT_SCAN) {
+    //         // This will create files in database but only returns entities that were created
+    //         // via this query and did not exist before
+    //         createdFiles.push(... await service.createFiles(collectedFiles).catch((error: Error) => {
+    //             logger.error(`Error occured whilst processing batch ${currentBatch}: ${error.message}`, error.stack);
+    //             return [];
+    //         }));
+    //     } else if(scanFlag == MountScanFlag.RESCAN) {
+    //         // This will create files in database but returns all files even those that were not created
+    //         // with this query but are included in the list.
+    //         createdFiles.push(... await service.createAndFindAll(collectedFiles).catch((error: Error) => {
+    //             logger.error(`Error occured whilst processing batch ${currentBatch}: ${error.message}`, error.stack);
+    //             return [];
+    //         }));
+    //     } else {
+    //         throw new Error(`Received file process task with invalid flag. Received ${scanFlag}, expected one of [${Object.values(MountScanFlag).join(", ")}]`);
+    //     }
 
-        return createdFiles.map((file) => ({ id: file.id }));
-    }).progress((batches, current) => {
-        // Update job progress
-        job.progress = Math.round((current / batches) * 100);
+    //     return createdFiles.map((file) => ({ id: file.id }));
+    // }).progress((batches, current) => {
+    //     // Update job progress
+    //     job.progress = Math.round((current / batches) * 100);
 
-        // Emit progress update
-        workerpool.workerEmit(new WorkerProgressEvent(job));
-    }).catch((batchNr, error) => {
-        logger.error(`Error occured while handling batch #${batchNr} in file worker: ${error.message}`, error.stack);
-    }).start().catch(() => []);
+    //     // Emit progress update
+    //     workerpool.workerEmit(new WorkerProgressEvent(job));
+    // }).catch((batchNr, error) => {
+    //     logger.error(`Error occured while handling batch #${batchNr} in file worker: ${error.message}`, error.stack);
+    // }).start().catch(() => []);
+    return null;
 }
 
 /**
@@ -139,21 +140,22 @@ async function continueAwaitingFiles(job: WorkerJobRef<FileProcessDTO>): Promise
         const fileService = new FileService(fileRepo);
 
         return mountService.findHasAwaitingFiles().then((mounts) => {
-            return Batch.of<Mount, FileProcessResultDTO>(mounts, 1).do(async (batch) => {
-                // As the batch size is always 1
-                const mount = batch[0];
-                const files = await fileService.findByFlagAndMount(mount.id, FileFlag.PENDING_ANALYSIS);
+            // return Batch.of<Mount, FileProcessResultDTO>(mounts, 1).do(async (batch) => {
+            //     // As the batch size is always 1
+            //     const mount = batch[0];
+            //     const files = await fileService.findByFlagAndMount(mount.id, FileFlag.PENDING_ANALYSIS);
 
-                return [ new FileProcessResultDTO(
-                    mount, 
-                    files.map((file) => ({ id: file.id })), 
-                    Date.now() - startedAtMs, 
-                    flag,
-                    scanFlag
-                )];
-            }).start().then((values) => {
-                return values;
-            });
+            //     return [ new FileProcessResultDTO(
+            //         mount, 
+            //         files.map((file) => ({ id: file.id })), 
+            //         Date.now() - startedAtMs, 
+            //         flag,
+            //         scanFlag
+            //     )];
+            // }).start().then((values) => {
+            //     return values;
+            // });
+            return null;
         });
     });
 }

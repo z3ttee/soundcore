@@ -24,7 +24,7 @@ services:
       - soundcore_dev
 
   meilisearch:
-    image: getmeili/meilisearch
+    image: getmeili/meilisearch:v1.0
     restart: always
     ports:
       - "7700:7700"

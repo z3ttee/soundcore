@@ -9,59 +9,59 @@ import { PlaylistItem } from "../../playlist/entities/playlist-item.entity";
 import { Publisher } from "../../publisher/entities/publisher.entity";
 import { Stream } from "../../stream/entities/stream.entity";
 import { Slug } from "@tsalliance/utilities";
-import { GeniusFlag, GeniusResource, Resource, ResourceFlag, ResourceType } from "../../utils/entities/resource";
+import { Resource, ResourceFlag, ResourceType } from "../../utils/entities/resource";
 import { LikedSong } from "../../collection/entities/like.entity";
 import { File } from "../../file/entities/file.entity";
-import { Artwork } from "../../artwork/entities/artwork.entity";
-import { Syncable, SyncFlag } from "../../meilisearch/interfaces/syncable.interface";
+import { SongArtwork } from "../../artwork/entities/artwork.entity";
 import { TracklistItem } from "../../tracklist/entities/tracklist.entity";
+import { GeniusInfo } from "../../utils/entities/genius.entity";
+import { MeilisearchInfo } from "../../utils/entities/meilisearch.entity";
+import { MeilisearchHasMany, MeilisearchHasOne, MeilisearchIndex, MeilisearchPK, MeilisearchProp } from "@soundcore/meilisearch";
 
 export interface SongID {
     id: string;
 }
 
+export const SONG_ARTWORK_RELATION_FK = "artworkId"
+
 @Entity()
 @Index(["name", "primaryArtist", "album", "duration", "order"], { unique: true })
-export class Song implements SongID, Resource, Syncable, GeniusResource, TracklistItem {
+@MeilisearchIndex()
+export class Song implements SongID, Resource, TracklistItem {
     public resourceType: ResourceType = "song";
 
     /**
      * MEILISEARCH RELATED ATTRIBUTES
      */
-    @Column({ nullable: true, default: null })
-    public lastSyncedAt: Date;
-
-    @Column({ default: 0, type: "tinyint" })
-    public lastSyncFlag: SyncFlag;
+    @Column(() => MeilisearchInfo)
+    public meilisearch: MeilisearchInfo;
 
     /**
      * GENIUS RELATED ATTRIBUTES
      */
-    @Column({ nullable: true })
-    public geniusId?: string;
- 
-    @Column({ type: "tinyint", default: 0 })
-    public geniusFlag: GeniusFlag;
- 
-    @Column({ nullable: false, default: 0 })
-    public geniusFailedTries: number;
+    @Column(() => GeniusInfo)
+    public genius: GeniusInfo;
 
     /**
      * DEFAULT ATTRIBUTES
      */
     @PrimaryGeneratedColumn("uuid")
+    @MeilisearchPK({ searchable: false })
     public id: string;
 
     @Column({ type: "tinyint", default: 0 })
     public flag: ResourceFlag;
 
     @Column({ nullable: true, length: 120 })
+    @MeilisearchProp()
     public slug: string;
 
     @Column({ nullable: false, collation: "utf8mb4_bin" })
+    @MeilisearchProp()
     public name: string;
 
     @Column({ nullable: false, default: 0 })
+    @MeilisearchProp({ searchable: false })
     public duration: number;
 
     @Column({ type: "text", nullable: true })
@@ -74,6 +74,7 @@ export class Song implements SongID, Resource, Syncable, GeniusResource, Trackli
     public releasedAt?: Date;
 
     @Column({ default: false })
+    @MeilisearchProp({ searchable: false })
     public explicit: boolean;
 
     @Column({ nullable: true, type: "text" })
@@ -97,21 +98,29 @@ export class Song implements SongID, Resource, Syncable, GeniusResource, Trackli
     /**
      * ENTITY RELATIONS
      */
-    @OneToOne(() => File, (file) => file.song, { onDelete: "CASCADE" })
+    @OneToOne(() => File, (file) => file.song, { onDelete: "CASCADE", nullable: false })
     @JoinColumn()
     public file: File;
 
-    @ManyToOne(() => Artwork, { onDelete: "SET NULL" })
-    @JoinColumn()
-    public artwork: Artwork;
+    @ManyToOne(() => SongArtwork, { onDelete: "SET NULL", nullable: true })
+    @JoinColumn({ name: SONG_ARTWORK_RELATION_FK })
+    @MeilisearchHasOne(() => SongArtwork)
+    public artwork: SongArtwork;
 
-    @ManyToOne(() => Artist)
+    @ManyToOne(() => Artist, { onDelete: "SET NULL", nullable: true })
     @JoinColumn()
+    @MeilisearchHasOne(() => Artist)
     public primaryArtist: Artist;
 
-    @ManyToMany(() => Artist)
+    @ManyToMany(() => Artist, { onDelete: "CASCADE", nullable: true })
     @JoinTable({ name: "featuring2song" })
+    @MeilisearchHasMany(() => Artist)
     public featuredArtists: Artist[];
+
+    @ManyToOne(() => Album, { onDelete: "SET NULL", nullable: true })
+    @JoinColumn()
+    @MeilisearchHasOne(() => Artist)
+    public album: Album;
 
     @ManyToMany(() => Publisher)
     @JoinTable({ name: "song2publisher" })
@@ -124,10 +133,6 @@ export class Song implements SongID, Resource, Syncable, GeniusResource, Trackli
     @ManyToMany(() => Label)
     @JoinTable({ name: "song2label" })
     public labels: Label[];
-
-    @ManyToOne(() => Album)
-    @JoinColumn()
-    public album: Album;
 
     @ManyToMany(() => Genre)
     @JoinTable({ name: "song2genre" })
@@ -157,7 +162,6 @@ export class Song implements SongID, Resource, Syncable, GeniusResource, Trackli
     @BeforeUpdate() 
     public onBeforeUpdate() {
         if(!this.slug) Slug.create(this.name);
-        this.lastSyncFlag = SyncFlag.AWAITING;
     }
 
 }

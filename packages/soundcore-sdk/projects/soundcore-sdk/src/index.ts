@@ -46,6 +46,8 @@ export * from "./lib/search";
 // Zone Module
 export * from "./lib/zone";
 
+// Tasks Module
+export * from "./lib/tasks";
 
 
 // Utils

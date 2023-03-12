@@ -3,8 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Page, BasePageable } from 'nestjs-pager';
 import { In, Repository } from 'typeorm';
 import { Artwork } from '../../artwork/entities/artwork.entity';
-import { SyncFlag } from '../../meilisearch/interfaces/syncable.interface';
-import { MeiliLabelService } from '../../meilisearch/services/meili-label.service';
+import { MeilisearchFlag } from '../../utils/entities/meilisearch.entity';
 import { CreateResult } from '../../utils/results/creation.result';
 import { CreateLabelDTO } from '../dtos/create-label.dto';
 import { UpdateLabelDTO } from '../dtos/update-label.dto';
@@ -15,8 +14,7 @@ export class LabelService {
     private readonly logger: Logger = new Logger(LabelService.name);
 
     constructor(
-        @InjectRepository(Label) private readonly repository: Repository<Label>,
-        private readonly meiliClient: MeiliLabelService
+        @InjectRepository(Label) private readonly repository: Repository<Label>
     ){ }
 
     /**
@@ -51,7 +49,7 @@ export class LabelService {
      * @param pageable Page settings
      * @returns Page<Publisher>
      */
-    public async findBySyncFlag(flag: SyncFlag, pageable: BasePageable): Promise<Page<Label>> {
+    public async findBySyncFlag(flag: MeilisearchFlag, pageable: BasePageable): Promise<Page<Label>> {
         const result = await this.repository.createQueryBuilder("label")
             .leftJoin("label.artwork", "artwork").addSelect(["artwork.id"])
             .where("label.lastSyncFlag = :flag", { flag })
@@ -88,7 +86,7 @@ export class LabelService {
 
         const label = this.repository.create();
         label.name = createLabelDto.name;
-        label.geniusId = createLabelDto.geniusId;
+        // label.geniusId = createLabelDto.geniusId;
         label.description = createLabelDto.description;
 
         return this.repository.createQueryBuilder()
@@ -120,7 +118,7 @@ export class LabelService {
         if(!label) throw new NotFoundException("Label not found.");
 
         label.name = updateLabelDto.name;
-        label.geniusId = updateLabelDto.geniusId;
+        // label.geniusId = updateLabelDto.geniusId;
         label.description = updateLabelDto.description;
 
         return this.save(label);
@@ -132,11 +130,13 @@ export class LabelService {
      * @returns True or False
      */
     public async deleteById(labelId: string): Promise<boolean> {
-        return this.meiliClient.deleteLabel(labelId).then(() => {
-            return this.repository.delete({ id: labelId }).then((value) => {
-                return value.affected > 0;
-            });
-        });
+        // return this.meiliClient.deleteLabel(labelId).then(() => {
+        //     return this.repository.delete({ id: labelId }).then((value) => {
+        //         return value.affected > 0;
+        //     });
+        // });
+
+        return false;
     }
 
     /**
@@ -172,13 +172,15 @@ export class LabelService {
      * @param flag Updated sync flag
      * @returns Label
      */
-    private async setSyncFlags(resources: Label[], flag: SyncFlag) {
+    private async setSyncFlags(resources: Label[], flag: MeilisearchFlag) {
         const ids = resources.map((user) => user.id);
 
         return this.repository.createQueryBuilder()
             .update({
-                lastSyncedAt: new Date(),
-                lastSyncFlag: flag
+                meilisearch: {
+                    syncedAt: new Date(),
+                    flag: flag
+                }
             })
             .where({ id: In(ids) })
             .execute();
@@ -190,11 +192,11 @@ export class LabelService {
      * @returns Label
      */
     public async sync(resources: Label[]) {
-        return this.meiliClient.setLabels(resources).then(() => {
-            return this.setSyncFlags(resources, SyncFlag.OK);
-        }).catch(() => {
-            return this.setSyncFlags(resources, SyncFlag.ERROR);
-        });
+        // return this.meiliClient.setLabels(resources).then(() => {
+        //     return this.setSyncFlags(resources, MeilisearchFlag.OK);
+        // }).catch(() => {
+        //     return this.setSyncFlags(resources, MeilisearchFlag.FAILED);
+        // });
     }
 
 }

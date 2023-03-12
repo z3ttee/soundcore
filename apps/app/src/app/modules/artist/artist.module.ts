@@ -5,7 +5,6 @@ import { RouterModule, Routes } from '@angular/router';
 import { SCDKAlbumModule, SCDKArtistModule } from '@soundcore/sdk';
 import { Error404Module } from 'src/app/shared/error404/error404.module';
 import { ListViewModule } from "src/app/components/resource-views/list-view/list-view.module";
-import { HeroIconModule, dotsVertical } from 'ng-heroicon';
 import { MatRippleModule } from '@angular/material/core';
 import { 
   SCNGXSkeletonModule, 
@@ -24,10 +23,11 @@ import {
 import { ArtistSongsComponent } from './views/artist-songs/artist-songs.component';
 import { SCNGXChipsModule } from 'src/app/components/chips/chips.module';
 import { SCNGXSongListItemModule } from 'src/app/components/list-items/song-list-item/song-list-item.module';
-import { FaIconLibrary, FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faEllipsisV, faPause, faPlay } from '@fortawesome/free-solid-svg-icons';
 import { LottieModule } from 'ngx-lottie';
 import { SongContextMenuModule } from 'src/app/components/menus/song-context-menu/song-context-menu.module';
+import { NgIconsModule } from '@ng-icons/core';
+import { heroEllipsisVerticalSolid } from '@ng-icons/heroicons/solid';
+import { heroHeart } from '@ng-icons/heroicons/outline';
 
 const routes: Routes = [
   { path: ":artistId", component: ArtistProfileComponent },
@@ -44,8 +44,7 @@ const routes: Routes = [
     CommonModule,
     RouterModule.forChild(routes),
     Error404Module,
-    HeroIconModule.withIcons({ dotsVertical }),
-    FontAwesomeModule,
+    NgIconsModule.withIcons({ heroEllipsisVerticalSolid, heroHeart }),
     LottieModule,
 
     MatRippleModule,
@@ -74,8 +73,4 @@ const routes: Routes = [
     SCNGXSongListItemModule
   ]
 })
-export class ArtistModule {
-  constructor(library: FaIconLibrary) {
-    library.addIcons(faPlay, faPause, faEllipsisV);
-  }
-}
+export class ArtistModule {}

@@ -3,8 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Page, BasePageable } from 'nestjs-pager';
 import { In, Repository } from 'typeorm';
 import { Artwork } from '../../artwork/entities/artwork.entity';
-import { SyncFlag } from '../../meilisearch/interfaces/syncable.interface';
-import { MeiliDistributorService } from '../../meilisearch/services/meili-distributor.service';
+import { MeilisearchFlag } from '../../utils/entities/meilisearch.entity';
 import { CreateResult } from '../../utils/results/creation.result';
 import { CreateDistributorDTO } from '../dtos/create-distributor.dto';
 import { UpdateDistributorDTO } from '../dtos/update-distributor.dto';
@@ -15,8 +14,7 @@ export class DistributorService {
     private logger: Logger = new Logger(DistributorService.name)
 
     constructor(
-        @InjectRepository(Distributor) private readonly repository: Repository<Distributor>,
-        private readonly meiliClient: MeiliDistributorService
+        @InjectRepository(Distributor) private readonly repository: Repository<Distributor>
     ){ }
 
     /**
@@ -51,7 +49,7 @@ export class DistributorService {
      * @param pageable Page settings
      * @returns Page<Distributor>
      */
-     public async findBySyncFlag(flag: SyncFlag, pageable: BasePageable): Promise<Page<Distributor>> {
+     public async findBySyncFlag(flag: MeilisearchFlag, pageable: BasePageable): Promise<Page<Distributor>> {
         const result = await this.repository.createQueryBuilder("distributor")
             .leftJoin("distributor.artwork", "artwork").addSelect(["artwork.id"])
             .where("distributor.lastSyncFlag = :flag", { flag })
@@ -88,7 +86,7 @@ export class DistributorService {
 
         const distributor = this.repository.create();
         distributor.name = createDistributorDto.name;
-        distributor.geniusId = createDistributorDto.geniusId;
+        // distributor.geniusId = createDistributorDto.geniusId;
         distributor.description = createDistributorDto.description;
 
         return this.repository.createQueryBuilder()
@@ -120,7 +118,7 @@ export class DistributorService {
         if(!distributor) throw new NotFoundException("Distributor not found.");
 
         distributor.name = updateDistributorDto.name;
-        distributor.geniusId = updateDistributorDto.geniusId;
+        // distributor.geniusId = updateDistributorDto.geniusId;
         distributor.description = updateDistributorDto.description;
 
         return this.save(distributor);
@@ -132,11 +130,13 @@ export class DistributorService {
      * @returns boolean
      */
     public async deleteById(distributorId: string): Promise<boolean> {
-        return this.meiliClient.deleteDistributor(distributorId).then(() => {
-            return this.repository.delete({ id: distributorId }).then((value) => {
-                return value.affected > 0;
-            });
-        });
+        // return this.meiliClient.deleteDistributor(distributorId).then(() => {
+        //     return this.repository.delete({ id: distributorId }).then((value) => {
+        //         return value.affected > 0;
+        //     });
+        // });
+
+        return false;
     }
 
     /**
@@ -172,13 +172,15 @@ export class DistributorService {
      * @param flag Updated sync flag
      * @returns UpdateResult
      */
-    private async setSyncFlags(resources: Distributor[], flag: SyncFlag) {
+    private async setSyncFlags(resources: Distributor[], flag: MeilisearchFlag) {
         const ids = resources.map((user) => user.id);
 
         return this.repository.createQueryBuilder()
             .update({
-                lastSyncedAt: new Date(),
-                lastSyncFlag: flag
+                meilisearch: {
+                    syncedAt: new Date(),
+                    flag: flag
+                }
             })
             .where({ id: In(ids) })
             .execute();
@@ -190,11 +192,11 @@ export class DistributorService {
      * @returns UpdateResult
      */
     public async sync(resources: Distributor[]) {
-        return this.meiliClient.setDistributors(resources).then(() => {
-            return this.setSyncFlags(resources, SyncFlag.OK);
-        }).catch(() => {
-            return this.setSyncFlags(resources, SyncFlag.ERROR);
-        });
+        // return this.meiliClient.setDistributors(resources).then(() => {
+        //     return this.setSyncFlags(resources, MeilisearchFlag.OK);
+        // }).catch(() => {
+        //     return this.setSyncFlags(resources, MeilisearchFlag.FAILED);
+        // });
     }
 
 }

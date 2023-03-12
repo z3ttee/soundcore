@@ -22,7 +22,7 @@ export class OIDCService {
         private readonly jwtService: JwtService,
         @Inject(OIDC_OPTIONS) private readonly options: OIDCConfig
     ) {
-        if(!this.options.issuer) {
+        if(!this.validateIssuerUrl(this.options.issuer)) {
             this.logger.error(`Found invalid issuer url. A valid value is needed for proper authentication.`);
             Bootstrapper.shutdown();
         }
@@ -82,12 +82,6 @@ export class OIDCService {
 
     public issuer(): Observable<Issuer> {
         return new Observable((subscriber) => {
-            if(typeof this._issuer !== "undefined" && this._issuer != null) {
-                subscriber.next(this._issuer);
-                subscriber.complete();
-                return;
-            }
-
             const discoverObservable: Observable<Issuer<BaseClient>> = new Observable((sub) => {
                 Issuer.discover(`${this.options.issuer}`).then((issuer) => {
                     this._issuer = issuer 
@@ -100,16 +94,22 @@ export class OIDCService {
     
                     this._issuer = issuer;
                     sub.next(issuer);
+                }).catch((error: Error) => {
+                    sub.error(new Error(`Could not contact issuer: ${error.message}`));
+                }).finally(() => {
                     sub.complete();
                 });
             })
 
-            subscriber.add(discoverObservable.subscribe((issuer) => {
+            subscriber.add(discoverObservable.pipe(catchError((err) => {
+                subscriber.error(err);
+                subscriber.complete();
+                return of(null);
+            })).subscribe((issuer) => {
                 subscriber.next(issuer);
                 subscriber.complete();
             }));
         });
-        
     }
 
     public jwks(): Observable<JWKStore> {
@@ -154,6 +154,11 @@ export class OIDCService {
                 })
             }));
         });
+    }
+
+    private validateIssuerUrl(issuerUrl: string): boolean {
+        if(typeof issuerUrl !== "string") return false;        
+        return true;
     }
 
 }

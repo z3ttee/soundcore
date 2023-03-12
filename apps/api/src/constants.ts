@@ -27,6 +27,9 @@ export const TYPEORM_CONNECTION_INDEXER = "indexer-connection"
 export const TYPEORM_CONNECTION_GENERAL = "default"
 
 // Internal events
+export const EVENT_TRIGGER_ARTWORK_PROCESS_SONGS = "trigger-artwork-process-for-songs";
+export const EVENT_TRIGGER_MEILISEARCH_PROCESS_SONGS = "trigger-artwork-meilisearch";
+
 export const EVENT_FILES_FOUND = "files-found-event"
 export const EVENT_FILES_PROCESSED = "files-processed-event"
 export const EVENT_SONGS_CHANGED = "songs-changed-event"
@@ -46,6 +49,7 @@ export const TYPEORM_ENTITY_GLOB = path.join(process.cwd(), "**/*.entity{ .ts,.j
 
 // Gateway events
 export const GATEWAY_EVENT_IMPORTTASK_UPDATE = "gateway-importtask-update";
+export const GATEWAY_EVENT_TASK_EMIT = "gateway-task-emit";
 
 // Step messages
 export const MOUNT_STEP_WAITING: MountProgressInfo = {

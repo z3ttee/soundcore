@@ -55,7 +55,7 @@ export class MountController {
 
   @Roles(ROLE_ADMIN)
   @Get(":mountId/rescan")
-  public async reindexMount(@Param("mountId") mountId: string): Promise<number> {
+  public async reindexMount(@Param("mountId") mountId: string) {
     return this.mountService.rescanMount(mountId)
   }
 

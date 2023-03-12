@@ -7,7 +7,9 @@
         <p class="font-semi">{{ user?.name || user?.id }}</p>
     </div>
     <div class="flex items-center justify-center min-w-10 max-w-10 h-10 rounded-full">
-        <span class="transition-all will-change-transform inline-flex justify-center items-center" [ngClass]="{'transform-gpu rotate-180': showOverlay}"><hero-icon [name]="'chevron-down'" [class]="'h-5 w-5'"></hero-icon></span>
+        <span class="transition-all will-change-transform inline-flex justify-center items-center" [ngClass]="{'transform-gpu rotate-180': showOverlay}">
+            <ng-icon name="heroChevronDown" class="h-5 w-5"></ng-icon>
+        </span>
     </div>
 
     <div #profileRef class="absolute block w-full p-2 left-0 right-0 top-0 transform-gpu -translate-y-[85%] scale-95 opacity-0 will-change-transform transition-all pointer-events-none" [ngClass]="{'pointer-events-auto select-none scale-100 opacity-100': showOverlay }">

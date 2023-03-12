@@ -2,9 +2,10 @@ import { CommonModule } from "@angular/common";
 import { NgModule } from "@angular/core";
 import { MatRippleModule } from "@angular/material/core";
 import { RouterModule, Routes } from "@angular/router";
-import { bell, HeroIconModule } from "ng-heroicon";
 import { SCNGXLabelModule, SCNGXToolbarModule, SCNGXTooltipModule } from "@soundcore/ngx";
 import { HomeComponent } from './views/home/home.component';
+import { NgIconsModule } from '@ng-icons/core';
+import { heroBell } from '@ng-icons/heroicons/outline';
 
 const routes: Routes = [
     { path: "", component: HomeComponent }
@@ -17,7 +18,7 @@ const routes: Routes = [
         SCNGXTooltipModule,
         SCNGXToolbarModule,
 
-        HeroIconModule.withIcons({ bell }),
+        NgIconsModule.withIcons({ heroBell }),
         MatRippleModule,
 
         SCNGXLabelModule,

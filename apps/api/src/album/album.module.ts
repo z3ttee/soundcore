@@ -4,16 +4,23 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { GeniusModule } from '../genius/genius.module';
 import { AlbumController } from './controllers/album.controller';
 import { Album } from './entities/album.entity';
+import { MeilisearchModule } from '@soundcore/meilisearch';
+import { AlbumMeiliService } from './services/album-meili.service';
 
 @Module({
   controllers: [AlbumController],
-  providers: [AlbumService],
+  providers: [
+    AlbumService,
+    AlbumMeiliService
+  ],
   imports: [
     forwardRef(() => GeniusModule),
-    TypeOrmModule.forFeature([ Album ])
+    TypeOrmModule.forFeature([ Album ]),
+    MeilisearchModule.forFeature([ Album ])
   ],
   exports: [
-    AlbumService
+    AlbumService,
+    AlbumMeiliService
   ]
 })
 export class AlbumModule {}

@@ -3,7 +3,7 @@ import { Authentication } from '../authentication/decorators/authentication.deco
 import { Roles } from '../authentication/decorators/role.decorator';
 import { ROLE_ADMIN, ROLE_MOD } from '../constants';
 import { User } from '../user/entities/user.entity';
-import { ArtistService } from './artist.service';
+import { ArtistService } from './services/artist.service';
 import { CreateArtistDTO } from './dtos/create-artist.dto';
 import { UpdateArtistDTO } from './dtos/update-artist.dto';
 
@@ -33,7 +33,7 @@ export class ArtistController {
   @Roles(ROLE_MOD, ROLE_ADMIN)
   @Delete(":artistId")
   public async deleteById(@Param("artistId") artistId: string) {
-    return this.artistService.deleteById(artistId);
+    // return this.artistService.deleteById(artistId);
   }
 
 }

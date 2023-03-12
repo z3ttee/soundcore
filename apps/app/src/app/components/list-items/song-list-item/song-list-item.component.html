@@ -78,7 +78,8 @@
     <!-- Like Col -->
     <div class="song-item-like-col inline-flex justify-center items-end max-w-10 min-w-10 px-2 opacity-100 pointer-events-none transition-all" [ngClass]="{'md:opacity-0': !song?.liked, 'opacity-100 pointer-events-auto': song?.liked || isMobile, 'text-accent opacity-100': song?.liked}">
         <span *ngIf="song" class="w-6 h-6" matRipple [matRippleCentered]="true" [matRippleUnbounded]="true" [matRippleRadius]="20" (click)="emitOnLike($event)">
-            <hero-icon name="heart" type="outline" [class]="'w-6 h-6 ' + (song?.liked ? 'fill-accent' : '')"></hero-icon>
+            <ng-icon name="heroHeart" class="w-6 h-6" *ngIf="!song?.liked"></ng-icon>
+            <ng-icon name="heroHeartSolid" class="w-6 h-6 fill-accent" *ngIf="song?.liked"></ng-icon>
         </span>
     </div>
     
@@ -91,7 +92,7 @@
     <!-- Menu column -->
     <div class="min-w-10 text-center">
         <span *ngIf="song" class="flex items-center justify-center w-8 h-8" matRipple [matRippleCentered]="true" [matRippleUnbounded]="true" [matRippleRadius]="20">
-            <fa-icon [icon]="['fas', 'ellipsis-v']"></fa-icon>
+            <ng-icon name="heroEllipsisVerticalSolid" class="w-6 h-6"></ng-icon>
         </span>
     </div>
 </div>

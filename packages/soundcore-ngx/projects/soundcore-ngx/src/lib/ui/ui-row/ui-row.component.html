@@ -5,8 +5,7 @@
             <p class="font-semi text-sm text-font text-opacity-70 line-clamp-1" *ngIf="subtitle">{{ subtitle }}</p> -->
             <scngx-ui-section-title>
                 {{ headline }}
-
-                <p scngxSubtitle>{{ subtitle }}</p>
+                <p class="font-semi text-sm text-font text-opacity-70 line-clamp-1 [&:empty]:hidden" scngxSubtitle>{{ subtitle }}</p>
             </scngx-ui-section-title>
         </div>
         <p class="hover:underline cursor-pointer" [routerLink]="route" *ngIf="route">{{ routeText }}</p>

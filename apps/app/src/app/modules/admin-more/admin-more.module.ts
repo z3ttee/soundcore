@@ -2,8 +2,9 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Routes } from '@angular/router';
 import { AdminMoreComponent } from './views/admin-more/admin-more.component';
-import { HeroIconModule, cog, logout } from 'ng-heroicon';
 import { SCNGXButtonModule, SCNGXUiTitleModule } from '@soundcore/ngx';
+import { NgIconsModule } from '@ng-icons/core';
+import { heroCog6Tooth, heroArrowRightOnRectangle } from '@ng-icons/heroicons/outline';
 
 const routes: Routes = [
   { path: "", component: AdminMoreComponent }
@@ -16,7 +17,7 @@ const routes: Routes = [
   imports: [
     CommonModule,
     RouterModule.forChild(routes),
-    HeroIconModule.withIcons({ cog, logout }),
+    NgIconsModule.withIcons({ heroCog6Tooth, heroArrowRightOnRectangle }),
 
     SCNGXButtonModule,
     SCNGXUiTitleModule

@@ -1,28 +1,24 @@
-import fs from "fs";
+import fs from "node:fs";
+import path from "node:path";
 import NodeID3 from "node-id3";
 import ffprobe from 'ffprobe';
 import ffprobeStatic from "ffprobe-static";
-
 import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { Page, BasePageable } from 'nestjs-pager';
-import path from "path";
-
 import { InjectRepository } from "@nestjs/typeorm";
-import { In, Repository, UpdateResult } from "typeorm";
-import { EventEmitter2 } from "@nestjs/event-emitter";
+import { In, Repository, SelectQueryBuilder, UpdateResult } from "typeorm";
 import { Environment } from "@soundcore/common";
 import { SyncableService } from "../../utils/services/syncing.service";
 import { Song } from "../entities/song.entity";
-import { MeiliSongService } from "../../meilisearch/services/meili-song.service";
 import { User } from "../../user/entities/user.entity";
-import { SyncFlag } from "../../meilisearch/interfaces/syncable.interface";
 import { CreateSongDTO } from "../dtos/create-song.dto";
-import { Artwork, ArtworkID } from "../../artwork/entities/artwork.entity";
-import { GeniusFlag, ResourceFlag } from "../../utils/entities/resource";
-import { ID3TagsDTO } from "../dtos/id3-tags.dto";
+import { Artwork, SongArtwork } from "../../artwork/entities/artwork.entity";
+import { ResourceFlag } from "../../utils/entities/resource";
+import { ID3Artist, ID3TagsDTO } from "../dtos/id3-tags.dto";
 import { SongUniqueFindDTO } from "../dtos/unique-find.dto";
 import { FileFlag } from "../../file/entities/file.entity";
-import { Slug } from "@tsalliance/utilities";
+import { GeniusFlag } from "../../utils/entities/genius.entity";
+import { MeilisearchFlag } from "../../utils/entities/meilisearch.entity";
 
 @Injectable()
 export class SongService implements SyncableService<Song> {
@@ -30,8 +26,7 @@ export class SongService implements SyncableService<Song> {
 
     constructor(
         @InjectRepository(Song) private readonly repository: Repository<Song>,
-        eventEmitter: EventEmitter2,
-        private readonly meilisearch: MeiliSongService
+        // private readonly meilisearch: MeiliSongService
     ){}
 
     /**
@@ -250,7 +245,7 @@ export class SongService implements SyncableService<Song> {
      * @param pageable Page settings
      * @returns Page<Artist>
      */
-    public async findBySyncFlag(flag: SyncFlag, pageable: BasePageable): Promise<Page<Song>> {
+    public async findBySyncFlag(flag: MeilisearchFlag, pageable: BasePageable): Promise<Page<Song>> {
         const result = await this.repository.createQueryBuilder("song")
             .leftJoin("song.artwork", "artwork").addSelect(["artwork.id"])
             .leftJoin("song.album", "album").addSelect(["album.id", "album.slug", "album.name"])
@@ -272,27 +267,30 @@ export class SongService implements SyncableService<Song> {
      * the existing one will be returned.
      * Existing song contains following relations: primaryArtist, featuredArtist, album
      * @param createSongDto Song data to be saved
-     * @returns [Song, hasExistedBefore]
+     * @returns Song[]
      */
-    public async createIfNotExists(dtos: CreateSongDTO[]): Promise<Song[]> {
+    public async createIfNotExists(dtos: (CreateSongDTO | Song)[], qb?: (query: SelectQueryBuilder<Song>, alias: string) => SelectQueryBuilder<Song> ): Promise<Song[]> {
         if(dtos.length <= 0) throw new BadRequestException("Cannot create resources for empty list.");
 
-        return this.repository.createQueryBuilder()
+        return await this.repository.createQueryBuilder()
             .insert()
             .values(dtos)
+            .orUpdate(["name", "primaryArtistId", "albumId", "order", "duration", "fileId"], ["id"], { skipUpdateIfNoValuesChanged: false })
             .returning(["id"])
-            .orUpdate(["name"], ["id"], { skipUpdateIfNoValuesChanged: false })
             .execute().then((insertResult) => {
-                return this.repository.createQueryBuilder("song")
+                const alias = "song";
+                let query: SelectQueryBuilder<Song> = this.repository.createQueryBuilder("song")
                     .leftJoinAndSelect("song.primaryArtist", "primaryArtist")
                     .leftJoinAndSelect("song.album", "album")
                     .leftJoinAndSelect("song.file", "file")
                     .leftJoinAndSelect("song.artwork", "artwork")
-                    .whereInIds(insertResult.raw)
-                    .getMany().then((songs) => {
-                        return songs;
-                    });
-            })
+
+                if(typeof qb === "function") {
+                    query = qb(this.repository.createQueryBuilder(alias), alias);
+                }
+                    
+                return query.whereInIds(insertResult.raw).getMany();
+            });
     }
 
     public async saveAll(songs: Song[]) {
@@ -305,12 +303,16 @@ export class SongService implements SyncableService<Song> {
      * @param artwork Artwork to set
      * @returns Song
      */
-    public async setArtwork(idOrObject: string | Song, artwork: Artwork): Promise<Song> {
+    public async setArtwork(idOrObject: string | Song, artwork: Artwork | SongArtwork): Promise<Song> {
         const song = await this.resolveSong(idOrObject);
         if(!song) throw new NotFoundException("Could not find song.");
 
-        song.artwork = artwork;
+        song.artwork = artwork as SongArtwork;
         return this.repository.save(song);
+    }
+
+    public async setArtworks(objects: (Pick<Song, "artwork"> & Pick<Song, "id">)[]): Promise<Song[]> {
+        return this.repository.save(objects);
     }
 
     /**
@@ -337,7 +339,7 @@ export class SongService implements SyncableService<Song> {
         const song = await this.resolveSong(idOrObject);
         if(!song) throw new NotFoundException("Could not find song.");
 
-        song.geniusFlag = flag;
+        song.genius.flag = flag;
         return this.repository.save(song);
     }
 
@@ -347,30 +349,17 @@ export class SongService implements SyncableService<Song> {
      * @param flag Updated sync flag
      * @returns Song
      */
-    private async setSyncFlags(resources: Song[], flag: SyncFlag) {
+    private async setSyncFlags(resources: Song[], flag: MeilisearchFlag) {
         const ids = resources.map((user) => user.id);
 
         return this.repository.createQueryBuilder()
             .update({
-                lastSyncedAt: new Date(),
-                lastSyncFlag: flag
+                meilisearch: {
+                    syncedAt: new Date(),
+                    flag: flag
+                }
             })
             .where({ id: In(ids) })
-            .execute();
-    }
-
-    /**
-     * Update the last synced attributes on songs.
-     * This will update the lastSyncedAt and lastSyncedFlag attributes.
-     * @param songs List of songs which should be affected by the change
-     * @param flag Flag to set for all songs
-     * @returns UpdateResult
-     */
-    public async setLastSyncedDetails(songs: Song[], flag: SyncFlag): Promise<UpdateResult> {
-        return this.repository.createQueryBuilder()
-            .update()
-            .set({ lastSyncedAt: new Date(), lastSyncFlag: flag })
-            .whereInIds(songs)
             .execute();
     }
 
@@ -380,11 +369,13 @@ export class SongService implements SyncableService<Song> {
      * @returns UpdateResult
      */
     public async syncWithMeilisearch(resources: Song[]) {
-        return this.meilisearch.setSongs(resources).then(() => {
-            return this.setSyncFlags(resources, SyncFlag.OK);
-        }).catch(() => {
-            return this.setSyncFlags(resources, SyncFlag.ERROR);
-        });
+        // return this.meilisearch.setSongs(resources).then(() => {
+        //     return this.setSyncFlags(resources, MeilisearchFlag.OK);
+        // }).catch(() => {
+        //     return this.setSyncFlags(resources, MeilisearchFlag.FAILED);
+        // });
+
+        return null;
     }
 
     /**
@@ -406,7 +397,9 @@ export class SongService implements SyncableService<Song> {
      * @param filepath Path to mp3 file
      * @returns ID3TagsDTO
      */
-    public async readID3TagsFromFile(filepath: string): Promise<ID3TagsDTO> {
+    public async readID3TagsFromFile(absolutePath: string): Promise<ID3TagsDTO> {
+        const filepath = path.resolve(absolutePath);
+        
         // Get duration in seconds
         const probe = await ffprobe(filepath, { path: ffprobeStatic.path });
         const durationInSeconds = Math.round(probe.streams[0].duration || 0);
@@ -427,13 +420,15 @@ export class SongService implements SyncableService<Song> {
             }
         }
 
+        const title = id3Tags.title?.trim() || path.basename(filepath).replace(/\.[^/.]+$/, "").trim();
+
         // Get artists
-        const artists: string[] = [];
+        const artists: ID3Artist[] = [];
         if (id3Tags.artist) {
             const splitted = id3Tags.artist.split(",") || [];
 
             for (const index in splitted) {
-                artists.push(splitted[index]?.trim());
+                artists.push({ name: splitted[index]?.trim() });
             }
         }
 
@@ -452,15 +447,12 @@ export class SongService implements SyncableService<Song> {
         // Build result DTO
         const result: ID3TagsDTO = {
             filepath,
-            title: id3Tags.title?.trim() || path.basename(filepath).replace(/\.[^/.]+$/, "").trim(),
+            title: title,
             duration: durationInSeconds,
-            artists: artists.map((name) => ({
-                name: name?.trim(),
-                slug: Slug.create(name?.trim())
-            })),
-            album: id3Tags.album?.trim(),
+            artists: artists,
+            album: id3Tags.album?.trim() ?? title,
             cover: artworkBuffer,
-            orderNr: parseInt(id3Tags.trackNumber?.split("/")?.[0]) || null
+            orderNr: parseInt(id3Tags.trackNumber?.split("/")?.[0]) ?? 0
         }
 
         return result

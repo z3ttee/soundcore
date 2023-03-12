@@ -1,0 +1,84 @@
+<ng-container *ngIf="($props | async) as props">
+    <div class="pt-window w-full h-full overflow-y-auto overflow-x-hidden" cdkVirtualScrollingElement>
+        <!-- Task title -->
+        <div class="mb-row px-window flex items-center justify-start gap-4">
+            <div class="min-w-9 w-9 overflow-hidden">
+                <scngx-task-status-icon [status]="props.task.data?.status" size="32"></scngx-task-status-icon>
+            </div>
+
+            <scngx-ui-title [inverted]="true">
+                {{ props.task.data?.name }}<div scngxSubtitle>Prozess</div>
+            </scngx-ui-title>
+        </div>
+
+        <!-- Task description -->
+        <div class="my-row px-window" *ngIf="props.task.data?.description">
+            <p>{{ props.task.data?.description }}</p>
+        </div>
+
+        <!-- Task Environment -->
+        <div class="my-row px-window">
+
+        </div>
+
+        <scngx-ui-row headline="Umgebungsvariablen" subtitle="Mit diesen Eingaben wurde der Prozess gestartet">
+            <div class="px-window">
+                <div class="p-4 rounded-sm bg-body-light border border-body-lighter font-mono overflow-x-auto">
+                    <pre>{{ props.task.data?.environment | json }}</pre>
+                </div>
+            </div>
+        </scngx-ui-row>
+
+        <scngx-ui-row headline="Stages" subtitle="Stages und Steps des Prozesses">
+            <div class="px-window">
+                <div class="p-4 rounded-sm bg-body-light border border-body-lighter">
+
+                    <div *ngFor="let stage of props.task?.data?.stages; let stageIndex = index" >
+                        <!-- Stage -->
+                        <div class="flex flex-1 items-center justify-start gap-2 my-1 p-2 rounded-sm bg-body-lighter bg-opacity-80 cursor-pointer select-none" >
+                            <mat-icon class="mat-icon-rtl-mirror">expand_more</mat-icon>
+                            <div class="hidden md:block">
+                                <p class="text-sm opacity-60">#{{ stageIndex + 1 }}</p>
+                            </div>
+                            <div class="flex-grow">
+                                <p class="line-clamp-1">{{ stage?.name }}</p>
+                                <p class="line-clamp-1 text-sm opacity-60">{{ stage?.description }}</p>
+                            </div>
+                            <div class="min-w-16 w-16 hidden md:block" *ngIf="isWorking(stage)">
+                                <p class="text-sm opacity-60">{{ getCurrentStepIndex(stage) ?? 0 }}/{{ stage.steps?.length }}</p>
+                            </div>
+                            <span>
+                                <scngx-task-status-icon [status]="stage.status"></scngx-task-status-icon>
+                            </span>
+                        </div>
+
+                        <!-- Steps -->
+                        <div class="pl-9" *ngFor="let step of stage.steps; let stepIndex = index">
+                            <div class="min-h-0 h-min w-full p-2 my-1 flex flex-1 items-center justify-start gap-2 rounded-sm bg-body-lighter bg-opacity-0 hover:bg-opacity-60 active:bg-opacity-80 cursor-pointer select-none">
+                                <div class="hidden md:block">
+                                    <p class="text-sm opacity-60">#{{ stepIndex + 1 }}</p>
+                                </div>
+                                
+                                <div class="flex-grow">
+                                    <p class="line-clamp-1">{{ step.name }}</p>
+                                    <p class="line-clamp-1 text-sm opacity-60">{{ step.description }}</p>
+                                </div>
+        
+                                <div class="min-w-16 w-16 hidden md:block">
+                                    <p class="text-sm opacity-60">{{ ((step.progress ?? 0)*100).toFixed(1) }} %</p>
+                                </div>
+        
+                                <span>
+                                    <scngx-task-status-icon [status]="step.status"></scngx-task-status-icon>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </scngx-ui-row>
+    
+        <!-- Page bottom padding -->
+        <div class="pb-window"></div>
+    </div>
+</ng-container>

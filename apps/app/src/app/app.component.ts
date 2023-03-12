@@ -35,11 +35,11 @@ export class AppComponent implements OnInit, OnDestroy {
     this.$isRouteLoading.pipe(filter((isLoading) => !isLoading)),
     this.authService.$ready.pipe(filter((isReady) => isReady)),
     this.authService.$onInitError.pipe(startWith(null)),
-    this.appService.$appInfo,
+    this.appService.$appInfo.pipe(tap((appInfo) => {
+      console.log(`Successfully contacted backend application on '${environment.api_base_uri}/v1'. Version: ${appInfo?.build?.version}, Application mode: ${appInfo?.isDockerized ? 'Docker' : 'Standalone'}`);
+    })),
   ]).pipe(
-    map(([isRouteLoading, isReady, keycloakInitError, appInfo]): AppProps => {
-      console.log(`Successfully contacted backend application on '${environment.api_base_uri}/v1'. Version: ${appInfo?.build?.version}, Application mode: ${appInfo?.isDockerized ? 'Docker' : 'Standalone'}`)
-      
+    map(([isRouteLoading, isReady, keycloakInitError]): AppProps => {
       // Toggle splash element
       const splashElement: HTMLElement = document.querySelector("#asc-splash-screen");
       if(!isRouteLoading && isReady) {

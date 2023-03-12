@@ -1,8 +1,9 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { BucketListItemComponent } from './bucket-list-item.component';
-import { chartPie, collection, HeroIconModule } from 'ng-heroicon';
 import { SCNGXBytesPipeModule, SCNGXSkeletonModule } from '@soundcore/ngx';
+import { NgIconsModule } from '@ng-icons/core';
+import { heroRectangleStack, heroChartPie } from '@ng-icons/heroicons/outline';
 
 @NgModule({
   declarations: [
@@ -10,7 +11,7 @@ import { SCNGXBytesPipeModule, SCNGXSkeletonModule } from '@soundcore/ngx';
   ],
   imports: [
     CommonModule,
-    HeroIconModule.withIcons({ collection, chartPie }),
+    NgIconsModule.withIcons({ heroRectangleStack, heroChartPie }),
 
     SCNGXBytesPipeModule,
     SCNGXSkeletonModule

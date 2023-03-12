@@ -3,8 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Page, BasePageable } from 'nestjs-pager';
 import { In, Repository } from 'typeorm';
 import { Artwork } from '../../artwork/entities/artwork.entity';
-import { SyncFlag } from '../../meilisearch/interfaces/syncable.interface';
-import { MeiliPublisherService } from '../../meilisearch/services/meili-publisher.service';
+import { MeilisearchFlag } from '../../utils/entities/meilisearch.entity';
 import { CreateResult } from '../../utils/results/creation.result';
 import { CreatePublisherDTO } from '../dtos/create-publisher.dto';
 import { UpdatePublisherDTO } from '../dtos/update-publisher.dto';
@@ -16,7 +15,7 @@ export class PublisherService {
 
     constructor(
         @InjectRepository(Publisher) private readonly repository: Repository<Publisher>,
-        private readonly meiliClient: MeiliPublisherService
+        // private readonly meiliClient: MeiliPublisherService
     ){}
 
     /**
@@ -51,7 +50,7 @@ export class PublisherService {
      * @param pageable Page settings
      * @returns Page<Publisher>
      */
-    public async findBySyncFlag(flag: SyncFlag, pageable: BasePageable): Promise<Page<Publisher>> {
+    public async findBySyncFlag(flag: MeilisearchFlag, pageable: BasePageable): Promise<Page<Publisher>> {
         const result = await this.repository.createQueryBuilder("publisher")
             .leftJoin("publisher.artwork", "artwork").addSelect(["artwork.id"])
             .where("publisher.lastSyncFlag = :flag", { flag })
@@ -88,7 +87,7 @@ export class PublisherService {
 
         const publisher = this.repository.create();
         publisher.name = createPublisherDto.name;
-        publisher.geniusId = createPublisherDto.geniusId;
+        // publisher.geniusId = createPublisherDto.geniusId;
         publisher.description = createPublisherDto.description;
 
         return this.repository.createQueryBuilder()
@@ -120,7 +119,7 @@ export class PublisherService {
         if(!publisher) throw new NotFoundException("Publisher not found.");
 
         publisher.name = updatePublisherDto.name;
-        publisher.geniusId = updatePublisherDto.geniusId;
+        // publisher.geniusId = updatePublisherDto.geniusId;
         publisher.description = updatePublisherDto.description;
 
         return this.save(publisher);
@@ -132,11 +131,13 @@ export class PublisherService {
      * @returns boolean
      */
     public async deleteById(publisherId: string): Promise<boolean> {
-        return this.meiliClient.deletePublisher(publisherId).then(() => {
-            return this.repository.delete({ id: publisherId }).then((value) => {
-                return value.affected > 0;
-            });
-        });
+        // return this.meiliClient.deletePublisher(publisherId).then(() => {
+        //     return this.repository.delete({ id: publisherId }).then((value) => {
+        //         return value.affected > 0;
+        //     });
+        // });
+
+        return false;
     }
 
     /**
@@ -172,13 +173,15 @@ export class PublisherService {
      * @param flag Updated sync flag
      * @returns Publisher
      */
-    private async setSyncFlags(resources: Publisher[], flag: SyncFlag) {
+    private async setSyncFlags(resources: Publisher[], flag: MeilisearchFlag) {
         const ids = resources.map((user) => user.id);
 
         return this.repository.createQueryBuilder()
             .update({
-                lastSyncedAt: new Date(),
-                lastSyncFlag: flag
+                meilisearch: {
+                    syncedAt: new Date(),
+                    flag: flag
+                }
             })
             .where({ id: In(ids) })
             .execute();
@@ -190,11 +193,11 @@ export class PublisherService {
      * @returns Publisher
      */
     public async sync(resources: Publisher[]) {
-        return this.meiliClient.setPublishers(resources).then(() => {
-            return this.setSyncFlags(resources, SyncFlag.OK);
-        }).catch(() => {
-            return this.setSyncFlags(resources, SyncFlag.ERROR);
-        });
+        // return this.meiliClient.setPublishers(resources).then(() => {
+        //     return this.setSyncFlags(resources, MeilisearchFlag.OK);
+        // }).catch(() => {
+        //     return this.setSyncFlags(resources, MeilisearchFlag.FAILED);
+        // });
     }
 
 }

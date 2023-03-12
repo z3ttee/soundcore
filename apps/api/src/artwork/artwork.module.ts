@@ -1,24 +1,32 @@
+import path from 'path';
 import { Module, OnModuleInit } from '@nestjs/common';
 import { ArtworkController } from './controllers/artwork.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ArtworkService } from './services/artwork.service';
-import { Artwork } from './entities/artwork.entity';
-import { WorkerQueue, WorkerQueueModule } from '@soundcore/nest-queue';
-import path from 'path';
-import { ArtworkQueueService } from './services/artwork-queue.service';
-import { ArtworkProcessDTO, ArtworkProcessFlag } from './dtos/artwork-process.dto';
+import { AlbumArtwork, ArtistArtwork, Artwork, DownloadableArtwork, SongArtwork } from './entities/artwork.entity';
+import { PipelineModule } from '@soundcore/pipelines';
+import { ScheduleModule } from '@nestjs/schedule';
+import { ArtworkBackgroundService } from './services/background.service';
 
 @Module({
   controllers: [ArtworkController],
   providers: [
     ArtworkService,
-    ArtworkQueueService
+    ArtworkBackgroundService
   ],
   imports: [
-    TypeOrmModule.forFeature([ Artwork ]),
-    WorkerQueueModule.forFeature({
-      script: path.join(__dirname, "worker", "artwork.worker.js"),
-      concurrent: 4
+    ScheduleModule,
+    TypeOrmModule.forFeature([ 
+      Artwork, 
+      SongArtwork, 
+      AlbumArtwork, 
+      ArtistArtwork, 
+      DownloadableArtwork 
+    ]),
+    PipelineModule.registerPipelines({
+      pipelines: [
+        path.join(__dirname, "pipelines", "artwork.pipeline.js")
+      ]
     })
   ],
   exports: [
@@ -27,14 +35,12 @@ import { ArtworkProcessDTO, ArtworkProcessFlag } from './dtos/artwork-process.dt
 })
 export class ArtworkModule implements OnModuleInit {
 
-  constructor(private readonly queue: WorkerQueue<ArtworkProcessDTO>) {}
+  constructor(
+    private readonly backgroundService: ArtworkBackgroundService
+  ) {}
 
   public async onModuleInit() {
-      return this.queue.enqueue(<ArtworkProcessDTO>{
-        flag: ArtworkProcessFlag.CONTINUE_PROCESSING,
-        entities: [],
-        sourceType: null
-      });
+    return this.backgroundService.markAwaitingAsAborted();
   }
 
 }

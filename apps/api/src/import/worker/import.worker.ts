@@ -1,17 +1,14 @@
 import { InternalServerErrorException, Logger } from "@nestjs/common";
 import { EventEmitter2 } from "@nestjs/event-emitter";
-import { Batch } from "@soundcore/common";
 import { WorkerJobRef } from "@soundcore/nest-queue";
-import { MeiliPlaylistService } from "../../meilisearch/services/meili-playlist.service";
-import { MeiliSongService } from "../../meilisearch/services/meili-song.service";
 import { PlaylistItem } from "../../playlist/entities/playlist-item.entity";
 import { Playlist } from "../../playlist/entities/playlist.entity";
 import { PlaylistService } from "../../playlist/playlist.service";
 import { Song } from "../../song/entities/song.entity";
 import { SongService } from "../../song/services/song.service";
 import Database from "../../utils/database/database-worker-client";
-import MeiliClient from "../../utils/database/meilisearch-worker-client";
-import { ImportTask, ImportTaskStatus, ImportTaskType } from "../entities/import.entity";
+import MeilisearchClient from "../../utils/database/meilisearch-worker-client";
+import { ImportTask, ImportTaskType } from "../entities/import.entity";
 import { SpotifySong, SpotifyTrackList } from "../clients/spotify/spotify-entities";
 import { ImportService } from "../services/import.service";
 import { SpotifyClient } from "../clients/spotify/spotify.client";
@@ -41,7 +38,7 @@ async function importSpotifyPlaylist(job: WorkerJobRef<ImportTask>): Promise<Imp
     // Connect the database client
     return Database.connect().then((datasource) => {
         // Create new meilisearch instance
-        return MeiliClient.connect().then((meilisearch) => {
+        return MeilisearchClient.connect().then((meilisearch) => {
 
             // Check if spotify module is enabled
             if(!client.isEnabled) {
@@ -50,9 +47,6 @@ async function importSpotifyPlaylist(job: WorkerJobRef<ImportTask>): Promise<Imp
 
             // Create new event emitter required by services
             const eventEmitter = new EventEmitter2()
-
-            // Instantiate meilisearch client for playlist syncing
-            const meiliPlaylistClient = new MeiliPlaylistService(meilisearch);
     
             // Instantiate repositories used by the services
             const songRepo = datasource.getRepository(Song);
@@ -62,8 +56,8 @@ async function importSpotifyPlaylist(job: WorkerJobRef<ImportTask>): Promise<Imp
             const reportRepo = datasource.getRepository(ImportReport);
 
             // Instantiate services
-            const songService = new SongService(songRepo, eventEmitter, new MeiliSongService(meilisearch));
-            const playlistService = new PlaylistService(playlistRepo, song2playlistRepo, eventEmitter, meiliPlaylistClient);
+            const songService = new SongService(songRepo);
+            const playlistService = new PlaylistService(playlistRepo, song2playlistRepo, eventEmitter);
             const importService = new ImportService(importRepo);
             const reportService = new ImportReportService(reportRepo);
             
@@ -171,55 +165,56 @@ async function importSpotifyPlaylist(job: WorkerJobRef<ImportTask>): Promise<Imp
                 const notImportedSongs: FailedSpotifyImport[] = [];
 
                 // Add songs to the playlist
-                return Batch.of<Song, any>(extractedSongs, 20).do(async (batch) => {
+                // return Batch.of<Song, any>(extractedSongs, 20).do(async (batch) => {
 
-                    await playlistService.setSongs(playlist.id, batch, user).then((insertResult) => {
-                        // Increment stats
-                        totalSongsImported += insertResult.identifiers.length;
-                    }).catch((error: Error) => {
-                        logger.error(`Failed adding songs to imported playlist: ${error.message}`, error.stack);
-                        notImportedSongs.push(...batch.map((song) => ({
-                            title: song.name,
-                            album: song.album?.name,
-                            artists: [ song.primaryArtist?.name, ...song.featuredArtists?.map((artist) => artist.name) ],
-                            reason: FailedReason.ERROR
-                        } as FailedSpotifyImport)))
-                    });
+                //     await playlistService.setSongs(playlist.id, batch, user).then((insertResult) => {
+                //         // Increment stats
+                //         totalSongsImported += insertResult.identifiers.length;
+                //     }).catch((error: Error) => {
+                //         logger.error(`Failed adding songs to imported playlist: ${error.message}`, error.stack);
+                //         notImportedSongs.push(...batch.map((song) => ({
+                //             title: song.name,
+                //             album: song.album?.name,
+                //             artists: [ song.primaryArtist?.name, ...song.featuredArtists?.map((artist) => artist.name) ],
+                //             reason: FailedReason.ERROR
+                //         } as FailedSpotifyImport)))
+                //     });
 
-                    return [];
-                }).start().then(() => {
-                    const endedAtMs = Date.now();
-                    const timeTookMs: number = endedAtMs - startedAtMs;
+                //     return [];
+                // }).start().then(() => {
+                //     const endedAtMs = Date.now();
+                //     const timeTookMs: number = endedAtMs - startedAtMs;
 
-                    // Create stats for reporting
-                    const stats: ImportSpotifyStats = {
-                        total: totalSpotifyTracks,
-                        importedAmount: totalSongsImported,
-                        timeTookMs
-                    }
+                //     // Create stats for reporting
+                //     const stats: ImportSpotifyStats = {
+                //         total: totalSpotifyTracks,
+                //         importedAmount: totalSongsImported,
+                //         timeTookMs
+                //     }
 
-                    // Create result object that is returned by the worker
-                    const result = new ImportSpotifyResult(playlist, ImportTaskStatus.OK, stats);
+                //     // Create result object that is returned by the worker
+                //     const result = new ImportSpotifyResult(playlist, ImportTaskStatus.OK, stats);
 
-                    return reportService.createIfNotExistsForTask(task, {
-                        notImportedSongs: notExtractedSpotifySongs
-                    } as ImportSpotifyReport).catch((error: Error) => {
-                        logger.warn(`Failed creating report for import task: ${error.message}`);
-                        return null;
-                    }).then((report) => {
-                        // Update payload in database
-                        return importService.setTaskPayload(task, playlist).then(() => {
-                            // Update stats in database
-                            return importService.setTaskStats(task, stats).then(() => {
-                                // Return result created above
-                                return result;
-                            });
-                        });
-                    });
-                }).catch((error: Error) => {
-                    logger.error(`Failed batch-import of songs for imported playlist: ${error.message}`);
-                    throw new InternalServerErrorException("Failed adding songs to playlist");
-                });
+                //     return reportService.createIfNotExistsForTask(task, {
+                //         notImportedSongs: notExtractedSpotifySongs
+                //     } as ImportSpotifyReport).catch((error: Error) => {
+                //         logger.warn(`Failed creating report for import task: ${error.message}`);
+                //         return null;
+                //     }).then((report) => {
+                //         // Update payload in database
+                //         return importService.setTaskPayload(task, playlist).then(() => {
+                //             // Update stats in database
+                //             return importService.setTaskStats(task, stats).then(() => {
+                //                 // Return result created above
+                //                 return result;
+                //             });
+                //         });
+                //     });
+                // }).catch((error: Error) => {
+                //     logger.error(`Failed batch-import of songs for imported playlist: ${error.message}`);
+                //     throw new InternalServerErrorException("Failed adding songs to playlist");
+                // });
+                return null;
             });
         });
     });

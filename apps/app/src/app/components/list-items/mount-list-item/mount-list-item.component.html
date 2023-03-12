@@ -27,7 +27,7 @@
 
             <ng-template #mountUsedSpace>
                 <div class="flex items-center gap-2 justify-end">
-                    <hero-icon class="h-5 w-5" name="chart-pie"></hero-icon>
+                    <ng-icon class="h-5 w-5" name="heroChartPie"></ng-icon>
                     <span class="text-sm">{{ mount?.usedSpace | scngxBytesPipe:"gb" }}</span>
                 </div>
             </ng-template>
@@ -38,7 +38,7 @@
 
             <ng-template #mountMountCount>
                 <div class="flex items-center justify-end gap-2">
-                    <hero-icon class="h-5 w-5" name="collection"></hero-icon>
+                    <ng-icon class="h-5 w-5" name="heroRectangleStack"></ng-icon>
                     <span class="text-sm">{{ mount?.filesCount ?? 0 }} Datei{{ mount?.filesCount != 1 ? 'en' : '' }}</span>
                 </div>
             </ng-template>
@@ -52,8 +52,8 @@
 
         <div class="min-w-6 w-6" *ngIf="mount">
             <div class="flex items-center justify-center w-full h-full">
-                <hero-icon class="h-5 w-5" name="star" *ngIf="!mount.isDefault"></hero-icon>
-                <hero-icon class="h-5 w-5 text-accent fill-accent" name="star" [type]="'solid'" *ngIf="mount.isDefault"></hero-icon>
+                <ng-icon class="h-5 w-5" name="heroStar" *ngIf="!mount.isDefault"></ng-icon>
+                <ng-icon class="h-5 w-5 text-accent fill-accent" name="heroStarSolid" *ngIf="mount.isDefault"></ng-icon>
             </div>
         </div>
     </div>

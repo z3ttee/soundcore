@@ -5,8 +5,9 @@ import { AppPlaylistChooseDialog } from './playlist-choose-dialog.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { GenericResourceListItemModule } from 'src/app/components/list-items/generic-resource-list-item/generic-resource-list-item.module';
 import { AppPlaylistCreateDialogModule } from '../playlist-create-dialog/playlist-create-dialog.module';
-import { HeroIconModule, plus } from 'ng-heroicon';
 import { SCSDKPlaylistModule } from '@soundcore/sdk';
+import { NgIconsModule } from '@ng-icons/core';
+import { heroPlusSolid } from '@ng-icons/heroicons/solid';
 
 @NgModule({
   declarations: [
@@ -14,7 +15,7 @@ import { SCSDKPlaylistModule } from '@soundcore/sdk';
   ],
   imports: [
     CommonModule,
-    HeroIconModule.withIcons({ plus }),
+    NgIconsModule.withIcons({ heroPlusSolid }),
     ReactiveFormsModule,
 
     SCNGXDialogModule,

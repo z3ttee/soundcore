@@ -10,22 +10,22 @@
     <scngx-divider></scngx-divider>
     <sccdk-context-menu-category>
         <sccdk-context-menu-item (click)="enqueueNext(true)">
-            <hero-icon name="play" [class]="'h-5 w-5'"></hero-icon>
+            <ng-icon name="heroPlaySolid" class="h-5 w-5"></ng-icon>
             <span>Abspielen</span>
         </sccdk-context-menu-item>
         <sccdk-context-menu-item (click)="enqueueNext()">
-            <hero-icon name="collection" [class]="'h-5 w-5'"></hero-icon>
+            <ng-icon name="heroRectangleStack" class="h-5 w-5"></ng-icon>
             <span>Zur Warteschlange hinzufügen</span>
         </sccdk-context-menu-item>
     </sccdk-context-menu-category>
     <scngx-divider></scngx-divider>
     <sccdk-context-menu-category>
         <sccdk-context-menu-item (click)="openChoosePlaylistDialog()">
-            <hero-icon name="view-grid-add" [class]="'h-5 w-5'"></hero-icon>
+            <ng-icon name="heroSquaresPlus" class="h-5 w-5"></ng-icon>
             <span>{{ !playlist ? "Zu Playlist hinzufügen": "Zu anderer Playlist hinzufügen" }}</span>
         </sccdk-context-menu-item>
         <sccdk-context-menu-item (click)="removeFromPlaylist()" *ngIf="playlist">
-            <hero-icon name="minus" [class]="'h-5 w-5'"></hero-icon>
+            <ng-icon name="heroMinusSolid" class="h-5 w-5"></ng-icon>
             <span>Aus Playlist entfernen</span>
         </sccdk-context-menu-item>
     </sccdk-context-menu-category>
@@ -36,7 +36,7 @@
             <span>Verwalten</span>
         </sccdk-context-menu-item>
         <sccdk-context-menu-item (click)="toggleLikeForSong()">
-            <hero-icon name="heart" [class]="'h-5 w-5'"></hero-icon>
+            <ng-icon name="heroHeart" class="h-5 w-5"></ng-icon>
             <span>Zu Lieblingssongs hinzufügen</span>
         </sccdk-context-menu-item>
     </sccdk-context-menu-category>

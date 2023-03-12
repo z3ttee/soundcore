@@ -2,7 +2,9 @@
     <!-- Task type (spotify icon) -->
     <div class="min-w-6 w-6 text-center">
         <scngx-skeleton *ngIf="!task; else taskTypeIcon" [class]="'w-8 h-8 aspect-square rounded-full'"></scngx-skeleton>
-        <ng-template #taskTypeIcon><fa-icon [icon]="['fab', 'spotify']" size="xl"></fa-icon></ng-template>
+        <ng-template #taskTypeIcon>
+            <ng-icon name="simpleSpotify" class="h-7 w-7"></ng-icon>
+        </ng-template>
     </div>
 
     <!-- Playlist Artwork with title -->

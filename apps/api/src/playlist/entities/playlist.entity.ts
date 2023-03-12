@@ -6,18 +6,29 @@ import { Resource, ResourceFlag, ResourceType } from "../../utils/entities/resou
 import { Slug } from "@tsalliance/utilities";
 import { PlaylistPrivacy } from "../enums/playlist-privacy.enum";
 import { PlaylistItem } from "./playlist-item.entity";
-import { Syncable, SyncFlag } from "../../meilisearch/interfaces/syncable.interface";
+import { MeilisearchInfo } from "../../utils/entities/meilisearch.entity";
+import { GeniusInfo } from "../../utils/entities/genius.entity";
 
 @Entity()
 @Index(["name", "author"], { unique: true })
-export class Playlist implements Resource, Syncable {
+export class Playlist implements Resource {
     public resourceType: ResourceType = "playlist";
 
-    @Column({ nullable: true, default: null})
-    public lastSyncedAt: Date;
+    /**
+     * MEILISEARCH RELATED ATTRIBUTES
+     */
+    @Column(() => MeilisearchInfo)
+    public meilisearch: MeilisearchInfo;
 
-    @Column({ default: 0 })
-    public lastSyncFlag: SyncFlag;
+    /**
+     * GENIUS RELATED ATTRIBUTES
+     */
+    @Column(() => GeniusInfo)
+    public genius: GeniusInfo;
+
+    /**
+     * DEFAULT ATTRIBUTES
+     */
 
     @PrimaryGeneratedColumn("uuid")
     public id: string;

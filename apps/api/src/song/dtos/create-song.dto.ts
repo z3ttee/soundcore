@@ -1,7 +1,7 @@
 import { IsArray, IsNotEmpty, IsNumber, IsOptional, Length, Min } from "class-validator";
 import { Album } from "../../album/entities/album.entity";
 import { Artist } from "../../artist/entities/artist.entity";
-import { Artwork } from "../../artwork/entities/artwork.entity";
+import { Artwork, SongArtwork } from "../../artwork/entities/artwork.entity";
 import { File } from "../../file/entities/file.entity";
 import { Song } from "../entities/song.entity";
 
@@ -49,6 +49,6 @@ export class CreateSongDTO implements
     public featuredArtists?: Artist[];
 
     @IsOptional()
-    public artwork?: Artwork;
+    public artwork?: SongArtwork;
 
 }

@@ -8,6 +8,7 @@
   "main": "dist/index.js",
   "scripts": {
     "build:api": "nest build",
+    "build:package": "nest build",
     "dev": "nest build --watch"
   },
   "files": [
@@ -18,13 +19,15 @@
     "@nestjs/core": "^9.0.0"
   },
   "dependencies": {
-    "@types/workerpool": "^6.1.0",
+    "@nestjs/common": "^9.0.0",
+    "@nestjs/core": "^9.0.0",
     "reflect-metadata": "^0.1.13",
     "rxjs": "7.5.6",
     "uuid": "^9.0.0",
     "workerpool": "^6.2.1"
   },
   "devDependencies": {
+    "@types/workerpool": "^6.1.0",
     "@types/node": "^16.0.0",
     "eslint": "^8.0.1",
     "eslint-config-nestjs": "*",

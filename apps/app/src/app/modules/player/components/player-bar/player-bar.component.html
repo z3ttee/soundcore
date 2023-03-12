@@ -24,7 +24,8 @@
 
                 <scngx-ibtn-text class="hidden sm:inline-block pointer-events-auto" (click)="toggleLike($event, props.song)" *ngIf="props.song">
                     <span class="w-full h-full flex items-center justify-center">
-                        <hero-icon name="heart" type="outline" [class]="'w-6 h-6 ' + (props.song?.liked ? 'fill-accent text-accent' : '')"></hero-icon>
+                        <ng-icon name="heroHeart" class="w-6 h-6" *ngIf="!props?.song?.liked"></ng-icon>
+                        <ng-icon name="heroHeartSolid" class="w-6 h-6 fill-accent" *ngIf="props?.song?.liked"></ng-icon>
                     </span>
                 </scngx-ibtn-text>
             </div>
@@ -40,7 +41,7 @@
                 <!-- Prev button -->
                 <scngx-ibtn-text class="hidden sm:inline-block" (click)="player.prev()">
                     <span class="flex items-center justify-center w-full h-full">
-                        <hero-icon name="fast-forward" type="solid" [class]="'h-7 w-7 rotate-180'"></hero-icon>
+                        <ng-icon name="heroForward" class="'h-7 w-7 rotate-180'"></ng-icon>
                     </span>
                 </scngx-ibtn-text>
     
@@ -53,7 +54,7 @@
                 <!-- Skip button -->
                 <scngx-ibtn-text class="hidden sm:inline-block" (click)="player.skip()">
                     <span class="flex items-center justify-center w-full h-full">
-                        <hero-icon name="fast-forward" type="solid" [class]="'h-7 w-7'"></hero-icon>
+                        <ng-icon name="heroForward" type="solid" class="'h-7 w-7'"></ng-icon>
                     </span>
                 </scngx-ibtn-text>
 
@@ -82,7 +83,9 @@
 
                 <!-- Queue button -->
                 <scngx-ibtn-text class="hidden md:inline-block">
-                    <span class="flex items-center justify-center w-full h-full"><hero-icon name="collection" class="h-6 w-6"></hero-icon></span>
+                    <span class="flex items-center justify-center w-full h-full">
+                        <ng-icon name="heroRectangleStack" class="h-6 w-6"></ng-icon>
+                    </span>
                 </scngx-ibtn-text>
             </div>
         </div>

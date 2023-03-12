@@ -1,23 +1,21 @@
 import path from 'path';
 import { Module } from '@nestjs/common';
-import { WorkerQueueModule } from '@soundcore/nest-queue';
 import { IndexerService } from './services/indexer.service';
-import { IndexerQueueService } from './services/indexer-queue.service';
+import { PipelineModule } from '@soundcore/pipelines';
 
 @Module({
     providers: [
-        IndexerService,
-        IndexerQueueService
+        IndexerService
     ],
     imports: [
-        WorkerQueueModule.forFeature({
-            script: path.join(__dirname, "worker", "indexer.worker.js"),
-            concurrent: 2
+        PipelineModule.registerPipelines({
+            pipelines: [
+                path.join(__dirname, "pipelines", "indexer.pipeline.js")
+            ]
         })
     ],
     exports: [
-        IndexerService,
-        IndexerQueueService
+        IndexerService
     ]
 })
 export class IndexerModule {}

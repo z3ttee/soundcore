@@ -4,8 +4,11 @@ import { RouterModule } from '@angular/router';
 import { AdminLayoutComponent } from './admin-layout.component';
 import { ProfileBarModule } from 'src/app/components/profile-bar/profile-bar.module';
 import { SCNGXBottomNavModule, SCNGXDrawerModule, SCNGXProgressbarModule, SCNGXToolbarModule } from '@soundcore/ngx';
-import { HeroIconModule, home, search, user, bookmarkAlt, chevronDown, plus, arrowLeft, cubeTransparent, documentAdd, lightningBolt, dotsVertical } from 'ng-heroicon';
 import { SCSDKImportModule } from '@soundcore/sdk';
+import { NgIconsModule } from '@ng-icons/core';
+import { heroPlusSolid, heroEllipsisVerticalSolid } from '@ng-icons/heroicons/solid';
+import { heroHome, heroShieldExclamation, heroCubeTransparent, heroArrowRightOnRectangle, heroCog6Tooth, heroDocumentPlus, heroBell, heroMagnifyingGlass, heroUser, heroBookmarkSquare, heroChevronDown } from '@ng-icons/heroicons/outline';
+import { NavListItemModule } from 'src/app/components/list-items/nav-list-item/nav-list-item.module';
 
 @NgModule({
   declarations: [
@@ -15,6 +18,7 @@ import { SCSDKImportModule } from '@soundcore/sdk';
     CommonModule,
     RouterModule,
     ProfileBarModule,
+    NavListItemModule,
         
     SCNGXDrawerModule,
     SCNGXBottomNavModule,
@@ -23,7 +27,21 @@ import { SCSDKImportModule } from '@soundcore/sdk';
 
     SCSDKImportModule,
 
-    HeroIconModule.withIcons({ home, search, user, bookmarkAlt, chevronDown, plus, arrowLeft, cubeTransparent, documentAdd, lightningBolt, dotsVertical }, { defaultHostDisplay: 'inlineBlock', attachDefaultDimensionsIfNoneFound: true })
+    NgIconsModule.withIcons({ 
+      heroHome, 
+      heroMagnifyingGlass, 
+      heroUser, 
+      heroBookmarkSquare, 
+      heroChevronDown, 
+      heroPlusSolid, 
+      heroBell,
+      heroEllipsisVerticalSolid,
+      heroCog6Tooth,
+      heroArrowRightOnRectangle,
+      heroShieldExclamation,
+      heroCubeTransparent,
+      heroDocumentPlus
+    })
   ]
 })
 export class AdminLayoutModule { }

@@ -2,8 +2,12 @@
     <scngx-ui-title>Weitere Navigation</scngx-ui-title>
 
     <ul class="flex flex-col items-start justify-start gap-2">
-        <scngx-btn-text class="w-full" [fullWidth]="true"><hero-icon name="cog" [class]="'h-5 w-5'"></hero-icon><span>Konfiguration</span></scngx-btn-text>
-        <scngx-btn-outlined class="w-full" [routerLink]="['/']" [fullWidth]="true" [appearance]="'error'"><hero-icon name="logout" [class]="'h-5 w-5'"></hero-icon><span>Webinterface verlassen</span></scngx-btn-outlined>
+        <scngx-btn-text class="w-full" [fullWidth]="true">
+            <ng-icon name="heroCog6Tooth" class="h-5 w-5"></ng-icon><span>Konfiguration</span>
+        </scngx-btn-text>
+        <scngx-btn-outlined class="w-full" [routerLink]="['/']" [fullWidth]="true" [appearance]="'error'">
+            <ng-icon name="heroArrowRightOnRectangle" class="h-5 w-5"></ng-icon><span>Webinterface verlassen</span>
+        </scngx-btn-outlined>
     </ul>
 
 </section>

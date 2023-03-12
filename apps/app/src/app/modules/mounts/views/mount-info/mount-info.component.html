@@ -8,10 +8,10 @@
                 <div class="flex flex-1 items-baseline justify-start gap-4">
                     <h4 class="line-clamp-2 break-words">{{ props.mount?.name }}</h4>
                     <div class="hidden md:block" *ngIf="props.mount?.status == 0">
-                        <scngx-ibtn-text size="md" (click)="openMountEditorDialog(props.mount)"><hero-icon class="h-6 w-6" name="pencil"></hero-icon></scngx-ibtn-text>
-                        <scngx-ibtn-text *ngIf="props.mount?.status == 0" [loading]="($refreshStatus | async)" size="md" (click)="triggerReindex(props.mount)"><hero-icon [class]="'h-6 w-6'" name="refresh"></hero-icon></scngx-ibtn-text>
-                        <scngx-ibtn-text *ngIf="!props.mount?.isDefault" [loading]="($setAsDefaultStatus | async)" size="md" (click)="setAsDefault(props.mount)"><hero-icon class="h-6 w-6" name="star"></hero-icon></scngx-ibtn-text>
-                        <scngx-ibtn-text [loading]="($deletingStatus | async)" size="md" appearance="error" (click)="deleteMount(props.mount)"><hero-icon [class]="'h-6 w-6'" name="trash"></hero-icon></scngx-ibtn-text>
+                        <scngx-ibtn-text size="md" (click)="openMountEditorDialog(props.mount)"><ng-icon class="h-6 w-6" name="heroPencil"></ng-icon></scngx-ibtn-text>
+                        <scngx-ibtn-text *ngIf="props.mount?.status == 0" [loading]="($refreshStatus | async)" size="md" (click)="triggerReindex(props.mount)"><ng-icon class="h-6 w-6" name="heroArrowPath"></ng-icon></scngx-ibtn-text>
+                        <scngx-ibtn-text *ngIf="!props.mount?.isDefault" [loading]="($setAsDefaultStatus | async)" size="md" (click)="setAsDefault(props.mount)"><ng-icon class="h-6 w-6" name="heroStar"></ng-icon></scngx-ibtn-text>
+                        <scngx-ibtn-text [loading]="($deletingStatus | async)" size="md" appearance="error" (click)="deleteMount(props.mount)"><ng-icon class="h-6 w-6" name="heroTrash"></ng-icon></scngx-ibtn-text>
                     </div>
                 </div>
                 <p scngxSubtitle>Mount</p>
@@ -58,10 +58,10 @@
         <ng-template #files>
             <div class="my-row px-window md:hidden" *ngIf="!props.loading">
                 <ul class="flex flex-wrap items-start w-full gap-2">
-                    <scngx-btn (click)="openMountEditorDialog(props.mount)"><hero-icon class="h-6 w-6" name="pencil"></hero-icon>Bearbeiten</scngx-btn>
-                    <scngx-lbtn *ngIf="props.mount?.status == 0" (click)="triggerReindex(props.mount)" [loading]="($refreshStatus | async)"><hero-icon class="h-6 w-6" name="refresh"></hero-icon>Scannen</scngx-lbtn>
-                    <scngx-lbtn *ngIf="!props.mount?.isDefault" [loading]="($setAsDefaultStatus | async)" (click)="setAsDefault(props.mount)"><hero-icon [class]="'h-6 w-6'" name="star"></hero-icon>Als Standard-Mount festlegen</scngx-lbtn>
-                    <scngx-lbtn-outlined appearance="error" [loading]="($deletingStatus | async)" (click)="deleteMount(props.mount)"><hero-icon [class]="'h-5 w-5 align-middle'" name="trash"></hero-icon><span class="align-middle">Mount löschen</span></scngx-lbtn-outlined>
+                    <scngx-btn (click)="openMountEditorDialog(props.mount)"><ng-icon class="h-6 w-6" name="heroPencil"></ng-icon>Bearbeiten</scngx-btn>
+                    <scngx-lbtn *ngIf="props.mount?.status == 0" (click)="triggerReindex(props.mount)" [loading]="($refreshStatus | async)"><ng-icon class="h-6 w-6" name="heroArrowPath"></ng-icon>Scannen</scngx-lbtn>
+                    <scngx-lbtn *ngIf="!props.mount?.isDefault" [loading]="($setAsDefaultStatus | async)" (click)="setAsDefault(props.mount)"><ng-icon class="h-6 w-6" name="heroStar"></ng-icon>Als Standard-Mount festlegen</scngx-lbtn>
+                    <scngx-lbtn-outlined appearance="error" [loading]="($deletingStatus | async)" (click)="deleteMount(props.mount)"><ng-icon class="h-5 w-5 align-middle" name="heroTrash"></ng-icon><span class="align-middle">Mount löschen</span></scngx-lbtn-outlined>
                 </ul>
             </div>
     
@@ -70,9 +70,9 @@
                 <div class="p-4 rounded-sm bg-body-light border border-body-lighter shadow-md" *ngIf="!props.loading">
                     <h6>Statistiken</h6>
                     <ul class="flex flex-col items-start w-full gap-2 mt-4">
-                        <li class="inline-flex items-center gap-2 opacity-80"><hero-icon [class]="'h-5 w-5'" name="collection"></hero-icon><span class="text-sm">{{ props.mount?.filesCount }} Datei{{ props.mount?.filesCount != 1 ? 'en' : '' }}</span></li>
-                        <li class="inline-flex items-center gap-2 opacity-80"><hero-icon [class]="'h-5 w-5'" name="chart-pie"></hero-icon><span class="text-sm">{{ props.mount?.usedSpace | scngxBytesPipe:"gb" }}</span></li>
-                        <li class="inline-flex items-center gap-2 opacity-80"><hero-icon [class]="'h-5 w-5'" name="refresh"></hero-icon><span class="text-sm">{{ props.mount?.lastScannedAt ? (props.mount?.lastScannedAt | date:"dd.MM.yyyy 'um' HH:mm 'Uhr'") : "Nie" }}</span></li>
+                        <li class="inline-flex items-center gap-2 opacity-80"><ng-icon class="h-5 w-5" name="heroRectangleStack"></ng-icon><span class="text-sm">{{ props.mount?.filesCount }} Datei{{ props.mount?.filesCount != 1 ? 'en' : '' }}</span></li>
+                        <li class="inline-flex items-center gap-2 opacity-80"><ng-icon class="h-5 w-5" name="heroChartPie"></ng-icon><span class="text-sm">{{ props.mount?.usedSpace | scngxBytesPipe:"gb" }}</span></li>
+                        <li class="inline-flex items-center gap-2 opacity-80"><ng-icon class="h-5 w-5" name="heroArrowPath"></ng-icon><span class="text-sm">{{ props.mount?.lastScannedAt ? (props.mount?.lastScannedAt | date:"dd.MM.yyyy 'um' HH:mm 'Uhr'") : "Nie" }}</span></li>
                     </ul>
                 </div>
     
@@ -80,7 +80,7 @@
                 <div class="p-4 rounded-sm bg-body-light border border-body-lighter shadow-md" *ngIf="!props.loading">
                     <h6>Status</h6>
                     <ul class="flex flex-col items-start w-full gap-2 mt-4">
-                        <li class="inline-flex items-center gap-2 opacity-80" *ngIf="props.mount?.isDefault"><hero-icon [class]="'h-5 w-5 fill-warn text-warn'" name="star"></hero-icon><span>Als Standard festgelegt</span></li>
+                        <li class="inline-flex items-center gap-2 opacity-80" *ngIf="props.mount?.isDefault"><ng-icon class="h-5 w-5 fill-accent text-accent" name="heroStarSolid"></ng-icon><span>Als Standard festgelegt</span></li>
                         <li class="inline-flex items-center gap-2 opacity-80">
                             <scngx-status-indicator size="md" [appearance]="props.mount?.status == 0 ? 'success' : 'warn'"></scngx-status-indicator>
                             <span>{{ props.mount?.status | scngxMountStatusPipe }}</span>

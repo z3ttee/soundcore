@@ -4,12 +4,11 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Page, BasePageable } from 'nestjs-pager';
 import { Repository, SelectQueryBuilder, UpdateResult } from 'typeorm';
 import { Artist } from '../../artist/entities/artist.entity';
-import { ArtworkID } from '../../artwork/entities/artwork.entity';
 import { EVENT_ALBUMS_CHANGED } from '../../constants';
-import { SyncFlag } from '../../meilisearch/interfaces/syncable.interface';
-import { MeiliAlbumService } from '../../meilisearch/services/meili-album.service';
 import { User } from '../../user/entities/user.entity';
-import { GeniusFlag, ResourceFlag } from '../../utils/entities/resource';
+import { GeniusFlag } from '../../utils/entities/genius.entity';
+import { MeilisearchFlag } from '../../utils/entities/meilisearch.entity';
+import { ResourceFlag } from '../../utils/entities/resource';
 import { SyncableService } from '../../utils/services/syncing.service';
 import { CreateAlbumDTO } from '../dto/create-album.dto';
 import { UpdateAlbumDTO } from '../dto/update-album.dto';
@@ -21,8 +20,7 @@ export class AlbumService implements SyncableService<Album> {
 
     constructor(
         @InjectRepository(Album) private readonly repository: Repository<Album>,
-        private readonly eventEmitter: EventEmitter2,
-        private readonly meilisearch: MeiliAlbumService
+        private readonly eventEmitter: EventEmitter2
     ) { }
 
     /**
@@ -159,7 +157,7 @@ export class AlbumService implements SyncableService<Album> {
      * @param pageable Page settings
      * @returns Page<Album>
      */
-    public async findBySyncFlag(flag: SyncFlag, pageable: BasePageable): Promise<Page<Album>> {
+    public async findBySyncFlag(flag: MeilisearchFlag, pageable: BasePageable): Promise<Page<Album>> {
         const result = await this.repository.createQueryBuilder("album")
             .leftJoinAndSelect("album.artwork", "artwork")
             .leftJoinAndSelect("album.primaryArtist", "primaryArtist")
@@ -186,26 +184,32 @@ export class AlbumService implements SyncableService<Album> {
     }
 
     /**
-     * Create an album if not exists.
-     * @param dtos Data to create album from
-     * @returns Album
+     * Create albums if not exists.
+     * @param dtos Data to create albums from
+     * @param qb Define a custom select query for returning created items
+     * @returns Album[]
      */
-    public async createIfNotExists(dtos: CreateAlbumDTO[]): Promise<Album[]> {
+    public async createIfNotExists(dtos: (CreateAlbumDTO | Album)[], qb?: (query: SelectQueryBuilder<Album>, alias: string) => SelectQueryBuilder<Album> ): Promise<Album[]> {
         if(dtos.length <= 0) throw new BadRequestException("Cannot create resources for empty list.");
 
         return await this.repository.createQueryBuilder()
             .insert()
             .values(dtos)
+            .orUpdate(["name", "primaryArtistId"], ["id"], { skipUpdateIfNoValuesChanged: false })
             .returning(["id"])
-            .orUpdate(["name"], ["name"], { skipUpdateIfNoValuesChanged: false })
             .execute().then((insertResult) => {
-                return this.repository.createQueryBuilder("album")
-                    .leftJoinAndSelect("album.primaryArtist", "primaryArtist")
-                    .whereInIds(insertResult.raw)
-                    .getMany();
+                const alias = "album";
+                let query: SelectQueryBuilder<Album> = this.repository.createQueryBuilder(alias)
+                    .leftJoin(`${alias}.artwork`, "artwork").addSelect(["artwork.id"])
+                    .leftJoin(`${alias}.primaryArtist`, "primaryArtist").addSelect(["primaryArtist.id", "primaryArtist.name", "primaryArtist.slug"]);
+
+                if(typeof qb === "function") {
+                    query = qb(this.repository.createQueryBuilder(alias), alias);
+                }
+                    
+                return query.whereInIds(insertResult.raw).getMany();
             });
     }
-
     /**
      * Update an existing album.
      * @param albumId Album's id
@@ -270,7 +274,7 @@ export class AlbumService implements SyncableService<Album> {
         const album = await this.resolveAlbum(idOrObject);
         if(!album) throw new NotFoundException("Album not found.");
 
-        album.geniusFlag = flag;
+        album.genius.flag = flag;
         return this.repository.save(album);
     }
 
@@ -281,10 +285,15 @@ export class AlbumService implements SyncableService<Album> {
      * @param flag Flag to set for all songs
      * @returns UpdateResult
      */
-    public async setLastSyncedDetails(resources: Album[], flag: SyncFlag): Promise<UpdateResult> {
+    public async setLastSyncedDetails(resources: Album[], flag: MeilisearchFlag): Promise<UpdateResult> {
         return this.repository.createQueryBuilder()
             .update()
-            .set({ lastSyncedAt: new Date(), lastSyncFlag: flag })
+            .set({ 
+                meilisearch: {
+                    syncedAt: new Date(), 
+                    flag: flag
+                }
+            })
             .whereInIds(resources)
             .execute();
     }
@@ -295,11 +304,13 @@ export class AlbumService implements SyncableService<Album> {
      * @returns Album
      */
     public async syncWithMeilisearch(resources: Album[]) {
-        return this.meilisearch.setAlbums(resources).then(() => {
-            return this.setLastSyncedDetails(resources, SyncFlag.OK);
-        }).catch(() => {
-            return this.setLastSyncedDetails(resources, SyncFlag.ERROR);
-        });
+        // return this.meilisearch.setAlbums(resources).then(() => {
+        //     return this.setLastSyncedDetails(resources, MeilisearchFlag.OK);
+        // }).catch(() => {
+        //     return this.setLastSyncedDetails(resources, MeilisearchFlag.FAILED);
+        // });
+
+        return null;
     }
 
     /**

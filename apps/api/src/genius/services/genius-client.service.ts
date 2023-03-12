@@ -39,41 +39,42 @@ export class GeniusClientService {
      * @returns Artist
      */
     public async lookupArtist(artist: Artist): Promise<Artist> {
-        const result: Artist = Object.assign(new Artist(), artist);
+        return null;
+        // const result: Artist = Object.assign(new Artist(), artist);
 
-        // Get the resource id from given artist object.
-        // If the object has no geniusId, try and search a matching id
-        // on genius.com. Fail, if this was not possible
-        const resourceId = artist.geniusId ? artist.geniusId : await this.searchResourceIdOfType("artist", artist.name);
-        if(!resourceId) return artist;
+        // // Get the resource id from given artist object.
+        // // If the object has no geniusId, try and search a matching id
+        // // on genius.com. Fail, if this was not possible
+        // const resourceId = artist.geniusId ? artist.geniusId : await this.searchResourceIdOfType("artist", artist.name);
+        // if(!resourceId) return artist;
 
-        // Request more detailed song data
-        return this.fetchResourceByIdAndType<GeniusArtistDTO>("artist", resourceId).then(async (resource) => {
-            // If there is an invalid response (e.g. errors)
-            // then return unmodified artist object.
-            if(!resource) return artist;
+        // // Request more detailed song data
+        // return this.fetchResourceByIdAndType<GeniusArtistDTO>("artist", resourceId).then(async (resource) => {
+        //     // If there is an invalid response (e.g. errors)
+        //     // then return unmodified artist object.
+        //     if(!resource) return artist;
 
-            result.geniusId = resource.id;
-            result.description = resource.description_preview;
+        //     result.geniusId = resource.id;
+        //     result.description = resource.description_preview;
 
-            // If there is an image url present on the resource.
-            // Download it and create an artwork for the artist
-            if(resource.image_url) {
-                // Download url to buffer
-                return this.artworkService.downloadToBuffer(resource.image_url).then((buffer) => {
-                    // Create artwork and write buffer to file
-                    // return this.artworkService.createForArtistIfNotExists(artist, true, buffer).then((artwork) => {
-                    //     // Update relation
-                    //     result.artwork = artwork;
-                    //     return result;
-                    // })
+        //     // If there is an image url present on the resource.
+        //     // Download it and create an artwork for the artist
+        //     if(resource.image_url) {
+        //         // Download url to buffer
+        //         return this.artworkService.downloadToBuffer(resource.image_url).then((buffer) => {
+        //             // Create artwork and write buffer to file
+        //             // return this.artworkService.createForArtistIfNotExists(artist, true, buffer).then((artwork) => {
+        //             //     // Update relation
+        //             //     result.artwork = artwork;
+        //             //     return result;
+        //             // })
 
-                    return null;
-                })
-            }
+        //             return null;
+        //         })
+        //     }
 
-            return result;
-        });
+        //     return result;
+        // });
     }
 
     /**
@@ -82,59 +83,60 @@ export class GeniusClientService {
      * @returns Album
      */
      public async lookupAlbum(album: Album): Promise<Album> {
-        const result: Album = Object.assign(new Album(), album);
-        const title = album?.name?.replace(/^(?:\[[^\]]*\]|\([^()]*\))\s*|\s*(?:\[[^\]]*\]|\([^()]*\))/gm, "").split("-")[0].trim();
-        const artist = album.primaryArtist.name;
-        const searchQuery = `${title} ${artist}`
+        return null;
+        // const result: Album = Object.assign(new Album(), album);
+        // const title = album?.name?.replace(/^(?:\[[^\]]*\]|\([^()]*\))\s*|\s*(?:\[[^\]]*\]|\([^()]*\))/gm, "").split("-")[0].trim();
+        // const artist = album.primaryArtist.name;
+        // const searchQuery = `${title} ${artist}`
 
-        // Get the resource id from given album object.
-        // If the object has no geniusId, try and search a matching id
-        // on genius.com. Fail, if this was not possible
-        const resourceId = album.geniusId ? album.geniusId : await this.searchResourceIdOfType("album", searchQuery);
-        if(!resourceId) return album;
+        // // Get the resource id from given album object.
+        // // If the object has no geniusId, try and search a matching id
+        // // on genius.com. Fail, if this was not possible
+        // const resourceId = album.geniusId ? album.geniusId : await this.searchResourceIdOfType("album", searchQuery);
+        // if(!resourceId) return album;
 
-        // Request more detailed song data
-        return this.fetchResourceByIdAndType<GeniusAlbumDTO>("album", resourceId).then(async (resource) => {
-            // If there is an invalid response (e.g. errors)
-            // then return unmodified album object.
-            if(!resource) return album;
+        // // Request more detailed song data
+        // return this.fetchResourceByIdAndType<GeniusAlbumDTO>("album", resourceId).then(async (resource) => {
+        //     // If there is an invalid response (e.g. errors)
+        //     // then return unmodified album object.
+        //     if(!resource) return album;
 
-            // Update metadata
-            result.geniusId = resource.id;
-            result.description = resource.description_preview;
-            result.releasedAt = resource.release_date;
+        //     // Update metadata
+        //     result.geniusId = resource.id;
+        //     result.description = resource.description_preview;
+        //     result.releasedAt = resource.release_date;
             
-            // Create labels if not exists
-            const labels = await this.parseAndCreateLabels(resource.performance_groups).catch(() => []);
-            // Create distributors if not exists
-            const distributors = await this.parseAndCreateDistributors(resource.performance_groups).catch(() => []);
-            // Create publishers if not exists
-            const publishers = await this.parseAndCreatePublishers(resource.performance_groups).catch(() => []);
+        //     // Create labels if not exists
+        //     const labels = await this.parseAndCreateLabels(resource.performance_groups).catch(() => []);
+        //     // Create distributors if not exists
+        //     const distributors = await this.parseAndCreateDistributors(resource.performance_groups).catch(() => []);
+        //     // Create publishers if not exists
+        //     const publishers = await this.parseAndCreatePublishers(resource.performance_groups).catch(() => []);
 
-            // Update relations
-            result.labels = labels;
-            result.distributors = distributors;
-            result.publishers = publishers;
+        //     // Update relations
+        //     result.labels = labels;
+        //     result.distributors = distributors;
+        //     result.publishers = publishers;
 
-            // If there is an image url present on the resource.
-            // Download it and create an artwork for the album
-            if(resource.cover_art_thumbnail_url) {
-                // Download url to buffer
-                return this.artworkService.downloadToBuffer(resource.cover_art_thumbnail_url).then((buffer) => {
-                    // Create artwork and write buffer to file
-                    // return this.artworkService.createForAlbumIfNotExists(album, true, buffer).then((artwork) => {
-                    //     // Update relation
-                    //     result.artwork = artwork;
-                    //     return result;
-                    // })
+        //     // If there is an image url present on the resource.
+        //     // Download it and create an artwork for the album
+        //     if(resource.cover_art_thumbnail_url) {
+        //         // Download url to buffer
+        //         return this.artworkService.downloadToBuffer(resource.cover_art_thumbnail_url).then((buffer) => {
+        //             // Create artwork and write buffer to file
+        //             // return this.artworkService.createForAlbumIfNotExists(album, true, buffer).then((artwork) => {
+        //             //     // Update relation
+        //             //     result.artwork = artwork;
+        //             //     return result;
+        //             // })
 
-                    return null;
-                })
-            }
+        //             return null;
+        //         })
+        //     }
 
-            // If no artwork to download, just return
-            return result;
-        });
+        //     // If no artwork to download, just return
+        //     return result;
+        // });
     }
 
     /**
@@ -143,68 +145,69 @@ export class GeniusClientService {
      * @returns Song
      */
      public async lookupSong(song: Song): Promise<Song> {
-        const result: Song = Object.assign(new Song(), song);
-        const title = song?.name?.replace(/^(?:\[[^\]]*\]|\([^()]*\))\s*|\s*(?:\[[^\]]*\]|\([^()]*\))/gm, "")?.split("-")?.[0]?.trim();
-        const artist = song.primaryArtist?.name;
-        const searchQuery = `${title} ${artist}`
+        return null;
+        // const result: Song = Object.assign(new Song(), song);
+        // const title = song?.name?.replace(/^(?:\[[^\]]*\]|\([^()]*\))\s*|\s*(?:\[[^\]]*\]|\([^()]*\))/gm, "")?.split("-")?.[0]?.trim();
+        // const artist = song.primaryArtist?.name;
+        // const searchQuery = `${title} ${artist}`
 
-        if(typeof title === "undefined" || title == null) return song;
-        if(typeof artist === "undefined" || artist == null) return song;
+        // if(typeof title === "undefined" || title == null) return song;
+        // if(typeof artist === "undefined" || artist == null) return song;
 
-        // Get the resource id from given artist object.
-        // If the object has no geniusId, try and search a matching id
-        // on genius.com. Fail, if this was not possible
-        const resourceId = song.geniusId ? song.geniusId : await this.searchResourceIdOfType("song", searchQuery);
-        if(!resourceId) return song;
+        // // Get the resource id from given artist object.
+        // // If the object has no geniusId, try and search a matching id
+        // // on genius.com. Fail, if this was not possible
+        // const resourceId = song.geniusId ? song.geniusId : await this.searchResourceIdOfType("song", searchQuery);
+        // if(!resourceId) return song;
 
-        // Request more detailed song data
-        return this.fetchResourceByIdAndType<GeniusSongDTO>("song", resourceId).then(async (resource) => {
-            // If there is an invalid response (e.g. errors)
-            // then return unmodified artist object.
-            if(!resource) return song;
+        // // Request more detailed song data
+        // return this.fetchResourceByIdAndType<GeniusSongDTO>("song", resourceId).then(async (resource) => {
+        //     // If there is an invalid response (e.g. errors)
+        //     // then return unmodified artist object.
+        //     if(!resource) return song;
 
-            // Update metadata
-            result.geniusId = resource.id;
-            result.description = resource.description_preview;
-            result.releasedAt = resource.release_date;
-            result.explicit = resource.explicit;
-            result.location = resource.recording_location;
-            result.youtubeUrl = resource.youtube_url;
-            result.youtubeUrlStart = resource.youtube_start;
+        //     // Update metadata
+        //     result.geniusId = resource.id;
+        //     result.description = resource.description_preview;
+        //     result.releasedAt = resource.release_date;
+        //     result.explicit = resource.explicit;
+        //     result.location = resource.recording_location;
+        //     result.youtubeUrl = resource.youtube_url;
+        //     result.youtubeUrlStart = resource.youtube_start;
 
-            // Create labels if not exists
-            const labels = await this.parseAndCreateLabels(resource.custom_performances).catch(() => []);
-            // Create distributors if not exists
-            const distributors = await this.parseAndCreateDistributors(resource.custom_performances).catch(() => []);
-            // Create publishers if not exists
-            const publishers = await this.parseAndCreatePublishers(resource.custom_performances).catch(() => []);
-            // Create genres if not exist
-            const genres = await this.parseAndCreateGenres(resource.tags).catch(() => []);
+        //     // Create labels if not exists
+        //     const labels = await this.parseAndCreateLabels(resource.custom_performances).catch(() => []);
+        //     // Create distributors if not exists
+        //     const distributors = await this.parseAndCreateDistributors(resource.custom_performances).catch(() => []);
+        //     // Create publishers if not exists
+        //     const publishers = await this.parseAndCreatePublishers(resource.custom_performances).catch(() => []);
+        //     // Create genres if not exist
+        //     const genres = await this.parseAndCreateGenres(resource.tags).catch(() => []);
 
-            // Update relations
-            result.labels = labels;
-            result.distributors = distributors;
-            result.publishers = publishers;
-            result.genres = genres;
+        //     // Update relations
+        //     result.labels = labels;
+        //     result.distributors = distributors;
+        //     result.publishers = publishers;
+        //     result.genres = genres;
 
-            // If there is an image url present on the resource.
-            // Download it and create an artwork for the artist
-            if(resource.song_art_image_thumbnail_url) {
-                // Download url to buffer
-                return this.artworkService.downloadToBuffer(resource.song_art_image_thumbnail_url).then((buffer) => {
-                    // Create artwork and write buffer to file
-                    // return this.artworkService.createForSongIfNotExists(song, true, buffer).then((artwork) => {
-                    //     // Update relation
-                    //     result.artwork = artwork;
-                    //     return result;
-                    // })
-                    return null;
-                })
-            }
+        //     // If there is an image url present on the resource.
+        //     // Download it and create an artwork for the artist
+        //     if(resource.song_art_image_thumbnail_url) {
+        //         // Download url to buffer
+        //         return this.artworkService.downloadToBuffer(resource.song_art_image_thumbnail_url).then((buffer) => {
+        //             // Create artwork and write buffer to file
+        //             // return this.artworkService.createForSongIfNotExists(song, true, buffer).then((artwork) => {
+        //             //     // Update relation
+        //             //     result.artwork = artwork;
+        //             //     return result;
+        //             // })
+        //             return null;
+        //         })
+        //     }
 
-            // If no artwork to download, just return
-            return result;
-        });
+        //     // If no artwork to download, just return
+        //     return result;
+        // });
     }
 
     /**

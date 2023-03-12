@@ -1,0 +1,38 @@
+<div 
+    [style.height]="itemHeight + 'px'"
+    class="flex flex-1 items-center justify-start gap-4 rounded-sm w-full h-full px-3 pointer-events-none select-none [&>.moreIcon]:hover:opacity-100"
+    [ngClass]="{'hover:border-opacity-100 active:border-opacity-100 border border-body-lighter border-opacity-0 transition-all bg-opacity-0 hover:bg-opacity-30 bg-body-light cursor-pointer pointer-events-auto active:bg-opacity-50': !!task}">
+        
+    <!-- Task Status -->
+    <div class="min-w-7 w-7 rounded-sm overflow-hidden">
+        <scngx-task-status-icon [status]="task?.status" size="22"></scngx-task-status-icon>
+    </div>
+
+    <!-- Task description -->
+    <div class="flex-grow overflow-hidden">
+        <p class="line-clamp-1">{{ task?.name }}</p>
+        <p class="text-sm opacity-60 line-clamp-1">{{ task?.description }}</p>
+    </div>
+
+    <!-- <div class="min-w-28 w-28" *ngIf="task?.status === 'working'">
+        <p class="text-sm opacity-60 font-light">Stage {{ getCurrentStageNr() }}/{{ task?.stages?.length }}</p>
+    </div> -->
+
+    <div class="min-w-32 w-32 hidden sm:block">
+        <div class="flex items-center opacity-70 gap-2">
+            <ng-icon name="heroCalendarDays" size="20"></ng-icon>
+            <span class="text-sm">{{ task?.createdAt | date:"HH:mm', 'dd.MM." }}</span>
+        </div>
+    </div>
+
+    <div class="min-w-32 w-32 hidden lg:block">
+        <div class="flex items-center opacity-70 gap-2">
+            <ng-icon name="heroClock" size="20"></ng-icon>
+            <span class="text-sm">{{ getDuration() }}</span>
+        </div>
+    </div>
+
+    <div class="moreIcon min-w-7 w-7 h-7 opacity-100 transition-all lg:opacity-0">
+        <ng-icon name="heroChevronRight" size="22" strokeWidth="2"></ng-icon>
+    </div>
+</div>

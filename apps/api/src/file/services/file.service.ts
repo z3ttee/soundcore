@@ -1,7 +1,8 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { BasePageable, Page } from 'nestjs-pager';
-import { Repository, UpdateResult } from 'typeorm';
+import { Repository, SelectQueryBuilder, UpdateResult } from 'typeorm';
+import { Artist } from '../../artist/entities/artist.entity';
 import { Mount } from '../../mount/entities/mount.entity';
 import { Song } from '../../song/entities/song.entity';
 import { CreateResult } from '../../utils/results/creation.result';
@@ -40,6 +41,15 @@ export class FileService {
             .leftJoinAndSelect("file.mount", "mount")
             .where("song.id = :songId", { songId })
             .getOne();
+    }
+
+    public async findBySongIdsForArtworkProcessing(songIds: string[]): Promise<File[]> {
+        return this.repository.createQueryBuilder("file")
+            .leftJoin("file.song", "song").addSelect(["song.id"])
+            .leftJoin("file.mount", "mount").addSelect(["mount.id", "mount.name", "mount.directory"])
+            .leftJoin("song.artwork", "artwork").addSelect(["artwork.id"])
+            .where("song.id IN(:songIds)", { songIds: songIds })
+            .getMany();
     }
 
     public async findByFlag(flag: FileFlag) {
@@ -206,6 +216,24 @@ export class FileService {
             }).catch((error: Error) => {
                 this.logger.error(`Failed creating database entries for files batch: ${error.message}`, error.stack);
                 return [];
+            });
+    }
+
+    public async createIfNotExists(files: File[], qb?: (query: SelectQueryBuilder<File>, alias: string) => SelectQueryBuilder<File> ): Promise<File[]> {
+        return this.repository.createQueryBuilder()
+            .insert()
+            .values(files)
+            .orUpdate(["name", "flag"], ["id"])
+            .returning(["id"])
+            .execute().then((insertResult) => {
+                if(typeof qb !== "function") {
+                    return this.repository.createQueryBuilder("file")
+                    .leftJoin("file.mount", "mount").addSelect(["mount.id", "mount.directory"])
+                    .whereInIds(insertResult.raw)
+                    .getMany();
+                }
+                    
+                return qb(this.repository.createQueryBuilder("file"), "file").whereInIds(insertResult.raw).getMany();
             });
     }
 

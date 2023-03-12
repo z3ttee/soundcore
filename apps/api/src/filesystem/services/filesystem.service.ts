@@ -37,6 +37,14 @@ export class FileSystemService {
     }
 
     /**
+     * Get the main config directory of the application.
+     * @returns {string} Root directory path
+     */
+    public getLogsDir(): string {
+        return path.join(this.getInstanceDir(), "logs");
+    }
+
+    /**
      * Get temporary directory of the application.
      * @returns {string} Filepath to temporary directory
      */
@@ -108,7 +116,7 @@ export class FileSystemService {
      * @param artwork Artwork database entry
      * @returns Absolute filepath
      */
-    public resolveArtworkDir(artwork: Artwork): string {
+    public resolveArtworkDir(artwork: Pick<Artwork, "id">): string {
         return path.join(this.resolveArtworkRootDir(), `${artwork.id}.jpeg`);
     }
 

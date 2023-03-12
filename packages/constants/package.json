@@ -9,7 +9,8 @@
   "scripts": {
     "dev": "tsc --watch",
     "build:api": "tsc",
-    "build:app": "tsc"
+    "build:app": "tsc",
+    "build:package": "tsc"
   },
   "devDependencies": {
     "typescript": "^4.3.5"

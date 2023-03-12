@@ -1,19 +1,36 @@
-import { Module } from '@nestjs/common';
-import { ArtistService } from './artist.service';
+import { Module, OnModuleInit } from '@nestjs/common';
+import { ArtistService } from './services/artist.service';
 import { ArtistController } from './artist.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { GeniusModule } from '../genius/genius.module';
 import { Artist } from './entities/artist.entity';
+import { InjectIndex, MeiliIndex, MeilisearchModule } from '@soundcore/meilisearch';
+import { ArtistMeiliService } from './services/artist-meili.service';
 
 @Module({
   controllers: [ArtistController],
-  providers: [ArtistService],
+  providers: [
+    ArtistService,
+    ArtistMeiliService
+  ],
   imports: [
     GeniusModule,
-    TypeOrmModule.forFeature([ Artist ])
+    TypeOrmModule.forFeature([ Artist ]),
+    MeilisearchModule.forFeature([ Artist ])
   ],
   exports: [
-    ArtistService
+    ArtistService,
+    ArtistMeiliService
   ]
 })
-export class ArtistModule {}
+export class ArtistModule implements OnModuleInit {
+
+  constructor(
+    @InjectIndex(Artist) private readonly artistIndex: MeiliIndex<Artist>
+  ) {}
+
+  onModuleInit() {
+      
+  }
+
+}

@@ -1,7 +1,7 @@
 <div class="relative">
     <div class="absolute h-full left-0 top-1/2 transform-gpu -translate-y-1/2 z-30 pointer-events-none max-h-full transition-opacity" [ngClass]="{'opacity-100': !isTouch && showPrev}">
         <div class="relative flex items-center justify-start h-full">
-            <button (click)="scrollPrev()" class="w-12 absolute -right-full aspect-square flex justify-center items-center border border-body-light bg-body rounded-full pointer-events-auto shadow-lg transform-gpu active:scale-[90%] transition-all will-change-transform opacity-0" [ngClass]="{'opacity-100': showPrev && !isTouch}">
+            <button (click)="scrollPrev()" class="w-12 absolute -right-full aspect-square flex justify-center items-center border border-body-light bg-body rounded-full pointer-events-auto shadow-lg transform-gpu active:scale-[90%] transition-all will-change-transform opacity-0 pointer-events-none" [ngClass]="{'opacity-100 pointer-events-auto': showPrev && !isTouch}">
                 <hero-icon name="chevron-right" [class]="'h-6 w-6 -rotate-180'"></hero-icon>
             </button>
             
@@ -13,7 +13,7 @@
         <ng-content></ng-content>
     </div>
 
-    <div class="absolute h-full right-0 top-1/2 transform-gpu -translate-y-1/2 z-30 pointer-events-none max-h-full transition-opacity" [ngClass]="{'opacity-100': !isTouch && showNext}">
+    <div class="absolute h-full right-0 top-1/2 transform-gpu -translate-y-1/2 z-30 pointer-events-none max-h-full transition-opacity pointer-events-none" [ngClass]="{'opacity-100 pointer-events-auto': !isTouch && showNext}">
         <div class="relative flex items-center justify-end h-full">
             <button (click)="scrollNext()" class="w-12 absolute -left-full aspect-square flex justify-center items-center border border-body-light bg-body rounded-full pointer-events-auto shadow-lg transform-gpu active:scale-[90%] transition-all will-change-transform opacity-0" [ngClass]="{'opacity-100': showNext && !isTouch}">
                 <hero-icon name="chevron-right" [class]="'h-6 w-6'"></hero-icon>
