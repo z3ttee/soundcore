@@ -7,7 +7,6 @@
  */
 export function filterDocument<T = any>(obj: T | Partial<T>, includedProps: string[]): T {
     const result = filterObjectByKeys(obj, includedProps);
-    console.log(result);
     return result;
 }
 

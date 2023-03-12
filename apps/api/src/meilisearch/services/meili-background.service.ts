@@ -16,8 +16,8 @@ export class MeiliBackgroundService {
         private readonly pipelines: PipelineService,
         private readonly tasks: TasksService
     ) {
-        this.pipelines.on("status", this.handleOnPipelineStatus);
-        this.pipelines.on("failed", this.handleOnPipelineFailed);
+        this.pipelines.on("status", (params) => this.handleOnPipelineStatus(params));
+        this.pipelines.on("failed", (error, params) => this.handleOnPipelineFailed(error, params));
     }
 
     @OnEvent(EVENT_TRIGGER_MEILISEARCH_PROCESS_SONGS)

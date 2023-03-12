@@ -27,9 +27,11 @@ export function createMeilisearchClient(inject: any[], logger: Logger): Provider
     provide: MeiliClient,
     inject: inject,
     useFactory: async (options: MeilisearchRootOptions): Promise<MeiliClient> => {
-      const client = new MeiliClient(createMeiliConfig(options), []);
+      const config = createMeiliConfig(options);
+      const client = new MeiliClient(config, []);
       return client.getVersion().catch((error: Error) => {
-        logger.error(`Could not collect to meilisearch instance: ${error.message}`, error.stack);
+        logger.error(`Could not connect to meilisearch instance: ${error.message}`, error.stack);
+        logger.error(`Connection to meilisearch failed with following config:`, config);
       }).then(() => {
         return client;
       })
