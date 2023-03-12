@@ -50,10 +50,7 @@ export class SearchService {
      * @param {Pageable} pageable Page settings
      */
     public async searchSongs(query: string, pageable: Pageable) {
-        return this.performGenericSearchQuery(this.songMeiliService.getIndex(), query, pageable).then((result) => {
-            console.log(result);
-            return result;
-        });
+        return this.performGenericSearchQuery(this.songMeiliService.getIndex(), query, pageable);
     }
 
     /**
