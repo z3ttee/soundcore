@@ -1,0 +1,21 @@
+<div class="w-full h-full px-window pt-window">
+
+    <scngx-ui-title>
+        Einstellungen
+        <div scngxSubtitle>Konfiguriere den Soundcore Service</div>
+    </scngx-ui-title>
+
+    <scngx-ui-row>
+        <scngx-tabs [fullHeight]="true">
+            <scngx-tab-item [route]="['./']" [exactRoute]="true">Allgemein</scngx-tab-item>
+            <!-- <scngx-tab-item [route]="['./metadata']">Metadaten</scngx-tab-item> -->
+            <scngx-tab-item [route]="['./reset']">Zurücksetzen</scngx-tab-item>
+    
+            <scngx-tab-body [fullHeight]="true">
+                <router-outlet></router-outlet>
+            </scngx-tab-body>
+        </scngx-tabs>
+    </scngx-ui-row>
+
+    <div class="pb-bottom"></div>
+</div>
