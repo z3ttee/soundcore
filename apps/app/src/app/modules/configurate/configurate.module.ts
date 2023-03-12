@@ -4,7 +4,8 @@ import { RouterModule, Routes } from "@angular/router";
 import { NgIconsModule } from "@ng-icons/core";
 import { heroArrowUturnLeft } from "@ng-icons/heroicons/outline";
 
-import { SCNGXButtonModule, SCNGXListTileModule, SCNGXUiRowModule, SCNGXUiTitleModule } from "@soundcore/ngx";
+import { SCNGXButtonModule, SCNGXDialogModule, SCNGXListTileModule, SCNGXUiRowModule, SCNGXUiTitleModule } from "@soundcore/ngx";
+import { SCSDKConfigureModule } from "@soundcore/sdk";
 import { SCNGXTabsModule } from "src/app/components/navigation-tabs";
 import { ConfigurateGeneralView } from "./views/configurate-general/configurate-general.component";
 import { ConfigurateIndexView } from "./views/configurate-index/configurate-index.component";
@@ -33,7 +34,10 @@ const routes: Routes = [
         SCNGXUiRowModule,
         SCNGXTabsModule,
         SCNGXButtonModule,
-        SCNGXListTileModule
+        SCNGXListTileModule,
+        SCNGXDialogModule,
+
+        SCSDKConfigureModule
     ]
 })
 export class ConfigurateModule {}

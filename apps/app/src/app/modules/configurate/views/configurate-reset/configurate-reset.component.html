@@ -1,11 +1,11 @@
 <div class="w-full">
     <scngx-ui-row headline="Zurücksetzen" subtitle="Auf Werkseinstellungen zurücksetzen">
         <div class="px-window">
-            <scngx-list-tile title="Datenbank zurücksetzen" subtitle="Es werden alle Daten aus der Datenbank gelöscht. Dabei werden registrierte Mounts ignoriert.">
+            <scngx-list-tile (click)="confirmAllReset()" title="Alles zurücksetzen" subtitle="Es werden alle Daten aus der Datenbank und der Suchmaschine gelöscht. Dabei werden registrierte Mounts ignoriert.">
                 <ng-icon name="heroArrowUturnLeft" size="20" scngx-leading></ng-icon>
             </scngx-list-tile>
     
-            <scngx-list-tile title="Suche zurücksetzen" subtitle="Es werden alle Daten aus der internen Suchmaschine entfernt">
+            <scngx-list-tile (click)="confirmSearchEngineReset()" title="Nur Suche zurücksetzen" subtitle="Es werden alle Daten aus der internen Suchmaschine entfernt">
                 <ng-icon name="heroArrowUturnLeft" size="20" scngx-leading></ng-icon>
             </scngx-list-tile>
         </div>

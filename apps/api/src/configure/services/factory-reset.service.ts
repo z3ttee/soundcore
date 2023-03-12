@@ -1,5 +1,5 @@
 import { Injectable, Logger } from "@nestjs/common";
-import { Bootstrapper } from "@soundcore/bootstrap";
+import { isUndefined } from "@soundcore/common";
 import Database from "../../utils/database/database-worker-client";
 import MeilisearchClient from "../../utils/database/meilisearch-worker-client";
 
@@ -39,13 +39,18 @@ export class FactoryResetService {
     }
 
     public async resetAll(exitOnCompletion: boolean = true) {
-        const resettedAll = await this.resetDatabase(false) && await this.resetMeilisearch(false);
+        let error: Error;
+
+        await this.resetDatabase(false).catch((err) => error = err);
+        await this.resetMeilisearch(false).catch((err) => error = err);
+
+        if(!isUndefined(error)) throw error;
         if(exitOnCompletion) this.shutdownApplication();
-        return resettedAll;
+        return true;
     }
 
     private async shutdownApplication() {
-        setTimeout(() => Bootstrapper.shutdown(), 1000)
+        setTimeout(() => process.exit(0), 1000)
     }
 
 }
