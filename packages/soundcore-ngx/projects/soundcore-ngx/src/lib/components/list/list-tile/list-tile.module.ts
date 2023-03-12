@@ -1,6 +1,5 @@
 import { CommonModule } from "@angular/common";
 import { NgModule } from "@angular/core";
-import { SCNGXButtonModule } from "../../buttons";
 import { SCNGXListTileComponent } from "./list-tile.component";
 
 @NgModule({
@@ -8,13 +7,10 @@ import { SCNGXListTileComponent } from "./list-tile.component";
         SCNGXListTileComponent
     ],
     imports: [
-        CommonModule,
-        SCNGXButtonModule
+        CommonModule
     ],
     exports: [
         SCNGXListTileComponent
     ]
 })
-export class SCNGXListTileModule {
-
-}
+export class SCNGXListTileModule {}
