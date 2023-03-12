@@ -29,6 +29,7 @@
 
         <div class="block h-full px-window">
             <div class="flex flex-col gap-1 select-none">
+                <scngx-nav-list-item [routerLink]="['./']" [routerLinkActiveOptions]="{ exact: true }" iconName="heroChartPie">Dashboard</scngx-nav-list-item>
                 <scngx-nav-list-item [routerLink]="['./zones']" iconName="heroCubeTransparent">Speicherzonen</scngx-nav-list-item>
                 <scngx-nav-list-item [routerLink]="['./import']" iconName="heroDocumentPlus">Importieren</scngx-nav-list-item>
                 <scngx-nav-list-item [routerLink]="['./tasks']" iconName="heroBolt">Prozesse</scngx-nav-list-item>
