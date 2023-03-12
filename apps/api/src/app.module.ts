@@ -39,6 +39,7 @@ import { FileSystemService } from './filesystem/services/filesystem.service';
 import { MeilisearchModule as MeilisearchModuleNEXT } from '@soundcore/meilisearch';
 import { ConfigService } from '@nestjs/config';
 import { MeilisearchModule } from './meilisearch/meilisearch.module';
+import { ConfigureModule } from './configure/configure.module';
 
 @Module({
   imports: [
@@ -126,7 +127,8 @@ import { MeilisearchModule } from './meilisearch/meilisearch.module';
       }),
     }),
     TracklistModule,
-    TasksModule.forRoot()
+    TasksModule.forRoot(),
+    ConfigureModule
   ],
   controllers: [
     AppController
