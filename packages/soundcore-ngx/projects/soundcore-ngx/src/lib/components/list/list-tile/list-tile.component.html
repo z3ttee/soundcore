@@ -1,0 +1,14 @@
+<div class="w-full">
+    <scngx-btn-text [fullWidth]="true">
+        <div class="flex items-center justify-start gap-4 text-left">
+            <ng-content select="[scngx-leading]"></ng-content>
+
+            <div class="select-none">
+                <p>{{ title}}</p>
+                <p class="text-sm opacity-60">{{ subtitle }}</p>
+            </div>
+
+            <ng-content select="[scngx-trailing]"></ng-content>
+        </div>
+    </scngx-btn-text>
+</div>

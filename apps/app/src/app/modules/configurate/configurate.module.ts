@@ -1,7 +1,10 @@
 import { CommonModule } from "@angular/common";
 import { NgModule } from "@angular/core";
 import { RouterModule, Routes } from "@angular/router";
-import { SCNGXUiRowModule, SCNGXUiTitleModule } from "@soundcore/ngx";
+import { NgIconsModule } from "@ng-icons/core";
+import { heroArrowUturnLeft } from "@ng-icons/heroicons/outline";
+
+import { SCNGXButtonModule, SCNGXListTileModule, SCNGXUiRowModule, SCNGXUiTitleModule } from "@soundcore/ngx";
 import { SCNGXTabsModule } from "src/app/components/navigation-tabs";
 import { ConfigurateGeneralView } from "./views/configurate-general/configurate-general.component";
 import { ConfigurateIndexView } from "./views/configurate-index/configurate-index.component";
@@ -24,10 +27,13 @@ const routes: Routes = [
     imports: [
         CommonModule,
         RouterModule.forChild(routes),
+        NgIconsModule.withIcons({ heroArrowUturnLeft }),
 
         SCNGXUiTitleModule,
         SCNGXUiRowModule,
-        SCNGXTabsModule
+        SCNGXTabsModule,
+        SCNGXButtonModule,
+        SCNGXListTileModule
     ]
 })
 export class ConfigurateModule {}
