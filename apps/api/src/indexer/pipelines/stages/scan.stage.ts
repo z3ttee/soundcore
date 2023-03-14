@@ -8,8 +8,8 @@ import { FileSystemService } from "../../../filesystem/services/filesystem.servi
 import { MountRegistryService } from "../../../mount/services/mount-registry.service";
 import { MountRegistry } from "../../../mount/entities/mount-registry.entity";
 import { FileDTO } from "../../../file/dto/file.dto";
-import { Batch } from "@soundcore/common";
-import { File } from "../../../file/entities/file.entity";
+import { Batch, isNull } from "@soundcore/common";
+import { File, FileFlag } from "../../../file/entities/file.entity";
 import { FileService } from "../../../file/services/file.service";
 import { STAGE_SCAN_ID, STEP_CHECKOUT_MOUNT_ID, STEP_LOOKUP_FILES_ID } from "../../pipelines";
 import { get, getOrDefault, getSharedOrDefault, progress, set, setShared, StepParams } from "@soundcore/pipelines";
@@ -173,25 +173,30 @@ export async function step_create_database_entries(params: StepParams) {
             // Resolving absolute filepath
             const filepath = fsService.resolveFilepath(file);
 
+            let stats = undefined;
             try {
                 // Get file stats
-                const stats = fs.statSync(filepath, { throwIfNoEntry: true });
-                if(!stats) logger.warn(`Could not get file stats for '${filepath}'.`);
-
-                // Set size of the file entity
-                file.size = stats?.size || 0;
-
-                // Calculate hash consisting of information
-                // that make the file unique
-                const pathToHash = `${mount.id}:${file.directory}:${file.name}:${file.size}`;
-                // Update hash on file entity
-                file.pathHash = crypto.createHash("md5").update(pathToHash, "binary").digest("hex");
-
-                collectedFiles.push(file);
+                stats = fs.statSync(filepath, { throwIfNoEntry: false });
             } catch (error) {
-                logger.warn(`Skipping file file ${filepath} because it could not be analyzed: ${error["message"] || error}`);
-                continue;
+                logger.warn(`Could not get file stats for '${filepath}': ${error["message"] || error}`);
             }
+
+            // Set size of the file entity
+            file.size = isNull(stats) ? stats.size : 0;
+            
+            if(isNull(stats)) {
+                file.flag = FileFlag.ERROR;
+                // console.log(filepath);
+                logger.info(filepath);
+            }
+
+            // Calculate hash consisting of information
+            // that make the file unique
+            const pathToHash = `${mount.id}:${file.directory}:${file.name}:${file.size}`;
+
+            // Update hash on file entity
+            file.pathHash = crypto.createHash("md5").update(pathToHash, "binary").digest("hex");
+            collectedFiles.push(file);
         }
 
         // This will create files in database but only returns entities that were created
