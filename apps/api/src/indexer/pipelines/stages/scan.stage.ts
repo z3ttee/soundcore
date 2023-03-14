@@ -176,19 +176,14 @@ export async function step_create_database_entries(params: StepParams) {
             let stats = undefined;
             try {
                 // Get file stats
-                stats = fs.statSync(filepath, { throwIfNoEntry: false });
+                stats = fs.statSync(filepath, { throwIfNoEntry: true });
             } catch (error) {
                 logger.warn(`Could not get file stats for '${filepath}': ${error["message"] || error}`);
+                logger.info(filepath);
             }
 
             // Set size of the file entity
-            file.size = isNull(stats) ? stats.size : 0;
-            
-            if(isNull(stats)) {
-                file.flag = FileFlag.ERROR;
-                // console.log(filepath);
-                logger.info(filepath);
-            }
+            file.size = stats?.size ?? 0;
 
             // Calculate hash consisting of information
             // that make the file unique
@@ -196,6 +191,12 @@ export async function step_create_database_entries(params: StepParams) {
 
             // Update hash on file entity
             file.pathHash = crypto.createHash("md5").update(pathToHash, "binary").digest("hex");
+            
+            if(isNull(stats)) {
+                file.flag = FileFlag.ERROR;
+                logger.info(filepath);
+            }
+
             collectedFiles.push(file);
         }
 
@@ -209,6 +210,7 @@ export async function step_create_database_entries(params: StepParams) {
 
             // Create a map of all created files
             for(const file of results) {
+                if(file.flag == FileFlag.ERROR || file.flag == FileFlag.POTENTIAL_DUPLICATE) continue;
                 mappedFiles.set(file.id, file);
             }
 
