@@ -4,13 +4,13 @@ import { ImportTask } from '../entities/import.entity';
 import { ApiResponse } from '../../utils/responses/api-response';
 import { Inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { SCDKOptions } from '../../scdk.module';
+import { SCSDKOptions } from '../../scdk.module';
 import { apiResponse } from '../../utils/rxjs/operators/api-response';
 import { BehaviorSubject, Observable, of } from 'rxjs';
 import { Pageable } from '../../pagination/pageable';
 import { Page } from '../../pagination/page';
 import { ImportReport } from '../entities/import-report.entity';
-import { SCDK_OPTIONS } from '../../constants';
+import { SCSDK_OPTIONS } from '../../constants';
 
 @Injectable()
 export class SCSDKImportService {
@@ -20,7 +20,7 @@ export class SCSDKImportService {
 
     constructor(
         private readonly httpClient: HttpClient,
-        @Inject(SCDK_OPTIONS) private readonly options: SCDKOptions
+        @Inject(SCSDK_OPTIONS) private readonly options: SCSDKOptions
     ) {}
 
     /**

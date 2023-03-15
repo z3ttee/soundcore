@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, Entity, Index, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, Index, ManyToOne, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { Mount } from "../../mount/entities/mount.entity";
 import { Song } from "../../song/entities/song.entity";
 
@@ -6,7 +6,8 @@ export enum FileFlag {
     PENDING_ANALYSIS = 0,
     OK = 1,
     POTENTIAL_DUPLICATE = 2,
-    ERROR = 3
+    ERROR = 3,
+    INVALID_PATH_ENCODING = 4
 }
 
 export interface FileID {
@@ -35,7 +36,7 @@ export class File {
     @Column({ nullable: true })
     public mimetype: string;
 
-    @Column({ type: "tinyint", nullable: false, default: 0 })
+    @Column({ type: "enum",  enum: FileFlag, nullable: false, default: FileFlag.PENDING_ANALYSIS })
     public flag: FileFlag
 
     @OneToOne(() => Song, (song) => song.file, { onDelete: "SET NULL" })

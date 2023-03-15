@@ -1,19 +1,19 @@
 import { ModuleWithProviders, NgModule } from "@angular/core";
-import { SCDK_OPTIONS } from "./constants";
+import { SCSDK_OPTIONS } from "./constants";
 
-export interface SCDKOptions {
+export interface SCSDKOptions {
     api_base_uri: string;
 }
 
 @NgModule()
-export class SCDKModule {
+export class SCSDKModule {
 
-    public static forRoot(options: SCDKOptions): ModuleWithProviders<SCDKModule> {
+    public static forRoot(options: SCSDKOptions): ModuleWithProviders<SCSDKModule> {
         return {
-            ngModule: SCDKModule,
+            ngModule: SCSDKModule,
             providers: [
                 {
-                    provide: SCDK_OPTIONS,
+                    provide: SCSDK_OPTIONS,
                     useValue: options
                 }
             ]

@@ -1,4 +1,4 @@
-export const SCDK_OPTIONS = "scdk_options"
+export const SCSDK_OPTIONS = "scsdk_options"
 
 export const SOUNDCORE_INDEXEDDB_NAME = "soundcore_indexeddb";
 export const SC_SEARCHHISTORY_SIZE = 12;

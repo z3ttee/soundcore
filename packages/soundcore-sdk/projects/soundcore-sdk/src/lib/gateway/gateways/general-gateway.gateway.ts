@@ -1,9 +1,9 @@
 import { Inject, Injectable } from "@angular/core";
 import { SSOService } from "@soundcore/sso";
 import { Observable, Subject } from "rxjs";
-import { GATEWAY_EVENT_IMPORTTASK_UPDATE, SCDK_OPTIONS } from "../../constants";
+import { GATEWAY_EVENT_IMPORTTASK_UPDATE, SCSDK_OPTIONS } from "../../constants";
 import { ImportTask } from "../../import/entities/import.entity";
-import { SCDKOptions } from "../../scdk.module";
+import { SCSDKOptions } from "../../scdk.module";
 import { ImportTaskUpdateEvent } from "../events/importtask-update.event";
 import { SCSDKAuthenticatedGateway } from "./gateway";
 
@@ -17,7 +17,7 @@ export class SCSDKGeneralGateway extends SCSDKAuthenticatedGateway {
 
   constructor(
     ssoService: SSOService,
-    @Inject(SCDK_OPTIONS) private readonly options: SCDKOptions
+    @Inject(SCSDK_OPTIONS) private readonly options: SCSDKOptions
   ) {
       super(new URL(`${options.api_base_uri}/general`), ssoService);
   }

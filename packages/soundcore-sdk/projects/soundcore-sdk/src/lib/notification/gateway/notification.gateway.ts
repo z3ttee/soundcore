@@ -1,10 +1,10 @@
 import { Inject, Injectable } from "@angular/core";
 import { Observable, Subject, takeUntil } from "rxjs";
-import { SCDKOptions } from "../../scdk.module";
+import { SCSDKOptions } from "../../scdk.module";
 import { Notification } from "../entities/notification.entity";
 import { SSOService } from "@soundcore/sso";
 import { SCSDKAuthenticatedGateway } from "../../gateway/gateways/gateway";
-import { SCDK_OPTIONS } from "../../constants";
+import { SCSDK_OPTIONS } from "../../constants";
 
 export const NOTIFICATION_EVENT_PUSH = "notification:push";
 
@@ -18,7 +18,7 @@ export class SCDKNotificationGateway extends SCSDKAuthenticatedGateway {
 
     constructor(
         ssoService: SSOService,
-        @Inject(SCDK_OPTIONS) private readonly options: SCDKOptions
+        @Inject(SCSDK_OPTIONS) private readonly options: SCSDKOptions
     ) {
         super(new URL(`${options.api_base_uri}/notifications`), ssoService);
     }

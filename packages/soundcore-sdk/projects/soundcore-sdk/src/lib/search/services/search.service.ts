@@ -1,10 +1,10 @@
 import { HttpClient } from "@angular/common/http";
 import { Inject, Injectable } from "@angular/core";
 import { BehaviorSubject, Observable, of, switchMap, tap } from "rxjs";
-import { SCDKOptions } from "../../scdk.module";
+import { SCSDKOptions } from "../../scdk.module";
 import { SCDKResource } from "../../utils/entities/resource";
 import { NgxIndexedDBService } from 'ngx-indexed-db';
-import { SCDK_OPTIONS, SC_SEARCHHISTORY_SIZE, SC_SEARCHHISTORY_STORE } from "../../constants";
+import { SCSDK_OPTIONS, SC_SEARCHHISTORY_SIZE, SC_SEARCHHISTORY_STORE } from "../../constants";
 import { SearchHistoryEntry } from "../entities/history-entry.entity";
 
 @Injectable({
@@ -21,7 +21,7 @@ export class SCSDKSearchService {
   constructor(
     private httpClient: HttpClient,
     private readonly dbService: NgxIndexedDBService,
-    @Inject(SCDK_OPTIONS) private readonly options: SCDKOptions
+    @Inject(SCSDK_OPTIONS) private readonly options: SCSDKOptions
   ) {
     this.restoreRecentlySearched();
   }

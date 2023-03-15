@@ -1,20 +1,20 @@
 import { HttpClient } from "@angular/common/http";
 import { Inject, Injectable } from "@angular/core";
-import { SCDKOptions } from "../../scdk.module";
+import { SCSDKOptions } from "../../scdk.module";
 import { Observable, of } from "rxjs";
 import { User } from "../../user/entities/user.entity";
 import { ApiResponse } from "../../utils/responses/api-response";
 import { apiResponse } from "../../utils/rxjs/operators/api-response";
 import { Page } from "../../pagination/page";
 import { Artist } from "../../artist/entities/artist.entity";
-import { SCDK_OPTIONS } from "../../constants";
+import { SCSDK_OPTIONS } from "../../constants";
 
 @Injectable()
 export class SCSDKProfileService {
 
     constructor(
         private readonly httpClient: HttpClient,
-        @Inject(SCDK_OPTIONS) private readonly options: SCDKOptions
+        @Inject(SCSDK_OPTIONS) private readonly options: SCSDKOptions
     ) {}
 
     public findByUserId(userId: string): Observable<ApiResponse<User>> {

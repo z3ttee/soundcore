@@ -2,11 +2,11 @@
 import { GATEWAY_MOUNT_UPDATE } from "@soundcore/constants";
 import { SCSDKAuthenticatedGateway } from "./gateway";
 import { Inject, Injectable } from "@angular/core";
-import { SCDKOptions } from "../../scdk.module";
+import { SCSDKOptions } from "../../scdk.module";
 import { SSOService } from "@soundcore/sso";
 import { MountStatusUpdateEvent } from "../events";
 import { Observable, Subject } from "rxjs";
-import { SCDK_OPTIONS } from "../../constants";
+import { SCSDK_OPTIONS } from "../../constants";
 
 @Injectable({
   providedIn: "root"
@@ -18,7 +18,7 @@ export class SCSDKAdminGateway extends SCSDKAuthenticatedGateway {
 
   constructor(
     ssoService: SSOService,
-    @Inject(SCDK_OPTIONS) options: SCDKOptions
+    @Inject(SCSDK_OPTIONS) options: SCSDKOptions
   ) {
       super(new URL(`${options.api_base_uri}/admin`), ssoService);
   }

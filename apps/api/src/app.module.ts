@@ -60,7 +60,7 @@ import { ConfigureModule } from './configure/configure.module';
       entityPrefix: process.env.DB_PREFIX ?? "sc_",
       retryAttempts: Number.MAX_VALUE,
       retryDelay: 10000,
-      charset: "utf8mb4_unicode_ci",
+      charset: "utf8mb4",
     }),
     MeilisearchModuleNEXT.forRootAsync({
       useFactory: (configService: ConfigService) => ({
