@@ -179,28 +179,13 @@ export async function step_create_database_entries(params: StepParams) {
             try {
                 // Get file stats
                 stats = fs.statSync(filepath, { throwIfNoEntry: true });
-            } catch (error) {             
-                try {
-                    // Try to convert the filepath to utf-8 and try again
-                    // If it fails again, the file path is somehow just not readable
-                    // (further investigation needed but occurs in rare cases)
-                    // Probably because of incompatabilities between utf-8 and windows-1252 encoding
-                    const filepathWin1252 = filepath;
-                    const filepathUtf8 = iconv.decode(Buffer.from(filepathWin1252, 'binary'), 'windows-1252');
+            } catch (error) {      
+                // Update flag to indicate something odd with the path encoding
+                // There must be errors with the encoding, when the file was found previously
+                // but cannot be found anymore
+                file.flag = FileFlag.INVALID_PATH_ENCODING;     
 
-                    // Try again reading file stats
-                    stats = fs.statSync(filepathUtf8, { throwIfNoEntry: true });
-
-                    logger.info(filepathUtf8);
-                    logger.info(stats);
-                } catch (err) {
-                    logger.warn(`Could not get file stats for '${filepath}': ${err["message"] || err}`);
-
-                    // Update flag to indicate something odd with the path encoding
-                    // There must be errors with the encoding, when the file was found previously
-                    // but cannot be found anymore
-                    file.flag = FileFlag.INVALID_PATH_ENCODING;
-                }
+                logger.warn(`Could not get file stats for '${filepath}': ${error["message"] || error}`);
             }
 
             // Set size of the file entity
