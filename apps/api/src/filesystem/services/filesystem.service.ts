@@ -150,15 +150,15 @@ export class FileSystemService {
         }
 
         if(typeof filepathOrFile === "string") {
-            const filepathWin1252 = filepathOrFile;
-            const filepathUtf8 = iconv.decode(Buffer.from(filepathWin1252, 'binary'), 'windows-1252');
-            return path.resolve(filepathUtf8);
+            // const filepathWin1252 = filepathOrFile;
+            // const filepathUtf8 = iconv.decode(Buffer.from(filepathWin1252, 'binary'), 'windows-1252');
+            return path.resolve(filepathOrFile);
         }
 
         const file = filepathOrFile as File;
-        const filepathWin1252 = path.join(this.resolveMountPath(file.mount), file.directory, file.name);
-        const filepathUtf8 = iconv.decode(Buffer.from(filepathWin1252, 'binary'), 'windows-1252');
-        return path.resolve(filepathUtf8);
+        // const filepathWin1252 = path.join(this.resolveMountPath(file.mount), file.directory, file.name);
+        // const filepathUtf8 = iconv.decode(Buffer.from(filepathWin1252, 'binary'), 'windows-1252');
+        return path.resolve(path.join(this.resolveMountPath(file.mount), file.directory, file.name));
     }
 
     /**
