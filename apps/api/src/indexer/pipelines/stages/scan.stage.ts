@@ -165,6 +165,7 @@ export async function step_create_database_entries(params: StepParams) {
             const file = new File();
             file.name = fileDto.filename;
             file.directory = fileDto.directory;
+            file.flag = FileFlag.PENDING_ANALYSIS;
             file.mount = {
                 id: mount.id,
                 directory: mount.directory
@@ -179,7 +180,10 @@ export async function step_create_database_entries(params: StepParams) {
                 stats = fs.statSync(filepath, { throwIfNoEntry: true });
             } catch (error) {
                 logger.warn(`Could not get file stats for '${filepath}': ${error["message"] || error}`);
-                logger.info(filepath);
+                // Update flag to indicate something odd with the path encoding
+                // There must be errors with the encoding, when the file was found previously
+                // but cannot be found anymore
+                file.flag = FileFlag.INVALID_PATH_ENCODING;
             }
 
             // Set size of the file entity
@@ -191,11 +195,6 @@ export async function step_create_database_entries(params: StepParams) {
 
             // Update hash on file entity
             file.pathHash = crypto.createHash("md5").update(pathToHash, "binary").digest("hex");
-            
-            if(isNull(stats)) {
-                file.flag = FileFlag.ERROR;
-                logger.info(filepath);
-            }
 
             collectedFiles.push(file);
         }
@@ -210,7 +209,7 @@ export async function step_create_database_entries(params: StepParams) {
 
             // Create a map of all created files
             for(const file of results) {
-                if(file.flag == FileFlag.ERROR || file.flag == FileFlag.POTENTIAL_DUPLICATE) continue;
+                if(file.flag != FileFlag.OK && file.flag != FileFlag.PENDING_ANALYSIS) continue;
                 mappedFiles.set(file.id, file);
             }
 
