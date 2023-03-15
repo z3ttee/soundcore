@@ -1,7 +1,7 @@
 /*
  * Public API Surface of soundcore-sdk
  */
-export * from "./lib/scdk.module";
+export { SCSDKModule, SCSDKOptions } from "./lib/scdk.module";
 export { SCSDKAppService, ApplicationInfo, ApplicationBuildInfo } from "./lib/app.service";
 
 // Gateways

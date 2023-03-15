@@ -4,7 +4,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { SCDKModule, SCSDKMountModule } from '@soundcore/sdk';
+import { SCSDKModule, SCSDKMountModule } from '@soundcore/sdk';
 import { environment } from 'src/environments/environment';
 import { SCNGXModule, SCNGXDialogModule } from '@soundcore/ngx';
 import { SCCDKScreenModule } from '@soundcore/cdk';
@@ -34,7 +34,7 @@ import { SSOModule } from "@soundcore/sso";
         mod: environment.mod_role
       }
     }),
-    SCDKModule.forRoot({
+    SCSDKModule.forRoot({
       api_base_uri: environment.api_base_uri
     }),
     SCNGXModule.register({
