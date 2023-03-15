@@ -1,9 +1,9 @@
 import os from "os"
 import path from "path";
 import fs from "fs"
+import iconv from "iconv-lite";
 
 import { Injectable, Logger } from '@nestjs/common';
-
 import { v4 as uuidv4 } from "uuid"
 import { File } from "../../file/entities/file.entity";
 import { Mount } from "../../mount/entities/mount.entity";
@@ -150,11 +150,15 @@ export class FileSystemService {
         }
 
         if(typeof filepathOrFile === "string") {
-            return path.resolve(filepathOrFile);
+            const filepathWin1252 = filepathOrFile;
+            const filepathUtf8 = iconv.decode(Buffer.from(filepathWin1252, 'binary'), 'windows-1252');
+            return path.resolve(filepathUtf8);
         }
 
         const file = filepathOrFile as File;
-        return path.resolve(this.resolveMountPath(file.mount), file.directory, file.name);
+        const filepathWin1252 = path.join(this.resolveMountPath(file.mount), file.directory, file.name);
+        const filepathUtf8 = iconv.decode(Buffer.from(filepathWin1252, 'binary'), 'windows-1252');
+        return path.resolve(filepathUtf8);
     }
 
     /**
