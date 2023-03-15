@@ -1,11 +1,11 @@
 import { HttpClient } from "@angular/common/http";
 import { Inject, Injectable } from "@angular/core";
 import { BehaviorSubject, map, Observable, tap } from "rxjs";
-import { SCDKOptions } from "../../scdk.module";
+import { SCSDKOptions } from "../../scdk.module";
 import { Notification } from "../entities/notification.entity";
 import { SCDKNotificationGateway } from "../gateway/notification.gateway";
 import { Page, Pageable } from "../../pagination";
-import { SCDK_OPTIONS } from "../../constants";
+import { SCSDK_OPTIONS } from "../../constants";
 
 @Injectable()
 export class SCDKNotificationService {
@@ -21,7 +21,7 @@ export class SCDKNotificationService {
     constructor(
         private readonly httpClient: HttpClient,
         private readonly gateway: SCDKNotificationGateway,
-        @Inject(SCDK_OPTIONS) private readonly options: SCDKOptions
+        @Inject(SCSDK_OPTIONS) private readonly options: SCSDKOptions
     ) {
         this.gateway.$onNotificationReceived.subscribe((notification) => this.addNotifications([ notification ]));
     }

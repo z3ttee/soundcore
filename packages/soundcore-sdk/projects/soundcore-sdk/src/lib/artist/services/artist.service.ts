@@ -3,19 +3,19 @@ import { Inject, Injectable } from "@angular/core";
 import { Observable, of } from "rxjs";
 import { MeiliArtist } from "../../meilisearch/entities/meili-artist.entity";
 import { ApiSearchResponse } from "../../meilisearch/entities/search-response.entity";
-import { SCDKOptions } from "../../scdk.module";
+import { SCSDKOptions } from "../../scdk.module";
 import { ApiResponse } from "../../utils/responses/api-response";
 import { apiResponse } from "../../utils/rxjs/operators/api-response";
 import { Artist } from "../entities/artist.entity";
 import { Pageable } from "../../pagination";
-import { SCDK_OPTIONS } from "../../constants";
+import { SCSDK_OPTIONS } from "../../constants";
 
 @Injectable()
 export class SCDKArtistService {
 
   constructor(
     private httpClient: HttpClient,
-    @Inject(SCDK_OPTIONS) private readonly options: SCDKOptions
+    @Inject(SCSDK_OPTIONS) private readonly options: SCSDKOptions
   ) { }
 
   /**

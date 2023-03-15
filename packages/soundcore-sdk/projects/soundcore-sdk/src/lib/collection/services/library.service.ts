@@ -1,11 +1,11 @@
 import { HttpClient } from "@angular/common/http";
 import { Inject, Injectable } from "@angular/core";
 import { Observable } from "rxjs";
-import { SCDK_OPTIONS } from "../../constants";
+import { SCSDK_OPTIONS } from "../../constants";
 import { Page } from "../../pagination";
 import { Pageable } from "../../pagination/pageable";
 import { Playlist } from "../../playlist/entities/playlist.entity";
-import { SCDKOptions } from "../../scdk.module";
+import { SCSDKOptions } from "../../scdk.module";
 import { Future, toFuture } from "../../utils/future";
 import { LikedResource } from "../entities/like.entity";
 
@@ -14,7 +14,7 @@ export class SCSDKLibraryService {
 
     constructor(
         private httpClient: HttpClient,
-        @Inject(SCDK_OPTIONS) private readonly options: SCDKOptions
+        @Inject(SCSDK_OPTIONS) private readonly options: SCSDKOptions
     ) {}
 
     public buildDatasourceUrl(userId?: string): string {
