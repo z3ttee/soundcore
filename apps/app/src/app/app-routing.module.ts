@@ -14,6 +14,7 @@ const routes: Routes = [
     { path: "zones", canActivate: [SSOGuard], loadChildren: () => import("./modules/zones/zones.module").then((m) => m.ZonesModule) },
     { path: "import", canActivate: [SSOGuard], loadChildren: () => import("./modules/import/import.module").then((m) => m.ImportModule) },
     { path: "tasks", canActivate: [SSOGuard], loadChildren: () => import("./modules/tasks/tasks.module").then((m) => m.TasksModule) },
+    { path: "configurate", canActivate: [SSOGuard], loadChildren: () => import("./modules/configurate/configurate.module").then((m) => m.ConfigurateModule) },
     { path: "more", canActivate: [SSOGuard], loadChildren: () => import("./modules/admin-more/admin-more.module").then((m) => m.AdminMoreModule) },
     { path: "**", redirectTo: "/admin/zones", pathMatch: "full" }
   ]},

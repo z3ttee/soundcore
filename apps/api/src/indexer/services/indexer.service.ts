@@ -17,18 +17,14 @@ export class IndexerService {
     ) {
         this.pipelines.on("failed", (error, { pipeline }) => {
             console.error(error);
-            console.log("Pipeline " + pipeline.id + " failed");
         })
-        this.pipelines.on("completed", ({ pipeline }) => {
-            console.log("Pipeline " + pipeline.id + " completed");
-            
+        this.pipelines.on("completed", ({ pipeline }) => {            
             this.emitter.emit(EVENT_TRIGGER_ARTWORK_PROCESS_SONGS);
             this.emitter.emit(EVENT_TRIGGER_MEILISEARCH_PROCESS_SONGS);
         })
         this.pipelines.on("status", (params) => {
             const task: Task = params.pipeline as Task;
             this.taskService.updateTask(task, true);
-            console.log("Pipeline status: ", task.status);
         })
     }
 

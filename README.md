@@ -129,6 +129,25 @@ networks:
   soundcore_prod:
 ```
 
+## Known Issues
+
+### Incompatible File Path Encodings
+In some very few edge cases during testing, there were audio files which were successfully scanned, but could not be read afterwards.
+For those files, the indexing process failed. After some investigations, this problem could relate to different file name encodings between operating systems.
+E.g. the file was created on a windows system using `Windows-1250` encoding, but the OS where the application is running on, uses `UTF-8` encoding in file paths.
+Currently this issue cannot be fixed, but a workaround is, to rename the affected files. On Linux, this can be done using following command, which renames
+files to use `UTF-8` character set:
+```bash
+convmv --notest -f windows1250 -t UTF-8 -r *
+
+# --notest: This will disable dry-run
+# -f windows1250: From encoding
+# -t UTF-8: To encoding
+# -r: Go into all sub directories
+# *: Alle files
+```
+
+
 Comming soon...
 
 ## Concept Art

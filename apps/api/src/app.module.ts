@@ -40,6 +40,7 @@ import { MeilisearchModule as MeilisearchModuleNEXT } from '@soundcore/meilisear
 import { ConfigService } from '@nestjs/config';
 import { MeilisearchModule } from './meilisearch/meilisearch.module';
 import { MetricsModule } from './metrics/metrics.module';
+import { ConfigureModule } from './configure/configure.module';
 
 @Module({
   imports: [
@@ -60,7 +61,7 @@ import { MetricsModule } from './metrics/metrics.module';
       entityPrefix: process.env.DB_PREFIX ?? "sc_",
       retryAttempts: Number.MAX_VALUE,
       retryDelay: 10000,
-      charset: "utf8mb4_unicode_ci",
+      charset: "utf8mb4",
     }),
     MeilisearchModuleNEXT.forRootAsync({
       useFactory: (configService: ConfigService) => ({
@@ -128,10 +129,8 @@ import { MetricsModule } from './metrics/metrics.module';
     }),
     TracklistModule,
     MetricsModule,
+    ConfigureModule,
     TasksModule.forRoot()
-  ],
-  controllers: [
-    AppController
   ],
   providers: [
     AppService

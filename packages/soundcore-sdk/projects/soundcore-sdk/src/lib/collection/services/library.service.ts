@@ -1,10 +1,15 @@
 import { HttpClient } from "@angular/common/http";
 import { Inject, Injectable } from "@angular/core";
 import { Observable } from "rxjs";
+import { SCSDK_OPTIONS } from "../../constants";
 import { Page } from "../../pagination";
 import { Pageable } from "../../pagination/pageable";
 import { Playlist } from "../../playlist/entities/playlist.entity";
+<<<<<<< HEAD
 import { SCSDKOptions, SCSDK_OPTIONS } from "../../scdk.module";
+=======
+import { SCSDKOptions } from "../../scdk.module";
+>>>>>>> main
 import { Future, toFuture } from "../../utils/future";
 import { LikedResource } from "../entities/like.entity";
 

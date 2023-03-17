@@ -14,6 +14,8 @@ export class SCNGXFileFlagPipe implements PipeTransform {
         return "Potenzielles Duplikat"
       case FileFlag.ERROR:
         return "Fehlerhaft"
+      case FileFlag.INVALID_PATH_ENCODING:
+        return "Fehlerhafter Pfad"
       default:
         return "Verfügbar"
     }

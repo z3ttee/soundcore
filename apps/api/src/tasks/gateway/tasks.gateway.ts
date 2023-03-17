@@ -23,7 +23,6 @@ export class TasksGateway extends AuthGateway {
     }
 
     public async emitTasks(tasks: Task[]) {
-        console.log("emitting " + tasks.length + " tasks")
         this.server.emit(GATEWAY_EVENT_TASK_EMIT, tasks);
     }
     

@@ -1,7 +1,11 @@
 import { HttpClient } from "@angular/common/http";
 import { Inject, Injectable } from "@angular/core";
 import { Observable, of } from "rxjs";
+<<<<<<< HEAD
 import { SCSDKOptions, SCSDK_OPTIONS } from "../../scdk.module";
+=======
+import { SCSDKOptions } from "../../scdk.module";
+>>>>>>> main
 import { Song } from "../entities/song.entity";
 import { ApiResponse } from "../../utils/responses/api-response";
 import { apiResponse } from "../../utils/rxjs/operators/api-response";
@@ -9,6 +13,7 @@ import { ApiSearchResponse } from "../../meilisearch/entities/search-response.en
 import { MeiliSong } from "../../meilisearch/entities/meili-song.entity";
 import { Page, Pageable } from "../../pagination";
 import { Future, toFuture } from "../../utils/future";
+import { SCSDK_OPTIONS } from "../../constants";
 
 @Injectable()
 export class SCSDKSongService {

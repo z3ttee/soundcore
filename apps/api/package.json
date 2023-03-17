@@ -61,7 +61,8 @@
     "typeorm": "^0.3.10",
     "workerpool": "^6.4.0",
     "ytdl-core": "^4.11.0",
-    "ytpl": "^2.3.0"
+    "ytpl": "^2.3.0",
+    "iconv-lite": "^0.6.3"
   },
   "devDependencies": {
     "@nestjs/cli": "^9.0.0",

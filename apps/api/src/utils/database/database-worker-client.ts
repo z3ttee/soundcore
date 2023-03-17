@@ -20,7 +20,7 @@ class DatabaseImpl {
         password: process.env.DB_PASS,
         username: process.env.DB_USER,
         entityPrefix: process.env.DB_PREFIX || "sc_",
-        charset: "utf8mb4_unicode_ci",
+        charset: "utf8mb4",
         entities: [
             TYPEORM_ENTITY_GLOB
         ]

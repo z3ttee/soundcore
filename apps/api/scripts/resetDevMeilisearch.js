@@ -3,10 +3,9 @@ const fs = require("node:fs");
 const path = require("node:path");
 const process = require("node:process");
 const meilisearch = require("meilisearch");
-const { off } = require("node:process");
+const resetMeilisearch = require("../src/utils/scripts/resetMeilisearch").resetMeilisearch
 
 const exit = process.exit;
-
 const envFilePath = path.resolve(__dirname, "..", ".env.dev");
 console.log(`Reading .env file '${envFilePath}'`);
 
@@ -37,29 +36,7 @@ readEnvFile().then(async (buffer) => {
         }
     });
 
-    const indexes = [];
-    let pageIndex = 0;
-
-    do {
-        const limit = 30;
-        const offset = pageIndex * limit;
-
-        const page = await meiliClient.getIndexes({ limit, offset });
-        if(page.results.length <= 0) break;
-
-        indexes.push(...page.results);
-        pageIndex++;
-    } while(true);
-
-    console.log(`Deleting ${indexes.length} indexes`);
-
-    for(const index of indexes) {
-        await index.delete().then(() => {
-            console.log(`Deleted index '${index.uid}'`);
-        }).catch((error) => {
-            console.log(`Failed deleting index '${index.uid}': ${error.message}`, error);
-        });
-    }
+    return resetMeilisearch(meiliClient);
 }).then(() => {
     exit(0);
 }).catch((error) => {

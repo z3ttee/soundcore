@@ -1,9 +1,9 @@
 import os from "os"
 import path from "path";
 import fs from "fs"
+import iconv from "iconv-lite";
 
 import { Injectable, Logger } from '@nestjs/common';
-
 import { v4 as uuidv4 } from "uuid"
 import { File } from "../../file/entities/file.entity";
 import { Mount } from "../../mount/entities/mount.entity";
@@ -154,7 +154,7 @@ export class FileSystemService {
         }
 
         const file = filepathOrFile as File;
-        return path.resolve(this.resolveMountPath(file.mount), file.directory, file.name);
+        return path.resolve(path.join(this.resolveMountPath(file.mount), file.directory, file.name));
     }
 
     /**

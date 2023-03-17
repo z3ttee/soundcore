@@ -5,7 +5,8 @@ export enum FileFlag {
     PENDING_ANALYSIS = 0,
     OK = 1,
     POTENTIAL_DUPLICATE = 2,
-    ERROR = 3
+    ERROR = 3,
+    INVALID_PATH_ENCODING = 4
 }
 
 export class File {
