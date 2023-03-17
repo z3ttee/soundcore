@@ -1,11 +1,7 @@
 import { Inject, Injectable } from "@angular/core";
 import { Observable, of } from "rxjs";
-<<<<<<< HEAD
-import { SCSDKOptions, SCSDK_OPTIONS } from "../../scdk.module";
-=======
 import { SCSDK_OPTIONS } from "../../constants";
 import { SCSDKOptions } from "../../scdk.module";
->>>>>>> main
 import { Artwork } from "../entities/artwork.entity";
 
 @Injectable()

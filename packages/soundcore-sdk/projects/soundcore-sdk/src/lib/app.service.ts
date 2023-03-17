@@ -1,12 +1,8 @@
 import { HttpClient } from "@angular/common/http";
 import { Inject, Injectable } from "@angular/core";
-import { BehaviorSubject, filter, Observable } from "rxjs";
-<<<<<<< HEAD
-import { SCSDKOptions, SCSDK_OPTIONS } from "./scdk.module";
-=======
+import { BehaviorSubject, Observable } from "rxjs";
 import { SCSDK_OPTIONS } from "./constants";
 import { SCSDKOptions } from "./scdk.module";
->>>>>>> main
 
 export class ApplicationBuildInfo {
     public version: string;

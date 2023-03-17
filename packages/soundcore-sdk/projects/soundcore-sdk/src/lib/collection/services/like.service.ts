@@ -4,11 +4,7 @@ import { Observable, Subject, tap } from "rxjs";
 import { SCSDK_OPTIONS } from "../../constants";
 import { Page } from "../../pagination/page";
 import { Pageable } from "../../pagination/pageable";
-<<<<<<< HEAD
-import { SCSDKOptions, SCSDK_OPTIONS } from "../../scdk.module";
-=======
 import { SCSDKOptions } from "../../scdk.module";
->>>>>>> main
 import { Song } from "../../song";
 import { Future, toFuture } from "../../utils/future";
 import { ToggleLikedSongDTO } from "../dtos/toggle-result.dto";

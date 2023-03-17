@@ -1,10 +1,6 @@
 import { Inject, Injectable } from "@angular/core";
 import { Observable, Subject, takeUntil } from "rxjs";
-<<<<<<< HEAD
-import { SCSDKOptions, SCSDK_OPTIONS } from "../../scdk.module";
-=======
 import { SCSDKOptions } from "../../scdk.module";
->>>>>>> main
 import { Notification } from "../entities/notification.entity";
 import { SSOService } from "@soundcore/sso";
 import { SCSDKAuthenticatedGateway } from "../../gateway/gateways/gateway";

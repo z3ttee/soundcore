@@ -1,11 +1,7 @@
 import { HttpClient } from "@angular/common/http";
 import { Inject, Injectable } from "@angular/core";
 import { BehaviorSubject, Observable, of, switchMap, tap } from "rxjs";
-<<<<<<< HEAD
-import { SCSDKOptions, SCSDK_OPTIONS } from "../../scdk.module";
-=======
 import { SCSDKOptions } from "../../scdk.module";
->>>>>>> main
 import { SCDKResource } from "../../utils/entities/resource";
 import { NgxIndexedDBService } from 'ngx-indexed-db';
 import { SCSDK_OPTIONS, SC_SEARCHHISTORY_SIZE, SC_SEARCHHISTORY_STORE } from "../../constants";

@@ -3,11 +3,7 @@ import { SSOService } from "@soundcore/sso";
 import { Observable, Subject } from "rxjs";
 import { GATEWAY_EVENT_TASK_EMIT, SCSDK_OPTIONS } from "../../constants";
 import { SCSDKAuthenticatedGateway } from "../../gateway/gateways/gateway";
-<<<<<<< HEAD
-import { SCSDKOptions, SCSDK_OPTIONS } from "../../scdk.module";
-=======
 import { SCSDKOptions } from "../../scdk.module";
->>>>>>> main
 import { Task } from "../entities/task.entity";
 
 @Injectable({

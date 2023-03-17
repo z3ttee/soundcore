@@ -1,9 +1,10 @@
 import { DeviceInfo } from "../entities/device-info.entity";
 import { Inject, Injectable } from "@angular/core";
-import { SCSDKOptions, SCSDK_OPTIONS } from "../../scdk.module";
+import { SCSDKOptions } from "../../scdk.module";
 import { HttpClient } from "@angular/common/http";
 import { Observable } from "rxjs";
 import { Future, toFuture } from "../../utils/future";
+import { SCSDK_OPTIONS } from "../../constants";
 
 @Injectable()
 export class SCSDKMetricsService {

@@ -3,11 +3,7 @@ import { Inject, Injectable } from "@angular/core";
 import { Observable } from "rxjs";
 import { SCSDK_OPTIONS } from "../../constants";
 import { Page, Pageable } from "../../pagination";
-<<<<<<< HEAD
-import { SCSDKOptions, SCSDK_OPTIONS } from "../../scdk.module";
-=======
 import { SCSDKOptions } from "../../scdk.module";
->>>>>>> main
 import { Future, toFuture } from "../../utils/future";
 import { Task, TaskDefinition } from "../entities/task.entity";
 

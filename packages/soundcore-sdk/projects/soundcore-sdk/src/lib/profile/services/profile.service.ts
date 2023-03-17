@@ -1,10 +1,6 @@
 import { HttpClient } from "@angular/common/http";
 import { Inject, Injectable } from "@angular/core";
-<<<<<<< HEAD
-import { SCSDKOptions, SCSDK_OPTIONS } from "../../scdk.module";
-=======
 import { SCSDKOptions } from "../../scdk.module";
->>>>>>> main
 import { Observable, of } from "rxjs";
 import { User } from "../../user/entities/user.entity";
 import { ApiResponse } from "../../utils/responses/api-response";

@@ -3,11 +3,7 @@ import { Inject, Injectable } from "@angular/core";
 import { Observable, of } from "rxjs";
 import { MeiliArtist } from "../../meilisearch/entities/meili-artist.entity";
 import { ApiSearchResponse } from "../../meilisearch/entities/search-response.entity";
-<<<<<<< HEAD
-import { SCSDKOptions, SCSDK_OPTIONS } from "../../scdk.module";
-=======
 import { SCSDKOptions } from "../../scdk.module";
->>>>>>> main
 import { ApiResponse } from "../../utils/responses/api-response";
 import { apiResponse } from "../../utils/rxjs/operators/api-response";
 import { Artist } from "../entities/artist.entity";

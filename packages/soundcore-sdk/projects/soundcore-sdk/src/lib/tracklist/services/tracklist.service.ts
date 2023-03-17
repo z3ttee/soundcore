@@ -1,12 +1,8 @@
 import { HttpClient } from "@angular/common/http";
 import { Inject, Injectable } from "@angular/core";
 import { map, Observable } from "rxjs";
-<<<<<<< HEAD
-import { SCSDKOptions, SCSDK_OPTIONS } from "../../scdk.module";
-=======
 import { SCSDK_OPTIONS } from "../../constants";
 import { SCSDKOptions } from "../../scdk.module";
->>>>>>> main
 import { ApiResponse } from "../../utils/responses/api-response";
 import { apiResponse } from "../../utils/rxjs/operators/api-response";
 import { SCSDKTracklist } from "../entities/tracklist.entity";
