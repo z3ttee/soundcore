@@ -1,7 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { SSOService, SSOUser } from '@soundcore/sso';
 import { SCCDKScreenService } from '@soundcore/cdk';
-import { User } from '@soundcore/sdk';
 
 @Component({
   selector: 'app-profile-bar',

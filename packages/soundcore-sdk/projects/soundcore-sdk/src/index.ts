@@ -49,10 +49,11 @@ export * from "./lib/zone";
 // Tasks Module
 export * from "./lib/tasks";
 
+// Metrics Module
+export * from "./lib/metrics";
+
 // Configure Module
 export * from "./lib/configure";
-
-
 
 
 // Utils

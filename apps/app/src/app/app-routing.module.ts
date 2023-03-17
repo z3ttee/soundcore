@@ -10,7 +10,7 @@ import { Error404Module } from './shared/error404/error404.module';
 
 const routes: Routes = [
   { path: "admin", component: AdminLayoutComponent, canActivate: [ SSOGuard ], data: { roles: ["admin"] }, children: [
-    { path: "", redirectTo: "/admin/zones", pathMatch: "full" },
+    { path: "", canActivate: [SSOGuard], loadChildren: () => import("./modules/dashboard/dashboard.module").then((m) => m.DashboardModule) },
     { path: "zones", canActivate: [SSOGuard], loadChildren: () => import("./modules/zones/zones.module").then((m) => m.ZonesModule) },
     { path: "import", canActivate: [SSOGuard], loadChildren: () => import("./modules/import/import.module").then((m) => m.ImportModule) },
     { path: "tasks", canActivate: [SSOGuard], loadChildren: () => import("./modules/tasks/tasks.module").then((m) => m.TasksModule) },

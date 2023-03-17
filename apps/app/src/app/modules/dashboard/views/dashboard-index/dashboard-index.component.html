@@ -1,0 +1,45 @@
+<ng-container *ngIf="($props | async) as props">
+    <div class="w-full h-full pt-window px-window">
+        <scngx-ui-title>
+            Willkommen, {{ props.account?.name }}
+        </scngx-ui-title>
+
+        <scngx-ui-row>
+            <div class="grid grid-cols-3 grid-rows-auto gap-4">
+                <div class="p-4 rounded-sm bg-body-light border border-body-lighter">
+                    <h6 class="pb-row">Mitteilungen</h6>
+
+                    <p class="text-sm opacity-60">Derzeit keine Mitteilungen vorhanden</p>
+                </div>
+                <div class="p-4 rounded-sm bg-body-light border border-body-lighter">
+                    <h6 class="pb-row">Systeminformationen</h6>
+
+                    <ul class="flex flex-col gap-10">
+                        <div class="flex flex-wrap gap-6">
+                            <li>
+                                <p class="text-xs font-light uppercase opacity-60">Architektur</p>
+                                <p>{{ props.infoRequest.data?.arch }}</p>
+                            </li>
+                            <li>
+                                <p class="text-xs font-light uppercase opacity-60">Modus</p>
+                                <p>{{ props.infoRequest.data?.applicationMode }}</p>
+                            </li>
+                        </div>
+                        <div class="flex flex-wrap gap-6">
+                            <li>
+                                <p class="text-xs font-light uppercase opacity-60">Arbeitsspeicher</p>
+                                <p>{{ props.infoRequest.data?.memory?.used | scngxBytesPipe:"gb" }} / {{ props.infoRequest.data?.memory?.total | scngxBytesPipe:"gb" }}</p>
+                            </li>
+                        </div>
+                        <div class="flex flex-wrap gap-6">
+                            <li>
+                                <p class="text-xs font-light uppercase opacity-60">Prozessor ({{ props.infoRequest.data?.cpu?.length ?? '-' }})</p>
+                                <p>{{ props.infoRequest.data?.cpu?.[0]?.model }}</p>
+                            </li>
+                        </div>
+                    </ul>
+                </div>
+            </div>
+        </scngx-ui-row>
+    </div>
+</ng-container>
