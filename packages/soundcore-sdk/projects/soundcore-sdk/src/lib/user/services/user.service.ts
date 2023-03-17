@@ -3,7 +3,7 @@ import { Inject, Injectable } from "@angular/core";
 import { Observable } from "rxjs";
 import { MeiliUser } from "../../meilisearch/entities/meili-user.entity";
 import { ApiSearchResponse } from "../../meilisearch/entities/search-response.entity";
-import { SCDKOptions, SCDK_OPTIONS } from "../../scdk.module";
+import { SCSDKOptions, SCSDK_OPTIONS } from "../../scdk.module";
 import { ApiResponse } from "../../utils/responses/api-response";
 import { apiResponse } from "../../utils/rxjs/operators/api-response";
 import { User } from "../entities/user.entity";
@@ -14,7 +14,7 @@ export class SCDKUserService {
 
     constructor(
         private readonly httpClient: HttpClient,
-        @Inject(SCDK_OPTIONS) private readonly options: SCDKOptions
+        @Inject(SCSDK_OPTIONS) private readonly options: SCSDKOptions
     ) {}
 
     /**

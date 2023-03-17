@@ -1,13 +1,13 @@
 import { Inject, Injectable } from "@angular/core";
 import { Observable, of } from "rxjs";
-import { SCDKOptions, SCDK_OPTIONS } from "../../scdk.module";
+import { SCSDKOptions, SCSDK_OPTIONS } from "../../scdk.module";
 import { Artwork } from "../entities/artwork.entity";
 
 @Injectable()
 export class SCDKArtworkService {
 
     constructor(
-        @Inject(SCDK_OPTIONS) private readonly options: SCDKOptions
+        @Inject(SCSDK_OPTIONS) private readonly options: SCSDKOptions
     ) {}
 
     /**

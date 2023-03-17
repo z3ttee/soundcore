@@ -1,6 +1,6 @@
 import { Inject, Injectable } from "@angular/core";
 import { Observable, Subject, takeUntil } from "rxjs";
-import { SCDKOptions, SCDK_OPTIONS } from "../../scdk.module";
+import { SCSDKOptions, SCSDK_OPTIONS } from "../../scdk.module";
 import { Notification } from "../entities/notification.entity";
 import { SSOService } from "@soundcore/sso";
 import { SCSDKAuthenticatedGateway } from "../../gateway/gateways/gateway";
@@ -17,7 +17,7 @@ export class SCDKNotificationGateway extends SCSDKAuthenticatedGateway {
 
     constructor(
         ssoService: SSOService,
-        @Inject(SCDK_OPTIONS) private readonly options: SCDKOptions
+        @Inject(SCSDK_OPTIONS) private readonly options: SCSDKOptions
     ) {
         super(new URL(`${options.api_base_uri}/notifications`), ssoService);
     }

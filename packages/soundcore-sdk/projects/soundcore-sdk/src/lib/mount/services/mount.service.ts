@@ -1,7 +1,7 @@
 import { HttpClient } from "@angular/common/http";
 import { Inject, Injectable } from "@angular/core";
 import { Observable, of } from "rxjs";
-import { SCDKOptions, SCDK_OPTIONS } from "../../scdk.module";
+import { SCSDKOptions, SCSDK_OPTIONS } from "../../scdk.module";
 import { CreateResult } from "../../utils/results/creation.result";
 import { CreateMountDTO } from "../dtos/create-mount.dto";
 import { UpdateMountDTO } from "../dtos/update-mount.dto";
@@ -15,7 +15,7 @@ export class SCSDKMountService {
 
     constructor(
         private readonly httpClient: HttpClient,
-        @Inject(SCDK_OPTIONS) private readonly options: SCDKOptions
+        @Inject(SCSDK_OPTIONS) private readonly options: SCSDKOptions
     ) {}
 
     /**

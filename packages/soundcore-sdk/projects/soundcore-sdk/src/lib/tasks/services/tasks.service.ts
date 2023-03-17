@@ -2,7 +2,7 @@ import { HttpClient } from "@angular/common/http";
 import { Inject, Injectable } from "@angular/core";
 import { Observable } from "rxjs";
 import { Page, Pageable } from "../../pagination";
-import { SCDKOptions, SCDK_OPTIONS } from "../../scdk.module";
+import { SCSDKOptions, SCSDK_OPTIONS } from "../../scdk.module";
 import { Future, toFuture } from "../../utils/future";
 import { Task, TaskDefinition } from "../entities/task.entity";
 
@@ -11,7 +11,7 @@ export class SCSDKTasksService {
 
     constructor(
         private readonly httpClient: HttpClient,
-        @Inject(SCDK_OPTIONS) private readonly options: SCDKOptions
+        @Inject(SCSDK_OPTIONS) private readonly options: SCSDKOptions
     ) {}
 
     /**

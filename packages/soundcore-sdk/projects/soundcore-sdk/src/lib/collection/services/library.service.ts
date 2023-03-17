@@ -4,7 +4,7 @@ import { Observable } from "rxjs";
 import { Page } from "../../pagination";
 import { Pageable } from "../../pagination/pageable";
 import { Playlist } from "../../playlist/entities/playlist.entity";
-import { SCDKOptions, SCDK_OPTIONS } from "../../scdk.module";
+import { SCSDKOptions, SCSDK_OPTIONS } from "../../scdk.module";
 import { Future, toFuture } from "../../utils/future";
 import { LikedResource } from "../entities/like.entity";
 
@@ -13,7 +13,7 @@ export class SCSDKLibraryService {
 
     constructor(
         private httpClient: HttpClient,
-        @Inject(SCDK_OPTIONS) private readonly options: SCDKOptions
+        @Inject(SCSDK_OPTIONS) private readonly options: SCSDKOptions
     ) {}
 
     public buildDatasourceUrl(userId?: string): string {

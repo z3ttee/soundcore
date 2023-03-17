@@ -3,7 +3,7 @@ import { Inject, Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, of, tap } from 'rxjs';
 import { MeiliPlaylist } from '../../meilisearch/entities/meili-playlist.entity';
 import { ApiSearchResponse } from '../../meilisearch/entities/search-response.entity';
-import { SCDKOptions, SCDK_OPTIONS } from '../../scdk.module';
+import { SCSDKOptions, SCSDK_OPTIONS } from '../../scdk.module';
 import { ApiResponse } from '../../utils/responses/api-response';
 import { apiResponse } from '../../utils/rxjs/operators/api-response';
 import { AddSongDTO } from '../dtos/add-song.dto';
@@ -31,7 +31,7 @@ export class SCSDKPlaylistService {
 
   constructor(
     private readonly httpClient: HttpClient,
-    @Inject(SCDK_OPTIONS) private readonly options: SCDKOptions
+    @Inject(SCSDK_OPTIONS) private readonly options: SCSDKOptions
   ) {
     this.fetchPlaylistLibrary();
   }

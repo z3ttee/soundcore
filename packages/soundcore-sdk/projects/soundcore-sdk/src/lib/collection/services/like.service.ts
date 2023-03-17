@@ -3,7 +3,7 @@ import { Inject, Injectable } from "@angular/core";
 import { Observable, Subject, tap } from "rxjs";
 import { Page } from "../../pagination/page";
 import { Pageable } from "../../pagination/pageable";
-import { SCDKOptions, SCDK_OPTIONS } from "../../scdk.module";
+import { SCSDKOptions, SCSDK_OPTIONS } from "../../scdk.module";
 import { Song } from "../../song";
 import { Future, toFuture } from "../../utils/future";
 import { ToggleLikedSongDTO } from "../dtos/toggle-result.dto";
@@ -19,7 +19,7 @@ export class SCSDKLikeService {
 
     constructor(
         private httpClient: HttpClient,
-        @Inject(SCDK_OPTIONS) private readonly options: SCDKOptions
+        @Inject(SCSDK_OPTIONS) private readonly options: SCSDKOptions
     ) {}
 
     public toggleLikeForSong(song: Song): Observable<Future<ToggleLikedSongDTO>> {

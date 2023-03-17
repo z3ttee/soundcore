@@ -1,7 +1,7 @@
 import { HttpClient } from "@angular/common/http";
 import { Inject, Injectable } from "@angular/core";
 import { BehaviorSubject, filter, Observable } from "rxjs";
-import { SCDKOptions, SCDK_OPTIONS } from "./scdk.module";
+import { SCSDKOptions, SCSDK_OPTIONS } from "./scdk.module";
 
 export class ApplicationBuildInfo {
     public version: string;
@@ -24,7 +24,7 @@ export class SCSDKAppService {
 
     constructor(
         private readonly httpClient: HttpClient,
-        @Inject(SCDK_OPTIONS) private readonly options: SCDKOptions
+        @Inject(SCSDK_OPTIONS) private readonly options: SCSDKOptions
     ) {
         const url = `${this.options.api_base_uri}/v1/`;
         this.httpClient.get<ApplicationInfo>(url).subscribe((info) => {
