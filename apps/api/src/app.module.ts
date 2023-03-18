@@ -43,6 +43,9 @@ import { MetricsModule } from './metrics/metrics.module';
 import { ConfigureModule } from './configure/configure.module';
 
 @Module({
+  controllers: [
+    AppController
+  ],
   imports: [
     EventEmitterModule.forRoot({
       global: true
