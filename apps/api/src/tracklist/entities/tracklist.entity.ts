@@ -1,3 +1,5 @@
+import { Song } from "../../song/entities/song.entity";
+
 /**
  * Enum to handle different
  * Tracklist types.
@@ -10,6 +12,14 @@ export enum TracklistType {
     RANDOM = 4,
     COLLECTION = 5,
     LIKED_SONGS = 6
+}
+
+export enum TracklistTypeV2 {
+    PLAYLIST = "playlist",
+    SINGLE = "single",
+    ALBUM = "album",
+    ARTIST = "artist",
+    FAVORITES = "favorites"
 }
 
 /**
@@ -52,5 +62,21 @@ export class Tracklist {
          */
         public readonly relativeMetaUrl: string
     ) {}
+
+}
+
+export class TracklistV2<T = Song> {
+
+    constructor(
+        public readonly uri: string,
+        public readonly type: TracklistTypeV2,
+        public readonly size: number,
+        public readonly items: T[],
+        public readonly seed?: string
+    ) {}
+
+    public static resolveUri(resourceId: string, type: TracklistTypeV2) {
+        return `${type}:${resourceId}`;
+    }
 
 }

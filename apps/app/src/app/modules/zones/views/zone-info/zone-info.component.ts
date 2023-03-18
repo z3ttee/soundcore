@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { BehaviorSubject, combineLatest, filter, map, Observable, Subject, switchMap, takeUntil } from 'rxjs';
+import { BehaviorSubject, combineLatest, filter, map, Observable, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { SCNGXDatasource, SCNGXDialogService } from '@soundcore/ngx';
 import { ApiError, ApplicationInfo, Zone, Future, Mount, SCSDKAdminGateway, SCSDKAppService, SCSDKZoneService, toFuture } from '@soundcore/sdk';
 import { AppMountCreateDialog, MountCreateDialogOptions } from 'src/app/dialogs/mount-create-dialog/mount-create-dialog.component';
@@ -61,6 +61,9 @@ export class ZoneInfoComponent implements OnDestroy {
       zone: request.data,
       appInfo: appInfo
     })),
+    tap((props) => {
+      console.log(props)
+    }),
     takeUntil(this._destroy)
   );
 

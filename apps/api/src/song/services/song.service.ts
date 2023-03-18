@@ -4,10 +4,9 @@ import NodeID3 from "node-id3";
 import ffprobe from 'ffprobe';
 import ffprobeStatic from "ffprobe-static";
 import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
-import { Page, BasePageable } from 'nestjs-pager';
 import { InjectRepository } from "@nestjs/typeorm";
 import { In, Repository, SelectQueryBuilder, UpdateResult } from "typeorm";
-import { Environment } from "@soundcore/common";
+import { Environment, Page, Pageable } from "@soundcore/common";
 import { SyncableService } from "../../utils/services/syncing.service";
 import { Song } from "../entities/song.entity";
 import { User } from "../../user/entities/user.entity";
@@ -41,7 +40,7 @@ export class SongService implements SyncableService<Song> {
             .limit(20)
             .getMany();
 
-        return Page.of(result, result.length, 0);
+        return Page.of(result, result.length);
     }
 
     /**
@@ -56,7 +55,7 @@ export class SongService implements SyncableService<Song> {
             .limit(20)
             .getMany();
 
-        return Page.of(result, result.length, 0);
+        return Page.of(result, result.length);
     }
 
     /**
@@ -77,6 +76,44 @@ export class SongService implements SyncableService<Song> {
             .getOne();
 
         return result;
+    }
+
+    /**
+     * Find list of tracks of an album
+     * @param albumId Album's id
+     * @param pageable Page settings
+     * @param authentication Authentication object
+     * @param seed Seed used for building shuffled tracklist
+     * @returns Page<Song>
+     */
+    public async findTracksByAlbum(albumId: string, pageable: Pageable, authentication?: User, seed?: string): Promise<Page<Song>> {
+        // Create query to get ids only
+        let idsQuery = this.repository.createQueryBuilder("song")
+            .select(["song.id"])
+            .leftJoin("song.album", "album")
+            .where("album.id = :albumId", { albumId: albumId })
+            .offset(pageable.offset)
+            .limit(pageable.limit)
+            .orderBy("song.order", "ASC");
+
+        // Add seed, used to create shuffled tracklist
+        if(seed) idsQuery = idsQuery.orderBy(`RAND(${seed})`);
+
+        // Find ids and use these ids to fetch metadata
+        return idsQuery.getManyAndCount().then(([ids, total]) => {
+            // Fetch metadata
+            return this.repository.createQueryBuilder("song")
+                .select(["song.id", "song.slug", "song.name", "song.duration", "song.explicit"])
+                .leftJoin("song.primaryArtist", "primaryArtist").addSelect(["primaryArtist.id", "primaryArtist.slug", "primaryArtist.name"])
+                .leftJoin("song.featuredArtists", "featuredArtist").addSelect(["featuredArtist.id", "featuredArtist.slug", "featuredArtist.name"])
+                .leftJoin("song.artwork", "artwork").addSelect(["artwork.id"])
+                .loadRelationCountAndMap("song.liked", "song.likes", "likes", (qb) => qb.where("likes.userId = :userId", { userId: authentication?.id }))
+                .whereInIds(ids)
+                .getMany().then((tracks) => {
+                    // Build page
+                    return Page.of(tracks, total, pageable);
+                });
+        });
     }
 
     public async findByNamesAndArtistsAndAlbums(names: string[], artistNames: string[], albumNames: string[]): Promise<Song[]> {
@@ -138,7 +175,7 @@ export class SongService implements SyncableService<Song> {
      * @param authentication User authentication object
      * @returns Page<Song>
      */
-    public async findByGenreAndOrArtist(genreId: string, artistId: string, pageable?: BasePageable, authentication?: User): Promise<Page<Song>> {
+    public async findByGenreAndOrArtist(genreId: string, artistId: string, pageable?: Pageable, authentication?: User): Promise<Page<Song>> {
         const query = this.buildGeneralQuery("song", authentication)
             .leftJoin("song.genres", "genre")
             // Pagination
@@ -147,7 +184,7 @@ export class SongService implements SyncableService<Song> {
             .where("(primaryArtist.id = :artistId OR artist.slug = :artistId) AND (genre.id = :genreId OR genre.slug = :genreId)", { genreId, artistId });
 
         const result = await query.getManyAndCount();
-        return Page.of(result[0], result[1], pageable.offset);
+        return Page.of(result[0], result[1], pageable);
     }
 
     /**
@@ -157,7 +194,7 @@ export class SongService implements SyncableService<Song> {
      * @param artistId Artist's id, to fetch songs from an artist that a user has in his collection.
      * @returns Page<Song>
      */
-    public async findByCollectionAndOrArtist(user: User, pageable: BasePageable, artistId?: string): Promise<Page<Song>> {
+    public async findByCollectionAndOrArtist(user: User, pageable: Pageable, artistId?: string): Promise<Page<Song>> {
         // TODO: Ignore indexes that are not OK
         // Fetch available elements
         let qb = await this.repository.createQueryBuilder('song')
@@ -218,7 +255,7 @@ export class SongService implements SyncableService<Song> {
             
         if(artistId) qb = qb.leftJoin("song.artists", "artist").andWhere("artist.id = :artistId", { artistId })
         const result = await qb.getManyAndCount();
-        return Page.of(result[0], result[1], 0)
+        return Page.of(result[0], result[1])
     }
 
     public async findCoverSongsInPlaylist(playlistId: string): Promise<Page<Song>> {
@@ -236,7 +273,7 @@ export class SongService implements SyncableService<Song> {
             .limit(4)
 
         const result = await qb.getManyAndCount();
-        return Page.of(result[0], result[1], 0);
+        return Page.of(result[0], result[1]);
     }
 
     /**
@@ -245,7 +282,7 @@ export class SongService implements SyncableService<Song> {
      * @param pageable Page settings
      * @returns Page<Artist>
      */
-    public async findBySyncFlag(flag: MeilisearchFlag, pageable: BasePageable): Promise<Page<Song>> {
+    public async findBySyncFlag(flag: MeilisearchFlag, pageable: Pageable): Promise<Page<Song>> {
         const result = await this.repository.createQueryBuilder("song")
             .leftJoin("song.artwork", "artwork").addSelect(["artwork.id"])
             .leftJoin("song.album", "album").addSelect(["album.id", "album.slug", "album.name"])
@@ -259,7 +296,7 @@ export class SongService implements SyncableService<Song> {
             .take(pageable.limit)
             .getManyAndCount();
 
-        return Page.of(result[0], result[1], pageable.offset);
+        return Page.of(result[0], result[1], pageable);
     }
 
     /**
@@ -504,7 +541,7 @@ export class SongService implements SyncableService<Song> {
      * @param pageable Page settings
      * @returns Page<Song>
      */
-    public async findBySearchQuery(query: string, pageable: BasePageable, authentication?: User): Promise<Page<Song>> {
+    public async findBySearchQuery(query: string, pageable: Pageable, authentication?: User): Promise<Page<Song>> {
         if(!query || query == "") {
             query = "%"
         } else {
@@ -523,7 +560,7 @@ export class SongService implements SyncableService<Song> {
             .orderBy("rand()");
 
         const result = await q.getManyAndCount();
-        return Page.of(result[0], result[1], pageable.offset);
+        return Page.of(result[0], result[1], pageable);
     }
 
     public getRepository(): Repository<Song> {
