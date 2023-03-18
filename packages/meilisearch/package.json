@@ -7,7 +7,7 @@
   "license": "MIT",
   "main": "dist/index.js",
   "scripts": {
-    "build:packages": "nest build",
+    "build:package": "nest build",
     "build:api": "nest build",
     "dev": "nest build --watch"
   },
