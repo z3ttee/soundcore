@@ -28,6 +28,22 @@ export class Pageable implements PageInfo {
         this.offset = Math.max(0, page) * this.limit;
     }
 
+    /**
+     * Get the url query string with leading "?"
+     * @returns string
+     */
+    public toQuery(): string {
+        return `?${this.toParams()}`;
+    }
+
+    /**
+     * Get the url query string without leading "?"
+     * @returns string
+     */
+    public toParams(): string {
+        return `offset=${this.offset}&limit=${this.limit}`;
+    }
+
 }
 
 export interface PageInfo {
