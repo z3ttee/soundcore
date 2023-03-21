@@ -39,20 +39,20 @@
                 </scngx-ibtn-text>
                 
                 <!-- Prev button -->
-                <scngx-ibtn-text class="hidden sm:inline-block" (click)="player.prev()">
+                <scngx-ibtn-text class="hidden sm:inline-block">
                     <span class="flex items-center justify-center w-full h-full">
                         <ng-icon name="heroForward" class="'h-7 w-7 rotate-180'"></ng-icon>
                     </span>
                 </scngx-ibtn-text>
     
                 <!-- Play button -->
-                <scngx-ibtn size="md" (click)="controls.toggle()">
+                <scngx-ibtn size="md">
                     <img *ngIf="!props.playing" class="w-7 h-7 text-body" src="assets/icons/play.svg">
                     <img *ngIf="props.playing" class="w-7 h-7 text-body" src="assets/icons/pause.svg">
                 </scngx-ibtn>
     
                 <!-- Skip button -->
-                <scngx-ibtn-text class="hidden sm:inline-block" (click)="player.skip()">
+                <scngx-ibtn-text class="hidden sm:inline-block">
                     <span class="flex items-center justify-center w-full h-full">
                         <ng-icon name="heroForward" type="solid" class="'h-7 w-7'"></ng-icon>
                     </span>

@@ -3,8 +3,6 @@ import { ActivatedRoute } from '@angular/router';
 import { combineLatest, map, Observable, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { Album, ApiError, Future, Page, SCDKAlbumService, toFutureCompat } from '@soundcore/sdk';
 import { SCNGXTracklist, SCNGXTracklistBuilder } from '@soundcore/ngx';
-import { AppPlayerService } from 'src/app/modules/player/services/player.service';
-import { PlayerItem } from 'src/app/modules/player/entities/player-item.entity';
 import { AUDIOWAVE_LOTTIE_OPTIONS } from 'src/app/constants';
 
 interface AlbumInfoProps {
@@ -13,7 +11,7 @@ interface AlbumInfoProps {
   error?: ApiError;
 
   tracklist?: SCNGXTracklist;
-  currentlyPlaying?: PlayerItem;
+  currentlyPlaying?: any;
 
   featuredAlbums?: Album[];
 
@@ -30,7 +28,7 @@ export class AlbumInfoComponent implements OnInit, OnDestroy {
     private readonly albumService: SCDKAlbumService,
     private readonly activatedRoute: ActivatedRoute,
     private readonly tracklistBuilder: SCNGXTracklistBuilder,
-    private readonly player: AppPlayerService
+    // private readonly player: AppPlayerService
   ) { }
 
   private readonly _destroy: Subject<void> = new Subject();
@@ -79,19 +77,19 @@ export class AlbumInfoComponent implements OnInit, OnDestroy {
         ]
       }))
     ),
-    this.player.$current.pipe(takeUntil(this._destroy)),
-    this.player.$isPaused.pipe(takeUntil(this._destroy))
+    // this.player.$current.pipe(takeUntil(this._destroy)),
+    // this.player.$isPaused.pipe(takeUntil(this._destroy))
   ]).pipe(
     // Build props object
-    map(([future, currentItem, isPaused]): AlbumInfoProps => {
+    map(([future]): AlbumInfoProps => {
       const tracklist = future.data[0];
       const albums = future.data?.[1];
 
       return {
         loading: future.loading,
         album: tracklist?.context,
-        currentlyPlaying: currentItem,
-        playing: !isPaused && currentItem?.tracklist?.id == tracklist?.id,
+        // currentlyPlaying: currentItem,
+        // playing: !isPaused && currentItem?.tracklist?.id == tracklist?.id,
         tracklist: tracklist,
         featuredAlbums: albums?.elements
       };
@@ -108,7 +106,7 @@ export class AlbumInfoComponent implements OnInit, OnDestroy {
   }
 
   public forcePlay(tracklist: SCNGXTracklist) {
-    this.player.playTracklist(tracklist, true).subscribe();
+    // this.player.playTracklist(tracklist, true).subscribe();
   }
 
 }

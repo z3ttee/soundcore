@@ -5,7 +5,6 @@ import { Observable, Subject, takeUntil } from 'rxjs';
 import { SCNGXDialogService, SCNGXTracklist } from '@soundcore/ngx';
 import { MeiliSong, Playlist, PlaylistAddSongFailReason, SCSDKLikeService, SCSDKPlaylistService, Song } from '@soundcore/sdk';
 import { AppPlaylistChooseDialog } from 'src/app/dialogs/playlist-choose-dialog/playlist-choose-dialog.component';
-import { AppPlayerService } from 'src/app/modules/player/services/player.service';
 
 @Component({
   selector: 'app-song-context-menu',
@@ -29,7 +28,7 @@ export class SongContextMenuComponent implements OnInit, OnDestroy {
     private readonly playlistService: SCSDKPlaylistService,
     private readonly dialog: SCNGXDialogService,
     private readonly snackbar: MatSnackBar,
-    private readonly playerService: AppPlayerService,
+    // private readonly playerService: AppPlayerService,
     private readonly likeService: SCSDKLikeService
   ) { }
 
@@ -90,11 +89,11 @@ export class SongContextMenuComponent implements OnInit, OnDestroy {
    */
   public enqueueNext(forcePlay: boolean = false) {
     if(typeof this.tracklist === "undefined" || this.tracklist == null) {
-      this.playerService.playSingle(this.song as Song, forcePlay);
+      // this.playerService.playSingle(this.song as Song, forcePlay);
       return;
     }
 
-    this.playerService.playSingleFromTracklist(this.song as Song, this.tracklist, forcePlay);
+    // this.playerService.playSingleFromTracklist(this.song as Song, this.tracklist, forcePlay);
   }
 
   public removeFromPlaylist() {

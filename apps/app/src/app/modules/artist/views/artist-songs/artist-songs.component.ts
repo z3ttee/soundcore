@@ -1,9 +1,7 @@
 import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { combineLatest, map, Observable, Subject, switchMap, takeUntil } from 'rxjs';
-import { Artist, SCDKArtistService, Song, toFutureCompat } from '@soundcore/sdk';
-import { AppPlayerService } from 'src/app/modules/player/services/player.service';
-import { PlayerItem } from 'src/app/modules/player/entities/player-item.entity';
+import { Artist, SCDKArtistService, toFutureCompat } from '@soundcore/sdk';
 import { AUDIOWAVE_LOTTIE_OPTIONS } from 'src/app/constants';
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 import { SCNGXTracklist, SCNGXTracklistBuilder } from '@soundcore/ngx';
@@ -11,7 +9,7 @@ import { SCNGXTracklist, SCNGXTracklistBuilder } from '@soundcore/ngx';
 interface ArtistSongsProps {
   artist?: Artist;
   tracklist?: SCNGXTracklist;
-  currentlyPlaying?: PlayerItem;
+  currentlyPlaying?: any;
 
   playing?: boolean;
   loading?: boolean;
@@ -29,7 +27,7 @@ export class ArtistSongsComponent implements OnInit, OnDestroy {
     private readonly artistService: SCDKArtistService,
     private readonly activatedRoute: ActivatedRoute,
     private readonly tracklistBuilder: SCNGXTracklistBuilder,
-    private readonly player: AppPlayerService
+    // private readonly player: AppPlayerService
   ) { }
 
   private readonly _destroy: Subject<void> = new Subject();
@@ -47,15 +45,15 @@ export class ArtistSongsComponent implements OnInit, OnDestroy {
         data: this.tracklistBuilder.forArtist(future.data)
       }))
     ),
-    this.player.$current.pipe(takeUntil(this._destroy)),
-    this.player.$isPaused.pipe(takeUntil(this._destroy))
+    // this.player.$current.pipe(takeUntil(this._destroy)),
+    // this.player.$isPaused.pipe(takeUntil(this._destroy))
   ]).pipe(
     // Build props object
-    map(([future, currentItem, isPaused]): ArtistSongsProps => ({
+    map(([future]): ArtistSongsProps => ({
       loading: future.loading,
       artist: future.data?.context,
-      currentlyPlaying: currentItem,
-      playing: !isPaused && currentItem?.tracklist?.id == future.data?.id,
+      // currentlyPlaying: currentItem,
+      // playing: !isPaused && currentItem?.tracklist?.id == future.data?.id,
       tracklist: future.data
     })),
   );
@@ -71,11 +69,11 @@ export class ArtistSongsComponent implements OnInit, OnDestroy {
   }
 
   public forcePlay(tracklist: SCNGXTracklist) {
-    this.player.playTracklist(tracklist, true).subscribe();
+    // this.player.playTracklist(tracklist, true).subscribe();
   }
 
   public forcePlayAtSong(tracklist: SCNGXTracklist, playAtIndex: number) {
-    this.player.playTracklist(tracklist, true, playAtIndex).subscribe();
+    // this.player.playTracklist(tracklist, true, playAtIndex).subscribe();
   }
 
 }

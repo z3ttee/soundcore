@@ -3,14 +3,12 @@ import { ActivatedRoute } from '@angular/router';
 import { combineLatest, map, Observable, startWith, Subject, switchMap, takeUntil } from 'rxjs';
 import { SCNGXTracklist, SCNGXTracklistBuilder } from '@soundcore/ngx';
 import { Album, Artist, Future, Page, Pageable, Playlist, SCDKAlbumService, SCDKArtistService, SCSDKPlaylistService, toFutureCompat } from '@soundcore/sdk';
-import { AppPlayerService } from 'src/app/modules/player/services/player.service';
-import { PlayerItem } from 'src/app/modules/player/entities/player-item.entity';
 import { AUDIOWAVE_LOTTIE_OPTIONS } from 'src/app/constants';
 
 interface ArtistInfoProps {
   artist?: Artist;
   tracklist?: SCNGXTracklist;
-  currentlyPlaying?: PlayerItem;
+  currentlyPlaying?: any;
 
   albums?: Future<Page<Album>>;
   featAlbums?: Future<Page<Album>>;
@@ -33,7 +31,7 @@ export class ArtistProfileComponent implements OnInit, OnDestroy {
     private readonly albumService: SCDKAlbumService,
     private readonly activatedRoute: ActivatedRoute,
     private readonly tracklistBuilder: SCNGXTracklistBuilder,
-    private readonly player: AppPlayerService
+    // private readonly player: AppPlayerService
   ) { }
 
   private readonly _destroy: Subject<void> = new Subject();
@@ -60,15 +58,15 @@ export class ArtistProfileComponent implements OnInit, OnDestroy {
         featAlbumsRequest,
         featPlaylistsRequest
       ]))),
-    this.player.$current.pipe(takeUntil(this._destroy)),
-    this.player.$isPaused.pipe(takeUntil(this._destroy))
+    // this.player.$current.pipe(takeUntil(this._destroy)),
+    // this.player.$isPaused.pipe(takeUntil(this._destroy))
   ]).pipe(
     // Build props object
-    map(([[tracklistRequest, albumsRequest, featAlbumsRequest, featPlaylistsRequest], currentItem, isPaused]): ArtistInfoProps => ({
+    map(([[tracklistRequest, albumsRequest, featAlbumsRequest, featPlaylistsRequest]]): ArtistInfoProps => ({
       loading: tracklistRequest.loading,
       artist: tracklistRequest.data?.context,
-      currentlyPlaying: currentItem,
-      playing: !isPaused && currentItem?.tracklist?.id == tracklistRequest.data?.id,
+      // currentlyPlaying: currentItem,
+      // playing: !isPaused && currentItem?.tracklist?.id == tracklistRequest.data?.id,
       tracklist: tracklistRequest.data,
       albums: albumsRequest,
       featAlbums: featAlbumsRequest,
@@ -104,7 +102,7 @@ export class ArtistProfileComponent implements OnInit, OnDestroy {
   }
 
   public forcePlay(tracklist: SCNGXTracklist) {
-    this.player.playTracklist(tracklist, true).subscribe();
+    // this.player.playTracklist(tracklist, true).subscribe();
   }
 
 }

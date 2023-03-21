@@ -5,9 +5,6 @@ import { Router } from "@angular/router";
 import { SCCDKScreenService } from "@soundcore/cdk";
 import { SCSDKLikeService, Song } from "@soundcore/sdk";
 import { combineLatest, filter, map, Observable, Subject, take, takeUntil, tap } from "rxjs";
-import { AppAudioService } from "../../services/audio.service";
-import { AppControlsService } from "../../services/controls.service";
-import { AppPlayerService } from "../../services/player.service";
 
 interface PlayerbarProps {
     song?: Song;
@@ -40,9 +37,6 @@ export class AppPlayerBarComponent implements OnInit, OnDestroy {
     private readonly _destroy: Subject<void> = new Subject();
 
     constructor(
-        public readonly player: AppPlayerService,
-        public readonly controls: AppControlsService,
-        private readonly audio: AppAudioService,
         private readonly likeService: SCSDKLikeService,
         private readonly snackbar: MatSnackBar,
         private readonly screen: SCCDKScreenService,
@@ -50,20 +44,10 @@ export class AppPlayerBarComponent implements OnInit, OnDestroy {
     ) {}
 
     public $props: Observable<PlayerbarProps> = combineLatest([
-        this.player.$current.pipe(takeUntil(this._destroy)),
-        this.player.$currentTime.pipe(takeUntil(this._destroy)),
-        this.controls.$isPaused.pipe(takeUntil(this._destroy)),
         this.screen.$screen.pipe(takeUntil(this._destroy)),
-        this.audio.$muted.pipe(takeUntil(this._destroy)),
-        this.audio.$volume.pipe(takeUntil(this._destroy))
     ]).pipe(
-        map(([currentItem, currentTime, isPaused, screen, isMuted, volume]): PlayerbarProps => ({
-            song: currentItem?.song,
-            currentTime: currentTime ?? 0,
-            playing: !isPaused,
-            isMobile: screen.isMobile,
-            isMuted: isMuted,
-            volume: volume
+        map(([screen]): PlayerbarProps => ({
+
         })),
         tap((props) => {
             this.seekInputControl.setValue(props.currentTime);
@@ -88,7 +72,7 @@ export class AppPlayerBarComponent implements OnInit, OnDestroy {
     }
 
     public onSeek(value: number) {
-        this.controls.seek(value);
+        // this.controls.seek(value);
     }
 
     public toggleLike(event: MouseEvent, song: Song) {
@@ -126,10 +110,10 @@ export class AppPlayerBarComponent implements OnInit, OnDestroy {
     }
 
     public toggleMute() {
-        this.audio.toggleMute();
+        // this.audio.toggleMute();
     }
 
     public setVolume(volume: number) {
-        this.audio.setVolume(volume);
+        // this.audio.setVolume(volume);
     }
 }

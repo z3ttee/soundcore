@@ -5,9 +5,6 @@ import { ActivatedRoute, Router } from "@angular/router";
 import { SCCDKScreenService } from "@soundcore/cdk";
 import { Album, Artist, Playlist, SCSDKLikeService, Song, TracklistType } from "@soundcore/sdk";
 import { combineLatest, filter, map, Observable, Subject, takeUntil } from "rxjs";
-import { AppAudioService } from "src/app/modules/player/services/audio.service";
-import { AppControlsService } from "src/app/modules/player/services/controls.service";
-import { AppPlayerService } from "src/app/modules/player/services/player.service";
 
 interface BigPictureProps {
     song?: Song;
@@ -34,9 +31,9 @@ export class BigPictureComponent implements OnDestroy, AfterViewInit {
     @ViewChild("container") public containerRef: ElementRef<HTMLElement>;
 
     constructor(
-        public readonly player: AppPlayerService,
-        public readonly controls: AppControlsService,
-        public readonly audio: AppAudioService,
+        // public readonly player: AppPlayerService,
+        // public readonly controls: AppControlsService,
+        // public readonly audio: AppAudioService,
         private readonly screen: SCCDKScreenService,
         private readonly likeService: SCSDKLikeService,
         private readonly snackbar: MatSnackBar,
@@ -48,23 +45,23 @@ export class BigPictureComponent implements OnDestroy, AfterViewInit {
     private readonly $destroy: Subject<void> = new Subject();
 
     public readonly $props: Observable<BigPictureProps> = combineLatest([
-        this.player.$current,
-        this.player.$currentTime,
+        // this.player.$current,
+        // this.player.$currentTime,
         this.screen.$isTouch,
-        this.audio.$muted,
-        this.audio.$volume,
-        this.controls.$isPaused,
+        // this.audio.$muted,
+        // this.audio.$volume,
+        // this.controls.$isPaused,
     ]).pipe(
-        map(([playerItem, currentTime, isTouch, isMuted, volume, isPaused]): BigPictureProps => ({
-            song: playerItem?.song,
-            playlist: playerItem?.tracklist?.contextType === TracklistType.PLAYLIST ? playerItem?.tracklist?.context : undefined,
-            artist: playerItem?.tracklist?.contextType === TracklistType.ARTIST || playerItem?.tracklist?.contextType === TracklistType.ARTIST_TOP ? playerItem?.tracklist?.context : undefined,
-            album: playerItem?.tracklist?.contextType === TracklistType.ALBUM ? playerItem?.tracklist?.context : undefined,
-            currentTime: currentTime,
-            isMobile: isTouch,
-            isMuted: isMuted,
-            volume: volume,
-            playing: !isPaused
+        map(([playerItem]): BigPictureProps => ({
+            // song: playerItem?.song,
+            // playlist: playerItem?.tracklist?.contextType === TracklistType.PLAYLIST ? playerItem?.tracklist?.context : undefined,
+            // artist: playerItem?.tracklist?.contextType === TracklistType.ARTIST || playerItem?.tracklist?.contextType === TracklistType.ARTIST_TOP ? playerItem?.tracklist?.context : undefined,
+            // album: playerItem?.tracklist?.contextType === TracklistType.ALBUM ? playerItem?.tracklist?.context : undefined,
+            // currentTime: currentTime,
+            // isMobile: isTouch,
+            // isMuted: isMuted,
+            // volume: volume,
+            // playing: !isPaused
         })),
         takeUntil(this.$destroy)
     );
@@ -80,15 +77,15 @@ export class BigPictureComponent implements OnDestroy, AfterViewInit {
     }
 
     public onSeek(value: number) {
-        this.controls.seek(value);
+        // this.controls.seek(value);
     }
 
     public toggleMute() {
-        this.audio.toggleMute();
+        // this.audio.toggleMute();
     }
 
     public setVolume(volume: number) {
-        this.audio.setVolume(volume);
+        // this.audio.setVolume(volume);
     }
 
     public closeBigPicture() {

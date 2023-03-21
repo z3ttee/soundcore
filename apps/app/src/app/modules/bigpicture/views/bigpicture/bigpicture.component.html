@@ -116,18 +116,18 @@
                         </scngx-ibtn-text>
                         
                         <!-- Prev button -->
-                        <scngx-ibtn-text class="" (click)="player.prev()">
+                        <scngx-ibtn-text class="">
                             <ng-icon name="heroBackward" [size]="'32px'"></ng-icon>
                         </scngx-ibtn-text>
             
                         <!-- Play button -->
-                        <scngx-ibtn size="lg" (click)="controls.toggle()">
+                        <scngx-ibtn size="lg">
                             <ng-icon *ngIf="!props.playing" name="heroPlaySolid" [size]="'32px'"></ng-icon>
                             <ng-icon *ngIf="props.playing" name="heroPauseSolid" [size]="'32px'" [strokeWidth]="4"></ng-icon>
                         </scngx-ibtn>
             
                         <!-- Skip button -->
-                        <scngx-ibtn-text class="" (click)="player.skip()">
+                        <scngx-ibtn-text class="">
                             <ng-icon name="heroForward" [size]="'32px'"></ng-icon>
                         </scngx-ibtn-text>
 

@@ -3,15 +3,13 @@ import { ActivatedRoute } from "@angular/router";
 import { SCSDKSongService, Song } from "@soundcore/sdk";
 import { combineLatest, map, Observable, Subject, switchMap, takeUntil } from "rxjs";
 import { AUDIOWAVE_LOTTIE_OPTIONS } from "src/app/constants";
-import { PlayerItem } from "src/app/modules/player/entities/player-item.entity";
-import { AppPlayerService } from "src/app/modules/player/services/player.service";
 
 interface SongInfoViewProps {
     loading?: boolean;
     playing?: boolean;
 
     song?: Song;
-    currentItem?: PlayerItem;
+    currentItem?: any;
 }
 
 @Component({
@@ -28,7 +26,6 @@ export class SongInfoViewComponent implements OnDestroy {
     constructor(
         private readonly activatedRoute: ActivatedRoute,
         private readonly songService: SCSDKSongService,
-        private readonly player: AppPlayerService
     ) {}
 
     public readonly $props: Observable<SongInfoViewProps> = combineLatest([
@@ -36,14 +33,14 @@ export class SongInfoViewComponent implements OnDestroy {
             map((params) => params.get("songId")),
             switchMap((songId) => this.songService.findById(songId).pipe(takeUntil(this._destroy)))
         ),
-        this.player.$current.pipe(takeUntil(this._destroy)),
-        this.player.$isPaused.pipe(takeUntil(this._destroy))
+        // this.player.$current.pipe(takeUntil(this._destroy)),
+        // this.player.$isPaused.pipe(takeUntil(this._destroy))
     ]).pipe(
-        map(([request, currentItem, isPaused]): SongInfoViewProps => ({
+        map(([request]): SongInfoViewProps => ({
             song: request.data,
             loading: request.loading,
-            currentItem,
-            playing: !isPaused && currentItem?.song?.id == request.data?.id,
+            // currentItem,
+            // playing: !isPaused && currentItem?.song?.id == request.data?.id,
         }))
     );
 
@@ -53,7 +50,7 @@ export class SongInfoViewComponent implements OnDestroy {
     }
 
     public forcePlay(song: Song) {
-        this.player.playSingle(song, true);
+        // this.player.playSingle(song, true);
     }
 
 }
