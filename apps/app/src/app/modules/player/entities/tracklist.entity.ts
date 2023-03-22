@@ -80,12 +80,19 @@ export class SCNGXTracklist<T = any> {
     }
 
     /**
+     * Get the current queue size
+     */
+    public get queueSize() {
+        return this.queue.length;
+    }
+
+    /**
      * Check if the queue is empty. This also considers
      * items that were not yet needed and are therefor not yet
      * fetched.
      */
     public get isQueueEmpty() {
-        return this.isEmpty || this.fetchedItemsCount < this.size;
+        return this.isEmpty || (this.hasFetchedAll && this.queueSize <= 0);
     }
 
     /**

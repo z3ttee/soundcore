@@ -96,9 +96,19 @@ export class PlayerService {
     private next(): Observable<string> {
         // Resource can be Album, Song, Playlist etc.
         const nextResource = this.queue.dequeue();
+        // If the resource is null, the queue is completely empty
+        if(isNull(nextResource)) {
+            // Because this could mean a skip is tried, just skip to end of current song
+            this.controls.resetCurrentlyPlaying(true);
+            return of(null);
+        }
+
         // Get next item
         return nextResource.tracklist.getNextItem().pipe(
             switchMap((item) => {
+                // If the next item is null, the tracklist is empty
+                // So we have to skip to the end of the track and let it start
+                // from beginning if play is hit
                 if(isNull(item)) {
                     this.controls.resetCurrentlyPlaying(true);
                     return of(null);
