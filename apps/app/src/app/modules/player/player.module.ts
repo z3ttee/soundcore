@@ -5,7 +5,7 @@ import { MatRippleModule } from "@angular/material/core";
 import { MatSnackBarModule } from "@angular/material/snack-bar";
 import { RouterModule } from "@angular/router";
 import { SCNGXArtworkModule, SCNGXExplicitBadgeModule, SCNGXIconBtnModule } from "@soundcore/ngx";
-import { SCSDKCollectionModule, SCSDKStreamModule, SCSDKStreamService } from "@soundcore/sdk";
+import { SCSDKCollectionModule, SCSDKStreamModule } from "@soundcore/sdk";
 import { SCNGXRangeModule } from "src/app/components/inputs/range/range.module";
 import { SCNGXSeekerModule } from "src/app/components/inputs/seeker";
 import { AppDurationPipeModule } from "src/app/pipes/duration/duration-pipe.module";

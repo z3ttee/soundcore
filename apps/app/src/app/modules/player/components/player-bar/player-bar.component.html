@@ -23,10 +23,8 @@
                 </div>
 
                 <scngx-ibtn-text class="hidden sm:inline-block pointer-events-auto" (click)="toggleLike($event, props.song)" *ngIf="props.song">
-                    <span class="w-full h-full flex items-center justify-center">
-                        <ng-icon name="heroHeart" class="w-6 h-6" *ngIf="!props?.song?.liked"></ng-icon>
-                        <ng-icon name="heroHeartSolid" class="w-6 h-6 fill-accent" *ngIf="props?.song?.liked"></ng-icon>
-                    </span>
+                    <ng-icon name="heroHeart" size="21" *ngIf="!props?.song?.liked"></ng-icon>
+                    <ng-icon name="heroHeartSolid" size="21" class="fill-accent" *ngIf="props?.song?.liked"></ng-icon>
                 </scngx-ibtn-text>
             </div>
     
@@ -34,15 +32,13 @@
             <div class="flex items-center justify-center gap-1">
 
                 <!-- Shuffle button -->
-                <scngx-ibtn-text class="hidden md:inline-block">
+                <!-- <scngx-ibtn-text class="hidden md:inline-block">
 
-                </scngx-ibtn-text>
+                </scngx-ibtn-text> -->
                 
                 <!-- Prev button -->
                 <scngx-ibtn-text class="hidden sm:inline-block">
-                    <span class="flex items-center justify-center w-full h-full">
-                        <ng-icon name="heroForward" class="'h-7 w-7 rotate-180'"></ng-icon>
-                    </span>
+                    <ng-icon name="heroForward" size="24" class="rotate-180"></ng-icon>
                 </scngx-ibtn-text>
     
                 <!-- Play button -->
@@ -53,39 +49,34 @@
     
                 <!-- Skip button -->
                 <scngx-ibtn-text class="hidden sm:inline-block">
-                    <span class="flex items-center justify-center w-full h-full">
-                        <ng-icon name="heroForward" type="solid" class="'h-7 w-7'"></ng-icon>
-                    </span>
+                    <ng-icon name="heroForward" size="24"></ng-icon>
                 </scngx-ibtn-text>
 
                 <!-- Repeat button -->
-                <scngx-ibtn-text class="hidden md:inline-block">
+                <!-- <scngx-ibtn-text class="hidden md:inline-block">
 
-                </scngx-ibtn-text>
+                </scngx-ibtn-text> -->
             </div>
     
             <div class="hidden sm:flex md:flex-grow md:w-full items-center justify-end gap-2">
                 <!-- Duration -->
-                <span class="text-font-tertiary text-sm w-24 md:w-min text-center">{{ props.currentTime | durationPipe }}/{{ props.song?.duration || 0 | durationPipe }}</span>
+                <span class="text-font-tertiary text-sm w-24 md:w-min text-center">{{ props.currentTime ?? 0 | durationPipe }}/{{ props.song?.duration ?? 0 | durationPipe }}</span>
     
                 <!-- Speaker button -->
                 <span class="hidden md:flex relative items-center justify-start" *ngIf="!props.isMobile">
                     <scngx-ibtn-text (click)="toggleMute()">
-                        <ng-icon [size]="'21px'" name="heroSpeakerWave" *ngIf="!props.isMuted; else mutedIcon"></ng-icon>
-                        <ng-template #mutedIcon><ng-icon [size]="'21px'" name="heroSpeakerXMark"></ng-icon></ng-template>
+                        <ng-icon size="21" name="heroSpeakerWave" *ngIf="!props.isMuted; else mutedIcon"></ng-icon>
+                        <ng-template #mutedIcon><ng-icon size="21" name="heroSpeakerXMark"></ng-icon></ng-template>
                     </scngx-ibtn-text>
 
                     <span class="inline-block pl-1 pr-2 -mt-1 max-w-28">
                         <scngx-range [max]="100" [current]="props.volume" (onChanged)="setVolume($event)"></scngx-range>
                     </span>
-                    
                 </span>
 
                 <!-- Queue button -->
                 <scngx-ibtn-text class="hidden md:inline-block">
-                    <span class="flex items-center justify-center w-full h-full">
-                        <ng-icon name="heroRectangleStack" class="h-6 w-6"></ng-icon>
-                    </span>
+                    <ng-icon name="heroRectangleStack" size="21"></ng-icon>
                 </scngx-ibtn-text>
             </div>
         </div>

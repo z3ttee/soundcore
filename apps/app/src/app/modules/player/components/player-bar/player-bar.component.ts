@@ -5,6 +5,7 @@ import { Router } from "@angular/router";
 import { SCCDKScreenService } from "@soundcore/cdk";
 import { SCSDKLikeService, Song } from "@soundcore/sdk";
 import { combineLatest, filter, map, Observable, Subject, take, takeUntil, tap } from "rxjs";
+import { PlayerService } from "../../services/player.service";
 
 interface PlayerbarProps {
     song?: Song;
@@ -40,18 +41,21 @@ export class AppPlayerBarComponent implements OnInit, OnDestroy {
         private readonly likeService: SCSDKLikeService,
         private readonly snackbar: MatSnackBar,
         private readonly screen: SCCDKScreenService,
-        private readonly router: Router
+        private readonly router: Router,
+        private readonly playerService: PlayerService
     ) {}
 
     public $props: Observable<PlayerbarProps> = combineLatest([
-        this.screen.$screen.pipe(takeUntil(this._destroy)),
+        this.playerService.$currentItem,
+        this.screen.$screen,
     ]).pipe(
-        map(([screen]): PlayerbarProps => ({
-
+        map(([currentItem, screen]): PlayerbarProps => ({
+            song: currentItem?.song ?? currentItem as Song
         })),
         tap((props) => {
             this.seekInputControl.setValue(props.currentTime);
-        })
+        }),
+        takeUntil(this._destroy)
     );
 
     public ngOnInit(): void {
