@@ -1,18 +1,32 @@
 {
   "name": "@soundcore/constants",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "private": true,
-  "main": "dist/index.js",
+  "main": "dist/index.cjs",
+  "module": "dist/index.es.mjs",
+  "type": "module",
   "files": [
     "dist/**/*"
   ],
   "scripts": {
-    "dev": "tsc --watch",
-    "build:api": "tsc",
-    "build:app": "tsc",
-    "build:package": "tsc"
+    "build:api": "rollup -c",
+    "build:app": "rollup -c",
+    "build:package": "rollup -c"
   },
   "devDependencies": {
-    "typescript": "^4.3.5"
+    "rollup": "^3.20.0",
+    "@rollup/plugin-typescript": "^11.0.0",
+    "@rollup/plugin-json": "^6.0.0",
+    "typescript": "^4.9.5"
+  },
+  "types": "dist/index.d.ts",
+  "exports": {
+    "./package.json": {
+      "default": "./package.json"
+    },
+    ".": {
+      "node": "./dist/index.cjs",
+      "default": "./dist/index.es.mjs"
+    }
   }
 }
