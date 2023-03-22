@@ -10,6 +10,7 @@
   "type": "module",
   "scripts": {
     "build:api": "yarn build:package",
+    "build:app": "yarn build:package",
     "build:package": "rollup -c && tsc --declaration --emitDeclarationOnly"
   },
   "files": [
