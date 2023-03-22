@@ -8,12 +8,12 @@ import {DragDropModule} from '@angular/cdk/drag-drop';
 import { ProfileBarModule } from "src/app/components/profile-bar/profile-bar.module";
 import { ReactiveFormsModule } from "@angular/forms";
 import { AppPlaylistCreateDialogModule } from "src/app/dialogs/playlist-create-dialog/playlist-create-dialog.module";
-import { AppPlayerModule } from "src/app/modules/player/player.module";
 import { SCNGXPlaylistListItemModule } from "src/app/components/list-items/playlist-list-item/playlist-list-item.module";
 import { NgIconsModule } from '@ng-icons/core';
 import { heroPlusSolid } from '@ng-icons/heroicons/solid';
 import { heroHome, heroArrowRightOnRectangle, heroCog6Tooth, heroBell, heroMagnifyingGlass, heroUser, heroBookmarkSquare, heroChevronDown, heroBolt, heroCubeTransparent, heroArrowLeft } from '@ng-icons/heroicons/outline';
 import { NavListItemModule } from "src/app/components/list-items/nav-list-item/nav-list-item.module";
+import { AppPlayerModule } from "src/app/modules/player/player.module";
 
 @NgModule({
     declarations: [

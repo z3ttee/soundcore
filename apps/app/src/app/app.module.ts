@@ -52,7 +52,7 @@ import { SSOModule } from "@soundcore/sso";
     }),
     SCCDKScreenModule,
     SCNGXDialogModule,
-    SCSDKMountModule
+    SCSDKMountModule,
   ],
   providers: [],
   bootstrap: [AppComponent]

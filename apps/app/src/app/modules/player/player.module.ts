@@ -5,7 +5,7 @@ import { MatRippleModule } from "@angular/material/core";
 import { MatSnackBarModule } from "@angular/material/snack-bar";
 import { RouterModule } from "@angular/router";
 import { SCNGXArtworkModule, SCNGXExplicitBadgeModule, SCNGXIconBtnModule } from "@soundcore/ngx";
-import { SCSDKCollectionModule, SCSDKStreamModule } from "@soundcore/sdk";
+import { SCSDKCollectionModule, SCSDKStreamModule, SCSDKStreamService } from "@soundcore/sdk";
 import { SCNGXRangeModule } from "src/app/components/inputs/range/range.module";
 import { SCNGXSeekerModule } from "src/app/components/inputs/seeker";
 import { AppDurationPipeModule } from "src/app/pipes/duration/duration-pipe.module";
@@ -18,14 +18,23 @@ import { AudioQueue } from "./services/queue.service";
 import { PlayerService } from "./services/player.service";
 import { AudioController } from "./services/controls.service";
 
+const queueInstance = new AudioQueue([]);
+const controllerInstance = new AudioController(new Audio());
+
 @NgModule({
     declarations: [
         AppPlayerBarComponent
     ],
     providers: [
-        AudioQueue,
+        {
+            provide: AudioQueue,
+            useValue: queueInstance
+        },
+        {
+            provide: AudioController,
+            useValue: controllerInstance
+        },
         PlayerService,
-        AudioController
     ],
     imports: [
         RouterModule,

@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
-import { LikedSong, PlaylistItem, Song } from "@soundcore/sdk";
-import { BehaviorSubject, Observable, switchMap, tap } from "rxjs";
+import { LikedSong, PlaylistItem, SCSDKStreamService, Song } from "@soundcore/sdk";
+import { BehaviorSubject, Observable, switchMap } from "rxjs";
 import { ResourceWithTracklist } from "../entities/resource-with-tracklist.entity";
 import { AudioController } from "./controls.service";
 import { AudioQueue } from "./queue.service";
@@ -15,7 +15,8 @@ export class PlayerService {
 
     constructor(
         private readonly queue: AudioQueue,
-        private readonly controls: AudioController
+        private readonly controls: AudioController,
+        private readonly streamService: SCSDKStreamService
     ) {
         // Handle ended event on audio element
         this.controls.$onEnded.pipe(
@@ -23,9 +24,11 @@ export class PlayerService {
             switchMap((item) => {
                 // Update current item
                 this.currentItem.next(item);
-                // Start playing the item
-                return this.controls.play(item)
+                // Request stream url
+                return this.streamService.requestStreamUrl(item.id);
             }),
+            // Start playing the item
+            switchMap((url) => this.controls.play(url))
         ).subscribe((streamUrl) => {
             console.log(`Now streaming ${streamUrl}`);
         });
