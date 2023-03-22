@@ -47,6 +47,8 @@ export class PlayerService {
             const positionInQueue = this.queue.enqueue(resource);
             console.log(`Enqueued tracklist entity at position ${positionInQueue}`);
 
+            // TODO: Need a method to dequeue an item at index "startIndex"
+
             // Check if player is idling
             if(this.isIdle) {
                 // If true, play next()
@@ -58,8 +60,21 @@ export class PlayerService {
         });
     }
 
-    public forcePlay(resource: ResourceWithTracklist<PlayableItem>) {
-        
+    public forcePlay(entity: any, tracklist: SCNGXTracklist, startIndex: number = 0) {
+        return new Observable((subscriber) => {
+            const resource: ResourceWithTracklist<PlayableItem> = {
+                ...entity,
+                tracklist: tracklist,
+                startIndex: startIndex
+            }
+    
+            const positionInQueue = this.queue.enqueue(resource);
+            // TODO: Need a method to dequeue an item at index "startIndex" and play it here immediately
+            this.next().subscribe();
+
+            subscriber.next(positionInQueue);
+            subscriber.complete();
+        });
     }
 
     /**

@@ -26,17 +26,17 @@
             
                 <ng-container scngx-controls>
                     <scngx-ibtn (click)="forcePlay(props.album, props.tracklist.data)" size="md">
-                        <img *ngIf="!props.playing; else paused" class="w-7 h-7 text-body ml-0.5" src="assets/icons/play.svg">
-                        <ng-template #paused><img *ngIf="props.playing" class="w-7 h-7 text-body ml-0.5" src="assets/icons/pause.svg"></ng-template>
+                        <!-- <img *ngIf="!props.playing; else paused" class="w-7 h-7 text-body ml-0.5" src="assets/icons/play.svg"> -->
+                        <!-- <ng-template #paused><img *ngIf="props.playing" class="w-7 h-7 text-body ml-0.5" src="assets/icons/pause.svg"></ng-template> -->
                     </scngx-ibtn>
             
-                    <button class="flex items-center p-2 rounded-full" matRipple [matRippleCentered]="true">
-                        <ng-icon name="heroHeart" class="h-7 aspect-square"></ng-icon>
-                    </button>
-            
-                    <button class="flex items-center p-2 rounded-full" matRipple [matRippleCentered]="true">
-                        <ng-icon name="heroEllipsisVerticalSolid" class="h-7 aspect-square"></ng-icon>
-                    </button>
+                    <scngx-ibtn-text>
+                        <ng-icon name="heroHeart" size="24"></ng-icon>
+                    </scngx-ibtn-text>
+
+                    <scngx-ibtn-text>
+                        <ng-icon name="heroEllipsisVerticalSolid" size="24"></ng-icon>
+                    </scngx-ibtn-text>
                 </ng-container>
             </app-list-view>
 
