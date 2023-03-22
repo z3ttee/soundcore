@@ -12,6 +12,8 @@ import { Pageable } from "./page";
  * NOTE: You cannot have page sizes of <= 0 or > 50. That means page sizes are always between
  * min. 1 and max. 50.
  * 
+ * NOTE: This is only available on NodeJS environments
+ * 
  * @param defaults Default page settings if some values are missing in url query
  * @returns Pageable - Page settings object
  */
