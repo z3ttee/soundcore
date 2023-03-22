@@ -11,6 +11,7 @@ export enum TracklistTypeV2 {
 
 export class TracklistV2<T = Song> {
 
+    public readonly id: string;
     public readonly uri: string;
     public readonly type: TracklistTypeV2;
     public readonly size: number;

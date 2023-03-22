@@ -69,6 +69,7 @@ export class Tracklist {
 export class TracklistV2<T = Song> {
 
     constructor(
+        public readonly id: string,
         public readonly uri: string,
         public readonly type: TracklistTypeV2,
         public readonly size: number,

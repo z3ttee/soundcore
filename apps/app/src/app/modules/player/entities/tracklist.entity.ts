@@ -29,6 +29,17 @@ export class SCNGXTracklist<T = any> {
     }
 
     /**
+     * Get the id of the tracklist.
+     * This usually equals to the id of the resource to which
+     * the tracklist belongs.
+     * E.g.: If the tracklist belongs to an album, the id
+     * equals to the album's id
+     */
+    public get id(): string {
+        return this.metadata.id;
+    }
+
+    /**
      * Get the size of the tracklist
      */
     public get size(): number {
