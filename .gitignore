@@ -3,6 +3,8 @@
 docker/
 docker-compose.dev.yml
 
+.rollup.cache/
+
 # NestJS
 dist/
 .angular/
