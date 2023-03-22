@@ -1,4 +1,4 @@
 
-export class SCSDKStreamToken {
+export class StreamToken {
     public token: string;
 }

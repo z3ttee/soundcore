@@ -24,7 +24,7 @@ export class SCSDKTracklistV2Service {
      * @returns Tracklist
      */
     public findByAlbum(albumId: string): Observable<Future<TracklistV2>> {
-        const baseUrl = `${this.options.api_base_uri}/v1/tracklists/album/${albumId}`;
+        const baseUrl = `${this.options.api_base_uri}/v2/tracklists/album/${albumId}`;
         return this.httpClient.get<TracklistV2>(baseUrl).pipe(toFuture());
     }
 

@@ -2,6 +2,7 @@ import { Controller, Get, Param } from '@nestjs/common';
 import { Authentication } from '../../authentication/decorators/authentication.decorator';
 import { User } from '../../user/entities/user.entity';
 import { TracklistV2 } from '../entities/tracklist.entity';
+import { TracklistV2Service } from '../services/tracklist-v2.service';
 import { TracklistService } from '../services/tracklist.service';
 
 /**
@@ -14,7 +15,9 @@ import { TracklistService } from '../services/tracklist.service';
 })
 export class TracklistV2Controller {
 
-    constructor(private readonly service: TracklistService) {}
+    constructor(
+        private readonly service: TracklistV2Service
+    ) {}
 
     /**
      * Find a tracklist by an album

@@ -4,12 +4,11 @@ import { Page, BasePageable } from 'nestjs-pager';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 import { PlaylistItem } from '../../playlist/entities/playlist-item.entity';
 import { Song } from '../../song/entities/song.entity';
-import { Tracklist, TracklistItem, TracklistType, TracklistTypeV2, TracklistV2 } from '../entities/tracklist.entity';
+import { Tracklist, TracklistItem, TracklistType } from '../entities/tracklist.entity';
 import { SongService } from '../../song/services/song.service';
 import { User } from '../../user/entities/user.entity';
 import { LikedSong } from '../../collection/entities/like.entity';
 import { LikeService } from '../../collection/services/like.service';
-import { Pageable } from '@soundcore/common';
 
 @Injectable()
 export class TracklistService {
@@ -20,13 +19,6 @@ export class TracklistService {
         @InjectRepository(PlaylistItem)  private tracklistRepository: Repository<PlaylistItem>
     ) {}
 
-    public async findTracklistByAlbumId(albumId: string, authentication?: User): Promise<TracklistV2> {
-        return this.songService.findTracksByAlbum(albumId, new Pageable(0, 30), authentication).then((page) => {
-            const type = TracklistTypeV2.ALBUM;
-            return new TracklistV2(TracklistV2.resolveUri(albumId, type), type, 0, page.items);
-        });
-    }
-
     /**
      * Find a list of song ids by an artist.
      * @param artistId Artist's id
@@ -36,6 +28,7 @@ export class TracklistService {
     public async findListByArtist(artistId: string, hostname: string, authentication?: User): Promise<Tracklist> {
         const result = await this.buildFindByArtistQuery(artistId, null, authentication).select(["song.id"]).getManyAndCount();
         const metadataUrl = `/meta`;
+
         return new Tracklist(result[1], TracklistType.ARTIST, result[0], metadataUrl);
     }
 

@@ -1,7 +1,7 @@
 import { Song } from "../../song/entities/song.entity";
 import { User } from "../../user/entities/user.entity";
 
-export class SCSDKStream {
+export class Stream {
 
     public songId: string;
     public listenerId: string;

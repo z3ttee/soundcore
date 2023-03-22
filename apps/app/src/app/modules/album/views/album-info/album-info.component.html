@@ -6,7 +6,7 @@
         <!-- Page -->
         <ng-template #content>
             <!-- Header -->
-            <app-list-view [resource]="props.album" [title]="props.album?.name" [isLoading]="props.loading" [artwork]="props.album?.artwork">
+            <app-list-view [resource]="$any(props.album)" [title]="props.album?.name" [isLoading]="props.loading" [artwork]="props.album?.artwork">
                 <ng-container scngx-stats>
                     <li class="inline-flex items-center gap-1 text-font-secondary hover:underline cursor-pointer" *ngIf="props.album?.primaryArtist">
                         <div class="w-7 h-7 rounded-full overflow-hidden">
