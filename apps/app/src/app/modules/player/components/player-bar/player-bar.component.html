@@ -42,13 +42,13 @@
                 </scngx-ibtn-text>
     
                 <!-- Play button -->
-                <scngx-ibtn size="md">
-                    <img *ngIf="!props.playing" class="w-7 h-7 text-body" src="assets/icons/play.svg">
-                    <img *ngIf="props.playing" class="w-7 h-7 text-body" src="assets/icons/pause.svg">
+                <scngx-ibtn size="md" (click)="togglePlaying()">
+                    <img *ngIf="($isPaused | async)" class="w-7 h-7 text-body" src="assets/icons/play.svg">
+                    <img *ngIf="!($isPaused | async)" class="w-7 h-7 text-body" src="assets/icons/pause.svg">
                 </scngx-ibtn>
     
                 <!-- Skip button -->
-                <scngx-ibtn-text class="hidden sm:inline-block">
+                <scngx-ibtn-text class="hidden sm:inline-block" (click)="skip()">
                     <ng-icon name="heroForward" size="24"></ng-icon>
                 </scngx-ibtn-text>
 

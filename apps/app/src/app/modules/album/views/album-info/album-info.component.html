@@ -25,7 +25,7 @@
                 </ng-container>
             
                 <ng-container scngx-controls>
-                    <scngx-ibtn (click)="forcePlay(props.tracklist)" size="md">
+                    <scngx-ibtn (click)="forcePlay(props.album, props.tracklist.data)" size="md">
                         <img *ngIf="!props.playing; else paused" class="w-7 h-7 text-body ml-0.5" src="assets/icons/play.svg">
                         <ng-template #paused><img *ngIf="props.playing" class="w-7 h-7 text-body ml-0.5" src="assets/icons/pause.svg"></ng-template>
                     </scngx-ibtn>
@@ -42,7 +42,7 @@
 
             <!-- Songs list -->
             <cdk-virtual-scroll-viewport [itemSize]="56">
-                <div *cdkVirtualFor="let item of props.tracklist; index as i" class="px-window">
+                <!-- <div *cdkVirtualFor="let item of props.tracklist; index as i" class="px-window">
                     <scngx-song-list-item 
                         [song]="item" 
                         [index]="i"
@@ -50,15 +50,15 @@
                         [playing]="props.playing"
                         [animRef]="lottieAnimationTemplate">
                     </scngx-song-list-item>
-                </div>
+                </div> -->
             </cdk-virtual-scroll-viewport>
 
             <!-- Footer -->
             <div class="pb-bottom">
-                <scngx-ui-row [headline]="'Mehr Alben' + (!props.album.primaryArtist?.name ? '' : ' von ' + props.album.primaryArtist?.name)" *ngIf="props.featuredAlbums?.length > 0">
+                <scngx-ui-row [headline]="'Mehr Alben' + (!props.album.primaryArtist?.name ? '' : ' von ' + props.album.primaryArtist?.name)" *ngIf="props.recommendedAlbums?.data?.size > 0">
                     <scngx-horizontal-list>
                         <scngx-album-grid-item 
-                            *ngFor="let item of props.featuredAlbums"
+                            *ngFor="let item of props.recommendedAlbums.data?.elements"
                             [item]="item" 
                             [useDate]="true"
                             [routerLink]="['/album', item.slug ?? item.id]">

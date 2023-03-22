@@ -1,19 +1,22 @@
 import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { combineLatest, map, Observable, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
-import { Album, ApiError, Future, Page, SCDKAlbumService, toFutureCompat } from '@soundcore/sdk';
-import { SCNGXTracklist, SCNGXTracklistBuilder } from '@soundcore/ngx';
+import { combineLatest, filter, map, Observable, of, Subject, switchMap, takeUntil } from 'rxjs';
+import { Album, ApiError, Future, Page, SCDKAlbumService, SCSDKTracklistV2Service, Song, toFutureCompat } from '@soundcore/sdk';
 import { AUDIOWAVE_LOTTIE_OPTIONS } from 'src/app/constants';
+import { PlayerService } from 'src/app/modules/player/services/player.service';
+import { SCNGXTracklist } from 'src/app/modules/player/entities/tracklist.entity';
+import { environment } from 'src/environments/environment';
+import { HttpClient } from '@angular/common/http';
 
 interface AlbumInfoProps {
   album?: Album;
   loading?: boolean;
   error?: ApiError;
 
-  tracklist?: SCNGXTracklist;
+  tracklist?: Future<SCNGXTracklist<Song>>;
   currentlyPlaying?: any;
 
-  featuredAlbums?: Album[];
+  recommendedAlbums?: Future<Page<Album>>;
 
   playing?: boolean;
 }
@@ -24,14 +27,15 @@ interface AlbumInfoProps {
 })
 export class AlbumInfoComponent implements OnInit, OnDestroy {
 
+  private readonly $destroy: Subject<void> = new Subject();
+
   constructor(
     private readonly albumService: SCDKAlbumService,
     private readonly activatedRoute: ActivatedRoute,
-    private readonly tracklistBuilder: SCNGXTracklistBuilder,
-    // private readonly player: AppPlayerService
+    private readonly playerService: PlayerService,
+    private readonly tracklistService: SCSDKTracklistV2Service,
+    private readonly httpClient: HttpClient,
   ) { }
-
-  private readonly _destroy: Subject<void> = new Subject();
 
   // Lottie animations options
   public animOptions = AUDIOWAVE_LOTTIE_OPTIONS;
@@ -49,51 +53,53 @@ export class AlbumInfoComponent implements OnInit, OnDestroy {
   public $album: Observable<Future<Album>> = this.$albumId.pipe(switchMap((albumId) => this.albumService.findById(albumId).pipe(toFutureCompat())));
 
   public readonly $props: Observable<AlbumInfoProps> = combineLatest([
+    // Get changes to album
+    this.$album,
+    // Load recommended albums by artist
     this.$album.pipe(
-      // Build a new tracklist for album data
-      map((albumFuture): Future<SCNGXTracklist<Album>> => ({
-        loading: albumFuture.loading,
-        error: albumFuture.error,
-        data: this.tracklistBuilder.forAlbum(albumFuture.data)
-      })),
-      // Request recommended albums for artist.
-      switchMap((tracklistFuture) => {
-        // If album still loading
-        if(tracklistFuture.loading) return of([tracklistFuture, { loading: true }] as [Future<SCNGXTracklist>, Future<Page<Album>>]);
-        const album = tracklistFuture.data?.context;
+      switchMap((album) => {
+        // If album still loading, return future with state loading
+        if(album.loading) return of(Future.loading());
 
-        return this.albumService.findRecommendedByArtist(album?.primaryArtist?.id, [ album?.id ]).pipe(
-          toFutureCompat(),
-          map((featAlbumsRequest): [Future<SCNGXTracklist>, Future<Page<Album>>] => ([ tracklistFuture, featAlbumsRequest ])),
-        );
-      }),
-      // Map future
-      map(([tracklistFuture, featuredAlbumFuture]): Future<[SCNGXTracklist, Page<Album>]> => ({
-        loading: tracklistFuture.loading,
-        error: tracklistFuture.error ?? featuredAlbumFuture.error,
-        data: [
-          tracklistFuture.data,
-          featuredAlbumFuture?.data as Page<Album>
-        ]
-      }))
+        const data = album.data;
+        return this.albumService.findRecommendedByArtist(data?.primaryArtist?.id, [ data?.id ]).pipe(toFutureCompat(),);
+      })
     ),
+    this.$album.pipe(
+      // filter((album) => !album.loading),
+      switchMap((album): Observable<Future<SCNGXTracklist<Song>>> => {
+        // If album still loading, return future with state loading
+        if(album.loading) return of(Future.loading());
+        // Fetch tracklist by album
+        return this.tracklistService.findByAlbum(album.data?.id).pipe(
+          map((tracklist): Future<SCNGXTracklist<Song>> => {
+            // If tracklist entity still loading, return loading state
+            if(tracklist.loading) return Future.loading();
+            // Otherwise build tracklist instance
+            return Future.of(new SCNGXTracklist(tracklist.data, `${environment.api_base_uri}`, this.httpClient))
+          })
+        );
+      })
+    )
     // this.player.$current.pipe(takeUntil(this._destroy)),
     // this.player.$isPaused.pipe(takeUntil(this._destroy))
   ]).pipe(
     // Build props object
-    map(([future]): AlbumInfoProps => {
-      const tracklist = future.data[0];
-      const albums = future.data?.[1];
+    map(([album, recommendedAlbums, tracklist]): AlbumInfoProps => {
+      // const tracklist = future.data[0];
+      // const albums = future.data?.[1];
 
       return {
-        loading: future.loading,
-        album: tracklist?.context,
+        loading: album.loading,
+        album: album.data,
+        tracklist: tracklist,
         // currentlyPlaying: currentItem,
         // playing: !isPaused && currentItem?.tracklist?.id == tracklist?.id,
-        tracklist: tracklist,
-        featuredAlbums: albums?.elements
+        // tracklist: tracklist,
+        recommendedAlbums: recommendedAlbums
       };
     }),
+    takeUntil(this.$destroy)
   );
 
   public ngOnInit(): void {
@@ -101,11 +107,12 @@ export class AlbumInfoComponent implements OnInit, OnDestroy {
   }
 
   public ngOnDestroy(): void {
-      this._destroy.next();
-      this._destroy.complete();
+      this.$destroy.next();
+      this.$destroy.complete();
   }
 
-  public forcePlay(tracklist: SCNGXTracklist) {
+  public forcePlay(album: Album, tracklist: SCNGXTracklist) {
+    this.playerService.playNext(album, tracklist).subscribe();
     // this.player.playTracklist(tracklist, true).subscribe();
   }
 

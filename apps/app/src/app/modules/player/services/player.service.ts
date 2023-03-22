@@ -1,17 +1,28 @@
 import { Injectable } from "@angular/core";
+import { isNull } from "@soundcore/common";
 import { LikedSong, PlaylistItem, SCSDKStreamService, Song } from "@soundcore/sdk";
-import { BehaviorSubject, Observable, switchMap } from "rxjs";
+import { BehaviorSubject, Observable, of, switchMap, take, tap } from "rxjs";
 import { ResourceWithTracklist } from "../entities/resource-with-tracklist.entity";
+import { SCNGXTracklist } from "../entities/tracklist.entity";
 import { AudioController } from "./controls.service";
 import { AudioQueue } from "./queue.service";
 
 export type PlayableItem = Song & PlaylistItem & LikedSong
 
-@Injectable()
+export type Streamable = PlayableItem & {
+    url: string;
+}
+
+@Injectable({
+    providedIn: "root"
+})
 export class PlayerService {
 
-    private readonly currentItem: BehaviorSubject<PlayableItem> = new BehaviorSubject(null);
+    private readonly currentItem: BehaviorSubject<Streamable> = new BehaviorSubject(null);
     public readonly $currentItem = this.currentItem.asObservable();
+
+    private readonly isLoading: BehaviorSubject<boolean> = new BehaviorSubject(false);
+    public readonly $isLoading = this.isLoading.asObservable();
 
     constructor(
         private readonly queue: AudioQueue,
@@ -19,40 +30,95 @@ export class PlayerService {
         private readonly streamService: SCSDKStreamService
     ) {
         // Handle ended event on audio element
-        this.controls.$onEnded.pipe(
-            switchMap(() => this.next()),
-            switchMap((item) => {
-                // Update current item
-                this.currentItem.next(item);
-                // Request stream url
-                return this.streamService.requestStreamUrl(item.id);
-            }),
-            // Start playing the item
-            switchMap((url) => this.controls.play(url))
-        ).subscribe((streamUrl) => {
-            console.log(`Now streaming ${streamUrl}`);
-        });
+        this.controls.$onEnded.pipe(switchMap(() => this.next())).subscribe();
     }
 
-    public playNext(resource: ResourceWithTracklist<PlayableItem>) {
-        const positionInQueue = this.queue.enqueue(resource);
-        console.log(`Enqueued tracklist entity at position ${positionInQueue}`);
+    public readonly $isPaused = this.controls.$isPaused;
+
+
+    public playNext(entity: any, tracklist: SCNGXTracklist, startIndex: number = 0): Observable<number> {
+        return new Observable((subscriber) => {
+            const resource: ResourceWithTracklist<PlayableItem> = {
+                ...entity,
+                tracklist: tracklist,
+                startIndex: startIndex
+            }
+    
+            const positionInQueue = this.queue.enqueue(resource);
+            console.log(`Enqueued tracklist entity at position ${positionInQueue}`);
+
+            // Check if player is idling
+            if(this.isIdle) {
+                // If true, play next()
+                this.next().subscribe();
+            }
+
+            subscriber.next(positionInQueue);
+            subscriber.complete();
+        });
     }
 
     public forcePlay(resource: ResourceWithTracklist<PlayableItem>) {
         
     }
 
-    private next(): Observable<PlayableItem> {
-        return new Observable<PlayableItem>((subscriber) => {
-            // Resource can be Album, Song, Playlist etc.
-            const nextResource = this.queue.dequeue();
+    /**
+     * Skip currently playing track
+     * @returns URL of the next playing song
+     */
+    public skip(): Observable<string> {
+        return this.next();
+    }
 
-            subscriber.add(nextResource.tracklist.getNextItem().subscribe((nextItem) => {
-                subscriber.next(nextItem);
-                subscriber.complete();
-            }));
-        });
+    /**
+     * Set play to paused or playing based on the current state
+     * @returns rue, if the player is now playing. Otherwise false
+     */
+    public togglePlaying(): Observable<boolean> {
+        return of(this.controls.togglePlaying());
+    }
+
+    /**
+     * Check if the player is idling. If true, it means
+     * there is nothing playing
+     */
+    public get isIdle(): boolean {
+        return isNull(this.currentItem.getValue());
+    }
+
+    /**
+     * Get the url to the stream that is currently playing
+     */
+    public get currentUrl(): string {
+        return this.currentItem.getValue()?.url;
+    }
+
+    private next(): Observable<string> {
+        // Resource can be Album, Song, Playlist etc.
+        const nextResource = this.queue.dequeue();
+        // Get next item
+        return nextResource.tracklist.getNextItem().pipe(
+            switchMap((item) => {
+                if(isNull(item)) {
+                    this.controls.resetCurrentlyPlaying(true);
+                    return of(null);
+                }
+
+                // Request stream url
+                return this.streamService.requestStreamUrl(item.id, true).pipe(tap((url) => {
+                    // Update current item
+                    this.currentItem.next({ ...item, url: url });
+                }));
+            }),
+            // Start playing the item
+            switchMap((url) => {
+                if(isNull(url)) return of(this.currentUrl);
+                return this.controls.play(url);
+            }),
+            // Print url
+            tap((url) => console.log(`Now streaming ${url}`)),
+            take(1)
+        );
     }
 
 }

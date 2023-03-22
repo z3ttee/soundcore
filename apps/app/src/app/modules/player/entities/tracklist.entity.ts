@@ -3,11 +3,16 @@ import { toFuture, TracklistV2 } from "@soundcore/sdk";
 import { Page, Pageable } from "@soundcore/common";
 import { filter, map, Observable, of, take, tap } from "rxjs";
 
+/**
+ * Tracklist class to handle tracklists by providing an integrated queueing system
+ * @template T Type of the items inside the tracklist
+ */
 export class SCNGXTracklist<T = any> {
 
     private readonly queue: T[] = [];
     private currentPageIndex = 0;
     private fetchedItemsCount = 0;
+    private didStartPlaying = false;
 
     constructor(
         public readonly metadata: TracklistV2<T>,
@@ -17,6 +22,10 @@ export class SCNGXTracklist<T = any> {
     ) {
         // Add first page included in metadata object
         this.addPageToQueue(metadata.items);
+
+        // Remove items list from tracklist to save memory
+        metadata.items = Page.of([]);
+        // metadata.items.items.splice(0, metadata.items.items.length);
     }
 
     /**
@@ -64,12 +73,19 @@ export class SCNGXTracklist<T = any> {
     }
 
     /**
+     * Check if the tracklist already started playing.
+     */
+    public get hasStarted() {
+        return this.didStartPlaying;
+    }
+
+    /**
      * Check if the queue is empty. This also considers
      * items that were not yet needed and are therefor not yet
      * fetched.
      */
     public get isQueueEmpty() {
-        return this.isEmpty && this.fetchedItemsCount
+        return this.isEmpty || this.fetchedItemsCount < this.size;
     }
 
     /**
@@ -79,6 +95,8 @@ export class SCNGXTracklist<T = any> {
      */
     public getNextItem(): Observable<T> {
         return new Observable<T>((subscriber) => {
+            // TODO: If tracklist did not start playing, startAtIndex should be used to get next track
+
             // If queue is not empty, take next item
             // from queue
             if(this.isNotEmpty) {
@@ -101,6 +119,9 @@ export class SCNGXTracklist<T = any> {
                 subscriber.complete();
             }));
         }).pipe(
+            // Because an item was dequeued, it means the 
+            // tracklist started playing
+            tap(() => this.didStartPlaying = true),
             // Only emit once, so the subscription 
             // is terminated after the first result
             take(1)

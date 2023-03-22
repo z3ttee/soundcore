@@ -12,14 +12,12 @@ class EnqueuedItem<T = any> {
     ) {}
 }
 
-// @Injectable()
+@Injectable({
+    providedIn: "root"
+})
 export class AudioQueue {
 
-    // private readonly queue: ResourceWithTracklist<PlayableItem>[] = [];
-
-    constructor(
-        private readonly queue: ResourceWithTracklist<PlayableItem>[]
-    ) {}
+    private readonly queue: ResourceWithTracklist<PlayableItem>[] = [];
 
     /**
      * Add a resource to the queue. Based on the tracklist type,

@@ -1,9 +1,7 @@
 import { Inject, Injectable } from '@angular/core';
-import { filter, map, Observable } from 'rxjs';
+import { filter, map, Observable, of } from 'rxjs';
 import { SCSDKOptions } from '../../scdk.module';
 import { HttpClient } from '@angular/common/http';
-import { apiResponse } from '../../utils/rxjs/operators/api-response';
-import { ApiResponse } from '../../utils/responses/api-response';
 import { SCSDK_OPTIONS } from '../../constants';
 import { StreamToken } from '../entities/token.entity';
 import { Future, toFuture } from '../../utils/future';
@@ -23,7 +21,9 @@ export class SCSDKStreamService {
      * @param songId Id of the song
      * @returns Stream url for the song
      */
-    public requestStreamUrl(songId: string): Observable<string> {
+    public requestStreamUrl(songId: string, withToken: boolean = true): Observable<string> {
+        if(!withToken) return of(`${this.options.api_base_uri}/v1/streams/stream`);
+        
         return this.requestToken(songId).pipe(
             filter((request) => !request.loading),
             map((request) => {

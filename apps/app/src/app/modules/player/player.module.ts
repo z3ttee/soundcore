@@ -15,26 +15,30 @@ import { NgIconsModule } from "@ng-icons/core";
 import { heroSpeakerWave, heroSpeakerXMark, heroHeart, heroForward, heroRectangleStack, heroArrowsPointingOut } from "@ng-icons/heroicons/outline";
 import { heroHeartSolid } from "@ng-icons/heroicons/solid";
 import { AudioQueue } from "./services/queue.service";
-import { PlayerService } from "./services/player.service";
 import { AudioController } from "./services/controls.service";
+import { PlayerService } from "./services/player.service";
 
-const queueInstance = new AudioQueue([]);
-const controllerInstance = new AudioController(new Audio());
+// const queueInstance = new AudioQueue([]);
+// const controllerInstance = new AudioController(new Audio());
+// const playerInstance = new PlayerService(queueInstance, controllerInstance);
 
 @NgModule({
     declarations: [
         AppPlayerBarComponent
     ],
     providers: [
-        {
-            provide: AudioQueue,
-            useValue: queueInstance
-        },
-        {
-            provide: AudioController,
-            useValue: controllerInstance
-        },
-        PlayerService,
+        // {
+        //     provide: AudioQueue,
+        //     useValue: queueInstance
+        // },
+        // {
+        //     provide: AudioController,
+        //     useValue: controllerInstance
+        // },
+        // {
+        //     provide: PlayerService,
+
+        // }
     ],
     imports: [
         RouterModule,

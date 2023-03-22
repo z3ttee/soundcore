@@ -35,7 +35,7 @@ export class AppPlayerBarComponent implements OnInit, OnDestroy {
     /**
      * Subject to notify subscriptions about destroying themselves.
      */
-    private readonly _destroy: Subject<void> = new Subject();
+    private readonly $destroy: Subject<void> = new Subject();
 
     constructor(
         private readonly likeService: SCSDKLikeService,
@@ -45,25 +45,28 @@ export class AppPlayerBarComponent implements OnInit, OnDestroy {
         private readonly playerService: PlayerService
     ) {}
 
+    public $isPaused = this.playerService.$isPaused.pipe(takeUntil(this.$destroy));
+
     public $props: Observable<PlayerbarProps> = combineLatest([
         this.playerService.$currentItem,
-        this.screen.$screen,
+        // this.screen.$screen,
     ]).pipe(
-        map(([currentItem, screen]): PlayerbarProps => ({
+        map(([currentItem]): PlayerbarProps => ({
             song: currentItem?.song ?? currentItem as Song
         })),
         tap((props) => {
             this.seekInputControl.setValue(props.currentTime);
         }),
-        takeUntil(this._destroy)
+        tap((props) => console.log(props)),
+        takeUntil(this.$destroy)
     );
 
     public ngOnInit(): void {
-        this.likeService.$onSongLikeChanged.pipe(takeUntil(this._destroy)).subscribe((toggleResult) => {
+        this.likeService.$onSongLikeChanged.pipe(takeUntil(this.$destroy)).subscribe((toggleResult) => {
             const likedSong = toggleResult.song;
             const isLiked = toggleResult.isLiked;
 
-            this.$props.pipe(filter((props) => !!props.song && props.song?.id == likedSong?.song?.id), take(1), takeUntil(this._destroy)).subscribe(({ song }) => {
+            this.$props.pipe(filter((props) => !!props.song && props.song?.id == likedSong?.song?.id), take(1), takeUntil(this.$destroy)).subscribe(({ song }) => {
                 song.liked = isLiked ?? song.liked;
             });
         });
@@ -71,8 +74,8 @@ export class AppPlayerBarComponent implements OnInit, OnDestroy {
 
     public ngOnDestroy(): void {
         // Notify subscriptions to destroy themselves
-        this._destroy.next();
-        this._destroy.complete();
+        this.$destroy.next();
+        this.$destroy.complete();
     }
 
     public onSeek(value: number) {
@@ -84,7 +87,7 @@ export class AppPlayerBarComponent implements OnInit, OnDestroy {
         event.preventDefault();
 
         if(typeof song === "undefined" || song == null) return;
-        this.likeService.toggleLikeForSong(song).pipe(takeUntil(this._destroy), filter((request) => !request.loading)).subscribe((request) => {
+        this.likeService.toggleLikeForSong(song).pipe(takeUntil(this.$destroy), filter((request) => !request.loading)).subscribe((request) => {
             if(request.error) {
                 this.snackbar.open(`Ein Fehler ist aufgetreten`, null, { duration: 3000 });
                 return;
@@ -119,5 +122,13 @@ export class AppPlayerBarComponent implements OnInit, OnDestroy {
 
     public setVolume(volume: number) {
         // this.audio.setVolume(volume);
+    }
+
+    public skip() {
+        this.playerService.skip().subscribe();
+    }
+
+    public togglePlaying() {
+        this.playerService.togglePlaying().subscribe();
     }
 }

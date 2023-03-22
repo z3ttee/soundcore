@@ -4,7 +4,7 @@ export function isUndefined(target: any): boolean {
 }
 
 export function isNull(target: any): boolean {
-    return isUndefined(target) && target == null;
+    return isUndefined(target) || target == null;
 }
 
 export function pascalToSnakeCase(input: string): string {
