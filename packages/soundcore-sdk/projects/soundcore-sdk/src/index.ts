@@ -28,8 +28,9 @@ export * from "./lib/profile";
 // Import Module
 export * from "./lib/import";
 
-// Futures
+// Utils
 export * from "./lib/utils/future";
+export * from "./lib/utils/datasource";
 
 // Mount Module
 export * from "./lib/mount";

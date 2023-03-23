@@ -1,13 +1,16 @@
 import { CollectionViewer } from "@angular/cdk/collections";
-import { Future, LikedSong, Page, Pageable, PlaylistItem, SCSDKTracklist, SCSDKTracklistService, Song, toFuture, toFutureCompat, TracklistType } from "@soundcore/sdk";
+import { Future, LikedSong, Page, Pageable, PlaylistItem, SCSDKBaseDatasource, SCSDKTracklist, SCSDKTracklistService, Song, toFuture, toFutureCompat, TracklistType } from "@soundcore/sdk";
 import { catchError, filter, map, Observable, of, switchMap, takeUntil } from "rxjs";
 import { Queue } from "../../../utils/queue/queue.entity";
 import { TRACKLIST_REGISTRY } from "../utils/tracklist-builder";
-import { SCNGXBaseDatasource, SCNGXDatasourceFreeHandler } from "./datasource.entity";
+import { SCNGXDatasourceFreeHandler } from "./datasource.entity";
 
 export type SCNGXTracklistItem = Song | LikedSong | PlaylistItem;
 
-export class SCNGXTracklist<T = any, C = any> extends SCNGXBaseDatasource<SCNGXTracklistItem> {
+/**
+ * @deprecated
+ */
+export class SCNGXTracklist<T = any, C = any> extends SCSDKBaseDatasource<SCNGXTracklistItem> {
 
     private tracklist?: SCSDKTracklist;
 
