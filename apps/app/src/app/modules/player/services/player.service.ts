@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { isNull } from "@soundcore/common";
-import { LikedSong, PlaylistItem, SCSDKStreamService, Song } from "@soundcore/sdk";
-import { BehaviorSubject, Observable, of, switchMap, take, tap } from "rxjs";
+import { LikedSong, PlaylistItem, SCSDKStreamService, Song, TracklistV2 } from "@soundcore/sdk";
+import { BehaviorSubject, map, Observable, of, switchMap, take, tap } from "rxjs";
 import { ResourceWithTracklist } from "../entities/resource-with-tracklist.entity";
 import { SCNGXTracklist } from "../entities/tracklist.entity";
 import { AudioController } from "./controls.service";
@@ -11,6 +11,7 @@ export type PlayableItem = Song & PlaylistItem & LikedSong
 
 export type Streamable = PlayableItem & {
     url: string;
+    tracklist: Pick<TracklistV2, "id">
 }
 
 @Injectable({
@@ -35,46 +36,55 @@ export class PlayerService {
 
     public readonly $isPaused = this.controls.$isPaused;
 
-
+    /**
+     * Add an entity to the queue. Playback will start if the audio element asks for 
+     * new track or if the queue is currently empty
+     * @param entity Entity (e.g. Album) to play
+     * @param tracklist Tracklist that belongs to that entity
+     * @param startIndex Index to start at. Defaults to 0
+     * @returns Position in queue (-1 if the tracklist is currently playing and therefor paused state changed)
+     */
     public playNext(entity: any, tracklist: SCNGXTracklist, startIndex: number = 0): Observable<number> {
-        return new Observable((subscriber) => {
-            const resource: ResourceWithTracklist<PlayableItem> = {
-                ...entity,
-                tracklist: tracklist,
-                startIndex: startIndex
-            }
-    
-            const positionInQueue = this.queue.enqueue(resource);
-            console.log(`Enqueued tracklist entity at position ${positionInQueue}`);
+        return this.toggleIfActive(tracklist).pipe(
+            switchMap((isActive) => {
+                if(isActive) return of(-1);
 
-            // TODO: Need a method to dequeue an item at index "startIndex"
-
-            // Check if player is idling
-            if(this.isIdle) {
-                // If true, play next()
-                this.next().subscribe();
-            }
-
-            subscriber.next(positionInQueue);
-            subscriber.complete();
-        });
+                const resource: ResourceWithTracklist<PlayableItem> = {
+                    ...entity,
+                    tracklist: tracklist,
+                    startIndex: startIndex
+                }
+        
+                const positionInQueue = this.queue.enqueue(resource);
+                // TODO: Need a method to dequeue an item at index "startIndex" and play it here immediately
+                return (this.isIdle ? this.next() : of()).pipe(map(() => positionInQueue));
+            }),
+        );
     }
 
-    public forcePlay(entity: any, tracklist: SCNGXTracklist, startIndex: number = 0) {
-        return new Observable((subscriber) => {
-            const resource: ResourceWithTracklist<PlayableItem> = {
-                ...entity,
-                tracklist: tracklist,
-                startIndex: startIndex
-            }
-    
-            const positionInQueue = this.queue.enqueue(resource);
-            // TODO: Need a method to dequeue an item at index "startIndex" and play it here immediately
-            this.next().subscribe();
+    /**
+     * Force play an entity
+     * @param entity Entity (e.g. Album) to play
+     * @param tracklist Tracklist that belongs to that entity
+     * @param startIndex Index to start at. Defaults to 0
+     * @returns Position in queue (-1 if the tracklist is currently playing and therefor paused state changed)
+     */
+    public forcePlay(entity: any, tracklist: SCNGXTracklist, startIndex: number = 0): Observable<number> {
+        return this.toggleIfActive(tracklist).pipe(
+            switchMap((isActive) => {
+                if(isActive) return of(-1);
 
-            subscriber.next(positionInQueue);
-            subscriber.complete();
-        });
+                const resource: ResourceWithTracklist<PlayableItem> = {
+                    ...entity,
+                    tracklist: tracklist,
+                    startIndex: startIndex
+                }
+        
+                const positionInQueue = this.queue.enqueue(resource);
+                // TODO: Need a method to dequeue an item at index "startIndex" and play it here immediately
+                return this.next().pipe(map(() => positionInQueue));
+            }),
+        );
     }
 
     /**
@@ -108,6 +118,29 @@ export class PlayerService {
         return this.currentItem.getValue()?.url;
     }
 
+    /**
+     * Get the tracklist id of the currently playing item
+     */
+    public get currentTracklistId(): string {
+        return this.currentItem.getValue()?.tracklist?.id;
+    }
+
+    /**
+     * Toggle the playback of a tracklist if it is active.
+     * @param tracklist Tracklist entity
+     * @returns True, if tracklist is active and state has changed. Otherwise false, if the tracklist currently is not active
+     */
+    public toggleIfActive(tracklist: SCNGXTracklist): Observable<boolean> {
+        // Check if the tracklist is playing currently
+        if(this.currentTracklistId == tracklist.id) {
+            // If true, the user may have clicked the play button again to
+            // pause the audio. So pause it
+            return this.togglePlaying().pipe(map(() => true));
+        }
+
+        return of(false);
+    }
+
     private next(): Observable<string> {
         // Resource can be Album, Song, Playlist etc.
         const nextResource = this.queue.dequeue();
@@ -132,7 +165,7 @@ export class PlayerService {
                 // Request stream url
                 return this.streamService.requestStreamUrl(item.id, true).pipe(tap((url) => {
                     // Update current item
-                    this.currentItem.next({ ...item, url: url });
+                    this.setCurrentItem(item, url, nextResource.tracklist.id);
                 }));
             }),
             // Start playing the item
@@ -146,4 +179,19 @@ export class PlayerService {
         );
     }
 
+    /**
+     * Update currently playing item
+     * @param item Entity that is playing
+     * @param url Url that is playing
+     * @param tracklistId Tracklist instance id that is playing
+     */
+    private setCurrentItem(item: PlayableItem, url: string, tracklistId: string) {
+        this.currentItem.next({ 
+            ...item, 
+            url: url,
+            tracklist: {
+                id: tracklistId
+            }
+        });
+    }
 }
