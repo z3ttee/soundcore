@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { combineLatest, filter, map, Observable, of, Subject, switchMap, takeUntil } from 'rxjs';
-import { Album, ApiError, Future, Page, SCDKAlbumService, SCSDKTracklistV2Service, Song, toFutureCompat } from '@soundcore/sdk';
+import { Album, ApiError, Future, Page, SCDKAlbumService, SCSDKDatasource, SCSDKSongService, SCSDKTracklistV2Service, Song, toFutureCompat } from '@soundcore/sdk';
 import { AUDIOWAVE_LOTTIE_OPTIONS } from 'src/app/constants';
 import { PlayerService } from 'src/app/modules/player/services/player.service';
 import { SCNGXTracklist } from 'src/app/modules/player/entities/tracklist.entity';
@@ -13,9 +13,10 @@ interface AlbumInfoProps {
   loading?: boolean;
   error?: ApiError;
 
-  tracklist?: Future<SCNGXTracklist<Song>>;
   currentlyPlaying?: any;
 
+  tracklist?: Future<SCNGXTracklist<Song>>;
+  datasource?: Future<SCSDKDatasource<Song>>;
   recommendedAlbums?: Future<Page<Album>>;
 
   playing?: boolean;
@@ -33,6 +34,7 @@ export class AlbumInfoComponent implements OnInit, OnDestroy {
     private readonly albumService: SCDKAlbumService,
     private readonly activatedRoute: ActivatedRoute,
     private readonly playerService: PlayerService,
+    private readonly songService: SCSDKSongService,
     private readonly tracklistService: SCSDKTracklistV2Service,
     private readonly httpClient: HttpClient,
   ) { }
@@ -65,8 +67,17 @@ export class AlbumInfoComponent implements OnInit, OnDestroy {
         return this.albumService.findRecommendedByArtist(data?.primaryArtist?.id, [ data?.id ]).pipe(toFutureCompat(),);
       })
     ),
+    // Load datasource
     this.$album.pipe(
-      // filter((album) => !album.loading),
+      switchMap((album): Observable<Future<SCSDKDatasource<Song>>> => {
+        // If album still loading, return future with state loading
+        if(album.loading) return of(Future.loading());
+        // Init datasource
+        return this.songService.findByAlbumDatasource(album.data?.id).pipe(map((datasource) => Future.of(datasource)));
+      })
+    ),
+    // Load tracklist
+    this.$album.pipe(
       switchMap((album): Observable<Future<SCNGXTracklist<Song>>> => {
         // If album still loading, return future with state loading
         if(album.loading) return of(Future.loading());
@@ -85,7 +96,7 @@ export class AlbumInfoComponent implements OnInit, OnDestroy {
     // this.player.$isPaused.pipe(takeUntil(this._destroy))
   ]).pipe(
     // Build props object
-    map(([album, recommendedAlbums, tracklist]): AlbumInfoProps => {
+    map(([album, recommendedAlbums, datasource, tracklist]): AlbumInfoProps => {
       // const tracklist = future.data[0];
       // const albums = future.data?.[1];
 
@@ -93,6 +104,7 @@ export class AlbumInfoComponent implements OnInit, OnDestroy {
         loading: album.loading,
         album: album.data,
         tracklist: tracklist,
+        datasource: datasource,
         // currentlyPlaying: currentItem,
         // playing: !isPaused && currentItem?.tracklist?.id == tracklist?.id,
         // tracklist: tracklist,

@@ -42,7 +42,7 @@
 
             <!-- Songs list -->
             <cdk-virtual-scroll-viewport [itemSize]="56">
-                <!-- <div *cdkVirtualFor="let item of props.tracklist; index as i" class="px-window">
+                <div *cdkVirtualFor="let item of props.datasource.data; index as i" class="px-window">
                     <scngx-song-list-item 
                         [song]="item" 
                         [index]="i"
@@ -50,7 +50,7 @@
                         [playing]="props.playing"
                         [animRef]="lottieAnimationTemplate">
                     </scngx-song-list-item>
-                </div> -->
+                </div>
             </cdk-virtual-scroll-viewport>
 
             <!-- Footer -->
