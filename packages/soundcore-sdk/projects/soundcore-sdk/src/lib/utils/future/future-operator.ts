@@ -13,17 +13,13 @@ export function toFuture() {
             // Subscribe to source observable
             const sourceSubscription = source.pipe(apiResponse()).subscribe((response) => {
                 // Push new future to subscriber
-                subscriber.next({
-                    loading: false,
-                    data: response.payload,
-                    error: response.error
-                });
+                subscriber.next(new Future<T>(response.payload, false, response.error));
                 // Complete subscription as it is completed
                 subscriber.complete();
             });
 
             // Push initial future with loading set to true
-            subscriber.next({ loading: true });
+            subscriber.next(Future.loading<T>());
             // Add subscription of request so it gets unsubscribed if the main sub
             // gets unsubscribed
             subscriber.add(sourceSubscription);
