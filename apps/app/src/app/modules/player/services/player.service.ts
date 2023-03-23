@@ -144,6 +144,7 @@ export class PlayerService {
     private next(): Observable<string> {
         // Resource can be Album, Song, Playlist etc.
         const nextResource = this.queue.dequeue();
+
         // If the resource is null, the queue is completely empty
         if(isNull(nextResource)) {
             // Because this could mean a skip is tried, just skip to end of current song

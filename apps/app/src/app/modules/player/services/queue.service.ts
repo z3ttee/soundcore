@@ -39,8 +39,7 @@ export class AudioQueue {
 
         // Check if there is already an actual list in the queue
         const tracklistIndex = Math.max(0, this.queue.length - 1);
-        if(this.queue[tracklistIndex]?.tracklist?.type !== TracklistTypeV2.SINGLE) {
-            
+        if(!isNull(this.queue[tracklistIndex]) && this.queue[tracklistIndex]?.tracklist?.type !== TracklistTypeV2.SINGLE) {
             // If true, overwrite it
             this.queue[tracklistIndex] = resource;
             return tracklistIndex;
@@ -48,7 +47,8 @@ export class AudioQueue {
 
         // If the type is anything else,
         // enqueue the item by pushing to the array
-        return this.queue.push(resource) - 1;
+        const position = this.queue.push(resource) - 1;
+        return position;
     }
 
     public dequeue(): ResourceWithTracklist<PlayableItem> {

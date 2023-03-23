@@ -1,7 +1,7 @@
 import { HttpClient } from "@angular/common/http";
-import { toFuture, TracklistV2 } from "@soundcore/sdk";
-import { Page, Pageable } from "@soundcore/common";
-import { filter, map, Observable, of, take, tap } from "rxjs";
+import { ApiError, toFuture, TracklistV2 } from "@soundcore/sdk";
+import { isNull, Page, Pageable } from "@soundcore/common";
+import { catchError, concat, defer, EMPTY, filter, from, map, mergeMap, Observable, of, Subject, take, takeUntil, tap } from "rxjs";
 
 /**
  * Tracklist class to handle tracklists by providing an integrated queueing system
@@ -9,23 +9,69 @@ import { filter, map, Observable, of, take, tap } from "rxjs";
  */
 export class SCNGXTracklist<T = any> {
 
-    private readonly queue: T[] = [];
-    private currentPageIndex = 0;
-    private fetchedItemsCount = 0;
-    private didStartPlaying = false;
+    /**
+     * Subject to manage emition of 
+     * release process
+     */
+    private readonly $onRelease: Subject<void> = new Subject();
+    /**
+     * Subject to manage emition 
+     * of errors
+     */
+    private readonly error: Subject<ApiError> = new Subject();
+    /**
+     * Subscribe to errors that 
+     * occur on the tracklist
+     */
+    public readonly $error = this.error.asObservable().pipe(takeUntil(this.$onRelease));
+
+    /**
+     * Internal queue array
+     */
+    private readonly queue: T[];
+
+    /**
+     * Internal state management for fetched pages, to check
+     * if a page was already fetched
+     */
+    private readonly fetchedPages: Set<number>;
+
+    private nextPageIndex;
+    private fetchedItemsCount;
+    private didStartPlaying;
 
     constructor(
+        /**
+         * Tracklist metadata to initialize tracklist datasource
+         * @template {T} Type of items inside the tracklist
+         */
         public readonly metadata: TracklistV2<T>,
+        /**
+         * Base URL used to build url for fetching
+         * new items
+         */
         private readonly apiBaseUrl: string,
-        private readonly httpClient: HttpClient,
-        private readonly pageSize: number = 30
+        /**
+         * HttpClient instance to perform
+         * http requests.
+         */
+        private readonly httpClient: HttpClient
     ) {
-        // Add first page included in metadata object
-        this.addPageToQueue(metadata.items);
+        // Initialize queue with first page inside tracklist
+        this.queue = [ ...this.metadata.items.items ];
+        // Initialize set with first fetched page
+        this.fetchedPages = new Set([0]);
+
+        this.nextPageIndex = 1;
+        this.didStartPlaying = false;
+        this.fetchedItemsCount = this.metadata.items.items.length;
 
         // Remove items list from tracklist to save memory
-        metadata.items = Page.of([]);
-        // metadata.items.items.splice(0, metadata.items.items.length);
+        metadata.items.items.splice(0, metadata.items.items.length);
+    }
+
+    public get pageSize(): number {
+        return this.metadata.items.info.limit;
     }
 
     /**
@@ -111,31 +157,45 @@ export class SCNGXTracklist<T = any> {
      * this method will try to fetch a new page of tracks. If after that the 
      * queue is still empty (method returns null), the tracklist is done playing
      */
-    public getNextItem(): Observable<T> {
+    public getNextItem(index: number = 0): Observable<T> {
         return new Observable<T>((subscriber) => {
-            // TODO: If tracklist did not start playing, startAtIndex should be used to get next track
+            // Check if page for index was fetched, if true, continue 
+            // with existing data
+            if(this.hasFetchedIndex(index)) {
+                // TODO: Cannot use index to dequeue, because queue is not always same size as tracklist
 
-            // If queue is not empty, take next item
-            // from queue
-            if(this.isNotEmpty) {
-                subscriber.next(this.dequeue());
-                subscriber.complete();
-                return
-            }
-
-            // Queue is empty, try fetching next page of items
-            subscriber.add(this.getNextItems().subscribe((page) => {
-                // If queue is still empty after fetching new page of items,
-                // the queue is completely empty and the tracklist is done playing.
-                if(this.isEmpty) {
-                    subscriber.next(null);
+                // If queue is not empty, take next item
+                // from queue
+                if(this.isNotEmpty) {
+                    subscriber.next(this.dequeue(index));
                     subscriber.complete();
                     return
                 }
 
-                subscriber.next(this.dequeue());
-                subscriber.complete();
-            }));
+                // Queue is empty, try fetching next page of items
+                subscriber.add(this.getNextItems().subscribe((page) => {
+                    // If queue is still empty after fetching new page of items,
+                    // the queue is completely empty and the tracklist is done playing.
+                    if(this.isEmpty) {
+                        subscriber.next(null);
+                        subscriber.complete();
+                        return
+                    }
+
+                    subscriber.next(this.dequeue(index));
+                    subscriber.complete();
+                }));
+            } else {
+                const startPageIndex = this.nextPageIndex;
+                const targetPageIndex = this.getPageOfIndex(index);
+                // Index was not yet fetched
+
+                subscriber.add(this.fetchUntilPage(startPageIndex, targetPageIndex).subscribe((pages) => {
+                    console.log(pages);
+                }))
+            }
+
+            
         }).pipe(
             // Because an item was dequeued, it means the 
             // tracklist started playing
@@ -147,36 +207,121 @@ export class SCNGXTracklist<T = any> {
     }
 
     /**
-     * Internal dequeue function to get next
-     * item from the array
+     * Release used resources. This will cause
+     * all listeners to be unsubscribed
      */
-    private dequeue(): T {
-        return this.queue.shift() ?? null;
+    public release() {
+        this.$onRelease.next();
+        this.$onRelease.complete();
     }
 
     /**
-     * Fetch next page of items from remote api
+     * Internal dequeue function to get next
+     * item from the array
+     */
+    private dequeue(index: number): T {
+        return this.queue.splice(index, 1)?.[0] ?? null;
+    }
+
+    /**
+     * Dequeue a track at a specific position.
+     * If needed, all tracks that were enqueued before the target can
+     * be removed from the queue as well. Only the target will be returned.
+     * This function will fetch all required pages iteratively.
+     * @param index Position in the queue to deqeueue
+     * @param dequeuePrevious Define if all items before that target are should get removed from the queue
+     */
+    // private dequeueAt(index: number, dequeuePrevious: boolean = false): Observable<T> {
+    //     return new Observable((subscriber) => {
+    //         // Check if page for index was already fetched
+    //         if(!this.hasFetchedIndex(index)) {
+    //             // If not, fetch all pages till index is reached
+    //             const targetPageIndex = this.getPageOfIndex(index);
+    //             const pageIndexDiff = targetPageIndex - this.nextPageIndex;
+
+    //             const requests = [];
+    //             for(let pageIndex = 0; pageIndex < pageIndexDiff; pageIndex++) {
+    //                 requests.push(
+    //                     this.fetchPage()
+    //                 )
+    //             }
+    //         }
+
+
+    //     });
+    // }
+
+    /**
+     * Fetch next page of items 
+     * from remote api
      */
     private getNextItems(): Observable<Page<T>> {
         // If the maximum has already been fetched, return empty page
-        if(this.size <= this.fetchedItemsCount) return of(Page.empty());
-
-        // Build page settings
-        const pageable = new Pageable(this.currentPageIndex, this.pageSize);
+        if(this.hasFetchedAll) return of(Page.empty());
 
         // Fetch next page of tracks
-        return this.httpClient.get<Page<T>>(`${this.getTracklistUrl()}/tracks${pageable.toQuery()}`).pipe(
-            toFuture(),
-            filter((request) => !request.loading),
-            map((request) => request.data ?? Page.empty()),
-            tap((page) => this.addPageToQueue(page))
+        return this.fetchPage(this.nextPageIndex).pipe(
+            // Add page to queue
+            tap((page) => {
+                this.nextPageIndex++;
+                this.fetchedItemsCount += page.items.length;
+                this.queue.push(...page.items);
+            })
         );
     }
 
-    private addPageToQueue(page: Page<T>) {
-        this.currentPageIndex++;
-        this.fetchedItemsCount += page.items.length;
-        this.queue.push(...page.items);
+    /**
+     * Fetch a page from api
+     * @param pageIndex Page to fetch
+     * @returns {Page<T>}
+     */
+    private fetchPage(pageIndex: number): Observable<Page<T>> {
+        // Build page settings
+        const pageable = new Pageable(pageIndex, this.pageSize);
+
+        // Fetch next page of tracks
+        return this.httpClient.get<Page<T>>(`${this.getTracklistUrl()}/tracks${pageable.toQuery()}`).pipe(
+            // Transform to future to get loading state
+            toFuture(),
+            // Only continue if future is resolved
+            filter((request) => !request.loading),
+            // Handle errors
+            tap((request) => {
+                this.publishError(request.error);
+            }),
+            // Return page content
+            map((request) => request.data ?? Page.empty()),
+        );
+    }
+
+    private fetchUntilPage(startPageIndex: number, maxPageIndex: number): Observable<Page<T>[]> {
+        return new Observable((subscriber) => {
+            const pageDiff = maxPageIndex - startPageIndex;
+
+            const aggregatedPages: Page<T>[] = [];
+
+            subscriber.add(defer(() => this.fetchPage(startPageIndex)).pipe(
+                mergeMap((page) => {
+                    const nextIndex = page.next;
+
+                    const $page = of(page);
+                    const $next = isNull(nextIndex) ? EMPTY : this.fetchPage(nextIndex);
+
+                    return concat($page, $next);
+                }),
+                take(pageDiff),
+            ).subscribe((page) => {
+                aggregatedPages.push(page);
+
+                // Check if current page equals target index
+                if(page.info.index == maxPageIndex) {
+                    // If true, all requested pages were fetched
+                    // and the request can be completed
+                    subscriber.next(aggregatedPages);
+                    subscriber.complete();
+                }
+            }));
+        })
     }
 
     /**
@@ -185,6 +330,30 @@ export class SCNGXTracklist<T = any> {
      */
     private getTracklistUrl(): string {
         return `${this.apiBaseUrl}/v1/tracklists/${this.metadata.uri}`;
+    }
+
+    private getPageOfIndex(index: number) {
+        return Math.floor(Math.max(0, index) / Math.max(1, this.pageSize));
+    }
+
+    /**
+     * Check if the page to which an index would resolve was
+     * already fetched.
+     * @param index Index to check
+     * @returns True, if the page was already fetched. Otherwise false
+     */
+    private hasFetchedIndex(index: number) {
+        console.log("fetched pages: ", this.fetchedPages);
+        return this.fetchedPages.has(this.getPageOfIndex(index));
+    }
+
+    /**
+     * 
+     * @param error 
+     */
+    private publishError(error: ApiError) {
+        if(isNull(error)) return;
+        this.error.next(error);
     }
 
 }

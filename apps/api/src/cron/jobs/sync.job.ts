@@ -55,7 +55,7 @@ export class MeiliSyncer {
         const affectedEntities = await Promise.all([
             this.artistService.findBySyncFlag(MeilisearchFlag.FAILED, new Pageable(0, SYNC_ITEMS_LIMIT)).catch(() => Page.of<Artist>([])),
             this.albumService.findBySyncFlag(MeilisearchFlag.FAILED, new Pageable(0, SYNC_ITEMS_LIMIT)).catch(() => Page.of<Album>([])),
-            this.songService.findBySyncFlag(MeilisearchFlag.FAILED, new Pageable(0, SYNC_ITEMS_LIMIT)).catch(() => Page.of<Song>([])),
+            Page.of([]),// this.songService.findBySyncFlag(MeilisearchFlag.FAILED, new Pageable(0, SYNC_ITEMS_LIMIT)).catch(() => Page.of<Song>([])),
             this.labelService.findBySyncFlag(MeilisearchFlag.FAILED, new Pageable(0, SYNC_ITEMS_LIMIT)).catch(() => Page.of<Label>([])),
             this.publisherService.findBySyncFlag(MeilisearchFlag.FAILED, new Pageable(0, SYNC_ITEMS_LIMIT)).catch(() => Page.of<Publisher>([])),
             this.distributorService.findBySyncFlag(MeilisearchFlag.FAILED, new Pageable(0, SYNC_ITEMS_LIMIT)).catch(() => Page.of<Distributor>([]))
