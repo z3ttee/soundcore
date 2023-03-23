@@ -49,4 +49,12 @@ export class SongController {
     return this.songService.findById(songId, false, user);
   }
 
+
+
+
+  @Get("/album/:albumId")
+  public async findByAlbum(@Param("albumId") albumId: string, @Authentication() authentication: User, @Pagination() pageable: Pageable) {
+    return this.songService.findByAlbum(albumId, pageable, authentication);
+  }
+
 }

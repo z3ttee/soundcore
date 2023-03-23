@@ -5,7 +5,7 @@ import ffprobe from 'ffprobe';
 import ffprobeStatic from "ffprobe-static";
 import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from "@nestjs/typeorm";
-import { In, Repository, SelectQueryBuilder, UpdateResult } from "typeorm";
+import { In, Repository, SelectQueryBuilder } from "typeorm";
 import { Environment, Page, Pageable } from "@soundcore/common";
 import { SyncableService } from "../../utils/services/syncing.service";
 import { Song } from "../entities/song.entity";
@@ -86,7 +86,7 @@ export class SongService implements SyncableService<Song> {
      * @param seed Seed used for building shuffled tracklist
      * @returns Page<Song>
      */
-    public async findTracksByAlbum(albumId: string, pageable: Pageable, authentication?: User, seed?: string): Promise<Page<Song>> {
+    public async findByAlbum(albumId: string, pageable: Pageable, authentication?: User, seed?: string): Promise<Page<Song>> {
         // Create query to get ids only
         let idsQuery = this.repository.createQueryBuilder("song")
             .select(["song.id"])
