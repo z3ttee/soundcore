@@ -26,8 +26,8 @@
             
                 <ng-container scngx-controls>
                     <scngx-ibtn (click)="forcePlay(props.album, props.tracklist.data)" size="md">
-                        <!-- <img *ngIf="!props.playing; else paused" class="w-7 h-7 text-body ml-0.5" src="assets/icons/play.svg"> -->
-                        <!-- <ng-template #paused><img *ngIf="props.playing" class="w-7 h-7 text-body ml-0.5" src="assets/icons/pause.svg"></ng-template> -->
+                        <ng-icon *ngIf="props.playing" name="heroPauseSolid" size="24"></ng-icon>
+                        <ng-icon *ngIf="!props.playing" name="heroPlaySolid" size="24"></ng-icon>
                     </scngx-ibtn>
             
                     <scngx-ibtn-text>

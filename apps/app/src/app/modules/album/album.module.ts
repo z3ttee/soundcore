@@ -11,8 +11,9 @@ import { SCNGXSongListItemModule } from 'src/app/components/list-items/song-list
 import { SongContextMenuModule } from 'src/app/components/menus/song-context-menu/song-context-menu.module';
 import { Error404Component } from 'src/app/shared/error404/error404.component';
 import { NgIconsModule } from '@ng-icons/core';
-import { heroEllipsisVerticalSolid } from '@ng-icons/heroicons/solid';
-import { heroHeart } from '@ng-icons/heroicons/outline';
+import { heroEllipsisVerticalSolid, heroPauseSolid, heroPlaySolid } from '@ng-icons/heroicons/solid';
+import { heroHeart, heroPlay, heroPause } from '@ng-icons/heroicons/outline';
+
 import { AppPlayerModule } from '../player/player.module';
 
 const routes: Routes = [
@@ -28,7 +29,7 @@ const routes: Routes = [
     CommonModule,
     RouterModule.forChild(routes),
     ListViewModule,
-    NgIconsModule.withIcons({ heroHeart, heroEllipsisVerticalSolid }),
+    NgIconsModule.withIcons({ heroHeart, heroEllipsisVerticalSolid, heroPauseSolid, heroPlaySolid }),
     AppPlayerModule,
 
     ListViewModule,
