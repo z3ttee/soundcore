@@ -1,9 +1,8 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, Param, Query } from '@nestjs/common';
 import { Authentication } from '../../authentication/decorators/authentication.decorator';
 import { User } from '../../user/entities/user.entity';
 import { TracklistV2 } from '../entities/tracklist.entity';
 import { TracklistV2Service } from '../services/tracklist-v2.service';
-import { TracklistService } from '../services/tracklist.service';
 
 /**
  * Controller class that contains
@@ -26,8 +25,8 @@ export class TracklistV2Controller {
      * @returns Tracklist
      */
     @Get("/album/:albumId")
-    public async findListByAlbum(@Param("albumId") albumId: string, @Authentication() authentication: User): Promise<TracklistV2> {
-        return this.service.findTracklistByAlbumId(albumId, authentication);
+    public async findListByAlbum(@Param("albumId") albumId: string, @Authentication() authentication: User, @Query("shuffled") shuffled?: string): Promise<TracklistV2> {
+        return this.service.findTracklistByAlbumId(albumId, authentication, shuffled === "true");
     }
 
 }

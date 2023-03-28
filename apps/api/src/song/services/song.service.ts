@@ -6,7 +6,7 @@ import ffprobeStatic from "ffprobe-static";
 import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from "@nestjs/typeorm";
 import { In, Repository, SelectQueryBuilder } from "typeorm";
-import { Environment, Page, Pageable } from "@soundcore/common";
+import { Environment, isNull, Page, Pageable } from "@soundcore/common";
 import { SyncableService } from "../../utils/services/syncing.service";
 import { Song } from "../entities/song.entity";
 import { User } from "../../user/entities/user.entity";
@@ -86,7 +86,9 @@ export class SongService implements SyncableService<Song> {
      * @param seed Seed used for building shuffled tracklist
      * @returns Page<Song>
      */
-    public async findByAlbum(albumId: string, pageable: Pageable, authentication?: User, seed?: string): Promise<Page<Song>> {
+    public async findByAlbum(albumId: string, pageable: Pageable, authentication?: User, seed?: number): Promise<Page<Song>> {
+        if(!isNull(seed) && isNaN(seed)) throw new BadRequestException("Invalid seed found. Must be an integer")
+
         // Create query to get ids only
         let idsQuery = this.repository.createQueryBuilder("song")
             .select(["song.id"])
@@ -97,22 +99,26 @@ export class SongService implements SyncableService<Song> {
             .orderBy("song.order", "ASC");
 
         // Add seed, used to create shuffled tracklist
-        if(seed) idsQuery = idsQuery.orderBy(`RAND(${seed})`);
+        if(!isNaN(seed)) idsQuery = idsQuery.orderBy(`RAND(${seed})`);
 
         // Find ids and use these ids to fetch metadata
         return idsQuery.getManyAndCount().then(([ids, total]) => {
-            // Fetch metadata
-            return this.repository.createQueryBuilder("song")
+            let findQuery = this.repository.createQueryBuilder("song")
                 .select(["song.id", "song.slug", "song.name", "song.duration", "song.explicit"])
                 .leftJoin("song.primaryArtist", "primaryArtist").addSelect(["primaryArtist.id", "primaryArtist.slug", "primaryArtist.name"])
                 .leftJoin("song.featuredArtists", "featuredArtist").addSelect(["featuredArtist.id", "featuredArtist.slug", "featuredArtist.name"])
                 .leftJoin("song.artwork", "artwork").addSelect(["artwork.id"])
                 .loadRelationCountAndMap("song.liked", "song.likes", "likes", (qb) => qb.where("likes.userId = :userId", { userId: authentication?.id }))
                 .whereInIds(ids)
-                .getMany().then((tracks) => {
-                    // Build page
-                    return Page.of(tracks, total, pageable);
-                });
+
+            // Add seed, used to create shuffled tracklist
+            if(!isNaN(seed)) findQuery = findQuery.orderBy(`RAND(${seed})`);
+
+            // Fetch metadata
+            return findQuery.getMany().then((tracks) => {
+                // Build page
+                return Page.of(tracks, total, pageable);
+            });
         });
     }
 

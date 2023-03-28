@@ -1,5 +1,6 @@
 import { HttpClient } from "@angular/common/http";
 import { Inject, Injectable } from "@angular/core";
+import { isNull } from "@soundcore/common";
 import { Observable } from "rxjs";
 import { SCSDK_OPTIONS } from "../../constants";
 import { SCSDKOptions } from "../../scdk.module";
@@ -23,9 +24,8 @@ export class SCSDKTracklistV2Service {
      * @param albumId Album's id
      * @returns Tracklist
      */
-    public findByAlbum(albumId: string): Observable<Future<TracklistV2>> {
-        const baseUrl = `${this.options.api_base_uri}/v2/tracklists/album/${albumId}`;
-        return this.httpClient.get<TracklistV2>(baseUrl).pipe(toFuture());
+    public findByAlbum(albumId: string, shuffled: boolean = false): Observable<Future<TracklistV2>> {
+        return this.httpClient.get<TracklistV2>(`${this.options.api_base_uri}/v2/tracklists/album/${albumId}?shuffled=${encodeURIComponent(shuffled)}`).pipe(toFuture());
     }
 
 }

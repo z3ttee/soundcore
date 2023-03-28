@@ -74,7 +74,7 @@ export class TracklistV2<T = Song> {
         public readonly type: TracklistTypeV2,
         public readonly size: number,
         public readonly items: Page<T>,
-        public readonly seed?: string
+        public readonly seed?: number
     ) {}
 
     public static resolveUri(resourceId: string, type: TracklistTypeV2) {
