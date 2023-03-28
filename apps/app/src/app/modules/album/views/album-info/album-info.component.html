@@ -48,7 +48,8 @@
                         [index]="i"
                         [active]="props.currentlyPlaying?.song?.id == item?.id"
                         [playing]="props.playing"
-                        [animRef]="lottieAnimationTemplate">
+                        [animRef]="lottieAnimationTemplate"
+                        (onPlay)="forcePlayAt(props.album, props.tracklist.data, i)">
                     </scngx-song-list-item>
                 </div>
             </cdk-virtual-scroll-viewport>

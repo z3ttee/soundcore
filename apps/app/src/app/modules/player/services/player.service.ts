@@ -66,25 +66,54 @@ export class PlayerService {
      * Force play an entity
      * @param entity Entity (e.g. Album) to play
      * @param tracklist Tracklist that belongs to that entity
-     * @param startIndex Index to start at. Defaults to 0
+     * @param startIndex Index to start at
      * @returns Position in queue (-1 if the tracklist is currently playing and therefor paused state changed)
      */
-    public forcePlay(entity: any, tracklist: SCNGXTracklist, startIndex: number = 0): Observable<number> {
+    public forcePlay(entity: any, tracklist: SCNGXTracklist): Observable<number> {
         return this.toggleIfActive(tracklist).pipe(
             switchMap((isActive) => {
                 if(isActive) return of(-1);
 
                 const resource: ResourceWithTracklist<PlayableItem> = {
                     ...entity,
-                    tracklist: tracklist,
-                    startIndex: startIndex
+                    tracklist: tracklist
                 }
         
                 const positionInQueue = this.queue.enqueue(resource);
-                // TODO: Need a method to dequeue an item at index "startIndex" and play it here immediately
                 return this.next().pipe(map(() => positionInQueue));
             }),
         );
+    }
+
+    /**
+     * Force play an entity
+     * @param entity Entity (e.g. Album) to play
+     * @param tracklist Tracklist that belongs to that entity
+     * @param indexAt Index to start at
+     * @returns Position in queue (-1 if the tracklist is currently playing and therefor paused state changed)
+     */
+    public forcePlayAt(entity: any, tracklist: SCNGXTracklist, indexAt: number): Observable<number> {
+        // return this.toggleIfActive(tracklist).pipe(
+        //     switchMap((isActive) => {
+        //         if(isActive && isNull(indexAt)) return of(-1);
+
+        //         const resource: ResourceWithTracklist<PlayableItem> = {
+        //             ...entity,
+        //             tracklist: tracklist
+        //         }
+        
+        //         const positionInQueue = this.queue.enqueue(resource);
+        //         return this.next(indexAt).pipe(map(() => positionInQueue));
+        //     }),
+        // );
+
+        // const resource: ResourceWithTracklist<PlayableItem> = {
+        //     ...entity,
+        //     tracklist: tracklist
+        // }
+
+        // const positionInQueue = this.queue.enqueue(resource);
+        return this.next(indexAt).pipe(map(() => 0));
     }
 
     /**
@@ -141,7 +170,11 @@ export class PlayerService {
         return of(false);
     }
 
-    private next(): Observable<string> {
+    private next(index?: number): Observable<string> {
+        console.log(index);
+
+        // If index is set, get the tracklist from queue. Otherwise just do normal dequeue()
+
         // Resource can be Album, Song, Playlist etc.
         const nextResource = this.queue.dequeue();
 
@@ -153,7 +186,7 @@ export class PlayerService {
         }
 
         // Get next item
-        return nextResource.tracklist.getNextItem().pipe(
+        return nextResource.tracklist.getNextItem(index).pipe(
             switchMap((item) => {
                 // If the next item is null, the tracklist is empty
                 // So we have to skip to the end of the track and let it start

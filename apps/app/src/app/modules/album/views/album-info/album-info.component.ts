@@ -127,4 +127,8 @@ export class AlbumInfoComponent implements OnInit, OnDestroy {
     this.playerService.forcePlay(album, tracklist).subscribe();
   }
 
+  public forcePlayAt(album: Album, tracklist: SCNGXTracklist, indexAt?: number) {
+    this.playerService.forcePlayAt(album, tracklist, indexAt).subscribe();
+  }
+
 }

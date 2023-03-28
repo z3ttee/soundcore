@@ -36,7 +36,6 @@ export class AudioQueue {
             return 0;
         }
 
-
         // Check if there is already an actual list in the queue
         const tracklistIndex = Math.max(0, this.queue.length - 1);
         if(!isNull(this.queue[tracklistIndex]) && this.queue[tracklistIndex]?.tracklist?.type !== TracklistTypeV2.SINGLE) {
@@ -64,7 +63,7 @@ export class AudioQueue {
         // Otherwise the item represents an actual tracklist, so we have
         // to access the internal queue of that tracklist and only dequeue it,
         // if that queue is empty
-        if(next.tracklist.isQueueEmpty) {
+        if(next.tracklist.hasEnded) {
             // Remove item if empty
             this.queue.shift();
             // Recursive call to continue with next item if exists
@@ -72,6 +71,19 @@ export class AudioQueue {
         }
 
         return next;
+    }
+
+    public getEnqueuedTracklist() {
+        const resource = this.queue[this.queue.length - 1];
+        // If the last enqueued resource is a single song, return null as
+        // this is not a tracklist
+        if(resource.tracklist.type === TracklistTypeV2.SINGLE) return null;
+
+        return resource;
+    }
+
+    public isTracklistEnqueued(id: string): boolean {
+        return this.getEnqueuedTracklist()?.id === id;
     }
     
 }

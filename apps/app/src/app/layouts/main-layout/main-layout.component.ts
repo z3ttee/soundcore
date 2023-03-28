@@ -1,6 +1,6 @@
 import { CdkDragDrop } from "@angular/cdk/drag-drop";
 import { Location } from "@angular/common";
-import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from "@angular/core";
+import { Component, OnDestroy, OnInit } from "@angular/core";
 import { UntypedFormControl } from "@angular/forms";
 import { NavigationCancel, NavigationEnd, NavigationError, NavigationStart, Router } from "@angular/router";
 import { SSOService, SSOUser } from "@soundcore/sso";
@@ -56,7 +56,6 @@ export class AscMainLayoutComponent implements OnInit, OnDestroy {
             isModAccount: isAdminAccount || isModAccount
         })),
         takeUntil(this._destroy),
-        tap((props) => console.log(props))
     );
 
     public ngOnInit(): void {

@@ -1,7 +1,7 @@
 import { HttpClient } from "@angular/common/http";
 import { ApiError, toFuture, TracklistV2 } from "@soundcore/sdk";
 import { isNull, Page, Pageable } from "@soundcore/common";
-import { catchError, concat, defer, EMPTY, filter, from, map, mergeMap, Observable, of, Subject, take, takeUntil, tap } from "rxjs";
+import { concat, defer, EMPTY, filter, map, mergeMap, Observable, of, Subject, take, takeUntil, tap } from "rxjs";
 
 /**
  * Tracklist class to handle tracklists by providing an integrated queueing system
@@ -26,18 +26,30 @@ export class SCNGXTracklist<T = any> {
     public readonly $error = this.error.asObservable().pipe(takeUntil(this.$onRelease));
 
     /**
+     * List of items that have been fetched
+     */
+    private readonly items: T[];
+
+    /**
+     * Int value to track at which point in the 
+     * tracklist the playback currently is
+     */
+    private currentQueuePointer: number = 0;
+
+    /**
      * Internal queue array
      */
-    private readonly queue: T[];
+    // private readonly queue: T[];
 
     /**
      * Internal state management for fetched pages, to check
      * if a page was already fetched
      */
-    private readonly fetchedPages: Set<number>;
+    private readonly fetchedPages: Set<number> = new Set();
+
+    private readonly pageSettings: Pageable;
 
     private nextPageIndex;
-    private fetchedItemsCount;
     private didStartPlaying;
 
     constructor(
@@ -58,20 +70,28 @@ export class SCNGXTracklist<T = any> {
         private readonly httpClient: HttpClient
     ) {
         // Initialize queue with first page inside tracklist
-        this.queue = [ ...this.metadata.items.items ];
+        // this.queue = [ ...this.metadata.items.items ];
+        // this.items.push(...this.metadata.items.items);
         // Initialize set with first fetched page
-        this.fetchedPages = new Set([0]);
+        // this.fetchedPages = new Set([0]);
 
         this.nextPageIndex = 1;
         this.didStartPlaying = false;
-        this.fetchedItemsCount = this.metadata.items.items.length;
+        // this.fetchedItemsCount = this.metadata.items.items.length;
+
+        // Create array that can fit <size> elements in it
+        this.items = Array.from({ length: this.metadata.size });
+        // Register first page of metadata
+        this.cachePage(this.metadata.items);
+        // Copy page settings from first received page
+        this.pageSettings = new Pageable(this.metadata.items.info.index, this.metadata.items.info.limit);
 
         // Remove items list from tracklist to save memory
-        metadata.items.items.splice(0, metadata.items.items.length);
+        delete metadata.items;
     }
 
     public get pageSize(): number {
-        return this.metadata.items.info.limit;
+        return this.pageSettings.limit;
     }
 
     /**
@@ -103,7 +123,7 @@ export class SCNGXTracklist<T = any> {
      * Check if the tracklist is not empty
      */
     public get isNotEmpty(): boolean {
-        return this.metadata.size > 0;
+        return !this.isEmpty;
     }
 
     /**
@@ -126,7 +146,7 @@ export class SCNGXTracklist<T = any> {
      * from the api (items are only fetched when needed)
      */
     public get hasFetchedAll() {
-        return this.fetchedItemsCount >= this.size;
+        return this.items.length >= this.size;
     }
 
     /**
@@ -139,17 +159,29 @@ export class SCNGXTracklist<T = any> {
     /**
      * Get the current queue size
      */
-    public get queueSize() {
-        return this.queue.length;
-    }
+    // public get queueSize() {
+    //     return this.queue.length;
+    // }
 
     /**
      * Check if the queue is empty. This also considers
      * items that were not yet needed and are therefor not yet
      * fetched.
      */
-    public get isQueueEmpty() {
-        return this.isEmpty || (this.hasFetchedAll && this.queueSize <= 0);
+    public get hasEnded() {
+        return this.isEmpty || this.currentQueuePointer >= this.size;
+    }
+
+    private get fetchedItemsCount() {
+        return this.items.length;
+    }
+
+    /**
+     * Check if the next page should be fetched
+     * This is true, when the current queue pointer is near the end of fetched items count
+     */
+    private get shouldFetchNext() {
+        return !this.hasFetchedAll && (this.currentQueuePointer+1) >= this.fetchedItemsCount
     }
 
     /**
@@ -157,45 +189,46 @@ export class SCNGXTracklist<T = any> {
      * this method will try to fetch a new page of tracks. If after that the 
      * queue is still empty (method returns null), the tracklist is done playing
      */
-    public getNextItem(index: number = 0): Observable<T> {
+    public getNextItem(indexInTracklist?: number): Observable<T> {
         return new Observable<T>((subscriber) => {
-            // Check if page for index was fetched, if true, continue 
-            // with existing data
-            if(this.hasFetchedIndex(index)) {
-                // TODO: Cannot use index to dequeue, because queue is not always same size as tracklist
-
-                // If queue is not empty, take next item
-                // from queue
-                if(this.isNotEmpty) {
-                    subscriber.next(this.dequeue(index));
-                    subscriber.complete();
-                    return
-                }
-
-                // Queue is empty, try fetching next page of items
-                subscriber.add(this.getNextItems().subscribe((page) => {
-                    // If queue is still empty after fetching new page of items,
-                    // the queue is completely empty and the tracklist is done playing.
-                    if(this.isEmpty) {
-                        subscriber.next(null);
+            // If index is null, no specific index is request
+            // That means, we can return the next item in queue
+            if(isNull(indexInTracklist)) {
+                // If next page should be fetched
+                if(this.shouldFetchNext) {
+                    // If true, fetch page
+                    console.log("fetch next page");
+                    subscriber.add(this.getNextItems().subscribe(() => {
+                        // After fetching next items, dequeue next item
+                        subscriber.next(this.dequeue());
                         subscriber.complete();
-                        return
-                    }
-
-                    subscriber.next(this.dequeue(index));
+                    }));
+                } else {
+                    // If false, return next item
+                    subscriber.next(this.dequeue());
                     subscriber.complete();
-                }));
+                }
             } else {
-                const startPageIndex = this.nextPageIndex;
-                const targetPageIndex = this.getPageOfIndex(index);
-                // Index was not yet fetched
+                // If index is set, a specific item was requested by the player
+                // This usually happens, when the user explicitly started a song inside
+                // that tracklist
 
-                subscriber.add(this.fetchUntilPage(startPageIndex, targetPageIndex).subscribe((pages) => {
-                    console.log(pages);
-                }))
+                // First, check if the page has already been fetched in which the requested
+                // index (item) is located
+                const targetPageIndex = this.getPageOfIndex(indexInTracklist);
+
+                console.log("target page: ", targetPageIndex)
+
+                if(!this.hasPage(targetPageIndex)) {
+                    // If the page was not fetched yet, fetch all pages
+                    // until the target page was fetched
+                    // TODO
+                } else {
+                    // If true, return item at index
+                    subscriber.next(this.items[indexInTracklist] ?? null);
+                    subscriber.complete();
+                }
             }
-
-            
         }).pipe(
             // Because an item was dequeued, it means the 
             // tracklist started playing
@@ -219,37 +252,28 @@ export class SCNGXTracklist<T = any> {
      * Internal dequeue function to get next
      * item from the array
      */
-    private dequeue(index: number): T {
-        return this.queue.splice(index, 1)?.[0] ?? null;
+    private dequeue(index?: number): T {
+        // Check if the pointer already is at the end of the tracklist
+        // If true, return null
+        if(this.hasEnded) return null;
+
+        let item: T;
+        if(isNull(index)) {
+            // Get next element
+            item = this.items[this.currentQueuePointer] ?? null;
+            // Increment counter
+            this.currentQueuePointer++;
+        } else {
+            // If index was set, return the 
+            // requested item at that exact index
+            item = this.items[index] ?? null;
+            // Note: We do not want to increment the queue pointer at this point,
+            // as a specific index was requested which usually means, the user started
+            // playing a song manually in the tracklist
+        }
+        
+        return item;
     }
-
-    /**
-     * Dequeue a track at a specific position.
-     * If needed, all tracks that were enqueued before the target can
-     * be removed from the queue as well. Only the target will be returned.
-     * This function will fetch all required pages iteratively.
-     * @param index Position in the queue to deqeueue
-     * @param dequeuePrevious Define if all items before that target are should get removed from the queue
-     */
-    // private dequeueAt(index: number, dequeuePrevious: boolean = false): Observable<T> {
-    //     return new Observable((subscriber) => {
-    //         // Check if page for index was already fetched
-    //         if(!this.hasFetchedIndex(index)) {
-    //             // If not, fetch all pages till index is reached
-    //             const targetPageIndex = this.getPageOfIndex(index);
-    //             const pageIndexDiff = targetPageIndex - this.nextPageIndex;
-
-    //             const requests = [];
-    //             for(let pageIndex = 0; pageIndex < pageIndexDiff; pageIndex++) {
-    //                 requests.push(
-    //                     this.fetchPage()
-    //                 )
-    //             }
-    //         }
-
-
-    //     });
-    // }
 
     /**
      * Fetch next page of items 
@@ -262,11 +286,7 @@ export class SCNGXTracklist<T = any> {
         // Fetch next page of tracks
         return this.fetchPage(this.nextPageIndex).pipe(
             // Add page to queue
-            tap((page) => {
-                this.nextPageIndex++;
-                this.fetchedItemsCount += page.items.length;
-                this.queue.push(...page.items);
-            })
+            tap((page) => this.cachePage(page))
         );
     }
 
@@ -278,6 +298,15 @@ export class SCNGXTracklist<T = any> {
     private fetchPage(pageIndex: number): Observable<Page<T>> {
         // Build page settings
         const pageable = new Pageable(pageIndex, this.pageSize);
+
+        const params = new URLSearchParams();
+        params.set("seed", this.metadata.seed);
+
+        if(!isNull(this.metadata.seed)) {
+            // params.set("seed", this.metadata.seed);
+        }
+
+        console.log(params);
 
         // Fetch next page of tracks
         return this.httpClient.get<Page<T>>(`${this.getTracklistUrl()}/tracks${pageable.toQuery()}`).pipe(
@@ -337,14 +366,12 @@ export class SCNGXTracklist<T = any> {
     }
 
     /**
-     * Check if the page to which an index would resolve was
-     * already fetched.
-     * @param index Index to check
+     * Check if a page was already fetched.
+     * @param pageIndex Index to check
      * @returns True, if the page was already fetched. Otherwise false
      */
-    private hasFetchedIndex(index: number) {
-        console.log("fetched pages: ", this.fetchedPages);
-        return this.fetchedPages.has(this.getPageOfIndex(index));
+    private hasPage(pageIndex: number) {
+        return this.fetchedPages.has(this.getPageOfIndex(pageIndex));
     }
 
     /**
@@ -354,6 +381,21 @@ export class SCNGXTracklist<T = any> {
     private publishError(error: ApiError) {
         if(isNull(error)) return;
         this.error.next(error);
+    }
+
+    /**
+     * Internally cache the result of a page. This will
+     * register the pageIndex as "fetched" and perform
+     * required function calls to register the fetched contents
+     * @param page Page that was fetched
+     */
+    private cachePage(page: Page<T>) {
+        const pageIndex = page.info.index;
+        const pageLimit = page.info.limit;
+        const items = page.items;
+
+        this.fetchedPages.add(pageIndex);
+        this.items.splice(pageIndex * pageLimit, pageLimit, ...Array.from({length: items.length}).map((_, i) => items[i]));
     }
 
 }
