@@ -1,23 +1,29 @@
 import { Injectable } from "@angular/core";
-import { isNull } from "@soundcore/common";
-import { Song, TracklistTypeV2 } from "@soundcore/sdk";
-import { Observable } from "rxjs";
+import { hasProperty, isNull } from "@soundcore/common";
 import { ResourceWithTracklist } from "../entities/resource-with-tracklist.entity";
 import { PlayableItem } from "./player.service";
 
 class EnqueuedItem<T = any> {
     constructor(
-        public isSingle: boolean,
+        public isList: boolean,
         public data: T
     ) {}
 }
 
 @Injectable({
-    providedIn: "root"
+    providedIn: "any"
 })
 export class AudioQueue {
 
-    private readonly queue: ResourceWithTracklist<PlayableItem>[] = [];
+    /**
+     * Map to efficiently track which resources are already enqueued,
+     * so we do not have to loop through whole queue to find a resource
+     */
+    private readonly enqueuedIds: Map<string, any> = new Map();
+    /**
+     * Internal queue list
+     */
+    private readonly queue: EnqueuedItem<PlayableItem | ResourceWithTracklist<PlayableItem>>[] = [];
 
     /**
      * Add a resource to the queue. Based on the tracklist type,
@@ -25,65 +31,76 @@ export class AudioQueue {
      * @param resource Resource to enqueue
      * @returns Position the resource was added to
      */
-    public enqueue(resource: ResourceWithTracklist<PlayableItem>): number {
-        // Init tracklist variable
-        const tracklist = resource.tracklist;
+    public enqueue(resource: PlayableItem | ResourceWithTracklist<PlayableItem>): number {
+        // Register id as enqueued
+        this.enqueuedIds.set(resource.id, true);
 
-        // If the tracklist represents a single song,
-        // put it on the top of the queue (so it is played next)
-        if(tracklist.type === TracklistTypeV2.SINGLE) {
-            this.queue.unshift(resource);
-            return 0;
+        // If the item should be enqueued as single
+        if(!this.isOfTypeList(resource)) {
+            return this.queue.unshift({ isList: false, data: resource }) - 1;
         }
 
-        // Check if there is already an actual list in the queue
-        const tracklistIndex = Math.max(0, this.queue.length - 1);
-        if(!isNull(this.queue[tracklistIndex]) && this.queue[tracklistIndex]?.tracklist?.type !== TracklistTypeV2.SINGLE) {
-            // If true, overwrite it
-            this.queue[tracklistIndex] = resource;
-            return tracklistIndex;
-        }
-
-        // If the type is anything else,
-        // enqueue the item by pushing to the array
-        const position = this.queue.push(resource) - 1;
-        return position;
+        // Otherwise push to end of queue
+        return this.queue.push({ isList: true, data: resource }) - 1;
     }
 
-    public dequeue(): ResourceWithTracklist<PlayableItem> {
+    public dequeue(): EnqueuedItem<PlayableItem | ResourceWithTracklist<PlayableItem>> {
         const next = this.queue[0];
         if(isNull(next)) return null;
 
-        // If the next item represents a single song,
-        // just remove the item from the queue and return it
-        if(next.tracklist.type === TracklistTypeV2.SINGLE) {
-            return this.queue.shift();
+        if(!next.isList) {
+            // Remove from registered ids
+            this.enqueuedIds.delete(next.data.id);
+            // Is a single song, so splice it from queue
+            return this.queue.splice(0, 1)?.[0];
         }
 
-        // Otherwise the item represents an actual tracklist, so we have
-        // to access the internal queue of that tracklist and only dequeue it,
-        // if that queue is empty
-        if(next.tracklist.hasEnded) {
-            // Remove item if empty
-            this.queue.shift();
-            // Recursive call to continue with next item if exists
-            return this.dequeue();
+        const data = next.data as ResourceWithTracklist<PlayableItem>;
+        const tracklist = data.tracklist;
+
+        // Check if tracklist has not ended, if true
+        // return, otherwise remove from queue
+        if(!tracklist.hasEnded) {
+            return next;
         }
 
-        return next;
+        // Remove from registered ids
+        this.enqueuedIds.delete(data.id);
+        // Release tracklist resources
+        tracklist.release();
+        // Remove from queue
+        this.queue.shift();
+        // Return new dequeue attempt
+        return this.dequeue();
     }
 
-    public getEnqueuedTracklist() {
-        const resource = this.queue[this.queue.length - 1];
-        // If the last enqueued resource is a single song, return null as
-        // this is not a tracklist
-        if(resource.tracklist.type === TracklistTypeV2.SINGLE) return null;
-
-        return resource;
+    /**
+     * Clear the queue
+     */
+    public clear() {
+        this.queue.splice(0, this.queue.length);
     }
 
-    public isTracklistEnqueued(id: string): boolean {
-        return this.getEnqueuedTracklist()?.id === id;
+    /**
+     * Check if an item is already enqueued
+     * @param id Id of the resource
+     */
+    public isEnqueued(id: string): boolean {
+        return this.enqueuedIds.has(id);
+    }
+
+    public findById(id: string): EnqueuedItem<PlayableItem | ResourceWithTracklist<PlayableItem>> {
+        if(!this.isEnqueued(id)) return null;
+        return this.queue.find((item) => item.data?.id === id);
+    }
+
+    public findTracklistById(id: string): EnqueuedItem<ResourceWithTracklist<PlayableItem>> {
+        if(!this.isEnqueued(id)) return null;
+        return this.queue.find((item) => item.isList && item.data?.id === id) as EnqueuedItem<ResourceWithTracklist<PlayableItem>>;
+    }
+
+    private isOfTypeList(item: any): boolean {
+        return hasProperty("tracklist", item);
     }
     
 }

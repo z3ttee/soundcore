@@ -1,7 +1,7 @@
 import { HttpClient } from "@angular/common/http";
 import { ApiError, toFuture, TracklistV2 } from "@soundcore/sdk";
 import { isNull, Page, Pageable } from "@soundcore/common";
-import { concat, defer, EMPTY, filter, map, mergeMap, Observable, of, Subject, take, takeUntil, tap } from "rxjs";
+import { concat, defer, EMPTY, filter, map, mergeMap, Observable, of, Subject, switchMap, take, takeUntil, tap } from "rxjs";
 
 /**
  * Tracklist class to handle tracklists by providing an integrated queueing system
@@ -37,17 +37,16 @@ export class SCNGXTracklist<T = any> {
     private currentQueuePointer: number = 0;
 
     /**
-     * Internal queue array
-     */
-    // private readonly queue: T[];
-
-    /**
      * Internal state management for fetched pages, to check
      * if a page was already fetched
      */
     private readonly fetchedPages: Set<number> = new Set();
 
-    private readonly pageSettings: Pageable;
+    /**
+     * Currently selecte size of each page that
+     * is fetched
+     */
+    private readonly pageSize: number;
 
     private nextPageIndex;
     private didStartPlaying;
@@ -69,29 +68,19 @@ export class SCNGXTracklist<T = any> {
          */
         private readonly httpClient: HttpClient
     ) {
-        // Initialize queue with first page inside tracklist
-        // this.queue = [ ...this.metadata.items.items ];
-        // this.items.push(...this.metadata.items.items);
-        // Initialize set with first fetched page
-        // this.fetchedPages = new Set([0]);
-
+        // TODO: Check if necessary
         this.nextPageIndex = 1;
         this.didStartPlaying = false;
-        // this.fetchedItemsCount = this.metadata.items.items.length;
 
         // Create array that can fit <size> elements in it
         this.items = Array.from({ length: this.metadata.size });
         // Register first page of metadata
         this.cachePage(this.metadata.items);
         // Copy page settings from first received page
-        this.pageSettings = new Pageable(this.metadata.items.info.index, this.metadata.items.info.limit);
+        this.pageSize = this.metadata.items.info.limit;
 
         // Remove items list from tracklist to save memory
         delete metadata.items;
-    }
-
-    public get pageSize(): number {
-        return this.pageSettings.limit;
     }
 
     /**
@@ -164,9 +153,9 @@ export class SCNGXTracklist<T = any> {
     // }
 
     /**
-     * Check if the queue is empty. This also considers
-     * items that were not yet needed and are therefor not yet
-     * fetched.
+     * Check if the tracklist reached end of playback.
+     * This is true, if the tracklist is empty (has no items)
+     * or the internal queue reached end of the list of items
      */
     public get hasEnded() {
         return this.isEmpty || this.currentQueuePointer >= this.size;
@@ -213,21 +202,35 @@ export class SCNGXTracklist<T = any> {
                 // This usually happens, when the user explicitly started a song inside
                 // that tracklist
 
-                // First, check if the page has already been fetched in which the requested
-                // index (item) is located
-                const targetPageIndex = this.getPageOfIndex(indexInTracklist);
+                subscriber.add(
+                    // First, check if the page has already been fetched in which the requested
+                    // index (item) is located
+                    of(this.getPageOfIndex(indexInTracklist))
+                    .pipe(
+                        switchMap((targetPageIndex) => {
+                            if(!this.hasPage(targetPageIndex)) {
+                                // If the page was not fetched yet, fetch all pages
+                                // until the target page was fetched
+                                // TODO
 
-                console.log("target page: ", targetPageIndex)
+                                return of(null);
+                            } else {
+                                // If true, return item at index
+                                return of(this.items[indexInTracklist] ?? null);
+                            }
+                        })
+                    ).subscribe((item) => {
+                        // Because specific index was request, reset
+                        // pointer to that index, but only if there is no seed set
+                        if(isNull(this.seed)) {
+                            // Set pointer to index + 1
+                            this.setPointerToIndex(indexInTracklist+1);
+                        }
 
-                if(!this.hasPage(targetPageIndex)) {
-                    // If the page was not fetched yet, fetch all pages
-                    // until the target page was fetched
-                    // TODO
-                } else {
-                    // If true, return item at index
-                    subscriber.next(this.items[indexInTracklist] ?? null);
-                    subscriber.complete();
-                }
+                        subscriber.next(item);
+                        subscriber.complete();
+                    })
+                );
             }
         }).pipe(
             // Because an item was dequeued, it means the 
@@ -262,7 +265,7 @@ export class SCNGXTracklist<T = any> {
             // Get next element
             item = this.items[this.currentQueuePointer] ?? null;
             // Increment counter
-            this.currentQueuePointer++;
+            this.setPointerToIndex(this.currentQueuePointer + 1);
         } else {
             // If index was set, return the 
             // requested item at that exact index
@@ -396,6 +399,17 @@ export class SCNGXTracklist<T = any> {
 
         this.fetchedPages.add(pageIndex);
         this.items.splice(pageIndex * pageLimit, pageLimit, ...Array.from({length: items.length}).map((_, i) => items[i]));
+    }
+
+    /**
+     * Move the internal pointer that is 
+     * used for queueing next items.
+     * This will automatically validate index to a min of 0 and
+     * a max of <size>
+     * @param resetToIndex Index to which the pointer should jump
+     */
+    private setPointerToIndex(resetToIndex: number = 0) {
+        this.currentQueuePointer = Math.max(0, Math.min(this.size, resetToIndex ?? 0));
     }
 
 }
