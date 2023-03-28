@@ -173,6 +173,11 @@ export class SCNGXTracklist<T = any> {
         return !this.hasFetchedAll && (this.currentQueuePointer+1) >= this.fetchedItemsCount
     }
 
+    public reshuffle(seed?: string) {
+        // TODO: Shuffle all tracklists and the queue
+        // TODO: API has to somehow give the original row numbers to match with the indexes in the datasource in the ui
+    }
+
     /**
      * Get the next item from the queue. If the queue is empty,
      * this method will try to fetch a new page of tracks. If after that the 
@@ -302,17 +307,14 @@ export class SCNGXTracklist<T = any> {
         // Build page settings
         const pageable = new Pageable(pageIndex, this.pageSize);
 
-        const params = new URLSearchParams();
-        params.set("seed", this.metadata.seed);
-
+        let params;
         if(!isNull(this.metadata.seed)) {
-            // params.set("seed", this.metadata.seed);
+            params = new URLSearchParams();
+            params.set("seed", `${this.seed}`);
         }
 
-        console.log(params);
-
         // Fetch next page of tracks
-        return this.httpClient.get<Page<T>>(`${this.getTracklistUrl()}/tracks${pageable.toQuery()}`).pipe(
+        return this.httpClient.get<Page<T>>(`${this.getTracklistUrl()}/tracks${pageable.toQuery()}${isNull(params) ? '': `&${params.toString()}`}`).pipe(
             // Transform to future to get loading state
             toFuture(),
             // Only continue if future is resolved
