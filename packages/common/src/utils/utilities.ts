@@ -10,3 +10,7 @@ export function isNull(target: any): boolean {
 export function pascalToSnakeCase(input: string): string {
     return input?.split(/\.?(?=[A-Z])/)?.join('_')?.toLowerCase();
 }
+
+export function hasProperty<T = any>(propertyKey: keyof T, obj: T): boolean {
+    return !isUndefined(obj[propertyKey]);
+}

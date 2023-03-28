@@ -13,7 +13,7 @@ const plugins = [
 export default [
     {
         input: 'src/node.ts',
-        external: ['@nestjs/common'],
+        external: ['@nestjs/common', 'rxjs'],
         output: [
             {
                 file: "dist/index.cjs",
@@ -26,6 +26,7 @@ export default [
     },
     {
         input: 'src/browser.ts',
+        external: ['rxjs'],
         output: [
             {
                 file: "dist/index.es.mjs",
