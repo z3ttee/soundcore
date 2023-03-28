@@ -1,5 +1,5 @@
 import { Injectable } from "@angular/core";
-import { isNull, toVoid } from "@soundcore/common";
+import { isNull, randomString, toVoid } from "@soundcore/common";
 import { LikedSong, PlaylistItem, SCSDKStreamService, Song } from "@soundcore/sdk";
 import { BehaviorSubject, map, Observable, of, switchMap, take, tap } from "rxjs";
 import { ResourceWithTracklist } from "../entities/resource-with-tracklist.entity";
@@ -59,6 +59,26 @@ export class PlayerService {
     ) {
         // Handle ended event on audio element
         this.controls.$onEnded.pipe(switchMap(() => this.next())).subscribe();
+    }
+
+    /**
+     * Toggle shuffle mode. This will generate
+     * a new seed for the player each time the shuffle mode
+     * is switched on again.
+     * @returns State after switching shuffle mode. True, if shuffle is now on, false if shuffle was turned off
+     */
+    public toggleShuffle(): Observable<boolean> {
+        const isShuffled = !isNull(this.playerSeed.getValue());
+
+        if(isShuffled) {
+            // Deactivate shuffle by setting seed to null
+            this.playerSeed.next(null);
+            return of(false);
+        }
+
+        const seed = randomString(8);
+        this.playerSeed.next(seed);
+        return of(true);
     }
 
 
@@ -191,7 +211,7 @@ export class PlayerService {
                 // So we have to skip to the end of the track and let it start
                 // from beginning if play is hit
                 if(isNull(item)) {
-                    // this.controls.resetCurrentlyPlaying(true);
+                    this.controls.resetCurrentlyPlaying(true);
                     return of(null);
                 }
 
@@ -210,7 +230,7 @@ export class PlayerService {
             }),
             // Start playing the item
             switchMap((url) => {
-                if(isNull(url)) return of(this.currentUrl);
+                if(isNull(url)) return of(null);
                 return this.controls.play(url);
             }),
             // Print url

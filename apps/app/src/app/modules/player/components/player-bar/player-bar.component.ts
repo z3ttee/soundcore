@@ -9,8 +9,10 @@ import { PlayerService } from "../../services/player.service";
 
 interface PlayerbarProps {
     song?: Song;
+    isPaused?: boolean;
+    isShuffled?: boolean;
+
     currentTime?: number;
-    playing?: boolean;
     isMobile?: boolean;
     isMuted?: boolean;
     volume?: number;
@@ -45,14 +47,15 @@ export class AppPlayerBarComponent implements OnInit, OnDestroy {
         private readonly playerService: PlayerService
     ) {}
 
-    public $isPaused = this.playerService.$isPaused.pipe(takeUntil(this.$destroy));
-
     public $props: Observable<PlayerbarProps> = combineLatest([
         this.playerService.$currentItem,
-        // this.screen.$screen,
+        this.playerService.$isPaused,
+        this.playerService.$isShuffled
     ]).pipe(
-        map(([currentItem]): PlayerbarProps => ({
-            song: currentItem?.song ?? currentItem as Song
+        map(([currentItem, isPaused, isShuffled]): PlayerbarProps => ({
+            song: currentItem?.song ?? currentItem as Song,
+            isPaused: isPaused,
+            isShuffled: isShuffled
         })),
         tap((props) => {
             this.seekInputControl.setValue(props.currentTime);
@@ -130,5 +133,11 @@ export class AppPlayerBarComponent implements OnInit, OnDestroy {
 
     public togglePlaying() {
         this.playerService.togglePlaying().subscribe();
+    }
+
+    public toggleShuffle() {
+        this.playerService.toggleShuffle().subscribe((shuffled) => {
+            console.log(shuffled);
+        });
     }
 }

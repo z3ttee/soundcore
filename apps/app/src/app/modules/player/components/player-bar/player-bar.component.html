@@ -32,9 +32,9 @@
             <div class="flex items-center justify-center gap-1">
 
                 <!-- Shuffle button -->
-                <!-- <scngx-ibtn-text class="hidden md:inline-block">
-
-                </scngx-ibtn-text> -->
+                <scngx-ibtn-text class="hidden md:inline-block" (click)="toggleShuffle()">
+                    <ng-icon name="featherShuffle" size="18" [ngClass]="{'text-accent': props.isShuffled}"></ng-icon>
+                </scngx-ibtn-text>
                 
                 <!-- Prev button -->
                 <scngx-ibtn-text class="hidden sm:inline-block">
@@ -43,8 +43,8 @@
     
                 <!-- Play button -->
                 <scngx-ibtn size="md" (click)="togglePlaying()">
-                    <img *ngIf="($isPaused | async)" class="w-7 h-7 text-body" src="assets/icons/play.svg">
-                    <img *ngIf="!($isPaused | async)" class="w-7 h-7 text-body" src="assets/icons/pause.svg">
+                    <ng-icon *ngIf="!props.isPaused" name="heroPauseSolid" size="22"></ng-icon>
+                    <ng-icon *ngIf="props.isPaused" name="heroPlaySolid" size="22"></ng-icon>
                 </scngx-ibtn>
     
                 <!-- Skip button -->
