@@ -1,11 +1,10 @@
 import os from "os"
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Page, BasePageable } from 'nestjs-pager';
 import { Zone, ZoneEnv, ZoneStatus } from '../entities/zone.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { FileSystemService } from '../../filesystem/services/filesystem.service';
-import { Environment } from "@soundcore/common";
+import { Environment, Page, Pageable } from "@soundcore/common";
 
 @Injectable()
 export class ZoneService {
@@ -20,7 +19,7 @@ export class ZoneService {
      * @param pageable Page settings
      * @returns Page<Zone>
      */
-    public async findPage(pageable: BasePageable): Promise<Page<Zone>> {
+    public async findPage(pageable: Pageable): Promise<Page<Zone>> {
         const query = await this.repository.createQueryBuilder("zone")
             // Select the amount of mounts
             .loadRelationCountAndMap("zone.mountsCount", "zone.mounts", "mountsCount")
@@ -40,7 +39,7 @@ export class ZoneService {
         return Page.of(result.entities.map((zone, index) => {
             zone.usedSpace = result.raw[index]?.usedSpace || 0;
             return zone;
-        }), totalElements, pageable.offset);
+        }), totalElements, pageable);
     }
 
     /**

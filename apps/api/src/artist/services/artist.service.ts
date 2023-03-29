@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Page, Pageable } from '@soundcore/common';
 import { Slug } from '@tsalliance/utilities';
-import { Page, BasePageable } from 'nestjs-pager';
 import { ObjectLiteral, Repository, SelectQueryBuilder, UpdateResult } from 'typeorm';
 import { GeniusFlag } from '../../utils/entities/genius.entity';
 import { MeilisearchFlag } from '../../utils/entities/meilisearch.entity';
@@ -80,7 +80,7 @@ export class ArtistService {
      * @param pageable Page settings
      * @returns Page<Artist>
      */
-    public async findBySyncFlag(flag: MeilisearchFlag, pageable: BasePageable): Promise<Page<Artist>> {
+    public async findBySyncFlag(flag: MeilisearchFlag, pageable: Pageable): Promise<Page<Artist>> {
         const result = await this.repository.createQueryBuilder("artist")
             .leftJoinAndSelect("artist.artwork", "artwork")
             .where("artist.lastSyncFlag = :flag", { flag })
@@ -90,7 +90,7 @@ export class ArtistService {
             .limit(pageable.limit)
             .getManyAndCount();
 
-        return Page.of(result[0], result[1], pageable.offset);
+        return Page.of(result[0], result[1], pageable);
     }
 
     /**

@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Page, Pageable } from 'nestjs-pager';
+import { Page, Pageable } from '@soundcore/common';
 import { Repository } from 'typeorm';
 import { Album } from '../../album/entities/album.entity';
 import { Playlist } from '../../playlist/entities/playlist.entity';
@@ -82,7 +82,7 @@ export class LikeService {
             .take(pageable.limit)
             .skip(pageable.offset)
             .where("user.id = :userId AND song.id != NULL", { userId })
-            .getManyAndCount().then(([resources, total]) => Page.of(resources, total, pageable.offset));
+            .getManyAndCount().then(([resources, total]) => Page.of(resources, total, pageable));
     }
 
     /**

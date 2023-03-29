@@ -1,4 +1,4 @@
-import { Page } from "nestjs-pager";
+import { Page } from "@soundcore/common";
 import { Album } from "../../album/entities/album.entity";
 import { Artist } from "../../artist/entities/artist.entity";
 import { Distributor } from "../../distributor/entities/distributor.entity";

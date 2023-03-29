@@ -1,7 +1,7 @@
 import { BadRequestException, ForbiddenException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Page, BasePageable } from 'nestjs-pager';
+import { Page, Pageable } from '@soundcore/common';
 import { Not, Repository, SelectQueryBuilder, UpdateResult } from 'typeorm';
 import { EVENT_PLAYLISTS_CHANGED } from '../constants';
 import { Song } from '../song/entities/song.entity';
@@ -98,7 +98,7 @@ export class PlaylistService {
             .where("playlist.id IN(:ids)", { ids })
             .getManyAndCount();
 
-        return Page.of(result[0], result[1], 0);
+        return Page.of(result[0], result[1]);
     }
 
     /**
@@ -119,7 +119,7 @@ export class PlaylistService {
             // .andWhere("playlist.privacy != :privacy", { privacy: PlaylistPrivacy.PRIVATE })
             .getManyAndCount();
 
-        return Page.of(result[0], result[1], 0);
+        return Page.of(result[0], result[1]);
     }
 
     /**
@@ -129,7 +129,7 @@ export class PlaylistService {
      * @param authentication User authentication object to check playlist access
      * @returns Page<Playlist>
      */
-    public async findByAuthor(authorId: string, pageable: BasePageable, authentication: User): Promise<Page<Playlist>> {        
+    public async findByAuthor(authorId: string, pageable: Pageable, authentication: User): Promise<Page<Playlist>> {        
         const result = await this.playlistRepository.createQueryBuilder("playlist")
             .leftJoin("playlist.author", "author").addSelect(["author.id", "author.name", "author.slug"])
             .leftJoin("playlist.artwork", "artwork").addSelect(["artwork.id"])
@@ -145,10 +145,10 @@ export class PlaylistService {
             .where("playlist.privacy = '" + PlaylistPrivacy.PUBLIC.toString() + "' AND (author.id = :authorId OR author.slug = :authorId) OR (likedByUser.userId = :userId AND playlist.privacy = :privacy)", { authorId: authorId, privacy: PlaylistPrivacy.NOT_LISTED.toString(), userId: authentication.id })
             .getManyAndCount();
 
-        return Page.of(result[0], result[1], pageable.offset);
+        return Page.of(result[0], result[1], pageable);
     }
 
-    public async findByArtist(artistId: string, pageable: BasePageable, authentication: User): Promise<Page<Playlist>> {
+    public async findByArtist(artistId: string, pageable: Pageable, authentication: User): Promise<Page<Playlist>> {
         const result = await this.playlistRepository.createQueryBuilder("playlist")
             .leftJoin("playlist.items", "item")
             .leftJoin("item.song", "song")
@@ -171,10 +171,10 @@ export class PlaylistService {
             .andWhere("(author.id = :authorId OR author.slug = :authorId OR playlist.privacy = :privacy)", { authorId: authentication?.id, privacy: PlaylistPrivacy.PUBLIC.toString() })
             .getManyAndCount();
 
-        return Page.of(result[0], result[1], pageable.offset);
+        return Page.of(result[0], result[1], pageable);
     }
 
-    public async findByGenre(genreId: string, pageable: BasePageable, authentication: User): Promise<Page<Playlist>> {
+    public async findByGenre(genreId: string, pageable: Pageable, authentication: User): Promise<Page<Playlist>> {
         const result = await this.playlistRepository.createQueryBuilder("playlist")
             .leftJoin("playlist.author", "author")
             .leftJoin("playlist.artwork", "artwork")
@@ -192,7 +192,7 @@ export class PlaylistService {
 
             // TODO: Check if user has access to playlist
 
-        return Page.of(result, result.length, pageable.offset);
+        return Page.of(result, result.length, pageable);
     }
 
     /**

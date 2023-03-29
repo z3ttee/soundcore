@@ -1,5 +1,5 @@
 import { Controller, Get, Param } from "@nestjs/common";
-import { Pageable, Pagination } from "nestjs-pager";
+import { Pageable, Pagination } from "@soundcore/common";
 import { Roles } from "../../authentication/decorators/role.decorator";
 import { TasksService } from "../services/tasks.service";
 

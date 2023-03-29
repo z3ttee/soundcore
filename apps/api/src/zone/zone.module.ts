@@ -1,6 +1,6 @@
 import { Logger, Module, OnModuleInit } from '@nestjs/common';
 import { ZoneService } from './services/zone.service';
-import { ZoneController } from './controllers/bucket.controller';
+import { ZoneController } from './controllers/zone.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Zone } from './entities/zone.entity';
 

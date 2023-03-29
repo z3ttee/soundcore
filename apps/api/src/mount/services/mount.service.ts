@@ -1,6 +1,5 @@
 import path from 'node:path';
 import { BadRequestException, Injectable, InternalServerErrorException, Logger, NotFoundException } from '@nestjs/common';
-import { Page, Pageable } from 'nestjs-pager';
 import { Repository } from 'typeorm';
 import { Zone } from '../../zone/entities/zone.entity';
 import { CreateMountDTO } from '../dtos/create-mount.dto';
@@ -12,12 +11,10 @@ import { FileSystemService } from '../../filesystem/services/filesystem.service'
 import { MountRegistryService } from './mount-registry.service';
 import { MountScanFlag } from '../dtos/scan-process.dto';
 import { FileFlag } from '../../file/entities/file.entity';
-import { Environment } from '@soundcore/common';
-import { EVENT_MOUNT_PROCESS_UPDATE, MOUNTNAME_MAX_LENGTH, MOUNT_MAX_STEPS, MOUNT_STEP_WAITING } from '../../constants';
+import { Environment, Page, Pageable } from '@soundcore/common';
+import { EVENT_MOUNT_PROCESS_UPDATE, MOUNTNAME_MAX_LENGTH } from '../../constants';
 import { AdminGateway } from '../../gateway/gateways/admin-gateway.gateway';
 import { OnEvent } from '@nestjs/event-emitter';
-import { PIPELINE_INDEX_ID } from '../../indexer/pipelines';
-import { PipelineRun } from '@soundcore/pipelines';
 import { IndexerService } from '../../indexer/services/indexer.service';
 import { Task } from '../../tasks/entities/task.entity';
 
@@ -56,7 +53,7 @@ export class MountService {
         return Page.of(result.entities.map((mount, index) => {
             mount.usedSpace = result.raw[index]?.usedSpace || 0
             return mount;
-        }), totalElements, pageable.page);
+        }), totalElements, pageable);
     }
 
     /**

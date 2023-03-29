@@ -1,5 +1,5 @@
 import { Controller, Get, Param } from '@nestjs/common';
-import { Pageable, Pagination } from 'nestjs-pager';
+import { Pageable, Pagination } from '@soundcore/common';
 import { GenreService } from '../services/genre.service';
 
 @Controller('genres')

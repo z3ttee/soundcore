@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Page, Pageable } from "nestjs-pager";
+import { Page, Pageable } from "@soundcore/common";
 import { Repository } from "typeorm";
 import { Playlist } from "../../playlist/entities/playlist.entity";
 import { PlaylistService } from "../../playlist/playlist.service";
@@ -25,7 +25,7 @@ export class LibraryService {
             .limit(pageable.limit)
             .where("user.id = :userId", { userId: user.id })
             .getManyAndCount().then(([resources, total]) => {
-                return Page.of(resources, total, pageable.offset);
+                return Page.of(resources, total, pageable);
             });
     }
 

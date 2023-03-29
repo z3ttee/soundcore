@@ -1,5 +1,5 @@
 import { Controller, Get, Param } from '@nestjs/common';
-import { Page, Pageable, Pagination } from 'nestjs-pager';
+import { Pageable, Pagination } from '@soundcore/common';
 import { Roles } from '../../authentication/decorators/role.decorator';
 import { Zone } from '../entities/zone.entity';
 import { ZoneService } from '../services/zone.service';
@@ -16,7 +16,7 @@ export class ZoneController {
 
   @Roles("admin")
   @Get()
-  public async findAll(@Pagination() pageable: Pageable): Promise<Page<Zone>> {
+  public async findAll(@Pagination() pageable: Pageable) {
     return this.service.findPage(pageable);
   }
 

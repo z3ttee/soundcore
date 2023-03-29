@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { Page, Pageable } from 'nestjs-pager';
 import { ArtistService } from '../../artist/services/artist.service';
 import { Artist } from '../../artist/entities/artist.entity';
 import { User } from '../../user/entities/user.entity';
 import { UserService } from '../../user/user.service';
+import { Page } from '@soundcore/common';
 
 @Injectable()
 export class ProfileService {
@@ -43,7 +43,7 @@ export class ProfileService {
         return Page.of(result.entities.map((artist, index) => {
             artist.streamCount = Number(result.raw[index]?.streamCount ?? 0);
             return artist;
-        }), result.entities.length, 0);
+        }), result.entities.length);
     }
 
 }

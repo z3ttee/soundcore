@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Page, Pageable } from 'nestjs-pager';
+import { Page, Pageable } from '@soundcore/common';
 import { Repository } from 'typeorm';
 import { User } from '../../user/entities/user.entity';
 import { CreateNotificationDTO } from '../dtos/notification.dto';
@@ -25,7 +25,7 @@ export class NotificationService {
             .where("notification.isBroadcast = :isBroadcast OR target.id = :targetId", { isBroadcast: 1, targetId: authentication.id })
             .getManyAndCount();
 
-        return Page.of(result[0], result[1], pageable.page)
+        return Page.of(result[0], result[1], pageable)
     }
 
     public async createNotification(createNotificationDto: CreateNotificationDTO): Promise<Notification> {

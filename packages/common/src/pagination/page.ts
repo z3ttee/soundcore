@@ -1,13 +1,16 @@
 import { isNull } from "../utils/utilities";
 
 export class Page<T = any> {
+    public readonly length: number = 0;
 
     constructor(
         public readonly next: number,
         public readonly items: T[],
         public readonly totalSize: number,
         public readonly info: PageInfo
-    ) {}
+    ) {
+        this.length = items?.length ?? 0;
+    }
 
     public static of<T = any>(items: T[], totalSize: number, pageable?: Pageable): Page<T> {
         let next: number = null;

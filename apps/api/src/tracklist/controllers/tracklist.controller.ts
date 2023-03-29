@@ -1,5 +1,4 @@
 import { Controller, Get, Param } from '@nestjs/common';
-import { Page, Pageable, Pagination } from 'nestjs-pager';
 import { Authentication } from '../../authentication/decorators/authentication.decorator';
 import { Hostname } from '../../hostname/decorator/hostname.decorator';
 import { PlaylistItem } from '../../playlist/entities/playlist-item.entity';
@@ -8,6 +7,7 @@ import { Song } from '../../song/entities/song.entity';
 import { Tracklist } from '../entities/tracklist.entity';
 import { TracklistService } from '../services/tracklist.service';
 import { LikedSong } from '../../collection/entities/like.entity';
+import { Page, Pageable, Pagination } from '@soundcore/common';
 
 /**
  * Controller class that contains

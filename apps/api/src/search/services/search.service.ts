@@ -1,8 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { Pageable } from '@soundcore/common';
 import { MeiliIndex } from '@soundcore/meilisearch';
-import { Pageable } from 'nestjs-pager';
 import { AlbumMeiliService } from '../../album/services/album-meili.service';
-import { Artist } from '../../artist/entities/artist.entity';
 import { ArtistMeiliService } from '../../artist/services/artist-meili.service';
 import { SongMeiliService } from '../../song/services/song-meili.service';
 import { User } from '../../user/entities/user.entity';

@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Page, BasePageable } from 'nestjs-pager';
+import { Page, Pageable } from '@soundcore/common';
 import { Repository, SelectQueryBuilder, UpdateResult } from 'typeorm';
 import { Artist } from '../../artist/entities/artist.entity';
 import { EVENT_ALBUMS_CHANGED } from '../../constants';
@@ -53,7 +53,7 @@ export class AlbumService implements SyncableService<Album> {
      * @param authentication Authentication object
      * @returns Page<Album>
      */
-    public async findByArtist(artistId: string, pageable: BasePageable, authentication?: User): Promise<Page<Album>> {
+    public async findByArtist(artistId: string, pageable: Pageable, authentication?: User): Promise<Page<Album>> {
         const result = await this.buildGeneralQuery("album", authentication)
             .skip(pageable.offset)
             .take(pageable.limit)
@@ -64,7 +64,7 @@ export class AlbumService implements SyncableService<Album> {
             .where("primaryArtist.id = :artistId OR primaryArtist.slug = :artistId", { artistId })
             .getManyAndCount();
 
-        return Page.of(result[0], result[1], pageable.offset);
+        return Page.of(result[0], result[1], pageable);
     }
 
     /**
@@ -76,7 +76,7 @@ export class AlbumService implements SyncableService<Album> {
      * @param authentication Authentication object
      * @returns Page<Album>
      */
-    public async findFeaturedWithArtist(artistId: string, pageable: BasePageable, authentication?: User): Promise<Page<Album>> {
+    public async findFeaturedWithArtist(artistId: string, pageable: Pageable, authentication?: User): Promise<Page<Album>> {
         const result = await this.buildGeneralQuery("album", authentication)
             .leftJoin("album.songs", "song")
             .leftJoin("song.primaryArtist", "songArtist")
@@ -92,7 +92,7 @@ export class AlbumService implements SyncableService<Album> {
             .andWhere("(songArtist.id = :artistId OR songArtist.slug = :artistId OR songFeatArtist.id = :artistId OR songFeatArtist.slug = :artistId)", { artistId })
             .getManyAndCount();
         
-        return Page.of(result[0], result[1], pageable.offset);
+        return Page.of(result[0], result[1], pageable);
     }
 
     /**
@@ -114,7 +114,7 @@ export class AlbumService implements SyncableService<Album> {
             .where("album.id NOT IN(:except) AND (primaryArtist.id = :artistId OR primaryArtist.slug = :artistId)", { except: exceptAlbumIds, artistId })
             .getMany();
 
-        return Page.of(result, maxAlbums, 0);
+        return Page.of(result, maxAlbums);
     }
 
     /**
@@ -124,7 +124,7 @@ export class AlbumService implements SyncableService<Album> {
      * @param authentication Authentication Object
      * @returns Page<Album>
      */
-    public async findByGenre(genreId: string, pageable: BasePageable, authentication?: User): Promise<Page<Album>> {
+    public async findByGenre(genreId: string, pageable: Pageable, authentication?: User): Promise<Page<Album>> {
         const result = await this.buildGeneralQuery("album", authentication)
             .leftJoin("album.songs", "song")
             .leftJoin("song.genres", "genre")
@@ -135,7 +135,7 @@ export class AlbumService implements SyncableService<Album> {
             .where("genre.id = :genreId OR genre.slug = :genreId", { genreId })
             .getManyAndCount()
 
-        return Page.of(result[0], result[1], pageable.offset);
+        return Page.of(result[0], result[1], pageable);
     }
 
     /**
@@ -157,7 +157,7 @@ export class AlbumService implements SyncableService<Album> {
      * @param pageable Page settings
      * @returns Page<Album>
      */
-    public async findBySyncFlag(flag: MeilisearchFlag, pageable: BasePageable): Promise<Page<Album>> {
+    public async findBySyncFlag(flag: MeilisearchFlag, pageable: Pageable): Promise<Page<Album>> {
         const result = await this.repository.createQueryBuilder("album")
             .leftJoinAndSelect("album.artwork", "artwork")
             .leftJoinAndSelect("album.primaryArtist", "primaryArtist")
@@ -168,7 +168,7 @@ export class AlbumService implements SyncableService<Album> {
             .limit(pageable.limit)
             .getManyAndCount();
 
-        return Page.of(result[0], result[1], pageable.offset);
+        return Page.of(result[0], result[1], pageable);
     }
 
     /**

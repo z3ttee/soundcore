@@ -1,6 +1,5 @@
 import { BadRequestException, Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
-import { Environment } from '@soundcore/common';
-import { Page, Pageable, Pagination } from 'nestjs-pager';
+import { Environment, Page, Pageable, Pagination } from '@soundcore/common';
 import { Roles } from '../../authentication/decorators/role.decorator';
 import { ROLE_ADMIN } from '../../constants';
 import { CreateResult } from '../../utils/results/creation.result';
@@ -15,7 +14,7 @@ export class MountController {
 
   @Roles(ROLE_ADMIN)
   @Get("/bucket/:bucketId")
-  public async findAllByBucket(@Param("bucketId") bucketId: string, @Pagination() pageable: Pageable): Promise<Page<Mount>> {
+  public async findAllByBucket(@Param("bucketId") bucketId: string, @Pagination() pageable: Pageable) {
     return this.mountService.findByBucketId(bucketId, pageable);
   }
 

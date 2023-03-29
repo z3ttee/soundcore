@@ -1,7 +1,7 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
+import { Page, Pageable } from "@soundcore/common";
 import { InjectIndex, MeiliIndex } from "@soundcore/meilisearch";
-import { Page, Pageable } from "nestjs-pager";
 import { Repository } from "typeorm";
 import { MeilisearchBaseService } from "../../meilisearch/services/meili.service";
 import { MeilisearchFlag } from "../../utils/entities/meilisearch.entity";
@@ -34,7 +34,7 @@ export class SongMeiliService extends MeilisearchBaseService<Song> {
             .limit(pageable.limit)
             .offset(pageable.offset)
             .getManyAndCount().then(([entities, total]) => {
-                return Page.of(entities, total, pageable.offset);
+                return Page.of(entities, total, pageable);
             });
     }
 
