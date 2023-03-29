@@ -69,10 +69,10 @@
         </div>
     
         <div class="w-full pb-bottom overflow-hidden">
-            <scngx-ui-row [headline]="'Alben'" [route]="['./albums']" *ngIf="props.albums.data?.elements?.length > 0">
+            <scngx-ui-row [headline]="'Alben'" [route]="['./albums']" *ngIf="props.albums.data?.length > 0">
                 <scngx-horizontal-list>
                     <scngx-album-grid-item 
-                        *ngFor="let item of props.albums.data?.elements"
+                        *ngFor="let item of props.albums.data?.items"
                         [item]="item" 
                         [useDate]="true"
                         [routerLink]="['/album', item.slug ?? item.id]">
@@ -80,11 +80,11 @@
                 </scngx-horizontal-list>
             </scngx-ui-row>
         
-                <scngx-ui-row [headline]="'Enthalten in'" [route]="['./playlists']" *ngIf="props.featPlaylists.data?.elements?.length > 0">
+                <scngx-ui-row [headline]="'Enthalten in'" [route]="['./playlists']" *ngIf="props.featPlaylists.data?.length > 0">
                     <div class="w-full">
                         <scngx-horizontal-list>
                             <scngx-playlist-grid-item
-                                *ngFor="let item of props.featPlaylists.data?.elements"
+                                *ngFor="let item of props.featPlaylists.data?.items"
                                 [item]="item"
                                 [routerLink]="['/playlist', item?.slug ?? item?.id]">
                             </scngx-playlist-grid-item>
@@ -92,11 +92,11 @@
                     </div>
                 </scngx-ui-row>
         
-                <scngx-ui-row [headline]="'Alben mit ' + props.artist?.name" [route]="['./playlists']" *ngIf="props.featAlbums.data?.elements?.length > 0">
+                <scngx-ui-row [headline]="'Alben mit ' + props.artist?.name" [route]="['./playlists']" *ngIf="props.featAlbums.data?.length > 0">
                     <div class="w-full">
                         <scngx-horizontal-list>
                             <scngx-album-grid-item 
-                                *ngFor="let item of props.featAlbums.data?.elements"
+                                *ngFor="let item of props.featAlbums.data?.items"
                                 [item]="item" 
                                 [useDate]="true"
                                 [routerLink]="['/album', item.slug ?? item.id]">

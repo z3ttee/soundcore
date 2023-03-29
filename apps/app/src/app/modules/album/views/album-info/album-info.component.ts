@@ -1,12 +1,13 @@
 import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { combineLatest, filter, map, Observable, of, Subject, switchMap, takeUntil } from 'rxjs';
-import { Album, ApiError, Future, Page, SCDKAlbumService, SCSDKDatasource, SCSDKSongService, SCSDKTracklistV2Service, Song, toFutureCompat } from '@soundcore/sdk';
+import { combineLatest, map, Observable, of, Subject, switchMap, takeUntil } from 'rxjs';
+import { Album, ApiError, Future, SCDKAlbumService, SCSDKDatasource, SCSDKSongService, SCSDKTracklistV2Service, Song, toFutureCompat } from '@soundcore/sdk';
 import { AUDIOWAVE_LOTTIE_OPTIONS } from 'src/app/constants';
 import { PlayerService } from 'src/app/modules/player/services/player.service';
 import { SCNGXTracklist } from 'src/app/modules/player/entities/tracklist.entity';
 import { environment } from 'src/environments/environment';
 import { HttpClient } from '@angular/common/http';
+import { Page } from '@soundcore/common';
 
 interface AlbumInfoProps {
   album?: Album;

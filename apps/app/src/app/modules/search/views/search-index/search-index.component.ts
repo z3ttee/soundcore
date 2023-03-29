@@ -4,8 +4,9 @@ import { UntypedFormControl } from '@angular/forms';
 import { Router } from '@angular/router';
 import { combineLatest, debounceTime, Observable, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { SCCDKScreenService } from '@soundcore/cdk';
-import { SCDKGenreService, MeiliAlbum, MeiliArtist, SCSDKSearchService, SCDKResource, MeiliPlaylist, Pageable, MeiliUser, SCDKUserService, SCDKArtistService, SCDKAlbumService, MeiliSong, SCSDKSongService, SCSDKPlaylistService } from '@soundcore/sdk';
+import { SCDKGenreService, MeiliAlbum, MeiliArtist, SCSDKSearchService, SCDKResource, MeiliPlaylist, MeiliUser, SCDKUserService, SCDKArtistService, SCDKAlbumService, MeiliSong, SCSDKSongService, SCSDKPlaylistService } from '@soundcore/sdk';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { Pageable } from '@soundcore/common';
 
 interface SearchIndexProps {
   query?: string;

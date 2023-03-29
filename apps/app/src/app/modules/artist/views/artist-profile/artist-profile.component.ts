@@ -2,8 +2,9 @@ import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/
 import { ActivatedRoute } from '@angular/router';
 import { combineLatest, map, Observable, startWith, Subject, switchMap, takeUntil } from 'rxjs';
 import { SCNGXTracklist, SCNGXTracklistBuilder } from '@soundcore/ngx';
-import { Album, Artist, Future, Page, Pageable, Playlist, SCDKAlbumService, SCDKArtistService, SCSDKPlaylistService, toFutureCompat } from '@soundcore/sdk';
+import { Album, Artist, Future, Playlist, SCDKAlbumService, SCDKArtistService, SCSDKPlaylistService, toFutureCompat } from '@soundcore/sdk';
 import { AUDIOWAVE_LOTTIE_OPTIONS } from 'src/app/constants';
+import { Page, Pageable } from '@soundcore/common';
 
 interface ArtistInfoProps {
   artist?: Artist;

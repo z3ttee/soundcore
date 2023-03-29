@@ -56,10 +56,10 @@
 
             <!-- Footer -->
             <div class="pb-bottom">
-                <scngx-ui-row [headline]="'Mehr Alben' + (!props.album?.primaryArtist?.name ? '' : ' von ' + props.album?.primaryArtist?.name)" *ngIf="props.recommendedAlbums?.data?.size > 0">
+                <scngx-ui-row [headline]="'Mehr Alben' + (!props.album?.primaryArtist?.name ? '' : ' von ' + props.album?.primaryArtist?.name)" *ngIf="props.recommendedAlbums?.data?.length > 0">
                     <scngx-horizontal-list>
                         <scngx-album-grid-item 
-                            *ngFor="let item of props.recommendedAlbums.data?.elements"
+                            *ngFor="let item of props.recommendedAlbums.data?.items"
                             [item]="item" 
                             [useDate]="true"
                             [routerLink]="['/album', item.slug ?? item.id]">
