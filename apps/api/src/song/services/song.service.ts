@@ -109,6 +109,7 @@ export class SongService implements SyncableService<Song> {
                 .leftJoin("song.featuredArtists", "featuredArtist").addSelect(["featuredArtist.id", "featuredArtist.slug", "featuredArtist.name"])
                 .leftJoin("song.artwork", "artwork").addSelect(["artwork.id"])
                 .loadRelationCountAndMap("song.liked", "song.likes", "likes", (qb) => qb.where("likes.userId = :userId", { userId: authentication?.id }))
+                .orderBy("song.order", "ASC")
                 .whereInIds(ids)
 
             // Add seed, used to create shuffled tracklist
@@ -119,6 +120,62 @@ export class SongService implements SyncableService<Song> {
                 // Build page
                 return Page.of(tracks, total, pageable);
             });
+        });
+    }
+
+    /**
+     * Find list of tracks of an artist ordered by popularity
+     * @param albumId Album's id
+     * @param pageable Page settings
+     * @param authentication Authentication object
+     * @param seed Seed used for building shuffled tracklist
+     * @returns Page<Song>
+     */
+    public async findByArtist(artistId: string, pageable: Pageable, authentication?: User, seed?: number): Promise<Page<Song>> {
+        if(!isNull(seed) && isNaN(seed)) throw new BadRequestException("Invalid seed found. Must be an integer")
+
+        // Create query to get ids only
+        let idsQuery = this.repository.createQueryBuilder("song")
+            .select(["song.id"])
+            .leftJoin("song.primaryArtist", "primaryArtist")
+            .leftJoin("song.featuredArtists", "featuredArtists")
+            .where("primaryArtist.id = :artistId OR primaryArtist.slug = :artistId OR (featuredArtists.id = :artistId OR featuredArtists.slug = :artistId)", { artistId: artistId })
+            .offset(pageable.offset)
+            .limit(pageable.limit)
+            // Order by likes and streams
+            .addSelect("COUNT(streams.id) as streamsCount").leftJoin("song.streams", "streams")
+            .addSelect("COUNT(likes.id) as likesCount").leftJoin("song.likes", "likes")
+            .groupBy("song.id")
+            .orderBy("likesCount", "DESC")
+            .addOrderBy("streamsCount", "DESC")
+
+        // Add seed, used to create shuffled tracklist
+        if(!isNaN(seed)) idsQuery = idsQuery.addOrderBy(`RAND(${seed})`);
+
+        idsQuery.getRawMany().then((values) => console.log(values))
+
+        // Find ids and use these ids to fetch metadata
+        return idsQuery.getManyAndCount().then(([ids, total]) => {
+            let findQuery = this.repository.createQueryBuilder("song")
+                .select(["song.id", "song.slug", "song.name", "song.duration", "song.explicit"])
+                .leftJoin("song.album", "album").addSelect(["album.id", "album.slug", "album.name"])
+                .leftJoin("song.primaryArtist", "primaryArtist").addSelect(["primaryArtist.id", "primaryArtist.slug", "primaryArtist.name"])
+                .leftJoin("song.featuredArtists", "featuredArtist").addSelect(["featuredArtist.id", "featuredArtist.slug", "featuredArtist.name"])
+                .leftJoin("song.artwork", "artwork").addSelect(["artwork.id"])
+                .loadRelationCountAndMap("song.liked", "song.likes", "likes", (qb) => qb.where("likes.userId = :userId", { userId: authentication?.id }))
+                // Sort by streamcount and likes
+                .addSelect("COUNT(streams.id) as streamsCount").leftJoin("song.streams", "streams")
+                .addSelect("COUNT(likes.id) as likesCount").leftJoin("song.likes", "likes")
+                .groupBy("song.id")
+                .orderBy("likesCount", "DESC")
+                .addOrderBy("streamsCount", "DESC")
+                // Where in ids
+                .whereInIds(ids)
+
+            // Add seed, used to create shuffled tracklist
+            if(!isNaN(seed)) findQuery = findQuery.orderBy(`RAND(${seed})`);
+            // Fetch metadata
+            return findQuery.getMany().then((tracks) => Page.of(tracks, total, pageable));
         });
     }
 
@@ -356,20 +413,6 @@ export class SongService implements SyncableService<Song> {
 
     public async setArtworks(objects: (Pick<Song, "artwork"> & Pick<Song, "id">)[]): Promise<Song[]> {
         return this.repository.save(objects);
-    }
-
-    /**
-     * Set the flag of a song.
-     * @param idOrObject Id or song object
-     * @param flag Flag to set
-     * @returns Song
-     */
-    public async setFlag(idOrObject: string | Song, flag: ResourceFlag): Promise<Song> {
-        const song = await this.resolveSong(idOrObject);
-        if(!song) throw new NotFoundException("Could not find song.");
-
-        song.flag = flag;
-        return this.repository.save(song);
     }
 
     /**

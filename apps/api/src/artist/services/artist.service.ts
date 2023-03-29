@@ -176,20 +176,6 @@ export class ArtistService {
     /**
      * Set resource flag of an artist.
      * @param idOrObject Artist id or object
-     * @param flag Resource flag
-     * @returns Artist
-     */
-    public async setFlag(idOrObject: string | Artist, flag: ResourceFlag): Promise<Artist> {
-        const artist = await this.resolveArtist(idOrObject);
-        if(!artist) return null;
-
-        artist.flag = flag;
-        return this.repository.save(artist);
-    }
-
-    /**
-     * Set resource flag of an artist.
-     * @param idOrObject Artist id or object
      * @param flag Genius flag
      * @returns Artist
      */

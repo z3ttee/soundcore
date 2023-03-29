@@ -51,6 +51,15 @@ export class SCSDKSongService {
     }
 
     /**
+     * Create datasource that contains songs that belong to an artist
+     * @param artistId Id of the artist
+     * @returns {SCSDKDatasource<Song>}
+     */
+    public findByArtistDatasource(artistId: string, initialSize?: number, pageSize?: number): Observable<SCSDKDatasource<Song>> {
+        return of(new SCSDKDatasource(this.httpClient, `${this.options.api_base_uri}/v1/songs/artist/${artistId}`, initialSize, pageSize));
+    }
+
+    /**
      * Find songs of the user's collection
      * @param pageable Page settings
      * @returns Observable<Page<Song>>

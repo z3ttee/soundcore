@@ -251,20 +251,6 @@ export class AlbumService implements SyncableService<Album> {
     }
 
     /**
-     * Set resource flag of an album.
-     * @param idOrObject Album id or object
-     * @param flag Resource flag
-     * @returns Album
-     */
-    public async setFlag(idOrObject: string | Album, flag: ResourceFlag): Promise<Album> {
-        const artist = await this.resolveAlbum(idOrObject);
-        if(!artist) throw new NotFoundException("Artist not found.");
-
-        artist.flag = flag;
-        return this.repository.save(artist);
-    }
-
-    /**
      * Set resource flag of an Album.
      * @param idOrObject Album id or object
      * @param flag Genius flag
