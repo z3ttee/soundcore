@@ -93,7 +93,7 @@ export class SongService implements SyncableService<Song> {
         let idsQuery = this.repository.createQueryBuilder("song")
             .select(["song.id"])
             .leftJoin("song.album", "album")
-            .where("album.id = :albumId", { albumId: albumId })
+            .where("album.id = :albumId OR album.slug = :albumId", { albumId: albumId })
             .offset(pageable.offset)
             .limit(pageable.limit)
             .orderBy("song.order", "ASC");
