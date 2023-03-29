@@ -1,2 +1,3 @@
 
-export { SCSDKBaseDatasource, SCSDKDatasource } from "./datasource";
+export { SCSDKBaseDatasource } from "./base-datasource";
+export { SCSDKDatasource } from "./datasource";
