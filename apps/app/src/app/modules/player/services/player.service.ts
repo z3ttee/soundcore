@@ -118,6 +118,13 @@ export class PlayerService {
         // Check if the entity was enqueued with a tracklist.
         // This means, that the entity may not be a single song
         if(!isNull(tracklist)) {
+            // If its a tracklist, check if the tracklist is actively playing currently
+            if(this.isTracklistActive(tracklist.id)) {
+                // If true, toggle playback state
+                return this.togglePlaying().pipe(toVoid());
+            }
+
+            // Otherwise force play at position 0
             return this.forcePlayAt(entity, tracklist, 0).pipe(toVoid());
         }
 
@@ -318,7 +325,7 @@ export class PlayerService {
         return current.id === songId && current.tracklistId === tracklistId;
     }
 
-    private isTracklistPlaying(tracklistId: string): boolean {
+    private isTracklistActive(tracklistId: string): boolean {
         const current = this.currentItem.getValue();
         if(isNull(current)) return false;
         return current.tracklistId === tracklistId;
