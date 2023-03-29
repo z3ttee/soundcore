@@ -54,7 +54,7 @@ export class Pageable implements PageInfo {
      * @returns string
      */
     public toParams(): string {
-        return `offset=${this.offset}&limit=${this.limit}`;
+        return `page=${this.index}&limit=${this.limit}`;
     }
 
 }
