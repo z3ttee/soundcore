@@ -1,33 +1,33 @@
 <ng-container *ngIf="($props | async) as props">
     <div class="w-full h-full" cdkVirtualScrollingElement>
         <!-- 404 -->
-        <app-error404 *ngIf="!props.loading && !props.album; else content" [title]="'Album nicht gefunden'"></app-error404>
+        <app-error404 *ngIf="!props.album.loading && !props.album.data; else content" [title]="'Album nicht gefunden'"></app-error404>
 
         <!-- Page -->
         <ng-template #content>
             <!-- Header -->
-            <app-list-view [resource]="$any(props.album)" [title]="props.album?.name" [isLoading]="props.loading" [artwork]="props.album?.artwork">
+            <app-list-view [resource]="$any(props.album.data)" [title]="props.album.data?.name" [isLoading]="props.album.loading" [artwork]="props.album.data?.artwork">
                 <ng-container scngx-stats>
-                    <li class="inline-flex items-center gap-1 text-font-secondary hover:underline cursor-pointer" *ngIf="props.album?.primaryArtist">
+                    <li class="inline-flex items-center gap-1 text-font-secondary hover:underline cursor-pointer" *ngIf="props.album.data?.primaryArtist">
                         <div class="w-7 h-7 rounded-full overflow-hidden">
-                            <scngx-artwork [artwork]="props.album?.artwork"></scngx-artwork>
+                            <scngx-artwork [artwork]="props.album.data?.artwork"></scngx-artwork>
                         </div>
-                        <span [routerLink]="['/artist', props.album?.primaryArtist?.slug || props.album?.primaryArtist?.id]">
-                            {{ props.album?.primaryArtist?.name }}
+                        <span [routerLink]="['/artist', props.album.data?.primaryArtist?.slug || props.album.data?.primaryArtist?.id]">
+                            {{ props.album.data?.primaryArtist?.name }}
                         </span>
                     </li>
                     <li class="text-font-secondary">
-                        <span>{{ props.album?.songsCount }} {{ props.album?.songsCount != 1 ? 'Songs' : 'Song' }}</span>
+                        <span>{{ props.album.data?.songsCount }} {{ props.album.data?.songsCount != 1 ? 'Songs' : 'Song' }}</span>
                     </li>
                     <li class="text-font-secondary">
-                        <span>{{ props.album?.totalDuration| scngxSongDurationPipe }} min</span>
+                        <span>{{ props.album.data?.totalDuration| scngxSongDurationPipe }} min</span>
                     </li>
                 </ng-container>
             
                 <ng-container scngx-controls>
-                    <scngx-ibtn (click)="forcePlay(props.album, props.tracklist.data)" size="md">
-                        <ng-icon *ngIf="props.playing" name="heroPauseSolid" size="24"></ng-icon>
-                        <ng-icon *ngIf="!props.playing" name="heroPlaySolid" size="24"></ng-icon>
+                    <scngx-ibtn (click)="forcePlay(props.album.data, props.tracklist.data)" size="md">
+                        <ng-icon *ngIf="props.isPlaying; else playIcon" name="heroPauseSolid" size="24"></ng-icon>
+                        <ng-template #playIcon><ng-icon name="heroPlaySolid" size="24"></ng-icon></ng-template>
                     </scngx-ibtn>
             
                     <scngx-ibtn-text>
@@ -41,32 +41,37 @@
             </app-list-view>
 
             <!-- Songs list -->
-            <cdk-virtual-scroll-viewport [itemSize]="56">
-                <div *cdkVirtualFor="let item of props.datasource.data; index as i" class="px-window">
-                    <scngx-song-list-item 
-                        [song]="item" 
-                        [index]="i"
-                        [active]="props.currentlyPlaying?.song?.id == item?.id"
-                        [playing]="props.playing"
-                        [animRef]="lottieAnimationTemplate"
-                        (onPlay)="forcePlayAt(props.album, props.tracklist.data, i)">
-                    </scngx-song-list-item>
-                </div>
-            </cdk-virtual-scroll-viewport>
+            <ng-container *ngIf="($datasource | async) as datasource">
+                <cdk-virtual-scroll-viewport [itemSize]="56">
+                    <div *cdkVirtualFor="let item of datasource; index as i" class="px-window">
+                        <scngx-song-list-item 
+                            [song]="item" 
+                            [index]="i"
+                            [active]="props.currentItemId === item?.id && props.isTracklistActive"
+                            [playing]="props.isPlaying"
+                            [animRef]="lottieAnimationTemplate"
+                            (onPlay)="forcePlayAt(props.album.data, props.tracklist.data, i)">
+                        </scngx-song-list-item>
+                    </div>
+                </cdk-virtual-scroll-viewport>
+            </ng-container>
+            
 
             <!-- Footer -->
-            <div class="pb-bottom">
-                <scngx-ui-row [headline]="'Mehr Alben' + (!props.album?.primaryArtist?.name ? '' : ' von ' + props.album?.primaryArtist?.name)" *ngIf="props.recommendedAlbums?.data?.length > 0">
-                    <scngx-horizontal-list>
-                        <scngx-album-grid-item 
-                            *ngFor="let item of props.recommendedAlbums.data?.items"
-                            [item]="item" 
-                            [useDate]="true"
-                            [routerLink]="['/album', item.slug ?? item.id]">
-                        </scngx-album-grid-item>
-                    </scngx-horizontal-list>
-                </scngx-ui-row>
-            </div>
+            <ng-container *ngIf="($recommendedAlbums | async) as recommendedAlbums">
+                <div class="pb-bottom">
+                    <scngx-ui-row [headline]="'Mehr Alben' + (!props.album.data?.primaryArtist?.name ? '' : ' von ' + props.album.data?.primaryArtist?.name)" *ngIf="recommendedAlbums.data?.length > 0">
+                        <scngx-horizontal-list>
+                            <scngx-album-grid-item 
+                                *ngFor="let item of recommendedAlbums.data?.items"
+                                [item]="item" 
+                                [useDate]="true"
+                                [routerLink]="['/album', item.slug ?? item.id]">
+                            </scngx-album-grid-item>
+                        </scngx-horizontal-list>
+                    </scngx-ui-row>
+                </div>
+            </ng-container>
         </ng-template>
     </div>
 </ng-container>
