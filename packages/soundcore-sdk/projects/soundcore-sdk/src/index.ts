@@ -7,9 +7,6 @@ export { SCSDKAppService, ApplicationInfo, ApplicationBuildInfo } from "./lib/ap
 // Gateways
 export * from "./lib/gateway";
 
-// Pagination
-export * from "./lib/pagination";
-
 // Tracklist
 export * from "./lib/tracklist";
 

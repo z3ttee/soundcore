@@ -79,6 +79,8 @@ export abstract class SCSDKBaseDatasource<T = any> extends DataSource<T> {
             this.subscription.add(collectionViewer.viewChange.subscribe((range) => {
                 const startPage = this.getPageForIndex(range.start);
                 const endPage = this.getPageForIndex(range.end);
+
+                console.log(startPage, endPage);
     
                 for (let pageIndex = startPage; pageIndex <= endPage; pageIndex++) {
                     if (this.hasPage(pageIndex)) {

@@ -1,6 +1,7 @@
 import { Controller, Get, Param, Query } from '@nestjs/common';
 import { isNull, Page, Pageable, Pagination } from '@soundcore/common';
 import { Authentication } from '../../authentication/decorators/authentication.decorator';
+import { Public } from '../../authentication/decorators/public.decorator';
 import { User } from '../../user/entities/user.entity';
 import { Song } from '../entities/song.entity';
 import { SongService } from '../services/song.service';
@@ -52,8 +53,10 @@ export class SongController {
 
 
 
+  @Public(true)
   @Get("/album/:albumId")
   public async findByAlbum(@Param("albumId") albumId: string, @Authentication() authentication: User, @Pagination() pageable: Pageable, @Query("seed") seed?: string) {
+    console.log(pageable);
     return this.songService.findByAlbum(albumId, pageable, authentication, isNull(seed) ? undefined : Number(seed));
   }
 

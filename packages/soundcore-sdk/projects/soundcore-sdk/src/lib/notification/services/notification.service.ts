@@ -4,8 +4,8 @@ import { BehaviorSubject, map, Observable, tap } from "rxjs";
 import { SCSDKOptions } from "../../scdk.module";
 import { Notification } from "../entities/notification.entity";
 import { SCDKNotificationGateway } from "../gateway/notification.gateway";
-import { Page, Pageable } from "../../pagination";
 import { SCSDK_OPTIONS } from "../../constants";
+import { Page, Pageable } from "@soundcore/common";
 
 @Injectable()
 export class SCDKNotificationService {
@@ -28,7 +28,7 @@ export class SCDKNotificationService {
 
     public findByCurrentUser(pageable: Pageable): Observable<Page<Notification>> {
         return this.httpClient.get<Page<Notification>>(`${this.options.api_base_uri}/v1/notifications/@me${pageable.toQuery()}`).pipe(tap((page) => {
-            this.addNotifications(page.elements);
+            this.addNotifications(page.items);
         }))
     }
 

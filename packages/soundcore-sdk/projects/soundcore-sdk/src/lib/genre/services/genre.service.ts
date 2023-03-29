@@ -5,7 +5,7 @@ import { SCSDKOptions } from "../../scdk.module";
 import { Genre } from "../entities/genre.entity";
 import { ApiResponse } from "../../utils/responses/api-response";
 import { apiResponse } from "../../utils/rxjs/operators/api-response";
-import { Page, Pageable } from "../../pagination";
+import { Page, Pageable } from "@soundcore/common";
 import { SCSDK_OPTIONS } from "../../constants";
 
 @Injectable({
@@ -36,7 +36,7 @@ export class SCDKGenreService {
      * @returns Observable<Page<Genre>>
      */
     public findByArtist(artistId: string, pageable: Pageable): Observable<ApiResponse<Page<Genre>>> {
-        if(!artistId) return of(ApiResponse.withPayload(Page.of([])))
+        if(!artistId) return of(ApiResponse.withPayload(Page.empty(pageable.index, pageable.limit, pageable.offset)))
         return this.httpClient.get<Page<Genre>>(`${this.options.api_base_uri}/v1/genres/byArtist/${artistId}${pageable.toQuery()}`).pipe(apiResponse())
     }
 

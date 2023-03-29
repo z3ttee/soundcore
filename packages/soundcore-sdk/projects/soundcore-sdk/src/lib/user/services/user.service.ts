@@ -7,8 +7,8 @@ import { SCSDKOptions } from "../../scdk.module";
 import { ApiResponse } from "../../utils/responses/api-response";
 import { apiResponse } from "../../utils/rxjs/operators/api-response";
 import { User } from "../entities/user.entity";
-import { Pageable } from "../../pagination";
 import { SCSDK_OPTIONS } from "../../constants";
+import { Pageable } from "@soundcore/common";
 
 @Injectable()
 export class SCDKUserService {

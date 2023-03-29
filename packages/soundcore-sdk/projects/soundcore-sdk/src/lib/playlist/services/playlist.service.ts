@@ -10,7 +10,7 @@ import { AddSongDTO } from '../dtos/add-song.dto';
 import { CreatePlaylistDTO } from '../dtos/create-playlist.dto';
 import { PlaylistItemAddResult } from '../entities/playlist-item-added.entity';
 import { Playlist } from '../entities/playlist.entity';
-import { Page, Pageable } from "../../pagination";
+import { Page, Pageable } from "@soundcore/common";
 import { Logger } from '../../logging';
 import { Future } from '../../utils/future/future';
 import { toFuture } from '../../utils/future';
@@ -116,7 +116,7 @@ export class SCSDKPlaylistService {
         return;
       }
 
-      const elements = response.payload.elements;
+      const elements = response.payload.items;
       this._librarySubj.next(elements);
 
       this.logger.log(`Found ${elements.length} playlists in current user's library.`);

@@ -7,10 +7,9 @@ import { HttpClient } from '@angular/common/http';
 import { SCSDKOptions } from '../../scdk.module';
 import { apiResponse } from '../../utils/rxjs/operators/api-response';
 import { BehaviorSubject, Observable, of } from 'rxjs';
-import { Pageable } from '../../pagination/pageable';
-import { Page } from '../../pagination/page';
 import { ImportReport } from '../entities/import-report.entity';
 import { SCSDK_OPTIONS } from '../../constants';
+import { Page, Pageable } from '@soundcore/common';
 
 @Injectable()
 export class SCSDKImportService {

@@ -1,9 +1,8 @@
 import { HttpClient } from "@angular/common/http";
 import { Inject, Injectable } from "@angular/core";
+import { Page, Pageable } from "@soundcore/common";
 import { Observable, Subject, tap } from "rxjs";
 import { SCSDK_OPTIONS } from "../../constants";
-import { Page } from "../../pagination/page";
-import { Pageable } from "../../pagination/pageable";
 import { SCSDKOptions } from "../../scdk.module";
 import { Song } from "../../song";
 import { Future, toFuture } from "../../utils/future";

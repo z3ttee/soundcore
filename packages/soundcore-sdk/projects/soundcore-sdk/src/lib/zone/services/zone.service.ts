@@ -3,7 +3,7 @@ import { Inject, Injectable } from "@angular/core";
 import { Observable, of } from "rxjs";
 import { SCSDKOptions } from "../../scdk.module";
 import { Zone } from "../entities/zone.entity";
-import { Page, Pageable } from "../../pagination";
+import { Page, Pageable } from "@soundcore/common";
 import { SCSDK_OPTIONS } from "../../constants";
 
 @Injectable()

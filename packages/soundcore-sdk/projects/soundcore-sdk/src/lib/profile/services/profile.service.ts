@@ -5,9 +5,9 @@ import { Observable, of } from "rxjs";
 import { User } from "../../user/entities/user.entity";
 import { ApiResponse } from "../../utils/responses/api-response";
 import { apiResponse } from "../../utils/rxjs/operators/api-response";
-import { Page } from "../../pagination/page";
 import { Artist } from "../../artist/entities/artist.entity";
 import { SCSDK_OPTIONS } from "../../constants";
+import { Page } from "@soundcore/common";
 
 @Injectable()
 export class SCSDKProfileService {

@@ -89,6 +89,8 @@ export class SongService implements SyncableService<Song> {
     public async findByAlbum(albumId: string, pageable: Pageable, authentication?: User, seed?: number): Promise<Page<Song>> {
         if(!isNull(seed) && isNaN(seed)) throw new BadRequestException("Invalid seed found. Must be an integer")
 
+        console.log(pageable.offset, pageable.limit);
+
         // Create query to get ids only
         let idsQuery = this.repository.createQueryBuilder("song")
             .select(["song.id"])
