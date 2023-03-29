@@ -119,7 +119,7 @@ export class PlayerService {
         // This means, that the entity may not be a single song
         if(!isNull(tracklist)) {
             // If its a tracklist, check if the tracklist is actively playing currently
-            if(this.isTracklistActive(tracklist.id)) {
+            if(this.isTracklistActive(tracklist.id) && !this.hasTracklistEnded(tracklist.id)) {
                 // If true, toggle playback state
                 return this.togglePlaying().pipe(toVoid());
             }
@@ -329,5 +329,10 @@ export class PlayerService {
         const current = this.currentItem.getValue();
         if(isNull(current)) return false;
         return current.tracklistId === tracklistId;
+    }
+
+    private hasTracklistEnded(tracklistId: string): boolean {
+        const tracklist = this.queue.findTracklistById(tracklistId);
+        return tracklist?.data?.tracklist?.hasEnded;
     }
 }
