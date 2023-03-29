@@ -1,5 +1,6 @@
 import { HttpClient } from "@angular/common/http";
-import { Page, Pageable, SCSDKBaseDatasource, toFuture } from "@soundcore/sdk";
+import { Page, Pageable } from "@soundcore/common";
+import { SCSDKBaseDatasource, toFuture } from "@soundcore/sdk";
 import { filter, map, Observable, of } from "rxjs";
 
 export type SCNGXDatasourceFreeHandler = () => boolean;
@@ -32,10 +33,10 @@ export class SCNGXDatasource<T = any> extends SCSDKBaseDatasource<T> {
                 }
 
                 // Get page data and return it
-                const page = request.data ?? Page.of([], 0, 0);
+                const page = request.data ?? Page.empty(pageable.index, pageable.limit, pageable.offset);
 
-                this.setTotalSize(page.totalElements);
-                return page.elements;
+                this.setTotalSize(page.totalSize);
+                return page.items;
             })
         );
     }
