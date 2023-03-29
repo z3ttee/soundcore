@@ -56,7 +56,6 @@ export class SongController {
   @Public(true)
   @Get("/album/:albumId")
   public async findByAlbum(@Param("albumId") albumId: string, @Authentication() authentication: User, @Pagination() pageable: Pageable, @Query("seed") seed?: string) {
-    console.log(pageable);
     return this.songService.findByAlbum(albumId, pageable, authentication, isNull(seed) ? undefined : Number(seed));
   }
 

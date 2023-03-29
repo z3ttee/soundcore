@@ -1,30 +1,49 @@
 import { isNull } from "../utils/utilities";
 
 export class Page<T = any> {
+    /**
+     * Amount of items on the current page
+     */
     public readonly length: number = 0;
+    /**
+     * Index of the next page. Null, if end
+     * of pagination reached
+     */
+    public readonly next: number = null;
+    /**
+     * Index of the previous page. Null, if start
+     * of pagination reached
+     */
+    public readonly prev: number = null;
 
     constructor(
-        public readonly next: number,
+        /**
+         * List of items on the page
+         */
         public readonly items: T[],
+        /**
+         * Amount of items that are available in total
+         */
         public readonly totalSize: number,
         public readonly info: PageInfo
     ) {
         this.length = items?.length ?? 0;
+
+        if(!isNull(info?.limit) && !isNull(info?.offset)) {
+            const maxPageIndex = Math.floor(totalSize / info.limit);
+            const currentPageIndex = Math.floor(info.offset/info.limit);
+
+            this.next = currentPageIndex >= maxPageIndex ? null : currentPageIndex + 1;
+            this.prev = currentPageIndex <= 0 ? null : currentPageIndex - 1;
+        }
     }
 
-    public static of<T = any>(items: T[], totalSize: number, pageable?: Pageable): Page<T> {
-        let next: number = null;
-        
-        if(!isNull(pageable)) {
-            const maxPages = Math.floor(totalSize / pageable.limit);
-            next = pageable.index < maxPages ? pageable.index + 1 : null;
-        }
-        
-        return new Page(next, items, totalSize, { limit: pageable?.limit, offset: pageable?.offset, index: pageable?.index });
+    public static of<T = any>(items: T[], totalSize: number, pageable?: Pageable): Page<T> {        
+        return new Page(items, totalSize, { limit: pageable?.limit, offset: pageable?.offset, index: pageable?.index });
     }
 
     public static empty<T = any>(index?: number, limit?: number, offset?: number): Page<T> {
-        return new Page(null, [], 0, { limit: limit, offset: offset, index: index });
+        return new Page([], 0, { limit: limit, offset: offset, index: index });
     }
 
 }

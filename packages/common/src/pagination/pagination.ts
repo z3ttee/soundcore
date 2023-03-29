@@ -22,7 +22,7 @@ export const Pagination = createParamDecorator(
         const request = ctx.switchToHttp().getRequest();
 
         let pageNr = parseInt(request.query?.page) || defaults?.page || 0;
-        let pageSize = parseInt(request.query?.size) || defaults?.size || 50;
+        let pageSize = parseInt(request.query?.limit) || defaults?.size || 50;
 
         return new Pageable(pageNr, pageSize);
     }
