@@ -148,11 +148,10 @@ export class SongService implements SyncableService<Song> {
             .groupBy("song.id")
             .orderBy("likesCount", "DESC")
             .addOrderBy("streamsCount", "DESC")
+            .addOrderBy("song.id", "DESC")
 
         // Add seed, used to create shuffled tracklist
         if(!isNaN(seed)) idsQuery = idsQuery.addOrderBy(`RAND(${seed})`);
-
-        idsQuery.getRawMany().then((values) => console.log(values))
 
         // Find ids and use these ids to fetch metadata
         return idsQuery.getManyAndCount().then(([ids, total]) => {
@@ -169,6 +168,7 @@ export class SongService implements SyncableService<Song> {
                 .groupBy("song.id")
                 .orderBy("likesCount", "DESC")
                 .addOrderBy("streamsCount", "DESC")
+                .addOrderBy("song.id", "DESC")
                 // Where in ids
                 .whereInIds(ids)
 

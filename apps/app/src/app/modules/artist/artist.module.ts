@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ArtistProfileComponent } from './views/artist-profile/artist-profile.component';
 import { RouterModule, Routes } from '@angular/router';
-import { SCDKAlbumModule, SCDKArtistModule } from '@soundcore/sdk';
+import { SCDKAlbumModule, SCDKArtistModule, SCSDKSongModule, SCSDKTracklistModule } from '@soundcore/sdk';
 import { Error404Module } from 'src/app/shared/error404/error404.module';
 import { ListViewModule } from "src/app/components/resource-views/list-view/list-view.module";
 import { MatRippleModule } from '@angular/material/core';
@@ -54,6 +54,8 @@ const routes: Routes = [
 
     SCDKArtistModule,
     SCDKAlbumModule,
+    SCSDKSongModule,
+    SCSDKTracklistModule,
 
     SCNGXHorizontalListModule,
     SCNGXSkeletonModule,

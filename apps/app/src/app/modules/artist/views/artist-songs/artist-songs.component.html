@@ -7,7 +7,7 @@
                 <div class="flex items-center justify-start flex-1 gap-4">
                     <div class="">
                         <scngx-skeleton class="w-7 h-7 rounded-full" *ngIf="props.loading"></scngx-skeleton>            
-                        <scngx-ibtn *ngIf="!props.loading" (click)="forcePlay(props.tracklist)" size="md">
+                        <scngx-ibtn *ngIf="!props.loading" (click)="forcePlay(props.artist.data, props.tracklist)" size="md">
                             <img *ngIf="!props.playing; else paused" class="w-7 h-7 text-body ml-0.5" src="assets/icons/play.svg">
                             <ng-template #paused><img *ngIf="props.playing" class="w-7 h-7 text-body ml-0.5" src="assets/icons/pause.svg"></ng-template>
                         </scngx-ibtn>
@@ -15,7 +15,7 @@
                     <div class="">
                         <scngx-skeleton *ngIf="props.loading" [class]="'w-1/4 h-12'"></scngx-skeleton>
                         <scngx-ui-title *ngIf="!props.loading" [route]="['..']">
-                            {{ props.artist?.name }}
+                            {{ props.artist.data?.name }}
                             <div scngxSubtitle>Die komplette Künstler-Kollektion</div>
                         </scngx-ui-title>
                     </div>
@@ -25,20 +25,20 @@
 
         <cdk-virtual-scroll-viewport [itemSize]="56" class="w-full h-full" #scroller>
             <div class="flex items-center justify-start gap-4 pb-row px-window">
-                <scngx-chip>{{ props.artist?.songCount ?? 0 }} Songs</scngx-chip>
-                <scngx-chip>{{ props.artist?.streamCount ?? 0 }} Streams in 30 Tagen</scngx-chip>
-                <scngx-chip>{{ props.artist?.streamCount ?? 0 }} Alben</scngx-chip>
+                <scngx-chip>{{ props.artist.data?.songCount ?? 0 }} Songs</scngx-chip>
+                <scngx-chip>{{ props.artist.data?.streamCount ?? 0 }} Streams in 30 Tagen</scngx-chip>
+                <scngx-chip>{{ props.artist.data?.streamCount ?? 0 }} Alben</scngx-chip>
             </div>
         
             <div class="px-window">
-                <div *cdkVirtualFor="let item of props.tracklist; index as i">
+                <div *cdkVirtualFor="let item of ($datasource | async); index as i">
                     <scngx-song-list-item
                         [song]="item"
                         [index]="i"
                         [active]="props.currentlyPlaying?.song?.id == item?.id"
                         [playing]="props.playing"
                         [animRef]="lottieAnimationTemplate"
-                        (onPlay)="forcePlayAtSong(props.tracklist, i)">
+                        (onPlay)="forcePlayAt(props.artist.data, props.tracklist, i)">
                     </scngx-song-list-item>
                 </div>
             </div>
