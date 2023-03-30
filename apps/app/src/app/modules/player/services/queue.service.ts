@@ -1,5 +1,7 @@
 import { Injectable } from "@angular/core";
 import { hasProperty, isNull } from "@soundcore/common";
+import { Future } from "@soundcore/sdk";
+import { Observable } from "rxjs";
 import { ResourceWithTracklist } from "../entities/resource-with-tracklist.entity";
 import { PlayableItem } from "./player.service";
 
@@ -77,8 +79,22 @@ export class AudioQueue {
     /**
      * Clear the queue
      */
-    public clear() {
-        this.queue.splice(0, this.queue.length);
+    public clear(): Observable<Future<void>> {
+        return new Observable((subscriber) => {
+            // Push loading state
+            subscriber.next(Future.loading());
+
+            // Find tracklists and release all
+            this.findTracklists().forEach((item) => {
+                item.data?.tracklist?.release();
+            });
+            // Remove all items by splicing array
+            this.queue.splice(0, this.queue.length);
+
+            // Complete observable
+            subscriber.next(Future.of(void 0));
+            subscriber.complete();
+        });
     }
 
     /**
@@ -94,9 +110,33 @@ export class AudioQueue {
         return this.queue.find((item) => item.data?.id === id);
     }
 
+    /**
+     * Find a list of enqueued tracklists
+     */
+    public findTracklists(): EnqueuedItem<ResourceWithTracklist<PlayableItem>>[] {
+        const tracklists: EnqueuedItem<ResourceWithTracklist<PlayableItem>>[] = [];
+        // Loop through queue, beginning at end and 
+        // go backwards (because all tracklists are 
+        // at end of the queue)
+        for(let i = this.queue.length - 1; i >= 0; i--) {
+            const item = this.queue[i];
+            // Break as soon as there is no tracklist in the queue
+            if(!this.isOfTypeList(item.data)) break;
+            // If is tracklist, push to results arr
+            tracklists.push(item as EnqueuedItem<ResourceWithTracklist<PlayableItem>>);
+        }
+
+        // Return reversed results array.
+        // This is done because the results arr has last-index as first
+        // one because of looping backwards
+        return tracklists.reverse();
+    }
+
     public findTracklistById(id: string): EnqueuedItem<ResourceWithTracklist<PlayableItem>> {
         if(!this.isEnqueued(id)) return null;
-        return this.queue.find((item) => item.isList && item.data?.id === id) as EnqueuedItem<ResourceWithTracklist<PlayableItem>>;
+
+        // return this.queue.find((item) => item.isList && item.data?.id === id) as EnqueuedItem<ResourceWithTracklist<PlayableItem>>;
+        return this.findTracklists().find((item) => item.isList && item.data?.id === id)
     }
 
     private isOfTypeList(item: any): boolean {
