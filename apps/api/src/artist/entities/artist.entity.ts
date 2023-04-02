@@ -13,7 +13,7 @@ export class Artist implements PlayableEntity {
     /**
      * PLAYABLE ENTITY ATTRIBUTES
      */
-    public readonly type: PlayableEntityType = PlayableEntityType.ALBUM;
+    public readonly type: PlayableEntityType = PlayableEntityType.ARTIST;
 
     /**
      * MEILISEARCH RELATED ATTRIBUTES
