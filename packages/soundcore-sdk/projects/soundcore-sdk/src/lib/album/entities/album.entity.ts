@@ -3,13 +3,12 @@ import { Artwork } from "../../artwork/entities/artwork.entity";
 import { Distributor } from "../../distributor/entities/distributor.entity";
 import { Label } from "../../label/entities/label.entity";
 import { Publisher } from "../../publisher/entities/publisher.entity";
-import { SCDKResource, SCDKResourceFlag, SCDKResourceType } from "../../utils/entities/resource";
+import { PlayableEntity, PlayableEntityType } from "../../tracklist/entities/playable.entity";
 
-export class Album implements SCDKResource {
-    public resourceType: SCDKResourceType = "album";
+export class Album implements PlayableEntity {
+    public type: PlayableEntityType;
 
     public id: string;
-    public flag: SCDKResourceFlag;
     public slug: string;
     public name: string;
     public releasedAt: Date;

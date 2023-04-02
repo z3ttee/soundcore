@@ -4,6 +4,7 @@ import { Public } from '../../authentication/decorators/public.decorator';
 import { User } from '../../user/entities/user.entity';
 import { TracklistV2 } from '../entities/tracklist.entity';
 import { TracklistV2Service } from '../services/tracklist-v2.service';
+import { PlayableEntityType } from '../entities/playable.entity';
 
 /**
  * Controller class that contains
@@ -25,7 +26,7 @@ export class TracklistV2Controller {
      * @param authentication Authentication object
      * @returns Tracklist
      */
-    @Get("/album/:albumId")
+    @Get(`/${PlayableEntityType.ALBUM.toLowerCase()}/:albumId`)
     public async findListByAlbum(@Param("albumId") albumId: string, @Authentication() authentication: User, @Query("shuffled") shuffled?: string): Promise<TracklistV2> {
         return this.service.findTracklistByAlbumId(albumId, authentication, shuffled === "true");
     }
@@ -36,7 +37,7 @@ export class TracklistV2Controller {
      * @param authentication Authentication object
      * @returns Tracklist
      */
-    @Get("/artist/:artistId")
+    @Get(`/${PlayableEntityType.ARTIST.toLowerCase()}/:artistId`)
     @Public(true)
     public async findListByArtist(@Param("artistId") artistId: string, @Authentication() authentication: User, @Query("shuffled") shuffled?: string): Promise<TracklistV2> {
         return this.service.findTracklistByArtistId(artistId, authentication, shuffled === "true");

@@ -11,11 +11,16 @@ import { Slug } from "@tsalliance/utilities";
 import { GeniusInfo } from "../../utils/entities/genius.entity";
 import { MeilisearchInfo } from "../../utils/entities/meilisearch.entity";
 import { MeilisearchHasOne, MeilisearchIndex, MeilisearchPK, MeilisearchProp } from "@soundcore/meilisearch";
+import { PlayableEntity, PlayableEntityType } from "../../tracklist/entities/playable.entity";
 
 @Entity()
 @MeilisearchIndex()
 @Index(["name", "primaryArtist"], { unique: true })
-export class Album {
+export class Album implements PlayableEntity {
+    /**
+     * PLAYABLE ENTITY ATTRIBUTES
+     */
+    public readonly type: PlayableEntityType = PlayableEntityType.ALBUM;
 
     /**
      * MEILISEARCH RELATED ATTRIBUTES

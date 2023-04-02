@@ -25,7 +25,7 @@
                 </ng-container>
             
                 <ng-container scngx-controls>
-                    <scngx-ibtn (click)="forcePlay(props.album.data, props.tracklist.data)" size="md">
+                    <scngx-ibtn (click)="forcePlay(props.album.data)" size="md">
                         <ng-icon *ngIf="props.isPlaying; else playIcon" name="heroPauseSolid" size="24"></ng-icon>
                         <ng-template #playIcon><ng-icon name="heroPlaySolid" size="24"></ng-icon></ng-template>
                     </scngx-ibtn>
@@ -50,7 +50,7 @@
                             [active]="props.currentItemId === item?.id && props.isTracklistActive"
                             [playing]="props.isPlaying"
                             [animRef]="lottieAnimationTemplate"
-                            (onPlay)="forcePlayAt(props.album.data, props.tracklist.data, i)">
+                            (onPlay)="forcePlayAt(props.album.data, i)">
                         </scngx-song-list-item>
                     </div>
                 </cdk-virtual-scroll-viewport>

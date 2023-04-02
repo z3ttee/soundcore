@@ -16,6 +16,7 @@ import { TracklistItem } from "../../tracklist/entities/tracklist.entity";
 import { GeniusInfo } from "../../utils/entities/genius.entity";
 import { MeilisearchInfo } from "../../utils/entities/meilisearch.entity";
 import { MeilisearchHasMany, MeilisearchHasOne, MeilisearchIndex, MeilisearchPK, MeilisearchProp } from "@soundcore/meilisearch";
+import { PlayableEntity, PlayableEntityType } from "../../tracklist/entities/playable.entity";
 
 export interface SongID {
     id: string;
@@ -26,7 +27,12 @@ export const SONG_ARTWORK_RELATION_FK = "artworkId"
 @Entity()
 @Index(["name", "primaryArtist", "album", "duration", "order"], { unique: true })
 @MeilisearchIndex()
-export class Song implements SongID, TracklistItem {
+export class Song implements SongID, TracklistItem, PlayableEntity {
+    /**
+     * PLAYABLE ENTITY ATTRIBUTES
+     */
+    public readonly type: PlayableEntityType = PlayableEntityType.ALBUM;
+    
     /**
      * MEILISEARCH RELATED ATTRIBUTES
      */

@@ -7,7 +7,7 @@
                 <div class="flex items-center justify-start flex-1 gap-4">
                     <div class="">
                         <scngx-skeleton class="w-7 h-7 rounded-full" *ngIf="props.loading"></scngx-skeleton>            
-                        <scngx-ibtn *ngIf="!props.loading" (click)="forcePlay(props.artist.data, props.tracklist)" size="md">
+                        <scngx-ibtn *ngIf="!props.loading" (click)="forcePlay(props.artist.data)" size="md">
                             <img *ngIf="!props.playing; else paused" class="w-7 h-7 text-body ml-0.5" src="assets/icons/play.svg">
                             <ng-template #paused><img *ngIf="props.playing" class="w-7 h-7 text-body ml-0.5" src="assets/icons/pause.svg"></ng-template>
                         </scngx-ibtn>
@@ -38,7 +38,7 @@
                         [active]="props.currentlyPlaying?.song?.id == item?.id"
                         [playing]="props.playing"
                         [animRef]="lottieAnimationTemplate"
-                        (onPlay)="forcePlayAt(props.artist.data, props.tracklist, i)">
+                        (onPlay)="forcePlayAt(props.artist.data, i)">
                     </scngx-song-list-item>
                 </div>
             </div>

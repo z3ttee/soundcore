@@ -5,10 +5,15 @@ import { Song } from "../../song/entities/song.entity";
 import { MeilisearchHasOne, MeilisearchIndex, MeilisearchPK, MeilisearchProp } from "@soundcore/meilisearch";
 import { MeilisearchInfo } from "../../utils/entities/meilisearch.entity";
 import { GeniusInfo } from "../../utils/entities/genius.entity";
+import { PlayableEntity, PlayableEntityType } from "../../tracklist/entities/playable.entity";
 
 @Entity()
 @MeilisearchIndex()
-export class Artist {
+export class Artist implements PlayableEntity {
+    /**
+     * PLAYABLE ENTITY ATTRIBUTES
+     */
+    public readonly type: PlayableEntityType = PlayableEntityType.ALBUM;
 
     /**
      * MEILISEARCH RELATED ATTRIBUTES

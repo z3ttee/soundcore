@@ -5,7 +5,6 @@ import { Album, Future, SCDKAlbumService, SCSDKDatasource, SCSDKSongService, SCS
 import { AUDIOWAVE_LOTTIE_OPTIONS } from 'src/app/constants';
 import { PlayerService } from 'src/app/modules/player/services/player.service';
 import { SCNGXTracklist } from 'src/app/modules/player/entities/tracklist.entity';
-import { environment } from 'src/environments/environment';
 import { HttpClient } from '@angular/common/http';
 import { Page } from '@soundcore/common';
 
@@ -73,33 +72,16 @@ export class AlbumInfoComponent implements OnInit, OnDestroy {
     this.playerService.$isPaused.pipe(startWith(true)), 
     // Get current tracklist id
     this.playerService.$currentItem.pipe(startWith(null)),
-    // Load tracklist
-    this.$album.pipe(
-      switchMap((album): Observable<Future<SCNGXTracklist<Song>>> => {
-        // If album still loading, return future with state loading
-        if(album.loading) return of(Future.loading());
-        // Fetch tracklist by album
-        return this.tracklistService.findByAlbum(album.data?.id).pipe(
-          map((tracklist): Future<SCNGXTracklist<Song>> => {
-            // If tracklist entity still loading, return loading state
-            if(tracklist.loading) return Future.loading();
-            // Otherwise build tracklist instance
-            return Future.of(new SCNGXTracklist(tracklist.data, `${environment.api_base_uri}`, this.httpClient))
-          })
-        );
-      })
-    ),
   ]).pipe(
     // Build props object
-    map(([album, isPaused, currentItem, tracklist]): AlbumInfoProps => {
+    map(([album, isPaused, currentItem]): AlbumInfoProps => {
       const currentTracklistId = currentItem?.tracklistId;
       const currentItemId = currentItem?.id;
 
       return {
         album: album,
-        tracklist: tracklist,
-        isPlaying: !isPaused && currentTracklistId === tracklist.data?.id,
-        isTracklistActive: currentTracklistId === tracklist.data?.id,
+        isPlaying: !isPaused && currentTracklistId === album.data?.id,
+        isTracklistActive: currentTracklistId === album.data?.id,
         currentItemId: currentItemId
       };
     }),
@@ -115,12 +97,12 @@ export class AlbumInfoComponent implements OnInit, OnDestroy {
       this.$destroy.complete();
   }
 
-  public forcePlay(album: Album, tracklist: SCNGXTracklist) {
-    this.playerService.forcePlay(album, tracklist).subscribe();
+  public forcePlay(album: Album) {
+    this.playerService.forcePlay(album).subscribe();
   }
 
-  public forcePlayAt(album: Album, tracklist: SCNGXTracklist, indexAt: number) {
-    this.playerService.forcePlayAt(album, tracklist, indexAt).subscribe();
+  public forcePlayAt(album: Album, indexAt: number) {
+    this.playerService.forcePlayAt(album, indexAt).subscribe();
   }
 
 }

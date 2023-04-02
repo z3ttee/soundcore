@@ -1,11 +1,12 @@
 import { Injectable } from "@angular/core";
 import { hasProperty, isNull } from "@soundcore/common";
-import { Future } from "@soundcore/sdk";
+import { Future, PlayableEntityType } from "@soundcore/sdk";
 import { Observable } from "rxjs";
 import { ResourceWithTracklist } from "../entities/resource-with-tracklist.entity";
 import { PlayableItem } from "./player.service";
+import { SCNGXTracklist } from "../entities/tracklist.entity";
 
-class EnqueuedItem<T = any> {
+class EnqueuedItem<T = PlayableItem | SCNGXTracklist> {
     constructor(
         public isList: boolean,
         public data: T
@@ -25,7 +26,7 @@ export class AudioQueue {
     /**
      * Internal queue list
      */
-    private readonly queue: EnqueuedItem<PlayableItem | ResourceWithTracklist<PlayableItem>>[] = [];
+    private readonly queue: EnqueuedItem[] = [];
 
     /**
      * Add a resource to the queue. Based on the tracklist type,
@@ -33,20 +34,26 @@ export class AudioQueue {
      * @param resource Resource to enqueue
      * @returns Position the resource was added to
      */
-    public enqueue(resource: PlayableItem | ResourceWithTracklist<PlayableItem>): number {
-        // Register id as enqueued
-        this.enqueuedIds.set(resource.id, true);
-
+    public enqueue(resource: PlayableItem | SCNGXTracklist): number {
         // If the item should be enqueued as single
         if(!this.isOfTypeList(resource)) {
-            return this.queue.unshift({ isList: false, data: resource }) - 1;
+            // Enqueue entity
+            this.queue.unshift({ isList: false, data: resource });
+            // Register id as enqueued
+            this.enqueuedIds.set(resource.id, true);
+            return 0;
         }
 
+        // Do not enqueue tracklists twice
+        if(this.isEnqueued(resource.id)) return -1;
         // Otherwise push to end of queue
-        return this.queue.push({ isList: true, data: resource }) - 1;
+        const position = this.queue.push({ isList: true, data: resource }) - 1;
+        // Register id as enqueued
+        this.enqueuedIds.set(resource.id, true);
+        return position;
     }
 
-    public dequeue(): EnqueuedItem<PlayableItem | ResourceWithTracklist<PlayableItem>> {
+    public dequeue(): EnqueuedItem {
         const next = this.queue[0];
         if(isNull(next)) return null;
 
@@ -57,8 +64,7 @@ export class AudioQueue {
             return this.queue.splice(0, 1)?.[0];
         }
 
-        const data = next.data as ResourceWithTracklist<PlayableItem>;
-        const tracklist = data.tracklist;
+        const tracklist = next.data as SCNGXTracklist;
 
         // Check if tracklist has not ended, if true
         // return, otherwise remove from queue
@@ -67,7 +73,7 @@ export class AudioQueue {
         }
 
         // Remove from registered ids
-        this.enqueuedIds.delete(data.id);
+        this.enqueuedIds.delete(tracklist.id);
         // Release tracklist resources
         tracklist.release();
         // Remove from queue
@@ -86,7 +92,7 @@ export class AudioQueue {
 
             // Find tracklists and release all
             this.findTracklists().forEach((item) => {
-                item.data?.tracklist?.release();
+                item.data?.release();
             });
             // Remove all items by splicing array
             this.queue.splice(0, this.queue.length);
@@ -105,7 +111,7 @@ export class AudioQueue {
         return this.enqueuedIds.has(id);
     }
 
-    public findById(id: string): EnqueuedItem<PlayableItem | ResourceWithTracklist<PlayableItem>> {
+    public findById(id: string): EnqueuedItem {
         if(!this.isEnqueued(id)) return null;
         return this.queue.find((item) => item.data?.id === id);
     }
@@ -113,17 +119,18 @@ export class AudioQueue {
     /**
      * Find a list of enqueued tracklists
      */
-    public findTracklists(): EnqueuedItem<ResourceWithTracklist<PlayableItem>>[] {
-        const tracklists: EnqueuedItem<ResourceWithTracklist<PlayableItem>>[] = [];
+    public findTracklists(): EnqueuedItem<SCNGXTracklist>[] {
+        const tracklists: EnqueuedItem<SCNGXTracklist>[] = [];
+
         // Loop through queue, beginning at end and 
         // go backwards (because all tracklists are 
         // at end of the queue)
         for(let i = this.queue.length - 1; i >= 0; i--) {
             const item = this.queue[i];
             // Break as soon as there is no tracklist in the queue
-            if(!this.isOfTypeList(item.data)) break;
+            if(!item.isList) break;
             // If is tracklist, push to results arr
-            tracklists.push(item as EnqueuedItem<ResourceWithTracklist<PlayableItem>>);
+            tracklists.push(item as EnqueuedItem<SCNGXTracklist>);
         }
 
         // Return reversed results array.
@@ -132,15 +139,13 @@ export class AudioQueue {
         return tracklists.reverse();
     }
 
-    public findTracklistById(id: string): EnqueuedItem<ResourceWithTracklist<PlayableItem>> {
+    public findTracklistById(id: string): SCNGXTracklist {
         if(!this.isEnqueued(id)) return null;
-
-        // return this.queue.find((item) => item.isList && item.data?.id === id) as EnqueuedItem<ResourceWithTracklist<PlayableItem>>;
-        return this.findTracklists().find((item) => item.isList && item.data?.id === id)
+        return this.findTracklists().find((item) => item.isList && item.data?.id === id)?.data;
     }
 
-    private isOfTypeList(item: any): boolean {
-        return hasProperty("tracklist", item);
+    public isOfTypeList(item: PlayableItem | SCNGXTracklist): boolean {
+        return item.type !== PlayableEntityType.SONG;
     }
     
 }

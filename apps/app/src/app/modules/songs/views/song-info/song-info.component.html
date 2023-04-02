@@ -1,7 +1,7 @@
 <ng-container *ngIf="($props | async) as props">
     <app-error404 *ngIf="!props.loading && !props.song" [title]="'Song nicht gefunden'"></app-error404>
 
-    <app-list-view [resource]="props.song" [title]="props.song?.name" [isLoading]="props.loading" [artwork]="props.song?.artwork">
+    <app-list-view [resource]="$any(props.song)" [title]="props.song?.name" [isLoading]="props.loading" [artwork]="props.song?.artwork">
         <ng-container scngx-stats>
             <li class="text-font-secondary">
                 <span *ngIf="props.song?.primaryArtist">by <span class="hover:underline cursor-pointer" [routerLink]="['/artist', props.song.primaryArtist.slug || props.song.primaryArtist.id]">{{ props.song.primaryArtist.name }}</span></span>

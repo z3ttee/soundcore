@@ -1,11 +1,13 @@
 import { Injectable } from "@angular/core";
 import { isNull, randomString, toVoid } from "@soundcore/common";
-import { LikedSong, PlaylistItem, SCSDKStreamService, Song } from "@soundcore/sdk";
-import { BehaviorSubject, map, Observable, of, switchMap, take, tap } from "rxjs";
+import { LikedSong, PlayableEntity, PlayableEntityType, PlaylistItem, SCSDKStreamService, Song } from "@soundcore/sdk";
+import { BehaviorSubject, filter, map, Observable, of, switchMap, take, takeUntil, tap } from "rxjs";
 import { ResourceWithTracklist } from "../entities/resource-with-tracklist.entity";
 import { SCNGXTracklist } from "../entities/tracklist.entity";
 import { AudioController } from "./controls.service";
 import { AudioQueue } from "./queue.service";
+import { environment } from "src/environments/environment";
+import { HttpClient } from "@angular/common/http";
 
 export type PlayableItem = Song & PlaylistItem & LikedSong
 
@@ -55,7 +57,8 @@ export class PlayerService {
     constructor(
         private readonly queue: AudioQueue,
         private readonly controls: AudioController,
-        private readonly streamService: SCSDKStreamService
+        private readonly streamService: SCSDKStreamService,
+        private readonly httpClient: HttpClient
     ) {
         // Handle ended event on audio element
         this.controls.$onEnded.pipe(switchMap(() => this.next())).subscribe();
@@ -114,47 +117,108 @@ export class PlayerService {
      * @param tracklist Tracklist that belongs to that entity
      * @returns Position in queue (-1 if the tracklist is currently playing and therefor paused state changed)
      */
-    public forcePlay(entity: any, tracklist?: SCNGXTracklist): Observable<void> {
+    public forcePlay(entity: PlayableEntity): Observable<void> {
+        // If is song, always enqueue
+        if(entity.type === PlayableEntityType.SONG) {
+            return this.toggleIfActive(entity).pipe(
+                switchMap((isActive) => {
+                    // If entity is already playing, the playback state just changed
+                    // and nothing needs to be done
+                    if(isActive) return of(null);
+
+                    // Otherwise enqueue entity as song
+                    this.queue.enqueue(entity as PlayableItem);
+                    // Play next
+                    return this.next().pipe(toVoid());
+                }),
+                toVoid()
+            );
+        }
+
+        // Entity is a tracklist
+        return this.toggleIfActive(entity).pipe(
+            switchMap((isActive) => {
+                // If entity is already playing, the playback state just changed
+                // and nothing needs to be done
+                if(isActive) return of(null);
+
+                // Otherwise enqueue entity as song
+                // this.queue.enqueue(entity as PlayableItem);
+                // return this.nextFromTracklist().pipe(toVoid());
+                return SCNGXTracklist.create(entity, `${environment.api_base_uri}`, this.httpClient).pipe(
+                    filter(({loading}) => !loading),
+                    switchMap((request) => {
+                        const data = request.data;
+                        if(isNull(data)) return of(null);
+
+                        // Enqueue tracklist and abort if the item was not enqueued
+                        if(this.queue.enqueue(data) <= -1) {
+                            // Release resources
+                            data.release();
+                            return of(null);
+                        }
+
+                        // Find enqueued tracklist (because it may have different obj ref)
+                        const tracklist = this.queue.findTracklistById(data.id);
+                        // Play next from tracklist
+                        return this.nextFromTracklist(tracklist);
+                    })
+                )
+            }),
+            toVoid()
+        )
+        
         // Check if the entity was enqueued with a tracklist.
         // This means, that the entity may not be a single song
-        if(!isNull(tracklist)) {
-            // If its a tracklist, check if the tracklist is actively playing currently
-            if(this.isTracklistActive(tracklist.id) && !this.hasTracklistEnded(tracklist.id)) {
-                // If true, toggle playback state
-                return this.togglePlaying().pipe(toVoid());
-            }
+        // if(!isNull(tracklist)) {
+        //     // If its a tracklist, check if the tracklist is actively playing currently
+        //     if(this.isTracklistActive(tracklist.id) && !this.hasTracklistEnded(tracklist.id)) {
+        //         // If true, toggle playback state
+        //         return this.togglePlaying().pipe(toVoid());
+        //     }
 
-            // Otherwise force play at position 0
-            return this.forcePlayAt(entity, tracklist, 0).pipe(toVoid());
-        }
+        //     // Otherwise force play at position 0
+        //     return this.forcePlayAt(entity, tracklist, 0).pipe(toVoid());
+        // }
 
         // This will enqueue the entity on top, if its
         // a single song
-        this.queue.enqueue(entity);
+        // this.queue.enqueue(entity);
         // Play next in queue (should be the enqueued new entity)
-        return this.next().pipe(toVoid());
+        // return this.next().pipe(toVoid());
     }
 
     /**
      * Force play an entity
      * @param entity Entity (e.g. Album) to play
-     * @param tracklist Tracklist that belongs to that entity
      * @param indexAt Index to start at
      * @returns Position in queue (-1 if the tracklist is currently playing and therefor paused state changed)
      */
-    public forcePlayAt(entity: any, tracklist: SCNGXTracklist, indexAt: number): Observable<any> {
-        // Check if not enqueued, if true, enqueue tracklist
-        if(!this.queue.isEnqueued(tracklist.id)) {
-            // Enqueue entity as tracklist
-            this.queue.enqueue({
-                ...entity,
-                tracklist: tracklist
-            });
-        }
-        
+    public forcePlayAt(entity: PlayableEntity, indexAt: number): Observable<void> {
         // Get enqueued tracklist by specified id
-        const enqueuedTracklist = this.queue.findTracklistById(tracklist.id)?.data?.tracklist;
-        return this.nextFromTracklist(enqueuedTracklist, indexAt);
+        // const enqueuedTracklist = this.queue.findTracklistById(entity.id)?.data?.tracklist;
+        // return this.nextFromTracklist(enqueuedTracklist, indexAt);
+
+        return SCNGXTracklist.create(entity, `${environment.api_base_uri}`, this.httpClient, indexAt).pipe(
+            filter(({ loading }) => !loading),
+            switchMap((request) => {
+                console.log(request.data);
+
+                const tracklist = request.data;
+                if(isNull(tracklist)) return of(null);
+
+                // Check if not enqueued, if true, enqueue tracklist
+                if(!this.queue.isEnqueued(tracklist.id)) {
+                    // Enqueue entity as tracklist
+                    this.queue.enqueue(tracklist);
+                }
+
+                // Get enqueued tracklist by specified id
+                const enqueuedTracklist = this.queue.findTracklistById(tracklist.id);
+                return this.nextFromTracklist(enqueuedTracklist, indexAt);
+            }),
+            toVoid()
+        );
     }
 
     /**
@@ -188,6 +252,10 @@ export class PlayerService {
         return this.currentItem.getValue()?.url;
     }
 
+    public get currentItemId(): string {
+        return this.currentItem.getValue()?.id;
+    }
+
     /**
      * Get the tracklist id of the currently playing item
      */
@@ -200,9 +268,9 @@ export class PlayerService {
      * @param tracklist Tracklist entity
      * @returns True, if tracklist is active and state has changed. Otherwise false, if the tracklist currently is not active
      */
-    public toggleIfActive(tracklist: SCNGXTracklist): Observable<boolean> {
+    public toggleIfActive(item: PlayableEntity): Observable<boolean> {
         // Check if the tracklist is playing currently
-        if(this.currentTracklistId == tracklist.id) {
+        if(this.currentTracklistId === item.id || this.currentItemId === item.id) {
             // If true, the user may have clicked the play button again to
             // pause the audio. So pause it
             return this.togglePlaying().pipe(map(() => true));
@@ -214,6 +282,8 @@ export class PlayerService {
     private nextFromTracklist(tracklist: SCNGXTracklist<PlayableItem>, indexInTracklist?: number): Observable<string> {
         return tracklist.getNextItem(indexInTracklist).pipe(
             switchMap((item): Observable<string> => {
+                console.log(item);
+
                 // If the next item is null, the tracklist is empty
                 // So we have to skip to the end of the track and let it start
                 // from beginning if play is hit
@@ -270,10 +340,12 @@ export class PlayerService {
                 return;
             }
 
-            const data = nextItem.data as ResourceWithTracklist<PlayableItem>;
-
-            subscriber.add(data.tracklist.getNextItem(index).subscribe((item) => {
-                subscriber.next([item, data.tracklist]);
+            // Treat data as tracklist (as its the only other option at this point)
+            const data = nextItem.data as SCNGXTracklist;
+            // Add next-query to subscriber
+            subscriber.add(data.getNextItem(index).subscribe((item) => {
+                // Emit result on subscriber
+                subscriber.next([item, data]);
                 subscriber.complete();
             }));
         }).pipe(
@@ -333,6 +405,6 @@ export class PlayerService {
 
     private hasTracklistEnded(tracklistId: string): boolean {
         const tracklist = this.queue.findTracklistById(tracklistId);
-        return tracklist?.data?.tracklist?.hasEnded;
+        return tracklist?.hasEnded;
     }
 }

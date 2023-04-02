@@ -1,7 +1,8 @@
 import { HttpClient } from "@angular/common/http";
-import { ApiError, toFuture, TracklistV2 } from "@soundcore/sdk";
+import { ApiError, Future, PlayableEntity, toFuture, TracklistV2 } from "@soundcore/sdk";
 import { isNull, Page, Pageable } from "@soundcore/common";
-import { concat, defer, EMPTY, filter, map, mergeMap, Observable, of, Subject, switchMap, take, takeUntil, tap } from "rxjs";
+import { BehaviorSubject, concat, defer, EMPTY, filter, map, mergeMap, Observable, of, Subject, take, takeUntil, tap } from "rxjs";
+import { QueuePointer } from "./queue-pointer";
 
 /**
  * Tracklist class to handle tracklists by providing an integrated queueing system
@@ -9,6 +10,7 @@ import { concat, defer, EMPTY, filter, map, mergeMap, Observable, of, Subject, s
  */
 export class SCNGXTracklist<T = any> {
 
+    private readonly $cancel: Subject<void> = new Subject();
     /**
      * Subject to manage emition of 
      * release process
@@ -28,13 +30,14 @@ export class SCNGXTracklist<T = any> {
     /**
      * List of items that have been fetched
      */
-    private readonly items: T[];
+    private items: T[];
 
     /**
      * Int value to track at which point in the 
      * tracklist the playback currently is
      */
-    private currentQueuePointer: number = 0;
+    // private currentQueuePointer: number = 0;
+    private readonly queuePointer: QueuePointer = new QueuePointer();
 
     /**
      * Internal state management for fetched pages, to check
@@ -48,15 +51,25 @@ export class SCNGXTracklist<T = any> {
      */
     private readonly pageSize: number;
 
-    private nextPageIndex;
-    private didStartPlaying;
+    private readonly metadataSubject: BehaviorSubject<TracklistV2<T>> = new BehaviorSubject(null);
+    public readonly $metadata = this.metadataSubject.asObservable().pipe(takeUntil(this.$cancel));
 
-    constructor(
+    /**
+     * Observable that emits ready state. A tracklist is considered ready, when all
+     * metadata has been fetched. When restarting or shuffling a playlist, metadata will be fetched
+     * again causing this observable to switch values.
+     */
+    public readonly $ready: Observable<boolean> = this.$metadata.pipe(map((metadata) => !isNull(metadata)));
+
+    private nextPageIndex = 0;
+    // private didStartPlaying;
+
+    private constructor(
         /**
-         * Tracklist metadata to initialize tracklist datasource
-         * @template {T} Type of items inside the tracklist
+         * Entity to which the tracklist belongs. This can for example
+         * be an artist or album
          */
-        public readonly metadata: TracklistV2<T>,
+        private readonly owner: PlayableEntity,
         /**
          * Base URL used to build url for fetching
          * new items
@@ -66,46 +79,100 @@ export class SCNGXTracklist<T = any> {
          * HttpClient instance to perform
          * http requests.
          */
-        private readonly httpClient: HttpClient
+        private readonly httpClient: HttpClient,
+        /**
+         * Index of track to start playback at.
+         * This will be ignored when shuffle is on
+         */
+        private readonly minimumQueueIndex: number = 0,
+        /**
+         * Define if the tracklist should be shuffled upon creation
+         */
+        generateShuffled: boolean = false
     ) {
-        // TODO: Check if necessary
-        this.nextPageIndex = 1;
-        this.didStartPlaying = false;
-
-        // Create array that can fit <size> elements in it
-        this.items = Array.from({ length: this.metadata.size });
-        // Register first page of metadata
-        this.cachePage(this.metadata.items);
-        // Copy page settings from first received page
-        this.pageSize = this.metadata.items.info.limit;
-
-        // Remove items list from tracklist to save memory
-        delete metadata.items;
+        this.restart(minimumQueueIndex, generateShuffled).subscribe(() => {
+            console.log("Tracklist restartet");
+        });
     }
 
     /**
-     * Get the id of the tracklist.
-     * This usually equals to the id of the resource to which
-     * the tracklist belongs.
-     * E.g.: If the tracklist belongs to an album, the id
-     * equals to the album's id
+     * Create a new tracklist instance
+     * @param apiBaseUrl Base url to the API service
+     * @param httpClient HttpClient to send http requests with
+     * @param ownerId Id of the related resource to which the tracklist belongs. This can for example be an album, artist etc.
+     * @param ownerType Type of the related resource to which the tracklist belongs. This can for example be an album ("album"), artist ("artist") etc.
+     * @param startAtIndex Index of track to start playback at
+     * @param generateShuffled Seed to use when generating shuffled tracklists
      */
-    public get id(): string {
+    public static create<T = any>(owner: PlayableEntity, apiBaseUrl: string, httpClient: HttpClient, startAtIndex: number = 0, generateShuffled: boolean = false): Observable<Future<SCNGXTracklist<T>>> {
+        return new Observable((subscriber) => {
+            // Check if owner is null
+            if(isNull(owner)) {
+                // If true, return 404 Future
+                subscriber.next(Future.notfound());
+                subscriber.complete();
+                return;
+            }
+
+            // Send loading state first
+            subscriber.next(Future.loading());
+            // Create new tracklist instance
+            const tracklist = new SCNGXTracklist(owner, apiBaseUrl, httpClient, startAtIndex, generateShuffled);
+            // Subscribe to ready state and wait till tracklist is ready
+            subscriber.add(tracklist.$ready.pipe(filter((isReady) => isReady)).subscribe(() => {
+                // If tracklist emitted ready=true, resolve future with tracklist data
+                subscriber.next(Future.of(tracklist));
+                // Complete the observable
+                subscriber.complete();
+            }));
+        });
+    }
+
+    /**
+     * Get current metadata snapshot
+     */
+    public get metadata(): TracklistV2<T> {
+        return this.metadataSubject.getValue();
+    }
+
+    /**
+     * Type of the tracklist. This equals
+     * to the type of the owner to which 
+     * the tracklist belongs
+     */
+    public get type() {
+        return this.metadata.type
+    }
+
+    /**
+     * Id of the tracklist. This equals
+     * to the id of the owner to which 
+     * the tracklist belongs
+     */
+    public get id() {
         return this.metadata.id;
+    }
+
+    /**
+     * Get the seed that is used to 
+     * create shuffled tracklists
+     */
+    public get seed(): number {
+        return this.metadata?.seed;
     }
 
     /**
      * Get the size of the tracklist
      */
     public get size(): number {
-        return this.metadata.size;
+        return this.metadata?.size;
     }
 
     /**
      * Check if the tracklist is empty
      */
     public get isEmpty(): boolean {
-        return this.metadata.size <= 0;
+        return this.metadata?.size <= 0;
     }
 
     /**
@@ -113,21 +180,6 @@ export class SCNGXTracklist<T = any> {
      */
     public get isNotEmpty(): boolean {
         return !this.isEmpty;
-    }
-
-    /**
-     * Get type of the tracklist
-     */
-    public get type() {
-        return this.metadata.type;
-    }
-
-    /**
-     * Get seed that is used 
-     * to build the tracklist
-     */
-    public get seed() {
-        return this.metadata.seed;
     }
 
     /**
@@ -141,9 +193,9 @@ export class SCNGXTracklist<T = any> {
     /**
      * Check if the tracklist already started playing.
      */
-    public get hasStarted() {
-        return this.didStartPlaying;
-    }
+    // public get hasStarted() {
+    //     return this.didStartPlaying;
+    // }
 
     /**
      * Get the current queue size
@@ -158,7 +210,7 @@ export class SCNGXTracklist<T = any> {
      * or the internal queue reached end of the list of items
      */
     public get hasEnded() {
-        return this.isEmpty || this.currentQueuePointer >= this.size;
+        return this.isEmpty || this.queuePointer.reachedEnd;
     }
 
     private get fetchedItemsCount() {
@@ -170,7 +222,61 @@ export class SCNGXTracklist<T = any> {
      * This is true, when the current queue pointer is near the end of fetched items count
      */
     private get shouldFetchNext() {
-        return !this.hasFetchedAll && (this.currentQueuePointer+1) >= this.fetchedItemsCount
+        return !this.hasFetchedAll && (this.queuePointer.position+1) >= this.fetchedItemsCount
+    }
+
+    /**
+     * Check if the next page can be prefetched.
+     * This is determined on the position of the queue pointer.
+     * A new page should be prefetched
+     */
+    private get shouldPrefetchNext() {
+        return !this.hasFetchedAll && (this.queuePointer.position+7) >= this.fetchedItemsCount
+    }
+
+    public restart(generateShuffled?: boolean): Observable<TracklistV2<T>>;
+    public restart(minimumQueueIndex?: number): Observable<TracklistV2<T>>;
+    public restart(minimumQueueIndex?: number, generateShuffled?: boolean): Observable<TracklistV2<T>>;
+    public restart(minimumQueueIndexOrgenerateShuffled?: number | boolean, generateShuffled?: boolean): Observable<TracklistV2<T>> {
+        // Extract info if tracklist should be shuffled
+        const shouldGenerateShuffled: boolean = typeof minimumQueueIndexOrgenerateShuffled === "boolean" ? (minimumQueueIndexOrgenerateShuffled || generateShuffled) : (generateShuffled ?? false);
+        const startAt: number = typeof minimumQueueIndexOrgenerateShuffled === "number" ? minimumQueueIndexOrgenerateShuffled as number : 0;
+
+        // Cancel all ongoing requests
+        this.$cancel.next();
+        // Clear current metadata. This will also
+        // cause the ready state to switch to false
+        this.metadataSubject.next(null);
+
+        // Clear items
+        this.items = null;
+
+        // Reset queue pointer to new index
+        this.queuePointer.setMin(startAt);
+        this.queuePointer.reset();
+
+        // Fetch metadata
+        return this.fetchMetadata(this.owner, startAt, shouldGenerateShuffled).pipe(
+            takeUntil(this.$cancel),
+            filter((request) => !request.loading),
+            map((request) => {
+                // Publish error if exists
+                if(request.error) {
+                    this.publishError(request.error);
+                    return null;
+                }
+
+                // Set new maximum for pointer
+                this.queuePointer.setMax(request.data?.size);
+                // Reload queue position
+                this.queuePointer.reset();
+                // Register first page
+                this.cachePage(request.data?.items);
+                // Save metadata by pushing to subject
+                this.metadataSubject.next(request.data);
+                return request.data;
+            })
+        );
     }
 
     public reshuffle(seed?: string) {
@@ -184,15 +290,23 @@ export class SCNGXTracklist<T = any> {
      * queue is still empty (method returns null), the tracklist is done playing
      */
     public getNextItem(indexInTracklist?: number): Observable<T> {
+        console.log("getting next");
         return new Observable<T>((subscriber) => {
             // If index is null, no specific index is request
             // That means, we can return the next item in queue
             if(isNull(indexInTracklist)) {
+                // Check if should prefetch next page
+                // This can only happen if it is not forced
+                console.log(this.shouldPrefetchNext, this.shouldFetchNext)
+                if(this.shouldPrefetchNext && !this.shouldFetchNext) {
+                    // Execute in background
+                    this.getNextItems().pipe(takeUntil(this.$cancel)).subscribe();
+                }
+
                 // If next page should be fetched
                 if(this.shouldFetchNext) {
                     // If true, fetch page
-                    console.log("fetch next page");
-                    subscriber.add(this.getNextItems().subscribe(() => {
+                    subscriber.add(this.getNextItems().pipe(takeUntil(this.$cancel)).subscribe(() => {
                         // After fetching next items, dequeue next item
                         subscriber.next(this.dequeue());
                         subscriber.complete();
@@ -203,44 +317,72 @@ export class SCNGXTracklist<T = any> {
                     subscriber.complete();
                 }
             } else {
+                subscriber.next(null);
+                subscriber.complete();
+
                 // If index is set, a specific item was requested by the player
                 // This usually happens, when the user explicitly started a song inside
-                // that tracklist
+                // that tracklist. In such cases the tracklist queue must be rebuild to start
+                // at that requested index. This is only done, if there is no specified seed.
+                // If there is a seed, request the page where the index is in and get the track
 
-                subscriber.add(
-                    // First, check if the page has already been fetched in which the requested
-                    // index (item) is located
-                    of(this.getPageOfIndex(indexInTracklist))
-                    .pipe(
-                        switchMap((targetPageIndex) => {
-                            if(!this.hasPage(targetPageIndex)) {
-                                // If the page was not fetched yet, fetch all pages
-                                // until the target page was fetched
-                                // TODO
+                // if(isNull(this.seed)) {
+                //     // If there is no seed, restart tracklist.
+                //     // Restarting a tracklist means reaching the tracklist endpoint
+                //     // and fetching the metadata again
+                // }
 
-                                return of(null);
-                            } else {
-                                // If true, return item at index
-                                return of(this.items[indexInTracklist] ?? null);
-                            }
-                        })
-                    ).subscribe((item) => {
-                        // Because specific index was request, reset
-                        // pointer to that index, but only if there is no seed set
-                        if(isNull(this.seed)) {
-                            // Set pointer to index + 1
-                            this.setPointerToIndex(indexInTracklist+1);
-                        }
+                // subscriber.add(
+                //     // First, check if the page has already been fetched in which the requested
+                //     // index (item) is located
+                //     of(this.getPageOfIndex(indexInTracklist))
+                //     .pipe(
+                //         switchMap((targetPageIndex) => {
+                //             if(!this.hasPage(targetPageIndex)) {
+                //                 // If the page was not fetched yet, fetch all pages
+                //                 // until the target page was fetched
+                //                 // TODO
 
-                        subscriber.next(item);
-                        subscriber.complete();
-                    })
-                );
+                //                 return this.fetchUntilPage(this.nextPageIndex, targetPageIndex).pipe(
+                //                     tap((pages) => console.log(pages)),
+                //                     tap((pages) => {
+                //                         pages.forEach((p) => {
+                //                             this.setNextPageIndex(targetPageIndex+1);
+                //                             this.cachePage(p);
+                //                         })
+                //                     }),
+                //                     map((pages) => {
+                //                         const tartetPage = pages[pages.length - 1];
+                //                         const index = this.getIndexInPage(indexInTracklist);
+
+                //                         console.log(targetPageIndex, tartetPage.info.index, index);
+
+                //                         return tartetPage.items[index];
+                //                     }),
+                //                     takeUntil(this.$cancel),
+                //                 );
+                //             } else {
+                //                 // If true, return item at index
+                //                 return of(this.items[indexInTracklist] ?? null);
+                //             }
+                //         })
+                //     ).subscribe((item) => {
+                //         // Because specific index was request, reset
+                //         // pointer to that index, but only if there is no seed set
+                //         if(isNull(this.seed)) {
+                //             // Set pointer to index + 1
+                //             this.setPointerToIndex(indexInTracklist+1);
+                //         }
+
+                //         subscriber.next(item);
+                //         subscriber.complete();
+                //     })
+                // );
             }
         }).pipe(
             // Because an item was dequeued, it means the 
             // tracklist started playing
-            tap(() => this.didStartPlaying = true),
+            // tap(() => this.didStartPlaying = true),
             // Only emit once, so the subscription 
             // is terminated after the first result
             take(1)
@@ -252,6 +394,8 @@ export class SCNGXTracklist<T = any> {
      * all listeners to be unsubscribed
      */
     public release() {
+        this.$cancel.next();
+        this.$cancel.complete();
         this.$onRelease.next();
         this.$onRelease.complete();
     }
@@ -268,9 +412,9 @@ export class SCNGXTracklist<T = any> {
         let item: T;
         if(isNull(index)) {
             // Get next element
-            item = this.items[this.currentQueuePointer] ?? null;
-            // Increment counter
-            this.setPointerToIndex(this.currentQueuePointer + 1);
+            item = this.items[this.queuePointer.position] ?? null;
+            // Increment pointer
+            this.queuePointer.inc();
         } else {
             // If index was set, return the 
             // requested item at that exact index
@@ -290,11 +434,27 @@ export class SCNGXTracklist<T = any> {
     private getNextItems(): Observable<Page<T>> {
         // If the maximum has already been fetched, return empty page
         if(this.hasFetchedAll) return of(Page.empty());
+        console.log(`Fetching next page with index ${this.nextPageIndex}`);
+
+        if(this.hasPage(this.nextPageIndex)) {
+            console.log("Page already fetched. Skipping")
+            // Return empty page to continue with dequeing
+            return of(Page.empty());
+        }
 
         // Fetch next page of tracks
         return this.fetchPage(this.nextPageIndex).pipe(
             // Add page to queue
-            tap((page) => this.cachePage(page))
+            map((page) => {
+                console.log(page);
+
+                if(!isNull(page)) {
+                    this.setNextPageIndex(this.nextPageIndex+1);
+                    this.cachePage(page);
+                }
+
+                return page ?? Page.empty();
+            }),
         );
     }
 
@@ -308,23 +468,24 @@ export class SCNGXTracklist<T = any> {
         const pageable = new Pageable(pageIndex, this.pageSize);
 
         let params;
-        if(!isNull(this.metadata.seed)) {
-            params = new URLSearchParams();
-            params.set("seed", `${this.seed}`);
-        }
+        // if(!isNull(this.metadata.seed)) {
+        //     params = new URLSearchParams();
+        //     params.set("seed", `${this.seed}`);
+        // }
 
         // Fetch next page of tracks
-        return this.httpClient.get<Page<T>>(`${this.getTracklistUrl()}/tracks${pageable.toQuery()}${isNull(params) ? '': `&${params.toString()}`}`).pipe(
+        return this.httpClient.get<Page<T>>(`${this.getTracksBaseUrl()}${pageable.toQuery()}${isNull(params) ? '': `&${params.toString()}`}`).pipe(
             // Transform to future to get loading state
             toFuture(),
             // Only continue if future is resolved
             filter((request) => !request.loading),
             // Handle errors
             tap((request) => {
-                this.publishError(request.error);
+                // Push error to tracklist if exists
+                if(!isNull(request.error)) this.publishError(request.error);
             }),
             // Return page content
-            map((request) => request.data ?? Page.empty()),
+            map((request) => request.data),
         );
     }
 
@@ -362,12 +523,19 @@ export class SCNGXTracklist<T = any> {
      * Get the url used for all tracklist operations
      * @returns 
      */
-    private getTracklistUrl(): string {
-        return `${this.apiBaseUrl}/v1/tracklists/${this.metadata.uri}`;
+    private getTracksBaseUrl(): string {
+        // const baseUrl = `${this.apiBaseUrl}/v1/songs/${this.type}/${this.id}`;
+        return `${this.apiBaseUrl}/v1/songs/${this.type}/${this.id}`;
     }
 
     private getPageOfIndex(index: number) {
         return Math.floor(Math.max(0, index) / Math.max(1, this.pageSize));
+    }
+
+    private getIndexInPage(indexInTracklist) {
+        const page = this.getPageOfIndex(indexInTracklist);
+        const index = Math.ceil(indexInTracklist / (page*this.pageSize));
+        return index;
     }
 
     /**
@@ -376,7 +544,7 @@ export class SCNGXTracklist<T = any> {
      * @returns True, if the page was already fetched. Otherwise false
      */
     private hasPage(pageIndex: number) {
-        return this.fetchedPages.has(this.getPageOfIndex(pageIndex));
+        return this.fetchedPages.has(pageIndex);
     }
 
     /**
@@ -395,23 +563,39 @@ export class SCNGXTracklist<T = any> {
      * @param page Page that was fetched
      */
     private cachePage(page: Page<T>) {
+        if(isNull(page)) return;
+
         const pageIndex = page.info.index;
         const pageLimit = page.info.limit;
         const items = page.items;
 
         this.fetchedPages.add(pageIndex);
+        if(isNull(this.items)) {
+            this.items = Array.from({length: items.length}).map((_, i) => items[i]);
+            return;
+        }
+
         this.items.splice(pageIndex * pageLimit, pageLimit, ...Array.from({length: items.length}).map((_, i) => items[i]));
     }
 
+    private setNextPageIndex(index: number) {
+        this.nextPageIndex = index;
+    }
+
     /**
-     * Move the internal pointer that is 
-     * used for queueing next items.
-     * This will automatically validate index to a min of 0 and
-     * a max of <size>
-     * @param resetToIndex Index to which the pointer should jump
+     * Fetch tracklist metadata
+     * @param ownerId Id of the tracklist owner. This can for example be an album's id. Usually its the id of the resource to which the tracklist belongs
+     * @param ownerType Type of the tracklist owner
+     * @param startAtIndex Index in tracklist to start playback at
+     * @param shuffled Generate a shuffled tracklist
+     * @returns {Future<TracklistV2>}
      */
-    private setPointerToIndex(resetToIndex: number = 0) {
-        this.currentQueuePointer = Math.max(0, Math.min(this.size, resetToIndex ?? 0));
+    private fetchMetadata(owner: PlayableEntity, startAtIndex: number = 0, shuffled: boolean = false) {
+        // Perform fetch request
+        return this.httpClient.get<TracklistV2<T>>(`${this.apiBaseUrl}/v2/tracklists/${encodeURIComponent(owner.type.toLowerCase())}/${encodeURIComponent(owner.id)}?shuffled=${encodeURIComponent(shuffled)}`).pipe(
+            toFuture(), 
+            takeUntil(this.$cancel)
+        );
     }
 
 }

@@ -6,6 +6,7 @@ import { SCSDK_OPTIONS } from "../../constants";
 import { SCSDKOptions } from "../../scdk.module";
 import { Future, toFuture } from "../../utils/future";
 import { TracklistV2 } from "../entities/tracklist-v2.entity";
+import { PlayableEntityType } from "../entities/playable.entity";
 
 @Injectable()
 export class SCSDKTracklistV2Service {
@@ -26,7 +27,7 @@ export class SCSDKTracklistV2Service {
      */
     public findByAlbum(albumId: string, shuffled: boolean = false): Observable<Future<TracklistV2>> {
         if(isNull(albumId)) return of(Future.notfound());
-        return this.httpClient.get<TracklistV2>(`${this.options.api_base_uri}/v2/tracklists/album/${albumId}?shuffled=${encodeURIComponent(shuffled)}`).pipe(toFuture());
+        return this.httpClient.get<TracklistV2>(`${this.options.api_base_uri}/v2/tracklists/${PlayableEntityType.ALBUM.toLowerCase()}/${albumId}?shuffled=${encodeURIComponent(shuffled)}`).pipe(toFuture());
     }
 
     /**
@@ -36,7 +37,7 @@ export class SCSDKTracklistV2Service {
      */
     public findByArtist(artistId: string, shuffled: boolean = false): Observable<Future<TracklistV2>> {
         if(isNull(artistId)) return of(Future.notfound());
-        return this.httpClient.get<TracklistV2>(`${this.options.api_base_uri}/v2/tracklists/artist/${artistId}?shuffled=${encodeURIComponent(shuffled)}`).pipe(toFuture());
+        return this.httpClient.get<TracklistV2>(`${this.options.api_base_uri}/v2/tracklists/${PlayableEntityType.ARTIST.toLowerCase()}/${artistId}?shuffled=${encodeURIComponent(shuffled)}`).pipe(toFuture());
     }
 
 }

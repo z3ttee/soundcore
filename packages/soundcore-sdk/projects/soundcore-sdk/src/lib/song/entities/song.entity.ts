@@ -1,11 +1,12 @@
 import { Album } from "../../album/entities/album.entity";
 import { Artist } from "../../artist/entities/artist.entity";
 import { Artwork } from "../../artwork/entities/artwork.entity";
-import { SCDKResource, SCDKResourceType } from "../../utils/entities/resource";
+import { PlayableEntity, PlayableEntityType } from "../../tracklist/entities/playable.entity";
 
-export class Song implements SCDKResource {
+export class Song implements PlayableEntity {
+    public type: PlayableEntityType;
+
     public slug: string;
-    public resourceType: SCDKResourceType;
     
     public id: string;
     public name: string;

@@ -4,7 +4,7 @@
     <cdk-virtual-scroll-viewport [itemSize]="56" class="w-full h-full overflow-x-hidden" *ngIf="props.loading || props.artist">
 
         <!-- Page Header -->
-        <app-list-view [resource]="props.artist" [title]="props.artist?.name" [isLoading]="props.loading" [artwork]="props.artist?.artwork">
+        <app-list-view [resource]="$any(props.artist)" [title]="props.artist?.name" [isLoading]="props.loading" [artwork]="props.artist?.artwork">
             <ng-container scngx-stats>
                 <li class="text-font-secondary">
                     <span>{{ props.artist?.albumCount ?? 0 }} Alben</span>
