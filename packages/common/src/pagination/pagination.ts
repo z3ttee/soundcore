@@ -18,12 +18,12 @@ import { Pageable } from "./page";
  * @returns Pageable - Page settings object
  */
 export const Pagination = createParamDecorator(
-    (defaults: { page: number, size: number }, ctx: ExecutionContext): Pageable => {        
+    (defaults: { index: number, limit: number, offset: number }, ctx: ExecutionContext): Pageable => {        
         const request = ctx.switchToHttp().getRequest();
 
-        let pageNr = parseInt(request.query?.page) || defaults?.page || 0;
-        let pageSize = parseInt(request.query?.limit) || defaults?.size || 50;
+        let offset = parseInt(request.query?.offset) ?? defaults?.offset ?? 0;
+        let limit = parseInt(request.query?.limit) ?? defaults?.limit ?? 50;
 
-        return new Pageable(pageNr, pageSize);
+        return new Pageable(offset, limit);
     }
 );

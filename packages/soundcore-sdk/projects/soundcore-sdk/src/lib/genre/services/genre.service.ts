@@ -36,7 +36,7 @@ export class SCDKGenreService {
      * @returns Observable<Page<Genre>>
      */
     public findByArtist(artistId: string, pageable: Pageable): Observable<ApiResponse<Page<Genre>>> {
-        if(!artistId) return of(ApiResponse.withPayload(Page.empty(pageable.index, pageable.limit, pageable.offset)))
+        if(!artistId) return of(ApiResponse.withPayload(Page.empty(pageable)))
         return this.httpClient.get<Page<Genre>>(`${this.options.api_base_uri}/v1/genres/byArtist/${artistId}${pageable.toQuery()}`).pipe(apiResponse())
     }
 

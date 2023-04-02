@@ -31,7 +31,7 @@ export class SCDKFileService {
      * @returns Page<File>
      */
     public findByMountId(mountId: string, pageable: Pageable): Observable<Page<File>> {
-        if(!mountId) return of(Page.empty(pageable.index, pageable.limit, pageable.offset));
+        if(!mountId) return of(Page.empty(pageable));
         return this.httpClient.get<Page<File>>(`${this.findByMountIdBaseURL(mountId)}${pageable.toQuery()}`);
     }
 

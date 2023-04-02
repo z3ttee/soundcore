@@ -20,8 +20,8 @@ export class SCSDKDatasource<T = any> extends SCSDKBaseDatasource<T> {
         super(pageSize ?? 30, initialSize, primaryKey);
     }
 
-    protected fetchPage(pageIndex: number): Observable<T[]> {
-        const pageable = new Pageable(pageIndex, this.pageSize);
+    protected fetchPage(offset: number): Observable<T[]> {
+        const pageable = new Pageable(offset, this.pageSize);
 
         if(typeof this.pageableUrl === "undefined" || this.pageableUrl == null) return of([]);
         return this.httpClient.get<Page<T>>(`${this.pageableUrl}${pageable.toQuery()}`).pipe(

@@ -62,7 +62,7 @@ export abstract class SCSDKBaseDatasource<T = any> extends DataSource<T> {
      * @param pageIndex Page index
      * @returns Page of elements
      */
-    protected abstract fetchPage(pageIndex: number): Observable<T[]>;
+    protected abstract fetchPage(offset: number): Observable<T[]>;
 
     public get ready(): boolean {
         return this._readySubject.getValue();
@@ -78,7 +78,9 @@ export abstract class SCSDKBaseDatasource<T = any> extends DataSource<T> {
                     continue;
                 }
 
-                this.fetchPage(pageIndex).pipe(
+                const offset = pageIndex * this.pageSize;
+
+                this.fetchPage(offset).pipe(
                     takeUntil(this._destroy),
                     catchError((err: Error) => {
                         console.error(err);
@@ -95,7 +97,7 @@ export abstract class SCSDKBaseDatasource<T = any> extends DataSource<T> {
     
                     // if(items.length <= 0) return;
                     // Add fetched items to cachedData
-                    this.cachedData.splice(pageIndex * this.pageSize, this.pageSize, ...Array.from({length: items.length}).map((_, i) => items[i]));
+                    this.cachedData.splice(offset, this.pageSize, ...Array.from({length: items.length}).map((_, i) => items[i]));
                     // Push updated cache to stream
                     this.dataStream.next(this.cachedData);
                 });

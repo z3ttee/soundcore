@@ -55,7 +55,7 @@ export class SCDKAlbumService {
      * @returns Observable<Page<Album>>
      */
     public findByArtist(artistId: string, pageable: Pageable): Observable<ApiResponse<Page<Album>>> {
-        if(!artistId) return of(ApiResponse.withPayload(Page.empty(pageable.index, pageable.limit, pageable.offset)));
+        if(!artistId) return of(ApiResponse.withPayload(Page.empty(pageable)));
         return this.httpClient.get<Page<Album>>(`${this.options.api_base_uri}/v1/albums/byArtist/${artistId}${pageable.toQuery()}`).pipe(apiResponse())
     }
 
@@ -67,7 +67,7 @@ export class SCDKAlbumService {
      * @returns Observable<Page<Album>>
      */
     public findFeaturedByArtist(artistId: string, pageable: Pageable): Observable<ApiResponse<Page<Album>>> {
-        if(!artistId) return of(ApiResponse.withPayload(Page.empty(pageable.index, pageable.limit, pageable.offset)));
+        if(!artistId) return of(ApiResponse.withPayload(Page.empty(pageable)));
         return this.httpClient.get<Page<Album>>(`${this.options.api_base_uri}/v1/albums/byFeaturedArtist/${artistId}${pageable.toQuery()}`).pipe(apiResponse())
     }
 

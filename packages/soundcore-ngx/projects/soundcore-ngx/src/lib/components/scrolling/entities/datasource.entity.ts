@@ -33,7 +33,7 @@ export class SCNGXDatasource<T = any> extends SCSDKBaseDatasource<T> {
                 }
 
                 // Get page data and return it
-                const page = request.data ?? Page.empty(pageable.index, pageable.limit, pageable.offset);
+                const page = request.data ?? Page.empty(pageable);
 
                 this.setTotalSize(page.totalSize);
                 return page.items;

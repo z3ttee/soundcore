@@ -43,6 +43,7 @@ export class ArtistService {
         const rawAndEntities = await this.repository.createQueryBuilder("artist")
             .leftJoin("artist.songs", "song")
             .leftJoin("song.streams", "stream")
+            .leftJoin("song.featuredArtists", "featuredArtists")
             .loadRelationCountAndMap("artist.albumCount", "artist.albums", "albumCount")
             .loadRelationCountAndMap("artist.songCount", "artist.songs", "songCount")
             .addSelect("COUNT(stream.id)", "streamCount")

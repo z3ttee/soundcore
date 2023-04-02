@@ -73,7 +73,7 @@ export class SCNGXTracklist<T = any, C = any> extends SCSDKBaseDatasource<SCNGXT
                         }
         
                         // Get page data and return it
-                        let page: Page<T> = Page.empty(pageable.index, pageable.limit, pageable.offset);
+                        let page: Page<T> = Page.empty(pageable);
                         if(request.data) {
                             page = request.data;
                             this.setTotalSize(page.totalSize);

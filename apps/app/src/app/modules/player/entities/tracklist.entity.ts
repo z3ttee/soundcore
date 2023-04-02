@@ -61,7 +61,7 @@ export class SCNGXTracklist<T = any> {
      */
     public readonly $ready: Observable<boolean> = this.$metadata.pipe(map((metadata) => !isNull(metadata)));
 
-    private nextPageIndex = 0;
+    private nextOffset = 0;
     // private didStartPlaying;
 
     private constructor(
@@ -434,22 +434,22 @@ export class SCNGXTracklist<T = any> {
     private getNextItems(): Observable<Page<T>> {
         // If the maximum has already been fetched, return empty page
         if(this.hasFetchedAll) return of(Page.empty());
-        console.log(`Fetching next page with index ${this.nextPageIndex}`);
+        console.log(`Fetching next page with offset ${this.nextOffset}`);
 
-        if(this.hasPage(this.nextPageIndex)) {
+        if(this.hasPage(this.getPageByOffset(this.nextOffset))) {
             console.log("Page already fetched. Skipping")
             // Return empty page to continue with dequeing
             return of(Page.empty());
         }
 
         // Fetch next page of tracks
-        return this.fetchPage(this.nextPageIndex).pipe(
+        return this.fetchPage(this.nextOffset).pipe(
             // Add page to queue
             map((page) => {
                 console.log(page);
 
                 if(!isNull(page)) {
-                    this.setNextPageIndex(this.nextPageIndex+1);
+                    this.setNextOffset(this.nextOffset);
                     this.cachePage(page);
                 }
 
@@ -463,9 +463,9 @@ export class SCNGXTracklist<T = any> {
      * @param pageIndex Page to fetch
      * @returns {Page<T>}
      */
-    private fetchPage(pageIndex: number): Observable<Page<T>> {
+    private fetchPage(offset: number): Observable<Page<T>> {
         // Build page settings
-        const pageable = new Pageable(pageIndex, this.pageSize);
+        const pageable = new Pageable(offset, this.pageSize);
 
         let params;
         // if(!isNull(this.metadata.seed)) {
@@ -497,10 +497,10 @@ export class SCNGXTracklist<T = any> {
 
             subscriber.add(defer(() => this.fetchPage(startPageIndex)).pipe(
                 mergeMap((page) => {
-                    const nextIndex = page.next;
+                    const nextOffset = page.nextOffset;
 
                     const $page = of(page);
-                    const $next = isNull(nextIndex) ? EMPTY : this.fetchPage(nextIndex);
+                    const $next = isNull(nextOffset) ? EMPTY : this.fetchPage(nextOffset);
 
                     return concat($page, $next);
                 }),
@@ -509,12 +509,12 @@ export class SCNGXTracklist<T = any> {
                 aggregatedPages.push(page);
 
                 // Check if current page equals target index
-                if(page.info.index == maxPageIndex) {
-                    // If true, all requested pages were fetched
-                    // and the request can be completed
-                    subscriber.next(aggregatedPages);
-                    subscriber.complete();
-                }
+                // if(page.info.index == maxPageIndex) {
+                //     // If true, all requested pages were fetched
+                //     // and the request can be completed
+                //     subscriber.next(aggregatedPages);
+                //     subscriber.complete();
+                // }
             }));
         })
     }
@@ -530,6 +530,11 @@ export class SCNGXTracklist<T = any> {
 
     private getPageOfIndex(index: number) {
         return Math.floor(Math.max(0, index) / Math.max(1, this.pageSize));
+    }
+
+    private getPageByOffset(offset: number) {
+        if(this.pageSize <= 0) return 0;
+        return Math.floor(Math.max(0, offset) / this.pageSize);
     }
 
     private getIndexInPage(indexInTracklist) {
@@ -565,21 +570,21 @@ export class SCNGXTracklist<T = any> {
     private cachePage(page: Page<T>) {
         if(isNull(page)) return;
 
-        const pageIndex = page.info.index;
-        const pageLimit = page.info.limit;
+        const limit = page.info.limit;
+        const offset = page.info.limit;
         const items = page.items;
 
-        this.fetchedPages.add(pageIndex);
+        this.fetchedPages.add(page.info.index);
         if(isNull(this.items)) {
             this.items = Array.from({length: items.length}).map((_, i) => items[i]);
             return;
         }
 
-        this.items.splice(pageIndex * pageLimit, pageLimit, ...Array.from({length: items.length}).map((_, i) => items[i]));
+        this.items.splice(offset, limit, ...Array.from({length: items.length}).map((_, i) => items[i]));
     }
 
-    private setNextPageIndex(index: number) {
-        this.nextPageIndex = index;
+    private setNextOffset(offset: number) {
+        this.nextOffset = offset;
     }
 
     /**
@@ -592,7 +597,7 @@ export class SCNGXTracklist<T = any> {
      */
     private fetchMetadata(owner: PlayableEntity, startAtIndex: number = 0, shuffled: boolean = false) {
         // Perform fetch request
-        return this.httpClient.get<TracklistV2<T>>(`${this.apiBaseUrl}/v2/tracklists/${encodeURIComponent(owner.type.toLowerCase())}/${encodeURIComponent(owner.id)}?shuffled=${encodeURIComponent(shuffled)}`).pipe(
+        return this.httpClient.get<TracklistV2<T>>(`${this.apiBaseUrl}/v2/tracklists/${encodeURIComponent(owner.type.toLowerCase())}/${encodeURIComponent(owner.id)}?shuffled=${encodeURIComponent(shuffled)}&offset=${encodeURIComponent(startAtIndex)}`).pipe(
             toFuture(), 
             takeUntil(this.$cancel)
         );
