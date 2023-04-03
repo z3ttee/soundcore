@@ -1,6 +1,6 @@
 import { HttpClient } from "@angular/common/http";
 import { Inject, Injectable } from "@angular/core";
-import { isNull } from "@soundcore/common";
+import { Pageable, isNull } from "@soundcore/common";
 import { Observable, of } from "rxjs";
 import { SCSDK_OPTIONS } from "../../constants";
 import { SCSDKOptions } from "../../scdk.module";
@@ -27,7 +27,7 @@ export class SCSDKTracklistV2Service {
      */
     public findByAlbum(albumId: string, shuffled: boolean = false): Observable<Future<TracklistV2>> {
         if(isNull(albumId)) return of(Future.notfound());
-        return this.httpClient.get<TracklistV2>(`${this.options.api_base_uri}/v2/tracklists/${PlayableEntityType.ALBUM.toLowerCase()}/${albumId}?shuffled=${encodeURIComponent(shuffled)}`).pipe(toFuture());
+        return this.httpClient.get<TracklistV2>(`${this.options.api_base_uri}/v2/tracklists/${PlayableEntityType.ALBUM.toLowerCase()}/${albumId}${new Pageable(0, 15).toQuery()}&shuffled=${encodeURIComponent(shuffled)}`).pipe(toFuture());
     }
 
     /**
@@ -37,7 +37,7 @@ export class SCSDKTracklistV2Service {
      */
     public findByArtist(artistId: string, shuffled: boolean = false): Observable<Future<TracklistV2>> {
         if(isNull(artistId)) return of(Future.notfound());
-        return this.httpClient.get<TracklistV2>(`${this.options.api_base_uri}/v2/tracklists/${PlayableEntityType.ARTIST.toLowerCase()}/${artistId}?shuffled=${encodeURIComponent(shuffled)}`).pipe(toFuture());
+        return this.httpClient.get<TracklistV2>(`${this.options.api_base_uri}/v2/tracklists/${PlayableEntityType.ARTIST.toLowerCase()}/${artistId}${new Pageable(0, 15).toQuery()}&shuffled=${encodeURIComponent(shuffled)}`).pipe(toFuture());
     }
 
 }

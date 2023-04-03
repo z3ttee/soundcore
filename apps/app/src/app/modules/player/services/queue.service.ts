@@ -46,11 +46,18 @@ export class AudioQueue {
 
         // Do not enqueue tracklists twice
         if(this.isEnqueued(resource.id)) return -1;
-        // Otherwise push to end of queue
-        const position = this.queue.push({ isList: true, data: resource }) - 1;
+        // Otherwise set to end of queue and remove previous one
+        const index = Math.max(0, this.queue.length - 1);
+        const tracklist = this.queue[index];
+        if(!isNull(tracklist) && tracklist.isList) {
+            this.enqueuedIds.delete(tracklist.data?.id);
+            (tracklist.data as SCNGXTracklist)?.release();
+        }
+
+        this.queue[index] = { isList: true, data: resource };
         // Register id as enqueued
         this.enqueuedIds.set(resource.id, true);
-        return position;
+        return index;
     }
 
     public dequeue(): EnqueuedItem {

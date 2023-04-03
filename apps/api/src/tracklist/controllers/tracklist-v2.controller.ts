@@ -5,6 +5,8 @@ import { User } from '../../user/entities/user.entity';
 import { TracklistV2 } from '../entities/tracklist.entity';
 import { TracklistV2Service } from '../services/tracklist-v2.service';
 import { PlayableEntityType } from '../entities/playable.entity';
+import { Pageable, Pagination } from '@soundcore/common';
+import { MAX_TRACKLIST_PAGE_SIZE } from '../../constants';
 
 /**
  * Controller class that contains
@@ -27,8 +29,8 @@ export class TracklistV2Controller {
      * @returns Tracklist
      */
     @Get(`/${PlayableEntityType.ALBUM.toLowerCase()}/:albumId`)
-    public async findListByAlbum(@Param("albumId") albumId: string, @Authentication() authentication: User, @Query("shuffled") shuffled?: string): Promise<TracklistV2> {
-        return this.service.findTracklistByAlbumId(albumId, authentication, shuffled === "true");
+    public async findListByAlbum(@Param("albumId") albumId: string, @Authentication() authentication: User, @Pagination() pageable: Pageable, @Query("shuffled") shuffled?: string, @Query("offset") offset?: string): Promise<TracklistV2> {
+        return this.service.findTracklistByAlbumId(albumId, pageable, authentication, shuffled === "true");
     }
 
     /**
@@ -39,8 +41,8 @@ export class TracklistV2Controller {
      */
     @Get(`/${PlayableEntityType.ARTIST.toLowerCase()}/:artistId`)
     @Public(true)
-    public async findListByArtist(@Param("artistId") artistId: string, @Authentication() authentication: User, @Query("shuffled") shuffled?: string): Promise<TracklistV2> {
-        return this.service.findTracklistByArtistId(artistId, authentication, shuffled === "true");
+    public async findListByArtist(@Param("artistId") artistId: string, @Authentication() authentication: User, @Pagination() pageable: Pageable, @Query("shuffled") shuffled?: string): Promise<TracklistV2> {
+        return this.service.findTracklistByArtistId(artistId, pageable, authentication, shuffled === "true");
     }
 
 }

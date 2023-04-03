@@ -65,7 +65,6 @@ export class ArtistSongsComponent implements OnInit, OnDestroy {
   }
 
   public forcePlay(artist: Artist) {
-    console.log(artist);
     this.playerService.forcePlay(artist).subscribe();
   }
 

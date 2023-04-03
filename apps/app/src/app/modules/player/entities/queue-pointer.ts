@@ -32,6 +32,16 @@ export class QueuePointer {
         return this._min;
     }
 
+    public get prev() {
+        if(this._position <= this._min) return null;
+        return this._position - 1;
+    }
+
+    public get next() {
+        if(this._position >= this._max) return null;
+        return this._position + 1;
+    }
+
     public get reachedEnd() {
         return this._position >= this._max;
     }
