@@ -1,11 +1,10 @@
-import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { combineLatest, map, Observable, of, startWith, Subject, switchMap, takeUntil } from 'rxjs';
-import { Album, Future, SCDKAlbumService, SCSDKDatasource, SCSDKSongService, SCSDKTracklistV2Service, Song, toFutureCompat } from '@soundcore/sdk';
+import { Album, Future, SCDKAlbumService, SCSDKDatasource, SCSDKSongService, Song, toFutureCompat } from '@soundcore/sdk';
 import { AUDIOWAVE_LOTTIE_OPTIONS } from 'src/app/constants';
 import { PlayerService } from 'src/app/modules/player/services/player.service';
 import { SCNGXTracklist } from 'src/app/modules/player/entities/tracklist.entity';
-import { HttpClient } from '@angular/common/http';
 import { Page } from '@soundcore/common';
 
 interface AlbumInfoProps {
@@ -21,7 +20,7 @@ interface AlbumInfoProps {
   templateUrl: './album-info.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class AlbumInfoComponent implements OnInit, OnDestroy {
+export class AlbumInfoComponent implements OnDestroy {
 
   private readonly $destroy: Subject<void> = new Subject();
 
@@ -30,8 +29,6 @@ export class AlbumInfoComponent implements OnInit, OnDestroy {
     private readonly activatedRoute: ActivatedRoute,
     private readonly playerService: PlayerService,
     private readonly songService: SCSDKSongService,
-    private readonly tracklistService: SCSDKTracklistV2Service,
-    private readonly httpClient: HttpClient,
   ) { }
 
   // Lottie animations options
@@ -44,18 +41,16 @@ export class AlbumInfoComponent implements OnInit, OnDestroy {
   public $albumId: Observable<string> = this.activatedRoute.paramMap.pipe(map((params) => params.get("albumId")));
 
   /**
-   * Observable that emits current datasource
-   * of tracks
-   */
-  public $datasource: Observable<SCSDKDatasource<Song>> = this.$albumId.pipe(switchMap((albumId) => {
-    return this.songService.findByAlbumDatasource(albumId);
-  }))
-
-  /**
    * Observable that emits current
    * album data in future format
    */
   public $album: Observable<Future<Album>> = this.$albumId.pipe(switchMap((albumId) => this.albumService.findById(albumId).pipe(toFutureCompat())));
+
+  /**
+   * Observable that emits current datasource
+   * of tracks
+   */
+  public $datasource: Observable<SCSDKDatasource<Song>> = this.$albumId.pipe(switchMap((albumId) => this.songService.findByAlbumDatasource(albumId)));
 
   /**
    * Observable that emits recommended albums
@@ -87,10 +82,6 @@ export class AlbumInfoComponent implements OnInit, OnDestroy {
     }),
     takeUntil(this.$destroy)
   );
-
-  public ngOnInit(): void {
-    
-  }
 
   public ngOnDestroy(): void {
       this.$destroy.next();

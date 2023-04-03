@@ -1,20 +1,20 @@
 <ng-container *ngIf="($props | async) as props">
-    <app-error404 *ngIf="!props.loading && !props.artist"></app-error404>
+    <app-error404 *ngIf="!props.artist.loading && !props.artist"></app-error404>
 
     <div class="flex flex-grow flex-col w-full h-full">
         <div class="w-full">
             <div class="bg-body sticky top-0 z-50 p-window" [ngClass]="{'shadow-md border-b border-opacity-70 border-b-body-lighter': (scroller.scrolledIndexChange | async) > 0}">
                 <div class="flex items-center justify-start flex-1 gap-4">
                     <div class="">
-                        <scngx-skeleton class="w-7 h-7 rounded-full" *ngIf="props.loading"></scngx-skeleton>            
-                        <scngx-ibtn *ngIf="!props.loading" (click)="forcePlay(props.artist.data)" size="md">
-                            <img *ngIf="!props.playing; else paused" class="w-7 h-7 text-body ml-0.5" src="assets/icons/play.svg">
-                            <ng-template #paused><img *ngIf="props.playing" class="w-7 h-7 text-body ml-0.5" src="assets/icons/pause.svg"></ng-template>
+                        <scngx-skeleton class="w-7 h-7 rounded-full" *ngIf="props.artist.loading"></scngx-skeleton>            
+                        <scngx-ibtn *ngIf="!props.artist.loading" (click)="forcePlay(props.artist.data)" size="md">
+                            <img *ngIf="!props.isPlaying; else paused" class="w-7 h-7 text-body ml-0.5" src="assets/icons/play.svg">
+                            <ng-template #paused><img *ngIf="props.isPlaying" class="w-7 h-7 text-body ml-0.5" src="assets/icons/pause.svg"></ng-template>
                         </scngx-ibtn>
                     </div>
                     <div class="">
-                        <scngx-skeleton *ngIf="props.loading" [class]="'w-1/4 h-12'"></scngx-skeleton>
-                        <scngx-ui-title *ngIf="!props.loading" [route]="['..']">
+                        <scngx-skeleton *ngIf="props.artist.loading" [class]="'w-1/4 h-12'"></scngx-skeleton>
+                        <scngx-ui-title *ngIf="!props.artist.loading" [route]="['..']">
                             {{ props.artist.data?.name }}
                             <div scngxSubtitle>Die komplette Künstler-Kollektion</div>
                         </scngx-ui-title>
@@ -35,8 +35,8 @@
                     <scngx-song-list-item
                         [song]="item"
                         [index]="i"
-                        [active]="props.currentlyPlaying?.song?.id == item?.id"
-                        [playing]="props.playing"
+                        [active]="props.currentItemId === item?.id && props.isTracklistActive"
+                        [playing]="props.isPlaying"
                         [animRef]="lottieAnimationTemplate"
                         (onPlay)="forcePlayAt(props.artist.data, i)">
                     </scngx-song-list-item>

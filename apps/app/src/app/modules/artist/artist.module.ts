@@ -55,7 +55,6 @@ const routes: Routes = [
     SCDKArtistModule,
     SCDKAlbumModule,
     SCSDKSongModule,
-    SCSDKTracklistModule,
 
     SCNGXHorizontalListModule,
     SCNGXSkeletonModule,

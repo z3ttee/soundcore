@@ -1,63 +1,74 @@
-import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { combineLatest, map, Observable, Subject, switchMap } from 'rxjs';
-import { Artist, Future, SCDKArtistService, SCSDKDatasource, SCSDKSongService, SCSDKTracklistV2Service, Song, toFutureCompat } from '@soundcore/sdk';
+import { combineLatest, map, Observable, startWith, Subject, switchMap } from 'rxjs';
+import { Artist, Future, SCDKArtistService, SCSDKDatasource, SCSDKSongService, Song, toFutureCompat } from '@soundcore/sdk';
 import { AUDIOWAVE_LOTTIE_OPTIONS } from 'src/app/constants';
-import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
-import { SCNGXTracklist } from 'src/app/modules/player/entities/tracklist.entity';
 import { PlayerService } from 'src/app/modules/player/services/player.service';
-import { HttpClient } from '@angular/common/http';
 
 interface ArtistSongsProps {
   artist?: Future<Artist>;
-  tracklist?: SCNGXTracklist;
-  currentlyPlaying?: any;
-
-  playing?: boolean;
-  loading?: boolean;
+  isPlaying?: boolean;
+  isTracklistActive?: boolean;
+  currentItemId?: string;
 }
 
 @Component({
   templateUrl: './artist-songs.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ArtistSongsComponent implements OnInit, OnDestroy {
-
-  @ViewChild("scroller") public readonly scroller: CdkVirtualScrollViewport;
+export class ArtistSongsComponent implements OnDestroy {
 
   constructor(
     private readonly artistService: SCDKArtistService,
     private readonly activatedRoute: ActivatedRoute,
     private readonly playerService: PlayerService,
     private readonly songService: SCSDKSongService,
-    private readonly tracklistService: SCSDKTracklistV2Service,
-    private readonly httpClient: HttpClient
   ) { }
-
-  private readonly _destroy: Subject<void> = new Subject();
-
-  private $artistId: Observable<string> = this.activatedRoute.paramMap.pipe(map((params) => params.get("artistId") ?? null))
-
-  public $artist: Observable<Future<Artist>> = this.$artistId.pipe(switchMap((artistId) => this.artistService.findById(artistId).pipe(toFutureCompat())));
-  public $datasource: Observable<SCSDKDatasource<Song>> = this.$artistId.pipe(switchMap((artistId) => this.songService.findByArtistDatasource(artistId)))
-
-  public readonly $props: Observable<ArtistSongsProps> = combineLatest([
-    this.$artist,
-    // this.player.$current.pipe(takeUntil(this._destroy)),
-    // this.player.$isPaused.pipe(takeUntil(this._destroy))
-  ]).pipe(
-    // Build props object
-    map(([artist]): ArtistSongsProps => ({
-      artist: artist,
-      // currentlyPlaying: currentItem,
-      // playing: !isPaused && currentItem?.tracklist?.id == future.data?.id,
-    })),
-  );
 
   // Lottie animations options
   public animOptions = AUDIOWAVE_LOTTIE_OPTIONS;
 
-  public ngOnInit(): void {}
+  private readonly _destroy: Subject<void> = new Subject();
+
+  /**
+   * Observable that emits currently active
+   * artistId extracted from the url.
+   */
+  public $artistId: Observable<string> = this.activatedRoute.paramMap.pipe(map((params) => params.get("artistId")));
+
+  /**
+   * Observable that emits current
+   * artist data in future format
+   */
+  public $artist: Observable<Future<Artist>> = this.$artistId.pipe(switchMap((artistId) => this.artistService.findById(artistId).pipe(toFutureCompat())));
+  
+  /**
+   * Observable that emits current datasource
+   * of tracks
+   */
+  public $datasource: Observable<SCSDKDatasource<Song>> = this.$artistId.pipe(switchMap((artistId) => this.songService.findByArtistDatasource(artistId)))
+
+  public readonly $props: Observable<ArtistSongsProps> = combineLatest([
+    // Get changes to artist
+    this.$artist,
+    // Get paused state
+    this.playerService.$isPaused.pipe(startWith(true)), 
+    // Get current tracklist id
+    this.playerService.$currentItem.pipe(startWith(null)),
+  ]).pipe(
+    // Build props object
+    map(([artist, isPaused, currentItem]): ArtistSongsProps => {
+      const currentTracklistId = currentItem?.tracklistId;
+      const currentItemId = currentItem?.id;
+
+      return {
+        artist: artist,
+        isPlaying: !isPaused && currentTracklistId === artist.data?.id,
+        isTracklistActive: currentTracklistId === artist.data?.id,
+        currentItemId: currentItemId
+      }
+    }),
+  );
 
   public ngOnDestroy(): void {
       this._destroy.next();

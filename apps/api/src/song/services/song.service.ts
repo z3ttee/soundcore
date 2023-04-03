@@ -174,7 +174,7 @@ export class SongService implements SyncableService<Song> {
                 // .addOrderBy("streamsCount", "DESC")
                 // .addOrderBy("song.id", "DESC")
                 // Order by album
-                .orderBy("album.name", "DESC")
+                .orderBy("album.name", "ASC")
                 .addOrderBy("song.order", "ASC")
                 .addOrderBy("song.id", "DESC")
                 // Where in ids
