@@ -3,7 +3,7 @@
     <cdk-virtual-scroll-viewport [itemSize]="56" [minBufferPx]="300" [maxBufferPx]="400" class="w-full h-full overflow-x-hidden">
         <app-error404 *ngIf="!props.loading && !props.playlist" [title]="'Playlist nicht gefunden'"></app-error404>
 
-        <app-list-view [resource]="props.playlist" [title]="props.playlist?.name" [isLoading]="props.loading" [artwork]="props.playlist?.artwork">
+        <app-list-view [resource]="$any(props.playlist)" [title]="props.playlist?.name" [isLoading]="props.loading" [artwork]="props.playlist?.artwork">
             <ng-container scngx-stats>
                 <li class="text-font-secondary">
                     <span *ngIf="props.playlist?.author">by <span class="hover:underline cursor-pointer" [routerLink]="['/profile', props.playlist?.author?.slug || props.playlist?.author?.id]">{{ props.playlist?.author?.name }}</span></span>

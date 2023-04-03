@@ -1,125 +1,59 @@
 import { BadRequestException, ForbiddenException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
-import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Page, Pageable } from '@soundcore/common';
-import { Not, Repository, SelectQueryBuilder, UpdateResult } from 'typeorm';
-import { EVENT_PLAYLISTS_CHANGED } from '../constants';
-import { Song } from '../song/entities/song.entity';
-import { User } from '../user/entities/user.entity';
-import { MeilisearchFlag } from '../utils/entities/meilisearch.entity';
-import { AddSongDTO } from './dtos/add-song.dto';
-import { CreatePlaylistDTO } from './dtos/create-playlist.dto';
-import { UpdatePlaylistDTO } from './dtos/update-playlist.dto';
-import { PlaylistAddSongFailReason, PlaylistItemAddResult } from './entities/playlist-item-added.entity';
-import { PlaylistItem } from './entities/playlist-item.entity';
-import { Playlist } from './entities/playlist.entity';
-import { PlaylistPrivacy } from './enums/playlist-privacy.enum';
+import { Page, Pageable, isNull } from '@soundcore/common';
+import { Not, ObjectLiteral, Repository, SelectQueryBuilder, UpdateResult } from 'typeorm';
+import { Playlist } from '../entities/playlist.entity';
+import { PlaylistItem } from '../entities/playlist-item.entity';
+import { User } from '../../user/entities/user.entity';
+import { PlaylistPrivacy } from '../enums/playlist-privacy.enum';
+import { CreatePlaylistDTO } from '../dtos/create-playlist.dto';
+import { AddSongDTO } from '../dtos/add-song.dto';
+import { PlaylistAddSongFailReason, PlaylistItemAddResult } from '../entities/playlist-item-added.entity';
+import { Song } from '../../song/entities/song.entity';
+import { MeilisearchFlag } from '../../utils/entities/meilisearch.entity';
+import { PlaylistMeiliService } from './playlist-meili.service';
+import { Slug } from '@tsalliance/utilities';
 
 @Injectable()
 export class PlaylistService {
     
     constructor(
         @InjectRepository(Playlist) private playlistRepository: Repository<Playlist>,
-        @InjectRepository(PlaylistItem)  private song2playlistRepository: Repository<PlaylistItem>,
-        private readonly emitter: EventEmitter2,
+        @InjectRepository(PlaylistItem) private song2playlistRepository: Repository<PlaylistItem>,
+        private readonly meilisearch: PlaylistMeiliService
     ) {}
 
     /**
-     * Find a playlist by its id.
-     * @param {string} playlistId Playlist's id.
-     * @returns {Playlist} Playlist
-     */
-    public async findById(playlistId: string): Promise<Playlist> {
-        const result = await this.playlistRepository.createQueryBuilder("playlist")
-            .leftJoinAndSelect("playlist.author", "author")
-            .where("playlist.id = :playlistId", { playlistId })
-            .orWhere("playlist.slug = :playlistId", { playlistId })
-            .getOne();
-
-        return result;
-    }
-
-    /**
-     * Finds a profile of a playlist including songs count and totalDuration.
-     * @param playlistId Id of the playlist
-     * @param requester User that requests information. Used to check if the user is allowed to access the playlist.
-     * @returns Playlist
-     */
-    public async findPlaylistProfileById(playlistId: string, authentication: User): Promise<Playlist> {
-        if(!await this.hasUserAccessToPlaylist(playlistId, authentication)) {
-            throw new ForbiddenException("Cannot access this playlist.");
-        }
-
-        const result = await this.buildGeneralQuery("playlist", authentication)
-            .where("playlist.id = :playlistId OR playlist.slug = :playlistId", { playlistId })
-            .getOneOrFail();
-
-        return result;
-    }
-
-    public async findPlaylistByIdWithInfo(playlistId: string): Promise<Playlist> {
-        return this.playlistRepository.findOne({ where: { id: playlistId }, relations: ["artwork", "author"]})
-    }
-
-    /**
-     * Check if a playlist already contains a song.
-     * @param playlistId Playlist's id
-     * @param songId Song's id
-     * @returns True or False
-     */
-    public async containsSong(playlistId: string, songId: string): Promise<boolean> {
-        const result = await this.playlistRepository.createQueryBuilder("playlist")
-            .leftJoin("playlist.items", "item")
-            .leftJoin("item.song", "song")
-
-            .where("song.id = :songId AND (playlist.id = :playlistId OR playlist.slug = :playlistId)", { songId, playlistId })
-            .select(["playlist.id"])
-            .getOne();
-
-        return !!result;
-    }
-
-    public async findPlaylistByIdWithCollaborators(playlistId: string): Promise<Playlist> {
-        return this.playlistRepository.findOne({ where: { id: playlistId }, relations: ["author"]})
-    }
-
-    public async findPlaylistByIdWithRelations(playlistId: string): Promise<Playlist> {
-        return this.playlistRepository.findOne({ where: { id: playlistId }, relations: ["artwork", "author", "items", "items.song"]})
-    }
-
-    /**
-     * Find playlists by a set of given ids.
-     * @param ids Set of playlist ids
-     * @param authentication Authentication object
-     * @returns Page<Playlist>
-     */
-    public async findByIds(ids: string[], authentication: User): Promise<Page<Playlist>> {
-        const result = await this.buildGeneralQuery("playlist", authentication)
-            .where("playlist.id IN(:ids)", { ids })
-            .getManyAndCount();
-
-        return Page.of(result[0], result[1]);
-    }
-
-    /**
-     * Find all playlists that belong to an authenticated user.
-     * This includes all authored playlists as well as liked and
-     * collaborative playlists of others.
+     * Find a playlist by its id
+     * @param {string} playlistId Id of the playlist
      * @param {User} authentication Authentication object
-     * @returns {Page} Page<Playlist>
+     * @returns {Playlist}
      */
-    public async findAllByAuthenticatedUser(authentication: User): Promise<Page<Playlist>> {
-        const result = await this.buildGeneralQuery("playlist", authentication)
-            .leftJoin("playlist.likedBy", "likedBy")
-            .leftJoin("likedBy.user", "likedByUser")
+    public async findById(playlistId: string, authentication?: User): Promise<Playlist> {
+        const result = await this.playlistRepository.createQueryBuilder("playlist")
+            .leftJoin("playlist.author", "author").addSelect(["author.id", "author.slug", "author.name"])
+            .leftJoin("playlist.artwork", "artwork").addSelect(["artwork.id"])
+            .where("(playlist.id = :playlistId OR playlist.slug = :playlistId) AND (playlist.privacy IN(:privacy) OR author.id = :authorId)", { 
+                playlistId: playlistId,
+                privacy: [PlaylistPrivacy.PUBLIC, PlaylistPrivacy.NOT_LISTED].join(","),
+                authorId: authentication?.id
+            })
+            .getOne();
 
-            .where("author.id = :authorId OR (likedByUser.id = :userId AND playlist.privacy != :privacy)", { authorId: authentication.id, privacy: PlaylistPrivacy.PRIVATE, userId: authentication.id })
-            // .orWhere("collaborator.id = :userId", { userId: authentication.id })
-            // .orWhere("likedByUser.id = :userId", { userId: authentication.id })
-            // .andWhere("playlist.privacy != :privacy", { privacy: PlaylistPrivacy.PRIVATE })
-            .getManyAndCount();
+        return result;
+    }
 
-        return Page.of(result[0], result[1]);
+    /**
+     * Find playlists by multiple ids
+     * @param {string} ids Ids of the playlists
+     * @returns {Playlist}
+     */
+    public async findInIds(ids: ObjectLiteral[]): Promise<Playlist[]> {
+        return this.playlistRepository.createQueryBuilder("playlist")
+            .leftJoin("playlist.author", "author").addSelect(["author.id", "author.slug", "author.name"])
+            .leftJoin("playlist.artwork", "artwork").addSelect(["artwork.id"])
+            .whereInIds(ids)
+            .getMany();
     }
 
     /**
@@ -148,6 +82,47 @@ export class PlaylistService {
         return Page.of(result[0], result[1], pageable);
     }
 
+    /**
+     * Check if a playlist already contains a song.
+     * @param playlistId Playlist's id
+     * @param songId Song's id
+     * @returns True or False
+     */
+    public async containsSong(playlistId: string, songId: string): Promise<boolean> {
+        const result = await this.playlistRepository.createQueryBuilder("playlist")
+            .leftJoin("playlist.items", "item")
+            .leftJoin("item.song", "song")
+
+            .where("song.id = :songId AND (playlist.id = :playlistId OR playlist.slug = :playlistId)", { songId, playlistId })
+            .select(["playlist.id"])
+            .getOne();
+
+        return !!result;
+    }
+
+    /**
+     * Find all playlists that belong to an authenticated user.
+     * This includes all authored playlists as well as liked and
+     * collaborative playlists of others.
+     * @param {User} authentication Authentication object
+     * @returns {Page} Page<Playlist>
+     */
+    public async findAllByAuthenticatedUser(authentication: User): Promise<Page<Playlist>> {
+        const result = await this.buildGeneralQuery("playlist", authentication)
+            .leftJoin("playlist.likedBy", "likedBy")
+            .leftJoin("likedBy.user", "likedByUser")
+
+            .where("author.id = :authorId OR (likedByUser.id = :userId AND playlist.privacy != :privacy)", { authorId: authentication.id, privacy: PlaylistPrivacy.PRIVATE, userId: authentication.id })
+            // .orWhere("collaborator.id = :userId", { userId: authentication.id })
+            // .orWhere("likedByUser.id = :userId", { userId: authentication.id })
+            // .andWhere("playlist.privacy != :privacy", { privacy: PlaylistPrivacy.PRIVATE })
+            .getManyAndCount();
+
+        return Page.of(result[0], result[1]);
+    }
+
+    
+
     public async findByArtist(artistId: string, pageable: Pageable, authentication: User): Promise<Page<Playlist>> {
         const result = await this.playlistRepository.createQueryBuilder("playlist")
             .leftJoin("playlist.items", "item")
@@ -174,27 +149,6 @@ export class PlaylistService {
         return Page.of(result[0], result[1], pageable);
     }
 
-    public async findByGenre(genreId: string, pageable: Pageable, authentication: User): Promise<Page<Playlist>> {
-        const result = await this.playlistRepository.createQueryBuilder("playlist")
-            .leftJoin("playlist.author", "author")
-            .leftJoin("playlist.artwork", "artwork")
-            .leftJoin("playlist.items", "item")
-            .leftJoin("item.song", "song")
-            .leftJoin("song.genres", "genre")
-
-            .addSelect(["artwork.id", "artwork.accentColor", "author.id", "author.name", "author.slug"])
-
-            .offset(pageable.offset)
-            .limit(pageable.limit)
-
-            .where("genre.id = :genreId OR genre.slug = :genreId", { genreId })
-            .getMany()
-
-            // TODO: Check if user has access to playlist
-
-        return Page.of(result, result.length, pageable);
-    }
-
     /**
      * Check if the user already has a playlist with a specific name.
      * You can define a playlistId to exclude. The intentional use case is to check for
@@ -209,51 +163,58 @@ export class PlaylistService {
         return !!(await this.playlistRepository.findOne({ where: { name: name, author: { id: userId }}, select: ["id"]}))
     }
 
-    public async createSafely(createPlaylistDto: CreatePlaylistDTO, authentication: User): Promise<Playlist> {
-        if(await this.existsByNameAndUser(createPlaylistDto.title, authentication.id)) throw new BadRequestException("Playlist already exists.");
-        return this.createIfNotExists(createPlaylistDto, authentication);
-    }
-
     /**
      * Create new playlist if it does not exist
      * @param createPlaylistDto Playlist metadata
      * @param authentication Author entity (User)
      * @returns Playlist
      */
-    public async createIfNotExists(createPlaylistDto: CreatePlaylistDTO, authentication: User): Promise<Playlist> {
-        const playlist = new Playlist();
-        playlist.author = authentication;
-        playlist.name = createPlaylistDto.title;
-        playlist.description = createPlaylistDto.description;
-        playlist.privacy = createPlaylistDto.privacy;
+    public async createIfNotExists(createPlaylistDtos: CreatePlaylistDTO[], authentication: User): Promise<Playlist[]> {   
+        const queryRunner = this.playlistRepository.manager.connection.createQueryRunner();
+        await queryRunner.startTransaction();
 
-        return this.playlistRepository.createQueryBuilder()
-            .insert()
-            .values(playlist)
-            .returning(["id"])
-            .orUpdate(["name"], ["name"], { skipUpdateIfNoValuesChanged: false })
-            .execute().then((insertResult) => {              
-                return this.playlistRepository.createQueryBuilder("playlist")
-                    .leftJoin("playlist.artwork", "artwork").addSelect(["artwork.id"])
+        try {
+            const manager = queryRunner.manager;
+            const repo = manager.getRepository(Playlist);
+
+            const playlists = await repo.createQueryBuilder()
+                .insert()
+                .values(createPlaylistDtos.map((dto): Partial<Playlist> => {
+                    return {
+                        ...dto,
+                        author: authentication,
+                        slug: Slug.create(dto.name)
+                    };
+                }))
+                .returning(["id"])
+                .orUpdate(["name"], ["id"], { skipUpdateIfNoValuesChanged: false })
+                .execute().then((insertResult) => {  
+                    return repo.createQueryBuilder("playlist")
                     .leftJoin("playlist.author", "author").addSelect(["author.id", "author.slug", "author.name"])
+                    .leftJoin("playlist.artwork", "artwork").addSelect(["artwork.id"])
                     .whereInIds(insertResult.raw)
-                    .getOne().then((result) => {
-                        this.emitter.emit(EVENT_PLAYLISTS_CHANGED, [ result ]);
-                        return result;
-                    });
-            });
+                    .getMany();
+                });
+
+            await this.meilisearch.syncAndUpdateEntities(playlists.filter((p) => p.privacy == PlaylistPrivacy.PUBLIC), true, repo);
+            await queryRunner.commitTransaction();
+            return playlists;
+        } catch (err) {
+            await queryRunner.rollbackTransaction();
+            throw new InternalServerErrorException();
+        }
     }
 
-    public async update(playlistId: string, updatePlaylistDto: UpdatePlaylistDTO, authentication: User): Promise<Playlist> {
+    public async update(playlistId: string, updatePlaylistDto: Partial<CreatePlaylistDTO>, authentication: User): Promise<Playlist> {
         const playlist = await this.findById(playlistId);
 
         if(!playlist) throw new NotFoundException("Playlist not found.")
         if(!await this.hasUserAccessToPlaylist(playlistId, authentication) || !await this.canEditPlaylist(playlist, authentication)) throw new ForbiddenException("Not allowed to edit this playlist.")
-        if(await this.existsByNameAndUser(updatePlaylistDto.title, authentication.id, playlistId)) throw new BadRequestException("Playlist already exists.");
+        if(await this.existsByNameAndUser(updatePlaylistDto.name, authentication.id, playlistId)) throw new BadRequestException("Playlist already exists.");
         
-        playlist.name = updatePlaylistDto.title || playlist.name;
-        playlist.privacy = updatePlaylistDto.privacy || playlist.privacy;
-        playlist.description = updatePlaylistDto.description || playlist.description;
+        playlist.name = updatePlaylistDto.name ?? playlist.name;
+        playlist.privacy = updatePlaylistDto.privacy ?? playlist.privacy;
+        playlist.description = updatePlaylistDto.description ?? playlist.description;
 
         return this.playlistRepository.createQueryBuilder().update()
             .set(playlist)
@@ -341,15 +302,23 @@ export class PlaylistService {
         throw new InternalServerErrorException();
     }
 
+    /**
+     * Delete a playlist by its id
+     * @param playlistId Id of the playlist
+     * @param authentication Authentication object
+     * @returns True, if got deleted. Otherwise false
+     */
     public async deleteById(playlistId: string, authentication?: User): Promise<boolean> {
-        const playlist = await this.findById(playlistId);
+        // Find the playlist by its id
+        return this.findById(playlistId).then((playlist) => {
+            // Check if null. If true, return 404
+            if(isNull(playlist)) throw new NotFoundException("Playlist not found");
+            // If authenticated user is not author, return 401
+            if(playlist.author?.id != authentication?.id) throw new ForbiddenException("No permission");
 
-        if(playlist.author?.id != authentication?.id) throw new ForbiddenException("Not allowed.");
-
-        // return this.meiliClient.deletePlaylist(playlist.id).then(() => {
-        //     return this.playlistRepository.delete({ id: playlist?.id }).then(() => true);
-        // })
-        return false;
+            // Delete playlist
+            return this.playlistRepository.delete(playlist.id).then((deleteResult) => deleteResult.affected > 0);
+        });
     }
 
     private async hasUserAccessToPlaylist(playlistId: string, authentication: User): Promise<boolean> {
@@ -390,19 +359,6 @@ export class PlaylistService {
             })
             .whereInIds(resources)
             .execute();
-    }
-
-    /**
-     * Synchronize the corresponding document on meilisearch.
-     * @param resource Playlist data
-     * @returns Playlist
-     */
-    public async sync(resources: Playlist[]) {
-        // return this.meiliClient.setPlaylists(resources).then(() => {
-        //     return this.setLastSyncedDetails(resources, MeilisearchFlag.OK);
-        // }).catch(() => {
-        //     return this.setLastSyncedDetails(resources, MeilisearchFlag.FAILED);
-        // });
     }
 
     /**

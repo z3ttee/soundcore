@@ -1,11 +1,10 @@
 import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
 import { Pageable, Pagination } from '@soundcore/common';
-import { Authentication } from '../authentication/decorators/authentication.decorator';
-import { User } from '../user/entities/user.entity';
-import { AddSongDTO } from './dtos/add-song.dto';
-import { CreatePlaylistDTO } from './dtos/create-playlist.dto';
-import { UpdatePlaylistDTO } from './dtos/update-playlist.dto';
-import { PlaylistService } from './playlist.service';
+import { Authentication } from '../../authentication/decorators/authentication.decorator';
+import { PlaylistService } from '../services/playlist.service';
+import { User } from '../../user/entities/user.entity';
+import { AddSongDTO } from '../dtos/add-song.dto';
+import { CreatePlaylistDTO } from '../dtos/create-playlist.dto';
 
 @Controller('playlists')
 export class PlaylistController {
@@ -17,8 +16,18 @@ export class PlaylistController {
   }
 
   @Get(":playlistId") 
-  public async findPlaylistById(@Param("playlistId") playlistId: string, @Authentication() requester: User) {
-    return this.playlistService.findPlaylistProfileById(playlistId, requester);
+  public async findPlaylistById(@Param("playlistId") playlistId: string, @Authentication() authentication: User) {
+    return this.playlistService.findById(playlistId, authentication);
+  }
+
+  @Post() 
+  public async createPlaylist(@Body() createPlaylistDto: CreatePlaylistDTO, @Authentication() author: User) {
+    return this.playlistService.createIfNotExists([createPlaylistDto], author).then((playlists) => playlists[0]);
+  }
+
+  @Put(":playlistId") 
+  public async updatePlaylist(@Param("playlistId") playlistId: string, @Body() updatePlaylistDto: Partial<CreatePlaylistDTO>, @Authentication() requester: User) {
+    return this.playlistService.update(playlistId, updatePlaylistDto, requester);
   }
 
   @Delete(":playlistId") 
@@ -46,20 +55,4 @@ export class PlaylistController {
     return this.playlistService.findByArtist(artistId, pageable, authentication);
   }
 
-  @Get("/byGenre/:genreId") 
-  public async findByGenre(@Param("genreId") genreId: string, @Pagination() pageable: Pageable, @Authentication() authentication: User) {
-    return this.playlistService.findByGenre(genreId, pageable, authentication);
-  }
-
-  @Post() 
-  public async createPlaylist(@Body() createPlaylistDto: CreatePlaylistDTO, @Authentication() author: User) {
-    return this.playlistService.createSafely(createPlaylistDto, author);
-  }
-
-  @Put(":playlistId") 
-  public async updatePlaylist(@Param("playlistId") playlistId: string, @Body() updatePlaylistDto: UpdatePlaylistDTO, @Authentication() requester: User) {
-    return this.playlistService.update(playlistId, updatePlaylistDto, requester);
-  }
-
-  
 }

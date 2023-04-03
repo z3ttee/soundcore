@@ -39,7 +39,7 @@ export class PlaylistInfoComponent implements OnInit, OnDestroy {
     this.activatedRoute.paramMap.pipe(
       takeUntil(this._destroy), 
       map((params) => params.get("playlistId") ?? null), 
-      switchMap((playlistId) => this.playlistService.findById(playlistId).pipe(toFutureCompat())), 
+      switchMap((playlistId) => this.playlistService.findById(playlistId)), 
       map((future) => ({
         ...future,
         data: this.tracklistBuilder.forPlaylist(future.data)

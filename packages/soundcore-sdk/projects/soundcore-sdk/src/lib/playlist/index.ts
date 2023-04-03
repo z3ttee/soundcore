@@ -7,5 +7,4 @@ export { PlaylistItemAddResult, PlaylistAddSongFailReason } from "./entities/pla
 export { PlaylistPrivacy } from "./enums/playlist-privacy.enum";
 export { CreatePlaylistDTO } from "./dtos/create-playlist.dto";
 export { AddSongDTO } from "./dtos/add-song.dto";
-export { UpdatePlaylistDTO } from "./dtos/update-playlist.dto";
 

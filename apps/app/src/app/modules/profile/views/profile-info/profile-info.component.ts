@@ -47,7 +47,7 @@ export class ProfileInfoComponent implements OnInit, OnDestroy {
 
         // Fetch 8 playlists of a user
         this.playlistService.findByAuthor(profileId, new Pageable(0, 8)).pipe(takeUntil(this._cancel)).subscribe((response) => {
-          this.playlists = response.payload?.items ?? [];
+          this.playlists = response.data?.items ?? [];
         });
 
         // Fetch top 5 artists of user

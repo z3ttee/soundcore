@@ -2,7 +2,8 @@
 export enum PlayableEntityType {
     SONG = "song",
     ALBUM = "album",
-    ARTIST = "artist"
+    ARTIST = "artist",
+    PLAYLIST = "playlist"
 }
 
 export interface PlayableEntity {

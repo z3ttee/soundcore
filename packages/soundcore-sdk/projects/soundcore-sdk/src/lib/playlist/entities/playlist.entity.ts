@@ -1,16 +1,16 @@
 import { Artwork } from "../../artwork/entities/artwork.entity";
+import { PlayableEntity, PlayableEntityType } from "../../tracklist/entities/playable.entity";
 import { User } from "../../user/entities/user.entity";
-import { SCDKResource, SCDKResourceType } from "../../utils/entities/resource";
 import { PlaylistPrivacy } from "../enums/playlist-privacy.enum";
 
-export class Playlist implements SCDKResource {
-    public resourceType: SCDKResourceType;
+export class Playlist implements PlayableEntity {
+    public type: PlayableEntityType = PlayableEntityType.PLAYLIST;
 
     // General playlist metadata
     public id: string;
     public name: string;
     public description?: string;
-    public privacy?: PlaylistPrivacy;
+    public privacy: PlaylistPrivacy;
     public createdAt: Date;
     public slug: string;
     public author?: User;

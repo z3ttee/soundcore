@@ -1,11 +1,10 @@
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { Song } from "../../song/entities/song.entity";
-import { TracklistItem } from "../../tracklist/entities/tracklist.entity";
 import { User } from "../../user/entities/user.entity";
 import { Playlist } from "./playlist.entity";
 
 @Entity({ name: "song2playlist" })
-export class PlaylistItem extends TracklistItem {
+export class PlaylistItem {
 
     @PrimaryGeneratedColumn({ unsigned: true, type: "bigint" })
     public id: number;

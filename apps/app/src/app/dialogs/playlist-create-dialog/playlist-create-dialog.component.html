@@ -1,7 +1,7 @@
 <scngx-dialog title="Playlist erstellen">
     <form class="py-2" scngx-dialog-content [formGroup]="form">
-        <div class="block w-full p-4 rounded-sm bg-error bg-opacity-30 border border-error-dark" *ngIf="errorMessage">
-            <p class="text-font">{{ errorMessage }}</p>
+        <div class="block w-full p-4 rounded-sm bg-error bg-opacity-30 border border-error-dark" *ngIf="($error | async) as error">
+            <p class="text-font">{{ error }}</p>
         </div>
 
         <div class="inline-block w-full my-row">
@@ -34,6 +34,6 @@
     </form>
     <div scngx-dialog-footer>
         <scngx-btn-text (click)="dialogRef.close(null)">Abbrechen</scngx-btn-text>
-        <scngx-lbtn-outlined appearance="success" [loading]="loading" (click)="submit()" [disabled]="form.invalid">Erstellen</scngx-lbtn-outlined>
+        <scngx-lbtn-outlined appearance="success" [loading]="($loading | async)" (click)="submit()" [disabled]="form.invalid">Erstellen</scngx-lbtn-outlined>
     </div>
 </scngx-dialog>

@@ -2,17 +2,22 @@ import { BeforeInsert, BeforeUpdate, Column, CreateDateColumn, Entity, Index, Jo
 import { Artwork } from "../../artwork/entities/artwork.entity";
 import { LikedPlaylist } from "../../collection/entities/like.entity";
 import { User } from "../../user/entities/user.entity";
-import { Resource, ResourceFlag, ResourceType } from "../../utils/entities/resource";
 import { Slug } from "@tsalliance/utilities";
 import { PlaylistPrivacy } from "../enums/playlist-privacy.enum";
 import { PlaylistItem } from "./playlist-item.entity";
 import { MeilisearchInfo } from "../../utils/entities/meilisearch.entity";
 import { GeniusInfo } from "../../utils/entities/genius.entity";
+import { MeilisearchHasOne, MeilisearchIndex, MeilisearchPK, MeilisearchProp } from "@soundcore/meilisearch";
+import { PlayableEntity, PlayableEntityType } from "../../tracklist/entities/playable.entity";
 
 @Entity()
+@MeilisearchIndex()
 @Index(["name", "author"], { unique: true })
-export class Playlist implements Resource {
-    public resourceType: ResourceType = "playlist";
+export class Playlist implements PlayableEntity {
+    /**
+     * PLAYABLE ENTITY ATTRIBUTES
+     */
+    public readonly type: PlayableEntityType = PlayableEntityType.PLAYLIST;
 
     /**
      * MEILISEARCH RELATED ATTRIBUTES
@@ -21,25 +26,19 @@ export class Playlist implements Resource {
     public meilisearch: MeilisearchInfo;
 
     /**
-     * GENIUS RELATED ATTRIBUTES
-     */
-    @Column(() => GeniusInfo)
-    public genius: GeniusInfo;
-
-    /**
      * DEFAULT ATTRIBUTES
      */
 
     @PrimaryGeneratedColumn("uuid")
+    @MeilisearchPK({ searchable: false })
     public id: string;
 
-    @Column({ type: "tinyint", default: 0 })
-    public flag: ResourceFlag;
-
-    @Column({ nullable: true, unique: true, length: 120 })
+    @Column({ nullable: false, unique: true, length: 120 })
+    @MeilisearchProp()
     public slug: string;
 
     @Column({ nullable: false })
+    @MeilisearchProp()
     public name: string;
 
     @Column({ nullable: true, length: 254 })
@@ -51,6 +50,7 @@ export class Playlist implements Resource {
     @CreateDateColumn()
     public createdAt: Date;
 
+    @MeilisearchHasOne(() => User)
     @ManyToOne(() => User)
     @JoinColumn()
     public author: User;
@@ -58,6 +58,7 @@ export class Playlist implements Resource {
     @OneToMany(() => PlaylistItem, pi => pi.playlist)
     public items: PlaylistItem[];
 
+    @MeilisearchHasOne(() => Artwork)
     @ManyToOne(() => Artwork, { onDelete: "SET NULL", nullable: true })
     @JoinColumn()
     public artwork?: Artwork;
@@ -70,7 +71,6 @@ export class Playlist implements Resource {
     /**
      * Total Duration of the Playlist
      */
-    @Column({ select: false } )
     public totalDuration?: number = 0;
     public likesCount?: number = 0;
 

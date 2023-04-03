@@ -3,9 +3,9 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Page, Pageable } from "@soundcore/common";
 import { Repository } from "typeorm";
 import { Playlist } from "../../playlist/entities/playlist.entity";
-import { PlaylistService } from "../../playlist/playlist.service";
 import { User } from "../../user/entities/user.entity";
 import { LikedResource } from "../entities/like.entity";
+import { PlaylistService } from "../../playlist/services/playlist.service";
 
 @Injectable()
 export class LibraryService {
