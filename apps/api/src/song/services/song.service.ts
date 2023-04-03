@@ -89,8 +89,6 @@ export class SongService implements SyncableService<Song> {
     public async findByAlbum(albumId: string, pageable: Pageable, authentication?: User, seed?: number): Promise<Page<Song>> {
         if(!isNull(seed) && isNaN(seed)) throw new BadRequestException("Invalid seed found. Must be an integer")
 
-        console.log(pageable);
-
         // Create query to get ids only
         let idsQuery = this.repository.createQueryBuilder("song")
             .select(["song.id"])
@@ -140,16 +138,20 @@ export class SongService implements SyncableService<Song> {
         let idsQuery = this.repository.createQueryBuilder("song")
             .select(["song.id"])
             .leftJoin("song.primaryArtist", "primaryArtist")
+            .leftJoin("song.album", "album")
             .leftJoin("song.featuredArtists", "featuredArtists")
             .where("primaryArtist.id = :artistId OR primaryArtist.slug = :artistId OR (featuredArtists.id = :artistId OR featuredArtists.slug = :artistId)", { artistId: artistId })
             .offset(pageable.offset)
             .limit(pageable.limit)
             // Order by likes and streams
-            .addSelect("COUNT(streams.id) as streamsCount").leftJoin("song.streams", "streams")
-            .addSelect("COUNT(likes.id) as likesCount").leftJoin("song.likes", "likes")
-            .groupBy("song.id")
-            .orderBy("likesCount", "DESC")
-            .addOrderBy("streamsCount", "DESC")
+            // .addSelect("COUNT(streams.id) as streamsCount").leftJoin("song.streams", "streams")
+            // .addSelect("COUNT(likes.id) as likesCount").leftJoin("song.likes", "likes")
+            // .groupBy("song.id")
+            // .orderBy("likesCount", "DESC")
+            // .addOrderBy("streamsCount", "DESC")
+            // Order by album
+            .orderBy("album.name", "ASC")
+            .addOrderBy("song.order", "ASC")
             .addOrderBy("song.id", "DESC")
 
         // Add seed, used to create shuffled tracklist
@@ -165,11 +167,15 @@ export class SongService implements SyncableService<Song> {
                 .leftJoin("song.artwork", "artwork").addSelect(["artwork.id"])
                 .loadRelationCountAndMap("song.liked", "song.likes", "likes", (qb) => qb.where("likes.userId = :userId", { userId: authentication?.id }))
                 // Sort by streamcount and likes
-                .addSelect("COUNT(streams.id) as streamsCount").leftJoin("song.streams", "streams")
-                .addSelect("COUNT(likes.id) as likesCount").leftJoin("song.likes", "likes")
-                .groupBy("song.id")
-                .orderBy("likesCount", "DESC")
-                .addOrderBy("streamsCount", "DESC")
+                // .addSelect("COUNT(streams.id) as streamsCount").leftJoin("song.streams", "streams")
+                // .addSelect("COUNT(likes.id) as likesCount").leftJoin("song.likes", "likes")
+                // .groupBy("song.id")
+                // .orderBy("likesCount", "DESC")
+                // .addOrderBy("streamsCount", "DESC")
+                // .addOrderBy("song.id", "DESC")
+                // Order by album
+                .orderBy("album.name", "DESC")
+                .addOrderBy("song.order", "ASC")
                 .addOrderBy("song.id", "DESC")
                 // Where in ids
                 .whereInIds(ids)
