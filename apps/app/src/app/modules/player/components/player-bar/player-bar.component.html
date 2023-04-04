@@ -1,24 +1,24 @@
 <ng-container *ngIf="($props | async) as props">
-    <div class="absolute bottom-0 right-0 z-[100000000000000000] block w-full pointer-events-none overflow-hidden" [ngClass]="{'p-window': !props.isMobile, 'p-2': props.isMobile}" #scngxPlayerContainer>
+    <div class="block w-full pointer-events-none overflow-hidden" #scngxPlayerContainer>
         <div class="relative flex flex-1 w-full items-stretch justify-start gap-4 p-2 bg-body-dark rounded pointer-events-auto overflow-hidden select-none">
             <!-- Seeker -->
             <div class="absolute w-full left-0 top-0" [ngClass]="{'pointer-events-none': props.isMobile}">
                 <scngx-seeker [duration]="props.song?.duration ?? 0" [current]="props.currentTime" (seek)="onSeek($event)"></scngx-seeker>
             </div>
     
-            <div (click)="props.isMobile ? openBigPictureMobile() : openBigPicture()" class="flex flex-grow w-full items-center justify-start gap-2 border border-body-lighter border-opacity-0 cursor-pointer rounded-sm p-1 transition-all active:bg-body active:bg-opacity-80 active:border-opacity-30" [ngClass]="{'hover:bg-body hover:border-opacity-30 hover:bg-opacity-60': !props.isMobile}">    
+            <div (click)="props.isMobile ? openBigPictureMobile() : openBigPicture()" class="relative flex flex-grow w-full items-center justify-start gap-2 border border-body-lighter border-opacity-0 cursor-pointer rounded-sm p-1 transition-all active:bg-body active:bg-opacity-80 active:border-opacity-30" [ngClass]="{'hover:bg-body hover:border-opacity-30 hover:bg-opacity-60': !props.isMobile}">                    
                 <!-- Artwork -->
-                <div class="min-w-12 max-w-12 h-12 rounded-sm overflow-hidden pointer-events-none">
+                <div class="min-w-10 max-w-10 h-10 md:min-w-12 md:max-w-12 md:h-12 rounded-sm overflow-hidden pointer-events-none">
                     <scngx-artwork [artwork]="props.song?.artwork"></scngx-artwork>
                 </div>
     
                 <!-- Title & Artist -->
                 <div class="flex-grow overflow-hidden" [ngClass]="{'pointer-events-none': props.isMobile}">
-                    <p class="line-clamp-1">{{ props.song?.name || "Unbekannter Titel" }}</p>
+                    <p class="line-clamp-1 text-sm md:text-base">{{ props.song?.name || "Unbekannter Titel" }}</p>
                     <ul class="line-clamp-1 w-full">
                         <li *ngIf="props.song?.explicit" class="inline mr-2"><scngx-explicit-badge [extended]="false"></scngx-explicit-badge></li>
-                        <li class="inline text-font text-opacity-70"><span class="text-sm hover:underline pointer-events-all cursor-pointer" [routerLink]="props.song?.primaryArtist ? ['/artist', props.song?.primaryArtist?.slug || props.song?.primaryArtist?.id] : []">{{ props.song?.primaryArtist.name ?? "Unbekannter Künstler" }}</span>{{ props.song?.featuredArtists.length > 0 ? ", " : "" }}</li>
-                        <li *ngFor="let artist of props.song?.featuredArtists; index as i" class="inline text-font text-opacity-70"><span class="text-sm hover:underline pointer-events-all cursor-pointer" [routerLink]="['/artist', artist.slug || artist.id]">{{ artist.name }}</span>{{ i + 1 < props.song.featuredArtists.length ? ", " : "" }}</li>
+                        <li class="inline text-font text-opacity-70"><span class=" text-xs md:text-sm hover:underline pointer-events-all cursor-pointer" [routerLink]="props.song?.primaryArtist ? ['/artist', props.song?.primaryArtist?.slug || props.song?.primaryArtist?.id] : []">{{ props.song?.primaryArtist.name ?? "Unbekannter Künstler" }}</span>{{ props.song?.featuredArtists.length > 0 ? ", " : "" }}</li>
+                        <li *ngFor="let artist of props.song?.featuredArtists; index as i" class="inline text-font text-opacity-70"><span class="text-xs md:text-sm hover:underline pointer-events-all cursor-pointer" [routerLink]="['/artist', artist.slug || artist.id]">{{ artist.name }}</span>{{ i + 1 < props.song.featuredArtists.length ? ", " : "" }}</li>
                     </ul>
                 </div>
 

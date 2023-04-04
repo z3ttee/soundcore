@@ -92,7 +92,7 @@
             <ng-container *ngTemplateOutlet="outageWarning; context: { $implicit: gateway.$connection }"></ng-container>
 
             <router-outlet></router-outlet>
-            <scngx-player-bar></scngx-player-bar>
+            <ng-container *ngTemplateOutlet="playerbar"></ng-container>
         </div>
     </scngx-drawer>
 
@@ -112,7 +112,7 @@
         <div class="h-full overflow-hidden relative" scngx-content>
             <ng-container *ngTemplateOutlet="outageWarning; context: { $implicit: gateway.$connection }"></ng-container>
             <router-outlet></router-outlet>
-            <scngx-player-bar></scngx-player-bar>
+            <ng-container *ngTemplateOutlet="playerbar"></ng-container>
         </div>
     </scngx-bottom-nav>
 
@@ -153,3 +153,9 @@
         </ng-container>
     </ng-template>
 </ng-container>
+
+<ng-template #playerbar>
+    <div class="absolute bottom-0 right-0 z-[100000000000000000] w-full px-4 pb-4 lg:px-window lg:pb-window">
+        <scngx-player-bar></scngx-player-bar>
+    </div>
+</ng-template>
