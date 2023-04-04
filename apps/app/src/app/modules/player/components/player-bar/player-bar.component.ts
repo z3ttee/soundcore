@@ -11,11 +11,12 @@ interface PlayerbarProps {
     song?: Song;
     isPaused?: boolean;
     isShuffled?: boolean;
+    isMuted?: boolean;
+    volume?: number;
+
 
     currentTime?: number;
     isMobile?: boolean;
-    isMuted?: boolean;
-    volume?: number;
 }
 
 interface ResponsiveOptions {
@@ -50,12 +51,16 @@ export class AppPlayerBarComponent implements OnInit, OnDestroy {
     public $props: Observable<PlayerbarProps> = combineLatest([
         this.playerService.$currentItem,
         this.playerService.$isPaused,
-        this.playerService.$isShuffled
+        this.playerService.$isShuffled,
+        this.playerService.$volume,
+        this.playerService.$isMuted,
     ]).pipe(
-        map(([currentItem, isPaused, isShuffled]): PlayerbarProps => ({
+        map(([currentItem, isPaused, isShuffled, volume, isMuted]): PlayerbarProps => ({
             song: currentItem?.song ?? currentItem as Song,
             isPaused: isPaused,
-            isShuffled: isShuffled
+            isShuffled: isShuffled,
+            volume: volume,
+            isMuted: isMuted
         })),
         tap((props) => {
             this.seekInputControl.setValue(props.currentTime);
@@ -120,11 +125,11 @@ export class AppPlayerBarComponent implements OnInit, OnDestroy {
     }
 
     public toggleMute() {
-        // this.audio.toggleMute();
+        this.playerService.toggleMute();
     }
 
     public setVolume(volume: number) {
-        // this.audio.setVolume(volume);
+        this.playerService.setVolume(volume);
     }
 
     public skip() {

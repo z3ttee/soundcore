@@ -55,6 +55,9 @@ export class PlayerService {
      */
     public readonly $isPaused = this.controls.$isPaused;
 
+    public readonly $isMuted = this.controls.$muted;
+    public readonly $volume = this.controls.$volume;
+
     constructor(
         private readonly queue: AudioQueue,
         private readonly controls: AudioController,
@@ -235,6 +238,14 @@ export class PlayerService {
      */
     public togglePlaying(): Observable<boolean> {
         return of(this.controls.togglePlaying());
+    }
+
+    public setVolume(volume: number) {
+        this.controls.setVolume(volume);
+    }
+
+    public toggleMute() {
+        this.controls.toggleMute();
     }
 
     /**

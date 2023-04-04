@@ -1,5 +1,7 @@
 import { Injectable } from "@angular/core";
-import { BehaviorSubject, fromEvent, map, mergeAll, Observable, Subject } from "rxjs";
+import { BehaviorSubject, Observable, Subject } from "rxjs";
+import { VolumeManager } from "../managers/volume-manager";
+import { DEFAULT_VOLUME } from "src/app/constants";
 
 @Injectable({
     providedIn: "root"
@@ -7,17 +9,25 @@ import { BehaviorSubject, fromEvent, map, mergeAll, Observable, Subject } from "
 export class AudioController {
 
     private readonly audioElement: HTMLAudioElement = new Audio();
+    private readonly volumeManager = new VolumeManager(this.audioElement, DEFAULT_VOLUME);
 
     private readonly onEnded: Subject<void> = new Subject();
-    public readonly $onEnded: Observable<void> = this.onEnded.asObservable();
+    public readonly $onEnded = this.onEnded.asObservable();
 
     private readonly isPaused: BehaviorSubject<boolean> = new BehaviorSubject(this.audioElement.paused);
-    public readonly $isPaused: Observable<boolean> = this.isPaused.asObservable();
+    public readonly $isPaused = this.isPaused.asObservable();
+
+    private readonly currenTime: BehaviorSubject<number> = new BehaviorSubject(this.audioElement.currentTime);
+    public readonly $currenTime = this.currenTime.asObservable();
+
+    public readonly $volume = this.volumeManager.$volume;
+    public readonly $muted = this.volumeManager.$muted;
 
     constructor() {
         this.audioElement.onended = () => this.onEnded.next();
         this.audioElement.onplaying = () => this.isPaused.next(false);
         this.audioElement.onpause = () => this.isPaused.next(true);
+        this.audioElement.ontimeupdate = () => this.currenTime.next(this.audioElement.currentTime)
     }
 
     public play(url: string): Observable<string> {
@@ -50,6 +60,14 @@ export class AudioController {
         if(pause) {
             this.audioElement.pause();
         }
+    }
+
+    public toggleMute() {
+        this.volumeManager.toggleMute();
+    }
+
+    public setVolume(volume: number): void {
+        this.volumeManager.setVolume(volume);
     }
 
 }

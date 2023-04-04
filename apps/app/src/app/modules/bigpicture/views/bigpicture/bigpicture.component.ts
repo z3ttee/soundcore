@@ -72,8 +72,8 @@ export class BigPictureComponent implements OnDestroy, AfterViewInit {
     }
 
     public ngAfterViewInit(): void {
-        const element = this.containerRef.nativeElement;
-        element.requestFullscreen && element.requestFullscreen();
+        // const element = this.containerRef.nativeElement;
+        // element.requestFullscreen && element.requestFullscreen();
     }
 
     public onSeek(value: number) {
