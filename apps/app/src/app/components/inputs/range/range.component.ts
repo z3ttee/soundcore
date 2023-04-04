@@ -1,4 +1,5 @@
 import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from "@angular/core";
+import { BehaviorSubject } from "rxjs";
 
 @Component({
     selector: 'scngx-range',
@@ -6,55 +7,43 @@ import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, EventEmi
     styleUrls: ['./range.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class SCNGXRangeComponent implements OnInit, AfterViewInit {
+export class SCNGXRangeComponent implements AfterViewInit {
   
     @ViewChild("inputElement") public range: ElementRef<HTMLInputElement>;
+
+    public readonly $value: BehaviorSubject<number> = new BehaviorSubject(0);
+    public readonly $max: BehaviorSubject<number> = new BehaviorSubject(100);
   
-    private _max: number = 100;
     @Input() public set max(val: number){
-      this._max = val;
+      this.$max.next(val);
+      this.updateProgress();
     }
-  
-    public get max(): number {
-      return this._max;
-    }
-  
+
     @Input() public set current(val: number) {
-      this.value = val;
+      this.$value.next(val);
       this.updateProgress();
     }
   
     @Output() 
-    public onChanged: EventEmitter<number> = new EventEmitter();
-  
-    public get current(): number { return this.value }
-  
-    public value: number = 0;
-  
-    constructor() { }
-  
-    ngOnInit(): void {
-        this.value = this.current;
-    }
+    public onChanged: EventEmitter<number> = new EventEmitter();  
 
     ngAfterViewInit(): void {
-        this.updateProgress();
+      this.updateProgress();
     }
   
     public onInputChanged(event: Event) {
-        this.onChanged.emit(parseInt(event.target["value"]));
-        this.updateProgress(true);
+      this.onChanged.emit(parseInt(event.target["value"]));
+      this.updateProgress(true);
     }
   
     public updateProgress(useValue: boolean = false) {
-        if(!this.range?.nativeElement) return;
+      if(!this.range?.nativeElement) return;
 
-        const max = this.max;
-        const val = useValue ? parseInt(this.range.nativeElement.value) : this.current;
+      const max = this.$max.getValue();
+      const val = useValue ? parseInt(this.range.nativeElement.value) : this.$value.getValue();
 
-        let progress = (val/max * 100 );
-        this.range.nativeElement.style.backgroundSize = progress + '% 100%';
+      let progress = (val/max * 100 );
+      this.range.nativeElement.style.backgroundSize = progress + '% 100%';
     }
-  
   
 }
