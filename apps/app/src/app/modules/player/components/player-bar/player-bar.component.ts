@@ -51,7 +51,7 @@ export class AppPlayerBarComponent implements OnInit, OnDestroy {
     public $props: Observable<PlayerbarProps> = combineLatest([
         this.playerService.$currentItem,
         this.playerService.$isPaused,
-        this.playerService.$isShuffled,
+        this.playerService.$shuffled,
         this.playerService.$volume,
         this.playerService.$isMuted,
     ]).pipe(
@@ -141,8 +141,6 @@ export class AppPlayerBarComponent implements OnInit, OnDestroy {
     }
 
     public toggleShuffle() {
-        this.playerService.toggleShuffle().subscribe((shuffled) => {
-            console.log(shuffled);
-        });
+        this.playerService.toggleShuffle();
     }
 }

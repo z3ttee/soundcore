@@ -31,7 +31,7 @@ export class Song implements SongID, TracklistItem, PlayableEntity {
     /**
      * PLAYABLE ENTITY ATTRIBUTES
      */
-    public readonly type: PlayableEntityType = PlayableEntityType.ALBUM;
+    public readonly type: PlayableEntityType = PlayableEntityType.SONG;
     
     /**
      * MEILISEARCH RELATED ATTRIBUTES

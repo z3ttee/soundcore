@@ -93,6 +93,9 @@ export class SCNGXTracklist<T = any> {
         this.restart(startAtIndex, generateShuffled).subscribe();
     }
 
+    public static create<T = any>(owner: PlayableEntity, apiBaseUrl: string, httpClient: HttpClient, generateShuffled?: boolean): Observable<Future<SCNGXTracklist<T>>>;
+    public static create<T = any>(owner: PlayableEntity, apiBaseUrl: string, httpClient: HttpClient, startAt?: number): Observable<Future<SCNGXTracklist<T>>>;
+    public static create<T = any>(owner: PlayableEntity, apiBaseUrl: string, httpClient: HttpClient, startAt?: number, generateShuffled?: boolean): Observable<Future<SCNGXTracklist<T>>>;
     /**
      * Create a new tracklist instance
      * @param apiBaseUrl Base url to the API service
@@ -102,7 +105,7 @@ export class SCNGXTracklist<T = any> {
      * @param startAtIndex Index of track to start playback at
      * @param generateShuffled Seed to use when generating shuffled tracklists
      */
-    public static create<T = any>(owner: PlayableEntity, apiBaseUrl: string, httpClient: HttpClient, startAtIndex: number = 0, generateShuffled: boolean = false): Observable<Future<SCNGXTracklist<T>>> {
+    public static create<T = any>(owner: PlayableEntity, apiBaseUrl: string, httpClient: HttpClient, startAtOrShuffle?: number | boolean, generateShuffled?: boolean): Observable<Future<SCNGXTracklist<T>>> {
         return new Observable((subscriber) => {
             // Check if owner is null
             if(isNull(owner)) {
@@ -112,10 +115,13 @@ export class SCNGXTracklist<T = any> {
                 return;
             }
 
+            const startAt = typeof startAtOrShuffle === "number" ? startAtOrShuffle : 0;
+            const shuffle = typeof startAtOrShuffle === "boolean" ? startAtOrShuffle : (generateShuffled ?? false) 
+
             // Send loading state first
             subscriber.next(Future.loading());
             // Create new tracklist instance
-            const tracklist = new SCNGXTracklist(owner, apiBaseUrl, httpClient, startAtIndex, generateShuffled);
+            const tracklist = new SCNGXTracklist(owner, apiBaseUrl, httpClient, startAt, shuffle);
             // Subscribe to ready state and wait till tracklist is ready
             subscriber.add(tracklist.$ready.pipe(filter((isReady) => isReady)).subscribe(() => {
                 // If tracklist emitted ready=true, resolve future with tracklist data
@@ -251,7 +257,9 @@ export class SCNGXTracklist<T = any> {
     public restart(startAtIndexOrgenerateShuffled?: number | boolean, generateShuffled?: boolean): Observable<SCNGXTracklist<T>> {
         // Extract info if tracklist should be shuffled
         const shouldGenerateShuffled: boolean = typeof startAtIndexOrgenerateShuffled === "boolean" ? (startAtIndexOrgenerateShuffled || generateShuffled) : (generateShuffled ?? false);
-        const startAt: number = typeof startAtIndexOrgenerateShuffled === "number" ? startAtIndexOrgenerateShuffled as number : 0;
+        const startAt: number = typeof startAtIndexOrgenerateShuffled === "number" ? startAtIndexOrgenerateShuffled as number : this.queuePointer.position;
+
+        console.log(startAt);
 
         // Update current startAt
         this.startAtIndex = startAt;
@@ -316,7 +324,8 @@ export class SCNGXTracklist<T = any> {
      * Check if an item with specified id is currently playing
      * @param itemId Id of the target item
      */
-    public isPlaying(itemId: string) {
+    public isPlayingById(itemId: string) {
+        if(isNull(itemId)) return false;
         const item = this.items[this.queuePointer.prev ?? 0];
         return item?.["id"] === itemId;
     }

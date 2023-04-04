@@ -1,10 +1,13 @@
 import { CollectionViewer, DataSource } from "@angular/cdk/collections";
+import { isNull } from "@soundcore/common";
 import { BehaviorSubject, catchError, combineLatest, filter, map, Observable, of, startWith, Subject, Subscription, takeUntil } from "rxjs";
 
 export abstract class SCSDKBaseDatasource<T = any> extends DataSource<T> {
     protected subscription = new Subscription();
     protected cachedData?: T[] = Array.from({ length: this.initialSize });
     protected dataStream = new BehaviorSubject<(T | undefined)[]>(this.cachedData ?? []);
+    protected pendingFetches: Map<number, Subscription> = new Map();
+
     private fetchedPages = new Set<number>();
 
     protected _totalSize: number = 1;
@@ -74,13 +77,12 @@ export abstract class SCSDKBaseDatasource<T = any> extends DataSource<T> {
             const endPage = this.getPageForIndex(range.end);
     
             for (let pageIndex = startPage; pageIndex <= endPage; pageIndex++) {
-                if (this.hasPage(pageIndex)) {
+                if (this.hasPage(pageIndex) || this.isFetchingPage(pageIndex)) {
                     continue;
                 }
 
                 const offset = pageIndex * this.pageSize;
-
-                this.fetchPage(offset).pipe(
+                const subscription = this.fetchPage(offset).pipe(
                     takeUntil(this._destroy),
                     catchError((err: Error) => {
                         console.error(err);
@@ -88,19 +90,26 @@ export abstract class SCSDKBaseDatasource<T = any> extends DataSource<T> {
                         return of(null);
                     })
                 ).subscribe((items) => {
+                    this.unregisterPendingFetch(pageIndex);
+
                     if(!this.ready) this.setReady(true);
-                    if(typeof items === "undefined" || items == null) return;
+                    if(!isNull(items)) {
+                        // Add page index to fetched set
+                        // to track fetched pages
+                        this.fetchedPages.add(pageIndex);
+        
+                        // if(items.length <= 0) return;
+                        // Add fetched items to cachedData
+                        this.cachedData.splice(offset, this.pageSize, ...Array.from({length: items.length}).map((_, i) => items[i]));
+                        // Push updated cache to stream
+                        this.dataStream.next(this.cachedData);
+                    }
     
-                    // Add page index to fetched set
-                    // to track fetched pages
-                    this.fetchedPages.add(pageIndex);
-    
-                    // if(items.length <= 0) return;
-                    // Add fetched items to cachedData
-                    this.cachedData.splice(offset, this.pageSize, ...Array.from({length: items.length}).map((_, i) => items[i]));
-                    // Push updated cache to stream
-                    this.dataStream.next(this.cachedData);
+                    subscription.unsubscribe();
                 });
+
+                this.registerPendingFetch(pageIndex, subscription);
+                this.cachedData.splice(offset, this.pageSize, ...Array.from({length: this.pageSize}).map(() => null));
             }
         }));
 
@@ -122,7 +131,19 @@ export abstract class SCSDKBaseDatasource<T = any> extends DataSource<T> {
      * @returns True or False
      */
     protected hasPage(pageIndex: number): boolean {
-        return this.fetchedPages.has(pageIndex) && this.cachedData.length >= (Math.max(1, pageIndex) * this.pageSize);
+        return this.fetchedPages.has(pageIndex) && this.cachedData.length >= (Math.max(1, pageIndex) * this.pageSize) && !this.isFetchingPage(pageIndex);
+    }
+
+    protected isFetchingPage(pageIndex: number): boolean {
+        return this.pendingFetches.has(pageIndex);
+    }
+
+    private registerPendingFetch(pageIndex: number, subscription: Subscription) {
+        this.pendingFetches.set(pageIndex, subscription);
+    }
+
+    private unregisterPendingFetch(pageIndex: number) {
+        this.pendingFetches.delete(pageIndex);
     }
 
     /**

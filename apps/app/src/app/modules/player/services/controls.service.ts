@@ -1,15 +1,16 @@
 import { Injectable } from "@angular/core";
 import { BehaviorSubject, Observable, Subject } from "rxjs";
 import { VolumeManager } from "../managers/volume-manager";
-import { DEFAULT_VOLUME } from "src/app/constants";
+import { ShuffleManager } from "../managers/shuffle-manager";
 
 @Injectable({
-    providedIn: "root"
+    providedIn: "platform"
 })
 export class AudioController {
 
     private readonly audioElement: HTMLAudioElement = new Audio();
-    private readonly volumeManager = new VolumeManager(this.audioElement, DEFAULT_VOLUME);
+    private readonly volumeManager = new VolumeManager(this.audioElement);
+    private readonly shuffleManager = new ShuffleManager();
 
     private readonly onEnded: Subject<void> = new Subject();
     public readonly $onEnded = this.onEnded.asObservable();
@@ -22,12 +23,17 @@ export class AudioController {
 
     public readonly $volume = this.volumeManager.$volume;
     public readonly $muted = this.volumeManager.$muted;
+    public readonly $shuffled = this.shuffleManager.$shuffled;
 
     constructor() {
         this.audioElement.onended = () => this.onEnded.next();
         this.audioElement.onplaying = () => this.isPaused.next(false);
         this.audioElement.onpause = () => this.isPaused.next(true);
         this.audioElement.ontimeupdate = () => this.currenTime.next(this.audioElement.currentTime)
+    }
+
+    public get shuffled() {
+        return this.shuffleManager.isShuffled;
     }
 
     public play(url: string): Observable<string> {
@@ -68,6 +74,10 @@ export class AudioController {
 
     public setVolume(volume: number): void {
         this.volumeManager.setVolume(volume);
+    }
+
+    public toggleShuffle() {
+        this.shuffleManager.toggleShuffled();
     }
 
 }

@@ -139,23 +139,17 @@ export class SongService implements SyncableService<Song> {
             .select(["song.id"])
             .leftJoin("song.primaryArtist", "primaryArtist")
             .leftJoin("song.album", "album")
-            .leftJoin("song.featuredArtists", "featuredArtists")
-            .where("primaryArtist.id = :artistId OR primaryArtist.slug = :artistId OR (featuredArtists.id = :artistId OR featuredArtists.slug = :artistId)", { artistId: artistId })
-            .offset(pageable.offset)
-            .limit(pageable.limit)
-            // Order by likes and streams
-            // .addSelect("COUNT(streams.id) as streamsCount").leftJoin("song.streams", "streams")
-            // .addSelect("COUNT(likes.id) as likesCount").leftJoin("song.likes", "likes")
-            // .groupBy("song.id")
-            // .orderBy("likesCount", "DESC")
-            // .addOrderBy("streamsCount", "DESC")
             // Order by album
             .orderBy("album.name", "ASC")
             .addOrderBy("song.order", "ASC")
             .addOrderBy("song.id", "DESC")
+            // .leftJoin("song.featuredArtists", "featuredArtists")
+            .where("primaryArtist.id = :artistId OR primaryArtist.slug = :artistId", { artistId: artistId })
+            .offset(pageable.offset)
+            .limit(pageable.limit);
 
         // Add seed, used to create shuffled tracklist
-        if(!isNaN(seed)) idsQuery = idsQuery.addOrderBy(`RAND(${seed})`);
+        if(!isNaN(seed)) idsQuery = idsQuery.orderBy(`RAND(${seed})`);
 
         // Find ids and use these ids to fetch metadata
         return idsQuery.getManyAndCount().then(([ids, total]) => {
@@ -166,13 +160,6 @@ export class SongService implements SyncableService<Song> {
                 .leftJoin("song.featuredArtists", "featuredArtist").addSelect(["featuredArtist.id", "featuredArtist.slug", "featuredArtist.name"])
                 .leftJoin("song.artwork", "artwork").addSelect(["artwork.id"])
                 .loadRelationCountAndMap("song.liked", "song.likes", "likes", (qb) => qb.where("likes.userId = :userId", { userId: authentication?.id }))
-                // Sort by streamcount and likes
-                // .addSelect("COUNT(streams.id) as streamsCount").leftJoin("song.streams", "streams")
-                // .addSelect("COUNT(likes.id) as likesCount").leftJoin("song.likes", "likes")
-                // .groupBy("song.id")
-                // .orderBy("likesCount", "DESC")
-                // .addOrderBy("streamsCount", "DESC")
-                // .addOrderBy("song.id", "DESC")
                 // Order by album
                 .orderBy("album.name", "ASC")
                 .addOrderBy("song.order", "ASC")

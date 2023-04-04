@@ -1,8 +1,7 @@
 import { Injectable } from "@angular/core";
-import { hasProperty, isNull } from "@soundcore/common";
+import { isNull } from "@soundcore/common";
 import { Future, PlayableEntityType } from "@soundcore/sdk";
 import { Observable } from "rxjs";
-import { ResourceWithTracklist } from "../entities/resource-with-tracklist.entity";
 import { PlayableItem } from "./player.service";
 import { SCNGXTracklist } from "../entities/tracklist.entity";
 
@@ -14,7 +13,7 @@ class EnqueuedItem<T = PlayableItem | SCNGXTracklist> {
 }
 
 @Injectable({
-    providedIn: "any"
+    providedIn: "platform"
 })
 export class AudioQueue {
 
@@ -97,10 +96,8 @@ export class AudioQueue {
             // Push loading state
             subscriber.next(Future.loading());
 
-            // Find tracklists and release all
-            this.findTracklists().forEach((item) => {
-                item.data?.release();
-            });
+            // Find tracklist and release
+            this.getEnqueuedTracklist()?.release();
             // Remove all items by splicing array
             this.queue.splice(0, this.queue.length);
 
@@ -126,33 +123,42 @@ export class AudioQueue {
     /**
      * Find a list of enqueued tracklists
      */
-    public findTracklists(): EnqueuedItem<SCNGXTracklist>[] {
-        const tracklists: EnqueuedItem<SCNGXTracklist>[] = [];
+    // public findTracklists(): EnqueuedItem<SCNGXTracklist>[] {
+    //     const tracklists: EnqueuedItem<SCNGXTracklist>[] = [];
 
-        // Loop through queue, beginning at end and 
-        // go backwards (because all tracklists are 
-        // at end of the queue)
-        for(let i = this.queue.length - 1; i >= 0; i--) {
-            const item = this.queue[i];
-            // Break as soon as there is no tracklist in the queue
-            if(!item.isList) break;
-            // If is tracklist, push to results arr
-            tracklists.push(item as EnqueuedItem<SCNGXTracklist>);
-        }
+    //     // Loop through queue, beginning at end and 
+    //     // go backwards (because all tracklists are 
+    //     // at end of the queue)
+    //     for(let i = this.queue.length - 1; i >= 0; i--) {
+    //         const item = this.queue[i];
+    //         // Break as soon as there is no tracklist in the queue
+    //         if(!item.isList) break;
+    //         // If is tracklist, push to results arr
+    //         tracklists.push(item as EnqueuedItem<SCNGXTracklist>);
+    //     }
 
-        // Return reversed results array.
-        // This is done because the results arr has last-index as first
-        // one because of looping backwards
-        return tracklists.reverse();
-    }
+    //     // Return reversed results array.
+    //     // This is done because the results arr has last-index as first
+    //     // one because of looping backwards
+    //     return tracklists.reverse();
+    // }
 
-    public findTracklistById(id: string): SCNGXTracklist {
-        if(!this.isEnqueued(id)) return null;
-        return this.findTracklists().find((item) => item.isList && item.data?.id === id)?.data;
+    public getEnqueuedTracklist(): SCNGXTracklist {
+        const item = this.queue[Math.max(0, this.queue.length - 1)];
+        if(isNull(item) || !item.isList) return null;
+        return item.data as SCNGXTracklist;
     }
 
     public isOfTypeList(item: PlayableItem | SCNGXTracklist): boolean {
         return item.type !== PlayableEntityType.SONG;
+    }
+
+    public setShuffled(shuffled: boolean) {
+        const tracklist = this.getEnqueuedTracklist();
+        console.log("shuffling ", tracklist);
+        if(isNull(tracklist)) return;
+        
+        tracklist.restart(shuffled).subscribe();
     }
     
 }
