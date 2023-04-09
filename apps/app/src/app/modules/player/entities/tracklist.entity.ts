@@ -1,7 +1,7 @@
 import { HttpClient } from "@angular/common/http";
 import { ApiError, Future, PlayableEntity, toFuture, TracklistV2 } from "@soundcore/sdk";
 import { isNull, Page, Pageable } from "@soundcore/common";
-import { BehaviorSubject, concat, defer, EMPTY, filter, map, mergeMap, Observable, of, Subject, take, takeUntil, tap } from "rxjs";
+import { BehaviorSubject, filter, map, Observable, of, Subject, take, takeUntil, tap } from "rxjs";
 import { QueuePointer } from "./queue-pointer";
 
 /**
@@ -195,20 +195,6 @@ export class SCNGXTracklist<T = any> {
     }
 
     /**
-     * Check if the tracklist already started playing.
-     */
-    // public get hasStarted() {
-    //     return this.didStartPlaying;
-    // }
-
-    /**
-     * Get the current queue size
-     */
-    // public get queueSize() {
-    //     return this.queue.length;
-    // }
-
-    /**
      * Check if the tracklist reached end of playback.
      * This is true, if the tracklist is empty (has no items)
      * or the internal queue reached end of the list of items
@@ -235,7 +221,7 @@ export class SCNGXTracklist<T = any> {
      * A new page should be prefetched
      */
     private get shouldPrefetchNext() {
-        return !this.hasFetchedAll && (this.queuePointer.position+7) >= this.fetchedItemsCount
+        return !this.hasFetchedAll && (this.queuePointer.position+4) >= this.fetchedItemsCount
     }
 
     /**
@@ -258,8 +244,6 @@ export class SCNGXTracklist<T = any> {
         // Extract info if tracklist should be shuffled
         const shouldGenerateShuffled: boolean = typeof startAtIndexOrgenerateShuffled === "boolean" ? (startAtIndexOrgenerateShuffled || generateShuffled) : (generateShuffled ?? false);
         const startAt: number = typeof startAtIndexOrgenerateShuffled === "number" ? startAtIndexOrgenerateShuffled as number : this.queuePointer.position;
-
-        console.log(startAt);
 
         // Update current startAt
         this.startAtIndex = startAt;
@@ -435,9 +419,9 @@ export class SCNGXTracklist<T = any> {
      * @param pageIndex Page to fetch
      * @returns {Page<T>}
      */
-    private fetchPage(offset: number): Observable<Page<T>> {
+    private fetchPage(offset: number, limit?: number): Observable<Page<T>> {
         // Build page settings
-        const pageable = new Pageable(offset, this.pageSize);
+        const pageable = new Pageable(offset, limit ?? this.pageSize);
 
         let params;
         if(!isNull(this.metadata.seed)) {
@@ -519,7 +503,7 @@ export class SCNGXTracklist<T = any> {
      * @returns {Future<TracklistV2>}
      */
     private fetchMetadata(owner: PlayableEntity, startAtIndex: number = 0, shuffled: boolean = false) {
-        const pageable = new Pageable(startAtIndex, 15);
+        const pageable = new Pageable(startAtIndex, 51);
         // Perform fetch request
         return this.httpClient.get<TracklistV2<T>>(`${this.apiBaseUrl}/v2/tracklists/${encodeURIComponent(owner.type.toLowerCase())}/${encodeURIComponent(owner.id)}${pageable.toQuery()}&shuffled=${encodeURIComponent(shuffled)}`).pipe(
             toFuture(), 

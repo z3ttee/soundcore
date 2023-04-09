@@ -22,6 +22,7 @@ const routes: Routes = [
   { path: "", component: AscMainLayoutComponent, canActivate: [SSOGuard], children: [
     { path: "", canActivate: [SSOGuard], loadChildren: () => import("./modules/home/home.module").then((m) => m.HomeModule) },
     { path: "album", canActivate: [SSOGuard], loadChildren: () => import("./modules/album/album.module").then((m) => m.AlbumModule) },
+    { path: "player", canActivate: [SSOGuard], loadChildren: () => import("./modules/player/player.module").then((m) => m.AppPlayerModule) },
     { path: "artist", canActivate: [SSOGuard], loadChildren: () => import("./modules/artist/artist.module").then((m) => m.ArtistModule) },
     { path: "playlist", canActivate: [SSOGuard], loadChildren: () => import("./modules/playlist/playlist.module").then((m) => m.PlaylistModule) },
     { path: "song", canActivate: [SSOGuard], loadChildren: () => import("./modules/songs/song.module").then((m) => m.SongModule) },

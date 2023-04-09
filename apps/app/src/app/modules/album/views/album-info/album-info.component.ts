@@ -92,8 +92,8 @@ export class AlbumInfoComponent implements OnDestroy {
     this.playerService.forcePlay(album).subscribe();
   }
 
-  public forcePlayAt(album: Album, indexAt: number) {
-    this.playerService.forcePlayAt(album, indexAt).subscribe();
+  public forcePlayAt(album: Album, indexAt: number, itemId: string) {
+    this.playerService.forcePlayAt(album, indexAt, itemId).subscribe();
   }
 
 }

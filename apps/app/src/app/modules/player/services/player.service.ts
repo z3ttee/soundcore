@@ -182,7 +182,7 @@ export class PlayerService {
                     // If true, find tracklist
                     const enqueuedTracklist = this.queue.getEnqueuedTracklist();
 
-                    console.log(enqueuedTracklist.isPlayingIndex(indexAt))
+                    console.log(enqueuedTracklist.isPlayingIndex(indexAt), enqueuedTracklist.isPlayingById(itemId))
 
                     // Check if requested index is already playing
                     if(enqueuedTracklist.isPlayingIndex(indexAt) || enqueuedTracklist.isPlayingById(itemId)) {

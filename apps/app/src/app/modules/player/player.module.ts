@@ -3,8 +3,8 @@ import { NgModule } from "@angular/core";
 import { ReactiveFormsModule } from "@angular/forms";
 import { MatRippleModule } from "@angular/material/core";
 import { MatSnackBarModule } from "@angular/material/snack-bar";
-import { RouterModule } from "@angular/router";
-import { SCNGXArtworkModule, SCNGXExplicitBadgeModule, SCNGXIconBtnModule } from "@soundcore/ngx";
+import { RouterModule, Routes } from "@angular/router";
+import { SCNGXArtworkModule, SCNGXExplicitBadgeModule, SCNGXIconBtnModule, SCNGXScrollingModule, SCNGXUiRowModule, SCNGXUiTitleModule } from "@soundcore/ngx";
 import { SCSDKCollectionModule, SCSDKStreamModule } from "@soundcore/sdk";
 import { SCNGXRangeModule } from "src/app/components/inputs/range/range.module";
 import { SCNGXSeekerModule } from "src/app/components/inputs/seeker";
@@ -15,14 +15,21 @@ import { NgIconsModule } from "@ng-icons/core";
 import { heroSpeakerWave, heroSpeakerXMark, heroHeart, heroForward, heroRectangleStack, heroArrowsPointingOut } from "@ng-icons/heroicons/outline";
 import { heroHeartSolid, heroPlaySolid, heroPauseSolid } from "@ng-icons/heroicons/solid";
 import { featherShuffle } from "@ng-icons/feather-icons";
+import { QueueViewComponent } from "./views/queue-view/queue-view.component";
+import { SCNGXSongListItemModule } from "src/app/components/list-items/song-list-item/song-list-item.module";
+
+const routes: Routes = [
+    { path: "queue", component: QueueViewComponent },
+]
 
 @NgModule({
     declarations: [
-        AppPlayerBarComponent
+        AppPlayerBarComponent,
+        QueueViewComponent
     ],
     providers: [],
     imports: [
-        RouterModule,
+        RouterModule.forChild(routes),
         CommonModule,
         ReactiveFormsModule,
         NgIconsModule.withIcons({ heroSpeakerWave, heroSpeakerXMark, heroHeart, heroHeartSolid, heroForward, heroRectangleStack, heroArrowsPointingOut, heroPlaySolid, heroPauseSolid, featherShuffle }),
@@ -37,9 +44,15 @@ import { featherShuffle } from "@ng-icons/feather-icons";
         SCNGXSeekerModule,
         SCNGXIconBtnModule,
         SCNGXRangeModule,
+        SCNGXScrollingModule,
+
+        SCNGXUiTitleModule,
+        SCNGXUiRowModule,
 
         SCSDKCollectionModule,
-        SCSDKStreamModule
+        SCSDKStreamModule,
+
+        SCNGXSongListItemModule
     ],
     exports: [
         AppPlayerBarComponent

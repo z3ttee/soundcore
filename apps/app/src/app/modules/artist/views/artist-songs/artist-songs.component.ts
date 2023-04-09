@@ -79,8 +79,8 @@ export class ArtistSongsComponent implements OnDestroy {
     this.playerService.forcePlay(artist).subscribe();
   }
 
-  public forcePlayAt(artist: Artist, indexAt: number) {
-    this.playerService.forcePlayAt(artist, indexAt).subscribe();
+  public forcePlayAt(artist: Artist, indexAt: number, itemId: string) {
+    this.playerService.forcePlayAt(artist, indexAt, itemId).subscribe();
   }
 
 }

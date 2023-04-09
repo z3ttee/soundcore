@@ -1,7 +1,8 @@
+import { Location } from "@angular/common";
 import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from "@angular/core";
 import { FormControl } from "@angular/forms";
 import { MatSnackBar } from "@angular/material/snack-bar";
-import { Router } from "@angular/router";
+import { ActivatedRoute, Router } from "@angular/router";
 import { SCCDKScreenService } from "@soundcore/cdk";
 import { SCSDKLikeService, Song } from "@soundcore/sdk";
 import { combineLatest, filter, map, Observable, Subject, take, takeUntil, tap } from "rxjs";
@@ -17,13 +18,6 @@ interface PlayerbarProps {
 
     currentTime?: number;
     isMobile?: boolean;
-}
-
-interface ResponsiveOptions {
-    showDuration: boolean;
-    showMaximize: boolean;
-    showHistoryControls: boolean;
-    reducedMode: boolean;
 }
 
 @Component({
@@ -43,9 +37,9 @@ export class AppPlayerBarComponent implements OnInit, OnDestroy {
     constructor(
         private readonly likeService: SCSDKLikeService,
         private readonly snackbar: MatSnackBar,
-        private readonly screen: SCCDKScreenService,
         private readonly router: Router,
-        private readonly playerService: PlayerService
+        private readonly playerService: PlayerService,
+        private readonly location: Location,
     ) {}
 
     public $props: Observable<PlayerbarProps> = combineLatest([
@@ -122,6 +116,27 @@ export class AppPlayerBarComponent implements OnInit, OnDestroy {
         this.router.navigate(['/bigpicture'], {
             skipLocationChange: true
         });
+    }
+
+    public toggleQueue() {
+        if(this.router.url.startsWith("/player/queue")) {
+            this.closeQueue();
+        } else {
+            this.router.navigate(['/player/queue'], {
+                skipLocationChange: true
+            });
+        }
+    }
+
+    private closeQueue() {
+        const path = this.location.path();
+    
+        if(path.startsWith('/bigpicture')) {
+            this.router.navigate(['/'], { skipLocationChange: false })
+            return;
+        }
+    
+        this.router.navigate([this.location.path()], { skipLocationChange: true })
     }
 
     public toggleMute() {

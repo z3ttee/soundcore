@@ -4,7 +4,7 @@
     [style.height]="itemHeight + 'px'">
 <!-- (click)="emitOnPlayMobile($event)" -->
     <!-- ID -->
-    <div class="relative max-w-11 min-w-11 h-11 justify-center items-center hidden md:inline-flex" *ngIf="showId">
+    <div class="relative max-w-11 min-w-11 h-11 justify-center items-center hidden md:inline-flex" *ngIf="showId && index !== null && index !== undefined">
         <scngx-skeleton [class]="'w-6 h-6 rounded-sm'" *ngIf="!song; else songId"></scngx-skeleton>
 
         <ng-template #songId>

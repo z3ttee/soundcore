@@ -38,7 +38,7 @@
                         [active]="props.currentItemId === item?.id && props.isTracklistActive"
                         [playing]="props.isPlaying"
                         [animRef]="lottieAnimationTemplate"
-                        (onPlay)="forcePlayAt(props.artist.data, i)">
+                        (onPlay)="forcePlayAt(props.artist.data, i, item.id)">
                     </scngx-song-list-item>
                 </div>
             </div>
