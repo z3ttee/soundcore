@@ -2,8 +2,7 @@ import { Location } from "@angular/common";
 import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from "@angular/core";
 import { FormControl } from "@angular/forms";
 import { MatSnackBar } from "@angular/material/snack-bar";
-import { ActivatedRoute, Router } from "@angular/router";
-import { SCCDKScreenService } from "@soundcore/cdk";
+import { Router } from "@angular/router";
 import { SCSDKLikeService, Song } from "@soundcore/sdk";
 import { combineLatest, filter, map, Observable, Subject, take, takeUntil, tap } from "rxjs";
 import { PlayerService } from "../../services/player.service";
@@ -59,7 +58,6 @@ export class AppPlayerBarComponent implements OnInit, OnDestroy {
         tap((props) => {
             this.seekInputControl.setValue(props.currentTime);
         }),
-        tap((props) => console.log(props)),
         takeUntil(this.$destroy)
     );
 

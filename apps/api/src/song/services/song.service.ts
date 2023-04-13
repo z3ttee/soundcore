@@ -6,13 +6,12 @@ import ffprobeStatic from "ffprobe-static";
 import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from "@nestjs/typeorm";
 import { In, Repository, SelectQueryBuilder } from "typeorm";
-import { Environment, isNull, Page, Pageable } from "@soundcore/common";
+import { Environment, isNull, isString, Page, Pageable } from "@soundcore/common";
 import { SyncableService } from "../../utils/services/syncing.service";
 import { Song } from "../entities/song.entity";
 import { User } from "../../user/entities/user.entity";
 import { CreateSongDTO } from "../dtos/create-song.dto";
 import { Artwork, SongArtwork } from "../../artwork/entities/artwork.entity";
-import { ResourceFlag } from "../../utils/entities/resource";
 import { ID3Artist, ID3TagsDTO } from "../dtos/id3-tags.dto";
 import { SongUniqueFindDTO } from "../dtos/unique-find.dto";
 import { FileFlag } from "../../file/entities/file.entity";
@@ -78,64 +77,79 @@ export class SongService implements SyncableService<Song> {
         return result;
     }
 
+    public async findByGeneric<T = Song>(idsQuery: SelectQueryBuilder<T>, findQuery: SelectQueryBuilder<T>, findIncludeQuery: SelectQueryBuilder<T>, pageable: Pageable, authentication?: User, seed?: number, startWithId?: string): Promise<Page<T>> {
+        if(!isNull(seed) && isNaN(seed)) throw new BadRequestException("Invalid seed found. Must be an integer")
+
+        // If a offset should be included, lower the limit by one
+        const shouldStartWithId = isString(startWithId);
+        const limit = shouldStartWithId ? pageable.limit - 1 : pageable.limit;
+        const offset = pageable.offset;
+
+        // Add page settings to query
+        idsQuery = idsQuery.offset(offset).limit(limit);
+        // Add seed, used to create shuffled tracklist
+        if(!isNaN(seed)) {
+            idsQuery = idsQuery.orderBy(`RAND(${seed})`);
+        }
+
+        // Find ids and use these ids to fetch metadata
+        return idsQuery.getManyAndCount().then(([ids, total]) => {
+            
+            findQuery = findQuery.whereInIds(ids);
+            findIncludeQuery = shouldStartWithId ? findIncludeQuery.where(`${findIncludeQuery.alias}.id = :id`, { 
+                id: startWithId 
+            }) : undefined;
+
+            // Add seed, used to create shuffled tracklist
+            if(!isNaN(seed)) findQuery = findQuery.orderBy(`RAND(${seed})`);
+
+            // Fetch metadata
+            return findQuery.getMany().then((tracks) => Page.of(tracks, total, pageable)).then((page) => {
+                if(isNull(findIncludeQuery)) return page;
+                // Find included item
+                return findIncludeQuery.getOne().then((song) => {
+                    // Add to top of page
+                    page.items.unshift(song);
+                    return page;
+                });
+            });
+        });
+    }
+
     /**
      * Find list of tracks of an album
      * @param albumId Album's id
      * @param pageable Page settings
      * @param authentication Authentication object
      * @param seed Seed used for building shuffled tracklist
+     * @param startWithId Id of the item in the list which should be put on beginning of the page
      * @returns Page<Song>
      */
-    public async findByAlbum(albumId: string, pageable: Pageable, authentication?: User, seed?: number): Promise<Page<Song>> {
-        if(!isNull(seed) && isNaN(seed)) throw new BadRequestException("Invalid seed found. Must be an integer")
-
-        // Create query to get ids only
-        let idsQuery = this.repository.createQueryBuilder("song")
+    public async findByAlbum(albumId: string, pageable: Pageable, authentication?: User, seed?: number, startWithId?: string): Promise<Page<Song>> {
+        const idsQuery = this.repository.createQueryBuilder("song")
             .select(["song.id"])
             .leftJoin("song.album", "album")
             .where("album.id = :albumId OR album.slug = :albumId", { albumId: albumId })
-            .offset(pageable.offset)
-            .limit(pageable.limit)
             .orderBy("song.order", "ASC");
 
-        // Add seed, used to create shuffled tracklist
-        if(!isNaN(seed)) idsQuery = idsQuery.orderBy(`RAND(${seed})`);
-
-        // Find ids and use these ids to fetch metadata
-        return idsQuery.getManyAndCount().then(([ids, total]) => {
-            let findQuery = this.repository.createQueryBuilder("song")
-                .select(["song.id", "song.slug", "song.name", "song.duration", "song.explicit"])
-                .leftJoin("song.primaryArtist", "primaryArtist").addSelect(["primaryArtist.id", "primaryArtist.slug", "primaryArtist.name"])
-                .leftJoin("song.featuredArtists", "featuredArtist").addSelect(["featuredArtist.id", "featuredArtist.slug", "featuredArtist.name"])
-                .leftJoin("song.artwork", "artwork").addSelect(["artwork.id"])
-                .loadRelationCountAndMap("song.liked", "song.likes", "likes", (qb) => qb.where("likes.userId = :userId", { userId: authentication?.id }))
-                .orderBy("song.order", "ASC")
-                .whereInIds(ids)
-
-            // Add seed, used to create shuffled tracklist
-            if(!isNaN(seed)) findQuery = findQuery.orderBy(`RAND(${seed})`);
-
-            // Fetch metadata
-            return findQuery.getMany().then((tracks) => {
-                // Build page
-                return Page.of(tracks, total, pageable);
-            });
-        });
+        const findQuery = this.buildGeneralQuery("song").orderBy("song.order", "ASC");
+        const findIncludeQuery = this.buildGeneralQuery("song", authentication).orderBy("song.order", "ASC")
+        
+        return this.findByGeneric(idsQuery, findQuery, findIncludeQuery, pageable, authentication, seed, startWithId);
     }
 
     /**
      * Find list of tracks of an artist ordered by popularity
-     * @param albumId Album's id
+     * @param artistId Artist's id
      * @param pageable Page settings
      * @param authentication Authentication object
      * @param seed Seed used for building shuffled tracklist
+     * @param startWithId Id of the item in the list which should be put on beginning of the page
      * @returns Page<Song>
      */
-    public async findByArtist(artistId: string, pageable: Pageable, authentication?: User, seed?: number): Promise<Page<Song>> {
-        if(!isNull(seed) && isNaN(seed)) throw new BadRequestException("Invalid seed found. Must be an integer")
-
+    public async findByArtist(artistId: string, pageable: Pageable, authentication?: User, seed?: number, startWithId?: string): Promise<Page<Song>> {
         // Create query to get ids only
-        let idsQuery = this.repository.createQueryBuilder("song")
+        const idsQuery = this.repository.createQueryBuilder("song")
             .select(["song.id"])
             .leftJoin("song.primaryArtist", "primaryArtist")
             .leftJoin("song.album", "album")
@@ -143,35 +157,21 @@ export class SongService implements SyncableService<Song> {
             .orderBy("album.name", "ASC")
             .addOrderBy("song.order", "ASC")
             .addOrderBy("song.id", "DESC")
-            // .leftJoin("song.featuredArtists", "featuredArtists")
             .where("primaryArtist.id = :artistId OR primaryArtist.slug = :artistId", { artistId: artistId })
-            .offset(pageable.offset)
-            .limit(pageable.limit);
 
-        // Add seed, used to create shuffled tracklist
-        if(!isNaN(seed)) idsQuery = idsQuery.orderBy(`RAND(${seed})`);
+        const findQuery = this.buildGeneralQuery("song", authentication)
+            // Order by album
+            .orderBy("album.name", "ASC")
+            .addOrderBy("song.order", "ASC")
+            .addOrderBy("song.id", "DESC")
 
-        // Find ids and use these ids to fetch metadata
-        return idsQuery.getManyAndCount().then(([ids, total]) => {
-            let findQuery = this.repository.createQueryBuilder("song")
-                .select(["song.id", "song.slug", "song.name", "song.duration", "song.explicit"])
-                .leftJoin("song.album", "album").addSelect(["album.id", "album.slug", "album.name"])
-                .leftJoin("song.primaryArtist", "primaryArtist").addSelect(["primaryArtist.id", "primaryArtist.slug", "primaryArtist.name"])
-                .leftJoin("song.featuredArtists", "featuredArtist").addSelect(["featuredArtist.id", "featuredArtist.slug", "featuredArtist.name"])
-                .leftJoin("song.artwork", "artwork").addSelect(["artwork.id"])
-                .loadRelationCountAndMap("song.liked", "song.likes", "likes", (qb) => qb.where("likes.userId = :userId", { userId: authentication?.id }))
-                // Order by album
-                .orderBy("album.name", "ASC")
-                .addOrderBy("song.order", "ASC")
-                .addOrderBy("song.id", "DESC")
-                // Where in ids
-                .whereInIds(ids)
+        const findIncludeQuery = this.buildGeneralQuery("song", authentication)
+            // Order by album
+            .orderBy("album.name", "ASC")
+            .addOrderBy("song.order", "ASC")
+            .addOrderBy("song.id", "DESC");
 
-            // Add seed, used to create shuffled tracklist
-            if(!isNaN(seed)) findQuery = findQuery.orderBy(`RAND(${seed})`);
-            // Fetch metadata
-            return findQuery.getMany().then((tracks) => Page.of(tracks, total, pageable));
-        });
+        return this.findByGeneric(idsQuery, findQuery, findIncludeQuery, pageable, authentication, seed, startWithId);
     }
 
     public async findByNamesAndArtistsAndAlbums(names: string[], artistNames: string[], albumNames: string[]): Promise<Song[]> {
@@ -619,18 +619,18 @@ export class SongService implements SyncableService<Song> {
      * @returns SelectQueryBuilder<Song>
      */
     public buildGeneralQuery(alias: string, authentication?: User) {
-        const queryBuilder = this.repository.createQueryBuilder(alias);
+        let queryBuilder = this.repository.createQueryBuilder(alias).select([`${alias}.id`, `${alias}.slug`, `${alias}.name`, `${alias}.duration`, `${alias}.explicit`]);
         
         // Fetch info if user has liked the song
         if(authentication) queryBuilder.loadRelationCountAndMap(`${alias}.liked`, `${alias}.likes`, "likes", (qb) => qb.where("likes.userId = :userId", { userId: authentication?.id }))
 
         // Add basic relations used everywhere
-        queryBuilder.leftJoin(`${alias}.artwork`, "artwork").addSelect(["artwork.id"]);
-        queryBuilder.leftJoin(`${alias}.primaryArtist`, "primaryArtist").addSelect(["primaryArtist.id", "primaryArtist.slug", "primaryArtist.name"])
-        queryBuilder.leftJoin(`${alias}.featuredArtists`, "featuredArtist").addSelect(["featuredArtist.id", "featuredArtist.slug", "featuredArtist.name"])
+        queryBuilder = queryBuilder.leftJoin(`${alias}.artwork`, "artwork").addSelect(["artwork.id"]);
+        queryBuilder = queryBuilder.leftJoin(`${alias}.primaryArtist`, "primaryArtist").addSelect(["primaryArtist.id", "primaryArtist.slug", "primaryArtist.name"])
+        queryBuilder = queryBuilder.leftJoin(`${alias}.featuredArtists`, "featuredArtist").addSelect(["featuredArtist.id", "featuredArtist.slug", "featuredArtist.name"])
 
         // Add album information
-        queryBuilder.leftJoin(`${alias}.album`, "album").addSelect(["album.id", "album.slug", "album.name"])
+        queryBuilder = queryBuilder.leftJoin(`${alias}.album`, "album").addSelect(["album.id", "album.slug", "album.name"])
 
         return queryBuilder;
     }

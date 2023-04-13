@@ -1,3 +1,3 @@
 
-export { isNull, isUndefined, hasProperty, pascalToSnakeCase } from "./utilities";
+export { isNull, isUndefined, hasProperty, pascalToSnakeCase, isString } from "./utilities";
 export { randomString, randomInt } from "./random";

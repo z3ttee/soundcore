@@ -12,16 +12,16 @@ export class TracklistV2Service {
         private readonly songService: SongService,
     ) {}
 
-    public async findTracklistByAlbumId(albumId: string, pageable: Pageable, authentication?: User, shuffled?: boolean): Promise<TracklistV2> {
+    public async findTracklistByAlbumId(albumId: string, pageable: Pageable, authentication?: User, shuffled?: boolean, startWithId?: string): Promise<TracklistV2> {
         const seed = shuffled ? randomInt(8) : undefined;
-        return this.songService.findByAlbum(albumId, pageable, authentication, seed).then((page) => {
+        return this.songService.findByAlbum(albumId, pageable, authentication, seed, startWithId).then((page) => {
             return new TracklistV2(albumId, PlayableEntityType.ALBUM, page.totalSize, page, seed ?? undefined);
         });
     }
 
-    public async findTracklistByArtistId(artistId: string, pageable: Pageable, authentication?: User, shuffled?: boolean): Promise<TracklistV2> {
+    public async findTracklistByArtistId(artistId: string, pageable: Pageable, authentication?: User, shuffled?: boolean, startWithId?: string): Promise<TracklistV2> {
         const seed = shuffled ? randomInt(8) : undefined;
-        return this.songService.findByArtist(artistId, pageable, authentication, seed).then((page) => {
+        return this.songService.findByArtist(artistId, pageable, authentication, seed, startWithId).then((page) => {
             return new TracklistV2(artistId, PlayableEntityType.ARTIST, page.totalSize, page, seed ?? undefined);
         });
     }

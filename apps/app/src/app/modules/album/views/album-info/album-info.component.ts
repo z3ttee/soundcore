@@ -9,7 +9,7 @@ import { Page } from '@soundcore/common';
 
 interface AlbumInfoProps {
   album?: Future<Album>;
-  tracklist?: Future<SCNGXTracklist<Song>>;
+  tracklist?: Future<SCNGXTracklist>;
   recommendedAlbums?: Future<Page<Album>>;
   isPlaying?: boolean;
   isTracklistActive?: boolean;

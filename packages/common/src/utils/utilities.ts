@@ -7,6 +7,10 @@ export function isNull(target: any): boolean {
     return isUndefined(target) || target == null;
 }
 
+export function isString(target: any): boolean {
+    return !isNull(target) && typeof target === "string";
+}
+
 export function pascalToSnakeCase(input: string): string {
     return input?.split(/\.?(?=[A-Z])/)?.join('_')?.toLowerCase();
 }

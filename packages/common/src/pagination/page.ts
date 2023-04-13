@@ -1,3 +1,4 @@
+import { MAX_PAGE_SIZE } from "../constants";
 import { isNull } from "../utils/utilities";
 
 export class Page<T = any> {
@@ -57,7 +58,7 @@ export class Pageable implements PageInfo {
     public readonly limit: number;
 
     constructor(offset: number, size: number) {
-        this.limit = Math.max(1, Math.min(50, size));
+        this.limit = Math.max(1, Math.min(MAX_PAGE_SIZE, size));
         this.offset = Math.max(0, offset);
         this.index = Math.floor(this.offset / this.limit);
     }

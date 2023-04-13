@@ -1,6 +1,7 @@
 import { createParamDecorator, ExecutionContext } from "@nestjs/common";
 import { Pageable } from "./page";
 import { isNull } from "../utils";
+import { MAX_PAGE_SIZE } from "../constants";
 
 /**
  * Pagination decorator to get page settings from
@@ -22,11 +23,11 @@ export const Pagination = createParamDecorator(
     (defaults: { limit?: number, offset?: number, maxLimit?: number }, ctx: ExecutionContext): Pageable => {        
         const request = ctx.switchToHttp().getRequest();
 
-        let limit: number = defaults?.limit ?? 30;
+        let limit: number = defaults?.limit ?? MAX_PAGE_SIZE;
         let offset: number = defaults?.offset ?? 0;
 
         if(!isNull(request.query?.limit) && !isNaN(request.query?.limit)) {
-            limit = Math.max(1, Math.min((defaults?.maxLimit ?? 30), (parseInt(request.query?.limit) ?? defaults?.limit ?? 30)));
+            limit = Math.max(1, Math.min((defaults?.maxLimit ?? MAX_PAGE_SIZE), (parseInt(request.query?.limit) ?? defaults?.limit ?? MAX_PAGE_SIZE)));
         }
         if(!isNull(request.query?.offset) && !isNaN(request.query?.offset)) {
             offset = Math.max(0, (parseInt(request.query?.offset) ?? defaults?.offset ?? 0));
