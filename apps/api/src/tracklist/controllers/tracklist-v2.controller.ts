@@ -1,8 +1,6 @@
 import { Controller, Get, Param, Query } from '@nestjs/common';
 import { Authentication } from '../../authentication/decorators/authentication.decorator';
-import { Public } from '../../authentication/decorators/public.decorator';
 import { User } from '../../user/entities/user.entity';
-import { TracklistV2 } from '../entities/tracklist.entity';
 import { TracklistV2Service } from '../services/tracklist-v2.service';
 import { PlayableEntityType } from '../entities/playable.entity';
 import { Pageable, Pagination } from '@soundcore/common';
@@ -22,26 +20,20 @@ export class TracklistV2Controller {
     ) {}
 
     /**
-     * Find a tracklist by an album
-     * @param albumId Album's id
-     * @param authentication Authentication object
+     * Find a tracklist by ownerId and ownerType. An owner usually is a resource
+     * to which the tracklist belongs. For example this can be an album, artist or 
+     * playlists in general
+     * @param ownerId Id of the owner resource
+     * @param ownerType Type of the owner resource
+     * @param pageable Page settings for the first page of tracks in the tracklist
+     * @param authentication Authentication object to include data like liked songs etc.
+     * @param shuffled If true, a seed will be generated for building a shuffled tracklist
+     * @param startWithId Id of an element in the tracklist to start playback at. This will decrement the requested limit by 1 and include the element to the id at the top of the first page
      * @returns Tracklist
      */
-    @Get(`/${PlayableEntityType.ALBUM.toLowerCase()}/:albumId`)
-    public async findListByAlbum(@Param("albumId") albumId: string, @Authentication() authentication: User, @Pagination() pageable: Pageable, @Query("shuffled") shuffled?: string, @Query("startWithId") startWithId?: string): Promise<TracklistV2> {
-        return this.service.findTracklistByAlbumId(albumId, pageable, authentication, shuffled === "true", startWithId);
-    }
-
-    /**
-     * Find a tracklist by an artist ordered by popularity
-     * @param artistId Artist's id
-     * @param authentication Authentication object
-     * @returns Tracklist
-     */
-    @Get(`/${PlayableEntityType.ARTIST.toLowerCase()}/:artistId`)
-    @Public(true)
-    public async findListByArtist(@Param("artistId") artistId: string, @Authentication() authentication: User, @Pagination() pageable: Pageable, @Query("shuffled") shuffled?: string, @Query("startWithId") startWithId?: string): Promise<TracklistV2> {
-        return this.service.findTracklistByArtistId(artistId, pageable, authentication, shuffled === "true", startWithId);
+    @Get(`/:ownerType/:ownerId`)
+    public async findTracklist(@Param("ownerType") ownerType: PlayableEntityType, @Param("ownerId") ownerId: string, @Pagination() pageable: Pageable, @Authentication() authentication: User, @Query("shuffled") shuffled?: "true" | "false", @Query("startWithId") startWithId?: string) {
+        return this.service.findTracklist(ownerId, ownerType, pageable, authentication, shuffled === "true", startWithId);
     }
 
 }
