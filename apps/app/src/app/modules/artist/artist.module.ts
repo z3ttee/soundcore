@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ArtistProfileComponent } from './views/artist-profile/artist-profile.component';
 import { RouterModule, Routes } from '@angular/router';
-import { SCDKAlbumModule, SCDKArtistModule, SCSDKSongModule, SCSDKTracklistModule } from '@soundcore/sdk';
+import { SCDKAlbumModule, SCSDKArtistModule, SCSDKSongModule } from '@soundcore/sdk';
 import { Error404Module } from 'src/app/shared/error404/error404.module';
 import { ListViewModule } from "src/app/components/resource-views/list-view/list-view.module";
 import { MatRippleModule } from '@angular/material/core';
@@ -27,7 +27,7 @@ import { LottieModule } from 'ngx-lottie';
 import { SongContextMenuModule } from 'src/app/components/menus/song-context-menu/song-context-menu.module';
 import { NgIconsModule } from '@ng-icons/core';
 import { heroEllipsisVerticalSolid } from '@ng-icons/heroicons/solid';
-import { heroHeart } from '@ng-icons/heroicons/outline';
+import { heroHeart, heroMusicalNote } from '@ng-icons/heroicons/outline';
 
 const routes: Routes = [
   { path: ":artistId", component: ArtistProfileComponent },
@@ -44,7 +44,7 @@ const routes: Routes = [
     CommonModule,
     RouterModule.forChild(routes),
     Error404Module,
-    NgIconsModule.withIcons({ heroEllipsisVerticalSolid, heroHeart }),
+    NgIconsModule.withIcons({ heroEllipsisVerticalSolid, heroHeart, heroMusicalNote }),
     LottieModule,
 
     MatRippleModule,
@@ -52,9 +52,9 @@ const routes: Routes = [
     ListViewModule,
     SongContextMenuModule,
 
-    SCDKArtistModule,
-    SCDKAlbumModule,
+    SCSDKArtistModule,
     SCSDKSongModule,
+    SCDKAlbumModule,
 
     SCNGXHorizontalListModule,
     SCNGXSkeletonModule,

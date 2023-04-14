@@ -4,7 +4,7 @@ import { UntypedFormControl } from '@angular/forms';
 import { Router } from '@angular/router';
 import { combineLatest, debounceTime, Observable, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { SCCDKScreenService } from '@soundcore/cdk';
-import { SCDKGenreService, MeiliAlbum, MeiliArtist, SCSDKSearchService, SCDKResource, MeiliPlaylist, MeiliUser, SCDKUserService, SCDKArtistService, SCDKAlbumService, MeiliSong, SCSDKSongService, SCSDKPlaylistService } from '@soundcore/sdk';
+import { SCDKGenreService, MeiliAlbum, MeiliArtist, SCSDKSearchService, SCDKResource, MeiliPlaylist, MeiliUser, SCDKUserService, SCDKAlbumService, MeiliSong, SCSDKSongService, SCSDKPlaylistService, SCSDKArtistService } from '@soundcore/sdk';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Pageable } from '@soundcore/common';
 
@@ -39,7 +39,7 @@ export class SearchIndexComponent implements OnInit, OnDestroy {
     private readonly searchService: SCSDKSearchService,
 
     private readonly userService: SCDKUserService,
-    private readonly artistService: SCDKArtistService,
+    private readonly artistService: SCSDKArtistService,
     private readonly albumService: SCDKAlbumService,
     private readonly genreService: SCDKGenreService,
     private readonly songService: SCSDKSongService,

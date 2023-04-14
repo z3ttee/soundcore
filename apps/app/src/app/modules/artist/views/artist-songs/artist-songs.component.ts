@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { combineLatest, map, Observable, startWith, Subject, switchMap } from 'rxjs';
-import { Artist, Future, SCDKArtistService, SCSDKDatasource, SCSDKSongService, Song, toFutureCompat } from '@soundcore/sdk';
+import { Artist, Future, SCSDKArtistService, SCSDKDatasource, SCSDKSongService, Song, toFutureCompat } from '@soundcore/sdk';
 import { AUDIOWAVE_LOTTIE_OPTIONS } from 'src/app/constants';
 import { PlayerService } from 'src/app/modules/player/services/player.service';
 
@@ -19,7 +19,7 @@ interface ArtistSongsProps {
 export class ArtistSongsComponent implements OnDestroy {
 
   constructor(
-    private readonly artistService: SCDKArtistService,
+    private readonly artistService: SCSDKArtistService,
     private readonly activatedRoute: ActivatedRoute,
     private readonly playerService: PlayerService,
     private readonly songService: SCSDKSongService,
@@ -40,13 +40,13 @@ export class ArtistSongsComponent implements OnDestroy {
    * Observable that emits current
    * artist data in future format
    */
-  public $artist: Observable<Future<Artist>> = this.$artistId.pipe(switchMap((artistId) => this.artistService.findById(artistId).pipe(toFutureCompat())));
+  public $artist: Observable<Future<Artist>> = this.$artistId.pipe(switchMap((artistId) => this.artistService.findById(artistId)));
   
   /**
    * Observable that emits current datasource
    * of tracks
    */
-  public $datasource: Observable<SCSDKDatasource<Song>> = this.$artistId.pipe(switchMap((artistId) => this.songService.findByArtistDatasource(artistId)))
+  public $datasource: Observable<SCSDKDatasource<Song>> = this.$artistId.pipe(switchMap((artistId) => this.songService.findByArtistDatasource(artistId)));
 
   public readonly $props: Observable<ArtistSongsProps> = combineLatest([
     // Get changes to artist

@@ -9,9 +9,11 @@ import { apiResponse } from "../../utils/rxjs/operators/api-response";
 import { Artist } from "../entities/artist.entity";
 import { SCSDK_OPTIONS } from "../../constants";
 import { Pageable } from "@soundcore/common";
+import { Future } from "../../utils/future/future";
+import { toFuture } from "../../utils/future";
 
 @Injectable()
-export class SCDKArtistService {
+export class SCSDKArtistService {
 
   constructor(
     private httpClient: HttpClient,
@@ -23,9 +25,9 @@ export class SCDKArtistService {
    * @param artistId Artist's id
    * @returns Observable<Artist>
    */
-  public findById(artistId: string): Observable<ApiResponse<Artist>> {
-    if(!artistId) return of(ApiResponse.withPayload(null));
-    return this.httpClient.get<Artist>(`${this.options.api_base_uri}/v1/artists/${artistId}`).pipe(apiResponse())
+  public findById(artistId: string): Observable<Future<Artist>> {
+    if(!artistId) return of(Future.notfound());
+    return this.httpClient.get<Artist>(`${this.options.api_base_uri}/v1/artists/${artistId}`).pipe(toFuture())
   }
 
   /**

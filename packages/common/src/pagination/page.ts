@@ -34,7 +34,7 @@ export class Page<T = any> {
             const maxPageIndex = Math.floor(totalSize / info.limit);
             const currentPageIndex = Math.floor(info.offset/info.limit);
 
-            if(maxPageIndex > currentPageIndex) this.nextOffset =  info.offset + info.limit;
+            if(maxPageIndex > currentPageIndex+1) this.nextOffset =  info.offset + info.limit;
             if(currentPageIndex > 0) this.prevOffset = Math.max(0, info.offset - info.limit);
         }
     }

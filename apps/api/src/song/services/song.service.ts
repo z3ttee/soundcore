@@ -6,7 +6,7 @@ import ffprobeStatic from "ffprobe-static";
 import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from "@nestjs/typeorm";
 import { In, Repository, SelectQueryBuilder } from "typeorm";
-import { Environment, isNull, isString, Page, Pageable } from "@soundcore/common";
+import { Environment, fisherYatesArray, isNull, isString, Page, Pageable } from "@soundcore/common";
 import { SyncableService } from "../../utils/services/syncing.service";
 import { Song } from "../entities/song.entity";
 import { User } from "../../user/entities/user.entity";
@@ -17,6 +17,7 @@ import { SongUniqueFindDTO } from "../dtos/unique-find.dto";
 import { FileFlag } from "../../file/entities/file.entity";
 import { GeniusFlag } from "../../utils/entities/genius.entity";
 import { MeilisearchFlag } from "../../utils/entities/meilisearch.entity";
+import { TRACKLIST_ARTIST_TOP_SIZE } from "../../constants";
 
 @Injectable()
 export class SongService implements SyncableService<Song> {
@@ -172,6 +173,72 @@ export class SongService implements SyncableService<Song> {
             .addOrderBy("song.id", "DESC");
 
         return this.findByGeneric(idsQuery, findQuery, findIncludeQuery, pageable, authentication, seed, startWithId);
+    }
+
+    /**
+     * Find list of tracks of an artist ordered by popularity
+     * @param artistId Artist's id
+     * @param pageSettings Page settings
+     * @param authentication Authentication object
+     * @param startWithId Id of the item in the list which should be put on beginning of the page
+     * @returns Page<Song>
+     */
+    public async findByArtistIdTop(artistId: string, pageSettings: Pageable, authentication?: User, seed?: number, startWithId?: string): Promise<Page<Song>> {
+        const pageable = new Pageable(pageSettings.offset, Math.max(1, Math.min(TRACKLIST_ARTIST_TOP_SIZE, TRACKLIST_ARTIST_TOP_SIZE - pageSettings.offset)));
+
+        console.log(pageable);
+
+        // Create query to get ids only
+        const idsQuery = this.repository.createQueryBuilder("song")
+            .select(["song.id"])
+            .leftJoin("song.primaryArtist", "primaryArtist")
+
+            // Order by streamcount and likes
+            .addSelect("COUNT(stream.id) as streamCount")
+            .addSelect("COUNT(like.id) as likeCount")
+            .leftJoin("song.streams", "stream")
+            .leftJoin("song.likes", "like")
+            .orderBy("streamCount", "DESC")
+            .addOrderBy("likeCount", "DESC")
+            .groupBy("song.id")
+
+            .where("primaryArtist.id = :artistId OR primaryArtist.slug = :artistId", { artistId: artistId })
+
+        const findQuery = this.buildGeneralQuery("song", authentication)
+            // Order by streamcount and likes
+            .addSelect("COUNT(stream.id) as streamCount")
+            .addSelect("COUNT(like.id) as likeCount")
+            .leftJoin("song.streams", "stream")
+            .leftJoin("song.likes", "like")
+            .orderBy("streamCount", "DESC")
+            .addOrderBy("likeCount", "DESC")
+            .groupBy("song.id")
+
+        const findIncludeQuery = this.buildGeneralQuery("song", authentication)
+            // Order by streamcount and likes
+            .addSelect("COUNT(stream.id) as streamCount")
+            .addSelect("COUNT(like.id) as likeCount")
+            .leftJoin("song.streams", "stream")
+            .leftJoin("song.likes", "like")
+            .orderBy("streamCount", "DESC")
+            .addOrderBy("likeCount", "DESC")
+            .groupBy("song.id")
+
+        return this.findByGeneric(idsQuery, findQuery, findIncludeQuery, pageable, authentication, undefined, startWithId).then((page) => {
+            // Limit the totalSize to the pageable limit
+            const limit = pageable.limit;
+            // Create items variable
+            let items = page.items;
+            // Check if seed is provided
+            if(!isNull(seed)) {
+                // Extract first item
+                const firstItem = page.items.splice(0, 1)[0];
+                // If a seed is provided, then return a shuffled result
+                items = [firstItem, ...fisherYatesArray(page.items.filter((s) => s.id !== firstItem.id))];
+            }
+            // Return new page instance
+            return Page.of(items, limit, pageable);
+        });
     }
 
     public async findByNamesAndArtistsAndAlbums(names: string[], artistNames: string[], albumNames: string[]): Promise<Song[]> {

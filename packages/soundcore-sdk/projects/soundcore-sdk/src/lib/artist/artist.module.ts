@@ -1,9 +1,9 @@
 import { NgModule } from "@angular/core";
-import { SCDKArtistService } from "./services/artist.service";
+import { SCSDKArtistService } from "./services/artist.service";
 
 @NgModule({
     providers: [
-        SCDKArtistService
+        SCSDKArtistService
     ]
 })
-export class SCDKArtistModule {}
+export class SCSDKArtistModule {}

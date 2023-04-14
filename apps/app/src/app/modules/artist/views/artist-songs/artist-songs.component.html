@@ -1,8 +1,11 @@
 <ng-container *ngIf="($props | async) as props">
-    <app-error404 *ngIf="!props.artist.loading && !props.artist"></app-error404>
-
-    <div class="flex flex-grow flex-col w-full h-full">
-        <div class="w-full">
+    <div class="relative w-full h-full" cdkVirtualScrollingElement>
+        <!-- 404 -->
+        <app-error404 *ngIf="!props.artist.loading && !props.artist.data; else content" [title]="'Künstler nicht gefunden'"></app-error404>
+        
+        <!-- Page -->
+        <ng-template #content>
+            <!-- Page Header -->
             <div class="bg-body sticky top-0 z-50 p-window" [ngClass]="{'shadow-md border-b border-opacity-70 border-b-body-lighter': (scroller.scrolledIndexChange | async) > 0}">
                 <div class="flex items-center justify-start flex-1 gap-4">
                     <div class="">
@@ -21,30 +24,29 @@
                     </div>
                 </div>
             </div>
-        </div>
 
-        <cdk-virtual-scroll-viewport [itemSize]="56" class="w-full h-full" #scroller>
+            <!-- Stats bar -->
             <div class="flex items-center justify-start gap-4 pb-row px-window">
                 <scngx-chip>{{ props.artist.data?.songCount ?? 0 }} Songs</scngx-chip>
                 <scngx-chip>{{ props.artist.data?.streamCount ?? 0 }} Streams in 30 Tagen</scngx-chip>
-                <scngx-chip>{{ props.artist.data?.streamCount ?? 0 }} Alben</scngx-chip>
+                <scngx-chip>{{ props.artist.data?.albumCount ?? 0 }} Alben</scngx-chip>
             </div>
-        
-            <div class="px-window">
-                <div *cdkVirtualFor="let item of ($datasource | async); index as i">
-                    <scngx-song-list-item
-                        [song]="item"
-                        [index]="i"
+
+            <!-- Songs list -->
+            <cdk-virtual-scroll-viewport [itemSize]="56" #scroller>
+                <div *cdkVirtualFor="let item of ($datasource | async); index as i" class="px-window">
+                    <scngx-song-list-item 
+                        [song]="item" 
+                        [index]="i" 
                         [active]="props.currentItemId === item?.id && props.isTracklistActive"
                         [playing]="props.isPlaying"
                         [animRef]="lottieAnimationTemplate"
                         (onPlay)="forcePlayAt(props.artist.data, i, item.id)">
                     </scngx-song-list-item>
                 </div>
-            </div>
-        
-            <div class="pb-bottom"></div>
-        </cdk-virtual-scroll-viewport>
+                <div class="pb-bottom"></div>
+            </cdk-virtual-scroll-viewport>
+        </ng-template>
     </div>
 </ng-container>
 
