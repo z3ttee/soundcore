@@ -4,7 +4,7 @@ import { VolumeManager } from "../managers/volume-manager";
 import { ShuffleManager } from "../managers/shuffle-manager";
 
 @Injectable({
-    providedIn: "platform"
+    providedIn: "root"
 })
 export class AudioController {
 

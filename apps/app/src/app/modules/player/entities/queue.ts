@@ -7,6 +7,7 @@ export class Queue<T = any> {
     public readonly $items = this.queue.asObservable();
 
     private _lastDequeuedItem: T;
+    private _initialized: boolean = false;
 
     public get items() {
         return this.queue.getValue();
@@ -24,6 +25,7 @@ export class Queue<T = any> {
         const queue = this.queue.getValue();
         queue.push(...items);
         this.queue.next(queue);
+        this._initialized = true;
     }
 
     public dequeue() {
@@ -34,12 +36,13 @@ export class Queue<T = any> {
         return item;
     }
 
-    public clear() {
+    public clearIfInitialized() {
+        if(!this._initialized) return;
         this.queue.next([]);
     }
 
     public release() {
-        this.clear();
+        this.clearIfInitialized();
         this.queue.complete();
     }
 

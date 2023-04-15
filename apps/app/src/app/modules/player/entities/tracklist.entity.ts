@@ -32,11 +32,13 @@ export class SCNGXTracklist {
      */
     public readonly $error = this.error.asObservable().pipe(takeUntil(this.$onRelease));
 
-    private readonly queue: Queue<PlayableItem> = new Queue();
-    private readonly cache: Cache<PlayableItem> = new Cache();
+    private readonly _queue: Queue<PlayableItem> = new Queue();
+    private readonly _cache: Cache<PlayableItem> = new Cache();
 
     private readonly metadataSubject: BehaviorSubject<TracklistWithoutItems> = new BehaviorSubject(null);
     public readonly $metadata = this.metadataSubject.asObservable().pipe(takeUntil(this.$cancel));
+
+    public readonly $queue = this._queue.$items;
 
     /**
      * Observable that emits ready state. A tracklist is considered ready, when all
@@ -124,6 +126,14 @@ export class SCNGXTracklist {
         return this.metadataSubject.getValue();
     }
 
+    public get name() {
+        return this.owner.name;
+    }
+
+    public get queue() {
+        return [...this._queue.items];
+    }
+
     /**
      * Type of the tracklist. This equals
      * to the type of the owner to which 
@@ -177,7 +187,7 @@ export class SCNGXTracklist {
      */
     public get hasFetchedAll() {
         // return this.items.length >= this.size;
-        return this.cache.length >= this.size;
+        return this._cache.length >= this.size;
     }
 
     /**
@@ -186,7 +196,7 @@ export class SCNGXTracklist {
      * or the internal queue reached end of the list of items
      */
     public get hasEnded() {
-        return this.isEmpty || this.queue.size <= 0;
+        return this.isEmpty || this._queue.size <= 0;
     }
 
     /**
@@ -194,7 +204,7 @@ export class SCNGXTracklist {
      * This is true, when the current queue pointer is near the end of fetched items count
      */
     private get shouldFetchNext() {
-        return !this.hasFetchedAll && this.queue.size <= 8
+        return !this.hasFetchedAll && this._queue.size <= 8
     }
 
     /**
@@ -229,9 +239,9 @@ export class SCNGXTracklist {
         // cause the ready state to switch to false
         this.metadataSubject.next(null);
         // Clear cached items
-        this.cache.clear();
+        this._cache.clear();
         // Clear enqueued items
-        this.queue.clear();
+        this._queue.clearIfInitialized();
 
         // Fetch metadata
         return this.fetchMetadata(this.owner, startAt, startWithId, shouldGenerateShuffled).pipe(
@@ -248,9 +258,9 @@ export class SCNGXTracklist {
                 if(isNull(metadata)) return null;
 
                 // Cache first page from metadata object
-                this.cache.set(0, metadata.items);
+                this._cache.set(0, metadata.items);
                 // Enqueue first page from metadata object
-                this.queue.enqueue(metadata.items.items)
+                this._queue.enqueue(metadata.items.items)
                 // Remove page from metadata
                 metadata.items = undefined;
                 // Save metadata by pushing to subject
@@ -277,7 +287,7 @@ export class SCNGXTracklist {
      */
     public isPlayingById(itemId: string) {
         if(isNull(itemId)) return false;
-        return this.queue.lastDequeuedItem.id === itemId;
+        return this._queue.lastDequeuedItem.id === itemId;
     }
 
     /**
@@ -324,8 +334,8 @@ export class SCNGXTracklist {
      * all listeners to be unsubscribed
      */
     public release() {
-        this.queue.release();
-        this.cache.release();
+        this._queue.release();
+        this._cache.release();
 
         this.$cancel.next();
         this.$cancel.complete();
@@ -342,7 +352,7 @@ export class SCNGXTracklist {
         // If true, return null
         if(this.hasEnded) return null;
 
-        return this.queue.dequeue();
+        return this._queue.dequeue();
     }
 
     /**
@@ -354,8 +364,8 @@ export class SCNGXTracklist {
         if(this.hasFetchedAll) return of(Page.empty());
 
         // Check if next offset already fetched
-        const nextOffset = this.cache.lastCachedPageInfo?.nextOffset ?? 0;
-        if(this.cache.has(this.getPageByOffset(nextOffset))) return of(null);
+        const nextOffset = this._cache.lastCachedPageInfo?.nextOffset ?? 0;
+        if(this._cache.has(this.getPageByOffset(nextOffset))) return of(null);
 
         return this.fetchPage(nextOffset).pipe(
             takeUntil(this.$cancel),
@@ -363,9 +373,9 @@ export class SCNGXTracklist {
                 if(isNull(page)) return Page.empty();
 
                 // Cache first page from metadata object
-                this.cache.set(page.info.index, page);
+                this._cache.set(page.info.index, page);
                 // Enqueue first page from metadata object
-                this.queue.enqueue(page.items);
+                this._queue.enqueue(page.items);
                 return page;
             })
         )

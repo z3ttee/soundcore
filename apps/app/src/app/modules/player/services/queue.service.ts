@@ -1,19 +1,19 @@
 import { Injectable } from "@angular/core";
 import { isNull } from "@soundcore/common";
 import { Future, PlayableEntityType } from "@soundcore/sdk";
-import { BehaviorSubject, Observable } from "rxjs";
+import { BehaviorSubject, Observable, combineLatest, distinctUntilChanged } from "rxjs";
 import { PlayableItem } from "./player.service";
 import { SCNGXTracklist } from "../entities/tracklist.entity";
 
-export class EnqueuedItem<T = PlayableItem | SCNGXTracklist> {
+export class EnqueuedItem {
     constructor(
         public isList: boolean,
-        public data: T
+        public data: PlayableItem | SCNGXTracklist
     ) {}
 }
 
 @Injectable({
-    providedIn: "platform"
+    providedIn: "root"
 })
 export class AudioQueue {
 
@@ -25,9 +25,15 @@ export class AudioQueue {
     /**
      * Internal queue list
      */
-    private readonly queueSubject: BehaviorSubject<EnqueuedItem[]> = new BehaviorSubject([]);
+    private readonly queueSubject: BehaviorSubject<PlayableItem[]> = new BehaviorSubject([]);
 
-    public readonly $queue = this.queueSubject.asObservable();
+    private readonly tracklistSubject: BehaviorSubject<SCNGXTracklist> = new BehaviorSubject(null);
+    public readonly $enqueuedTracklist = this.tracklistSubject.asObservable();
+
+    public readonly $queue: Observable<Readonly<[PlayableItem[], SCNGXTracklist]>> = combineLatest([
+        this.queueSubject.asObservable().pipe(distinctUntilChanged()),
+        this.tracklistSubject.asObservable().pipe(distinctUntilChanged()),
+    ]);
 
     /**
      * Add a resource to the queue. Based on the tracklist type,
@@ -37,11 +43,12 @@ export class AudioQueue {
      */
     public enqueue(resource: PlayableItem | SCNGXTracklist): number {
         const queue = this.queueSubject.getValue();
+        const tracklist = this.getEnqueuedTracklist();
 
         // If the item should be enqueued as single
         if(!this.isOfTypeList(resource)) {
             // Enqueue entity
-            queue.unshift({ isList: false, data: resource });
+            queue.unshift(resource as PlayableItem);
             // Register id as enqueued
             this.enqueuedIds.set(resource.id, true);
             // Update queue subject
@@ -50,44 +57,47 @@ export class AudioQueue {
         }
 
         // Do not enqueue tracklists twice
-        if(this.isEnqueued(resource.id)) return -1;
-        // Otherwise set to end of queue and remove previous one
-        const index = Math.max(0, queue.length - 1);
-        const tracklist = queue[index];
-        if(!isNull(tracklist) && tracklist.isList) {
-            this.enqueuedIds.delete(tracklist.data?.id);
-            (tracklist.data as SCNGXTracklist)?.release();
-        }
+        if(tracklist?.id === resource.id) return -1;
 
-        queue[index] = { isList: true, data: resource };
+
+        // if(!isNull(tracklist) && tracklist.isList) {
+        //     this.enqueuedIds.delete(tracklist.data?.id);
+        //     (tracklist.data as SCNGXTracklist)?.release();
+        // }
+
+        // queue[index] = { isList: true, data: resource };
         // Register id as enqueued
         this.enqueuedIds.set(resource.id, true);
-        // Update queue subject
-        this.queueSubject.next(queue);
-        return index;
+        // Update tracklist subject
+        this.tracklistSubject.next(resource as SCNGXTracklist);
+        return Math.max(0, queue.length - 1);
     }
 
     public dequeue(): EnqueuedItem {
+        const tracklist = this.getEnqueuedTracklist();
         const queue = this.queueSubject.getValue();
-        const next = queue[0];
-        if(isNull(next)) return null;
-
-        if(!next.isList) {
-            // Remove from registered ids
-            this.enqueuedIds.delete(next.data.id);
+        // If there is no tracklist enqueued 
+        // or the queue is empty, return null
+        if(isNull(tracklist) && queue.length <= 0) return null;
+        
+        // Check if tracklist is null, or the queue has more than 0 items
+        // If true, prioritize queue over tracklist
+        if(isNull(tracklist) || queue.length > 0) {
             // Is a single song, so splice it from queue
             const item = queue.splice(0, 1)?.[0];
+            // Remove from registered ids
+            this.enqueuedIds.delete(item?.id);
             // Update queue subject
             this.queueSubject.next(queue);
-            return item;
+            return { isList: false, data: item };
         }
 
-        const tracklist = next.data as SCNGXTracklist;
+        // const tracklist = next.data as SCNGXTracklist;
 
         // Check if tracklist has not ended, if true
         // return, otherwise remove from queue
         if(!tracklist.hasEnded) {
-            return next;
+            return { isList: true, data: tracklist };
         }
 
         // Remove from registered ids
@@ -135,15 +145,18 @@ export class AudioQueue {
 
     public findById(id: string): EnqueuedItem {
         if(!this.isEnqueued(id)) return null;
+        if(this.getEnqueuedTracklist()?.id === id) return { isList: true, data: this.getEnqueuedTracklist() }
         const queue = this.queueSubject.getValue();
-        return queue.find((item) => item.data?.id === id);
+        const item = queue.find((item) => item?.id === id);
+        return !isNull(item) ? { isList: false, data: item } : null;
     }
 
     public getEnqueuedTracklist(): SCNGXTracklist {
-        const queue = this.queueSubject.getValue();
-        const item = queue[Math.max(0, queue.length - 1)];
-        if(isNull(item) || !item.isList) return null;
-        return item.data as SCNGXTracklist;
+        // const queue = this.queueSubject.getValue();
+        // const item = queue[Math.max(0, queue.length - 1)];
+        // if(isNull(item) || !item.isList) return null;
+        // return item.data as SCNGXTracklist;
+        return this.tracklistSubject.getValue();
     }
 
     public isOfTypeList(item: PlayableItem | SCNGXTracklist): boolean {

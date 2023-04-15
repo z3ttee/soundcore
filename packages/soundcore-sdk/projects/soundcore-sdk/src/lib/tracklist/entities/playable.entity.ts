@@ -10,4 +10,5 @@ export enum PlayableEntityType {
 export interface PlayableEntity {
     readonly id: string;
     readonly type: PlayableEntityType;
+    name: string;
 }

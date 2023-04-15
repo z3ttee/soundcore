@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
-import { isNull, isString, randomString, toVoid } from "@soundcore/common";
+import { isNull, toVoid } from "@soundcore/common";
 import { LikedSong, PlayableEntity, PlayableEntityType, PlaylistItem, SCSDKStreamService, Song } from "@soundcore/sdk";
-import { BehaviorSubject, filter, map, Observable, of, switchMap, take, tap } from "rxjs";
+import { BehaviorSubject, distinctUntilChanged, filter, map, Observable, of, switchMap, take, tap } from "rxjs";
 import { ResourceWithTracklist } from "../entities/resource-with-tracklist.entity";
 import { SCNGXTracklist } from "../entities/tracklist.entity";
 import { AudioController } from "./controls.service";
@@ -30,7 +30,7 @@ export class PlayerService {
     /**
      * Observable that emits the currently playing item
      */
-    public readonly $currentItem = this.currentItem.asObservable();
+    public readonly $currentItem = this.currentItem.asObservable().pipe(distinctUntilChanged());
 
     // TODO: Loading should be set every time a new song is loading (should start on next() and end when player gives feedback that the song is actually playing)
     private readonly isLoading: BehaviorSubject<boolean> = new BehaviorSubject(false);
@@ -41,11 +41,14 @@ export class PlayerService {
      * Emits true, if the player is paused
      * Emits false, if the player is playing
      */
-    public readonly $isPaused = this.controls.$isPaused;
+    public readonly $isPaused = this.controls.$isPaused.pipe(distinctUntilChanged());
 
-    public readonly $isMuted = this.controls.$muted;
-    public readonly $volume = this.controls.$volume;
-    public readonly $shuffled = this.controls.$shuffled;
+    public readonly $isMuted = this.controls.$muted.pipe(distinctUntilChanged());
+    public readonly $volume = this.controls.$volume.pipe(distinctUntilChanged());
+    public readonly $shuffled = this.controls.$shuffled.pipe(distinctUntilChanged());
+
+    public readonly $queue = this.queue.$queue.pipe(distinctUntilChanged());
+    public readonly $queueSize = this.$queue.pipe(map(([queue, tracklist]) => (queue?.length ?? 0) + (tracklist?.queue?.length ?? 0)), distinctUntilChanged());
 
     constructor(
         private readonly queue: AudioQueue,
