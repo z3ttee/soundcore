@@ -118,23 +118,10 @@ export class AppPlayerBarComponent implements OnInit, OnDestroy {
 
     public toggleQueue() {
         if(this.router.url.startsWith("/player/queue")) {
-            this.closeQueue();
+            this.location.back();
         } else {
-            this.router.navigate(['/player/queue'], {
-                skipLocationChange: true
-            });
+            this.router.navigate(['/player/queue']);
         }
-    }
-
-    private closeQueue() {
-        const path = this.location.path();
-    
-        if(path.startsWith('/bigpicture')) {
-            this.router.navigate(['/'], { skipLocationChange: false })
-            return;
-        }
-    
-        this.router.navigate([this.location.path()], { skipLocationChange: true })
     }
 
     public toggleMute() {

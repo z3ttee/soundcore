@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component } from "@angular/core";
-import { AudioQueue, EnqueuedItem } from "../../services/queue.service";
-import { PlayerService, Streamable } from "../../services/player.service";
 import { Observable, combineLatest, map } from "rxjs";
+import { PlayerService, Streamable } from "src/app/modules/player/services/player.service";
+import { AudioQueue, EnqueuedItem } from "src/app/modules/player/services/queue.service";
 
 interface QueueViewProps {
     queue?: EnqueuedItem[];

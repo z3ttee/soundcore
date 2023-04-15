@@ -15,17 +15,26 @@ import { NgIconsModule } from "@ng-icons/core";
 import { heroSpeakerWave, heroSpeakerXMark, heroHeart, heroForward, heroRectangleStack, heroArrowsPointingOut } from "@ng-icons/heroicons/outline";
 import { heroHeartSolid, heroPlaySolid, heroPauseSolid } from "@ng-icons/heroicons/solid";
 import { featherShuffle } from "@ng-icons/feather-icons";
-import { QueueViewComponent } from "./views/queue-view/queue-view.component";
 import { SCNGXSongListItemModule } from "src/app/components/list-items/song-list-item/song-list-item.module";
+import { QueueViewComponent } from "./views/queue-view/tabs/queue-view/queue-view.component";
+import { SCNGXTabsModule } from "src/app/components/navigation-tabs";
+import { QueueIndexViewComponent } from "./views/queue-view/index-view.component";
+import { QueueHistoryViewComponent } from "./views/queue-view/tabs/history-view/history-view.component";
+import { EmptyPageBannerModule } from "src/app/components/banners/empty-page-banner";
 
 const routes: Routes = [
-    { path: "queue", component: QueueViewComponent },
+    { path: "queue", component: QueueIndexViewComponent, children: [
+        { path: "", component: QueueViewComponent },
+        { path: "history", component: QueueHistoryViewComponent },
+    ]},
 ]
 
 @NgModule({
     declarations: [
         AppPlayerBarComponent,
-        QueueViewComponent
+        QueueIndexViewComponent,
+        QueueHistoryViewComponent,
+        QueueViewComponent,
     ],
     providers: [],
     imports: [
@@ -45,6 +54,9 @@ const routes: Routes = [
         SCNGXIconBtnModule,
         SCNGXRangeModule,
         SCNGXScrollingModule,
+        SCNGXTabsModule,
+
+        EmptyPageBannerModule,
 
         SCNGXUiTitleModule,
         SCNGXUiRowModule,
