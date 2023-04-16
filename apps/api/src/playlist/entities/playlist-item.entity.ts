@@ -27,4 +27,10 @@ export class PlaylistItem {
     @JoinColumn()
     public playlist: Playlist;
 
+    constructor(song?: Song, playlist?: Playlist, addedBy?: User) {
+        this.song = song;
+        this.playlist = playlist;
+        this.addedBy = addedBy;
+    }
+
 }

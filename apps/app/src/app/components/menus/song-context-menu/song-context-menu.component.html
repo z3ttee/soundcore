@@ -9,25 +9,25 @@
     </sccdk-context-menu-category>
     <scngx-divider></scngx-divider>
     <sccdk-context-menu-category>
-        <sccdk-context-menu-item (click)="enqueueNext(true)">
-            <ng-icon name="heroPlaySolid" class="h-5 w-5"></ng-icon>
+        <sccdk-context-menu-item (click)="forcePlay()">
+            <ng-icon name="heroPlaySolid" size="21"></ng-icon>
             <span>Abspielen</span>
         </sccdk-context-menu-item>
-        <sccdk-context-menu-item (click)="enqueueNext()">
-            <ng-icon name="heroRectangleStack" class="h-5 w-5"></ng-icon>
+        <sccdk-context-menu-item (click)="playNext()">
+            <ng-icon name="heroRectangleStack" size="21"></ng-icon>
             <span>Zur Warteschlange hinzufügen</span>
         </sccdk-context-menu-item>
     </sccdk-context-menu-category>
     <scngx-divider></scngx-divider>
     <sccdk-context-menu-category>
         <sccdk-context-menu-item (click)="openChoosePlaylistDialog()">
-            <ng-icon name="heroSquaresPlus" class="h-5 w-5"></ng-icon>
-            <span>{{ !playlist ? "Zu Playlist hinzufügen": "Zu anderer Playlist hinzufügen" }}</span>
+            <ng-icon name="heroSquaresPlus" size="21"></ng-icon>
+            <span>{{ "Zu Playlist hinzufügen" }}</span>
         </sccdk-context-menu-item>
-        <sccdk-context-menu-item (click)="removeFromPlaylist()" *ngIf="playlist">
-            <ng-icon name="heroMinusSolid" class="h-5 w-5"></ng-icon>
+        <!-- <sccdk-context-menu-item (click)="removeFromPlaylist()" *ngIf="playlist">
+            <ng-icon name="heroMinusSolid" size="21"></ng-icon>
             <span>Aus Playlist entfernen</span>
-        </sccdk-context-menu-item>
+        </sccdk-context-menu-item> -->
     </sccdk-context-menu-category>
     <scngx-divider></scngx-divider>
     <sccdk-context-menu-category *ngIf="$isAdmin | async">
@@ -35,10 +35,10 @@
             <!-- <hero-icon name="minus" [class]="'h-5 w-5'"></hero-icon> -->
             <span>Verwalten</span>
         </sccdk-context-menu-item>
-        <sccdk-context-menu-item (click)="toggleLikeForSong()">
-            <ng-icon name="heroHeart" class="h-5 w-5"></ng-icon>
+        <!-- <sccdk-context-menu-item (click)="toggleLikeForSong()">
+            <ng-icon name="heroHeart" size="21"></ng-icon>
             <span>Zu Lieblingssongs hinzufügen</span>
-        </sccdk-context-menu-item>
+        </sccdk-context-menu-item> -->
     </sccdk-context-menu-category>
     <ng-content></ng-content>
 </sccdk-context-menu>

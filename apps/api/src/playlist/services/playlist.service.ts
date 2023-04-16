@@ -235,16 +235,18 @@ export class PlaylistService {
      * @param requester The user requesting the operation. Used to check if the user is allowed to add songs
      * @returns 
      */
-    public async addSong(playlistId: string, addSongDto: AddSongDTO, authentication: User): Promise<PlaylistItemAddResult> {       
-        // Check if user could theoretically access the playlist.
-        if(!await this.hasUserAccessToPlaylist(playlistId, authentication)) {
-            throw new NotFoundException("Playlist not found")
-        }
+    public async addSong(playlistId: string, addSongDto: AddSongDTO, authentication: User): Promise<PlaylistItemAddResult> {    
+        // Find playlist but user must be author
+        const playlist = await this.playlistRepository.createQueryBuilder("playlist")
+            .leftJoin("playlist.author", "author")
+            .where("author.id = :userId AND (playlist.id = :playlistId OR playlist.slug = :playlistId)", { 
+                userId: authentication.id,
+                playlistId: playlistId 
+            })
+            .getOne();
 
-        // Check if the playlist object
-        // exists in the database
-        const playlist: Playlist = await this.findById(playlistId);
-        if(!playlist) throw new NotFoundException("Playlist not found");    
+        // Return 404 is playlist is null
+        if(isNull(playlist)) throw new NotFoundException("Playlist not found");    
 
         const targetId = addSongDto.targetSongId;
 
@@ -254,16 +256,17 @@ export class PlaylistService {
             return new PlaylistItemAddResult(targetId, true, PlaylistAddSongFailReason.DUPLICATE);
         }
 
+        // Create song object
+        const song = { id: targetId } as Song;
+        // Create addedBy object
+        const addedBy = { id: authentication.id } as User;
         // Create new item object
-        const item = new PlaylistItem();
-        item.song = { id: targetId } as Song;
-        item.playlist = { id: playlist.id } as Playlist;
-        item.addedBy = { id: authentication.id } as User;
+        const item = new PlaylistItem(song, playlist, addedBy);
 
         // Save the relation
         return this.song2playlistRepository.save(item).then(() => {
             return new PlaylistItemAddResult(targetId, false);
-        })
+        });
     }
 
     public async setSongs(playlistId: string, songs: Song[], authentication: User) {

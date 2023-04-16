@@ -88,6 +88,9 @@ export class PlayerService {
 
                 // Otherwise enqueue entity
                 const result = this.queue.enqueue(entity as PlayableItem);
+
+                console.log(result);
+
                 // Play next
                 return of(result != -1);
             })
@@ -133,6 +136,8 @@ export class PlayerService {
      * @returns Position in queue (-1 if the tracklist is currently playing and therefor paused state changed)
      */
     public forcePlay(entity: PlayableEntity): Observable<void> {
+        console.log(entity);
+
         // If is song, always enqueue
         if(entity.type === PlayableEntityType.SONG) {
             return this.toggleIfActive(entity).pipe(
@@ -391,7 +396,7 @@ export class PlayerService {
                 // Request stream url
                 return this.streamService.requestStreamUrl(item.id, true).pipe(tap((url) => {
                     // Update current item
-                    this.setCurrentItem(item, url, tracklist.id, );
+                    this.setCurrentItem(item, url, tracklist?.id);
                 }));
             }),
             // Start playing the item

@@ -1,10 +1,12 @@
-import { ChangeDetectionStrategy, Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { SSOService } from '@soundcore/sso';
 import { Observable, Subject, takeUntil } from 'rxjs';
-import { SCNGXDialogService, SCNGXTracklist } from '@soundcore/ngx';
-import { MeiliSong, Playlist, PlaylistAddSongFailReason, SCSDKLikeService, SCSDKPlaylistService, Song } from '@soundcore/sdk';
+import { SCNGXDialogService } from '@soundcore/ngx';
+import { PlayableEntity, PlayableEntityType, Playlist, PlaylistAddSongFailReason, SCSDKLikeService, SCSDKPlaylistService, Song } from '@soundcore/sdk';
 import { AppPlaylistChooseDialog } from 'src/app/dialogs/playlist-choose-dialog/playlist-choose-dialog.component';
+import { PlayerService } from 'src/app/modules/player/services/player.service';
+import { isNull } from '@soundcore/common';
 
 @Component({
   selector: 'app-song-context-menu',
@@ -14,22 +16,18 @@ import { AppPlaylistChooseDialog } from 'src/app/dialogs/playlist-choose-dialog/
 })
 export class SongContextMenuComponent implements OnInit, OnDestroy {
 
-  @Input() public song: Song | MeiliSong
-  @Input() public playlist: Playlist;
-
-  /**
-   * Specify the tracklist the song belongs to.
-   * This changes the behaviour of some context menu items
-   */
-  @Input() public tracklist: SCNGXTracklist;
+  @Input() public song: Song;
+  @Input() public owner: PlayableEntity;
+  @Input() public index: number;
 
   constructor(
     private readonly authService: SSOService,
     private readonly playlistService: SCSDKPlaylistService,
     private readonly dialog: SCNGXDialogService,
     private readonly snackbar: MatSnackBar,
-    // private readonly playerService: AppPlayerService,
-    private readonly likeService: SCSDKLikeService
+    private readonly player: PlayerService,
+    private readonly likeService: SCSDKLikeService,
+    private readonly cdr: ChangeDetectorRef
   ) { }
 
   private readonly _destroy: Subject<void> = new Subject();
@@ -87,13 +85,17 @@ export class SongContextMenuComponent implements OnInit, OnDestroy {
    * Request the playerService to play the song
    * next by adding it to the queue
    */
-  public enqueueNext(forcePlay: boolean = false) {
-    if(typeof this.tracklist === "undefined" || this.tracklist == null) {
-      // this.playerService.playSingle(this.song as Song, forcePlay);
+  public playNext() {
+    this.player.playNext(this.song).subscribe();
+  }
+
+  public forcePlay() {
+    if(isNull(this.owner) || this.owner.type === PlayableEntityType.SONG) {
+      this.player.forcePlay(this.song).subscribe();
       return;
     }
 
-    // this.playerService.playSingleFromTracklist(this.song as Song, this.tracklist, forcePlay);
+    this.player.forcePlayAt(this.owner, this.index, this.song.id).subscribe();
   }
 
   public removeFromPlaylist() {
@@ -103,12 +105,8 @@ export class SongContextMenuComponent implements OnInit, OnDestroy {
   public toggleLikeForSong() {
     const song = this.song as Song;
 
-    console.log(song)
-
-
     if(!this.song) return;
     this.likeService.toggleLikeForSong(song).subscribe((request) => {
-      console.log(request)
       if(request.loading) return;
       if(request.error) {
         this.snackbar.open("Ein Fehler ist aufgetreten.", null, { duration: 3000 });
@@ -116,6 +114,7 @@ export class SongContextMenuComponent implements OnInit, OnDestroy {
       }
 
       song.liked = request.data.isLiked ?? song.liked;
+      this.cdr.detectChanges();
 
       if(song.liked) {
         this.snackbar.open(`Song zu Lieblingssongs hinzugefügt.`, null, { duration: 3000 });

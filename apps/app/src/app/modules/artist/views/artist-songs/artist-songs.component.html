@@ -41,7 +41,9 @@
                         [active]="props.currentItemId === item?.id && props.isTracklistActive"
                         [playing]="props.isPlaying"
                         [animRef]="lottieAnimationTemplate"
-                        (onPlay)="forcePlayAt(props.artist.data, i, item.id)">
+                        (onPlay)="forcePlayAt(props.artist.data, i, item.id)"
+                        [sccdkContext]="songContextMenu"
+                        [sccdkContextData]="{song: item, index: i, owner: props.artist.data}">
                     </scngx-song-list-item>
                 </div>
                 <div class="pb-bottom"></div>
@@ -55,5 +57,5 @@
 </ng-template>
 
 <ng-template #songContextMenu let-data>
-    <app-song-context-menu [song]="data.song" [playlist]="data.playlist" [tracklist]="data.tracklist"></app-song-context-menu>
+    <app-song-context-menu [song]="data.song" [owner]="data.owner" [index]="data.index"></app-song-context-menu>
 </ng-template>
