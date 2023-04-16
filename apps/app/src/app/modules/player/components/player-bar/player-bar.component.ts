@@ -49,7 +49,7 @@ export class AppPlayerBarComponent implements OnInit, OnDestroy {
         this.playerService.$isMuted,
     ]).pipe(
         map(([currentItem, isPaused, isShuffled, volume, isMuted]): PlayerbarProps => ({
-            song: currentItem?.song ?? currentItem as Song,
+            song: currentItem,
             isPaused: isPaused,
             isShuffled: isShuffled,
             volume: volume,

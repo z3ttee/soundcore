@@ -1,14 +1,15 @@
 import { ChangeDetectionStrategy, Component, OnDestroy } from "@angular/core";
+import { Song } from "@soundcore/sdk";
 import { Observable, Subject, combineLatest, map, takeUntil } from "rxjs";
 import { AUDIOWAVE_LOTTIE_OPTIONS } from "src/app/constants";
 import { SCNGXTracklist } from "src/app/modules/player/entities/tracklist.entity";
-import { PlayableItem, PlayerService, Streamable } from "src/app/modules/player/services/player.service";
+import { PlayerService, Streamable } from "src/app/modules/player/services/player.service";
 import { AudioQueue } from "src/app/modules/player/services/queue.service";
 
 interface QueueViewProps {
-    tracks?: PlayableItem[];
+    tracks?: Song[];
     enqueuedTracklist?: SCNGXTracklist;
-    tracklistQueue?: PlayableItem[];
+    tracklistQueue?: Song[];
 
     current?: Streamable;
     isPlaying?: boolean;

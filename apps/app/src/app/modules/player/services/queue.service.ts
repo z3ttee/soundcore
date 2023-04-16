@@ -58,14 +58,6 @@ export class AudioQueue {
 
         // Do not enqueue tracklists twice
         if(tracklist?.id === resource.id) return -1;
-
-
-        // if(!isNull(tracklist) && tracklist.isList) {
-        //     this.enqueuedIds.delete(tracklist.data?.id);
-        //     (tracklist.data as SCNGXTracklist)?.release();
-        // }
-
-        // queue[index] = { isList: true, data: resource };
         // Register id as enqueued
         this.enqueuedIds.set(resource.id, true);
         // Update tracklist subject
@@ -74,6 +66,16 @@ export class AudioQueue {
     }
 
     public dequeue(): EnqueuedItem {
+        return this.recursiveDequeue(0);
+    }
+
+    private recursiveDequeue(currentDepth?: number): EnqueuedItem {
+        // Cancel recursion to not go deeper than 1 loop
+        // This was implemented because during development it happened
+        // that tracklist were not successfully dequeued, when this got fixed
+        // this maximum depth mechanism was introduced for the worst case scenario
+        if(currentDepth >= 1) return null;
+
         const tracklist = this.getEnqueuedTracklist();
         const queue = this.queueSubject.getValue();
         // If there is no tracklist enqueued 
@@ -92,24 +94,25 @@ export class AudioQueue {
             return { isList: false, data: item };
         }
 
-        // const tracklist = next.data as SCNGXTracklist;
-
         // Check if tracklist has not ended, if true
         // return, otherwise remove from queue
-        if(!tracklist.hasEnded) {
-            return { isList: true, data: tracklist };
+        if(tracklist.hasEnded) {
+            // Remove from registered ids
+            this.enqueuedIds.delete(tracklist.id);
+            // Release tracklist resources
+            tracklist.release();
+            // Remove from queue
+            queue.shift();
+            // Update queue subject
+            this.queueSubject.next(queue);
+            return this.recursiveDequeue(1);
         }
 
-        // Remove from registered ids
-        this.enqueuedIds.delete(tracklist.id);
-        // Release tracklist resources
-        tracklist.release();
-        // Remove from queue
-        queue.shift();
-        // Update queue subject
-        this.queueSubject.next(queue);
+        return { isList: true, data: tracklist };
+
+        
         // Return new dequeue attempt
-        return this.dequeue();
+        // return this.dequeue();
     }
 
     /**

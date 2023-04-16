@@ -2,7 +2,6 @@ import { Injectable } from "@angular/core";
 import { isNull, toVoid } from "@soundcore/common";
 import { LikedSong, PlayableEntity, PlayableEntityType, PlaylistItem, SCSDKStreamService, Song } from "@soundcore/sdk";
 import { BehaviorSubject, distinctUntilChanged, filter, map, Observable, of, switchMap, take, tap } from "rxjs";
-import { ResourceWithTracklist } from "../entities/resource-with-tracklist.entity";
 import { SCNGXTracklist } from "../entities/tracklist.entity";
 import { AudioController } from "./controls.service";
 import { AudioQueue } from "./queue.service";
@@ -11,7 +10,7 @@ import { HttpClient } from "@angular/common/http";
 
 export type PlayableItem = Song & PlaylistItem & LikedSong
 
-export type Streamable = PlayableItem & {
+export type Streamable = Song & {
     url: string;
     tracklistId?: string;
     tracklistIndex?: number;
@@ -78,24 +77,53 @@ export class PlayerService {
      * @param entity Entity (e.g. Album) to play
      * @param tracklist Tracklist that belongs to that entity
      * @param startIndex Index to start at. Defaults to 0
-     * @returns Position in queue (-1 if the tracklist is currently playing and therefor paused state changed)
+     * @returns True, if the entity was enqueued, otherwise false
      */
-    public playNext(entity: any, tracklist: SCNGXTracklist, startIndex: number = 0): Observable<number> {
-        return this.toggleIfActive(tracklist).pipe(
+    public playNext(entity: PlayableEntity): Observable<boolean> {
+        return this.toggleIfActive(entity).pipe(
             switchMap((isActive) => {
-                if(isActive) return of(-1);
+                // If entity is already playing, the playback state just changed
+                // and nothing needs to be done
+                if(isActive) return of(false);
 
-                const resource: ResourceWithTracklist<PlayableItem> = {
-                    ...entity,
-                    tracklist: tracklist,
-                    startIndex: startIndex
-                }
-        
-                const positionInQueue = this.queue.enqueue(resource);
-                // TODO: Need a method to dequeue an item at index "startIndex" and play it here immediately
-                return (this.isIdle ? this.next() : of()).pipe(map(() => positionInQueue));
-            }),
+                // Otherwise enqueue entity
+                const result = this.queue.enqueue(entity as PlayableItem);
+                // Play next
+                return of(result != -1);
+            })
         );
+
+        // // If is song, always enqueue
+        // if(entity.type === PlayableEntityType.SONG) {
+        //     return this.toggleIfActive(entity).pipe(
+        //         switchMap((isActive) => {
+        //             // If entity is already playing, the playback state just changed
+        //             // and nothing needs to be done
+        //             if(isActive) return of(null);
+
+        //             // Otherwise enqueue entity as song
+        //             this.queue.enqueue(entity as PlayableItem);
+        //             // Play next
+        //             return of(null);
+        //         }),
+        //         toVoid()
+        //     );
+        // }
+        
+        // return this.toggleIfActive(tracklist).pipe(
+        //     switchMap((isActive) => {
+        //         if(isActive) return of(-1);
+
+        //         const resource: ResourceWithTracklist<PlayableItem> = {
+        //             ...entity,
+        //             tracklist: tracklist,
+        //         }
+        
+        //         const positionInQueue = this.queue.enqueue(resource);
+        //         // TODO: Need a method to dequeue an item at index "startIndex" and play it here immediately
+        //         return (this.isIdle ? this.next() : of()).pipe(map(() => positionInQueue));
+        //     }),
+        // );
     }
 
     /**
@@ -301,10 +329,8 @@ export class PlayerService {
                     return this.togglePlaying().pipe(map(() => null));
                 }
 
-                // Extract correct song object from item
-                const song = item.song ?? item as Song;
                 // Request stream url
-                return this.streamService.requestStreamUrl(song.id, true).pipe(tap((url) => {
+                return this.streamService.requestStreamUrl(item.id, true).pipe(tap((url) => {
                     // Update current item
                     this.setCurrentItem(item, url, tracklist.id);
                 }));
@@ -322,7 +348,7 @@ export class PlayerService {
     }
 
     private next(): Observable<string> {
-        return new Observable<[PlayableItem, SCNGXTracklist]>((subscriber) => {
+        return new Observable<[Song, SCNGXTracklist]>((subscriber) => {
             // Dequeue next item from queue
             const nextItem = this.queue.dequeue();
 
@@ -362,10 +388,8 @@ export class PlayerService {
                     return of(null);
                 }
 
-                // Extract correct song object from item
-                const song = item.song ?? item as Song;
                 // Request stream url
-                return this.streamService.requestStreamUrl(song.id, true).pipe(tap((url) => {
+                return this.streamService.requestStreamUrl(item.id, true).pipe(tap((url) => {
                     // Update current item
                     this.setCurrentItem(item, url, tracklist.id, );
                 }));
@@ -390,7 +414,7 @@ export class PlayerService {
      * @param tracklistId Tracklist instance id that is playing
      * @param tracklistIndex Index in tracklist
      */
-    private setCurrentItem(item: PlayableItem, url: string, tracklistId?: string, tracklistIndex?: number) {
+    private setCurrentItem(item: Song, url: string, tracklistId?: string, tracklistIndex?: number) {
         this.currentItem.next({ 
             ...item, 
             url: url,
