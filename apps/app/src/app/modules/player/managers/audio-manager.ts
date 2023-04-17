@@ -59,8 +59,19 @@ export class AudioManager {
         return this._mode === AudioManagerMode.HLS;
     }
 
+    /**
+     * Get instance of the HTML5 Audio element
+     */
     public get audioElement() {
         return this._audio;
+    }
+
+    /**
+     * Seek on the track
+     * @param seconds Second to seek
+     */
+    public seek(seconds: number) {
+        this._audio.currentTime = seconds;
     }
 
     public play(url: string): Observable<string> {

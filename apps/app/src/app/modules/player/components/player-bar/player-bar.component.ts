@@ -81,7 +81,7 @@ export class AppPlayerBarComponent implements OnInit, OnDestroy {
     }
 
     public onSeek(value: number) {
-        // this.controls.seek(value);
+        this.playerService.seek(value);
     }
 
     public toggleLike(event: MouseEvent, song: Song) {

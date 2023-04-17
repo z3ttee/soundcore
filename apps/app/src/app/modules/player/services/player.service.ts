@@ -78,6 +78,14 @@ export class PlayerService {
     }
 
     /**
+     * Seek on the track
+     * @param seconds Second to seek
+     */
+    public seek(seconds: number) {
+        this.audioManager.seek(seconds);
+    }
+
+    /**
      * Add an entity to the queue. Playback will start if the audio element asks for 
      * new track or if the queue is currently empty
      * @param entity Entity (e.g. Album) to play
