@@ -1,5 +1,5 @@
 import { isNull } from "@soundcore/common";
-import { BehaviorSubject, combineLatest, debounceTime, map, skip } from "rxjs";
+import { BehaviorSubject, combineLatest, debounceTime, distinctUntilChanged, map, skip } from "rxjs";
 import { DEFAULT_VOLUME, LOCALSTORAGE_KEY_VOLUME } from "src/app/constants";
 
 export class VolumeManager {
@@ -8,11 +8,17 @@ export class VolumeManager {
     private readonly volume: BehaviorSubject<number> = new BehaviorSubject(this.read());
     private readonly mute: BehaviorSubject<boolean> = new BehaviorSubject(false);
 
-    public readonly $volume = this.volume.asObservable().pipe(map((val) => val * 100));
+    public readonly $volume = this.volume.asObservable().pipe(
+        map((val) => val * 100),
+        distinctUntilChanged()
+    );
     public readonly $muted = combineLatest([
         this.volume.asObservable(),
         this.mute.asObservable()
-    ]).pipe(map(([volume, isMuted]) => volume <= 0 || isMuted))
+    ]).pipe(
+        map(([volume, isMuted]) => volume <= 0 || isMuted), 
+        distinctUntilChanged()
+    )
     
     constructor(
         private readonly audio: HTMLAudioElement,

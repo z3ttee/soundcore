@@ -3,11 +3,12 @@ import { isNull, toVoid } from "@soundcore/common";
 import { LikedSong, PlayableEntity, PlayableEntityType, PlaylistItem, SCSDKStreamService, Song } from "@soundcore/sdk";
 import { BehaviorSubject, distinctUntilChanged, filter, map, Observable, of, switchMap, take, tap } from "rxjs";
 import { SCNGXTracklist } from "../entities/tracklist.entity";
-import { AudioController } from "./controls.service";
 import { AudioQueue } from "./queue.service";
 import { environment } from "src/environments/environment";
 import { HttpClient } from "@angular/common/http";
-import { AudioManager } from "../managers/audio-manager";
+import { AudioManager, AudioManagerMode } from "../managers/audio-manager";
+import { VolumeManager } from "../managers/volume-manager";
+import { ShuffleManager } from "../managers/shuffle-manager";
 
 export type PlayableItem = Song & PlaylistItem & LikedSong
 
@@ -21,6 +22,10 @@ export type Streamable = Song & {
     providedIn: "root"
 })
 export class PlayerService {
+
+    private readonly audioManager = new AudioManager(AudioManagerMode.HTML5);
+    private readonly volumeManager = new VolumeManager(this.audioManager.audioElement);
+    private readonly shuffleManager = new ShuffleManager();
 
     /**
      * Subject used to control the $currentItem observable.
@@ -41,28 +46,25 @@ export class PlayerService {
      * Emits true, if the player is paused
      * Emits false, if the player is playing
      */
-    public readonly $isPaused = this.controls.$isPaused.pipe(distinctUntilChanged());
+    public readonly $isPaused = this.audioManager.$isPaused;
+    public readonly $currentTime = this.audioManager.$currenTime;
 
-    public readonly $isMuted = this.controls.$muted.pipe(distinctUntilChanged());
-    public readonly $volume = this.controls.$volume.pipe(distinctUntilChanged());
-    public readonly $shuffled = this.controls.$shuffled.pipe(distinctUntilChanged());
-    public readonly $currentTime = this.controls.$currenTime.pipe(distinctUntilChanged());
+    public readonly $volume = this.volumeManager.$volume;
+    public readonly $isMuted = this.volumeManager.$muted;
+    public readonly $shuffled = this.shuffleManager.$shuffled;
 
     public readonly $queue = this.queue.$queue.pipe(distinctUntilChanged());
     public readonly $queueSize = this.$queue.pipe(map(([queue, tracklist]) => (queue?.length ?? 0) + (tracklist?.queue?.length ?? 0)), distinctUntilChanged());
 
-    private readonly audioManager = new AudioManager();
-
     constructor(
         private readonly queue: AudioQueue,
-        private readonly controls: AudioController,
         private readonly streamService: SCSDKStreamService,
         private readonly httpClient: HttpClient
     ) {
         // Handle ended event on audio element
-        this.controls.$onEnded.pipe(switchMap(() => this.next())).subscribe();
+        this.audioManager.$onEnded.pipe(switchMap(() => this.next())).subscribe();
         // Subscribe to shuffle state changes and forward to queue
-        this.controls.$shuffled.subscribe((shuffled) => this.queue.setShuffled(shuffled));
+        this.shuffleManager.$shuffled.subscribe((shuffled) => this.queue.setShuffled(shuffled));
     }
 
     /**
@@ -72,7 +74,7 @@ export class PlayerService {
      * @returns State after switching shuffle mode. True, if shuffle is now on, false if shuffle was turned off
      */
     public toggleShuffle() {
-        this.controls.toggleShuffle();
+        this.shuffleManager.toggleShuffled();
     }
 
     /**
@@ -166,7 +168,7 @@ export class PlayerService {
                 // and nothing needs to be done
                 if(isActive) return of(null);
 
-                return SCNGXTracklist.create(entity, `${environment.api_base_uri}`, this.httpClient, this.controls.shuffled).pipe(
+                return SCNGXTracklist.create(entity, `${environment.api_base_uri}`, this.httpClient, this.shuffleManager.isShuffled).pipe(
                     filter(({loading}) => !loading),
                     switchMap((request) => {
                         const data = request.data;
@@ -209,7 +211,7 @@ export class PlayerService {
                 const tracklistId = entity.id;
                 // Extract enqueue status of tracklistId
                 const isEnqueued = this.queue.isEnqueued(tracklistId);
-                const isShuffled = this.controls.shuffled;
+                const isShuffled = this.shuffleManager.isShuffled;
 
                 // Check if is already enqueued
                 if(isEnqueued) {
@@ -224,9 +226,9 @@ export class PlayerService {
 
                     // Restart tracklist using indexAt
                     if(isShuffled) {
-                        tracklistRequest = enqueuedTracklist.restart(itemId, this.controls.shuffled);
+                        tracklistRequest = enqueuedTracklist.restart(itemId, this.shuffleManager.isShuffled);
                     } else {
-                        tracklistRequest = enqueuedTracklist.restart(indexAt, this.controls.shuffled);
+                        tracklistRequest = enqueuedTracklist.restart(indexAt, this.shuffleManager.isShuffled);
                     }
                 } else {
                     // Otherwise create new tracklist
@@ -269,15 +271,15 @@ export class PlayerService {
      * @returns rue, if the player is now playing. Otherwise false
      */
     public togglePlaying(): Observable<boolean> {
-        return of(this.controls.togglePlaying());
-    }
-
-    public setVolume(volume: number) {
-        this.controls.setVolume(volume);
+        return this.audioManager.togglePlaying();
     }
 
     public toggleMute() {
-        this.controls.toggleMute();
+        this.volumeManager.toggleMute();
+    }
+
+    public setVolume(volume: number): void {
+        this.volumeManager.setVolume(volume);
     }
 
     /**
@@ -334,7 +336,7 @@ export class PlayerService {
                 // If the resource is null, the queue is completely empty
                 if(isNull(nextItem)) {
                     // Because this could mean a skip is tried, just skip to end of current song
-                    this.controls.resetCurrentlyPlaying(true);
+                    this.audioManager.resetCurrentlyPlaying(true);
                     subscriber.next([null, null]);
                     subscriber.complete();
                     return;
@@ -380,7 +382,7 @@ export class PlayerService {
                 // So we have to skip to the end of the track and let it start
                 // from beginning if play is hit
                 if(isNull(item)) {
-                    this.controls.resetCurrentlyPlaying(true);
+                    this.audioManager.resetCurrentlyPlaying(true);
                     return of(null);
                 }
 

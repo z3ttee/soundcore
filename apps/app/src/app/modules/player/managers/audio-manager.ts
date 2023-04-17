@@ -1,6 +1,6 @@
 import { isNull } from "@soundcore/common";
 import Hls from "hls.js";
-import { BehaviorSubject, Observable, distinctUntilChanged, from, map, of, switchMap } from "rxjs";
+import { BehaviorSubject, Observable, Subject, distinctUntilChanged, from, map, of, switchMap } from "rxjs";
 
 export enum AudioManagerMode {
     HLS = "hls",
@@ -27,12 +27,20 @@ export class AudioManager {
      */
     public readonly $ready = this._readySubject.asObservable().pipe(distinctUntilChanged());
     
-    private _$onEnded: Observable<void>;
+    private readonly onEnded: Subject<void> = new Subject();
+    public readonly $onEnded = this.onEnded.asObservable();
+
+    private readonly isPaused: BehaviorSubject<boolean> = new BehaviorSubject(true);
+    public readonly $isPaused = this.isPaused.asObservable().pipe(distinctUntilChanged());
+
+    private readonly currenTime: BehaviorSubject<number> = new BehaviorSubject(0);
+    public readonly $currenTime = this.currenTime.asObservable().pipe(distinctUntilChanged());
 
     private _mode: AudioManagerMode = AudioManagerMode.HTML5;
 
     constructor(forceMode?: AudioManagerMode) {
         this.initialize(forceMode);
+        this.registerEvents();
     }
 
     /**
@@ -51,6 +59,10 @@ export class AudioManager {
         return this._mode === AudioManagerMode.HLS;
     }
 
+    public get audioElement() {
+        return this._audio;
+    }
+
     public play(url: string): Observable<string> {
         return of(url).pipe(
             switchMap((url) => {
@@ -65,6 +77,38 @@ export class AudioManager {
                 return this.playHLS(url).pipe(map(() => url));
             })
         );
+    }
+
+    /**
+     * Toggle playing or paused state
+     * @returns True, if the player is now playing. Otherwise false
+     */
+    public togglePlaying(): Observable<boolean> {
+        return new Observable((subscriber) => {
+            if(!this._audio.paused) {
+                this._audio.pause();
+
+                subscriber.next(false);
+                subscriber.complete();
+            } else {
+                this._audio.play().finally(() => {
+                    subscriber.next(true);
+                    subscriber.complete();
+                });
+            }
+        })
+    }
+
+    /**
+     * Reset the player's currentTime to 0 and optionally
+     * pause the playback.
+     * @param pause Optionally pause the playback. Defaults to false
+     */
+    public resetCurrentlyPlaying(pause: boolean = false) {
+        this._audio.currentTime = 0;
+        if(pause) {
+            this._audio.pause();
+        }
     }
 
     private playHLS(manifestUrl: string): Observable<any> {
@@ -83,8 +127,22 @@ export class AudioManager {
         this._readySubject.next(false);
         // Create HTML5 audio element
         this._audio = new Audio();
-        // Set playback mode
-        this._mode = forceMode ?? (Hls.isSupported() ? AudioManagerMode.HLS : AudioManagerMode.HTML5);
+
+        // Check if a mode is force
+        if(isNull(forceMode)) {
+            // If true,
+            // Set playback mode based on
+            // if HLS streaming is supported
+            if(Hls.isSupported()) {
+                this._mode =AudioManagerMode.HLS;
+            } else {
+                console.warn(`[${this.LABEL}] Browser does not support HLS for media streaming. Setting mode to '${this._mode.toUpperCase()}'`);
+                this._mode = AudioManagerMode.HTML5;
+            }
+        } else {
+            // Otherwise set mode to forced mode
+            this._mode = forceMode;
+        }
 
         if(this.isHLS) {
             // Create HLS instance
@@ -99,9 +157,15 @@ export class AudioManager {
             // Attach hls instance to HTML5 Audio element
             this._hls.attachMedia(this._audio);
         } else {
-            console.warn(`[${this.LABEL}] Browser does not support HLS for media streaming. Setting mode to '${this._mode.toUpperCase()}'`);
             this.handleInitializedEvent();
         }
+    }
+
+    private registerEvents() {
+        this._audio.onended = () => this.onEnded.next();
+        this._audio.onplaying = () => this.isPaused.next(false);
+        this._audio.onpause = () => this.isPaused.next(true);
+        this._audio.ontimeupdate = () => this.currenTime.next(this._audio.currentTime)
     }
 
     /**

@@ -41,6 +41,8 @@ export class AppPlayerBarComponent implements OnInit, OnDestroy {
         private readonly location: Location,
     ) {}
 
+    // public $currentTime: Observable<number> = this.playerService.
+
     public $props: Observable<PlayerbarProps> = combineLatest([
         this.playerService.$currentItem,
         this.playerService.$isPaused,

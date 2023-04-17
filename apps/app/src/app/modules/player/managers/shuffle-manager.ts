@@ -1,10 +1,10 @@
 import { isNull } from "@soundcore/common";
-import { BehaviorSubject, debounceTime } from "rxjs";
+import { BehaviorSubject, debounceTime, distinctUntilChanged } from "rxjs";
 import { DEFAULT_SHUFFLED, LOCALSTORAGE_KEY_SHUFFLED } from "src/app/constants";
 
 export class ShuffleManager {
     private readonly shuffled: BehaviorSubject<boolean> = new BehaviorSubject(this.read());
-    public readonly $shuffled = this.shuffled.asObservable();
+    public readonly $shuffled = this.shuffled.asObservable().pipe(distinctUntilChanged());
     
     constructor(
         private readonly defaultShuffled: boolean = DEFAULT_SHUFFLED
