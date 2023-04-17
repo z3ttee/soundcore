@@ -23,7 +23,7 @@ export type Streamable = Song & {
 })
 export class PlayerService {
 
-    private readonly audioManager = new AudioManager(AudioManagerMode.HTML5);
+    private readonly audioManager = new AudioManager();
     private readonly volumeManager = new VolumeManager(this.audioManager.audioElement);
     private readonly shuffleManager = new ShuffleManager();
 

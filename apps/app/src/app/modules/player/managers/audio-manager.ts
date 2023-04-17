@@ -1,5 +1,5 @@
 import { isNull } from "@soundcore/common";
-import Hls from "hls.js";
+import Hls, { ManifestParsedData } from "hls.js";
 import { BehaviorSubject, Observable, Subject, distinctUntilChanged, from, map, of, switchMap } from "rxjs";
 
 export enum AudioManagerMode {
@@ -78,16 +78,20 @@ export class AudioManager {
         return of(url).pipe(
             switchMap((url) => {
                 // Check if mode is not HLS
-                if(!this.isHLS) {
+                if(!this.isHLS || !this.isM3u8Url(url)) {
                     // If true, play audio normally 
                     // via HTML5 audio
                     this._audio.src = url;
                     return from(this._audio.play()).pipe(map(() => url));
                 }
                 
-                return this.playHLS(url).pipe(map(() => url));
+                return this.playHLS(url);
             })
         );
+    }
+
+    private isM3u8Url(url: string): boolean {
+        return new URL(url).pathname.includes(".m3u8");
     }
 
     /**
@@ -122,11 +126,13 @@ export class AudioManager {
         }
     }
 
-    private playHLS(manifestUrl: string): Observable<any> {
+    private playHLS(manifestUrl: string): Observable<string> {
         return new Observable((subscriber) => {
             console.log("play ", manifestUrl);
 
-            subscriber.next();
+            this._hls.loadSource(manifestUrl);
+
+            subscriber.next(manifestUrl);
             subscriber.complete();
         });
     }
@@ -176,7 +182,30 @@ export class AudioManager {
         this._audio.onended = () => this.onEnded.next();
         this._audio.onplaying = () => this.isPaused.next(false);
         this._audio.onpause = () => this.isPaused.next(true);
-        this._audio.ontimeupdate = () => this.currenTime.next(this._audio.currentTime)
+        this._audio.ontimeupdate = () => this.currenTime.next(this._audio.currentTime);
+
+        this._hls.on(Hls.Events.MANIFEST_PARSED, (_, data) => this.handleManifestParsedEvent(data));
+
+        this._hls.on(Hls.Events.ERROR, function (event, data) {
+            if (data.fatal) {
+                switch (data.type) {
+                    case Hls.ErrorTypes.NETWORK_ERROR:
+                    // try to recover network error
+                    console.log('fatal network error encountered, try to recover');
+                    this._hls.startLoad();
+                    break;
+                    case Hls.ErrorTypes.MEDIA_ERROR:
+                    console.log('fatal media error encountered, try to recover');
+                    this._hls.recoverMediaError();
+                    break;
+                    default:
+                    // cannot recover
+                    this._hls.destroy();
+                    console.log("unrecoverable error");
+                    break;
+                }
+            }
+        });
     }
 
     /**
@@ -186,6 +215,10 @@ export class AudioManager {
     private handleInitializedEvent() {
         console.log(`[${this.LABEL}] Audio Player initialized. Running in '${this._mode.toUpperCase()}' mode`);
         this._readySubject.next(true);
+    }
+
+    private handleManifestParsedEvent(data: ManifestParsedData) {
+        console.log(data);
     }
 
 }
