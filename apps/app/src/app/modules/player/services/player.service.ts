@@ -7,6 +7,7 @@ import { AudioController } from "./controls.service";
 import { AudioQueue } from "./queue.service";
 import { environment } from "src/environments/environment";
 import { HttpClient } from "@angular/common/http";
+import { AudioManager } from "../managers/audio-manager";
 
 export type PlayableItem = Song & PlaylistItem & LikedSong
 
@@ -45,9 +46,12 @@ export class PlayerService {
     public readonly $isMuted = this.controls.$muted.pipe(distinctUntilChanged());
     public readonly $volume = this.controls.$volume.pipe(distinctUntilChanged());
     public readonly $shuffled = this.controls.$shuffled.pipe(distinctUntilChanged());
+    public readonly $currentTime = this.controls.$currenTime.pipe(distinctUntilChanged());
 
     public readonly $queue = this.queue.$queue.pipe(distinctUntilChanged());
     public readonly $queueSize = this.$queue.pipe(map(([queue, tracklist]) => (queue?.length ?? 0) + (tracklist?.queue?.length ?? 0)), distinctUntilChanged());
+
+    private readonly audioManager = new AudioManager();
 
     constructor(
         private readonly queue: AudioQueue,
@@ -178,7 +182,7 @@ export class PlayerService {
                         // Find enqueued tracklist (because it may have different obj ref)
                         const tracklist = this.queue.getEnqueuedTracklist();
                         // Play next from tracklist
-                        return this.nextFromTracklist(tracklist);
+                        return this.next(tracklist);
                     })
                 );
             }),
@@ -246,7 +250,7 @@ export class PlayerService {
 
                 // Get enqueued tracklist by specified id
                 const enqueuedTracklist = this.queue.getEnqueuedTracklist();
-                return this.nextFromTracklist(enqueuedTracklist);
+                return this.next(enqueuedTracklist);
             }),
             toVoid()
         );
@@ -317,70 +321,57 @@ export class PlayerService {
 
         return of(false);
     }
+    private next(): Observable<string>;
+    private next(tracklist?: SCNGXTracklist): Observable<string>;
+    private next(tracklist?: SCNGXTracklist): Observable<string> {
+        return new Observable<[Song, SCNGXTracklist]>((subscriber) => {
+            // Check if a tracklist is provided
+            if(isNull(tracklist)) {
+                // If not, continue normally by dequeueing from tracks
+                // Dequeue next item from queue
+                const nextItem = this.queue.dequeue();
 
-    private nextFromTracklist(tracklist: SCNGXTracklist): Observable<string> {
-        return tracklist.getNextItem().pipe(
-            switchMap((item): Observable<string> => {
-                // If the next item is null, the tracklist is empty
-                // So we have to skip to the end of the track and let it start
-                // from beginning if play is hit
-                if(isNull(item)) {
+                // If the resource is null, the queue is completely empty
+                if(isNull(nextItem)) {
+                    // Because this could mean a skip is tried, just skip to end of current song
                     this.controls.resetCurrentlyPlaying(true);
-                    return of(null);
+                    subscriber.next([null, null]);
+                    subscriber.complete();
+                    return;
                 }
 
+                // Check if the item is not a list of tracks
+                if(!nextItem.isList) {
+                    // If true, return song
+                    const data = nextItem.data as PlayableItem;
+                    subscriber.next([data, null]);
+                    subscriber.complete();
+                    return;
+                }
+
+                // Treat data as tracklist (as its the only other option at this point)
+                const data = nextItem.data as SCNGXTracklist;
+                // Add next-query to subscriber
+                subscriber.add(data.getNextItem().subscribe((item) => {
+                    // Emit result on subscriber
+                    subscriber.next([item, data]);
+                    subscriber.complete();
+                }));
+                return;
+            }
+            
+            // Otherwise dequeue from provided tracklist
+            subscriber.add(tracklist.getNextItem().pipe(switchMap((item): Observable<Song> => {
                 // If current item is already playing, toggle play state
-                if(this.isPlaying(item.id, tracklist.id)) {
+                if(this.isPlaying(item?.id, tracklist.id)) {
                     return this.togglePlaying().pipe(map(() => null));
                 }
 
-                // Request stream url
-                return this.streamService.requestStreamUrl(item.id, true).pipe(tap((url) => {
-                    // Update current item
-                    this.setCurrentItem(item, url, tracklist.id);
-                }));
-            }),
-            // Start playing the item
-            switchMap((url) => {
-                if(isNull(url)) return of(null);
-                return this.controls.play(url);
-            }),
-            // Print url
-            tap((url) => {
-                if(!isNull(url)) console.log(`Now streaming ${url}`)
-            }),
-        )
-    }
-
-    private next(): Observable<string> {
-        return new Observable<[Song, SCNGXTracklist]>((subscriber) => {
-            // Dequeue next item from queue
-            const nextItem = this.queue.dequeue();
-
-            // If the resource is null, the queue is completely empty
-            if(isNull(nextItem)) {
-                // Because this could mean a skip is tried, just skip to end of current song
-                this.controls.resetCurrentlyPlaying(true);
-                subscriber.next([null, null]);
-                subscriber.complete();
-                return;
-            }
-
-            // Check if the item is not a list of tracks
-            if(!nextItem.isList) {
-                // If true, return song
-                const data = nextItem.data as PlayableItem;
-                subscriber.next([data, null]);
-                subscriber.complete();
-                return;
-            }
-
-            // Treat data as tracklist (as its the only other option at this point)
-            const data = nextItem.data as SCNGXTracklist;
-            // Add next-query to subscriber
-            subscriber.add(data.getNextItem().subscribe((item) => {
-                // Emit result on subscriber
-                subscriber.next([item, data]);
+                return of(item);
+            })).subscribe((item) => {
+                // Push result
+                subscriber.next([item, tracklist]);
+                // Complete subscription
                 subscriber.complete();
             }));
         }).pipe(
@@ -402,15 +393,42 @@ export class PlayerService {
             // Start playing the item
             switchMap((url) => {
                 if(isNull(url)) return of(this.currentUrl);
-                return this.controls.play(url);
-            }),
-            // Print url
-            tap((url) => {
-                if(!isNull(url)) console.log(`Now streaming ${url}`)
-            }),            
+                // return this.controls.play(url);
+                return this.audioManager.play(url);
+            }),         
             take(1)
         );
     }
+
+    // private nextFromTracklist(tracklist: SCNGXTracklist): Observable<string> {
+    //     return tracklist.getNextItem().pipe(
+    //         switchMap((item): Observable<string> => {
+    //             // If the next item is null, the tracklist is empty
+    //             // So we have to skip to the end of the track and let it start
+    //             // from beginning if play is hit
+    //             if(isNull(item)) {
+    //                 this.controls.resetCurrentlyPlaying(true);
+    //                 return of(null);
+    //             }
+
+    //             // If current item is already playing, toggle play state
+    //             if(this.isPlaying(item.id, tracklist.id)) {
+    //                 return this.togglePlaying().pipe(map(() => null));
+    //             }
+
+    //             // Request stream url
+    //             return this.streamService.requestStreamUrl(item.id, true).pipe(tap((url) => {
+    //                 // Update current item
+    //                 this.setCurrentItem(item, url, tracklist.id);
+    //             }));
+    //         }),
+    //         // Start playing the item
+    //         switchMap((url) => {
+    //             if(isNull(url)) return of(null);
+    //             return this.controls.play(url);
+    //         })
+    //     )
+    // }
 
     /**
      * Update currently playing item
