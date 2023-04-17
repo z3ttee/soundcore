@@ -3,7 +3,7 @@
         <div class="relative flex flex-1 w-full items-stretch justify-start gap-4 p-2 bg-body-dark rounded pointer-events-auto overflow-hidden select-none">
             <!-- Seeker -->
             <div class="absolute w-full left-0 top-0" [ngClass]="{'pointer-events-none': props.isMobile}">
-                <scngx-seeker [duration]="props.song?.duration ?? 0" [current]="props.currentTime" (seek)="onSeek($event)"></scngx-seeker>
+                <scngx-seeker [duration]="props.song?.duration ?? 0" [current]="($currentTime | async)" (seek)="onSeek($event)"></scngx-seeker>
             </div>
     
             <div (click)="props.isMobile ? openBigPictureMobile() : openBigPicture()" class="relative flex flex-grow w-full items-center justify-start gap-2 border border-body-lighter border-opacity-0 cursor-pointer rounded-sm p-1 transition-all active:bg-body active:bg-opacity-80 active:border-opacity-30" [ngClass]="{'hover:bg-body hover:border-opacity-30 hover:bg-opacity-60': !props.isMobile}">                    
@@ -60,7 +60,7 @@
     
             <div class="hidden sm:flex md:flex-grow md:w-full items-center justify-end gap-2">
                 <!-- Duration -->
-                <span class="text-font-tertiary text-sm w-24 md:w-min text-center">{{ props.currentTime ?? 0 | durationPipe }}/{{ props.song?.duration ?? 0 | durationPipe }}</span>
+                <span class="text-font-tertiary text-sm w-24 md:w-min text-center">{{ ($currentTime | async) ?? 0 | durationPipe }}/{{ props.song?.duration ?? 0 | durationPipe }}</span>
     
                 <!-- Speaker button -->
                 <span class="hidden md:flex relative items-center justify-start" *ngIf="!props.isMobile">
