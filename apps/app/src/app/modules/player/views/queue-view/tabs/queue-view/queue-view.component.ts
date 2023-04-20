@@ -41,7 +41,7 @@ export class QueueViewComponent implements OnDestroy {
             let tracklist = combinedQueue[1];
 
             return {
-                tracks: queue,
+                tracks: [...(queue ?? [])],
                 enqueuedTracklist: tracklist,
                 tracklistQueue: [...(tracklist?.queue ?? [])],
                 current: current,

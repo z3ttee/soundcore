@@ -20,31 +20,29 @@
         <!-- Enqueued songs -->
         <div class="mt-row" *ngIf="props.tracks?.length > 0">
             <h6>Nächster Song</h6>
-
-            <cdk-virtual-scroll-viewport [itemSize]="56">
-                <div *cdkVirtualFor="let item of props.tracks; index as i">
-                    <scngx-song-list-item 
-                        [song]="item" 
-                        [index]="props.current ? i+1 : i" 
-                        [animRef]="lottieAnimationTemplate">
-                    </scngx-song-list-item>
-                </div>
-            </cdk-virtual-scroll-viewport>
+            
+            <!-- Songs list -->
+            <scngx-song-list 
+                #list
+                [startIndex]="props.current ? 1 : 0"
+                [datasource]="props.tracks" 
+                [useParentScroll]="true"
+                [useParentPadding]="true">
+            </scngx-song-list>
         </div>
 
         <!-- Enqueued tracklist -->
         <div class="mt-row" *ngIf="props.enqueuedTracklist">
             <h6>Nächster Song aus: {{ props.enqueuedTracklist?.name }}</h6>
 
-            <cdk-virtual-scroll-viewport [itemSize]="56">
-                <div *cdkVirtualFor="let item of props.tracklistQueue; index as i">
-                    <scngx-song-list-item 
-                        [song]="item" 
-                        [index]="props.current ? (props.tracks?.length)+i+1 : (props.tracks?.length)+i" 
-                        [animRef]="lottieAnimationTemplate">
-                    </scngx-song-list-item>
-                </div>
-            </cdk-virtual-scroll-viewport>
+            <!-- Songs list -->
+            <scngx-song-list 
+                #list
+                [startIndex]="props.current ? (props.tracks?.length)+1 : (props.tracks?.length)"
+                [datasource]="props.tracklistQueue" 
+                [useParentScroll]="true"
+                [useParentPadding]="true">
+            </scngx-song-list>
         </div>    
         <div class="pb-bottom"></div>
     </div>

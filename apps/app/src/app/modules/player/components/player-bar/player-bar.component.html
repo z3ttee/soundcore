@@ -6,7 +6,7 @@
                 <scngx-seeker [duration]="props.song?.duration ?? 0" [current]="($currentTime | async)" (seek)="onSeek($event)"></scngx-seeker>
             </div>
     
-            <div (click)="props.isMobile ? openBigPictureMobile() : openBigPicture()" class="relative flex flex-grow w-full items-center justify-start gap-2 border border-body-lighter border-opacity-0 cursor-pointer rounded-sm p-1 transition-all active:bg-body active:bg-opacity-80 active:border-opacity-30" [ngClass]="{'hover:bg-body hover:border-opacity-30 hover:bg-opacity-60': !props.isMobile}">                    
+            <div (click)="props.isMobile ? openBigPictureMobile() : openBigPicture()" class="relative flex flex-grow w-full items-center justify-start gap-2 border border-body-lighter border-opacity-0 cursor-pointer rounded-sm p-1 transition-all active:bg-body active:bg-opacity-80 active:border-opacity-30" [ngClass]="{'hover:bg-body hover:border-opacity-30 hover:bg-opacity-60': !props.isMobile, 'pointer-events-none opacity-0': !props.song}">                    
                 <!-- Artwork -->
                 <div class="min-w-10 max-w-10 h-10 md:min-w-12 md:max-w-12 md:h-12 rounded-sm overflow-hidden pointer-events-none">
                     <scngx-artwork [artwork]="props.song?.artwork"></scngx-artwork>

@@ -13,4 +13,7 @@ export class SCNGXTabsComponent {
     @Input()
     public fullHeight: boolean = true;
 
+    @Input()
+    public useParentPadding?: boolean;
+
 }

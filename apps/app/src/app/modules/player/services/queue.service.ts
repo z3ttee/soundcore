@@ -31,8 +31,8 @@ export class AudioQueue {
     public readonly $enqueuedTracklist = this.tracklistSubject.asObservable();
 
     public readonly $queue: Observable<Readonly<[PlayableItem[], SCNGXTracklist]>> = combineLatest([
-        this.queueSubject.asObservable().pipe(distinctUntilChanged()),
-        this.tracklistSubject.asObservable().pipe(distinctUntilChanged()),
+        this.queueSubject.asObservable(),
+        this.tracklistSubject.asObservable(),
     ]);
 
     /**

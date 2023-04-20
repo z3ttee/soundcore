@@ -21,6 +21,7 @@ import { SCNGXTabsModule } from "src/app/components/navigation-tabs";
 import { QueueIndexViewComponent } from "./views/queue-view/index-view.component";
 import { QueueHistoryViewComponent } from "./views/queue-view/tabs/history-view/history-view.component";
 import { EmptyPageBannerModule } from "src/app/components/banners/empty-page-banner";
+import { SongListModule } from "src/app/components/lists/song-list/song-list.module";
 
 const routes: Routes = [
     { path: "queue", component: QueueIndexViewComponent, children: [
@@ -64,7 +65,8 @@ const routes: Routes = [
         SCSDKCollectionModule,
         SCSDKStreamModule,
 
-        SCNGXSongListItemModule
+        SCNGXSongListItemModule,
+        SongListModule
     ],
     exports: [
         AppPlayerBarComponent

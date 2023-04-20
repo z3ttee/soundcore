@@ -396,7 +396,7 @@ export class PlayerService {
                 // Request stream url
                 return this.streamService.requestStreamUrl(item.id, true).pipe(tap((url) => {
                     // Update current item
-                    this.setCurrentItem(item, url, tracklist.owner);
+                    this.setCurrentItem(item, url, tracklist?.owner);
                 }));
             }),
             // Start playing the item
