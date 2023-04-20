@@ -70,7 +70,7 @@ export class AlbumInfoComponent implements OnDestroy {
   ]).pipe(
     // Build props object
     map(([album, isPaused, currentItem]): AlbumInfoProps => {
-      const currentTracklistId = currentItem?.tracklistId;
+      const currentTracklistId = currentItem?.owner?.id;
       const currentItemId = currentItem?.id;
 
       return {

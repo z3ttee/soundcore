@@ -73,7 +73,7 @@ export abstract class SCNGXBaseTracklist<T, U extends TracklistEntityTypes>  {
          * Entity to which the tracklist belongs. This can for example
          * be an artist or album
          */
-        protected readonly owner: PlayableEntity,
+        public readonly owner: PlayableEntity,
         /**
          * Base URL used to build url for fetching
          * new items

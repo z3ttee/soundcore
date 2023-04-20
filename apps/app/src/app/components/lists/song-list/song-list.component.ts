@@ -39,7 +39,7 @@ export class SongListComponent implements AfterViewInit {
         return {
             isPlaying: !isPaused,
             currentItemId: currentItem?.id,
-            isOwnerActive: this.owner?.id === currentItem?.tracklistId,
+            isOwnerActive: this.owner?.id === currentItem?.owner?.id,
         }
     }));
 

@@ -31,9 +31,7 @@ export class ArtistProfileComponent implements OnDestroy {
     private readonly albumService: SCDKAlbumService,
     private readonly activatedRoute: ActivatedRoute,
     private readonly playerService: PlayerService
-  ) {
-    console.log(this.playerService.$currentItem);
-  }
+  ) {}
 
   private readonly $destroy: Subject<void> = new Subject();
 
@@ -75,7 +73,7 @@ export class ArtistProfileComponent implements OnDestroy {
   ]).pipe(
     // Build props object
     map(([artist, albums, featAlbums, featPlaylists, currentItem, isPaused]): ArtistInfoProps => {
-      const currentTracklistId = currentItem?.tracklistId;
+      const currentTracklistId = currentItem?.owner?.id;
       const currentItemId = currentItem?.id;
 
       return {

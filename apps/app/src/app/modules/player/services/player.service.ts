@@ -14,8 +14,7 @@ export type PlayableItem = Song & PlaylistItem & LikedSong
 
 export type Streamable = Song & {
     url: string;
-    tracklistId?: string;
-    tracklistIndex?: number;
+    owner?: PlayableEntity;
 }
 
 @Injectable({
@@ -313,7 +312,7 @@ export class PlayerService {
      * Get the tracklist id of the currently playing item
      */
     public get currentTracklistId(): string {
-        return this.currentItem.getValue()?.tracklistId;
+        return this.currentItem.getValue()?.owner?.id;
     }
 
     /**
@@ -397,7 +396,7 @@ export class PlayerService {
                 // Request stream url
                 return this.streamService.requestStreamUrl(item.id, true).pipe(tap((url) => {
                     // Update current item
-                    this.setCurrentItem(item, url, tracklist?.id);
+                    this.setCurrentItem(item, url, tracklist.owner);
                 }));
             }),
             // Start playing the item
@@ -447,19 +446,18 @@ export class PlayerService {
      * @param tracklistId Tracklist instance id that is playing
      * @param tracklistIndex Index in tracklist
      */
-    private setCurrentItem(item: Song, url: string, tracklistId?: string, tracklistIndex?: number) {
+    private setCurrentItem(item: Song, url: string, owner: PlayableEntity) {
         this.currentItem.next({ 
             ...item, 
             url: url,
-            tracklistId: tracklistId ?? undefined,
-            tracklistIndex: tracklistIndex ?? undefined
+            owner: owner ?? undefined,
         });
     }
 
     private isPlaying(songId: string, tracklistId?: string): boolean {
         const current = this.currentItem.getValue();
         if(isNull(current)) return false;
-        return current.id === songId && current.tracklistId === tracklistId;
+        return current.id === songId && current.owner?.id === tracklistId;
     }
 
 }
