@@ -41,21 +41,12 @@
             </app-list-view>
 
             <!-- Songs list -->
-            <ng-container *ngIf="($datasource | async) as datasource">
-                <cdk-virtual-scroll-viewport [itemSize]="56">
-                    <div *cdkVirtualFor="let item of datasource; index as i" class="px-window">
-                        <scngx-song-list-item 
-                            [song]="item" 
-                            [index]="i"
-                            [active]="props.currentItemId === item?.id && props.isTracklistActive"
-                            [playing]="props.isPlaying"
-                            [animRef]="lottieAnimationTemplate"
-                            (onPlay)="forcePlayAt(props.album.data, i, item.id)">
-                        </scngx-song-list-item>
-                    </div>
-                </cdk-virtual-scroll-viewport>
-            </ng-container>
-            
+            <scngx-song-list 
+                #list
+                [datasource]="($datasource | async)" 
+                [owner]="props.album.data"
+                [useParentScroll]="true">
+            </scngx-song-list>
 
             <!-- Footer -->
             <ng-container *ngIf="($recommendedAlbums | async) as recommendedAlbums">
@@ -75,11 +66,3 @@
         </ng-template>
     </div>
 </ng-container>
-
-<ng-template #lottieAnimationTemplate>
-    <ng-lottie [options]="animOptions" class="aspect-square"></ng-lottie>
-</ng-template>
-
-<!-- <ng-template #songContextMenu let-data>
-    <app-song-context-menu [song]="data.song" [playlist]="data.playlist" [tracklist]="data.tracklist"></app-song-context-menu>
-</ng-template> -->

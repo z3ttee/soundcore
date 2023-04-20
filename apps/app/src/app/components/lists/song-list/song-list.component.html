@@ -1,0 +1,45 @@
+<div class="w-full" *ngIf="useParentScroll; else alternateList" [ngClass]="{'px-window': !useParentPadding}">
+    <ng-container *ngTemplateOutlet="list"></ng-container>
+</div>
+
+<!-- Alternate virtual list -->
+<ng-template #alternateList>
+    <div class="w-full h-full" cdkVirtualScrollingElement>
+        <ng-container *ngTemplateOutlet="list"></ng-container>
+    </div>
+</ng-template>
+
+<!-- List -->
+<ng-template #list>
+    <ng-container *ngIf="($playerInfo | async) as props">
+        <cdk-virtual-scroll-viewport [itemSize]="56">
+            <scngx-song-list-item 
+                #scroller
+                *cdkVirtualFor="let item of datasource; index as i; trackBy:ngTrackBy"
+                [index]="i + (startIndex ?? 0)"
+                [song]="item" 
+                [active]="props.currentItemId === item?.id && props.isOwnerActive"
+                [playing]="props.isPlaying"
+                [animRef]="lottieAnimationTemplate"
+                (onPlay)="forcePlayAt(owner, i, item.id)"
+                (onLike)="handleOnLike(item)"
+                [sccdkContext]="songContextMenu"
+                [sccdkContextData]="{song: item, index: i, owner: owner}">
+            </scngx-song-list-item>
+        </cdk-virtual-scroll-viewport>
+    </ng-container>
+</ng-template>
+
+<!-- Equalizer Animation -->
+<ng-template #lottieAnimationTemplate>
+    <ng-lottie [options]="animOptions" class="aspect-square"></ng-lottie>
+</ng-template>
+
+<!-- Context Menu -->
+<ng-template #songContextMenu let-data>
+    <app-song-context-menu 
+        [song]="data.song" 
+        [owner]="data.owner" 
+        [index]="data.index">
+    </app-song-context-menu>
+</ng-template>

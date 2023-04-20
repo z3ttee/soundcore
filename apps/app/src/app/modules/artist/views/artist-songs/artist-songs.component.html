@@ -6,7 +6,7 @@
         <!-- Page -->
         <ng-template #content>
             <!-- Page Header -->
-            <div class="bg-body sticky top-0 z-50 p-window" [ngClass]="{'shadow-md border-b border-opacity-70 border-b-body-lighter': (scroller.scrolledIndexChange | async) > 0}">
+            <div class="bg-body sticky top-0 z-50 p-window" [ngClass]="{'shadow-md border-b border-opacity-70 border-b-body-lighter': (list.$scrolledIndexChanged| async) > 0}">
                 <div class="flex items-center justify-start flex-1 gap-4">
                     <div class="">
                         <scngx-skeleton class="w-7 h-7 rounded-full" *ngIf="props.artist.loading"></scngx-skeleton>            
@@ -33,21 +33,13 @@
             </div>
 
             <!-- Songs list -->
-            <cdk-virtual-scroll-viewport [itemSize]="56" #scroller>
-                <div *cdkVirtualFor="let item of ($datasource | async); index as i" class="px-window">
-                    <scngx-song-list-item 
-                        [song]="item" 
-                        [index]="i" 
-                        [active]="props.currentItemId === item?.id && props.isTracklistActive"
-                        [playing]="props.isPlaying"
-                        [animRef]="lottieAnimationTemplate"
-                        (onPlay)="forcePlayAt(props.artist.data, i, item.id)"
-                        [sccdkContext]="songContextMenu"
-                        [sccdkContextData]="{song: item, index: i, owner: props.artist.data}">
-                    </scngx-song-list-item>
-                </div>
-                <div class="pb-bottom"></div>
-            </cdk-virtual-scroll-viewport>
+            <scngx-song-list 
+                #list
+                [datasource]="($datasource | async)" 
+                [owner]="props.artist.data"
+                [useParentScroll]="true">
+            </scngx-song-list>
+            <div class="pb-bottom"></div>
         </ng-template>
     </div>
 </ng-container>

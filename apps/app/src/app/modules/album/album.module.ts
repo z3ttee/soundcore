@@ -15,6 +15,7 @@ import { heroEllipsisVerticalSolid, heroPauseSolid, heroPlaySolid } from '@ng-ic
 import { heroHeart, heroPlay, heroPause } from '@ng-icons/heroicons/outline';
 
 import { AppPlayerModule } from '../player/player.module';
+import { SongListModule } from 'src/app/components/lists/song-list/song-list.module';
 
 const routes: Routes = [
   { path: ":albumId", component: AlbumInfoComponent },
@@ -52,7 +53,8 @@ const routes: Routes = [
     SCNGXScrollingModule,
     SCNGXButtonModule,
 
-    Error404Module
+    Error404Module,
+    SongListModule
   ]
 })
 export class AlbumModule { }

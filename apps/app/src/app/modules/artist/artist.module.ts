@@ -28,6 +28,7 @@ import { SongContextMenuModule } from 'src/app/components/menus/song-context-men
 import { NgIconsModule } from '@ng-icons/core';
 import { heroEllipsisVerticalSolid } from '@ng-icons/heroicons/solid';
 import { heroHeart, heroMusicalNote } from '@ng-icons/heroicons/outline';
+import { SongListModule } from 'src/app/components/lists/song-list/song-list.module';
 
 const routes: Routes = [
   { path: ":artistId", component: ArtistProfileComponent },
@@ -69,9 +70,9 @@ const routes: Routes = [
     SCNGXArtworkModule,
 
     SCNGXScrollingModule,
-    SCNGXTableModule,
 
-    SCNGXSongListItemModule
+    SCNGXSongListItemModule,
+    SongListModule
   ]
 })
 export class ArtistModule {}

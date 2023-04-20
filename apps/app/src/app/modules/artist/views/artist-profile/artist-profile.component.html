@@ -69,20 +69,13 @@
                 <scngx-ui-section-title>Top 5 Songs</scngx-ui-section-title>
             </div>
 
-            <ng-container *ngIf="($datasource | async) as datasource">
-                <cdk-virtual-scroll-viewport [itemSize]="56">
-                    <div *cdkVirtualFor="let item of ($datasource | async); index as i" class="px-window">
-                        <scngx-song-list-item 
-                            [song]="item" 
-                            [index]="i" 
-                            [active]="props.currentItemId === item?.id && props.isTracklistActive"
-                            [playing]="props.isPlaying"
-                            [animRef]="lottieAnimationTemplate"
-                            (onPlay)="forcePlayAt(props.artist.data, i, item.id)">
-                        </scngx-song-list-item>
-                    </div>
-                </cdk-virtual-scroll-viewport>
-            </ng-container>
+            <!-- Songs list -->
+            <scngx-song-list 
+                #list
+                [datasource]="($datasource | async)" 
+                [owner]="props.artist.data"
+                [useParentScroll]="true">
+            </scngx-song-list>
         
             <div class="w-full pb-bottom overflow-hidden">
                 <scngx-ui-row [headline]="'Alben'" [route]="['./albums']" *ngIf="props.albums.data?.length > 0">
@@ -124,11 +117,3 @@
         </ng-template>
     </div>
 </ng-container>
-
-<ng-template #lottieAnimationTemplate>
-    <ng-lottie [options]="animOptions" class="aspect-square"></ng-lottie>
-</ng-template>
-
-<!-- <ng-template #songContextMenu let-data>
-    <app-song-context-menu [song]="data.song" [playlist]="data.playlist" [tracklist]="data.tracklist"></app-song-context-menu>
-</ng-template> -->

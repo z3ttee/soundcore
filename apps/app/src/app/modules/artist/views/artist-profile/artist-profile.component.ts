@@ -90,9 +90,6 @@ export class ArtistProfileComponent implements OnDestroy {
     tap((props) => console.log(props))
   );
 
-  // Lottie animations options
-  public animOptions = AUDIOWAVE_LOTTIE_OPTIONS;
-
   public ngOnDestroy(): void {
       this.$destroy.next();
       this.$destroy.complete();
