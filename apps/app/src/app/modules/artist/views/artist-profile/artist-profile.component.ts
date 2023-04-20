@@ -31,7 +31,9 @@ export class ArtistProfileComponent implements OnDestroy {
     private readonly albumService: SCDKAlbumService,
     private readonly activatedRoute: ActivatedRoute,
     private readonly playerService: PlayerService
-  ) { }
+  ) {
+    console.log(this.playerService.$currentItem);
+  }
 
   private readonly $destroy: Subject<void> = new Subject();
 

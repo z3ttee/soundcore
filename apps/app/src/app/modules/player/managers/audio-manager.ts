@@ -151,7 +151,7 @@ export class AudioManager {
             // Set playback mode based on
             // if HLS streaming is supported
             if(Hls.isSupported()) {
-                this._mode =AudioManagerMode.HLS;
+                this._mode = AudioManagerMode.HLS;
             } else {
                 console.warn(`[${this.LABEL}] Browser does not support HLS for media streaming. Setting mode to '${this._mode.toUpperCase()}'`);
                 this._mode = AudioManagerMode.HTML5;
@@ -184,28 +184,30 @@ export class AudioManager {
         this._audio.onpause = () => this.isPaused.next(true);
         this._audio.ontimeupdate = () => this.currenTime.next(this._audio.currentTime);
 
-        this._hls.on(Hls.Events.MANIFEST_PARSED, (_, data) => this.handleManifestParsedEvent(data));
-
-        this._hls.on(Hls.Events.ERROR, function (event, data) {
-            if (data.fatal) {
-                switch (data.type) {
-                    case Hls.ErrorTypes.NETWORK_ERROR:
-                    // try to recover network error
-                    console.log('fatal network error encountered, try to recover');
-                    this._hls.startLoad();
-                    break;
-                    case Hls.ErrorTypes.MEDIA_ERROR:
-                    console.log('fatal media error encountered, try to recover');
-                    this._hls.recoverMediaError();
-                    break;
-                    default:
-                    // cannot recover
-                    this._hls.destroy();
-                    console.log("unrecoverable error");
-                    break;
+        if(this.isHLS) {
+            // Register manifest parsed event
+            this._hls.on(Hls.Events.MANIFEST_PARSED, (_, data) => this.handleManifestParsedEvent(data));
+            this._hls.on(Hls.Events.ERROR, function (event, data) {
+                if (data.fatal) {
+                    switch (data.type) {
+                        case Hls.ErrorTypes.NETWORK_ERROR:
+                            // try to recover network error
+                            console.log('fatal network error encountered, try to recover');
+                            this._hls.startLoad();
+                            break;
+                        case Hls.ErrorTypes.MEDIA_ERROR:
+                            console.log('fatal media error encountered, try to recover');
+                            this._hls.recoverMediaError();
+                            break;
+                        default:
+                            // cannot recover
+                            this._hls.destroy();
+                            console.log("unrecoverable error");
+                            break;
+                    }
                 }
-            }
-        });
+            });
+        }
     }
 
     /**
