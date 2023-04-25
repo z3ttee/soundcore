@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { isNull } from "@soundcore/common";
 import { Future, PlayableEntityType } from "@soundcore/sdk";
-import { BehaviorSubject, Observable, combineLatest, distinctUntilChanged } from "rxjs";
+import { BehaviorSubject, Observable, combineLatest, distinctUntilChanged, map, of, switchMap } from "rxjs";
 import { PlayableItem } from "./player.service";
 import { SCNGXTracklist } from "../entities/tracklist.entity";
 
@@ -32,7 +32,10 @@ export class AudioQueue {
 
     public readonly $queue: Observable<Readonly<[PlayableItem[], SCNGXTracklist]>> = combineLatest([
         this.queueSubject.asObservable(),
-        this.tracklistSubject.asObservable(),
+        this.tracklistSubject.asObservable().pipe(switchMap((tracklist) => {
+            if(isNull(tracklist)) return of(null);
+            return tracklist.$queue.pipe(map(() => tracklist));
+        })),
     ]);
 
     /**

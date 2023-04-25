@@ -32,7 +32,7 @@
         </div>
 
         <!-- Enqueued tracklist -->
-        <div class="mt-row" *ngIf="props.enqueuedTracklist">
+        <div class="mt-row" *ngIf="props.enqueuedTracklist && props.enqueuedTracklist?.queue?.length > 0">
             <h6>Nächster Song aus: {{ props.enqueuedTracklist?.name }}</h6>
 
             <!-- Songs list -->
