@@ -46,8 +46,8 @@ export class SCSDKSongService {
      * @param albumId Id of the album
      * @returns {SCSDKDatasource<Song>}
      */
-    public findByAlbumDatasource(albumId: string, initialSize?: number, pageSize?: number): Observable<SCSDKDatasource<Song>> {
-        return of(new SCSDKDatasource(this.httpClient, `${this.options.api_base_uri}/v1/songs/album/${albumId}`, initialSize, pageSize));
+    public findByAlbumDatasource(albumId: string, initialSize?: number, pageSize?: number) {
+        return of(new SCSDKDatasource<Song>(this.httpClient, `${this.options.api_base_uri}/v1/songs/album/${albumId}`, initialSize, pageSize));
     }
 
     /**
@@ -55,8 +55,8 @@ export class SCSDKSongService {
      * @param artistId Id of the artist
      * @returns {SCSDKDatasource<Song>}
      */
-    public findByArtistDatasource(artistId: string, initialSize?: number, pageSize?: number): Observable<SCSDKDatasource<Song>> {
-        return of(new SCSDKDatasource(this.httpClient, `${this.options.api_base_uri}/v1/songs/artist/${artistId}`, initialSize, pageSize));
+    public findByArtistDatasource(artistId: string, initialSize?: number, pageSize?: number) {
+        return of(new SCSDKDatasource<Song>(this.httpClient, `${this.options.api_base_uri}/v1/songs/artist/${artistId}`, initialSize, pageSize));
     }
 
     /**
@@ -64,8 +64,17 @@ export class SCSDKSongService {
      * @param artistId Id of the artist
      * @returns {SCSDKDatasource<Song>}
      */
-    public findByArtistTopDatasource(artistId: string, initialSize?: number, pageSize?: number): Observable<SCSDKDatasource<Song>> {
-        return of(new SCSDKDatasource(this.httpClient, `${this.options.api_base_uri}/v1/songs/artist_top/${artistId}`, initialSize, pageSize));
+    public findByArtistTopDatasource(artistId: string, initialSize?: number, pageSize?: number) {
+        return of(new SCSDKDatasource<Song>(this.httpClient, `${this.options.api_base_uri}/v1/songs/artist_top/${artistId}`, initialSize, pageSize));
+    }
+
+    /**
+     * Create datasource that contains songs that belong to a playlist
+     * @param playlistId Id of the playlist
+     * @returns {SCSDKDatasource<Song>}
+     */
+    public findByPlaylistDatasource(playlistId: string, initialSize?: number, pageSize?: number) {
+        return of(new SCSDKDatasource<Song>(this.httpClient, `${this.options.api_base_uri}/v1/songs/playlist/${playlistId}`, initialSize, pageSize));
     }
 
     /**

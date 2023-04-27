@@ -176,6 +176,42 @@ export class SongService implements SyncableService<Song> {
     }
 
     /**
+     * Find list of tracks of a playlist
+     * @param playlistId Playlist's id
+     * @param pageable Page settings
+     * @param authentication Authentication object
+     * @param seed Seed used for building shuffled tracklist
+     * @param startWithId Id of the item in the list which should be put on beginning of the page
+     * @returns Page<Song>
+     */
+    public async findByPlaylist(playlistId: string, pageable: Pageable, authentication?: User, seed?: number, startWithId?: string): Promise<Page<Song>> {
+        // Create query to get ids only
+        const idsQuery = this.repository.createQueryBuilder("song")
+            .select(["song.id"])
+            .leftJoin("song.playlists", "item")
+            .leftJoin("item.playlist", "playlist")
+            .where("playlist.id = :playlistId OR playlist.slug = :playlistId", { playlistId: playlistId })
+            .orderBy("item.order", "ASC")
+            .addOrderBy("song.id", "ASC")
+
+        const findQuery = this.buildGeneralQuery("song", authentication)
+            .leftJoin("song.playlists", "item").addSelect(["item.id", "item.order", "item.createdAt"])
+            .leftJoin("item.playlist", "playlist").addSelect(["playlist.id", "playlist.slug", "playlist.name"])
+            .leftJoin("item.addedBy", "addedBy").addSelect(["addedBy.id", "addedBy.slug", "addedBy.name"])
+            .orderBy("item.order", "ASC")
+            .addOrderBy("song.id", "ASC")
+
+        const findIncludeQuery = this.buildGeneralQuery("song", authentication)
+            .leftJoin("song.playlists", "item").addSelect(["item.id", "item.order", "item.createdAt"])
+            .leftJoin("item.playlist", "playlist").addSelect(["playlist.id", "playlist.slug", "playlist.name"])
+            .leftJoin("item.addedBy", "addedBy").addSelect(["addedBy.id", "addedBy.slug", "addedBy.name"])
+            .orderBy("item.order", "ASC")
+            .addOrderBy("song.id", "ASC")
+
+        return this.findByGeneric(idsQuery, findQuery, findIncludeQuery, pageable, authentication, seed, startWithId);
+    }
+
+    /**
      * Find list of tracks of an artist ordered by popularity
      * @param artistId Artist's id
      * @param pageSettings Page settings

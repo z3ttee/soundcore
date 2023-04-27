@@ -50,4 +50,14 @@ export class SCSDKTracklistV2Service {
         return this.httpClient.get<TracklistV2>(`${this.options.api_base_uri}/v2/tracklists/${PlayableEntityType.ARTIST_TOP.toLowerCase()}/${artistId}${new Pageable(0, 5).toQuery()}&shuffled=${encodeURIComponent(shuffled)}`).pipe(toFuture());
     }
 
+    /**
+     * Find tracklist entity by a playlist
+     * @param playlistId Playlist's id
+     * @returns Tracklist
+     */
+    public findByPlaylist(playlistId: string, shuffled: boolean = false): Observable<Future<TracklistV2>> {
+        if(isNull(playlistId)) return of(Future.notfound());
+        return this.httpClient.get<TracklistV2>(`${this.options.api_base_uri}/v2/tracklists/${PlayableEntityType.PLAYLIST.toLowerCase()}/${playlistId}${new Pageable(0, 15).toQuery()}&shuffled=${encodeURIComponent(shuffled)}`).pipe(toFuture());
+    }
+
 }

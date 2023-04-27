@@ -21,6 +21,8 @@ export class TracklistV2Service {
             return this.findTracklistByArtistId(ownerId, pageable, authentication, seed, startWithId);
         } else if(ownerType === PlayableEntityType.ARTIST_TOP) {
             return this.findTracklistByArtistIdTop(ownerId, pageable, authentication, seed, startWithId);
+        } else if(ownerType === PlayableEntityType.PLAYLIST) {
+            return this.findTracklistByPlaylistId(ownerId, pageable, authentication, seed, startWithId);
         }
         
         throw new BadRequestException("Requested invalid tracklist");
@@ -41,6 +43,12 @@ export class TracklistV2Service {
     public async findTracklistByArtistIdTop(artistId: string, pageable: Pageable, authentication?: User, seed?: number, startWithId?: string): Promise<TracklistV2> {
         return this.songService.findByArtistIdTop(artistId, pageable, authentication, seed, startWithId).then((page) => {
             return new TracklistV2(artistId, PlayableEntityType.ARTIST_TOP, page.totalSize, page, undefined);
+        });
+    }
+
+    public async findTracklistByPlaylistId(playlistId: string, pageable: Pageable, authentication?: User, seed?: number, startWithId?: string): Promise<TracklistV2> {
+        return this.songService.findByPlaylist(playlistId, pageable, authentication, seed, startWithId).then((page) => {
+            return new TracklistV2(playlistId, PlayableEntityType.PLAYLIST, page.totalSize, page, seed ?? undefined);
         });
     }
 

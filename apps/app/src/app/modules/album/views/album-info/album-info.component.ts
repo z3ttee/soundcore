@@ -84,8 +84,8 @@ export class AlbumInfoComponent implements OnDestroy {
   );
 
   public ngOnDestroy(): void {
-      this.$destroy.next();
-      this.$destroy.complete();
+    this.$destroy.next();
+    this.$destroy.complete();
   }
 
   public forcePlay(album: Album) {

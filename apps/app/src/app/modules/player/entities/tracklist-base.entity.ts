@@ -5,10 +5,10 @@ import { BehaviorSubject, filter, map, Observable, of, Subject, switchMap, take,
 import { Queue } from "./queue";
 import { Cache } from "./cache";
 
-export type TracklistWithoutItems<T extends TracklistEntityTypes = Song> = Omit<TracklistV2<T>, "items">;
 export const PAGE_SIZE = 30;
-
+export type TracklistWithoutItems<T extends TracklistEntityTypes = Song> = Omit<TracklistV2<T>, "items">;
 export type TracklistEntityTypes = Song | LikedSong | PlaylistItem;
+
 export abstract class SCNGXBaseTracklist<T, U extends TracklistEntityTypes>  {
     /**
      * Subject to manage emition of 
@@ -201,7 +201,7 @@ export abstract class SCNGXBaseTracklist<T, U extends TracklistEntityTypes>  {
      */
     public isPlayingById(itemId: string) {
         if(isNull(itemId)) return false;
-        return this._queue.lastDequeuedItem.id === itemId;
+        return this._queue.lastDequeuedItem?.id === itemId;
     }
 
     /**
@@ -261,7 +261,7 @@ export abstract class SCNGXBaseTracklist<T, U extends TracklistEntityTypes>  {
      * Internal dequeue function to get next
      * item from the array
      */
-    protected abstract dequeue(): U;
+    protected abstract dequeue(): Song;
 
     /**
      * Restart the tracklist
@@ -331,14 +331,14 @@ export abstract class SCNGXBaseTracklist<T, U extends TracklistEntityTypes>  {
      * this method will try to fetch a new page of tracks. If after that the 
      * queue is still empty (method returns null), the tracklist is done playing
      */
-    public getNextItem(): Observable<U> {
+    public getNextItem() {
         // if(this.wasReleased) return of(null);
         return this.$ready.pipe(
             filter((isReady) => isReady),
             take(1),
             takeUntil(this.$onCancel),
             switchMap(() => {
-                return new Observable<U>((subscriber) => {        
+                return new Observable<Song>((subscriber) => {        
                     // If next page should be fetched
                     if(this.shouldFetchNext) {
                         // If true, fetch page

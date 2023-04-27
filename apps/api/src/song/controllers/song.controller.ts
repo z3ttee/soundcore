@@ -68,4 +68,10 @@ export class SongController {
     return this.songService.findByArtistIdTop(artistId, pageable, authentication, isNull(seed) ? undefined : Number(seed));
   }
 
+  @Public(true)
+  @Get("/playlist/:playlistId")
+  public async findByPlaylist(@Param("playlistId") playlistId: string, @Authentication() authentication: User, @Pagination() pageable: Pageable, @Query("seed") seed?: string) {
+    return this.songService.findByPlaylist(playlistId, pageable, authentication, isNull(seed) ? undefined : Number(seed));
+  }
+
 }

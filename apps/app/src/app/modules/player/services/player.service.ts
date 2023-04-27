@@ -6,7 +6,7 @@ import { SCNGXTracklist } from "../entities/tracklist.entity";
 import { AudioQueue } from "./queue.service";
 import { environment } from "src/environments/environment";
 import { HttpClient } from "@angular/common/http";
-import { AudioManager, AudioManagerMode } from "../managers/audio-manager";
+import { AudioManager } from "../managers/audio-manager";
 import { VolumeManager } from "../managers/volume-manager";
 import { ShuffleManager } from "../managers/shuffle-manager";
 
@@ -98,12 +98,8 @@ export class PlayerService {
                 // If entity is already playing, the playback state just changed
                 // and nothing needs to be done
                 if(isActive) return of(false);
-
                 // Otherwise enqueue entity
                 const result = this.queue.enqueue(entity as PlayableItem);
-
-                console.log(result);
-
                 // Play next
                 return of(result != -1);
             })
@@ -149,8 +145,6 @@ export class PlayerService {
      * @returns Position in queue (-1 if the tracklist is currently playing and therefor paused state changed)
      */
     public forcePlay(entity: PlayableEntity): Observable<void> {
-        console.log(entity);
-
         // If is song, always enqueue
         if(entity.type === PlayableEntityType.SONG) {
             return this.toggleIfActive(entity).pipe(
@@ -224,6 +218,7 @@ export class PlayerService {
                 if(isEnqueued) {
                     // If true, find tracklist
                     const enqueuedTracklist = this.queue.getEnqueuedTracklist();
+                    if(isNull(enqueuedTracklist)) return of(null);
 
                     // Check if requested index is already playing
                     if(enqueuedTracklist.isPlayingById(itemId)) {
