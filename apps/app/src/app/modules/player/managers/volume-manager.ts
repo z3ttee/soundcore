@@ -5,16 +5,16 @@ import { DEFAULT_VOLUME, LOCALSTORAGE_KEY_VOLUME } from "src/app/constants";
 export class VolumeManager {
     private readonly defaultVolume;
 
-    private readonly volume: BehaviorSubject<number> = new BehaviorSubject(this.read());
-    private readonly mute: BehaviorSubject<boolean> = new BehaviorSubject(false);
+    private readonly _volume: BehaviorSubject<number> = new BehaviorSubject(this.read());
+    private readonly _mute: BehaviorSubject<boolean> = new BehaviorSubject(false);
 
-    public readonly $volume = this.volume.asObservable().pipe(
+    public readonly $volume = this._volume.asObservable().pipe(
         map((val) => val * 100),
         distinctUntilChanged()
     );
     public readonly $muted = combineLatest([
-        this.volume.asObservable(),
-        this.mute.asObservable()
+        this._volume.asObservable(),
+        this._mute.asObservable()
     ]).pipe(
         map(([volume, isMuted]) => volume <= 0 || isMuted), 
         distinctUntilChanged()
@@ -25,33 +25,37 @@ export class VolumeManager {
         defaultVolume: number = DEFAULT_VOLUME
     ) {
         this.defaultVolume = (defaultVolume ?? DEFAULT_VOLUME) / 100;
-        this.audio.volume = Math.max(0, Math.min(1, this.read()));
+        this.audio.volume = Math.max(0, Math.min(1, this.volume));
 
         this.$volume.pipe(skip(1), debounceTime(300)).subscribe((vol) => {
             this.persist(vol);
         });
     }
 
+    public get volume() {
+        return this._volume.getValue();
+    }
+
     public setVolume(volume: number) {
         this.audio.volume = Math.max(0, Math.min(100, (volume / 100)));
-        this.volume.next(this.audio.volume)
+        this._volume.next(this.audio.volume)
     }
 
     public toggleMute() {
-        const isMuted = this.mute.getValue();
+        const isMuted = this._mute.getValue();
 
         if(isMuted) {
             // Reset to previous volume and
             // push new muted state
-            this.audio.volume = this.volume.getValue();
-            this.mute.next(false);
+            this.audio.volume = this._volume.getValue();
+            this._mute.next(false);
             return;
         }
         
         // Otherwise set volume to 0 and
         // push new muted state
         this.audio.volume = 0;
-        this.mute.next(true);
+        this._mute.next(true);
     }
 
     private persist(volume: number) {
