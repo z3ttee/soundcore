@@ -28,7 +28,7 @@ export class SCNGXRangeComponent implements AfterViewInit {
     public onChanged: EventEmitter<number> = new EventEmitter();  
 
     ngAfterViewInit(): void {
-      this.updateProgress();
+      this.updateProgress(true);
     }
   
     public onInputChanged(event: Event) {
