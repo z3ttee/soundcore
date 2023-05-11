@@ -1,9 +1,9 @@
 
-export function isUndefined(target: any): boolean {
+export function isUndefined(target: any): target is undefined {
     return typeof target === "undefined";
 }
 
-export function isNull(target: any): boolean {
+export function isNull(target: any): target is null | undefined {
     return isUndefined(target) || target == null;
 }
 
