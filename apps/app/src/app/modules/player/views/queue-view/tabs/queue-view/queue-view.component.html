@@ -40,6 +40,7 @@
                 #list
                 [startIndex]="props.current ? (props.tracks?.length)+1 : (props.tracks?.length)"
                 [datasource]="props.tracklistQueue" 
+                [owner]="props.enqueuedTracklist.owner"
                 [useParentScroll]="true"
                 [useParentPadding]="true">
             </scngx-song-list>

@@ -21,7 +21,6 @@ export type Streamable = Song & {
     providedIn: "root"
 })
 export class PlayerService {
-
     private readonly audioManager = new AudioManager();
     private readonly volumeManager = new VolumeManager(this.audioManager.audioElement);
     private readonly shuffleManager = new ShuffleManager();
@@ -203,6 +202,7 @@ export class PlayerService {
     public forcePlayAt(entity: PlayableEntity, indexAt: number, itemId: string): Observable<void> {
         return of(null).pipe(
             switchMap(() => {
+                console.log(entity);
                 // Throw error, if unsupported entity type for forcePlayAt.
                 if(entity.type === PlayableEntityType.SONG) throw new Error(`Cannot call forcePlayAt() on song entities (type=${PlayableEntityType.SONG.toLowerCase()})`);
                 // Initialize tracklist request

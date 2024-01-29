@@ -55,6 +55,7 @@ export class SongListComponent implements AfterViewInit {
     @Input()
     public useParentPadding?: boolean;
 
+
     @Input()
     public owner: PlayableEntity;
 
@@ -82,7 +83,14 @@ export class SongListComponent implements AfterViewInit {
         this.onLike.next(item);
     }
 
+    /**
+     * Force play a track when clicked
+     * @param owner Owner of the song. This can be an album to which the song belongs
+     * @param indexAt Index inside the owner
+     * @param itemId Id of the song
+     */
     public forcePlayAt(owner: PlayableEntity, indexAt: number, itemId: string) {
+        console.log("force play at:", owner, indexAt, itemId);
         this.player.forcePlayAt(owner, indexAt, itemId).pipe(takeUntil(this.$destroy)).subscribe();
     }
 

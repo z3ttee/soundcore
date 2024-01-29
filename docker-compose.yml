@@ -25,14 +25,14 @@ services:
       - soundcore_dev
 
   meilisearch:
-    image: getmeili/meilisearch:v1.0
+    image: getmeili/meilisearch
     restart: always
     ports:
       - "7700:7700"
     environment:
       - MEILI_MASTER_KEY=super_secret_master_key
     volumes:
-      - "~/volumes/meilisearch:/meili_data"
+      - ".docker/meilisearch:/meili_data"
     entrypoint: ["meilisearch", "--env=development"]
     networks:
       - soundcore_dev

@@ -25,7 +25,9 @@ export class VolumeManager {
         defaultVolume: number = DEFAULT_VOLUME
     ) {
         this.defaultVolume = (defaultVolume ?? DEFAULT_VOLUME) / 100;
-        this.audio.volume = Math.max(0, Math.min(1, this.volume));
+        // this.audio.volume = Math.max(0, Math.min(1, this.volume));
+
+        this.setVolume(this.volume);
 
         this.$volume.pipe(skip(1), debounceTime(300)).subscribe((vol) => {
             this.persist(vol);
@@ -37,7 +39,13 @@ export class VolumeManager {
     }
 
     public setVolume(volume: number) {
-        this.audio.volume = Math.max(0, Math.min(100, (volume / 100)));
+        let value = volume ?? DEFAULT_VOLUME;
+        if(value > 1) {
+            value = volume / 100;
+        }
+
+        console.log("setting volume:", volume)
+        this.audio.volume = Math.max(0, Math.min(1, volume));
         this._volume.next(this.audio.volume)
     }
 
