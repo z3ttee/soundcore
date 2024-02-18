@@ -30,24 +30,34 @@ import { AppService } from './app.service';
 import { PipesModule } from '@tsalliance/utilities';
 import { HostnameModule } from './hostname/hostname.module';
 import { CronModule } from './cron/cron.module';
-import { CommonConfigModule, Environment } from '@soundcore/common';
+import { Environment } from '@soundcore/common';
 import { WorkerQueueModule } from '@soundcore/nest-queue';
 import { TracklistModule } from './tracklist/tracklist.module';
 import { PipelineModule } from '@soundcore/pipelines';
 import { TasksModule } from './tasks/tasks.module';
 import { FileSystemService } from './filesystem/services/filesystem.service';
 import { MeilisearchModule as MeilisearchModuleNEXT } from '@soundcore/meilisearch';
-import { ConfigService } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MeilisearchModule } from './meilisearch/meilisearch.module';
 import { MetricsModule } from './metrics/metrics.module';
 import { ConfigureModule } from './configure/configure.module';
 
 @Module({
+  controllers: [
+    AppController
+  ],
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: [
+        ".env.dev",
+        ".env"
+      ],
+      expandVariables: true
+    }),
     EventEmitterModule.forRoot({
       global: true
     }),
-    CommonConfigModule,
     FileSystemModule.forRoot(),
     TypeOrmModule.forRoot({
       type: "mariadb",

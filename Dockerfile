@@ -1,5 +1,5 @@
 # Define base image for build-stage
-FROM node:18-alpine as BUILDER
+FROM node:lts-alpine as BUILDER
 
 # Required for turborepo
 RUN apk add --no-cache libc6-compat
@@ -30,7 +30,7 @@ RUN yarn build:api
 
 # Build stage completed, begin with new base image
 # Remember, copy previously built files into the new image
-FROM node:18-alpine AS DEPLOY
+FROM node:lts-alpine AS DEPLOY
 
 # Set workdir
 ARG CWD=/opt/soundcore

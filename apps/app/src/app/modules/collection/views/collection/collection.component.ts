@@ -6,12 +6,10 @@ import { LikedSong, SCSDKLikeService, ToggleLikedSongDTO } from '@soundcore/sdk'
 import { SSOService, SSOUser } from '@soundcore/sso';
 import { combineLatest, filter, map, Observable, Subject, take, takeUntil } from 'rxjs';
 import { AUDIOWAVE_LOTTIE_OPTIONS } from 'src/app/constants';
-import { PlayerItem } from 'src/app/modules/player/entities/player-item.entity';
-import { AppPlayerService } from 'src/app/modules/player/services/player.service';
 
 interface CollectionViewProps {
   playing?: boolean;
-  currentItem?: PlayerItem;
+  currentItem?: any;
 
   tracklist?: SCNGXTracklist<LikedSong>;
   user?: SSOUser;
@@ -34,15 +32,15 @@ export class CollectionComponent implements OnInit, OnDestroy {
   constructor(
     private readonly activatedRoute: ActivatedRoute,
     private readonly likeService: SCSDKLikeService,
-    private readonly player: AppPlayerService,
+    // private readonly player: AppPlayerService,
     private readonly tracklistBuilder: SCNGXTracklistBuilder,
     private readonly ssoService: SSOService,
     private readonly snackbar: MatSnackBar
   ) { }
 
   public readonly $props: Observable<CollectionViewProps> = combineLatest([
-    this.player.$current.pipe(takeUntil(this._destroy)),
-    this.player.$isPaused.pipe(takeUntil(this._destroy)),
+    // this.player.$current.pipe(takeUntil(this._destroy)),
+    // this.player.$isPaused.pipe(takeUntil(this._destroy)),
     this.ssoService.$user.pipe(
       map((ssoUser): [SSOUser, SCNGXTracklist<LikedSong>] => {
         return [ssoUser, this.tracklistBuilder.forLikedSongs(ssoUser.id) as SCNGXTracklist<LikedSong>];
@@ -50,9 +48,9 @@ export class CollectionComponent implements OnInit, OnDestroy {
       takeUntil(this._destroy)
     )
   ]).pipe(
-    map(([currentItem, isPaused, [ssoUser, tracklist]]): CollectionViewProps => ({
-      currentItem,
-      playing: !isPaused && currentItem?.tracklist?.id == tracklist?.id,
+    map(([[ssoUser, tracklist]]): CollectionViewProps => ({
+      // currentItem,
+      // playing: !isPaused && currentItem?.tracklist?.id == tracklist?.id,
       tracklist,
       user: ssoUser,
     }))
@@ -82,7 +80,7 @@ export class CollectionComponent implements OnInit, OnDestroy {
   }
 
   public forcePlay(tracklist: SCNGXTracklist<LikedSong>) {
-    this.player.playTracklist(tracklist, true).subscribe();
+    // this.player.playTracklist(tracklist, true).subscribe();
   }
 
   public toggleAndRemoveFromCollection(likedSong: LikedSong, tracklist: SCNGXTracklist<LikedSong>) {

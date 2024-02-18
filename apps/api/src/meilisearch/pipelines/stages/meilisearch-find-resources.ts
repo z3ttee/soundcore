@@ -1,7 +1,6 @@
-import { Batch } from "@soundcore/common";
+import { Batch, Page, Pageable } from "@soundcore/common";
 import { MeiliClient, MeiliIndex } from "@soundcore/meilisearch";
 import { progress, StepParams } from "@soundcore/pipelines";
-import { Page, Pageable } from "nestjs-pager";
 import { DataSource } from "typeorm";
 import { Album } from "../../../album/entities/album.entity";
 import { AlbumMeiliService } from "../../../album/services/album-meili.service";
@@ -30,12 +29,12 @@ export async function step_sync_artists(params: StepParams) {
     do {
         const page = await service.fetchEntities(new Pageable(pageIndex, limit)).catch((error: Error) => {
             logger.error(`Failed fetching due entities: ${error.message}`);
-            return Page.of([], 0);
+            return Page.empty();
         });
 
-        if(page.size <= 0) break;
+        if(page.length <= 0) break;
 
-        entities.push(...page.elements);
+        entities.push(...page.items);
         pageIndex++;
     } while (true);
 
@@ -74,9 +73,9 @@ export async function step_sync_albums(params: StepParams) {
             return Page.of([], 0);
         });
 
-        if(page.size <= 0) break;
+        if(page.length <= 0) break;
 
-        entities.push(...page.elements);
+        entities.push(...page.items);
         pageIndex++;
     } while (true);
 
@@ -115,9 +114,9 @@ export async function step_sync_songs(params: StepParams) {
             return Page.of([], 0);
         });
 
-        if(page.size <= 0) break;
+        if(page.length <= 0) break;
 
-        entities.push(...page.elements);
+        entities.push(...page.items);
         pageIndex++;
     } while (true);
 

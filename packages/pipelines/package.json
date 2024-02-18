@@ -7,7 +7,7 @@
   "license": "MIT",
   "main": "dist/index.js",
   "scripts": {
-    "build:packages": "nest build",
+    "build:package": "nest build",
     "build:api": "nest build",
     "dev": "nest build --watch"
   },
@@ -22,7 +22,6 @@
     "@nestjs/common": "^9.0.0",
     "@nestjs/core": "^9.0.0",
     "object-sizeof": "^2.6.1",
-    "nestjs-pager": "^1.1.9",
     "winston": "^3.8.2",
     "reflect-metadata": "^0.1.13",
     "rxjs": "7.5.6",

@@ -1,7 +1,7 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
+import { Page, Pageable } from "@soundcore/common";
 import { PipelineRegistry, PipelineRun, RunStatus, IPipeline } from "@soundcore/pipelines";
-import { Page, Pageable } from "nestjs-pager";
 import { Repository } from "typeorm";
 import { Task } from "../entities/task.entity";
 import { TasksGateway } from "../gateway/tasks.gateway";
@@ -29,7 +29,7 @@ export class TasksService {
             .limit(pageable.limit)
             .orderBy("task.updatedAt", "DESC")
             .getManyAndCount().then(([tasks, total]) => {
-                return Page.of(tasks, total, pageable.offset);
+                return Page.of(tasks, total, pageable);
             })
     }
 
@@ -40,7 +40,7 @@ export class TasksService {
      */
     public async findDefinitions(pageable: Pageable): Promise<Page<IPipeline>> {
         return this.registry.listAll().then((definitions) => {
-            return Page.of( definitions.splice(pageable.offset, pageable.limit), definitions.length, pageable.offset);
+            return Page.of( definitions.splice(pageable.offset, pageable.limit), definitions.length, pageable);
         });
     }
 

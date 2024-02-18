@@ -10,7 +10,7 @@ import { AddSongDTO } from '../dtos/add-song.dto';
 import { CreatePlaylistDTO } from '../dtos/create-playlist.dto';
 import { PlaylistItemAddResult } from '../entities/playlist-item-added.entity';
 import { Playlist } from '../entities/playlist.entity';
-import { Page, Pageable } from "../../pagination";
+import { Page, Pageable, isNull } from "@soundcore/common";
 import { Logger } from '../../logging';
 import { Future } from '../../utils/future/future';
 import { toFuture } from '../../utils/future';
@@ -18,19 +18,20 @@ import { SCSDK_OPTIONS } from '../../constants';
 
 @Injectable()
 export class SCSDKPlaylistService {
-  private readonly logger = new Logger("PlaylistService");
+  private readonly logger = new Logger(SCSDKPlaylistService.name);
 
   /**
    * Subject used to control the emitted data by the $library observable.
    */
-  private readonly _librarySubj: BehaviorSubject<Playlist[]> = new BehaviorSubject([]);
+  // private readonly _librarySubj: BehaviorSubject<Playlist[]> = new BehaviorSubject([]);
 
   /**
    * Observable that emits the currently available playlists of a user.
    */
-  public readonly $library: Observable<Playlist[]> = this._librarySubj.asObservable();
+  public readonly $library: Observable<Playlist[]> = this.librarySubject.asObservable();
 
   constructor(
+    private readonly librarySubject: BehaviorSubject<Playlist[]>,
     private readonly httpClient: HttpClient,
     @Inject(SCSDK_OPTIONS) private readonly options: SCSDKOptions
   ) {
@@ -42,9 +43,9 @@ export class SCSDKPlaylistService {
    * @param playlistId Playlist's id
    * @returns Playlist
    */
-  public findById(playlistId: string): Observable<ApiResponse<Playlist>> {
-    if(!playlistId) return of(ApiResponse.withPayload(null));
-    return this.httpClient.get<Playlist>(`${this.options.api_base_uri}/v1/playlists/${playlistId}`).pipe(apiResponse());
+  public findById(playlistId: string): Observable<Future<Playlist>> {
+    if(!playlistId) return of(Future.notfound());
+    return this.httpClient.get<Playlist>(`${this.options.api_base_uri}/v1/playlists/${playlistId}`).pipe(toFuture());
   }
 
   /**
@@ -63,9 +64,9 @@ export class SCSDKPlaylistService {
    * @param authorId Playlist author's id
    * @returns Playlist
    */
-   public findByAuthor(authorId: string, pageable: Pageable): Observable<ApiResponse<Page<Playlist>>> {
-    if(!authorId) return of(ApiResponse.withPayload(null));
-    return this.httpClient.get<Page<Playlist>>(`${this.options.api_base_uri}/v1/playlists/byAuthor/${authorId}${pageable.toQuery()}`).pipe(apiResponse());
+   public findByAuthor(authorId: string, pageable: Pageable): Observable<Future<Page<Playlist>>> {
+    if(!authorId) return of(Future.notfound());
+    return this.httpClient.get<Page<Playlist>>(`${this.options.api_base_uri}/v1/playlists/byAuthor/${authorId}${pageable.toQuery()}`).pipe(toFuture());
   }
 
   /**
@@ -86,10 +87,13 @@ export class SCSDKPlaylistService {
    * @param createPlaylistDto Playlist data to create
    * @returns Playlist
    */
-  public createPlaylist(createPlaylistDto: CreatePlaylistDTO): Observable<ApiResponse<Playlist>> {
+  public createPlaylist(createPlaylistDto: CreatePlaylistDTO): Observable<Future<Playlist>> {
     return this.httpClient.post<Playlist>(`${this.options.api_base_uri}/v1/playlists`, createPlaylistDto).pipe(
-      apiResponse(),
-      tap((response) => this.addToLocalLibrary(response.payload))
+      toFuture(),
+      tap((response) => {
+        if(response.loading) return;
+        this.addToLocalLibrary(response.data);
+      })
     );
   }
 
@@ -116,8 +120,8 @@ export class SCSDKPlaylistService {
         return;
       }
 
-      const elements = response.payload.elements;
-      this._librarySubj.next(elements);
+      const elements = response.payload.items;
+      this.librarySubject.next(elements);
 
       this.logger.log(`Found ${elements.length} playlists in current user's library.`);
     });
@@ -130,10 +134,10 @@ export class SCSDKPlaylistService {
    * @param playlist Playlist to add
    */
   private addToLocalLibrary(playlist: Playlist) {
-    if(typeof playlist === "undefined" || playlist == null) return;
-    const playlists = this._librarySubj.getValue();
+    if(isNull(playlist)) return;
+    const playlists = this.librarySubject.getValue();
     playlists.push(playlist)
-    this._librarySubj.next(playlists);
+    this.librarySubject.next(playlists);
 
     this.logger.log(`Added playlist '${playlist.name}' to local library.`);
   }

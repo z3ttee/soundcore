@@ -2,8 +2,8 @@ import { Injectable, Logger } from '@nestjs/common';
 import { ImportTask, ImportTaskStatus, ImportTaskType } from '../entities/import.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Page, Pageable } from 'nestjs-pager';
 import { User } from '../../user/entities/user.entity';
+import { Page, Pageable } from '@soundcore/common';
 
 @Injectable()
 export class ImportService {
@@ -54,7 +54,7 @@ export class ImportService {
             .limit(pageable.limit)
             .where("user.id = :userId AND task.status IN (:status) AND task.type = :type", { userId, status, type })
             .getManyAndCount().then(([tasks, count]) => {
-                return Page.of(tasks, count, pageable.offset);
+                return Page.of(tasks, count, pageable);
             })
     }
 

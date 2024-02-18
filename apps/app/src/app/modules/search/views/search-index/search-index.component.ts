@@ -2,10 +2,11 @@ import { HttpClient } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
 import { UntypedFormControl } from '@angular/forms';
 import { Router } from '@angular/router';
-import { combineLatest, debounceTime, Observable, Subject, switchMap, takeUntil, tap } from 'rxjs';
+import { combineLatest, debounceTime, Observable, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { SCCDKScreenService } from '@soundcore/cdk';
-import { SCDKGenreService, MeiliAlbum, MeiliArtist, SCSDKSearchService, SCDKResource, MeiliPlaylist, Pageable, MeiliUser, SCDKUserService, SCDKArtistService, SCDKAlbumService, MeiliSong, SCSDKSongService, SCSDKPlaylistService } from '@soundcore/sdk';
+import { SCDKGenreService, MeiliAlbum, MeiliArtist, SCSDKSearchService, SCDKResource, MeiliPlaylist, MeiliUser, SCDKUserService, SCDKAlbumService, MeiliSong, SCSDKSongService, SCSDKPlaylistService, SCSDKArtistService } from '@soundcore/sdk';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { Pageable } from '@soundcore/common';
 
 interface SearchIndexProps {
   query?: string;
@@ -38,7 +39,7 @@ export class SearchIndexComponent implements OnInit, OnDestroy {
     private readonly searchService: SCSDKSearchService,
 
     private readonly userService: SCDKUserService,
-    private readonly artistService: SCDKArtistService,
+    private readonly artistService: SCSDKArtistService,
     private readonly albumService: SCDKAlbumService,
     private readonly genreService: SCDKGenreService,
     private readonly songService: SCSDKSongService,
@@ -61,14 +62,15 @@ export class SearchIndexComponent implements OnInit, OnDestroy {
     switchMap(([history, query, isTouch]) => {
       return new Observable<SearchIndexProps>((subscriber) => {
         subscriber.add(combineLatest([
-          this.songService.searchSongs(query, new Pageable(0, 10)).pipe(takeUntil(this.$cancel)),
+          // this.songService.searchSongs(query, new Pageable(0, 10)).pipe(takeUntil(this.$cancel)),
+          of(null),
           this.artistService.searchArtist(query, new Pageable(0, 10)).pipe(takeUntil(this.$cancel)),
           this.albumService.searchAlbum(query, new Pageable(0, 10)).pipe(takeUntil(this.$cancel)),
           this.playlistService.searchPlaylist(query, new Pageable(0, 10)).pipe(takeUntil(this.$cancel)),
           this.userService.searchUser(query, new Pageable(0, 10)).pipe(takeUntil(this.$cancel))
         ]).subscribe(([songSearchReq, artistSearchReq, albumSearchReq, playlistSearchReq, userSearchReq]) => {
           const hits: SearchHits = {
-            songs: songSearchReq?.payload?.hits ?? [],
+            songs: (songSearchReq as any)?.payload?.hits ?? [],
             artists: artistSearchReq?.payload?.hits ?? [],
             albums: albumSearchReq?.payload?.hits ?? [],
             playlists: playlistSearchReq?.payload?.hits ?? [],

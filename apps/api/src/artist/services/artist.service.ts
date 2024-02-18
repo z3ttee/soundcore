@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Page, Pageable } from '@soundcore/common';
 import { Slug } from '@tsalliance/utilities';
-import { Page, BasePageable } from 'nestjs-pager';
 import { ObjectLiteral, Repository, SelectQueryBuilder, UpdateResult } from 'typeorm';
 import { GeniusFlag } from '../../utils/entities/genius.entity';
 import { MeilisearchFlag } from '../../utils/entities/meilisearch.entity';
@@ -43,6 +43,7 @@ export class ArtistService {
         const rawAndEntities = await this.repository.createQueryBuilder("artist")
             .leftJoin("artist.songs", "song")
             .leftJoin("song.streams", "stream")
+            .leftJoin("song.featuredArtists", "featuredArtists")
             .loadRelationCountAndMap("artist.albumCount", "artist.albums", "albumCount")
             .loadRelationCountAndMap("artist.songCount", "artist.songs", "songCount")
             .addSelect("COUNT(stream.id)", "streamCount")
@@ -80,7 +81,7 @@ export class ArtistService {
      * @param pageable Page settings
      * @returns Page<Artist>
      */
-    public async findBySyncFlag(flag: MeilisearchFlag, pageable: BasePageable): Promise<Page<Artist>> {
+    public async findBySyncFlag(flag: MeilisearchFlag, pageable: Pageable): Promise<Page<Artist>> {
         const result = await this.repository.createQueryBuilder("artist")
             .leftJoinAndSelect("artist.artwork", "artwork")
             .where("artist.lastSyncFlag = :flag", { flag })
@@ -90,7 +91,7 @@ export class ArtistService {
             .limit(pageable.limit)
             .getManyAndCount();
 
-        return Page.of(result[0], result[1], pageable.offset);
+        return Page.of(result[0], result[1], pageable);
     }
 
     /**
@@ -172,20 +173,6 @@ export class ArtistService {
     //         });
     //     });
     // }
-
-    /**
-     * Set resource flag of an artist.
-     * @param idOrObject Artist id or object
-     * @param flag Resource flag
-     * @returns Artist
-     */
-    public async setFlag(idOrObject: string | Artist, flag: ResourceFlag): Promise<Artist> {
-        const artist = await this.resolveArtist(idOrObject);
-        if(!artist) return null;
-
-        artist.flag = flag;
-        return this.repository.save(artist);
-    }
 
     /**
      * Set resource flag of an artist.

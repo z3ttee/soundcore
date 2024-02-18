@@ -1,11 +1,10 @@
-<div 
-    (click)="emitOnPlayMobile($event)" 
-    class="song-list-item-wrapper flex flex-1 gap-1 px-1.5 w-full overflow-x-hidden items-center rounded select-none cursor-pointer bg-body-light bg-opacity-0 hover:bg-opacity-30 active:bg-opacity-50 [&>.list-item-play-btn]:hover:opacity-100 border-body-lighter border border-opacity-0 hover:border-opacity-100" 
+<div  
+    class="song-list-item-wrapper relative flex flex-1 gap-1 px-1.5 w-full overflow-x-hidden items-center rounded select-none cursor-pointer bg-body-light bg-opacity-0 hover:bg-opacity-30 active:bg-opacity-50 [&>.list-item-play-btn]:hover:opacity-100 border-body-lighter border border-opacity-0 hover:border-opacity-100" 
     [ngClass]="{'pointer-events-none': !song}"
     [style.height]="itemHeight + 'px'">
-        
+<!-- (click)="emitOnPlayMobile($event)" -->
     <!-- ID -->
-    <div class="relative max-w-11 min-w-11 h-11 justify-center items-center hidden md:inline-flex" *ngIf="showId">
+    <div class="relative max-w-11 min-w-11 h-11 justify-center items-center hidden md:inline-flex" *ngIf="showId && index !== null && index !== undefined">
         <scngx-skeleton [class]="'w-6 h-6 rounded-sm'" *ngIf="!song; else songId"></scngx-skeleton>
 
         <ng-template #songId>
@@ -27,10 +26,20 @@
     </div>
 
     <!-- Song title -->
-    <div class="flex overflow-hidden w-full gap-2 items-center min-w-0">
-        <div class="min-w-12 max-w-12 h-12 rounded-sm overflow-hidden" *ngIf="showCover">
+    <div class="flex relative w-full gap-2 items-center min-w-0 overflow-y-hidden">
+        <!-- Click trigger for mobile devices -->
+        <div class="absolute z-30 pointer-events-auto -top-2 -left-2 -bottom-2 right-1 md:hidden" (click)="emitOnPlayMobile($event)"></div>
+
+        <div class="min-w-12 max-w-12 h-12 rounded-sm overflow-hidden relative" *ngIf="showCover">
             <scngx-skeleton [class]="'w-full h-full'" *ngIf="!song; else songCover"></scngx-skeleton>
             <ng-template #songCover><scngx-artwork [artwork]="song?.artwork"></scngx-artwork></ng-template>
+
+            <div *ngIf="active && playing" class="md:hidden absolute h-full w-full top-0 left-0 flex items-center justify-center bg-body-dark bg-opacity-50 p-1">
+                <!-- <span class="absolute top-1/2 left-1/2"> -->
+                    <ng-container *ngTemplateOutlet="animRef"></ng-container>
+                <!-- </span> -->
+            </div>
+            
         </div>
 
         <div class="flex flex-col w-full" *ngIf="!song; else songTitle">
@@ -55,7 +64,7 @@
     </div>
 
     <!-- Song album -->
-    <div class="min-w-44 w-44 px-2 text-right text-font text-opacity-70 hidden md:block md:line-clamp-1" *ngIf="showAlbum">
+    <div class="min-w-44 w-44 px-2 text-right text-font text-opacity-70 hidden md:block md:line-clamp-1" *ngIf="showAlbum && song?.album">
         <scngx-skeleton [class]="'w-full h-4'" *ngIf="!song; else songAlbum"></scngx-skeleton>
 
         <ng-template #songAlbum>
@@ -76,10 +85,10 @@
     </div>
 
     <!-- Like Col -->
-    <div class="song-item-like-col inline-flex justify-center items-end max-w-10 min-w-10 px-2 opacity-100 pointer-events-none transition-all" [ngClass]="{'md:opacity-0': !song?.liked, 'opacity-100 pointer-events-auto': song?.liked || isMobile, 'text-accent opacity-100': song?.liked}">
+    <div class="song-item-like-col inline-flex justify-center items-end max-w-10 min-w-10 px-2 opacity-100 pointer-events-none transition-all" [ngClass]="{'md:opacity-0': !song?.liked, 'opacity-100 pointer-events-auto': song?.liked, 'text-accent opacity-100': song?.liked}">
         <span *ngIf="song" class="w-6 h-6" matRipple [matRippleCentered]="true" [matRippleUnbounded]="true" [matRippleRadius]="20" (click)="emitOnLike($event)">
-            <ng-icon name="heroHeart" class="w-6 h-6" *ngIf="!song?.liked"></ng-icon>
-            <ng-icon name="heroHeartSolid" class="w-6 h-6 fill-accent" *ngIf="song?.liked"></ng-icon>
+            <ng-icon size="21" name="heroHeart" class="w-6 h-6" *ngIf="!song?.liked"></ng-icon>
+            <ng-icon size="21" name="heroHeartSolid" class="w-6 h-6 fill-accent" *ngIf="song?.liked"></ng-icon>
         </span>
     </div>
     
@@ -92,7 +101,7 @@
     <!-- Menu column -->
     <div class="min-w-10 text-center">
         <span *ngIf="song" class="flex items-center justify-center w-8 h-8" matRipple [matRippleCentered]="true" [matRippleUnbounded]="true" [matRippleRadius]="20">
-            <ng-icon name="heroEllipsisVerticalSolid" class="w-6 h-6"></ng-icon>
+            <ng-icon size="21" name="heroEllipsisVerticalSolid" class="w-6 h-6"></ng-icon>
         </span>
     </div>
 </div>

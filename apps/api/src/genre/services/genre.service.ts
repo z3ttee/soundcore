@@ -1,6 +1,6 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Page, BasePageable } from 'nestjs-pager';
+import { Page, Pageable } from '@soundcore/common';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 import { CreateResult } from '../../utils/results/creation.result';
 import { CreateGenreDTO } from '../dtos/create-genre.dto';
@@ -20,13 +20,13 @@ export class GenreService {
      * @param pageable Page settings
      * @returns Page<Genre>
      */
-    public async findAll(pageable: BasePageable): Promise<Page<Genre>> {
+    public async findAll(pageable: Pageable): Promise<Page<Genre>> {
         const result = await this.buildGeneralQuery("genre")
             .skip(pageable.offset)
             .take(pageable.limit)
             .getManyAndCount();
 
-        return Page.of(result[0], result[1], pageable.offset);
+        return Page.of(result[0], result[1], pageable);
     }
 
     /**
@@ -60,7 +60,7 @@ export class GenreService {
      * @param pageable Page settings
      * @returns Page<Genre>
      */
-    public async findByArtist(artistIdOrSlug: string, pageable: BasePageable): Promise<Page<Genre>> {
+    public async findByArtist(artistIdOrSlug: string, pageable: Pageable): Promise<Page<Genre>> {
         const result = await this.repository.createQueryBuilder("genre")
             .leftJoin("genre.songs", "song")
             .leftJoin("song.artists", "artist")
@@ -71,7 +71,7 @@ export class GenreService {
             .where("artist.id = :artistIdOrSlug OR artist.slug = :artistIdOrSlug", { artistIdOrSlug })
             .getManyAndCount();
 
-        return Page.of(result[0], result[1], pageable.offset);
+        return Page.of(result[0], result[1], pageable);
     }
 
     /**

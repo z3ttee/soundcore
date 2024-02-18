@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { BasePageable, Page } from 'nestjs-pager';
+import { Page, Pageable } from '@soundcore/common';
 import { ILike, In, Repository } from 'typeorm';
 import { KeycloakTokenPayload } from '../authentication/entities/oidc-token.entity';
 import { MeilisearchFlag } from '../utils/entities/meilisearch.entity';
@@ -124,7 +124,7 @@ export class UserService {
         // });
     }
 
-    public async findBySearchQuery(query: string, pageable: BasePageable): Promise<Page<User>> {
+    public async findBySearchQuery(query: string, pageable: Pageable): Promise<Page<User>> {
         if(!query || query == "") {
             query = "%"
         } else {
@@ -132,7 +132,7 @@ export class UserService {
         }
 
         const result = await this.repository.findAndCount({ where: { name: ILike(query) }, skip: pageable.offset, take: pageable.limit});
-        return Page.of(result[0], result[1], pageable.offset);
+        return Page.of(result[0], result[1], pageable);
     }
 
     private hasUpdated(token: KeycloakTokenPayload, existingUser: User): boolean {

@@ -7,7 +7,7 @@ export class AppController {
 
     constructor(private readonly service: AppService) {}
 
-    @Get("/")
+    @Get("")
     public async getBuildInfo(): Promise<ApplicationInfo> {
         return {
             build: await this.service.getApplicationBuildInfo(),

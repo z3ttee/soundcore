@@ -7,9 +7,6 @@ export { SCSDKAppService, ApplicationInfo, ApplicationBuildInfo } from "./lib/ap
 // Gateways
 export * from "./lib/gateway";
 
-// Pagination
-export * from "./lib/pagination";
-
 // Tracklist
 export * from "./lib/tracklist";
 
@@ -28,8 +25,9 @@ export * from "./lib/profile";
 // Import Module
 export * from "./lib/import";
 
-// Futures
+// Utils
 export * from "./lib/utils/future";
+export * from "./lib/utils/datasource";
 
 // Mount Module
 export * from "./lib/mount";
@@ -54,6 +52,9 @@ export * from "./lib/metrics";
 
 // Configure Module
 export * from "./lib/configure";
+
+// Artist Module
+export * from "./lib/artist";
 
 
 // Utils
@@ -85,14 +86,6 @@ export * from "./lib/user/services/user.service";
 // Genre Module
 export * from "./lib/genre/services/genre.service";
 export * from "./lib/genre/entities/genre.entity";
-
-
-/**
- * Export all artist sdk parts
- */
-export * from "./lib/artist/artist.module";
-export * from "./lib/artist/services/artist.service";
-export * from "./lib/artist/entities/artist.entity";
 
 /**
  * Export all album sdk parts

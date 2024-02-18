@@ -1,6 +1,7 @@
-import { Controller, Get, Param } from '@nestjs/common';
-import { Page, Pageable, Pagination } from 'nestjs-pager';
+import { Controller, Get, Param, Query } from '@nestjs/common';
+import { isNull, Page, Pageable, Pagination } from '@soundcore/common';
 import { Authentication } from '../../authentication/decorators/authentication.decorator';
+import { Public } from '../../authentication/decorators/public.decorator';
 import { User } from '../../user/entities/user.entity';
 import { Song } from '../entities/song.entity';
 import { SongService } from '../services/song.service';
@@ -29,10 +30,10 @@ export class SongController {
     return this.songService.findIdsByCollection(user)
   }
 
-  @Get("/byCollection/byArtist/:artistId")
-  public async findByCollectionAndArtist(@Param("artistId") artistId: string, @Authentication() user: User, @Pagination() pageable: Pageable): Promise<Page<Song>> {
-    return this.songService.findByCollectionAndOrArtist(user, pageable, artistId)
-  }
+  // @Get("/byCollection/byArtist/:artistId")
+  // public async findByCollectionAndArtist(@Param("artistId") artistId: string, @Authentication() user: User, @Pagination() pageable: Pageable): Promise<Page<Song>> {
+  //   return this.songService.findByCollectionAndOrArtist(user, pageable, artistId)
+  // }
 
   @Get("/byGenre/:genreId")
   public async findByGenre(@Param("genreId") genreId: string, @Pagination() pageable: Pageable, @Authentication() user: User): Promise<Page<Song>> {
@@ -47,6 +48,30 @@ export class SongController {
   @Get(":songId")
   public async findById(@Param("songId") songId: string, @Authentication() user: User): Promise<Song> {
     return this.songService.findById(songId, false, user);
+  }
+
+
+
+
+  @Get("/album/:albumId")
+  public async findByAlbum(@Param("albumId") albumId: string, @Authentication() authentication: User, @Pagination() pageable: Pageable, @Query("seed") seed?: string) {
+    return this.songService.findByAlbum(albumId, pageable, authentication, isNull(seed) ? undefined : Number(seed));
+  }
+
+  @Get("/artist/:artistId")
+  public async findByArtist(@Param("artistId") artistId: string, @Authentication() authentication: User, @Pagination() pageable: Pageable, @Query("seed") seed?: string) {
+    return this.songService.findByArtist(artistId, pageable, authentication, isNull(seed) ? undefined : Number(seed));
+  }
+
+  @Get("/artist_top/:artistId")
+  public async findByArtistTop(@Param("artistId") artistId: string, @Authentication() authentication: User, @Pagination() pageable: Pageable, @Query("seed") seed?: string) {
+    return this.songService.findByArtistIdTop(artistId, pageable, authentication, isNull(seed) ? undefined : Number(seed));
+  }
+
+  @Public(true)
+  @Get("/playlist/:playlistId")
+  public async findByPlaylist(@Param("playlistId") playlistId: string, @Authentication() authentication: User, @Pagination() pageable: Pageable, @Query("seed") seed?: string) {
+    return this.songService.findByPlaylist(playlistId, pageable, authentication, isNull(seed) ? undefined : Number(seed));
   }
 
 }

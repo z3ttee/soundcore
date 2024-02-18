@@ -1,6 +1,5 @@
 import { HttpClient } from "@angular/common/http";
 import { Inject, Injectable } from "@angular/core";
-import { Page, Pageable } from "../../pagination";
 import { BehaviorSubject, Observable, of } from "rxjs";
 import { MeiliAlbum } from "../../meilisearch/entities/meili-album.entity";
 import { ApiSearchResponse } from "../../meilisearch/entities/search-response.entity";
@@ -9,6 +8,7 @@ import { ApiResponse } from "../../utils/responses/api-response";
 import { apiResponse } from "../../utils/rxjs/operators/api-response";
 import { Album } from "../entities/album.entity";
 import { SCSDK_OPTIONS } from "../../constants";
+import { Page, Pageable } from "@soundcore/common";
 
 @Injectable()
 export class SCDKAlbumService {
@@ -38,7 +38,7 @@ export class SCDKAlbumService {
      * @returns Page<Album>
      */
     public findRecommendedByArtist(artistId: string, seed: string[] = []): Observable<ApiResponse<Page<Album>>> {
-        if(!artistId) return of(ApiResponse.withPayload(Page.of([])));
+        if(!artistId) return of(ApiResponse.withPayload(Page.empty()));
 
         const query = new URLSearchParams()
         for(const except of seed) {
@@ -55,7 +55,7 @@ export class SCDKAlbumService {
      * @returns Observable<Page<Album>>
      */
     public findByArtist(artistId: string, pageable: Pageable): Observable<ApiResponse<Page<Album>>> {
-        if(!artistId) return of(ApiResponse.withPayload(Page.of([])));
+        if(!artistId) return of(ApiResponse.withPayload(Page.empty(pageable)));
         return this.httpClient.get<Page<Album>>(`${this.options.api_base_uri}/v1/albums/byArtist/${artistId}${pageable.toQuery()}`).pipe(apiResponse())
     }
 
@@ -67,7 +67,7 @@ export class SCDKAlbumService {
      * @returns Observable<Page<Album>>
      */
     public findFeaturedByArtist(artistId: string, pageable: Pageable): Observable<ApiResponse<Page<Album>>> {
-        if(!artistId) return of(ApiResponse.withPayload(Page.of([])));
+        if(!artistId) return of(ApiResponse.withPayload(Page.empty(pageable)));
         return this.httpClient.get<Page<Album>>(`${this.options.api_base_uri}/v1/albums/byFeaturedArtist/${artistId}${pageable.toQuery()}`).pipe(apiResponse())
     }
 

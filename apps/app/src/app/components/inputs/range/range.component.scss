@@ -1,7 +1,16 @@
 :host {  
 
     input[type=range] {
-        @apply bg-body-lighter w-full appearance-none inline-block bg-opacity-70 h-[4px] transform-gpu origin-bottom cursor-pointer will-change-auto -mt-2;
+        @apply bg-body-lighter bg-opacity-70 transform-gpu;
+
+        display: inline-block;
+        appearance: none;
+        width: 100%;
+        height: 4px;
+        cursor: pointer;
+        will-change: auto;
+        margin-top: -8px;
+        transform-origin: bottom;
 
         background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #FFBF50), color-stop(100%, #FFBF50));
         background-size: 0% 100%;
@@ -10,7 +19,15 @@
 
     /* Chrome based browsers */
     input[type=range]::-webkit-slider-thumb {
-        @apply appearance-none border-none h-4 w-4 rounded-full bg-accent cursor-pointer -mt-0 transition-all;
+        @apply bg-accent cursor-pointer transition-all;
+
+        appearance: none;
+        height: 1em;
+        width: 1em;
+
+        border-radius: 9999px;
+        border-style: none;
+        margin-top: 0px;
     }
     input[type=range]:active::-webkit-slider-thumb {
         @apply transform-gpu scale-125;
@@ -18,7 +35,15 @@
 
     /* Firefox */
     input[type=range]::-moz-range-thumb {
-        @apply appearance-none border-none h-4 w-4 rounded-full bg-accent cursor-pointer -mt-0 transition-all;
+        @apply bg-accent transition-all;
+
+        appearance: none;
+        height: 1em;
+        width: 1em;
+
+        border-radius: 9999px;
+        border-style: none;
+        margin-top: 0px;
     }
     input[type=range]:active::-moz-range-thumb {
         @apply transform-gpu scale-125;

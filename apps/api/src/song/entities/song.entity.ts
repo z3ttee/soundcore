@@ -9,7 +9,6 @@ import { PlaylistItem } from "../../playlist/entities/playlist-item.entity";
 import { Publisher } from "../../publisher/entities/publisher.entity";
 import { Stream } from "../../stream/entities/stream.entity";
 import { Slug } from "@tsalliance/utilities";
-import { Resource, ResourceFlag, ResourceType } from "../../utils/entities/resource";
 import { LikedSong } from "../../collection/entities/like.entity";
 import { File } from "../../file/entities/file.entity";
 import { SongArtwork } from "../../artwork/entities/artwork.entity";
@@ -17,6 +16,7 @@ import { TracklistItem } from "../../tracklist/entities/tracklist.entity";
 import { GeniusInfo } from "../../utils/entities/genius.entity";
 import { MeilisearchInfo } from "../../utils/entities/meilisearch.entity";
 import { MeilisearchHasMany, MeilisearchHasOne, MeilisearchIndex, MeilisearchPK, MeilisearchProp } from "@soundcore/meilisearch";
+import { PlayableEntity, PlayableEntityType } from "../../tracklist/entities/playable.entity";
 
 export interface SongID {
     id: string;
@@ -27,9 +27,12 @@ export const SONG_ARTWORK_RELATION_FK = "artworkId"
 @Entity()
 @Index(["name", "primaryArtist", "album", "duration", "order"], { unique: true })
 @MeilisearchIndex()
-export class Song implements SongID, Resource, TracklistItem {
-    public resourceType: ResourceType = "song";
-
+export class Song implements SongID, TracklistItem, PlayableEntity {
+    /**
+     * PLAYABLE ENTITY ATTRIBUTES
+     */
+    public readonly type: PlayableEntityType = PlayableEntityType.SONG;
+    
     /**
      * MEILISEARCH RELATED ATTRIBUTES
      */
@@ -48,9 +51,6 @@ export class Song implements SongID, Resource, TracklistItem {
     @PrimaryGeneratedColumn("uuid")
     @MeilisearchPK({ searchable: false })
     public id: string;
-
-    @Column({ type: "tinyint", default: 0 })
-    public flag: ResourceFlag;
 
     @Column({ nullable: true, length: 120 })
     @MeilisearchProp()
@@ -150,9 +150,8 @@ export class Song implements SongID, Resource, TracklistItem {
     // Value that will be set if the songs of a playlist
     // are fetched
     public playlistAdded?: Date;
-    public streamCount = 0;
-    public liked = false;
-    public available = true;
+    public streamCount = undefined;
+    public liked = undefined;
 
     @BeforeInsert()
     public onBeforeInsert() {

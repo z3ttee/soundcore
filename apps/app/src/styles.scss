@@ -15,7 +15,10 @@
 * {
     font-family: 'Readex Pro', sans-serif;
     -webkit-tap-highlight-color: transparent;
-    @apply font-normal text-base;
+    font-weight: 500;
+
+    font-size: 14px;
+    line-height: 1.5rem/* 24px */;
 }
 
 html, body { 
@@ -32,6 +35,8 @@ body {
 .cdk-global-overlay-wrapper, .cdk-overlay-container {
     z-index: 9999999999999 !important;
 }
+
+.mdc-notched-outline__notch { border-right: none; }
 
 /**
 []=============================[]
@@ -69,7 +74,7 @@ h6 {
 */
 /* width */
 ::-webkit-scrollbar {
-    @apply w-3;
+    width: 0.75rem/* 12px */;
 }
   
 /* Handle */
@@ -78,7 +83,7 @@ h6 {
 }
 
 ::-webkit-scrollbar-track {
-    @apply bg-transparent;
+    background-color: transparent;
 }
 
 /**

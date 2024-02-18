@@ -12,6 +12,7 @@ import { SCNGXSeekerModule } from "src/app/components/inputs/seeker";
 import { AppDurationPipeModule } from "src/app/pipes/duration/duration-pipe.module";
 import { BigPictureComponent } from "./views/bigpicture/bigpicture.component";
 import { MatSnackBarModule } from "@angular/material/snack-bar";
+import { PlayableEntityTypePipeModule } from "src/app/pipes/playableEntity/playableEntityType.module";
 
 const routes: Routes = [
     { path: "", component: BigPictureComponent },
@@ -34,7 +35,8 @@ const routes: Routes = [
         SCNGXExplicitBadgeModule,
         SCNGXSeekerModule,
         SCNGXRangeModule,
-        AppDurationPipeModule
+        AppDurationPipeModule,
+        PlayableEntityTypePipeModule
     ],
     exports: [
         BigPictureComponent

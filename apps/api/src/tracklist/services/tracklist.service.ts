@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Page, BasePageable } from 'nestjs-pager';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 import { PlaylistItem } from '../../playlist/entities/playlist-item.entity';
 import { Song } from '../../song/entities/song.entity';
@@ -9,6 +8,7 @@ import { SongService } from '../../song/services/song.service';
 import { User } from '../../user/entities/user.entity';
 import { LikedSong } from '../../collection/entities/like.entity';
 import { LikeService } from '../../collection/services/like.service';
+import { Page, Pageable } from '@soundcore/common';
 
 @Injectable()
 export class TracklistService {
@@ -28,6 +28,7 @@ export class TracklistService {
     public async findListByArtist(artistId: string, hostname: string, authentication?: User): Promise<Tracklist> {
         const result = await this.buildFindByArtistQuery(artistId, null, authentication).select(["song.id"]).getManyAndCount();
         const metadataUrl = `/meta`;
+
         return new Tracklist(result[1], TracklistType.ARTIST, result[0], metadataUrl);
     }
 
@@ -38,7 +39,7 @@ export class TracklistService {
      * @param authentication User authentication object
      * @returns Page<Song>
      */
-    public async findMetaByArtist(artistId: string, pageable: BasePageable, authentication?: User): Promise<Page<Song>> {
+    public async findMetaByArtist(artistId: string, pageable: Pageable, authentication?: User): Promise<Page<Song>> {
         const baseQuery = await this.buildFindByArtistQuery(artistId, pageable, authentication)
         
         const result = await baseQuery.getRawAndEntities();
@@ -46,7 +47,7 @@ export class TracklistService {
         return Page.of(result.entities.map((song, index) => {
             song.streamCount = result.raw[index]?.streamCount || 0
             return song;
-        }), totalElements, pageable.offset);   
+        }), totalElements, pageable);   
     }
 
     /**
@@ -76,7 +77,7 @@ export class TracklistService {
         return Page.of(result.entities.map((song, index) => {
             song.streamCount = result.raw[index]?.streamCount || 0
             return song;
-        }), totalElements, 0);   
+        }), totalElements);   
     }
 
     /**
@@ -99,14 +100,14 @@ export class TracklistService {
      * @param authentication User authentication object
      * @returns Page<Song>
      */
-    public async findMetaByAlbum(albumId: string, pageable: BasePageable, authentication?: User): Promise<Page<Song>> {
+    public async findMetaByAlbum(albumId: string, pageable: Pageable, authentication?: User): Promise<Page<Song>> {
         const baseQuery = await this.buildFindByAlbumQuery(albumId, pageable, authentication)            
         const result = await baseQuery.getRawAndEntities();
         const totalElements = await baseQuery.getCount();
         return Page.of(result.entities.map((song, index) => {
             song.streamCount = result.raw[index]?.streamCount || 0
             return song;
-        }), totalElements, pageable.offset);    
+        }), totalElements, pageable);    
     }
 
     /**
@@ -138,7 +139,7 @@ export class TracklistService {
      * @param authentication User authentication object
      * @returns Page<Song>
      */
-    public async findMetaByPlaylist(playlistId: string, pageable: BasePageable, authentication?: User): Promise<Page<PlaylistItem>> {
+    public async findMetaByPlaylist(playlistId: string, pageable: Pageable, authentication?: User): Promise<Page<PlaylistItem>> {
         // TODO: Check if user has access to playlist
         const result = await this.tracklistRepository.createQueryBuilder("item")
             .leftJoin("item.song", "song").addSelect(["song.id", "song.slug", "song.name", "song.duration"])
@@ -159,7 +160,7 @@ export class TracklistService {
             .take(pageable.limit)
             .getManyAndCount();
 
-        return Page.of(result[0], result[1], pageable.offset);
+        return Page.of(result[0], result[1], pageable);
     }
 
     /**
@@ -187,7 +188,7 @@ export class TracklistService {
      * @param authentication User authentication object
      * @returns Page<Song>
      */
-    public async findMetaByLikedSongs(authentication: User, pageable: BasePageable): Promise<Page<LikedSong>> {
+    public async findMetaByLikedSongs(authentication: User, pageable: Pageable): Promise<Page<LikedSong>> {
         const result = await this.likeService.getRepository().createQueryBuilder("like")
             .leftJoin("like.user", "user").addSelect(["user.id", "user.slug", "user.name"])
             .leftJoin("user.artwork", "ua").addSelect(["ua.id"])
@@ -203,7 +204,7 @@ export class TracklistService {
             .where("user.id = :userId AND like.type = :type", { userId: authentication.id, type: LikedSong.name })
             .getManyAndCount();
 
-        return Page.of(result[0], result[1], pageable.offset);
+        return Page.of(result[0], result[1], pageable);
     }
 
     /**
@@ -215,7 +216,7 @@ export class TracklistService {
      * @param authentication 
      * @returns SelectQueryBuilder<Song>
      */
-    protected buildFindByArtistQuery(artistId: string, pageable?: BasePageable, authentication?: User): SelectQueryBuilder<Song> {
+    protected buildFindByArtistQuery(artistId: string, pageable?: Pageable, authentication?: User): SelectQueryBuilder<Song> {
         const query = this.songService.buildGeneralQuery("song", authentication)
             // Get amount of streams
             .loadRelationCountAndMap('song.streamCount', 'song.streams', 'streamCount')
@@ -277,7 +278,7 @@ export class TracklistService {
      * @param authentication 
      * @returns SelectQueryBuilder<Song>
      */
-    protected buildFindByAlbumQuery(albumId: string, pageable?: BasePageable, authentication?: User): SelectQueryBuilder<Song> {
+    protected buildFindByAlbumQuery(albumId: string, pageable?: Pageable, authentication?: User): SelectQueryBuilder<Song> {
         let query = this.songService.buildGeneralQuery("song", authentication)
             // Get amount of streams
             // If this has landed, this row can actually be moved to buildGeneralQuery()
@@ -304,7 +305,7 @@ export class TracklistService {
      * @param authentication 
      * @returns SelectQueryBuilder<Song>
      */
-     protected buildFindByPlaylistQuery(playlistId: string, alias: string, pageable?: BasePageable, authentication?: User): SelectQueryBuilder<Song> {
+     protected buildFindByPlaylistQuery(playlistId: string, alias: string, pageable?: Pageable, authentication?: User): SelectQueryBuilder<Song> {
         const query = this.songService.buildGeneralQuery(alias, authentication)
             // Get amount of streams
             // TODO: To be optimised using selectAndMap in next TypeORM release

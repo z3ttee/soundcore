@@ -2,7 +2,7 @@ import { HttpClient } from "@angular/common/http";
 import { Inject, Injectable } from "@angular/core";
 import { Observable } from "rxjs";
 import { SCSDK_OPTIONS } from "../../constants";
-import { Page, Pageable } from "../../pagination";
+import { Page, Pageable } from "@soundcore/common";
 import { SCSDKOptions } from "../../scdk.module";
 import { Future, toFuture } from "../../utils/future";
 import { Task, TaskDefinition } from "../entities/task.entity";

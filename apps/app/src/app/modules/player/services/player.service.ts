@@ -1,361 +1,458 @@
 import { Injectable } from "@angular/core";
-import { Queue, SCNGXDatasourceFreeHandler, SCNGXTracklist } from "@soundcore/ngx";
-import { Logger, Song } from "@soundcore/sdk";
-import { BehaviorSubject, map, Observable, of, Subject, tap } from "rxjs";
-import { PlayerItem } from "../entities/player-item.entity";
-import { AppAudioService } from "./audio.service";
-import { AppControlsService } from "./controls.service";
-import { AppHistoryService } from "./history.service";
-import { AppMediasessionService } from "./mediasession.service";
+import { isNull, toVoid } from "@soundcore/common";
+import { LikedSong, PlayableEntity, PlayableEntityType, PlaylistItem, SCSDKStreamService, Song } from "@soundcore/sdk";
+import { BehaviorSubject, distinctUntilChanged, filter, map, Observable, of, switchMap, take, tap } from "rxjs";
+import { SCNGXTracklist } from "../entities/tracklist.entity";
+import { AudioQueue } from "./queue.service";
+import { environment } from "src/environments/environment";
+import { HttpClient } from "@angular/common/http";
+import { AudioManager } from "../managers/audio-manager";
+import { VolumeManager } from "../managers/volume-manager";
+import { ShuffleManager } from "../managers/shuffle-manager";
+
+export type PlayableItem = Song & PlaylistItem & LikedSong
+
+export type Streamable = Song & {
+    url: string;
+    owner?: PlayableEntity;
+}
 
 @Injectable({
     providedIn: "root"
 })
-export class AppPlayerService {
-    private readonly logger = new Logger(AppPlayerService.name);
+export class PlayerService {
+    private readonly audioManager = new AudioManager();
+    private readonly volumeManager = new VolumeManager(this.audioManager.audioElement);
+    private readonly shuffleManager = new ShuffleManager();
+
+    /**
+     * Subject used to control the $currentItem observable.
+     * This is used to push new state.
+     */
+    private readonly currentItem: BehaviorSubject<Streamable> = new BehaviorSubject(null);
+    /**
+     * Observable that emits the currently playing item
+     */
+    public readonly $currentItem = this.currentItem.asObservable().pipe(distinctUntilChanged());
+
+    // TODO: Loading should be set every time a new song is loading (should start on next() and end when player gives feedback that the song is actually playing)
+    private readonly isLoading: BehaviorSubject<boolean> = new BehaviorSubject(false);
+    public readonly $isLoading = this.isLoading.asObservable();
+
+    /**
+     * Observable that emits the current playback state.
+     * Emits true, if the player is paused
+     * Emits false, if the player is playing
+     */
+    public readonly $isPaused = this.audioManager.$isPaused;
+    public readonly $currentTime = this.audioManager.$currenTime;
+
+    public readonly $volume = this.volumeManager.$volume;
+    public readonly $isMuted = this.volumeManager.$muted;
+    public readonly $shuffled = this.shuffleManager.$shuffled;
+
+    public readonly $queue = this.queue.$queue.pipe(distinctUntilChanged());
+    public readonly $queueSize = this.$queue.pipe(map(([queue, tracklist]) => (queue?.length ?? 0) + (tracklist?.queue?.length ?? 0)), distinctUntilChanged());
 
     constructor(
-        private readonly controls: AppControlsService,
-        private readonly audio: AppAudioService,
-        private readonly history: AppHistoryService,
-        private readonly session: AppMediasessionService
+        private readonly queue: AudioQueue,
+        private readonly streamService: SCSDKStreamService,
+        private readonly httpClient: HttpClient
     ) {
-        this._singleQueue.$onAdded.subscribe(() => {
-            this.logger.verbose(`New playable item waiting in queue. Queue size: ${this.queueSize}`);
-        });
-
-        this._singleQueue.$size.subscribe(() => {
-            this.logger.verbose(`Queue state changed. Queue size: ${this.queueSize}`);
-        });
-
-        this.audio.$onNext.subscribe(() => this.next().subscribe());
-        this.controls.$onSkip.subscribe(() => this.skip());
-        this.controls.$onPrev.subscribe(() => this.prev());
-
-        this.$current.subscribe((current) => {
-            this.session.setSession(current);
-        })
-    }
-
-    private readonly _currentItem: BehaviorSubject<PlayerItem> = new BehaviorSubject(null);
-
-    /**
-     * Observable version of isIdle() function.
-     * Emits true, if the currently playing item is null (nothing playing).
-     * Otherwise it emits false (currently playing).
-     */
-    public readonly $isIdle: Observable<boolean> = this._currentItem.asObservable().pipe(map((value) => !value));
-
-    /**
-     * Queue for handling single songs that were added to the playback queue
-     */
-    private readonly _singleQueue: Queue<Song> = new Queue();
-    /**
-     * Queue for handling tracklists that were added to the playback queue
-     * Currently, this queue can have only one item at a time, but is built for
-     * more items in mind (for now, it seems better UX-wise to just leave it by one).
-     */
-    private _enqueuedTracklist?: SCNGXTracklist;
-    /**
-     * Emits currently playing item.
-     */
-    public readonly $current: Observable<PlayerItem> = this._currentItem.asObservable();
-    /**
-     * Subject to control value of $size observable
-     */
-    private readonly _sizeSubject: BehaviorSubject<number> = new BehaviorSubject(0);
-    /**
-     * Emits current size of the internal queue
-     */
-    public readonly $size: Observable<number> = this._sizeSubject.asObservable();
-    /**
-     * Redirected observable of AppAudioService.
-     * Emits the current time in seconds of the audio src.
-     */
-    public readonly $currentTime: Observable<number> = this.audio.$currentTime;
-    /**
-     * Redirect $isPaused observable from controls service
-     */
-    public readonly $isPaused: Observable<boolean> = this.controls.$isPaused;
-    /**
-     * 
-     */
-    private readonly _preparingSubject: BehaviorSubject<boolean> = new BehaviorSubject(true);
-    public readonly $preparing: Observable<boolean> = this._preparingSubject.asObservable();
-
-    /**
-     * Get full queue size
-     */
-    public get queueSize(): number {
-        return this._singleQueue.size + (this._enqueuedTracklist?.queue?.size || 0);
-    }
-
-    private freeHandler: SCNGXDatasourceFreeHandler = () => false;
-
-    /**
-     * Play a single resource. This will enqueue the song
-     * if "force" is not set to true.
-     * @param song Song to play next
-     * @param force If true, will play the song immediately and skips the currently playing song. This does not cancel playback of a whole tracklist, but just the current song
-     */
-    public playSingle(song: Song, force: boolean = true) {
-        // Check if the tracklist is currently playing
-        if(this.isPlayingSrcById(song.id)) {
-            // If true, check if paused and toggle play/pause
-            if(this.audio.isPaused()) {
-                this.audio.play();
-            } else {
-                this.audio.pause();
-            }
-
-            return;
-        }
-
-        // Enqueue to top of the queue
-        this._singleQueue.enqueueTop(song);
-        this.updateSize();
-
-        // Otherwise play immediately
-        if(force || this.isIdle()) {
-            this.history.resetPointer();
-            this.next().subscribe();
-        }
-    }
-
-    public playSingleFromTracklist(song: Song, tracklist: SCNGXTracklist, force: boolean = false) {
-        // TODO:
+        // Handle ended event on audio element
+        this.audioManager.$onEnded.pipe(switchMap(() => this.next())).subscribe();
+        // Subscribe to shuffle state changes and forward to queue
+        this.shuffleManager.$shuffled.subscribe((shuffled) => this.queue.setShuffled(shuffled));
     }
 
     /**
-     * Play a tracklist. This will enqueue the tracklist if "force"
-     * is not set to true. 
-     * @param tracklist Tracklist to play next
-     * @param force If true, will skip currently playing item and starts playing the tracklist
+     * Toggle shuffle mode. This will generate
+     * a new seed for the player each time the shuffle mode
+     * is switched on again.
+     * @returns State after switching shuffle mode. True, if shuffle is now on, false if shuffle was turned off
      */
-    public playTracklist(tracklist: SCNGXTracklist, force: boolean = true, playAtIndex?: number): Observable<void> {
-        const shouldStartAtIndex: boolean = typeof playAtIndex !== "undefined" && playAtIndex != null;
+    public toggleShuffle() {
+        this.shuffleManager.toggleShuffled();
+    }
+
+    /**
+     * Seek on the track
+     * @param seconds Second to seek
+     */
+    public seek(seconds: number) {
+        this.audioManager.seek(seconds);
+    }
+
+    /**
+     * Add an entity to the queue. Playback will start if the audio element asks for 
+     * new track or if the queue is currently empty
+     * @param entity Entity (e.g. Album) to play
+     * @param tracklist Tracklist that belongs to that entity
+     * @param startIndex Index to start at. Defaults to 0
+     * @returns True, if the entity was enqueued, otherwise false
+     */
+    public playNext(entity: PlayableEntity): Observable<boolean> {
+        return this.toggleIfActive(entity).pipe(
+            switchMap((isActive) => {
+                // If entity is already playing, the playback state just changed
+                // and nothing needs to be done
+                if(isActive) return of(false);
+                // Otherwise enqueue entity
+                const result = this.queue.enqueue(entity as PlayableItem);
+                // Play next
+                return of(result != -1);
+            })
+        );
+
+        // // If is song, always enqueue
+        // if(entity.type === PlayableEntityType.SONG) {
+        //     return this.toggleIfActive(entity).pipe(
+        //         switchMap((isActive) => {
+        //             // If entity is already playing, the playback state just changed
+        //             // and nothing needs to be done
+        //             if(isActive) return of(null);
+
+        //             // Otherwise enqueue entity as song
+        //             this.queue.enqueue(entity as PlayableItem);
+        //             // Play next
+        //             return of(null);
+        //         }),
+        //         toVoid()
+        //     );
+        // }
         
-        // Check if the tracklist is currently playing
-        if(this.isPlayingSrcById(tracklist.id) && !shouldStartAtIndex) {
-            // If true, check if paused and toggle play/pause
-            if(this.audio.isPaused()) {
-                return this.audio.play();
-            } else {
-                return this.audio.pause();
-            }
+        // return this.toggleIfActive(tracklist).pipe(
+        //     switchMap((isActive) => {
+        //         if(isActive) return of(-1);
+
+        //         const resource: ResourceWithTracklist<PlayableItem> = {
+        //             ...entity,
+        //             tracklist: tracklist,
+        //         }
+        
+        //         const positionInQueue = this.queue.enqueue(resource);
+        //         // TODO: Need a method to dequeue an item at index "startIndex" and play it here immediately
+        //         return (this.isIdle ? this.next() : of()).pipe(map(() => positionInQueue));
+        //     }),
+        // );
+    }
+
+    /**
+     * Force play an entity
+     * @param entity Entity (e.g. Album) to play
+     * @param tracklist Tracklist that belongs to that entity
+     * @returns Position in queue (-1 if the tracklist is currently playing and therefor paused state changed)
+     */
+    public forcePlay(entity: PlayableEntity): Observable<void> {
+        // If is song, always enqueue
+        if(entity.type === PlayableEntityType.SONG) {
+            return this.toggleIfActive(entity).pipe(
+                switchMap((isActive) => {
+                    // If entity is already playing, the playback state just changed
+                    // and nothing needs to be done
+                    if(isActive) return of(null);
+
+                    // Otherwise enqueue entity as song
+                    this.queue.enqueue(entity as PlayableItem);
+                    // Play next
+                    return this.next().pipe(toVoid());
+                }),
+                toVoid()
+            );
         }
 
-        return this.dequeueTracklist().pipe(tap((wasDestroyed) => {
-            // "Enqueue" tracklist
-            this._enqueuedTracklist = tracklist;
-            this._enqueuedTracklist.claim(this.freeHandler);
-            this.updateSize();
+        // Entity is a tracklist
+        return this.toggleIfActive(entity).pipe(
+            switchMap((isActive) => {
+                // If entity is already playing, the playback state just changed
+                // and nothing needs to be done
+                if(isActive) return of(null);
+
+                return SCNGXTracklist.create(entity, `${environment.api_base_uri}`, this.httpClient, this.shuffleManager.isShuffled).pipe(
+                    filter(({loading}) => !loading),
+                    switchMap((request) => {
+                        const data = request.data;
+                        if(isNull(data)) return of(null);
     
-            if(shouldStartAtIndex) {
-                this._enqueuedTracklist.resetQueue().subscribe(() => {
-                    this._enqueuedTracklist.dequeueAt(playAtIndex).subscribe((song) => {
-                        const item = new PlayerItem(song, tracklist, false);
-                        this.playItem(item);
-                    });
-                });
-                return;
-            }
+                        // Enqueue tracklist and abort if the item was not enqueued
+                        if(this.queue.enqueue(data) <= -1) {
+                            // Release resources
+                            data.release();
+                            return of(null);
+                        }
     
-            if(force || this.isIdle()) {
-                // Start with next title but take it from tracklist queue
-                this.history.resetPointer();
-                this.next(true).subscribe();
-            }
-        }), map((_) => null));
-    }
-
-    public isPlayingSrcById(id: string) {
-        const current = this._currentItem.getValue();
-        if(typeof current === "undefined" || current == null) return false;
-
-        if(current.tracklist) {
-            return current.tracklist?.id == id;
-        } else {
-            return current.song?.id == id;
-        }
+                        // Find enqueued tracklist (because it may have different obj ref)
+                        const tracklist = this.queue.getEnqueuedTracklist();
+                        // Play next from tracklist
+                        return this.next(tracklist);
+                    })
+                );
+            }),
+            toVoid()
+        );
     }
 
     /**
-     * Play next track in queue.
+     * Force play an entity
+     * @param entity Entity (e.g. Album) to play
+     * @param indexAt Index to start at
+     * @param itemId Id of the item to play at
+     * @returns Position in queue (-1 if the tracklist is currently playing and therefor paused state changed)
      */
-    private next(takeFromTracklist?: boolean): Observable<void> {   
-        return this.getNext(takeFromTracklist).pipe(map((nextItem) => this.playItem(nextItem)));
-    }
+    public forcePlayAt(entity: PlayableEntity, indexAt: number, itemId: string): Observable<void> {
+        return of(null).pipe(
+            switchMap(() => {
+                console.log(entity);
+                // Throw error, if unsupported entity type for forcePlayAt.
+                if(entity.type === PlayableEntityType.SONG) throw new Error(`Cannot call forcePlayAt() on song entities (type=${PlayableEntityType.SONG.toLowerCase()})`);
+                // Initialize tracklist request
+                let tracklistRequest: Observable<SCNGXTracklist> = of(null);
 
-    /**
-     * Play an item object.
-     * @param item PlayerItem data
-     */
-    private playItem(item: PlayerItem): void {
-        if(!item) {
-            this.logger.log(`Queue is empty, cannot get next song`);
-            this.audio.skipTime();
-            return;
-        }
+                // Extract tracklist id
+                const tracklistId = entity.id;
+                // Extract enqueue status of tracklistId
+                const isEnqueued = this.queue.isEnqueued(tracklistId);
+                const isShuffled = this.shuffleManager.isShuffled;
 
-        // Add current item to history
-        const currentItem = this._currentItem.getValue();
-        if(typeof currentItem !== "undefined" && currentItem != null) {
-            this.history.add(currentItem);
-        }
-    
-        // Updated current item
-        this._currentItem.next(item);
-    
-        // Start playing current item
-        this.audio.forcePlay(item).subscribe();
-    }
+                // Check if is already enqueued
+                if(isEnqueued) {
+                    // If true, find tracklist
+                    const enqueuedTracklist = this.queue.getEnqueuedTracklist();
+                    if(isNull(enqueuedTracklist)) return of(null);
 
-    /**
-     * Check if the player is currently playing something.
-     * Evaluates to true, if there is currently nothing playing, otherwise false.
-     * @returns True or False
-     */
-    public isIdle(): boolean {
-        return !this._currentItem.getValue();
-    }
-
-    /**
-     * Skip currently playing track.
-     */
-    public skip() {
-        this.logger.verbose(`Skipping current song...`);
-        this.next().subscribe();
-    }
-
-    /**
-     * Skip currently playing track.
-     */
-     public prev() {
-        this.logger.verbose(`Going to prev song...`);
-
-        if(this.audio.currentTime > 5 || this.history.isEmpty()) {
-            this.logger.verbose(`Resetting time of audio, user tried to go back on song that played longer than 5s`)
-            this.audio.resetTime();
-            return;
-        }
-
-        const nextItem = this.history.backward();
-        this.playItem(nextItem);
-    }
-
-    /**
-     * Get the next available item.
-     * @returns 
-     */
-    private getNext(takeFromTracklist?: boolean): Observable<PlayerItem> {
-        let result: PlayerItem;
-
-        // Check if user went back in history.
-        // If so, try to serve next song from history pointer
-        if(this.history.isActive()) {
-            // Move the pointer one position forward and get that item
-            const item = this.history.forward();
-            this.logger.log(`Took item from history (forward): `, item);
-
-            // If item not nullish, set it as result
-            if(typeof item !== "undefined" && item != null) {
-                return of(item);
-            } else {
-                // If the item is null, history is empty or the pointer has moved
-                // outside scope (more than forward) --> Reset pointer
-                this.history.resetPointer();
-            }
-        }
-
-        // Check if the queue of single songs is not empty and the player did not
-        // advice to explicitly take from a tracklist.
-        // If thats true, take a song from the single song queue
-        if(this._singleQueue.isNotEmpty() && !takeFromTracklist) {
-            // Single queue not empty, take from this queue first
-            let item: Song;
-
-            // Check if the player is currently shuffled
-            if(this.controls.isShuffled()) {
-                // If true, deqeueue from random position
-                item = this._singleQueue.dequeueRandom();
-            } else {
-                // If false, dequeue normally
-                item = this._singleQueue.dequeue();
-            }
-            
-            // Build the result item
-            result = !item ? null : new PlayerItem(item, null);
-        } else {
-            // Otherwise take from tracklist queue
-            
-            // Check if there is a tracklist enqueued
-            console.log("tracklist enqueued? ", !!this._enqueuedTracklist)
-            if(!!this._enqueuedTracklist) {
-                const tracklist = this._enqueuedTracklist;
-
-                // Initialize tracklist as it may not have happened
-                // const itemObservable: Observable<Song> = tracklist.initialize().pipe(switchMap(() => {
-                //     // Switch to dequeueing observable after initialization
-                //     return this.controls.isShuffled() ? tracklist.dequeueRandom() : tracklist.dequeue();
-                // }));
-
-                const itemObservable: Observable<Song> = this.controls.isShuffled() ? tracklist.dequeueRandom() : tracklist.dequeue();
-
-                return itemObservable.pipe(map((song) => {
-                    // Check if the size of the tracklist's internal queue is empty
-                    // If true, dequeue the tracklist
-
-                    console.log(song);
-
-                    console.log(tracklist.queue.size);
-
-                    if(tracklist.queue.size <= 0) {
-                        this.dequeueTracklist().subscribe();
+                    // Check if requested index is already playing
+                    if(enqueuedTracklist.isPlayingById(itemId)) {
+                        // If true, toggle playback state and return
+                        return this.togglePlaying().pipe(switchMap(() => tracklistRequest));
                     }
 
-                    // Build the result item
-                    return !song ? null : new PlayerItem(song, tracklist);
+                    // Restart tracklist using indexAt
+                    if(isShuffled) {
+                        tracklistRequest = enqueuedTracklist.restart(itemId, this.shuffleManager.isShuffled);
+                    } else {
+                        tracklistRequest = enqueuedTracklist.restart(indexAt, this.shuffleManager.isShuffled);
+                    }
+                } else {
+                    // Otherwise create new tracklist
+                    if(isShuffled) {
+                        tracklistRequest = SCNGXTracklist.create(entity, `${environment.api_base_uri}`, this.httpClient, itemId, isShuffled).pipe(filter(({ loading }) => !loading), map((request) => request.data));
+                    } else {
+                        tracklistRequest = SCNGXTracklist.create(entity, `${environment.api_base_uri}`, this.httpClient, indexAt, isShuffled).pipe(filter(({ loading }) => !loading), map((request) => request.data));
+                    }
+                }
+
+                return tracklistRequest;
+            }),
+            switchMap((tracklist) => {
+                if(isNull(tracklist)) return of(null);
+
+                // Check if not enqueued, if true, enqueue tracklist
+                if(!this.queue.isEnqueued(tracklist.id)) {
+                    // Enqueue entity as tracklist
+                    this.queue.enqueue(tracklist);
+                }
+
+                // Get enqueued tracklist by specified id
+                const enqueuedTracklist = this.queue.getEnqueuedTracklist();
+                return this.next(enqueuedTracklist);
+            }),
+            toVoid()
+        );
+    }
+
+    /**
+     * Skip currently playing track
+     * @returns URL of the next playing song
+     */
+    public skip(): Observable<string> {
+        return this.next();
+    }
+
+    /**
+     * Set play to paused or playing based on the current state
+     * @returns rue, if the player is now playing. Otherwise false
+     */
+    public togglePlaying(): Observable<boolean> {
+        return this.audioManager.togglePlaying();
+    }
+
+    public toggleMute() {
+        this.volumeManager.toggleMute();
+    }
+
+    public setVolume(volume: number): void {
+        this.volumeManager.setVolume(volume);
+    }
+
+    /**
+     * Check if the player is idling. If true, it means
+     * there is nothing playing
+     */
+    public get isIdle(): boolean {
+        return isNull(this.currentItem.getValue());
+    }
+
+    /**
+     * Get the url to the stream that is currently playing
+     */
+    public get currentUrl(): string {
+        return this.currentItem.getValue()?.url;
+    }
+
+    public get currentItemId(): string {
+        return this.currentItem.getValue()?.id;
+    }
+
+    /**
+     * Get the tracklist id of the currently playing item
+     */
+    public get currentTracklistId(): string {
+        return this.currentItem.getValue()?.owner?.id;
+    }
+
+    /**
+     * Toggle the playback of a tracklist if it is active.
+     * @param tracklist Tracklist entity
+     * @returns True, if tracklist is active and state has changed. Otherwise false, if the tracklist currently is not active
+     */
+    public toggleIfActive(item: PlayableEntity): Observable<boolean> {
+        // Check if the tracklist is playing currently
+        if(this.currentTracklistId === item.id || this.currentItemId === item.id) {
+            // If true, the user may have clicked the play button again to
+            // pause the audio. So pause it
+            return this.togglePlaying().pipe(map(() => true));
+        }
+
+        return of(false);
+    }
+    private next(): Observable<string>;
+    private next(tracklist?: SCNGXTracklist): Observable<string>;
+    private next(tracklist?: SCNGXTracklist): Observable<string> {
+        return new Observable<[Song, SCNGXTracklist]>((subscriber) => {
+            // Check if a tracklist is provided
+            if(isNull(tracklist)) {
+                // If not, continue normally by dequeueing from tracks
+                // Dequeue next item from queue
+                const nextItem = this.queue.dequeue();
+
+                // If the resource is null, the queue is completely empty
+                if(isNull(nextItem)) {
+                    // Because this could mean a skip is tried, just skip to end of current song
+                    this.audioManager.resetCurrentlyPlaying(true);
+                    subscriber.next([null, null]);
+                    subscriber.complete();
+                    return;
+                }
+
+                // Check if the item is not a list of tracks
+                if(!nextItem.isList) {
+                    // If true, return song
+                    const data = nextItem.data as PlayableItem;
+                    subscriber.next([data, null]);
+                    subscriber.complete();
+                    return;
+                }
+
+                // Treat data as tracklist (as its the only other option at this point)
+                const data = nextItem.data as SCNGXTracklist;
+                // Add next-query to subscriber
+                subscriber.add(data.getNextItem().subscribe((item) => {
+                    // Emit result on subscriber
+                    subscriber.next([item, data]);
+                    subscriber.complete();
                 }));
+                return;
             }
+            
+            // Otherwise dequeue from provided tracklist
+            subscriber.add(tracklist.getNextItem().pipe(switchMap((item): Observable<Song> => {
+                // If current item is already playing, toggle play state
+                if(this.isPlaying(item?.id, tracklist.id)) {
+                    return this.togglePlaying().pipe(map(() => null));
+                }
 
-            result = null;
-        }
+                return of(item);
+            })).subscribe((item) => {
+                // Push result
+                subscriber.next([item, tracklist]);
+                // Complete subscription
+                subscriber.complete();
+            }));
+        }).pipe(
+            switchMap(([item, tracklist]) => {
+                // If the next item is null, the tracklist is empty
+                // So we have to skip to the end of the track and let it start
+                // from beginning if play is hit
+                if(isNull(item)) {
+                    this.audioManager.resetCurrentlyPlaying(true);
+                    return of(null);
+                }
 
-        // Update size state because item could have been dequeued
-        this.updateSize();
-        return of(result);
+                // Request stream url
+                return this.streamService.requestStreamUrl(item.id, true).pipe(tap((url) => {
+                    // Update current item
+                    this.setCurrentItem(item, url, tracklist?.owner);
+                }));
+            }),
+            // Start playing the item
+            switchMap((url) => {
+                if(isNull(url)) return of(this.currentUrl);
+                // return this.controls.play(url);
+                return this.audioManager.play(url);
+            }),         
+            take(1)
+        );
     }
+
+    // private nextFromTracklist(tracklist: SCNGXTracklist): Observable<string> {
+    //     return tracklist.getNextItem().pipe(
+    //         switchMap((item): Observable<string> => {
+    //             // If the next item is null, the tracklist is empty
+    //             // So we have to skip to the end of the track and let it start
+    //             // from beginning if play is hit
+    //             if(isNull(item)) {
+    //                 this.controls.resetCurrentlyPlaying(true);
+    //                 return of(null);
+    //             }
+
+    //             // If current item is already playing, toggle play state
+    //             if(this.isPlaying(item.id, tracklist.id)) {
+    //                 return this.togglePlaying().pipe(map(() => null));
+    //             }
+
+    //             // Request stream url
+    //             return this.streamService.requestStreamUrl(item.id, true).pipe(tap((url) => {
+    //                 // Update current item
+    //                 this.setCurrentItem(item, url, tracklist.id);
+    //             }));
+    //         }),
+    //         // Start playing the item
+    //         switchMap((url) => {
+    //             if(isNull(url)) return of(null);
+    //             return this.controls.play(url);
+    //         })
+    //     )
+    // }
 
     /**
-     * Dequeue tracklist by setting it to undefined.
+     * Update currently playing item
+     * @param item Entity that is playing
+     * @param url Url that is playing
+     * @param tracklistId Tracklist instance id that is playing
+     * @param tracklistIndex Index in tracklist
      */
-    private dequeueTracklist(): Observable<void> {
-        if(typeof this._enqueuedTracklist === "undefined" || this._enqueuedTracklist == null) {
-            return of(null);
-        }
-
-        this._enqueuedTracklist.unclaim(this.freeHandler)
-        return this._enqueuedTracklist.destroyIfNotClaimed(this.freeHandler).pipe(tap((wasDestroyed) => {
-            if(!wasDestroyed) {
-                console.warn(`[AudioPlayerService] Could not destroy tracklist when removing from queue.`);
-            }
-
-            this.unsetEnqueuedTracklist();
-        }), map(() => null));
+    private setCurrentItem(item: Song, url: string, owner: PlayableEntity) {
+        this.currentItem.next({ 
+            ...item, 
+            url: url,
+            owner: owner ?? undefined,
+        });
     }
 
-    private unsetEnqueuedTracklist() {
-        this.logger.verbose(`Dequeued tracklist: `, this._enqueuedTracklist);
-        this._enqueuedTracklist = undefined;
-        this.updateSize();
-    }
-
-    /**
-     * Push update to size subject.
-     */
-    private updateSize() {
-        this._sizeSubject.next(this.queueSize);
+    private isPlaying(songId: string, tracklistId?: string): boolean {
+        const current = this.currentItem.getValue();
+        if(isNull(current)) return false;
+        return current.id === songId && current.owner?.id === tracklistId;
     }
 
 }

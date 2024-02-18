@@ -1,13 +1,17 @@
 import { CollectionViewer } from "@angular/cdk/collections";
-import { Future, LikedSong, Page, Pageable, PlaylistItem, SCSDKTracklist, SCSDKTracklistService, Song, toFuture, toFutureCompat, TracklistType } from "@soundcore/sdk";
+import { Page, Pageable } from "@soundcore/common";
+import { Future, LikedSong, PlaylistItem, SCSDKBaseDatasource, SCSDKTracklist, SCSDKTracklistService, Song, toFuture, toFutureCompat, TracklistType } from "@soundcore/sdk";
 import { catchError, filter, map, Observable, of, switchMap, takeUntil } from "rxjs";
 import { Queue } from "../../../utils/queue/queue.entity";
 import { TRACKLIST_REGISTRY } from "../utils/tracklist-builder";
-import { SCNGXBaseDatasource, SCNGXDatasourceFreeHandler } from "./datasource.entity";
+import { SCNGXDatasourceFreeHandler } from "./datasource.entity";
 
 export type SCNGXTracklistItem = Song | LikedSong | PlaylistItem;
 
-export class SCNGXTracklist<T = any, C = any> extends SCNGXBaseDatasource<SCNGXTracklistItem> {
+/**
+ * @deprecated
+ */
+export class SCNGXTracklist<T = any, C = any> extends SCSDKBaseDatasource<SCNGXTracklistItem> {
 
     private tracklist?: SCSDKTracklist;
 
@@ -69,13 +73,13 @@ export class SCNGXTracklist<T = any, C = any> extends SCNGXBaseDatasource<SCNGXT
                         }
         
                         // Get page data and return it
-                        let page: Page<T> = Page.of([], tracklist.size, 0);
+                        let page: Page<T> = Page.empty(pageable);
                         if(request.data) {
                             page = request.data;
-                            this.setTotalSize(page.totalElements);
+                            this.setTotalSize(page.totalSize);
                         }
 
-                        return page.elements;
+                        return page.items;
                     })
                 );
             }),

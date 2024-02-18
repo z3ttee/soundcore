@@ -1,25 +1,22 @@
 import { Location } from "@angular/common";
-import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, HostListener, OnDestroy, ViewChild } from "@angular/core";
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, HostListener, OnDestroy, ViewChild } from "@angular/core";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { ActivatedRoute, Router } from "@angular/router";
 import { SCCDKScreenService } from "@soundcore/cdk";
-import { Album, Artist, Playlist, SCSDKLikeService, Song, TracklistType } from "@soundcore/sdk";
+import { PlayableEntity, SCSDKLikeService, Song } from "@soundcore/sdk";
 import { combineLatest, filter, map, Observable, Subject, takeUntil } from "rxjs";
-import { AppAudioService } from "src/app/modules/player/services/audio.service";
-import { AppControlsService } from "src/app/modules/player/services/controls.service";
-import { AppPlayerService } from "src/app/modules/player/services/player.service";
+import { PlayerService, Streamable } from "src/app/modules/player/services/player.service";
 
 interface BigPictureProps {
-    song?: Song;
-    album?: Album;
-    playlist?: Playlist;
-    artist?: Artist;
+    song?: Streamable;
+    owner?: PlayableEntity;
 
     currentTime?: number;
-    playing?: boolean;
     volume?: number;
-    isMuted?: boolean;
+    shuffled?: boolean;
 
+    isPlaying?: boolean;
+    isMuted?: boolean;
     isMobile?: boolean;
 }
 
@@ -29,42 +26,41 @@ interface BigPictureProps {
     styleUrls: [ "./bigpicture.component.scss" ],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class BigPictureComponent implements OnDestroy, AfterViewInit {
+export class BigPictureComponent implements OnDestroy {
 
     @ViewChild("container") public containerRef: ElementRef<HTMLElement>;
 
     constructor(
-        public readonly player: AppPlayerService,
-        public readonly controls: AppControlsService,
-        public readonly audio: AppAudioService,
+        private readonly player: PlayerService,
         private readonly screen: SCCDKScreenService,
         private readonly likeService: SCSDKLikeService,
         private readonly snackbar: MatSnackBar,
         private readonly location: Location,
         private readonly router: Router,
-        private readonly activatedRoute: ActivatedRoute
+        private readonly activatedRoute: ActivatedRoute,
+        private readonly cdr: ChangeDetectorRef
     ) {}
 
     private readonly $destroy: Subject<void> = new Subject();
 
     public readonly $props: Observable<BigPictureProps> = combineLatest([
-        this.player.$current,
+        this.player.$currentItem,
         this.player.$currentTime,
+        this.player.$isMuted,
+        this.player.$isPaused,
+        this.player.$shuffled,
+        this.player.$volume,
         this.screen.$isTouch,
-        this.audio.$muted,
-        this.audio.$volume,
-        this.controls.$isPaused,
     ]).pipe(
-        map(([playerItem, currentTime, isTouch, isMuted, volume, isPaused]): BigPictureProps => ({
-            song: playerItem?.song,
-            playlist: playerItem?.tracklist?.contextType === TracklistType.PLAYLIST ? playerItem?.tracklist?.context : undefined,
-            artist: playerItem?.tracklist?.contextType === TracklistType.ARTIST || playerItem?.tracklist?.contextType === TracklistType.ARTIST_TOP ? playerItem?.tracklist?.context : undefined,
-            album: playerItem?.tracklist?.contextType === TracklistType.ALBUM ? playerItem?.tracklist?.context : undefined,
+        map(([currentItem, currentTime, isMuted, isPaused, shuffled, volume, isTouch]): BigPictureProps => ({
+            song: currentItem,
+            owner: currentItem.owner,
             currentTime: currentTime,
-            isMobile: isTouch,
             isMuted: isMuted,
+            isPlaying: !isPaused,
+            isMobile: isTouch,
+            shuffled: shuffled,
             volume: volume,
-            playing: !isPaused
         })),
         takeUntil(this.$destroy)
     );
@@ -74,21 +70,36 @@ export class BigPictureComponent implements OnDestroy, AfterViewInit {
         this.$destroy.complete();
     }
 
-    public ngAfterViewInit(): void {
-        const element = this.containerRef.nativeElement;
-        element.requestFullscreen && element.requestFullscreen();
-    }
-
     public onSeek(value: number) {
-        this.controls.seek(value);
+        this.player.seek(value);
     }
 
     public toggleMute() {
-        this.audio.toggleMute();
+        this.player.toggleMute();
+    }
+
+    public toggleShuffle() {
+        this.player.toggleShuffle();
+    }
+
+    public togglePlaying() {
+        this.player.togglePlaying().subscribe();
+    }
+
+    public toggleQueue() {
+        if(this.router.url.startsWith("/player/queue")) {
+            this.location.back();
+        } else {
+            this.router.navigate(['/player/queue']);
+        }
     }
 
     public setVolume(volume: number) {
-        this.audio.setVolume(volume);
+        this.player.setVolume(volume);
+    }
+
+    public skip() {
+        this.player.skip().subscribe();
     }
 
     public closeBigPicture() {
@@ -115,6 +126,9 @@ export class BigPictureComponent implements OnDestroy, AfterViewInit {
 
             const isLiked = request.data.isLiked;
             song.liked = isLiked ?? song.liked;
+
+            this.cdr.markForCheck();
+            this.cdr.detectChanges();
 
             if(isLiked) {
                 this.snackbar.open(`Song zu Lieblingssongs hinzugefügt`, null, { duration: 3000 });

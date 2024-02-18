@@ -1,6 +1,11 @@
+import { Page } from "@soundcore/common";
+import { Song } from "../../song/entities/song.entity";
+import { PlayableEntityType } from "./playable.entity";
+
 /**
  * Enum to handle different
  * Tracklist types.
+ * @deprecated
  */
 export enum TracklistType {
     PLAYLIST = 0,
@@ -17,6 +22,7 @@ export enum TracklistType {
  * inside a Tracklist.
  * It consists currently only of an id
  * that corresponds to a song.
+ * @deprecated
  */
 export class TracklistItem {
     /**
@@ -29,6 +35,7 @@ export class TracklistItem {
  * Class to handle Tracklists.
  * It contains the size, type
  * and items of a tracklist.
+ * @deprecated
  */
 export class Tracklist {
 
@@ -51,6 +58,18 @@ export class Tracklist {
          * Default: /meta
          */
         public readonly relativeMetaUrl: string
+    ) {}
+
+}
+
+export class TracklistV2<T = Song> {
+
+    constructor(
+        public readonly id: string,
+        public readonly type: PlayableEntityType,
+        public readonly size: number,
+        public readonly items: Page<T>,
+        public readonly seed?: number
     ) {}
 
 }

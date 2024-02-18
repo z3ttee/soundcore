@@ -44,9 +44,6 @@ export class SCNGXSongListItemComponent implements OnInit, OnDestroy, AfterViewI
   public animRef: TemplateRef<any>;
 
   @Input()
-  public isMobile: boolean = false;
-
-  @Input()
   public itemHeight: number = 56;
 
   @Output() public onPlay: EventEmitter<Song> = new EventEmitter();
@@ -74,7 +71,6 @@ export class SCNGXSongListItemComponent implements OnInit, OnDestroy, AfterViewI
 
   public emitOnPlayMobile(event: MouseEvent) {
     if(!this.song) return;
-    if(!this.isMobile) return;
     
     if(this.onPlay.observed) {
       this.cancelEvent(event);

@@ -1,16 +1,19 @@
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { Album } from "../../album/entities/album.entity";
 import { ArtistArtwork } from "../../artwork/entities/artwork.entity";
-import { Resource, ResourceFlag, ResourceType } from "../../utils/entities/resource";
 import { Song } from "../../song/entities/song.entity";
 import { MeilisearchHasOne, MeilisearchIndex, MeilisearchPK, MeilisearchProp } from "@soundcore/meilisearch";
 import { MeilisearchInfo } from "../../utils/entities/meilisearch.entity";
 import { GeniusInfo } from "../../utils/entities/genius.entity";
+import { PlayableEntity, PlayableEntityType } from "../../tracklist/entities/playable.entity";
 
 @Entity()
 @MeilisearchIndex()
-export class Artist implements Resource {
-    public resourceType: ResourceType = "artist";
+export class Artist implements PlayableEntity {
+    /**
+     * PLAYABLE ENTITY ATTRIBUTES
+     */
+    public readonly type: PlayableEntityType = PlayableEntityType.ARTIST;
 
     /**
      * MEILISEARCH RELATED ATTRIBUTES
@@ -30,9 +33,6 @@ export class Artist implements Resource {
     @PrimaryGeneratedColumn("uuid")
     @MeilisearchPK({ searchable: false })
     public id: string;
- 
-    @Column({ type: "tinyint", default: 0 })
-    public flag: ResourceFlag;
 
     @Column({ nullable: false, unique: true })
     @MeilisearchProp()
@@ -59,25 +59,8 @@ export class Artist implements Resource {
     @OneToMany(() => Song, (song) => song.primaryArtist, { cascade: ["insert", "update"] })
     public songs: Song[];
 
-    public songCount?: number = 0;
-    public albumCount?: number = 0;
-    public streamCount?: number = 0;
+    public songCount?: number = undefined;
+    public albumCount?: number = undefined;
+    public streamCount?: number = undefined;
 
 }
-
-// @IndexEntity()
-// export class ArtistIndex {
-
-//     @PrimaryKey({ searchable: false })
-//     public id: string;
-
-//     @Property()
-//     public name: string;
-
-//     @Property()
-//     public slug: string;
-
-//     @HasOne(ArtworkIndex)
-//     public artwork: Artwork;
-
-// }

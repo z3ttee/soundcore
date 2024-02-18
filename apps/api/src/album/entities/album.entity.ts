@@ -7,17 +7,20 @@ import { Distributor } from "../../distributor/entities/distributor.entity";
 import { Label } from "../../label/entities/label.entity";
 import { Publisher } from "../../publisher/entities/publisher.entity";
 import { Song } from "../../song/entities/song.entity";
-import { Resource, ResourceFlag, ResourceType } from "../../utils/entities/resource";
 import { Slug } from "@tsalliance/utilities";
 import { GeniusInfo } from "../../utils/entities/genius.entity";
 import { MeilisearchInfo } from "../../utils/entities/meilisearch.entity";
 import { MeilisearchHasOne, MeilisearchIndex, MeilisearchPK, MeilisearchProp } from "@soundcore/meilisearch";
+import { PlayableEntity, PlayableEntityType } from "../../tracklist/entities/playable.entity";
 
 @Entity()
 @MeilisearchIndex()
 @Index(["name", "primaryArtist"], { unique: true })
-export class Album implements Resource {
-    public resourceType: ResourceType = "album";
+export class Album implements PlayableEntity {
+    /**
+     * PLAYABLE ENTITY ATTRIBUTES
+     */
+    public readonly type: PlayableEntityType = PlayableEntityType.ALBUM;
 
     /**
      * MEILISEARCH RELATED ATTRIBUTES
@@ -45,9 +48,6 @@ export class Album implements Resource {
     @Column({ nullable: true, unique: true, length: 120 })
     @MeilisearchProp()
     public slug: string;
-
-    @Column({ type: "tinyint", default: 0 })
-    public flag: ResourceFlag;
 
     @Column({ nullable: true })
     public releasedAt: Date;
@@ -89,8 +89,8 @@ export class Album implements Resource {
     @OneToMany(() => LikedAlbum, (l) => l.album)
     public likedBy: LikedAlbum[];
 
-    public songsCount?: number;
-    public totalDuration?: number;
+    public songsCount?: number = undefined;
+    public totalDuration?: number = undefined;
 
     @BeforeInsert()
     public onBeforeInsert() {

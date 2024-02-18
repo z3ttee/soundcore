@@ -1,21 +1,19 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { combineLatest, map, Observable, Subject, switchMap, takeUntil } from 'rxjs';
-import { Playlist, SCSDKPlaylistService, toFutureCompat } from '@soundcore/sdk';
-import { AppPlayerService } from 'src/app/modules/player/services/player.service';
-import { SCNGXTracklist, SCNGXTracklistBuilder } from '@soundcore/ngx';
-import { PlayerItem } from 'src/app/modules/player/entities/player-item.entity';
+import { combineLatest, map, Observable, startWith, Subject, switchMap, takeUntil } from 'rxjs';
+import { Future, Playlist, SCSDKDatasource, SCSDKPlaylistService, SCSDKSongService, Song } from '@soundcore/sdk';
 import { AUDIOWAVE_LOTTIE_OPTIONS } from 'src/app/constants';
+import { PlayerService } from 'src/app/modules/player/services/player.service';
+import { SCNGXTracklist } from 'src/app/modules/player/entities/tracklist.entity';
 import { SSOService, SSOUser } from '@soundcore/sso';
 
 interface PlaylistInfoProps {
-  playlist?: Playlist;
-  tracklist?: SCNGXTracklist;
-  currentlyPlaying?: PlayerItem;
-  currentUser?: SSOUser;
-
-  playing?: boolean;
-  loading?: boolean;
+  playlist?: Future<Playlist>;
+  tracklist?: Future<SCNGXTracklist>;
+  isPlaying?: boolean;
+  isTracklistActive?: boolean;
+  currentItemId?: string;
+  user?: SSOUser;
 }
 
 @Component({
@@ -24,53 +22,76 @@ interface PlaylistInfoProps {
 })
 export class PlaylistInfoComponent implements OnInit, OnDestroy {
 
-  private _destroy: Subject<void> = new Subject();
-
-  // Lottie animations options
-  public animOptions = AUDIOWAVE_LOTTIE_OPTIONS;
+  private readonly $destroy: Subject<void> = new Subject();
 
   constructor(
     private readonly playlistService: SCSDKPlaylistService,
     private readonly activatedRoute: ActivatedRoute,
-    private readonly tracklistBuilder: SCNGXTracklistBuilder,
-    private readonly authService: SSOService,
-    private readonly player: AppPlayerService
+    private readonly playerService: PlayerService,
+    private readonly songService: SCSDKSongService,
+    private readonly ssoService: SSOService
   ) {}
 
+  // Lottie animations options
+  public animOptions = AUDIOWAVE_LOTTIE_OPTIONS;
+
+  /**
+   * Observable that emits currently active
+   * playlistId extracted from the url.
+   */
+  public $playlistId: Observable<string> = this.activatedRoute.paramMap.pipe(map((params) => params.get("playlistId")));
+
+  /**
+   * Observable that emits current
+   * playlist data in future format
+   */
+  public $playlist: Observable<Future<Playlist>> = this.$playlistId.pipe(switchMap((playlistId) => this.playlistService.findById(playlistId)));
+
+  /**
+   * Observable that emits current datasource
+   * of tracks
+   */
+  public $datasource: Observable<SCSDKDatasource<Song>> = this.$playlistId.pipe(switchMap((playlistId) => this.songService.findByPlaylistDatasource(playlistId)));
+  
   public readonly $props: Observable<PlaylistInfoProps> = combineLatest([
-    this.activatedRoute.paramMap.pipe(
-      takeUntil(this._destroy), 
-      map((params) => params.get("playlistId") ?? null), 
-      switchMap((playlistId) => this.playlistService.findById(playlistId).pipe(toFutureCompat())), 
-      map((future) => ({
-        ...future,
-        data: this.tracklistBuilder.forPlaylist(future.data)
-      }))),
-    this.player.$current.pipe(takeUntil(this._destroy)),
-    this.player.$isPaused.pipe(takeUntil(this._destroy)),
-    this.authService.$user.pipe(takeUntil(this._destroy))
+    // Get changes to playlist
+    this.$playlist,
+    // Get paused state
+    this.playerService.$isPaused.pipe(startWith(true)), 
+    // Get current tracklist id
+    this.playerService.$currentItem.pipe(startWith(null)),
+    // Get user data
+    this.ssoService.$user
   ]).pipe(
     // Build props object
-    map(([future, currentItem, isPaused, currentUser]) => ({
-      loading: future.loading,
-      playlist: future.data?.context,
-      currentlyPlaying: currentItem,
-      playing: !isPaused && currentItem?.tracklist?.id == future.data?.id,
-      tracklist: future.data,
-      currentUser: currentUser
-    }))
+    map(([playlist, isPaused, currentItem, user]): PlaylistInfoProps => {
+      const currentTracklistId = currentItem?.owner?.id;
+      const currentItemId = currentItem?.id;
+
+      return {
+        playlist: playlist,
+        isPlaying: !isPaused && currentTracklistId === playlist.data?.id,
+        isTracklistActive: currentTracklistId === playlist.data?.id,
+        currentItemId: currentItemId,
+        user: user
+      };
+    }),
+    takeUntil(this.$destroy)
   );
 
   public ngOnInit(): void {}
 
   public ngOnDestroy(): void {
-      this._destroy.next();
-      this._destroy.complete();
+      this.$destroy.next();
+      this.$destroy.complete();
   }
 
-  public forcePlay(tracklist: SCNGXTracklist) {
-    if(!tracklist) return;
-    this.player.playTracklist(tracklist, true).pipe(takeUntil(this._destroy)).subscribe();
+  public forcePlay(playlist: Playlist) {
+    this.playerService.forcePlay(playlist).subscribe();
+  }
+
+  public forcePlayAt(playlist: Playlist, indexAt: number, itemId: string) {
+    this.playerService.forcePlayAt(playlist, indexAt, itemId).subscribe();
   }
 
 }

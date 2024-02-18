@@ -3,7 +3,7 @@ import { EventEmitter2 } from "@nestjs/event-emitter";
 import { WorkerJobRef } from "@soundcore/nest-queue";
 import { PlaylistItem } from "../../playlist/entities/playlist-item.entity";
 import { Playlist } from "../../playlist/entities/playlist.entity";
-import { PlaylistService } from "../../playlist/playlist.service";
+// import { PlaylistService } from "../../playlist/playlist.service";
 import { Song } from "../../song/entities/song.entity";
 import { SongService } from "../../song/services/song.service";
 import Database from "../../utils/database/database-worker-client";
@@ -57,7 +57,7 @@ async function importSpotifyPlaylist(job: WorkerJobRef<ImportTask>): Promise<Imp
 
             // Instantiate services
             const songService = new SongService(songRepo);
-            const playlistService = new PlaylistService(playlistRepo, song2playlistRepo, eventEmitter);
+            // const playlistService = new PlaylistService(playlistRepo, song2playlistRepo, eventEmitter);
             const importService = new ImportService(importRepo);
             const reportService = new ImportReportService(reportRepo);
             
@@ -150,14 +150,14 @@ async function importSpotifyPlaylist(job: WorkerJobRef<ImportTask>): Promise<Imp
                 }
 
                 // Create playlist in soundcore database
-                const playlist = await playlistService.createIfNotExists({
-                    title: spotifyPlaylist.name,
-                    description: spotifyPlaylist.description,
-                    privacy: task.privacy
-                }, user).catch((error: Error) => {
-                    logger.error(`Could not create playlist via spotify import: ${error.message}`, error.stack);
-                    throw new InternalServerErrorException("Could not create playlist.");
-                });
+                // const playlist = await playlistService.createIfNotExists({
+                //     title: spotifyPlaylist.name,
+                //     description: spotifyPlaylist.description,
+                //     privacy: task.privacy
+                // }, user).catch((error: Error) => {
+                //     logger.error(`Could not create playlist via spotify import: ${error.message}`, error.stack);
+                //     throw new InternalServerErrorException("Could not create playlist.");
+                // });
 
                 // Used to track how many of the found songs
                 // were added to the playlist

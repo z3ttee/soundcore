@@ -4,7 +4,8 @@ services:
     image: mariadb
     restart: always
     environment:
-      MARIADB_ROOT_PASSWORD: root
+      - MARIADB_ROOT_PASSWORD=root
+      - MARIADB_DATABASE=soundcore
     ports:
       - "3306:3306"
     networks:
@@ -24,37 +25,17 @@ services:
       - soundcore_dev
 
   meilisearch:
-    image: getmeili/meilisearch:v1.0
+    image: getmeili/meilisearch
     restart: always
     ports:
       - "7700:7700"
     environment:
       - MEILI_MASTER_KEY=super_secret_master_key
     volumes:
-      - "~/volumes/meilisearch:/meili_data"
+      - ".docker/meilisearch:/meili_data"
     entrypoint: ["meilisearch", "--env=development"]
     networks:
       - soundcore_dev
-
-  soundcore:
-    image: soundcore:latest
-    ports:
-      - "3002:3002"
-    depends_on:
-      - database
-    environment:
-      - DB_PORT=3306
-      - DB_HOST=database
-      - DB_USER=root
-      - DB_PASS=root
-      - DB_NAME=soundcore
-      - DB_PREFIX=sc_
-      - MEILISEARCH_HOST=meilisearch
-      - MEILISEARCH_KEY=
-    networks:
-      - soundcore_dev
-    volumes:
-      - ~/volumes/soundcore/data:/data
 
 networks:
   soundcore_dev:

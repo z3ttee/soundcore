@@ -1,28 +1,22 @@
+import { Location } from "@angular/common";
 import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from "@angular/core";
 import { FormControl } from "@angular/forms";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { Router } from "@angular/router";
-import { SCCDKScreenService } from "@soundcore/cdk";
 import { SCSDKLikeService, Song } from "@soundcore/sdk";
 import { combineLatest, filter, map, Observable, Subject, take, takeUntil, tap } from "rxjs";
-import { AppAudioService } from "../../services/audio.service";
-import { AppControlsService } from "../../services/controls.service";
-import { AppPlayerService } from "../../services/player.service";
+import { PlayerService } from "../../services/player.service";
 
 interface PlayerbarProps {
     song?: Song;
-    currentTime?: number;
-    playing?: boolean;
-    isMobile?: boolean;
+    isPaused?: boolean;
+    isShuffled?: boolean;
     isMuted?: boolean;
     volume?: number;
-}
 
-interface ResponsiveOptions {
-    showDuration: boolean;
-    showMaximize: boolean;
-    showHistoryControls: boolean;
-    reducedMode: boolean;
+
+    currentTime?: number;
+    isMobile?: boolean;
 }
 
 @Component({
@@ -37,45 +31,44 @@ export class AppPlayerBarComponent implements OnInit, OnDestroy {
     /**
      * Subject to notify subscriptions about destroying themselves.
      */
-    private readonly _destroy: Subject<void> = new Subject();
+    private readonly $destroy: Subject<void> = new Subject();
 
     constructor(
-        public readonly player: AppPlayerService,
-        public readonly controls: AppControlsService,
-        private readonly audio: AppAudioService,
         private readonly likeService: SCSDKLikeService,
         private readonly snackbar: MatSnackBar,
-        private readonly screen: SCCDKScreenService,
-        private readonly router: Router
+        private readonly router: Router,
+        private readonly playerService: PlayerService,
+        private readonly location: Location,
     ) {}
 
+    public $currentTime: Observable<number> = this.playerService.$currentTime.pipe(takeUntil(this.$destroy));
+
     public $props: Observable<PlayerbarProps> = combineLatest([
-        this.player.$current.pipe(takeUntil(this._destroy)),
-        this.player.$currentTime.pipe(takeUntil(this._destroy)),
-        this.controls.$isPaused.pipe(takeUntil(this._destroy)),
-        this.screen.$screen.pipe(takeUntil(this._destroy)),
-        this.audio.$muted.pipe(takeUntil(this._destroy)),
-        this.audio.$volume.pipe(takeUntil(this._destroy))
+        this.playerService.$currentItem,
+        this.playerService.$isPaused,
+        this.playerService.$shuffled,
+        this.playerService.$volume,
+        this.playerService.$isMuted,
     ]).pipe(
-        map(([currentItem, currentTime, isPaused, screen, isMuted, volume]): PlayerbarProps => ({
-            song: currentItem?.song,
-            currentTime: currentTime ?? 0,
-            playing: !isPaused,
-            isMobile: screen.isMobile,
-            isMuted: isMuted,
-            volume: volume
+        map(([currentItem, isPaused, isShuffled, volume, isMuted]): PlayerbarProps => ({
+            song: currentItem,
+            isPaused: isPaused,
+            isShuffled: isShuffled,
+            volume: volume,
+            isMuted: isMuted
         })),
         tap((props) => {
             this.seekInputControl.setValue(props.currentTime);
-        })
+        }),
+        takeUntil(this.$destroy)
     );
 
     public ngOnInit(): void {
-        this.likeService.$onSongLikeChanged.pipe(takeUntil(this._destroy)).subscribe((toggleResult) => {
+        this.likeService.$onSongLikeChanged.pipe(takeUntil(this.$destroy)).subscribe((toggleResult) => {
             const likedSong = toggleResult.song;
             const isLiked = toggleResult.isLiked;
 
-            this.$props.pipe(filter((props) => !!props.song && props.song?.id == likedSong?.song?.id), take(1), takeUntil(this._destroy)).subscribe(({ song }) => {
+            this.$props.pipe(filter((props) => !!props.song && props.song?.id == likedSong?.song?.id), take(1), takeUntil(this.$destroy)).subscribe(({ song }) => {
                 song.liked = isLiked ?? song.liked;
             });
         });
@@ -83,12 +76,12 @@ export class AppPlayerBarComponent implements OnInit, OnDestroy {
 
     public ngOnDestroy(): void {
         // Notify subscriptions to destroy themselves
-        this._destroy.next();
-        this._destroy.complete();
+        this.$destroy.next();
+        this.$destroy.complete();
     }
 
     public onSeek(value: number) {
-        this.controls.seek(value);
+        this.playerService.seek(value);
     }
 
     public toggleLike(event: MouseEvent, song: Song) {
@@ -96,7 +89,7 @@ export class AppPlayerBarComponent implements OnInit, OnDestroy {
         event.preventDefault();
 
         if(typeof song === "undefined" || song == null) return;
-        this.likeService.toggleLikeForSong(song).pipe(takeUntil(this._destroy), filter((request) => !request.loading)).subscribe((request) => {
+        this.likeService.toggleLikeForSong(song).pipe(takeUntil(this.$destroy), filter((request) => !request.loading)).subscribe((request) => {
             if(request.error) {
                 this.snackbar.open(`Ein Fehler ist aufgetreten`, null, { duration: 3000 });
                 return;
@@ -125,11 +118,31 @@ export class AppPlayerBarComponent implements OnInit, OnDestroy {
         });
     }
 
+    public toggleQueue() {
+        if(this.router.url.startsWith("/player/queue")) {
+            this.location.back();
+        } else {
+            this.router.navigate(['/player/queue']);
+        }
+    }
+
     public toggleMute() {
-        this.audio.toggleMute();
+        this.playerService.toggleMute();
     }
 
     public setVolume(volume: number) {
-        this.audio.setVolume(volume);
+        this.playerService.setVolume(volume);
+    }
+
+    public skip() {
+        this.playerService.skip().subscribe();
+    }
+
+    public togglePlaying() {
+        this.playerService.togglePlaying().subscribe();
+    }
+
+    public toggleShuffle() {
+        this.playerService.toggleShuffle();
     }
 }

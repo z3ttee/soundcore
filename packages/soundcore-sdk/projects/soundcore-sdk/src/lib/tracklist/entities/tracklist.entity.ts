@@ -2,6 +2,7 @@
 /**
  * Enum to handle different
  * Tracklist types.
+ * @deprecated
  */
 export enum TracklistType {
     PLAYLIST = 0,
@@ -18,6 +19,7 @@ export enum TracklistType {
  * inside a Tracklist.
  * It consists currently only of an id
  * that corresponds to a song.
+ * @deprecated
  */
 export class TracklistItem {
     /**
@@ -30,6 +32,7 @@ export class TracklistItem {
  * Class to handle Tracklists.
  * It contains the size, type
  * and items of a tracklist.
+ * @deprecated
  */
 export class SCSDKTracklist {
 

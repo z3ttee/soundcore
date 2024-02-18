@@ -1,6 +1,8 @@
 import path from "node:path"
 import { MountProgressInfo } from "./mount/entities/mount.entity";
 
+export const TRACKLIST_ARTIST_TOP_SIZE = 5;
+
 // Validation
 export const MOUNTNAME_MAX_LENGTH = 32
 

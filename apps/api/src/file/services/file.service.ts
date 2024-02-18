@@ -1,8 +1,7 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { BasePageable, Page } from 'nestjs-pager';
+import { Page, Pageable } from '@soundcore/common';
 import { Repository, SelectQueryBuilder, UpdateResult } from 'typeorm';
-import { Artist } from '../../artist/entities/artist.entity';
 import { Mount } from '../../mount/entities/mount.entity';
 import { Song } from '../../song/entities/song.entity';
 import { CreateResult } from '../../utils/results/creation.result';
@@ -85,7 +84,7 @@ export class FileService {
      * @param pageable Page settings
      * @returns Page<File>
      */
-    public async findByMount(mountId: string, pageable: BasePageable): Promise<Page<File>> {
+    public async findByMount(mountId: string, pageable: Pageable): Promise<Page<File>> {
         const idsResult = await this.repository.createQueryBuilder("file")
             .leftJoin("file.mount", "mount")
             .offset(pageable.offset)
@@ -103,7 +102,7 @@ export class FileService {
             .whereInIds(idsResult[0])
             .getMany()
 
-        return Page.of(files, idsResult[1], pageable.offset);
+        return Page.of(files, idsResult[1], pageable);
     }
 
     /**

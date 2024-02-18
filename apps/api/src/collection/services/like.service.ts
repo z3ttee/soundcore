@@ -1,15 +1,15 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Page, Pageable } from 'nestjs-pager';
+import { Page, Pageable } from '@soundcore/common';
 import { Repository } from 'typeorm';
 import { Album } from '../../album/entities/album.entity';
 import { Playlist } from '../../playlist/entities/playlist.entity';
 import { PlaylistPrivacy } from '../../playlist/enums/playlist-privacy.enum';
-import { PlaylistService } from '../../playlist/playlist.service';
 import { Song } from '../../song/entities/song.entity';
 import { User } from '../../user/entities/user.entity';
 import { ToggleLikedSongDTO } from '../dtos/toggle-result.dto';
 import { LikedAlbum, LikedPlaylist, LikedResource, LikedSong } from '../entities/like.entity';
+import { PlaylistService } from '../../playlist/services/playlist.service';
 
 @Injectable()
 export class LikeService {
@@ -82,7 +82,7 @@ export class LikeService {
             .take(pageable.limit)
             .skip(pageable.offset)
             .where("user.id = :userId AND song.id != NULL", { userId })
-            .getManyAndCount().then(([resources, total]) => Page.of(resources, total, pageable.offset));
+            .getManyAndCount().then(([resources, total]) => Page.of(resources, total, pageable));
     }
 
     /**

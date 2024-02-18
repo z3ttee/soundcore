@@ -1,7 +1,8 @@
 import { HttpClient } from "@angular/common/http";
 import { Component, OnDestroy, OnInit } from "@angular/core";
+import { Page, Pageable } from "@soundcore/common";
 import { SCNGXDatasource } from "@soundcore/ngx";
-import { Future, Page, Pageable, SCSDKTaskGateway, SCSDKTasksService, Task, TaskDefinition } from "@soundcore/sdk";
+import { Future, SCSDKTaskGateway, SCSDKTasksService, Task, TaskDefinition } from "@soundcore/sdk";
 import { combineLatest, map, Observable, Subject, takeUntil } from "rxjs";
 
 interface TasksIndexViewProps {

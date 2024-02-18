@@ -25,9 +25,7 @@ export class CreateMountDTO implements
     public doScan?: boolean = true;
 
     @IsOptional()
-    @IsNumber()
-    @Max(1)
-    @Min(0)
+    @IsBoolean()
     public isDefault: boolean = false;
 
 }

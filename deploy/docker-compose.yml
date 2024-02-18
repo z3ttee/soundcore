@@ -1,0 +1,60 @@
+version: '3.9'
+services:
+  database:
+    image: mariadb
+    restart: always
+    environment:
+      MARIADB_ROOT_PASSWORD: root
+    ports:
+      - "3306:3306"
+    networks:
+      - soundcore_dev
+
+  phpmyadmin:
+    image: phpmyadmin
+    restart: always
+    depends_on:
+      - database
+    ports:
+      - "8080:80"
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - PMA_HOST=database
+    networks:
+      - soundcore_dev
+
+  meilisearch:
+    image: getmeili/meilisearch:v1.0
+    restart: always
+    ports:
+      - "7700:7700"
+    environment:
+      - MEILI_MASTER_KEY=super_secret_master_key
+    volumes:
+      - "~/volumes/meilisearch:/meili_data"
+    entrypoint: ["meilisearch", "--env=development"]
+    networks:
+      - soundcore_dev
+
+  soundcore:
+    image: soundcore:latest
+    ports:
+      - "3002:3002"
+    depends_on:
+      - database
+    environment:
+      - DB_PORT=3306
+      - DB_HOST=database
+      - DB_USER=root
+      - DB_PASS=root
+      - DB_NAME=soundcore
+      - DB_PREFIX=sc_
+      - MEILISEARCH_HOST=meilisearch
+      - MEILISEARCH_KEY=
+    networks:
+      - soundcore_dev
+    volumes:
+      - ~/volumes/soundcore/data:/data
+
+networks:
+  soundcore_dev:

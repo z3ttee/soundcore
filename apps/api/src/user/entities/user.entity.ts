@@ -9,11 +9,13 @@ import { Artwork } from "../../artwork/entities/artwork.entity";
 import { PlaylistItem } from "../../playlist/entities/playlist-item.entity";
 import { ImportTask } from "../../import/entities/import.entity";
 import { MeilisearchInfo } from "../../utils/entities/meilisearch.entity";
+import { MeilisearchIndex, MeilisearchPK, MeilisearchProp } from "@soundcore/meilisearch";
 
 // TODO: Remove attributes from Syncable object when they get sent as response
 // TODO: Split profile and users logic
 
 @Entity()
+@MeilisearchIndex()
 export class User implements Resource {
     public flag: ResourceFlag = ResourceFlag.OK;
     public resourceType: ResourceType = "user";
@@ -28,12 +30,15 @@ export class User implements Resource {
      * DEFAULT ATTRIBUTES
      */
     @PrimaryColumn({ type: "varchar" })
+    @MeilisearchPK({ searchable: false })
     public id: string;
 
     @Column({ nullable: true, unique: true, length: 120 })
+    @MeilisearchProp()
     public slug: string;
 
     @Column({ nullable: true, length: 120 })
+    @MeilisearchProp()
     public name: string;
 
     @Column({ nullable: true })

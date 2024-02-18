@@ -6,7 +6,7 @@ import { CreateResult } from "../../utils/results/creation.result";
 import { CreateMountDTO } from "../dtos/create-mount.dto";
 import { UpdateMountDTO } from "../dtos/update-mount.dto";
 import { Mount } from "../entities/mount.entity";
-import { Page, Pageable } from "../../pagination";
+import { Page, Pageable } from "@soundcore/common";
 import { Future, toFuture } from "../../utils/future";
 import { Task } from "../../tasks/entities/task.entity";
 import { SCSDK_OPTIONS } from "../../constants";

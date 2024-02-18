@@ -1,7 +1,8 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
-import { Pageable, Playlist, SCSDKPlaylistService, SCDKUserService, User, SCSDKProfileService, Artist } from '@soundcore/sdk';
+import { Playlist, SCSDKPlaylistService, SCDKUserService, User, SCSDKProfileService, Artist } from '@soundcore/sdk';
+import { Pageable } from '@soundcore/common';
 
 @Component({
   selector: 'app-profile-info',
@@ -46,12 +47,12 @@ export class ProfileInfoComponent implements OnInit, OnDestroy {
 
         // Fetch 8 playlists of a user
         this.playlistService.findByAuthor(profileId, new Pageable(0, 8)).pipe(takeUntil(this._cancel)).subscribe((response) => {
-          this.playlists = response.payload?.elements ?? [];
+          this.playlists = response.data?.items ?? [];
         });
 
         // Fetch top 5 artists of user
         this.profileService.findTopArtistsByUser(this.profile.id).pipe(takeUntil(this._cancel)).subscribe((response) => {
-          this.artists = response.payload?.elements ?? [];
+          this.artists = response.payload?.items ?? [];
           console.log(this.artists);
         });
       })

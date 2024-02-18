@@ -1,6 +1,6 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Page, BasePageable } from 'nestjs-pager';
+import { Page, Pageable } from '@soundcore/common';
 import { In, Repository } from 'typeorm';
 import { Artwork } from '../../artwork/entities/artwork.entity';
 import { MeilisearchFlag } from '../../utils/entities/meilisearch.entity';
@@ -49,7 +49,7 @@ export class DistributorService {
      * @param pageable Page settings
      * @returns Page<Distributor>
      */
-     public async findBySyncFlag(flag: MeilisearchFlag, pageable: BasePageable): Promise<Page<Distributor>> {
+     public async findBySyncFlag(flag: MeilisearchFlag, pageable: Pageable): Promise<Page<Distributor>> {
         const result = await this.repository.createQueryBuilder("distributor")
             .leftJoin("distributor.artwork", "artwork").addSelect(["artwork.id"])
             .where("distributor.lastSyncFlag = :flag", { flag })
@@ -57,7 +57,7 @@ export class DistributorService {
             .limit(pageable.limit)
             .getManyAndCount();
 
-        return Page.of(result[0], result[1], pageable.offset);
+        return Page.of(result[0], result[1], pageable);
     }
 
     /**
