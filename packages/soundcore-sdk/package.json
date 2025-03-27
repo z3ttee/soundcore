@@ -41,7 +41,6 @@
     "ngx-indexed-db": "^11.0.0",
     "@soundcore/sso": "*",
     "@soundcore/common": "*",
-    "@soundcore/constants": "*",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.12.0"

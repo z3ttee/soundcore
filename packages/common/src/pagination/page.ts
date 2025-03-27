@@ -1,7 +1,9 @@
 import { MAX_PAGE_SIZE } from "../constants";
+import { objectToSearchParams } from "../utils/objectToSearchParams";
 import { isNull } from "../utils/utilities";
+import { PageFilter, PageSort } from "./filter";
 
-export class Page<T = any> {
+export class Page<T = unknown> {
     /**
      * Amount of items on the current page
      */
@@ -10,12 +12,12 @@ export class Page<T = any> {
      * Index of the next page. Null, if end
      * of pagination reached
      */
-    public readonly nextOffset: number = null;
+    public readonly nextOffset: number | null = null;
     /**
      * Index of the previous page. Null, if start
      * of pagination reached
      */
-    public readonly prevOffset: number = null;
+    public readonly prevOffset: number | null = null;
 
     constructor(
         /**
@@ -26,41 +28,54 @@ export class Page<T = any> {
          * Amount of items that are available in total
          */
         public readonly totalSize: number,
-        public readonly info: PageInfo
+        public readonly info?: PageInfo
     ) {
         this.length = items?.length ?? 0;
 
-        if(!isNull(info?.limit) && !isNull(info?.offset)) {
-            const maxPageIndex = Math.floor(totalSize / info.limit);
-            const currentPageIndex = Math.floor(info.offset/info.limit);
+        if (!isNull(info?.limit) && !isNull(info?.offset)) {
+            const limit = info?.limit as number;
+            const offset = info?.offset as number;
 
-            if(maxPageIndex > currentPageIndex+1) this.nextOffset =  info.offset + info.limit;
-            if(currentPageIndex > 0) this.prevOffset = Math.max(0, info.offset - info.limit);
+            const maxPageIndex = Math.floor(totalSize / limit);
+            const currentPageIndex = Math.floor(offset / limit);
+
+            if (maxPageIndex > currentPageIndex + 1) this.nextOffset = offset + limit;
+            if (currentPageIndex > 0) this.prevOffset = Math.max(0, offset - limit);
         }
     }
 
-    public static of<T = any>(items: T[], totalSize: number, pageable?: Pageable): Page<T> {        
+    public static of<T = unknown>(items: T[], totalSize: number, pageable?: Pageable): Page<T> {
         return new Page(items, totalSize, { limit: pageable?.limit, offset: pageable?.offset, index: pageable?.index });
     }
 
-    public static empty<T = any>(pageable?: Pageable): Page<T>;
-    public static empty<T = any>(limitOrPageable?: number | Pageable, offset?: number): Page<T> {
-        if(typeof limitOrPageable === "number") return new Page([], 0, { limit: limitOrPageable, offset: offset, index: Math.floor((Math.max(0, offset ?? 0) / Math.max(1, limitOrPageable ?? 0))) });
+    public static empty<T = unknown>(pageable?: Pageable): Page<T>;
+    public static empty<T = unknown>(limitOrPageable?: number | Pageable, offset?: number): Page<T> {
+        if (typeof limitOrPageable === "number")
+            return new Page([], 0, {
+                limit: limitOrPageable,
+                offset: offset,
+                index: Math.floor(Math.max(0, offset ?? 0) / Math.max(1, limitOrPageable ?? 0))
+            });
         return new Page([], 0, limitOrPageable?.toInfo());
     }
-
 }
 
 export class Pageable implements PageInfo {
-
     public readonly index: number;
     public readonly offset: number;
     public readonly limit: number;
 
-    constructor(offset: number, size: number) {
+    constructor(
+        offset: number,
+        size: number,
+        public readonly searchQuery?: string | null,
+        public readonly sort?: PageSort | null,
+        public readonly filter?: PageFilter | null
+    ) {
         this.limit = Math.max(1, Math.min(MAX_PAGE_SIZE, size));
         this.offset = Math.max(0, offset);
         this.index = Math.floor(this.offset / this.limit);
+        this.filter = filter;
     }
 
     /**
@@ -76,7 +91,8 @@ export class Pageable implements PageInfo {
      * @returns string
      */
     public toParams(): string {
-        return `offset=${this.offset}&limit=${this.limit}`;
+        return `offset=${this.offset}&limit=${this.limit}${!isNull(this.filter) ? `&${objectToSearchParams(this.filter)}` : ""
+            }${!isNull(this.sort) ? `&${objectToSearchParams(this.sort)}` : ""}${this.searchQuery ? `&${encodeURIComponent(this.searchQuery)}` : ""}`;
     }
 
     public toInfo(): PageInfo {
@@ -84,13 +100,12 @@ export class Pageable implements PageInfo {
             index: this.index,
             offset: this.offset,
             limit: this.limit
-        }
+        };
     }
-
 }
 
 export interface PageInfo {
-    readonly index: number;
-    readonly offset: number;
-    readonly limit: number;
+    readonly index: number | undefined;
+    readonly offset: number | undefined;
+    readonly limit: number | undefined;
 }

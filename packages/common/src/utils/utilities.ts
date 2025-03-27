@@ -7,7 +7,7 @@ export function isNull(target: any): target is null | undefined {
     return isUndefined(target) || target == null;
 }
 
-export function isString(target: any): boolean {
+export function isString(target: any): target is string {
     return !isNull(target) && typeof target === "string";
 }
 
