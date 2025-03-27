@@ -1,4 +1,3 @@
-import sizeof from "object-sizeof";
 import { debounceTime, Subject } from "rxjs";
 import { workerEmit } from "workerpool";
 import { DEFAULT_STATUS_EVENT_DEBOUNCE_MS } from "../constants";
@@ -42,7 +41,7 @@ statusEvent.subscribe((eventParams) => {
     const pipeline = eventParams[0].pipeline;
     let subject: Subject<EventHandlerParams<"status">>;
 
-    if(!collectedStatusEvents.has(pipeline.id)) {
+    if (!collectedStatusEvents.has(pipeline.id)) {
         const debounceMs = Math.max(0, getDebounceMs());
 
         subject = new Subject();
@@ -70,7 +69,7 @@ function getDebounceMs() {
  * @param message Message to emit
  */
 export function message(message: string) {
-    if(!globalThis.pipeline) {
+    if (!globalThis.pipeline) {
         throw new Error(`Message was emitted outside the scope of a pipeline.`);
     }
 
@@ -89,7 +88,7 @@ export function progress(progress: number) {
     const stage: Stage = globalThis.stage;
     const pipeline: PipelineRun = globalThis.pipeline;
 
-    if(!step || !stage || !pipeline) {
+    if (!step || !stage || !pipeline) {
         throw new Error(`Progress was emitted outside the scope of step in a pipeline.`);
     }
 
@@ -106,7 +105,7 @@ export function progress(progress: number) {
  */
 export function emit<T extends EventName>(eventName: T, ...args: EventHandlerParams<T>) {
 
-    if(eventName === "status") {
+    if (eventName === "status") {
         debounceStatus((args as EventHandlerParams<"status">));
     } else {
         workerEmit({ name: eventName, args } as WorkerEmitEvent<T>);
@@ -133,13 +132,9 @@ export function set<T = any>(key: string, value: T) {
     const stage: Stage = globalThis.stage;
     const pipeline: PipelineRun = globalThis.pipeline;
 
-    if(!step || !stage || !pipeline) {
+    if (!step || !stage || !pipeline) {
         throw new Error(`set() was called outside the scope of step in a pipeline.`);
     }
-
-    const outputsMemSize = sizeof(globalThis.outputs);
-    const valueMemSize = sizeof(value);
-    globalThis.logger?.info(`Writing ${valueMemSize} bytes to output (Total: ${valueMemSize+outputsMemSize} bytes)`);
 
     return writeOutput<T>(pipeline, `${stage.id}.${step.id}.${key}`, value);
 }
@@ -151,10 +146,6 @@ export function set<T = any>(key: string, value: T) {
  * @returns Written value
  */
 export function setShared<T = any>(key: string, value: T) {
-    const outputsMemSize = sizeof(globalThis.sharedOutputs);
-    const valueMemSize = sizeof(value);
-    globalThis.logger?.info(`Writing ${valueMemSize} bytes to shared output (Total: ${valueMemSize+outputsMemSize} bytes)`);
-
     globalThis.sharedOutputs[key] = value;
     return value;
 }
@@ -183,7 +174,7 @@ export function get<T = any>(path: string) {
 export function getOrDefault<T = any>(path: string, defaultValue: T) {
     const pipeline: PipelineRun = globalThis.pipeline;
 
-    if(!pipeline) {
+    if (!pipeline) {
         throw new Error(`GetOrDefault() was called outside the scope of a pipeline.`);
     }
     return readOutput<T>(pipeline, path, defaultValue);
@@ -203,18 +194,18 @@ function writeOutput<T = any>(pipeline: PipelineRun, path: string, value: T) {
     const parts = path.split(".");
 
     let currentObj = globalThis.outputs;
-    for(let index = 0; index < parts.length; index++) {
+    for (let index = 0; index < parts.length; index++) {
         const key = parts[index];
 
         // Check if last key has been reached
-        if(index == parts.length - 1) {
+        if (index == parts.length - 1) {
             // If true, set value to object
             currentObj[key] = value;
             return value;
         }
 
         // Otherwise get nested object or create it
-        if(typeof currentObj[key] === "undefined" || currentObj[key] == null) {
+        if (typeof currentObj[key] === "undefined" || currentObj[key] == null) {
             // Instantiate new nested object if it is null
             currentObj[key] = {};
         }
@@ -227,18 +218,18 @@ function writeOutput<T = any>(pipeline: PipelineRun, path: string, value: T) {
 function readOutput<T = any>(pipeline: PipelineRun, path: string, defaultValue: T): T {
     const parts = path.split(".");
 
-    let currentObj = {...globalThis.outputs};
-    for(let index = 0; index < parts.length; index++) {
+    let currentObj = { ...globalThis.outputs };
+    for (let index = 0; index < parts.length; index++) {
         const key = parts[index];
 
         // Check if last key has been reached
-        if(index == parts.length - 1) {
+        if (index == parts.length - 1) {
             // If true, return value on the current object at that key
             return currentObj[key] ?? defaultValue ?? undefined;
         }
 
         // If there is no nested object, but the path requires one, return undefined or defaultValue
-        if(typeof currentObj[key] === "undefined" || currentObj[key] == null) {
+        if (typeof currentObj[key] === "undefined" || currentObj[key] == null) {
             return defaultValue ?? undefined
         }
 

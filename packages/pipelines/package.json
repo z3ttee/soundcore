@@ -1,44 +1,34 @@
 {
   "name": "@soundcore/pipelines",
-  "version": "0.0.1",
-  "description": "",
+  "version": "1.0.0",
   "author": "z3ttee",
-  "private": false,
+  "private": true,
   "license": "MIT",
   "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
-    "build:package": "nest build",
-    "build:api": "nest build",
-    "dev": "nest build --watch"
+    "ci:build": "nest build"
   },
   "files": [
     "dist/**/*"
   ],
-  "peerDependencies": {
-    "@nestjs/common": "^9.0.0",
-    "@nestjs/core": "^9.0.0"
-  },
   "dependencies": {
-    "@nestjs/common": "^9.0.0",
-    "@nestjs/core": "^9.0.0",
-    "object-sizeof": "^2.6.1",
-    "winston": "^3.8.2",
-    "reflect-metadata": "^0.1.13",
-    "rxjs": "7.5.6",
-    "workerpool": "^6.4.0"
+    "@nestjs/common": "^11.0.0",
+    "@nestjs/core": "^11.0.0",
+    "winston": "^3.17.0",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.2",
+    "workerpool": "^9.2.0"
   },
   "devDependencies": {
-    "@types/workerpool": "^6.1.1",
-    "@types/node": "^16.0.0",
-    "prettier": "^2.8.3",
+    "@repo/config-typescript": "*",
+    "@types/workerpool": "^6.4.7",
+    "@types/node": "^22.13.14",
     "eslint": "^8.33.0",
     "eslint-config-nestjs": "*",
-    "eslint-config-prettier": "^8.6.0",
-    "source-map-support": "^0.5.20",
-    "ts-loader": "^9.2.3",
-    "ts-node": "^10.0.0",
-    "tsconfig": "*",
-    "tsconfig-paths": "4.0.0",
-    "typescript": "^4.3.5"
+    "ts-loader": "^9.5.2",
+    "ts-node": "^10.9.2",
+    "tsconfig-paths": "4.2.0",
+    "typescript": "^5.8.2"
   }
 }

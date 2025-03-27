@@ -1,7 +1,7 @@
 import path from "node:path";
 import crypto from "node:crypto";
 import { Inject, Injectable, Logger } from "@nestjs/common";
-import { WorkerPool, pool } from "workerpool";
+import { Pool, pool } from "workerpool";
 import { DEFAULT_CONCURRENT_PIPELINES, LOCAL_OPTIONS_TOKEN } from "../constants";
 import { PipelineRun, PipelineWorkerResult } from "../entities/pipeline.entity";
 import { PipelineQueue } from "./pipeline-queue.service";
@@ -18,7 +18,7 @@ import { MODULE_OPTIONS_TOKEN } from "../pipelines.module-definition";
 export class PipelineService {
     private readonly logger = new Logger(PipelineService.name);
 
-    private readonly pool: WorkerPool;
+    private readonly pool: Pool;
     private readonly running: Map<string, PipelineRun> = new Map();
 
     private isDispatching: boolean = false;
@@ -40,14 +40,14 @@ export class PipelineService {
                     ...process.env
                 }
             },
-            
+
         });
 
         // Register polling interval
         const intervalHandler = () => {
 
             // Check if previous polling interval is still busy dispatching worker
-            if(!this.isDispatching) {
+            if (!this.isDispatching) {
                 // If not, dispatch next run and
                 // update status accordingly
                 this.isDispatching = true;
@@ -125,7 +125,7 @@ export class PipelineService {
     private async dispatchNextRun(): Promise<PipelineRun> {
         const peek = this.queue.peek();
         // No runs enqueued
-        if(typeof peek === "undefined" || peek == null) {
+        if (typeof peek === "undefined" || peek == null) {
             return null;
         }
 
@@ -133,7 +133,7 @@ export class PipelineService {
         const totalCapacity: number = this.localOptions.concurrent ?? DEFAULT_CONCURRENT_PIPELINES;
 
         // Max concurrently running pipelines reached
-        if(currentlyRunning >= totalCapacity) {
+        if (currentlyRunning >= totalCapacity) {
             return null;
         }
 
@@ -142,7 +142,7 @@ export class PipelineService {
         const definition = this.registry.get(pipelineRun.id);
 
         // Execute the pipeline in the worker pool
-        this.pool.exec("default", [ pipelineRun, definition, this.globalOptions, this.localOptions ], {
+        this.pool.exec("default", [pipelineRun, definition, this.globalOptions, this.localOptions], {
             // Subscribe to any event
             on: (payload: WorkerEmitEvent<any>) => {
                 const { name, args } = payload;
