@@ -1,33 +1,5 @@
-# Soundcore Meilisearch Library
-Meilisearch library that wraps meilisearch-js into a NestJS module
+# Soundcore BOOTSTRAP
 
-## Installation
-```bash
-npm install --save @soundcore/meilisearch
-```
-or using yarn
-```bash
-yarn add @soundcore/meilisearch
-```
+Bootstrap package to have a common way to boot our NestJS applications.
 
-## Usage
-First, you have to register the module in your `app.module.ts`:
-```javascript
-import { Module } from '@nestjs/common';
-import { MeilisearchModule } from '@soundcore/meilisearch';
-
-@Module({
-  imports: [
-    MeilisearchModule.forRootAsync({
-      useFactory: (configService: ConfigService) => ({
-        host: configService.get("meilisearch.host"),
-        port: configService.get("meilisearch.port"),
-        key: configService.get("meilisearch.key")
-      })
-    })
-  ],
-})
-export class AppModule {}
-```
-
-// TODO
+## Getting started
