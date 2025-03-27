@@ -1,0 +1,26 @@
+{
+  "name": "@repo/utilities",
+  "version": "1.0.0",
+  "private": true,
+  "license": "UNLICENSED",
+  "types": "./dist/typings/index.d.ts",
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "scripts": {
+    "ci:lint": "eslint",
+    "ci:build": "rimraf dist && node esbuild.mjs && tsc --project tsconfig.prod.json"
+  },
+  "files": [
+    "dist/**/*",
+    "README.md"
+  ],
+  "dependencies": {
+    "rxjs": "^7.8.2"
+  },
+  "devDependencies": {
+    "@repo/config-typescript": "*",
+    "esbuild": "^0.25.1",
+    "rimraf": "^6.0.1",
+    "typescript": "^5.8.2"
+  }
+}

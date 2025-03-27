@@ -1,0 +1,1 @@
+export { toVoid } from "./toVoid";
