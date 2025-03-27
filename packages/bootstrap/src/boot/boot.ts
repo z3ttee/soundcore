@@ -25,7 +25,7 @@ import { readServiceInfo } from "../utils/readServiceInfo";
  * This is used to build a new instance for a NestJS application
  * that allows for imperative configuration using the builder pattern.
  */
-export class NGSBootstrapper {
+export class Bootstrapper {
   /** @ignore */
   private readonly _globalPipes: Set<PipeTransform> = new Set();
   /** @ignore */
@@ -54,20 +54,20 @@ export class NGSBootstrapper {
    * @param module Root module of the NestJS application
    * @returns Instance of the bootstrapper for further configuration
    */
-  public static create(module: unknown): NGSBootstrapper {
-    return new NGSBootstrapper(module);
+  public static create(module: unknown): Bootstrapper {
+    return new Bootstrapper(module);
   }
   /**
    * Update CORS settings
    * @returns Instance of the current bootstrapper
    */
-  public setCors(options: boolean | CorsOptions | CorsOptionsDelegate<unknown>): NGSBootstrapper {
+  public setCors(options: boolean | CorsOptions | CorsOptionsDelegate<unknown>): Bootstrapper {
     this._corsOptions = options;
     return this;
   }
 
   /** Set version options */
-  public setVersioning(options: VersioningOptions): NGSBootstrapper {
+  public setVersioning(options: VersioningOptions): Bootstrapper {
     this._versionOptions = options;
     return this;
   }
@@ -79,7 +79,7 @@ export class NGSBootstrapper {
    */
   public onBeforeStartup<TInitReturnValue = unknown>(
     beforeStartupFn: OnBeforeStartupFn<TInitReturnValue>
-  ): NGSBootstrapper {
+  ): Bootstrapper {
     this._onBeforeStartupFn = beforeStartupFn;
     return this;
   }
@@ -88,7 +88,7 @@ export class NGSBootstrapper {
    * @param pipe Global pipe implementation to register
    * @returns Instance of the current bootstrapper
    */
-  public registerGlobalPipe(pipe: PipeTransform): NGSBootstrapper {
+  public registerGlobalPipe(pipe: PipeTransform): Bootstrapper {
     this._globalPipes.add(pipe);
     return this;
   }
@@ -97,7 +97,7 @@ export class NGSBootstrapper {
    * @param pipe Global pipe implementation to register
    * @returns Instance of the current bootstrapper
    */
-  public registerGlobalFilter(filter: ExceptionFilter): NGSBootstrapper {
+  public registerGlobalFilter(filter: ExceptionFilter): Bootstrapper {
     this._globalFilters.add(filter);
     return this;
   }
@@ -106,7 +106,7 @@ export class NGSBootstrapper {
    * @param guard Global guard implementation to register
    * @returns Instance of the current bootstrapper
    */
-  public registerGlobalGuard(guard: CanActivate): NGSBootstrapper {
+  public registerGlobalGuard(guard: CanActivate): Bootstrapper {
     this._globalGuards.add(guard);
     return this;
   }
@@ -123,15 +123,15 @@ export class NGSBootstrapper {
    * @param enableLogo Enable printing the branding by setting this to `true` or disable the branding by setting this to `false`. Default is `true`
    * @returns Instance of the current bootstrapper
    */
-  public withLogo(enableLogo: boolean): NGSBootstrapper;
+  public withLogo(enableLogo: boolean): Bootstrapper;
   /**
    * Configure the branding that is printed to stdout
    * @param logoOptions Options to configure the branding
    * @returns Instance of the current bootstrapper
    */
-  public withLogo(logoOptions: LogoOptions): NGSBootstrapper;
+  public withLogo(logoOptions: LogoOptions): Bootstrapper;
   /** @ignore */
-  public withLogo(logoOptionsOrBool: LogoOptions | boolean): NGSBootstrapper {
+  public withLogo(logoOptionsOrBool: LogoOptions | boolean): Bootstrapper {
     // Check if boolean is set,
     // then enable/disable logo based on that value
     if (typeof logoOptionsOrBool === "boolean") {
@@ -149,7 +149,7 @@ export class NGSBootstrapper {
    * @param initOptions Options to configure db init
    * @returns Instance of the current bootstrapper
    */
-  public withDbInit(initOptions: DBInitOptions): NGSBootstrapper {
+  public withDbInit(initOptions: DBInitOptions): Bootstrapper {
     this._dbInitOptions = initOptions;
     return this;
   }

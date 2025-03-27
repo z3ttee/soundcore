@@ -1,1 +1,1 @@
-export { NGSBootstrapper } from "./boot";
+export { Bootstrapper } from "./boot";

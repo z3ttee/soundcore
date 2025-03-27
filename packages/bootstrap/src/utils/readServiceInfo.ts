@@ -4,7 +4,7 @@ import { ENV_CLIENT_SECRET_KEY, FILE_SERVICE_INFO } from "../constants";
 import { ServiceInfo } from "../entities/service-info.entity";
 import { MissingServiceInfoFileException } from "../exceptions/missingServiceInfo";
 import logger from "./logger";
-import { isNull } from "@soundcore/common";
+import { isNull } from "@repo/utilities";
 
 /**
  * Read the service info file of
