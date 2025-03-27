@@ -6,7 +6,7 @@ import { SearchService } from '../services/search.service';
 
 @Controller('search')
 export class SearchController {
-  constructor(private readonly service: SearchService) {}
+  constructor(private readonly service: SearchService) { }
 
   @Get("playlists")
   public async searchPlaylists(@Query("q") query: string, @Pagination() pageable: Pageable, @Authentication() authentication: User) {
@@ -33,18 +33,18 @@ export class SearchController {
     return this.service.searchSongs(query, pageable);
   }
 
-  @Get("labels")
-  public async searchLabels(@Query("q") query: string, @Pagination() pageable: Pageable) {
-    return this.service.searchLabels(query, pageable);
-  }
+  // @Get("labels")
+  // public async searchLabels(@Query("q") query: string, @Pagination() pageable: Pageable) {
+  //   return this.service.searchLabels(query, pageable);
+  // }
 
-  @Get("publishers")
-  public async searchPublishers(@Query("q") query: string, @Pagination() pageable: Pageable) {
-    return this.service.searchPublishers(query, pageable);
-  }
+  // @Get("publishers")
+  // public async searchPublishers(@Query("q") query: string, @Pagination() pageable: Pageable) {
+  //   return this.service.searchPublishers(query, pageable);
+  // }
 
-  @Get("distributors")
-  public async searchDistributors(@Query("q") query: string, @Pagination() pageable: Pageable) {
-    return this.service.searchDistributors(query, pageable);
-  }
+  // @Get("distributors")
+  // public async searchDistributors(@Query("q") query: string, @Pagination() pageable: Pageable) {
+  //   return this.service.searchDistributors(query, pageable);
+  // }
 }
