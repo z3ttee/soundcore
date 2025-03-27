@@ -1,25 +1,20 @@
 {
-  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "@repo/config-typescript/nestjs",
   "compilerOptions": {
     "outDir": "./dist",
-    "target": "ESNext",
-    "module": "ESNext",
     "declaration": true,
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
-    "allowSyntheticDefaultImports": true,
     "sourceMap": true,
-    "incremental": true,
-    "skipLibCheck": true,
-    "noImplicitAny": true,
-    "noImplicitOverride": true,
-    "forceConsistentCasingInFileNames": true,
-    "noFallthroughCasesInSwitch": true,
-    "esModuleInterop": true,
-    "strictNullChecks": true,
-    "moduleResolution": "Node",
-    "resolveJsonModule": true
+    "lib": [
+      "DOM"
+    ]
   },
-  "include": ["src/**/*", "esbuild.mjs"],
-  "exclude": ["node_modules", "test", "dist", "**/*spec.ts"]
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "test",
+    "dist",
+    "**/*spec.ts"
+  ]
 }

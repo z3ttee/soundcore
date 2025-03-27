@@ -9,7 +9,7 @@ await esbuild.build({
   minifyWhitespace: true,
   outdir: "dist/esm",
   treeShaking: true,
-  tsconfig: "tsconfig.prod.json",
+  tsconfig: "tsconfig.json",
   platform: "browser"
 });
 
@@ -22,6 +22,6 @@ await esbuild.build({
   minifyWhitespace: true,
   outdir: "dist/cjs",
   treeShaking: true,
-  tsconfig: "tsconfig.prod.json",
+  tsconfig: "tsconfig.json",
   platform: "node"
 });

@@ -11,9 +11,11 @@ export function decodeJwt<T = unknown>(token: string | undefined | null): T | nu
   try {
     const base64Url = token.split(".")[1];
     const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+
+    const base64decoded = !window ? Buffer.from(base64, 'base64').toString() : window.atob(base64);
+
     const jsonPayload = decodeURIComponent(
-      window
-        .atob(base64)
+      base64decoded
         .split("")
         .map(function (c) {
           return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
