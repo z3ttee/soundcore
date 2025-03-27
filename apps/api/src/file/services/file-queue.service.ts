@@ -1,6 +1,6 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { EventEmitter2, OnEvent } from "@nestjs/event-emitter";
-import { WorkerJob, WorkerJobRef, WorkerQueue } from "@soundcore/nest-queue";
+import { WorkerJob, WorkerJobRef, WorkerQueue } from "@soundcore/queue";
 import { EVENT_FILES_FOUND, EVENT_FILES_PROCESSED, EVENT_MOUNT_PROCESS_UPDATE, MOUNT_MAX_STEPS, MOUNT_STEP_WAITING } from "../../constants";
 import { FilesFoundEvent } from "../../events/files-found.event";
 import { FileDTO } from "../dto/file.dto";
@@ -65,7 +65,7 @@ export class FileQueueService {
         const { payload } = job;
         const { mount, flag } = payload;
 
-        if(flag == FileProcessFlag.DEFAULT) {
+        if (flag == FileProcessFlag.DEFAULT) {
             this.logger.verbose(`Creating database entries for files on mount '${mount.name}'`);
 
             this.eventEmitter.emit(EVENT_MOUNT_PROCESS_UPDATE, mount, MountStatus.BUSY, {
@@ -86,8 +86,8 @@ export class FileQueueService {
     private async handleOnWorkerFailed(job: WorkerJobRef<FileProcessDTO>, error: Error) {
         const { mount, flag } = job.payload;
 
-        if(flag == FileProcessFlag.DEFAULT) {
-            if(Environment.isDebug) {
+        if (flag == FileProcessFlag.DEFAULT) {
+            if (Environment.isDebug) {
                 this.logger.error(`Could not process batch of files for mount '${mount?.name}': ${error?.message}`, error?.stack);
             } else {
                 this.logger.error(`Could not process batch of files for mount '${mount?.name}': ${error?.message}`);
@@ -96,7 +96,7 @@ export class FileQueueService {
             // Emit mount status update
             this.eventEmitter.emit(EVENT_MOUNT_PROCESS_UPDATE, mount, MountStatus.ERRORED, null);
         } else {
-            if(Environment.isDebug) {
+            if (Environment.isDebug) {
                 this.logger.error(`Failed checking for file that await analysis: ${error.message}`, error.stack)
             } else {
                 this.logger.error(`Failed checking for file that await analysis: ${error.message}`)
@@ -110,25 +110,25 @@ export class FileQueueService {
     private async handleOnWorkerCompleted(job: WorkerJob<FileProcessDTO, FileProcessResultDTO[]>) {
         const { result } = job;
 
-        for(const res of result) {
+        for (const res of result) {
             const { timeTookMs = 0, filesProcessed = [] } = res || {};
             const { flag, mount, scanFlag } = res;
 
-            if(flag == FileProcessFlag.DEFAULT) {
-                if(filesProcessed.length <= 0) {
+            if (flag == FileProcessFlag.DEFAULT) {
+                if (filesProcessed.length <= 0) {
                     this.logger.verbose(`No new files were created on mount '${mount?.name}'. Took ${timeTookMs}ms.`);
                     this.eventEmitter.emit(EVENT_MOUNT_PROCESS_UPDATE, mount, MountStatus.UP, null);
                     return;
                 }
-        
+
                 this.logger.verbose(`Created database entries for ${filesProcessed.length} files on mount '${mount?.name}'. Took ${timeTookMs}ms.`);
             } else {
-                if(filesProcessed.length <= 0) {
+                if (filesProcessed.length <= 0) {
                     this.logger.verbose(`No waiting files found. Took ${timeTookMs}ms.`);
                     this.eventEmitter.emit(EVENT_MOUNT_PROCESS_UPDATE, mount, MountStatus.UP, null);
                     return;
                 }
-        
+
                 this.logger.verbose(`${filesProcessed.length} files have been enqueued for analysis. Took ${timeTookMs}ms.`);
             }
 
@@ -150,9 +150,9 @@ export class FileQueueService {
      */
     private async handleOnWorkerProgress(job: WorkerJobRef<FileProcessDTO>) {
         const { payload, progress } = job;
-        if(typeof payload?.mount === "undefined" || payload?.mount == null) return;
+        if (typeof payload?.mount === "undefined" || payload?.mount == null) return;
 
-        if(Environment.isDebug) {
+        if (Environment.isDebug) {
             this.logger.debug(`Progress on mount ${job.payload.mount?.name}: ${job.progress}%`);
         }
     }

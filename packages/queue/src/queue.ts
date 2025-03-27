@@ -1,41 +1,52 @@
 import { BehaviorSubject, debounceTime, Observable, Subject, switchMap } from "rxjs";
-import { EventCallback } from "../queue/events/events";
+import { EventCallback } from "./queue/events/events";
 
-export abstract class BaseQueue<T, EN> {
-
-    private readonly _events: Map<EN, EventCallback[]> = new Map();
-    private _debounceMs: number = 0;
+export abstract class BaseQueue<T, TEventName> {
 
     private readonly _debounceSubject: Subject<void> = new Subject();
+    private _debounceMs: number = 0;
+
+    /** 
+     * Map of registered events. 
+     * The event name is used as key and 
+     * the callback will be registered on that key
+     */
+    private readonly _events: Map<TEventName, EventCallback[]> = new Map();
+
+    /** Subject used to add/remove items to/from the queue */
     private readonly _queueSubject: BehaviorSubject<T[]> = new BehaviorSubject([]);
-    protected readonly $queue: Observable<T[]> = this._debounceSubject.asObservable().pipe(
-        debounceTime(this.debounceMs || 0),
+
+    /** Observable to subscribe to changes to the queue */
+    public readonly $queue: Observable<T[]> = this._debounceSubject.asObservable().pipe(
+        debounceTime(this._debounceMs ?? 0),
         switchMap(() => this._queueSubject.asObservable())
     );
 
-    constructor(_debounceMs: number = 0) {
-        this._debounceMs = _debounceMs;
+    /** 
+     * Create a new queue instance. 
+     * @param debounce Debounce time in milliseconds. Defaults to 0
+     */
+    constructor(debounce: number = 0) {
+        this._debounceMs = debounce;
     }
 
-    protected get debounceMs(): number {
-        return this._debounceMs;
-    }
-
-    protected get eventRegistry(): Map<EN, EventCallback[]> {
-        return this._events;
-    }
-
-    protected getHandlersForEvent(eventName: EN): EventCallback[] {
+    /** Get all registered event handlers of an event */
+    protected _getHandlersForEvent(eventName: TEventName): EventCallback[] {
         return this._events.get(eventName) || [];
     }
 
+    /** Get current size of the queue */
     public get size(): number {
         return this._queueSubject.getValue().length;
     }
 
+    /** 
+     * Set the debounce time in milliseconds. 
+     * Setting a debounce adds a delay between 
+     * adding an item to the queue and reflecting that change 
+     */
     public setDebounceMs(val: number) {
-        if(!val) val = 0;
-        this._debounceMs = val;
+        this._debounceMs = val ?? 0;
     }
 
     /**
@@ -43,7 +54,7 @@ export abstract class BaseQueue<T, EN> {
      * @param item Item to add
      * @returns Position in queue (beginning at 0)
      */
-     public async enqueue(item: T): Promise<number> {
+    public async enqueue(item: T): Promise<number> {
         const queue = this._queueSubject.getValue();
         const position = queue.push(item);
 
@@ -79,17 +90,22 @@ export abstract class BaseQueue<T, EN> {
      * @param eventName Name of the event
      * @param callback Event handler callback
      */
-    public async on<T extends EN>(eventName: T, callback: EventCallback) {
+    public async on<T extends TEventName = never>(eventName: T, callback: EventCallback) {
         const handlers: EventCallback[] = this._events.get(eventName) || [];
         handlers.push(callback);
 
         this._events.set(eventName, handlers);
     }
 
-    public async off<T extends EN>(eventName: T, callback: EventCallback) {
+    /**
+     * Remove a registered event handler.
+     * @param eventName Name of the event
+     * @param callback Function that was registered
+     */
+    public async off<T extends TEventName = never>(eventName: T, callback: EventCallback) {
         const handlers: EventCallback[] = this._events.get(eventName) || [];
         const index = handlers.findIndex((val) => val == callback);
-        if(index == -1) return;
+        if (index == -1) return;
 
         handlers.splice(index, 1);
         this._events.set(eventName, handlers);

@@ -4,7 +4,7 @@ import fs from "fs";
 import path from "path";
 import { FileDTO } from "../../file/dto/file.dto";
 import { MountScanResultDTO } from "../dtos/scan-result.dto";
-import { WorkerJobRef, WorkerProgressEvent } from "@soundcore/nest-queue";
+import { WorkerJobRef, WorkerProgressEvent } from "@soundcore/queue";
 
 import workerpool from "workerpool";
 import { FileSystemService } from "../../filesystem/services/filesystem.service";
@@ -36,26 +36,26 @@ export const MOUNT_STEP_SCAN = "SCANNING";
 export default async function (job: WorkerJobRef<MountScanProcessDTO>): Promise<MountScanResultDTO> {
     const { mount, flag } = job.payload;
 
-    if(flag === MountScanFlag.DOCKER_LOOKUP) {
+    if (flag === MountScanFlag.DOCKER_LOOKUP) {
         return lookupDockerMountedVolumes(job);
     }
 
-    if(typeof mount === "undefined" || mount == null) {
+    if (typeof mount === "undefined" || mount == null) {
         throw new Error("Invalid mount: null");
     }
 
     const mountDirectory = filesystem.resolveMountPath(mount);
 
     // Create directory if it does not exist.
-    if(!fs.existsSync(mountDirectory)) {
+    if (!fs.existsSync(mountDirectory)) {
         logger.warn(`Could not find directory '${mountDirectory}'. Creating it...`);
         fs.mkdirSync(mountDirectory, { recursive: true });
     }
 
     // Execute correct type of scan
-    if(flag === MountScanFlag.DEFAULT_SCAN) {
+    if (flag === MountScanFlag.DEFAULT_SCAN) {
         return scanMount(job);
-    } else if(flag === MountScanFlag.RESCAN) {
+    } else if (flag === MountScanFlag.RESCAN) {
         return rescanMount(job);
     } else {
         throw new InternalServerErrorException(`Received mount scan task with invalid flag.`);
@@ -93,7 +93,7 @@ async function scanMount(job: WorkerJobRef<MountScanProcessDTO>): Promise<MountS
         globs.on("match", (match: any) => {
             // Check if files already in registry, if not, add to files list
             // for further processing. Otherwise it will be ignored
-            if(!registry.files.includes(match)) {
+            if (!registry.files.includes(match)) {
                 // On every match, create object.
                 const file = new FileDTO();
                 file.directory = path.dirname(match);
@@ -101,14 +101,14 @@ async function scanMount(job: WorkerJobRef<MountScanProcessDTO>): Promise<MountS
 
                 files.push(file);
             }
-            
+
             // Always add match to matches array
             matches.push(match);
         })
 
         // Listen for END event.
         // This will be triggered when matching process is done.
-        globs.on("end", () => { 
+        globs.on("end", () => {
             updateProgress(job, 0.9);
 
             // Update registry file entries
@@ -155,14 +155,14 @@ async function lookupDockerMountedVolumes(job: WorkerJobRef<MountScanProcessDTO>
         return new Promise<MountScanResultDTO>((resolve, reject) => {
             logger.log(`Application is running in docker mode: Checking for mounted volumes.`);
             const rootDir = "/mnt/";
-    
+
             fs.readdir(rootDir, { withFileTypes: true }, (err, files) => {
-                if(err) {
+                if (err) {
                     console.error(err)
                     reject(err);
                     return;
                 }
-    
+
                 const mountDtos: CreateMountDTO[] = files.filter((dirent) => dirent.isDirectory()).map((dirent) => ({
                     zone: { id: fsService.getInstanceId() },
                     name: service.formatName(dirent.name),
@@ -173,7 +173,7 @@ async function lookupDockerMountedVolumes(job: WorkerJobRef<MountScanProcessDTO>
                 }));
 
                 service.createMultipleIfNotExists(mountDtos).then((mounts) => {
-                    if(mounts.length > 0) {
+                    if (mounts.length > 0) {
                         logger.log(`Registered ${mounts.length} mounted directories inside '${rootDir}'.`);
                     }
 
@@ -198,4 +198,3 @@ function updateProgress(job: WorkerJobRef, progress: number) {
     job.progress = progress;
     workerpool.workerEmit(new WorkerProgressEvent(job));
 }
-  

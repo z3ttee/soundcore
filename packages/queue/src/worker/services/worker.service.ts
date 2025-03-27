@@ -1,5 +1,5 @@
 import { Inject, Injectable } from "@nestjs/common";
-import workerpool from "workerpool";
+import { Pool, pool, cpus } from "workerpool";
 import { WorkerQueueModuleOptions, WorkerQueueOptions } from "../worker.module";
 import { WorkerQueue } from "../entities/worker-queue.entity";
 import { Worker } from "../entities/worker.entity";
@@ -12,7 +12,7 @@ export class WorkerService {
 
     private readonly _options: WorkerQueueOptions;
 
-    private readonly _pool: workerpool.WorkerPool;
+    private readonly _pool: Pool;
     private readonly _worker: Worker;
 
     constructor(
@@ -32,17 +32,17 @@ export class WorkerService {
         this._worker = new Worker(path.resolve(this._options.script));
 
         // Create worker pool
-        this._pool = workerpool.pool(path.resolve(__dirname, "..", "worker.js"), {
-            workerType: this._options.workerType || "thread",
+        this._pool = pool(path.resolve(__dirname, "..", "worker.js"), {
+            workerType: this._options.workerType ?? "thread",
             minWorkers: 1,
-            maxWorkers: this._options.concurrent || 1,
+            maxWorkers: Math.max(1, Math.min(cpus - 1, this._options.concurrent ?? 1)),
             forkOpts: {
                 env: {
                     ...process.env
                 }
             }
         });
-        
+
         // Listen to events
         this.queue.on("waiting", () => {
             this.offerNewItemToWorkers();
@@ -54,12 +54,12 @@ export class WorkerService {
 
         // Only continue, if there are idle workers
         // and if there are no pending tasks
-        if(stats.idleWorkers > 0 && stats.pendingTasks <= 0) {
+        if (stats.idleWorkers > 0 && stats.pendingTasks <= 0) {
             // For every idle worker, offer them
             // a new task via pool proxy
-            for(let i = 0; i < stats.idleWorkers; i++) {
+            for (let i = 0; i < stats.idleWorkers; i++) {
                 // Break the loop, if the queue is empty
-                if(this.queue.size <= 0) break;
+                if (this.queue.size <= 0) break;
 
                 // Dequeue item from the queue
                 const job = await this.queue.dequeue();
@@ -67,7 +67,7 @@ export class WorkerService {
                     ...process.env
                 }
 
-                this._pool.exec("default", [ env, this._worker, job ], {
+                this._pool.exec("default", [env, this._worker, job], {
                     on: (event: WorkerExecutionEvent) => {
                         this.queue.fireEvent(event.name, event.job, event.error);
                     }
@@ -76,6 +76,6 @@ export class WorkerService {
         }
     }
 
-    
+
 
 }

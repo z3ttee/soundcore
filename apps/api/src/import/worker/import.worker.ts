@@ -1,6 +1,6 @@
 import { InternalServerErrorException, Logger } from "@nestjs/common";
 import { EventEmitter2 } from "@nestjs/event-emitter";
-import { WorkerJobRef } from "@soundcore/nest-queue";
+import { WorkerJobRef } from "@soundcore/queue";
 import { PlaylistItem } from "../../playlist/entities/playlist-item.entity";
 import { Playlist } from "../../playlist/entities/playlist.entity";
 // import { PlaylistService } from "../../playlist/playlist.service";
@@ -19,11 +19,11 @@ import { ImportReportService } from "../services/import-report.service";
 export default async function (job: WorkerJobRef<ImportTask>): Promise<any> {
     const taskType = job.payload.type;
 
-    if(taskType == ImportTaskType.SPOTIFY_PLAYLIST) {
+    if (taskType == ImportTaskType.SPOTIFY_PLAYLIST) {
         return importSpotifyPlaylist(job);
     } else {
         throw new InternalServerErrorException("Received import task with invalid type.");
-    } 
+    }
 
     // https://open.spotify.com/playlist/1m1n3D4q1PXSmaqQBS5rK7?si=16545a9d58314b9c
 }
@@ -34,20 +34,20 @@ async function importSpotifyPlaylist(job: WorkerJobRef<ImportTask>): Promise<Imp
     // Just for logging and stats
     const logger = new Logger()
     const startedAtMs = Date.now();
-    
+
     // Connect the database client
     return Database.connect().then((datasource) => {
         // Create new meilisearch instance
         return MeilisearchClient.connect().then((meilisearch) => {
 
             // Check if spotify module is enabled
-            if(!client.isEnabled) {
+            if (!client.isEnabled) {
                 throw new InternalServerErrorException("Spotify module is disabled");
             }
 
             // Create new event emitter required by services
             const eventEmitter = new EventEmitter2()
-    
+
             // Instantiate repositories used by the services
             const songRepo = datasource.getRepository(Song);
             const playlistRepo = datasource.getRepository(Playlist);
@@ -60,30 +60,30 @@ async function importSpotifyPlaylist(job: WorkerJobRef<ImportTask>): Promise<Imp
             // const playlistService = new PlaylistService(playlistRepo, song2playlistRepo, eventEmitter);
             const importService = new ImportService(importRepo);
             const reportService = new ImportReportService(reportRepo);
-            
+
             // Destructure job object into payload
             // and make variables of most used data
             const { payload } = job;
             const task = payload as SpotifyImport;
             const user = payload.user;
             const baseUrl = task.baseUrl;
-        
+
             // Extract playlist id from the url
             const url = new URL(task.url + "/", baseUrl);
             const playlistId = url.pathname.replace("/playlist/", "");
 
             // Fetch playlist from spotify
             return client.findSpotifyPlaylistById(playlistId).then(async (spotifyPlaylist) => {
-        
+
                 // Array of songs that were extracted from the spotify playlist
                 const extractedSongs: Song[] = [];
                 const notExtractedSpotifySongs: FailedSpotifyImport[] = [];
-                
+
                 // Used to track how many total songs are in the playlist on spotify
                 let totalSpotifyTracks: number = 0;
-        
+
                 let nextUrl: string = undefined;
-                while(true) {
+                while (true) {
                     // Array of songs that were found in spotify playlist
                     const availableSpotifySongs: Map<string, SpotifySong> = new Map();
 
@@ -94,16 +94,16 @@ async function importSpotifyPlaylist(job: WorkerJobRef<ImportTask>): Promise<Imp
 
                     // Increments stats
                     totalSpotifyTracks += tracklist.items.length;
-        
+
                     // Save nextUrl for next iteration
                     nextUrl = tracklist.next;
 
                     const names: string[] = [];
                     const artistNames: string[] = [];
                     const albumNames: string[] = [];
-        
+
                     // Collect songs and push to found array
-                    for(let i = 0; i < tracklist.items.length; i++) {
+                    for (let i = 0; i < tracklist.items.length; i++) {
                         const item = tracklist.items[i];
                         const track = item.track;
 
@@ -111,7 +111,7 @@ async function importSpotifyPlaylist(job: WorkerJobRef<ImportTask>): Promise<Imp
                         // This is later used to lookup matching songs on soundcore
                         names.push(track.name);
                         artistNames.push(...track.artists.map((artist) => artist.name));
-                        if(track.album?.name) albumNames.push(track.album?.name);
+                        if (track.album?.name) albumNames.push(track.album?.name);
 
                         // Save spotify song with key
                         availableSpotifySongs.set(getSpotifySongKey(track), track)
@@ -146,7 +146,7 @@ async function importSpotifyPlaylist(job: WorkerJobRef<ImportTask>): Promise<Imp
                     extractedSongs.push(...songs);
 
                     // Was last page, so the loop can be broken
-                    if(!tracklist.next) break;
+                    if (!tracklist.next) break;
                 }
 
                 // Create playlist in soundcore database

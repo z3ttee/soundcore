@@ -1,6 +1,6 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { EventEmitter2 } from "@nestjs/event-emitter";
-import { WorkerJob, WorkerJobRef, WorkerQueue } from "@soundcore/nest-queue";
+import { WorkerJob, WorkerJobRef, WorkerQueue } from "@soundcore/queue";
 import { EVENT_FILES_FOUND, MOUNT_MAX_STEPS, MOUNT_STEP_WAITING } from "../../constants";
 import { FilesFoundEvent } from "../../events/files-found.event";
 import { MountScanResultDTO } from "../dtos/scan-result.dto";
@@ -85,7 +85,7 @@ export class MountQueueService {
         // the only objective was to create mounts based on mounted directories.
         // This will only happen, if the application is in DOCKER mode.
         // The job has completed and the default scanning process is triggered here.
-        if(job.payload.flag === MountScanFlag.DOCKER_LOOKUP) {
+        if (job.payload.flag === MountScanFlag.DOCKER_LOOKUP) {
             this.mountService.checkMountsStandaloneMode();
             return;
         }
@@ -95,12 +95,12 @@ export class MountQueueService {
 
         // Update last scanned at
         await this.mountService.updateLastScanned(mount);
-        
 
-        if(files.length <= 0) {
+
+        if (files.length <= 0) {
             this.logger.verbose(`No new files found (total: ${result?.totalFiles}) on mount '${mount.name}'. Took ${result?.timeMs}ms.`);
             // Do not emit event if the flag is not set to rescan
-            if(flag != MountScanFlag.RESCAN) {
+            if (flag != MountScanFlag.RESCAN) {
                 // This is no rescan, so no files means no further steps needed
                 // Status can be cleared and set to UP
                 await this.mountService.setProgressInfoAndEmit(mount, null, MountStatus.UP);
@@ -129,7 +129,7 @@ export class MountQueueService {
     private async handleOnFailed(job: WorkerJobRef<MountScanProcessDTO>, error: Error) {
         const { mount, flag } = job.payload;
 
-        if(flag === MountScanFlag.DOCKER_LOOKUP) {
+        if (flag === MountScanFlag.DOCKER_LOOKUP) {
             this.logger.error(`Failed looking up mounted directories via docker volumes: ${error.message}`, error.stack);
         } else {
             this.logger.error(`Failed looking for files on mount ${mount.name}: ${error.message}`, error.stack);

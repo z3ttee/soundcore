@@ -7,7 +7,7 @@ export class WorkerJobRef<T = any> {
         public readonly id: string,
         public readonly payload: T,
         public progress: number = 0
-    ) {}
+    ) { }
 
     public static fromJob<T>(job: WorkerJob<T, any>) {
         return new WorkerJobRef<T>(job.id, job.payload, job.progress)
@@ -15,7 +15,6 @@ export class WorkerJobRef<T = any> {
 }
 
 export class WorkerJob<T = any, R = any> {
-
     public readonly id: string;
     public readonly payload: T;
     public progress: number = 0;

@@ -1,6 +1,6 @@
 import { Module, OnModuleInit } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { WorkerQueueModule } from '@soundcore/nest-queue';
+import { WorkerQueueModule } from '@soundcore/queue';
 import path from 'path';
 import { IndexerModule } from '../indexer/indexer.module';
 import { FileController } from './controllers/file.controller';
@@ -18,7 +18,7 @@ import { FileService } from './services/file.service';
   ],
   imports: [
     IndexerModule,
-    TypeOrmModule.forFeature([ File ]),
+    TypeOrmModule.forFeature([File]),
     WorkerQueueModule.forFeature({
       script: path.join(__dirname, "worker", "file.worker.js"),
       concurrent: 4
@@ -29,10 +29,10 @@ import { FileService } from './services/file.service';
   ]
 })
 export class FileModule implements OnModuleInit {
-  constructor(private readonly queue: FileQueueService) {}
+  constructor(private readonly queue: FileQueueService) { }
 
   public async onModuleInit() {
     // await this.queue.processAwaitingFiles();
   }
-  
+
 }

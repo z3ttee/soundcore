@@ -1,5 +1,5 @@
 import { Injectable, Logger } from "@nestjs/common";
-import { WorkerJob, WorkerQueue } from "@soundcore/nest-queue";
+import { WorkerJob, WorkerQueue } from "@soundcore/queue";
 import { GeniusProcessDTO } from "../dtos/genius-process.dto";
 
 @Injectable()
@@ -10,7 +10,7 @@ export class GeniusQueueService {
         private readonly queue: WorkerQueue<GeniusProcessDTO>
     ) {
         this.queue.on("started", (job: WorkerJob<GeniusProcessDTO, any>) => {
-            
+
         });
     }
 

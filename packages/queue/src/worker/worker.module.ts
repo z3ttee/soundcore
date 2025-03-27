@@ -7,7 +7,6 @@ import { createRedisOptionsProviderAsync } from "./utils";
 
 
 export interface WorkerQueueOptions extends QueueOptions {
-
     /**
      * @default thread
      */
@@ -27,19 +26,17 @@ export interface WorkerQueueOptions extends QueueOptions {
 }
 
 export interface WorkerQueueModuleOptions {
-    defaultQueueOptions?: {} 
-        & Pick<WorkerQueueOptions, "concurrent"> 
-        & Pick<WorkerQueueOptions, "workerType"> 
-        & Pick<WorkerQueueOptions, "debounceMs">;
+    defaultQueueOptions?: {}
+    & Pick<WorkerQueueOptions, "concurrent">
+    & Pick<WorkerQueueOptions, "workerType">
+    & Pick<WorkerQueueOptions, "debounceMs">;
 }
 
 export interface WorkerQueueAsyncOptions extends Pick<ModuleMetadata, 'imports'>, Pick<FactoryProvider, 'inject'> {
     useFactory: (...args: any[]) => Promise<WorkerQueueModuleOptions> | WorkerQueueModuleOptions;
 }
 
-@Module({
-    
-})
+@Module({})
 export class WorkerQueueModule {
 
     public static async forRootAsync(asyncOptions: WorkerQueueAsyncOptions): Promise<DynamicModule> {
@@ -60,9 +57,6 @@ export class WorkerQueueModule {
     public static forFeature(options: WorkerQueueOptions): DynamicModule {
         return {
             module: WorkerQueueModule,
-            imports: [
-                
-            ],
             providers: [
                 {
                     provide: WORKERQUEUE_FEATURE_OPTIONS,

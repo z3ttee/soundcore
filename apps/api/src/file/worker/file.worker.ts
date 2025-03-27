@@ -4,7 +4,7 @@ import crypto from "node:crypto";
 import { Logger } from "@nestjs/common";
 import { FileProcessDTO, FileProcessFlag } from "../dto/file-process.dto";
 import { File, FileFlag, FileID } from "../entities/file.entity";
-import { WorkerJobRef, WorkerProgressEvent } from "@soundcore/nest-queue";
+import { WorkerJobRef, WorkerProgressEvent } from "@soundcore/queue";
 import workerpool from "workerpool";
 import Database from "../../utils/database/database-worker-client";
 import { FileService } from "../services/file.service";
@@ -29,19 +29,19 @@ export default async function (job: WorkerJobRef<FileProcessDTO>): Promise<FileP
         const startTime = Date.now();
         const fileIds: FileID[] = [];
 
-        if(flag == FileProcessFlag.DEFAULT) {
+        if (flag == FileProcessFlag.DEFAULT) {
             // This will create new file entities by given dtos.
             fileIds.push(...await processGivenFiles(job, datasource));
             const timeTookMs = Date.now() - startTime;
             return [new FileProcessResultDTO(mount, fileIds, timeTookMs, flag, scanFlag)];
-        } else if(flag == FileProcessFlag.CONTINUE_AWAITING) {
+        } else if (flag == FileProcessFlag.CONTINUE_AWAITING) {
             // This will just fetch all files depending on the awaiting flag.
             // It pushes entities to the result list which then will hand over the data
             // to the next step in the indexation pipeline
             return continueAwaitingFiles(job);
         } else {
             throw new Error(`Received file process task with an invalid process type. Received ${flag}, expected one of [${Object.values(FileProcessFlag)}]`);
-        }    
+        }
     });
 }
 

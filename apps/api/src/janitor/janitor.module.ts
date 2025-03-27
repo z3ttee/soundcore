@@ -1,7 +1,7 @@
 import path from "node:path";
 
 import { Module } from "@nestjs/common";
-import { WorkerQueueModule } from "@soundcore/nest-queue";
+import { WorkerQueueModule } from "@soundcore/queue";
 import { JanitorService } from "./services/janitor.service";
 import { DeleteStreamsCronJob } from "./cron/delete-streams.cron";
 
@@ -23,4 +23,4 @@ import { DeleteStreamsCronJob } from "./cron/delete-streams.cron";
         JanitorService
     ]
 })
-export class JanitorModule {}
+export class JanitorModule { }

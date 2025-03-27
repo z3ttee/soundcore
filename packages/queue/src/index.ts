@@ -1,4 +1,4 @@
-
+export * from "./queue";
 export * from "./queue/queue.module";
 export * from "./queue/entities/queue.entity";
 

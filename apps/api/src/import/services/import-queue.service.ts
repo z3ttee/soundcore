@@ -1,6 +1,6 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { Environment } from "@soundcore/common";
-import { WorkerJob, WorkerJobRef, WorkerQueue } from "@soundcore/nest-queue";
+import { WorkerJob, WorkerJobRef, WorkerQueue } from "@soundcore/queue";
 import { ImportTaskUpdateEvent } from "../../gateway/events/importtask-update.event";
 import { GeneralGateway } from "../../gateway/gateways/general-gateway.gateway";
 import { ImportTask, ImportTaskStatus, ImportTaskType } from "../entities/import.entity";
@@ -26,7 +26,7 @@ export class ImportQueueService {
             this.updateImportTask(job.payload, ImportTaskStatus.OK);
 
             // Do some logging
-            if(job.payload.type == ImportTaskType.SPOTIFY_PLAYLIST) {
+            if (job.payload.type == ImportTaskType.SPOTIFY_PLAYLIST) {
                 const result = job.result as ImportSpotifyResult;
                 this.logger.verbose(`Successfully imported playlist '${result.playlist.name}' from Spotify. Found ${result.stats.importedAmount}/${result.stats.total} songs. Took ${result.stats.timeTookMs}ms.`);
             }
@@ -36,7 +36,7 @@ export class ImportQueueService {
             this.updateImportTask(job.payload, ImportTaskStatus.ERRORED);
 
             // Do some logging
-            if(Environment.isDebug) {
+            if (Environment.isDebug) {
                 this.logger.error(`Failed processing import task: ${error.message}`, error.stack);
             } else {
                 this.logger.error(`Failed processing import task: ${error.message}`, error.stack);
@@ -49,7 +49,7 @@ export class ImportQueueService {
     }
 
     private async updateImportTask(task: ImportTask, status: ImportTaskStatus) {
-        const taskCopy = {...task};
+        const taskCopy = { ...task };
         const user = task.user;
 
         taskCopy.user = undefined;

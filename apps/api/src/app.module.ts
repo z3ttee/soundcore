@@ -31,7 +31,7 @@ import { PipesModule } from '@tsalliance/utilities';
 import { HostnameModule } from './hostname/hostname.module';
 import { CronModule } from './cron/cron.module';
 import { Environment } from '@soundcore/common';
-import { WorkerQueueModule } from '@soundcore/nest-queue';
+import { WorkerQueueModule } from '@soundcore/queue';
 import { TracklistModule } from './tracklist/tracklist.module';
 import { PipelineModule } from '@soundcore/pipelines';
 import { TasksModule } from './tasks/tasks.module';
@@ -94,7 +94,7 @@ import { ConfigureModule } from './configure/configure.module';
       })
     }),
     PipelineModule.forRootAsync({
-      inject: [ FileSystemService ],
+      inject: [FileSystemService],
       useFactory: async (fsService: FileSystemService) => {
         return {
           // Enable stdout on dev mode
@@ -146,4 +146,4 @@ import { ConfigureModule } from './configure/configure.module';
     AppService
   ]
 })
-export class AppModule {}
+export class AppModule { }

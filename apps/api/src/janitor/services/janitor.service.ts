@@ -1,6 +1,6 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { Environment } from "@soundcore/common";
-import { WorkerJob, WorkerJobRef, WorkerQueue } from "@soundcore/nest-queue";
+import { WorkerJob, WorkerJobRef, WorkerQueue } from "@soundcore/queue";
 import { Observable, Subject } from "rxjs";
 import { Janitor, JanitorProcessRef, JanitorTask } from "../entities/janitor.entity";
 
@@ -18,7 +18,7 @@ export class JanitorService {
     ) {
 
         this.queue.on("failed", (jobRef: WorkerJobRef<Janitor>, error: Error) => {
-            if(Environment.isDebug) {
+            if (Environment.isDebug) {
                 this.logger.error(`Janitor Task failed: ${error.message}`, error.stack);
             } else {
                 this.logger.error(`Janitor Task failed: ${error.message}`);

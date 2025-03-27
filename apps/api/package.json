@@ -34,7 +34,7 @@
     "@soundcore/bootstrap": "*",
     "@soundcore/common": "*",
     "@soundcore/constants": "*",
-    "@soundcore/nest-queue": "*",
+    "@soundcore/queue": "*",
     "@soundcore/pipelines": "*",
     "@soundcore/meilisearch": "*",
     "@tsalliance/utilities": "^1.19.0",

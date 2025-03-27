@@ -1,6 +1,6 @@
 import { InternalServerErrorException, Logger } from "@nestjs/common";
 import { Environment } from "@soundcore/common";
-import { WorkerJobRef } from "@soundcore/nest-queue";
+import { WorkerJobRef } from "@soundcore/queue";
 import { DataSource } from "typeorm";
 import { ImportTask } from "../../import/entities/import.entity";
 import { ImportService } from "../../import/services/import.service";
@@ -14,16 +14,16 @@ export default async function (job: WorkerJobRef<Janitor>): Promise<JanitorResul
     const janitor = job.payload;
     const task = janitor?.ref?.task;
 
-    if(typeof janitor === "undefined" || janitor == null) {
+    if (typeof janitor === "undefined" || janitor == null) {
         throw new InternalServerErrorException("Found invalid janitor instance in worker.");
     }
 
     return Database.connect().then(async (datasource) => {
-        if(task == JanitorTask.CLEAR_ONGOING_IMPORTS) {
+        if (task == JanitorTask.CLEAR_ONGOING_IMPORTS) {
             return clearOngoingImports(datasource, janitor.ref);
-        } else if(task == JanitorTask.CLEAR_OLD_IMPORTS) {
+        } else if (task == JanitorTask.CLEAR_OLD_IMPORTS) {
             return clearOldImports(datasource, janitor.ref);
-        } else if(task == JanitorTask.CLEAR_STREAMS) {
+        } else if (task == JanitorTask.CLEAR_STREAMS) {
             return clearStreams(datasource, janitor.ref);
         } else {
             throw new InternalServerErrorException("Received janitor task with invalid type.");
@@ -42,7 +42,7 @@ async function clearOngoingImports(datasource: DataSource, janitor: JanitorRef):
     const logger = new Logger(janitor.name);
     const startTimeMs = Date.now();
 
-    if(Environment.isDebug) {
+    if (Environment.isDebug) {
         logger.debug(`Clearing all ongoing imports...`);
     }
 
@@ -65,11 +65,11 @@ async function clearOngoingImports(datasource: DataSource, janitor: JanitorRef):
  * @param janitor 
  * @returns 
  */
- async function clearOldImports(datasource: DataSource, janitor: JanitorRef): Promise<JanitorResultDTO> {
+async function clearOldImports(datasource: DataSource, janitor: JanitorRef): Promise<JanitorResultDTO> {
     const logger = new Logger(janitor.name);
     const startTimeMs = Date.now();
 
-    if(Environment.isDebug) {
+    if (Environment.isDebug) {
         logger.debug(`Clearing all imports older than 7days...`);
     }
 
@@ -92,11 +92,11 @@ async function clearOngoingImports(datasource: DataSource, janitor: JanitorRef):
  * @param janitor 
  * @returns 
  */
- async function clearStreams(datasource: DataSource, janitor: JanitorRef): Promise<JanitorResultDTO> {
+async function clearStreams(datasource: DataSource, janitor: JanitorRef): Promise<JanitorResultDTO> {
     const logger = new Logger(janitor.name);
     const startTimeMs = Date.now();
 
-    if(Environment.isDebug) {
+    if (Environment.isDebug) {
         logger.debug(`Clearing all streams older than 30days...`);
     }
 

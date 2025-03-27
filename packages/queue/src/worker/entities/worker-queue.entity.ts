@@ -1,4 +1,4 @@
-import { BaseQueue } from "../../shared/queue-interface";
+import { BaseQueue } from "../../queue";
 import { WorkerQueueOptions } from "../worker.module";
 import { WorkerJob, WorkerJobRef } from "./worker-job.entity";
 
@@ -6,28 +6,28 @@ export type WorkerEventName = "waiting" | "drained" | "started" | "completed" | 
 
 export class WorkerQueue<T = any> extends BaseQueue<WorkerJob<T>, WorkerEventName> {
 
-    constructor(private readonly _options: WorkerQueueOptions) {
-        super(_options.debounceMs || 0);
+    constructor(options: WorkerQueueOptions) {
+        super(options.debounceMs || 0);
 
         this.$queue.subscribe((queue) => {
-            if(queue.length > 0) {
-                const handlers = this.eventRegistry.get("waiting");
-                if(typeof handlers !== "undefined" && handlers != null) handlers.forEach((handler) => handler(queue.length));
+            if (queue.length > 0) {
+                const handlers = this._getHandlersForEvent("waiting");
+                if (typeof handlers !== "undefined" && handlers != null) handlers.forEach((handler) => handler(queue.length));
             } else {
-                const handlers = this.eventRegistry.get("drained");
-                if(typeof handlers !== "undefined" && handlers != null) handlers.forEach((handler) => handler(queue.length));
-            }  
+                const handlers = this._getHandlersForEvent("drained");
+                if (typeof handlers !== "undefined" && handlers != null) handlers.forEach((handler) => handler(queue.length));
+            }
         })
     }
 
     public async fireEvent(eventName: WorkerEventName, job: WorkerJob | WorkerJobRef, ...args) {
-        const eventHandlers = this.eventRegistry.get(eventName);
-        if(typeof eventHandlers === "undefined" || eventHandlers == null) return;
-        
+        const eventHandlers = this._getHandlersForEvent(eventName);
+        if (typeof eventHandlers === "undefined" || eventHandlers == null) return;
+
         const jobData: WorkerJob = job["isRef"] ? WorkerJob.fromRef(job as WorkerJobRef) : job as WorkerJob;
 
         try {
-            if(typeof args === "undefined" || args == null) {
+            if (typeof args === "undefined" || args == null) {
                 eventHandlers.forEach((handler) => handler(jobData));
             } else {
                 eventHandlers.forEach((handler) => handler(jobData, ...args));

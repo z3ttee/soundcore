@@ -1,6 +1,6 @@
 import path from 'path';
 import { DynamicModule, Module } from '@nestjs/common';
-import { WorkerQueueModule } from '@soundcore/nest-queue';
+import { WorkerQueueModule } from '@soundcore/queue';
 import { ArtworkModule } from '../artwork/artwork.module';
 import { DistributorModule } from '../distributor/distributor.module';
 import { GenreModule } from '../genre/genre.module';
@@ -39,7 +39,7 @@ export class GeniusModule {
       ],
       providers: [
         optionsProvider,
-        GeniusService, 
+        GeniusService,
         GeniusClientService,
         GeniusQueueService
       ]
