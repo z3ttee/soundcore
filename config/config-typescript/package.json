@@ -1,0 +1,9 @@
+{
+  "name": "@repo/config-typescript",
+  "version": "1.0.0",
+  "private": true,
+  "main": "index.js",
+  "files": [
+    "*.json"
+  ]
+}
