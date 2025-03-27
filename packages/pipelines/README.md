@@ -8,7 +8,7 @@ First, you need to register the module globally in your `app.module.ts` to creat
 configuration:
 ```typescript
 import { Module } from '@nestjs/common';
-import { PipelineModule } from '@soundcore/pipelines';
+import { PipelineModule } from '@repo/pipelines';
 
 @Module({
   // ...
@@ -25,10 +25,10 @@ export class AppModule {}
 
 ### Register a pipeline
 #### Create a new pipeline
-Before you can register a pipeline, you have to create a new one. This is done by creating a new script file, that contains a default export. That export statement has to return an instance of either `PipelineConfigurator` or `StageConfigurator` imported from `@soundcore/pipelines`. To understand this better, please see the following example on how to define a pipeline. For that, we create a new file called `my-pipeline.ts` and enter the following lines:
+Before you can register a pipeline, you have to create a new one. This is done by creating a new script file, that contains a default export. That export statement has to return an instance of either `PipelineConfigurator` or `StageConfigurator` imported from `@repo/pipelines`. To understand this better, please see the following example on how to define a pipeline. For that, we create a new file called `my-pipeline.ts` and enter the following lines:
 
 ```typescript
-import { pipeline } from "@soundcore/pipelines";
+import { pipeline } from "@repo/pipelines";
 
 export default pipeline("my-pipeline", "My Pipeline Name", "A pipeline description")
     // Define a new stage in the pipeline
@@ -66,7 +66,7 @@ Registering a pipeline is done by importing the `PipelineModule` in the desired 
 For example:
 ```typescript
 import { Module } from '@nestjs/common';
-import { PipelineModule } from '@soundcore/pipelines';
+import { PipelineModule } from '@repo/pipelines';
 
 @Module({
   // ...
@@ -87,7 +87,7 @@ export class SubModule {}
 You are now ready to add a new run to the queue. To do that, inject the `PipelineService` into any service registered in the same module as the pipeline is:
 ```typescript
 import { Injectable } from "@nestjs/common";
-import { PipelineRun, PipelineService } from "@soundcore/pipelines";
+import { PipelineRun, PipelineService } from "@repo/pipelines";
 
 @Injectable()
 export class ExampleService {

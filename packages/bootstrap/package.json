@@ -1,5 +1,5 @@
 {
-  "name": "@soundcore/bootstrap",
+  "name": "@repo/bootstrap",
   "version": "1.0.0",
   "private": true,
   "main": "./dist/cjs/index.js",
