@@ -17,7 +17,7 @@ export class MeilisearchModule extends ConfigurableMeilisearchModule {
             global: true,
             providers: [
                 ...module.providers,
-                createMeilisearchClient([ MODULE_OPTIONS_TOKEN ], new Logger(LOGGER_LABEL)),
+                createMeilisearchClient([MODULE_OPTIONS_TOKEN], new Logger(LOGGER_LABEL)),
             ],
             exports: [
                 MODULE_OPTIONS_TOKEN,
@@ -33,17 +33,17 @@ export class MeilisearchModule extends ConfigurableMeilisearchModule {
             global: true,
             providers: [
                 ...module.providers,
-                createMeilisearchClient([ MODULE_OPTIONS_TOKEN ], new Logger(LOGGER_LABEL)),
+                createMeilisearchClient([MODULE_OPTIONS_TOKEN], new Logger(LOGGER_LABEL)),
             ],
             exports: [
                 MODULE_OPTIONS_TOKEN,
-                MeiliClient,                
+                MeiliClient,
             ]
         }
     }
 
     public static forFeature(indexes: IndexSchema[]): DynamicModule {
-        const providers = createIndexesAsyncProviders([ MeiliClient, MODULE_OPTIONS_TOKEN ], indexes, new Logger(LOGGER_LABEL));
+        const providers = createIndexesAsyncProviders([MeiliClient, MODULE_OPTIONS_TOKEN], indexes, new Logger(LOGGER_LABEL));
 
         return {
             module: MeilisearchModule,

@@ -10,7 +10,7 @@ export class SchemaService {
     private readonly _schemas: Map<string, IndexSchema> = new Map();
 
     constructor(schemas: IndexSchema[]) {
-        this._schemas = new Map(schemas.map((schema) => ([ getSchemaToken(schema), schema ])));
+        this._schemas = new Map(schemas.map((schema) => ([getSchemaToken(schema), schema])));
     }
 
     public has(uid: string): boolean {
@@ -22,7 +22,7 @@ export class SchemaService {
     }
 
     public register(uid: string, schema: IndexSchema) {
-        if(this._schemas.has(uid)) {
+        if (this._schemas.has(uid)) {
             throw new Error(`Registering schemas using identical uids is not allowed`);
         }
 

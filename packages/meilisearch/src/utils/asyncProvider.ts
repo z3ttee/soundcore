@@ -47,9 +47,8 @@ export function createMeilisearchClient(inject: any[], logger: Logger): Provider
 export function createMeiliConfig(options: MeilisearchRootOptions): Config {
   return {
     host: `${options.host}:${options.port ?? 7700}`,
-    headers: {
-      "Authorization": `Bearer ${options.key}`
-    }
+    apiKey: options.key,
+    requestConfig: options.requestConfig
   }
 }
 
@@ -62,12 +61,10 @@ export function createIndexesAsyncProviders(inject: any[], schemas: IndexSchema[
       const options: IndexOptions = getIndexOptions(schema);
 
       // Check if schema has options
-      if(isUndefined(options)) {
+      if (isUndefined(options)) {
         logger.warn(`Please decorate index schemas using @MeiliIndex(). This is missing on '${schema.name}'`);
         return null;
       }
-
-      
 
       // Create meilisearch connection config
       const config = createMeiliConfig(meiliOptions);
@@ -88,13 +85,13 @@ export function createIndexesAsyncProviders(inject: any[], schemas: IndexSchema[
       const displayableAttrs: string[] = [];
       const sortableAttributes: string[] = [];
 
-      for(const attr of attributes.values()) {
-        if(attr.searchable) searchableAttrs.push(attr.attrName);
-        if(attr.filterable) filterableAttrs.push(attr.attrName);
-        if(attr.sortable) sortableAttributes.push(attr.attrName);
-        if(attr.displayable) displayableAttrs.push(attr.attrName);
+      for (const attr of attributes.values()) {
+        if (attr.searchable) searchableAttrs.push(attr.attrName);
+        if (attr.filterable) filterableAttrs.push(attr.attrName);
+        if (attr.sortable) sortableAttributes.push(attr.attrName);
+        if (attr.displayable) displayableAttrs.push(attr.attrName);
       }
-      
+
       // Execute update task on meilisearch to update primary key
       return index.update({ primaryKey: primaryKeyAttr.attrName }).then((task) => {
         // Wait for changes to be done

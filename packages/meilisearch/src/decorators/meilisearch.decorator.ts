@@ -1,6 +1,5 @@
 import { isUndefined, pascalToSnakeCase } from "@soundcore/common";
 import { Faceting, TypoTolerance } from "meilisearch";
-import { REFLECT_MEILIINDEX_OPTIONS } from "../constants";
 import { setIndexOptions } from "../utils/reflectUtils";
 
 export interface IndexOptions {
@@ -15,8 +14,8 @@ export function MeilisearchIndex(options: IndexOptions);
 export function MeilisearchIndex(uidOrOptions?: string | IndexOptions): ClassDecorator {
     let options: IndexOptions = {}
 
-    if(!isUndefined(uidOrOptions)) {
-        if(typeof uidOrOptions === "string") {
+    if (!isUndefined(uidOrOptions)) {
+        if (typeof uidOrOptions === "string") {
             options.uid = uidOrOptions;
         } else {
             options = uidOrOptions;
@@ -24,7 +23,7 @@ export function MeilisearchIndex(uidOrOptions?: string | IndexOptions): ClassDec
     }
 
     return (target) => {
-        if(isUndefined(options.uid)) {
+        if (isUndefined(options.uid)) {
             options.uid = pascalToSnakeCase(target["name"]);
         }
 

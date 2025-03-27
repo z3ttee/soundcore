@@ -6,7 +6,7 @@ import { getAllSchemaAttributes, getSchemaAttributes, getSchemaRelations } from 
 export class MeiliIndex<T = any> extends Index<T> {
 
     constructor(
-        config: Config, 
+        config: Config,
         uid: string,
         primaryKey: string,
         protected readonly schema: T,
@@ -18,19 +18,19 @@ export class MeiliIndex<T = any> extends Index<T> {
         this.updatedAt = metadata?.updatedAt;
     }
 
-    public async addDocuments(documents: T[], options?: DocumentOptions): Promise<EnqueuedTask> {
+    public override async addDocuments(documents: T[], options?: DocumentOptions): Promise<EnqueuedTask> {
         return super.addDocuments(documents.map((document) => this.buildDocument(document)), options);
     }
 
-    public async addDocumentsInBatches(documents: T[], batchSize?: number, options?: DocumentOptions): Promise<EnqueuedTask[]> {
+    public override async addDocumentsInBatches(documents: T[], batchSize?: number, options?: DocumentOptions): Promise<EnqueuedTask[]> {
         return super.addDocumentsInBatches(documents.map((document) => this.buildDocument(document)), batchSize, options);
     }
 
-    public async updateDocuments(documents: Partial<T>[], options?: DocumentOptions): Promise<EnqueuedTask> {
+    public override async updateDocuments(documents: Partial<T>[], options?: DocumentOptions): Promise<EnqueuedTask> {
         return super.updateDocuments(documents.map((document) => this.buildDocument(document)), options);
     }
 
-    public async updateDocumentsInBatches(documents: Partial<T>[], batchSize?: number, options?: DocumentOptions): Promise<EnqueuedTask[]> {
+    public override async updateDocumentsInBatches(documents: Partial<T>[], batchSize?: number, options?: DocumentOptions): Promise<EnqueuedTask[]> {
         return super.updateDocumentsInBatches(documents.map((document) => this.buildDocument(document)), batchSize, options);
     }
 
@@ -45,5 +45,5 @@ export class MeiliIndex<T = any> extends Index<T> {
         const includedProps = Array.from(attributes.keys());
         return filterDocument<T>(document, includedProps);
     }
-    
+
 }
