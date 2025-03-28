@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Page, Pageable } from '@soundcore/common';
+import { Page, Pageable } from '@repo/utilities';
 import { Repository, SelectQueryBuilder, UpdateResult } from 'typeorm';
 import { Artist } from '../../artist/entities/artist.entity';
 import { EVENT_ALBUMS_CHANGED } from '../../constants';
@@ -29,7 +29,7 @@ export class AlbumService implements SyncableService<Album> {
      * @param albumId Album's id
      * @returns Album
      */
-     public async findById(albumId: string, authentication?: User): Promise<Album> {
+    public async findById(albumId: string, authentication?: User): Promise<Album> {
         const result = await this.buildGeneralQuery("album", authentication)
             .loadRelationCountAndMap("album.songsCount", "album.songs")
 
@@ -38,7 +38,7 @@ export class AlbumService implements SyncableService<Album> {
             .leftJoin("album.labels", "label").leftJoin("label.artwork", "la").addSelect(["label.id", "label.slug", "label.name", "la.id"])
             .leftJoin("primaryArtist.artwork", "artistArtwork").addSelect(["artistArtwork.id"])
             .leftJoin("album.songs", "song").addSelect('SUM(song.duration) as album_totalDuration')
-            
+
             .groupBy("album.id")
             .where("album.id = :albumId OR album.slug = :albumId", { albumId })
             .getOne();
@@ -91,7 +91,7 @@ export class AlbumService implements SyncableService<Album> {
             .where("primaryArtist.id != :artistId AND primaryArtist.slug != :artistId", { artistId })
             .andWhere("(songArtist.id = :artistId OR songArtist.slug = :artistId OR songFeatArtist.id = :artistId OR songFeatArtist.slug = :artistId)", { artistId })
             .getManyAndCount();
-        
+
         return Page.of(result[0], result[1], pageable);
     }
 
@@ -104,9 +104,9 @@ export class AlbumService implements SyncableService<Album> {
      */
     public async findRecommendedProfilesByArtist(artistId: string, exceptAlbumIds: string | string[] = [], authentication?: User): Promise<Page<Album>> {
         const maxAlbums = 8;
-        if(!exceptAlbumIds) exceptAlbumIds = []
-        if(!Array.isArray(exceptAlbumIds)) {
-            exceptAlbumIds = [ exceptAlbumIds ];
+        if (!exceptAlbumIds) exceptAlbumIds = []
+        if (!Array.isArray(exceptAlbumIds)) {
+            exceptAlbumIds = [exceptAlbumIds];
         }
 
         const result = await this.buildGeneralQuery("album", authentication)
@@ -189,8 +189,8 @@ export class AlbumService implements SyncableService<Album> {
      * @param qb Define a custom select query for returning created items
      * @returns Album[]
      */
-    public async createIfNotExists(dtos: (CreateAlbumDTO | Album)[], qb?: (query: SelectQueryBuilder<Album>, alias: string) => SelectQueryBuilder<Album> ): Promise<Album[]> {
-        if(dtos.length <= 0) throw new BadRequestException("Cannot create resources for empty list.");
+    public async createIfNotExists(dtos: (CreateAlbumDTO | Album)[], qb?: (query: SelectQueryBuilder<Album>, alias: string) => SelectQueryBuilder<Album>): Promise<Album[]> {
+        if (dtos.length <= 0) throw new BadRequestException("Cannot create resources for empty list.");
 
         return await this.repository.createQueryBuilder()
             .insert()
@@ -203,10 +203,10 @@ export class AlbumService implements SyncableService<Album> {
                     .leftJoin(`${alias}.artwork`, "artwork").addSelect(["artwork.id"])
                     .leftJoin(`${alias}.primaryArtist`, "primaryArtist").addSelect(["primaryArtist.id", "primaryArtist.name", "primaryArtist.slug"]);
 
-                if(typeof qb === "function") {
+                if (typeof qb === "function") {
                     query = qb(this.repository.createQueryBuilder(alias), alias);
                 }
-                    
+
                 return query.whereInIds(insertResult.raw).getMany();
             });
     }
@@ -219,19 +219,19 @@ export class AlbumService implements SyncableService<Album> {
     public async update(albumId: string, updateAlbumDto: UpdateAlbumDTO): Promise<Album> {
         updateAlbumDto.name = updateAlbumDto.name?.trim();
         updateAlbumDto.description = updateAlbumDto.description?.trim();
-        if(!updateAlbumDto.primaryArtist) throw new BadRequestException("Creating album without primary artist is not allowed.");
+        if (!updateAlbumDto.primaryArtist) throw new BadRequestException("Creating album without primary artist is not allowed.");
 
         const album = await this.resolveAlbum(albumId);
-        if(!album) throw new NotFoundException("Album not found");
+        if (!album) throw new NotFoundException("Album not found");
 
         album.name = updateAlbumDto.name;
         album.primaryArtist = updateAlbumDto.primaryArtist;
         album.description = updateAlbumDto.description;
         album.releasedAt = updateAlbumDto.releasedAt;
-        
+
         return this.save(album).then((result) => {
             // Emit changed event to proceed with automatic genius lookup
-            if(updateAlbumDto.lookupGenius) this.eventEmitter.emit(EVENT_ALBUMS_CHANGED, album);
+            if (updateAlbumDto.lookupGenius) this.eventEmitter.emit(EVENT_ALBUMS_CHANGED, album);
             return result;
         })
     }
@@ -244,7 +244,7 @@ export class AlbumService implements SyncableService<Album> {
      */
     public async setPrimaryArtist(idOrObject: string | Album, primaryArtist: Artist): Promise<Album> {
         const album = await this.resolveAlbum(idOrObject);
-        if(!album) throw new NotFoundException("Album not found.");
+        if (!album) throw new NotFoundException("Album not found.");
 
         album.primaryArtist = primaryArtist;
         return this.repository.save(album);
@@ -258,7 +258,7 @@ export class AlbumService implements SyncableService<Album> {
      */
     public async setGeniusFlag(idOrObject: string | Album, flag: GeniusFlag): Promise<Album> {
         const album = await this.resolveAlbum(idOrObject);
-        if(!album) throw new NotFoundException("Album not found.");
+        if (!album) throw new NotFoundException("Album not found.");
 
         album.genius.flag = flag;
         return this.repository.save(album);
@@ -274,9 +274,9 @@ export class AlbumService implements SyncableService<Album> {
     public async setLastSyncedDetails(resources: Album[], flag: MeilisearchFlag): Promise<UpdateResult> {
         return this.repository.createQueryBuilder()
             .update()
-            .set({ 
+            .set({
                 meilisearch: {
-                    syncedAt: new Date(), 
+                    syncedAt: new Date(),
                     flag: flag
                 }
             })
@@ -305,7 +305,7 @@ export class AlbumService implements SyncableService<Album> {
      * @returns Album
      */
     private async resolveAlbum(idOrObject: string | Album): Promise<Album> {
-        if(typeof idOrObject == "string") {
+        if (typeof idOrObject == "string") {
             return this.findById(idOrObject);
         }
 
@@ -317,9 +317,9 @@ export class AlbumService implements SyncableService<Album> {
             .leftJoin(`${alias}.artwork`, "artwork").addSelect(["artwork.id", "artwork.accentColor"])
             .leftJoin(`${alias}.primaryArtist`, "primaryArtist").addSelect(["primaryArtist.id", "primaryArtist.slug", "primaryArtist.name"])
             .loadRelationCountAndMap(`${alias}.liked`, `${alias}.likedBy`, "likedBy", (qb) => qb.where("likedBy.userId = :userId", { userId: authentication?.id }))
-    }    
+    }
 
 
-    
+
 
 }

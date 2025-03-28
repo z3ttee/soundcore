@@ -1,6 +1,6 @@
 import { HttpClient } from "@angular/common/http";
 import { ApiError, Future, LikedSong, PlayableEntity, PlaylistItem, Song, toFuture, TracklistV2 } from "@soundcore/sdk";
-import { isNull, isString, Page, Pageable } from "@soundcore/common";
+import { isNull, isString, Page, Pageable } from "@repo/utilities";
 import { BehaviorSubject, filter, map, Observable, of, Subject, switchMap, take, takeUntil, tap } from "rxjs";
 import { Queue } from "./queue";
 import { Cache } from "./cache";
@@ -9,7 +9,7 @@ export const PAGE_SIZE = 30;
 export type TracklistWithoutItems<T extends TracklistEntityTypes = Song> = Omit<TracklistV2<T>, "items">;
 export type TracklistEntityTypes = Song | LikedSong | PlaylistItem;
 
-export abstract class SCNGXBaseTracklist<T, U extends TracklistEntityTypes>  {
+export abstract class SCNGXBaseTracklist<T, U extends TracklistEntityTypes> {
     /**
      * Subject to manage emition of 
      * cancel events
@@ -94,7 +94,7 @@ export abstract class SCNGXBaseTracklist<T, U extends TracklistEntityTypes>  {
          */
         generateShuffled?: boolean
     ) {
-        if(isString(startAt)) {
+        if (isString(startAt)) {
             this.restart(startAt as string, generateShuffled).subscribe();
         } else {
             this.restart(startAt as number, generateShuffled).subscribe();
@@ -200,7 +200,7 @@ export abstract class SCNGXBaseTracklist<T, U extends TracklistEntityTypes>  {
      * @param itemId Id of the target item
      */
     public isPlayingById(itemId: string) {
-        if(isNull(itemId)) return false;
+        if (isNull(itemId)) return false;
         return this._queue.lastDequeuedItem?.id === itemId;
     }
 
@@ -230,7 +230,7 @@ export abstract class SCNGXBaseTracklist<T, U extends TracklistEntityTypes>  {
      * @param error Error instance that was received
      */
     protected error(error: ApiError) {
-        if(isNull(error)) return;
+        if (isNull(error)) return;
         this._errorSubject.next(error);
     }
 
@@ -302,13 +302,13 @@ export abstract class SCNGXBaseTracklist<T, U extends TracklistEntityTypes>  {
             filter((request) => !request.loading),
             map((request) => {
                 // Publish error if exists
-                if(request.error) {
+                if (request.error) {
                     this.error(request.error);
                     return null;
                 }
 
                 const metadata = request.data;
-                if(isNull(metadata)) return null;
+                if (isNull(metadata)) return null;
 
                 // Cache first page from metadata object
                 this._cache.set(0, metadata.items);
@@ -338,9 +338,9 @@ export abstract class SCNGXBaseTracklist<T, U extends TracklistEntityTypes>  {
             take(1),
             takeUntil(this.$onCancel),
             switchMap(() => {
-                return new Observable<Song>((subscriber) => {        
+                return new Observable<Song>((subscriber) => {
                     // If next page should be fetched
-                    if(this.shouldFetchNext) {
+                    if (this.shouldFetchNext) {
                         // If true, fetch page
                         subscriber.add(this.getNextItems().pipe(takeUntil(this.$onCancel)).subscribe(() => {
                             // After fetching next items, dequeue next item
@@ -349,7 +349,7 @@ export abstract class SCNGXBaseTracklist<T, U extends TracklistEntityTypes>  {
                         }));
                         return;
                     }
-        
+
                     // If false, return next item
                     subscriber.next(this.dequeue());
                     subscriber.complete();
@@ -364,7 +364,7 @@ export abstract class SCNGXBaseTracklist<T, U extends TracklistEntityTypes>  {
             }),
             takeUntil(this.$onCancel)
         );
-    }    
+    }
 
     /**
      * Fetch next page of items 
@@ -372,16 +372,16 @@ export abstract class SCNGXBaseTracklist<T, U extends TracklistEntityTypes>  {
      */
     private getNextItems(): Observable<Page<U>> {
         // If the maximum has already been fetched, return empty page
-        if(this.hasFetchedAll || this.hasEnded) return of(Page.empty());
+        if (this.hasFetchedAll || this.hasEnded) return of(Page.empty());
 
         // Check if next offset already fetched
         const nextOffset = this._cache.lastCachedPageInfo?.nextOffset ?? 0;
-        if(this._cache.has(this.getPageByOffset(nextOffset))) return of(null);
+        if (this._cache.has(this.getPageByOffset(nextOffset))) return of(null);
 
         return this.fetchPage(nextOffset).pipe(
             takeUntil(this.$onCancel),
             map((page) => {
-                if(isNull(page)) return Page.empty();
+                if (isNull(page)) return Page.empty();
 
                 // Cache first page from metadata object
                 this._cache.set(page.info.index, page);
@@ -402,13 +402,13 @@ export abstract class SCNGXBaseTracklist<T, U extends TracklistEntityTypes>  {
         const pageable = new Pageable(offset, limit ?? PAGE_SIZE);
 
         let params;
-        if(!isNull(this.metadata.seed)) {
+        if (!isNull(this.metadata.seed)) {
             params = new URLSearchParams();
             params.set("seed", `${this.seed}`);
         }
 
         // Fetch next page of tracks
-        return this._httpClient.get<Page<U>>(`${this.apiBaseUrl}/v1/songs/${this.type}/${this.id}${pageable.toQuery()}${isNull(params) ? '': `&${params.toString()}`}`).pipe(
+        return this._httpClient.get<Page<U>>(`${this.apiBaseUrl}/v1/songs/${this.type}/${this.id}${pageable.toQuery()}${isNull(params) ? '' : `&${params.toString()}`}`).pipe(
             // Transform to future to get loading state
             toFuture(),
             // Only continue if future is resolved
@@ -416,7 +416,7 @@ export abstract class SCNGXBaseTracklist<T, U extends TracklistEntityTypes>  {
             // Handle errors
             tap((request) => {
                 // Push error to tracklist if exists
-                if(!isNull(request.error)) this.error(request.error);
+                if (!isNull(request.error)) this.error(request.error);
             }),
             // Return page content
             map((request) => request.data),
@@ -431,7 +431,7 @@ export abstract class SCNGXBaseTracklist<T, U extends TracklistEntityTypes>  {
      * @param shuffled Generate a shuffled tracklist
      * @returns {Future<TracklistV2>}
      */
-    private fetchMetadata(owner: PlayableEntity, startWithId?: string, shuffled?: boolean): Observable<Future<TracklistV2<U>>>; 
+    private fetchMetadata(owner: PlayableEntity, startWithId?: string, shuffled?: boolean): Observable<Future<TracklistV2<U>>>;
     /**
      * Fetch tracklist metadata
      * @param ownerId Id of the tracklist owner. This can for example be an album's id. Usually its the id of the resource to which the tracklist belongs
@@ -440,8 +440,8 @@ export abstract class SCNGXBaseTracklist<T, U extends TracklistEntityTypes>  {
      * @param shuffled Generate a shuffled tracklist
      * @returns {Future<TracklistV2>}
      */
-    private fetchMetadata(owner: PlayableEntity, startAtIndex?: number, shuffled?: boolean): Observable<Future<TracklistV2<U>>>; 
-    private fetchMetadata(owner: PlayableEntity, startAtIndex?: number, startWithId?: string, shuffled?: boolean): Observable<Future<TracklistV2<U>>>; 
+    private fetchMetadata(owner: PlayableEntity, startAtIndex?: number, shuffled?: boolean): Observable<Future<TracklistV2<U>>>;
+    private fetchMetadata(owner: PlayableEntity, startAtIndex?: number, startWithId?: string, shuffled?: boolean): Observable<Future<TracklistV2<U>>>;
     private fetchMetadata(owner: PlayableEntity, startAtIndexOrWithId?: number | string, shuffledOrStartWithId?: boolean | string, shuffled?: boolean): Observable<Future<TracklistV2<U>>> {
         const startAtIndex: number = typeof startAtIndexOrWithId === "number" ? startAtIndexOrWithId : 0;
         const startWithId: string = typeof startAtIndexOrWithId === "string" ? startAtIndexOrWithId : typeof shuffledOrStartWithId === "string" ? shuffledOrStartWithId : undefined;
@@ -461,7 +461,7 @@ export abstract class SCNGXBaseTracklist<T, U extends TracklistEntityTypes>  {
         params.set("shuffled", `${shuffledTracklist}`);
 
         // Check if is shuffled and a startWithId is set
-        if(shuffledTracklist && !isNull(startWithId)) {
+        if (shuffledTracklist && !isNull(startWithId)) {
             // If true, set includeOffset parameter to 
             // include item at startAtIndex when shuffled
             params.set("startWithId", `${startWithId}`);
@@ -470,7 +470,7 @@ export abstract class SCNGXBaseTracklist<T, U extends TracklistEntityTypes>  {
         // Perform fetch request
         return this._httpClient.get<TracklistV2<U>>(`
             ${this.apiBaseUrl}/v2/tracklists/${validatedOwnerType}/${validatedOwnerId}?${params.toString()}`).pipe(
-            toFuture(), 
+            toFuture(),
             takeUntil(this.$onCancel)
         );
     }

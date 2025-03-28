@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { Playlist, SCSDKPlaylistService, SCDKUserService, User, SCSDKProfileService, Artist } from '@soundcore/sdk';
-import { Pageable } from '@soundcore/common';
+import { Pageable } from '@repo/utilities';
 
 @Component({
   selector: 'app-profile-info',
@@ -60,10 +60,10 @@ export class ProfileInfoComponent implements OnInit, OnDestroy {
   }
 
   public ngOnDestroy(): void {
-      this._destroy.next();
-      this._destroy.complete();
+    this._destroy.next();
+    this._destroy.complete();
 
-      this._cancel.next();
-      this._cancel.complete();
+    this._cancel.next();
+    this._cancel.complete();
   }
 }

@@ -1,4 +1,4 @@
-import { Page } from "@soundcore/common";
+import { Page } from "@repo/utilities";
 import { Album } from "../../album/entities/album.entity";
 import { Artist } from "../../artist/entities/artist.entity";
 import { Distributor } from "../../distributor/entities/distributor.entity";
@@ -17,7 +17,7 @@ export class ComplexSearchResult {
     public albums: Page<Album>;
     public playlists: Page<Playlist>;
     public genres: Page<Genre>;
-    
+
     public distributors: Page<Distributor>;
     public labels: Page<Label>;
     public publisher: Page<Publisher>;

@@ -3,7 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { combineLatest, map, Observable, startWith, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { Album, Artist, Future, PlayableEntityType, Playlist, SCDKAlbumService, SCSDKArtistService, SCSDKDatasource, SCSDKPlaylistService, SCSDKSongService, Song, toFutureCompat } from '@soundcore/sdk';
 import { AUDIOWAVE_LOTTIE_OPTIONS } from 'src/app/constants';
-import { Page, Pageable } from '@soundcore/common';
+import { Page, Pageable } from '@repo/utilities';
 import { PlayerService } from 'src/app/modules/player/services/player.service';
 
 interface ArtistInfoProps {
@@ -31,7 +31,7 @@ export class ArtistProfileComponent implements OnDestroy {
     private readonly albumService: SCDKAlbumService,
     private readonly activatedRoute: ActivatedRoute,
     private readonly playerService: PlayerService
-  ) {}
+  ) { }
 
   private readonly $destroy: Subject<void> = new Subject();
 
@@ -46,12 +46,12 @@ export class ArtistProfileComponent implements OnDestroy {
    * artist data in future format
    */
   public $artist: Observable<Future<Artist>> = this.$artistId.pipe(switchMap((artistId) => this.artistService.findById(artistId).pipe(map((artist) => {
-    if(artist.loading) return artist;
+    if (artist.loading) return artist;
     // Change type to ARTIST_TOP so the player understands which tracklist to play
-    if(artist.data) artist.data.type = PlayableEntityType.ARTIST_TOP;
+    if (artist.data) artist.data.type = PlayableEntityType.ARTIST_TOP;
     return artist;
   }))));
-  
+
   /**
    * Observable that emits current datasource
    * of tracks
@@ -91,8 +91,8 @@ export class ArtistProfileComponent implements OnDestroy {
   );
 
   public ngOnDestroy(): void {
-      this.$destroy.next();
-      this.$destroy.complete();
+    this.$destroy.next();
+    this.$destroy.complete();
   }
 
   public forcePlay(artist: Artist) {

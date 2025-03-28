@@ -1,12 +1,13 @@
 import { Controller, Get, Param } from '@nestjs/common';
-import { Pageable, Pagination } from '@soundcore/common';
+import { Pageable } from '@repo/utilities';
+import { Pagination } from '@repo/nestjs';
 import { Roles } from '../../authentication/decorators/role.decorator';
 import { Zone } from '../entities/zone.entity';
 import { ZoneService } from '../services/zone.service';
 
 @Controller('zones')
 export class ZoneController {
-  constructor(private readonly service: ZoneService) {}
+  constructor(private readonly service: ZoneService) { }
 
   @Roles("admin")
   @Get(":bucketId")

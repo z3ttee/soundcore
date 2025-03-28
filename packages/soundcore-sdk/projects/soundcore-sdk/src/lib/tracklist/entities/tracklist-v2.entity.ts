@@ -1,5 +1,5 @@
 import { Song } from "../../song/entities/song.entity";
-import { Page } from "@soundcore/common"
+import { Page } from "@repo/utilities"
 import { PlayableEntityType } from "./playable.entity";
 
 // export enum TracklistTypeV2 {

@@ -4,7 +4,7 @@ import { combineLatest, map, Observable, of, startWith, Subject, switchMap, take
 import { Album, Future, SCDKAlbumService, SCSDKDatasource, SCSDKSongService, Song, toFutureCompat } from '@soundcore/sdk';
 import { AUDIOWAVE_LOTTIE_OPTIONS } from 'src/app/constants';
 import { PlayerService } from 'src/app/modules/player/services/player.service';
-import { Page } from '@soundcore/common';
+import { Page } from '@repo/utilities';
 import { SCNGXTracklist } from 'src/app/modules/player/entities/tracklist.entity';
 
 interface AlbumInfoProps {
@@ -56,15 +56,15 @@ export class AlbumInfoComponent implements OnDestroy {
    * Observable that emits recommended albums
    */
   public $recommendedAlbums: Observable<Future<Page<Album>>> = this.$album.pipe(switchMap((album) => {
-    if(album.loading) return of(Future.loading());
-    return this.albumService.findRecommendedByArtist(album.data?.primaryArtist?.id, [ album.data?.id ]).pipe(toFutureCompat(),);
+    if (album.loading) return of(Future.loading());
+    return this.albumService.findRecommendedByArtist(album.data?.primaryArtist?.id, [album.data?.id]).pipe(toFutureCompat(),);
   }))
 
   public readonly $props: Observable<AlbumInfoProps> = combineLatest([
     // Get changes to album
     this.$album,
     // Get paused state
-    this.playerService.$isPaused.pipe(startWith(true)), 
+    this.playerService.$isPaused.pipe(startWith(true)),
     // Get current tracklist id
     this.playerService.$currentItem.pipe(startWith(null)),
   ]).pipe(

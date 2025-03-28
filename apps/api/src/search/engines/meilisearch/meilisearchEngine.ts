@@ -1,4 +1,4 @@
-import { Pageable, Page } from "@soundcore/common";
+import { Pageable, Page } from "@repo/utilities";
 import { SearchEngine, SearchEngineConfig, SearchEngineDataset, SearchEngineObjectType } from "../engine";
 import { IndexSchema } from "@repo/meilisearch/dist/definitions";
 import { MeiliClient } from "@repo/meilisearch";
@@ -10,13 +10,15 @@ export type MeilisearchEngineConfig = SearchEngineConfig & {
 }
 
 export class MeilisearchEngine extends SearchEngine {
-    private _client = new MeiliClient({
-        host: `${this.config.host}:${this.config.port}`,
-        apiKey: this.config.key
-    }, this.config.schemas ?? []);
+    private readonly _client: MeiliClient;
 
-    constructor(protected readonly config: MeilisearchEngineConfig) {
+    constructor(protected override readonly config: MeilisearchEngineConfig) {
         super(config);
+
+        this._client = new MeiliClient({
+            host: `${this.config.host}:${this.config.port}`,
+            apiKey: this.config.key
+        }, this.config.schemas ?? []);
     }
 
     /** Create a new instance of the meilisearch engine */

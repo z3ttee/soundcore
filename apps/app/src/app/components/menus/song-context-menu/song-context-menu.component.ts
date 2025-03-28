@@ -6,7 +6,7 @@ import { SCNGXDialogService } from '@soundcore/ngx';
 import { PlayableEntity, PlayableEntityType, Playlist, PlaylistAddSongFailReason, SCSDKLikeService, SCSDKPlaylistService, Song } from '@soundcore/sdk';
 import { AppPlaylistChooseDialog } from 'src/app/dialogs/playlist-choose-dialog/playlist-choose-dialog.component';
 import { PlayerService } from 'src/app/modules/player/services/player.service';
-import { isNull } from '@soundcore/common';
+import { isNull } from '@repo/utilities';
 
 @Component({
   selector: 'app-song-context-menu',
@@ -33,7 +33,7 @@ export class SongContextMenuComponent implements OnInit, OnDestroy {
   private readonly _destroy: Subject<void> = new Subject();
   public readonly $isAdmin: Observable<boolean> = this.authService.$isAdmin.pipe(takeUntil(this._destroy));
 
-  public ngOnInit(): void {}
+  public ngOnInit(): void { }
   public ngOnDestroy(): void {
     this._destroy.next();
     this._destroy.complete();
@@ -41,14 +41,14 @@ export class SongContextMenuComponent implements OnInit, OnDestroy {
 
   public openChoosePlaylistDialog() {
     this.dialog.open<any, any, Playlist>(AppPlaylistChooseDialog).$afterClosed.subscribe((playlist) => {
-      if(typeof playlist === "undefined" || playlist == null || typeof this.song === "undefined" || this.song == null) return;
+      if (typeof playlist === "undefined" || playlist == null || typeof this.song === "undefined" || this.song == null) return;
       this.addSong(playlist.id, false);
     })
   }
 
   public openForceAddSongDialog(playlistId: string) {
     this.dialog.confirm("Der Song befindet sich bereits in der Playlist. Möchtest du ihn dennoch hinzufügen?", "Bereits hinzugefügt").$afterClosed.subscribe((confirmed) => {
-      if(!confirmed) return;
+      if (!confirmed) return;
       this.addSong(playlistId, true);
     })
   }
@@ -60,18 +60,18 @@ export class SongContextMenuComponent implements OnInit, OnDestroy {
       targetSongId: song.id,
       force
     }).subscribe((response) => {
-      if(response.error || (response.payload?.failed && response.payload?.failReason == PlaylistAddSongFailReason.ERROR)) {
+      if (response.error || (response.payload?.failed && response.payload?.failReason == PlaylistAddSongFailReason.ERROR)) {
         this.snackbar.open(`Song konnte nicht zur Playlist hinzugefügt werden.`, null, { duration: 5000 });
         console.error(response.error);
         return;
       }
 
       const result = response.payload;
-      if(result.failed) {
-        if(result.failReason == PlaylistAddSongFailReason.NOT_FOUND) {
+      if (result.failed) {
+        if (result.failReason == PlaylistAddSongFailReason.NOT_FOUND) {
           this.snackbar.open(`Dieser Song existiert nicht.`, null, { duration: 5000 });
         }
-        if(result.failReason == PlaylistAddSongFailReason.DUPLICATE && !force) {
+        if (result.failReason == PlaylistAddSongFailReason.DUPLICATE && !force) {
           this.openForceAddSongDialog(playlistId);
         }
         return;
@@ -90,7 +90,7 @@ export class SongContextMenuComponent implements OnInit, OnDestroy {
   }
 
   public forcePlay() {
-    if(isNull(this.owner) || this.owner.type === PlayableEntityType.SONG) {
+    if (isNull(this.owner) || this.owner.type === PlayableEntityType.SONG) {
       this.player.forcePlay(this.song).subscribe();
       return;
     }
@@ -105,10 +105,10 @@ export class SongContextMenuComponent implements OnInit, OnDestroy {
   public toggleLikeForSong() {
     const song = this.song as Song;
 
-    if(!this.song) return;
+    if (!this.song) return;
     this.likeService.toggleLikeForSong(song).subscribe((request) => {
-      if(request.loading) return;
-      if(request.error) {
+      if (request.loading) return;
+      if (request.error) {
         this.snackbar.open("Ein Fehler ist aufgetreten.", null, { duration: 3000 });
         return;
       }
@@ -116,7 +116,7 @@ export class SongContextMenuComponent implements OnInit, OnDestroy {
       song.liked = request.data.isLiked ?? song.liked;
       this.cdr.detectChanges();
 
-      if(song.liked) {
+      if (song.liked) {
         this.snackbar.open(`Song zu Lieblingssongs hinzugefügt.`, null, { duration: 3000 });
       } else {
         this.snackbar.open(`Song von Lieblingssongs entfernt.`, null, { duration: 3000 });

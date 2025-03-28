@@ -4,7 +4,8 @@ import { Zone, ZoneEnv, ZoneStatus } from '../entities/zone.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { FileSystemService } from '../../filesystem/services/filesystem.service';
-import { Environment, Page, Pageable } from "@soundcore/common";
+import { Page, Pageable } from "@repo/utilities";
+import { Environment } from "@repo/bootstrap";
 
 @Injectable()
 export class ZoneService {
@@ -12,7 +13,7 @@ export class ZoneService {
     constructor(
         private readonly fileSystem: FileSystemService,
         @InjectRepository(Zone) private readonly repository: Repository<Zone>,
-    ){}
+    ) { }
 
     /**
      * Find a page of zones.
@@ -62,8 +63,8 @@ export class ZoneService {
             .getRawAndEntities()
 
         const zone = result.entities[0];
-        if(!zone) throw new NotFoundException("Zone not found");
-        
+        if (!zone) throw new NotFoundException("Zone not found");
+
         zone.usedSpace = result.raw[0].usedSpace;
         return zone;
     }

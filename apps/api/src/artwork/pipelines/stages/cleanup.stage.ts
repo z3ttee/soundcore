@@ -1,4 +1,4 @@
-import { Batch } from "@soundcore/common";
+import { Batch } from "@repo/utilities";
 import { getOrDefault, progress, StepParams } from "@repo/pipelines";
 import { DataSource } from "typeorm";
 import { Artwork, ArtworkFlag, ArtworkWriteResult } from "../../entities/artwork.entity";

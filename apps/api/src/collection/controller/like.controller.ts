@@ -1,5 +1,5 @@
 import { Controller, Get, Param } from '@nestjs/common';
-import { Pageable, Pagination } from '@soundcore/common';
+import { Pageable, Pagination } from '@repo/utilities';
 import { Authentication } from '../../authentication/decorators/authentication.decorator';
 import { User } from '../../user/entities/user.entity';
 import { LikeService } from '../services/like.service';
@@ -7,7 +7,7 @@ import { LikeService } from '../services/like.service';
 @Controller('likes')
 export class LikeController {
 
-  constructor(private readonly likeService: LikeService) {}
+  constructor(private readonly likeService: LikeService) { }
 
   @Get("/songs")
   public async findPageByLikedSongsOfUser(@Authentication() user: User, @Pagination() pageable: Pageable) {

@@ -8,7 +8,7 @@ import { ApiResponse } from "../../utils/responses/api-response";
 import { apiResponse } from "../../utils/rxjs/operators/api-response";
 import { User } from "../entities/user.entity";
 import { SCSDK_OPTIONS } from "../../constants";
-import { Pageable } from "@soundcore/common";
+import { Pageable } from "@repo/utilities";
 
 @Injectable()
 export class SCDKUserService {
@@ -16,7 +16,7 @@ export class SCDKUserService {
     constructor(
         private readonly httpClient: HttpClient,
         @Inject(SCSDK_OPTIONS) private readonly options: SCSDKOptions
-    ) {}
+    ) { }
 
     /**
      * Make a request to the profiles endpoint

@@ -11,7 +11,7 @@ import { FileSystemService } from '../../filesystem/services/filesystem.service'
 import { MountRegistryService } from './mount-registry.service';
 import { MountScanFlag } from '../dtos/scan-process.dto';
 import { FileFlag } from '../../file/entities/file.entity';
-import { Environment, Page, Pageable } from '@soundcore/common';
+import { Environment, Page, Pageable } from '@repo/utilities';
 import { EVENT_MOUNT_PROCESS_UPDATE, MOUNTNAME_MAX_LENGTH } from '../../constants';
 import { AdminGateway } from '../../gateway/gateways/admin-gateway.gateway';
 import { OnEvent } from '@nestjs/event-emitter';
@@ -28,7 +28,7 @@ export class MountService {
         private readonly mountRegistryService: MountRegistryService,
         private readonly indexService: IndexerService,
         private readonly gateway?: AdminGateway,
-    ) {}
+    ) { }
 
     /**
      * Find a list of mounts inside a bucket.
@@ -37,7 +37,7 @@ export class MountService {
      * @returns Page<Mount>
      */
     public async findByBucketId(bucketId: string, pageable: Pageable): Promise<Page<Mount>> {
-        if(!pageable) throw new BadRequestException("Missing page settings");
+        if (!pageable) throw new BadRequestException("Missing page settings");
 
         const query = await this.repository.createQueryBuilder("mount")
             .leftJoin("mount.zone", "bucket")
@@ -47,7 +47,7 @@ export class MountService {
             .addSelect("SUM(file.size) AS usedSpace")
             .groupBy("mount.id")
             .where("bucket.id = :bucketId", { bucketId })
-        
+
         const result = await query.getRawAndEntities();
         const totalElements = await query.getCount();
         return Page.of(result.entities.map((mount, index) => {
@@ -96,7 +96,7 @@ export class MountService {
      * @returns Mount
      */
     public async findByNameInBucket(bucketId: string, name: string): Promise<Mount> {
-        return await this.repository.findOne({ where: { name, zone: { id: bucketId } }, relations: ["zone"]});
+        return await this.repository.findOne({ where: { name, zone: { id: bucketId } }, relations: ["zone"] });
     }
 
     /**
@@ -106,7 +106,7 @@ export class MountService {
      * @returns Mount
      */
     public async findByDirectoryInBucket(bucketId: string, directory: string): Promise<Mount> {
-        return await this.repository.findOne({ where: { directory: path.resolve(directory), zone: { id: bucketId } }, relations: ["zone"]});
+        return await this.repository.findOne({ where: { directory: path.resolve(directory), zone: { id: bucketId } }, relations: ["zone"] });
     }
 
     /**
@@ -149,7 +149,7 @@ export class MountService {
      * @returns True or False
      */
     public async existsByNameInBucket(bucketId: string, name: string): Promise<boolean> {
-        return !!(await this.repository.findOne({ where: { name, zone: { id: bucketId } }}));
+        return !!(await this.repository.findOne({ where: { name, zone: { id: bucketId } } }));
     }
 
     /**
@@ -159,7 +159,7 @@ export class MountService {
      * @returns True or False
      */
     public async existsByPathInBucket(bucketId: string, directory: string): Promise<boolean> {
-        return !!(await this.repository.findOne({ where: { directory, zone: { id: bucketId } }}));
+        return !!(await this.repository.findOne({ where: { directory, zone: { id: bucketId } } }));
     }
 
     /**
@@ -170,7 +170,7 @@ export class MountService {
      */
     public async rescanMount(idOrObject: string | Mount): Promise<Task> {
         const mount = await this.resolveMount(idOrObject);
-        if(!mount) throw new NotFoundException("Mount not found");
+        if (!mount) throw new NotFoundException("Mount not found");
 
         return this.enqueue(mount, MountScanFlag.RESCAN);
     }
@@ -183,7 +183,7 @@ export class MountService {
      */
     private async scanMountInternal(idOrObject: string | Mount): Promise<Task> {
         const mount = await this.resolveMount(idOrObject);
-        if(!mount) throw new NotFoundException("Mount not found");
+        if (!mount) throw new NotFoundException("Mount not found");
 
         return this.enqueue(mount, MountScanFlag.DEFAULT_SCAN);
     }
@@ -203,7 +203,7 @@ export class MountService {
         const directory = createMountDto.directory
 
         const existingMount = await this.findByNameInBucket(createMountDto.zone.id, createMountDto.name) || await this.findByDirectoryInBucket(createMountDto.zone.id, createMountDto.directory);
-        if(existingMount) return new CreateResult(existingMount, true);
+        if (existingMount) return new CreateResult(existingMount, true);
 
         const mount = this.repository.create();
         mount.name = createMountDto.name;
@@ -215,15 +215,15 @@ export class MountService {
             .values(mount)
             .orIgnore()
             .execute().then((insertResult) => {
-                if(insertResult.identifiers.length < 0) {
+                if (insertResult.identifiers.length < 0) {
                     return this.findByNameInBucket(createMountDto.zone.id, createMountDto.name).then((existingMount) => {
                         return new CreateResult(existingMount, false);
                     });
                 }
 
                 return this.findById(insertResult.identifiers[0].id).then((result) => {
-                    if(createMountDto.isDefault) this.setDefaultMount(result);
-                    if(createMountDto.doScan) this.rescanMount(mount);
+                    if (createMountDto.isDefault) this.setDefaultMount(result);
+                    if (createMountDto.doScan) this.rescanMount(mount);
                     return new CreateResult(mount, true)
                 })
             }).catch((error) => {
@@ -257,20 +257,20 @@ export class MountService {
         updateMountDto.name = updateMountDto.name?.trim();
         const mount = await this.findById(mountId);
 
-        if(!mount || !mount.zone) {
+        if (!mount || !mount.zone) {
             throw new NotFoundException("Mount not found.")
         }
 
-        if(updateMountDto.name && updateMountDto.name != mount.name && await this.existsByNameInBucket(mount.zone.id, updateMountDto.name)) {
+        if (updateMountDto.name && updateMountDto.name != mount.name && await this.existsByNameInBucket(mount.zone.id, updateMountDto.name)) {
             throw new BadRequestException("Mount with that name already exists inside this bucket.");
         }
 
         mount.name = updateMountDto.name;
-        
-        if(mount.isDefault && !updateMountDto.isDefault) {
+
+        if (mount.isDefault && !updateMountDto.isDefault) {
             // Mount is removed as default mount, but no other mount
             // is selected to be next default --> select random one
-            if(!await this.setRandomAsDefaultMount([mount.id])) {
+            if (!await this.setRandomAsDefaultMount([mount.id])) {
                 throw new BadRequestException("Cannot remove this mount as default mount as it is the only mount in the bucket.");
             } else {
                 mount.isDefault = false;
@@ -278,8 +278,8 @@ export class MountService {
         }
 
         return this.repository.save(mount).then(async (result) => {
-            if(updateMountDto.isDefault) await this.setDefaultMount(mount);
-            if(updateMountDto.doScan) this.rescanMount(mount);
+            if (updateMountDto.isDefault) await this.setDefaultMount(mount);
+            if (updateMountDto.doScan) this.rescanMount(mount);
             return result;
         });
     }
@@ -292,7 +292,7 @@ export class MountService {
      */
     public async checkForDefaultMount() {
         return this.findDefault().then((defaultMount) => {
-            if(typeof defaultMount !== "undefined" && defaultMount != null) {
+            if (typeof defaultMount !== "undefined" && defaultMount != null) {
                 return defaultMount;
             }
 
@@ -316,8 +316,8 @@ export class MountService {
      */
     public async setDefaultMount(idOrObject: string | Mount): Promise<Mount> {
         const mount = await this.resolveMount(idOrObject);
-        if(!mount) throw new NotFoundException("Mount not found.");
-        if(mount.isDefault) return mount;
+        if (!mount) throw new NotFoundException("Mount not found.");
+        if (mount.isDefault) return mount;
 
         mount.isDefault = true;
         return this.repository.manager.transaction<Mount>(async (manager) => {
@@ -336,7 +336,7 @@ export class MountService {
      */
     public async setRandomAsDefaultMount(exclude: string[]): Promise<Mount> {
         const mount = await this.findOneInBucket(exclude);
-        if(!mount) return null;
+        if (!mount) return null;
 
         return this.setDefaultMount(mount).then((result) => {
             this.logger.verbose(`Mount '${mount.name}' was set to be new default mount for bucket '${mount.zone?.id}'.`)
@@ -353,7 +353,7 @@ export class MountService {
      */
     public async setProgressInfo(idOrObject: string | Mount, progress: MountProgress, status: MountStatus = MountStatus.BUSY): Promise<Mount> {
         const mount = await this.resolveMount(idOrObject);
-        if(!mount) throw new NotFoundException("Mount not found.");
+        if (!mount) throw new NotFoundException("Mount not found.");
 
         mount.progressInfo = progress;
         return this.repository.update(mount.id, {
@@ -379,8 +379,8 @@ export class MountService {
      * to the scanner queue for directory scanning.
      */
     public async checkMountsDockerMode() {
-        if(!Environment.isDockerized) throw new InternalServerErrorException(`Tried checking mounts in docker mode, but application is in standalone mode.`);
-        
+        if (!Environment.isDockerized) throw new InternalServerErrorException(`Tried checking mounts in docker mode, but application is in standalone mode.`);
+
         // return this.queue.enqueue(<MountScanProcessDTO>{
         //     flag: MountScanFlag.DOCKER_LOOKUP,
         //     mount: null
@@ -402,7 +402,7 @@ export class MountService {
         // let page: Page<Mount>;
         // let fetchedElements = 0;
         // let pageIndex = options.page;
-    
+
         // while(fetchedElements < page?.totalElements || page == null) {
         //     page = await this.findByBucketId(this.fileSystem.getInstanceId(), options);
         //     pageIndex++;
@@ -423,12 +423,12 @@ export class MountService {
      */
     public async delete(mountId: string): Promise<boolean> {
         const mount = await this.resolveMount(mountId);
-        if(!mount) return true;
+        if (!mount) return true;
 
-        if(!await this.setRandomAsDefaultMount([mount.id])) {
+        if (!await this.setRandomAsDefaultMount([mount.id])) {
             throw new BadRequestException("Cannot delete default mount. First, select an other mount as default.");
         }
-        
+
         return this.repository.delete({ id: mountId }).then((result) => {
             return result.affected > 0;
         })
@@ -445,7 +445,7 @@ export class MountService {
      * @returns Mount
      */
     private async resolveMount(idOrObject: string | Mount): Promise<Mount> {
-        if(typeof idOrObject == "string") {
+        if (typeof idOrObject == "string") {
             return await this.findById(idOrObject);
         } else {
             return idOrObject;

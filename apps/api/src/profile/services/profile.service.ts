@@ -3,7 +3,7 @@ import { ArtistService } from '../../artist/services/artist.service';
 import { Artist } from '../../artist/entities/artist.entity';
 import { User } from '../../user/entities/user.entity';
 import { UserService } from '../../user/user.service';
-import { Page } from '@soundcore/common';
+import { Page } from '@repo/utilities';
 
 @Injectable()
 export class ProfileService {
@@ -11,7 +11,7 @@ export class ProfileService {
     constructor(
         private readonly userService: UserService,
         private readonly artistService: ArtistService
-    ) {}
+    ) { }
 
     public async findByCurrentUser(authentication: User): Promise<User> {
         return this.findByUserId(authentication.id);

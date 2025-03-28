@@ -1,6 +1,6 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Page, Pageable } from '@soundcore/common';
+import { Page, Pageable } from '@repo/utilities';
 import { Repository, SelectQueryBuilder, UpdateResult } from 'typeorm';
 import { Mount } from '../../mount/entities/mount.entity';
 import { Song } from '../../song/entities/song.entity';
@@ -14,7 +14,7 @@ export class FileService {
 
     constructor(
         @InjectRepository(File) private readonly repository: Repository<File>
-    ) {}
+    ) { }
 
     public async findById(fileId: string): Promise<File> {
         return this.repository.createQueryBuilder("file")
@@ -113,8 +113,8 @@ export class FileService {
      */
     public async setSong(idOrObject: string | File, song: Song): Promise<File> {
         const file = await this.resolveFile(idOrObject);
-        if(!file) throw new NotFoundException("File not found.");
-        if(file.song?.id == song.id) return file;
+        if (!file) throw new NotFoundException("File not found.");
+        if (file.song?.id == song.id) return file;
 
         file.song = song;
         return this.repository.save(file);
@@ -128,8 +128,8 @@ export class FileService {
      */
     public async setFlag(idOrObject: string | File, flag: FileFlag): Promise<File> {
         const file = await this.resolveFile(idOrObject);
-        if(!file) throw new NotFoundException("File not found.");
-        if(file.flag == flag) return file;
+        if (!file) throw new NotFoundException("File not found.");
+        if (file.flag == flag) return file;
 
         file.flag = flag;
         return this.repository.save(file);
@@ -153,7 +153,7 @@ export class FileService {
     public async findOrCreateFile(createFileDto: CreateFileDTO): Promise<CreateResult<File>> {
         const { fileDto, mount } = createFileDto;
         const existingFile = await this.findByNameAndDirectory(fileDto.filename, mount, fileDto.directory);
-        if(existingFile) return new CreateResult(existingFile, true);
+        if (existingFile) return new CreateResult(existingFile, true);
 
         const file = this.repository.create();
         file.flag = FileFlag.OK;
@@ -167,7 +167,7 @@ export class FileService {
             .values(file)
             .orIgnore()
             .execute().then((result) => {
-                if(result.identifiers.length > 0) {
+                if (result.identifiers.length > 0) {
                     return new CreateResult(file, false);
                 }
                 return this.findByNameAndDirectory(fileDto.filename, mount, fileDto.directory).then((file) => new CreateResult(file, true));
@@ -218,20 +218,20 @@ export class FileService {
             });
     }
 
-    public async createIfNotExists(files: File[], qb?: (query: SelectQueryBuilder<File>, alias: string) => SelectQueryBuilder<File> ): Promise<File[]> {
+    public async createIfNotExists(files: File[], qb?: (query: SelectQueryBuilder<File>, alias: string) => SelectQueryBuilder<File>): Promise<File[]> {
         return this.repository.createQueryBuilder()
             .insert()
             .values(files)
             .orUpdate(["name", "flag"], ["id"])
             .returning(["id"])
             .execute().then((insertResult) => {
-                if(typeof qb !== "function") {
+                if (typeof qb !== "function") {
                     return this.repository.createQueryBuilder("file")
-                    .leftJoin("file.mount", "mount").addSelect(["mount.id", "mount.directory"])
-                    .whereInIds(insertResult.raw)
-                    .getMany();
+                        .leftJoin("file.mount", "mount").addSelect(["mount.id", "mount.directory"])
+                        .whereInIds(insertResult.raw)
+                        .getMany();
                 }
-                    
+
                 return qb(this.repository.createQueryBuilder("file"), "file").whereInIds(insertResult.raw).getMany();
             });
     }
@@ -242,7 +242,7 @@ export class FileService {
      * @returns File
      */
     private async resolveFile(idOrObject: string | File): Promise<File> {
-        if(typeof idOrObject == "string") {
+        if (typeof idOrObject == "string") {
             return this.findById(idOrObject);
         }
 

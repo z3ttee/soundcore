@@ -1,6 +1,6 @@
 import { DataSource } from "typeorm";
 import { FileSystemService } from "../../../filesystem/services/filesystem.service";
-import { Batch } from "@soundcore/common";
+import { Batch } from "@repo/utilities";
 import { STAGE_METADATA_ID, STEP_CREATE_SONGS_ID } from "../../pipelines";
 import { getOrDefault, progress, StepParams } from "@repo/pipelines";
 import { Artwork, SongArtwork } from "../../../artwork/entities/artwork.entity";

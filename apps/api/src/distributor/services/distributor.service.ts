@@ -1,6 +1,6 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Page, Pageable } from '@soundcore/common';
+import { Page, Pageable } from '@repo/utilities';
 import { In, Repository } from 'typeorm';
 import { Artwork } from '../../artwork/entities/artwork.entity';
 import { MeilisearchFlag } from '../../utils/entities/meilisearch.entity';
@@ -15,14 +15,14 @@ export class DistributorService {
 
     constructor(
         @InjectRepository(Distributor) private readonly repository: Repository<Distributor>
-    ){ }
+    ) { }
 
     /**
      * Find a distributor by its id.
      * @param name Distributor's id
      * @returns Distributor
      */
-     public async findById(distributorId: string): Promise<Distributor> {
+    public async findById(distributorId: string): Promise<Distributor> {
         return this.repository.createQueryBuilder("distributor")
             .leftJoin("distributor.artwork", "artwork")
             .addSelect(["artwork.id"])
@@ -49,7 +49,7 @@ export class DistributorService {
      * @param pageable Page settings
      * @returns Page<Distributor>
      */
-     public async findBySyncFlag(flag: MeilisearchFlag, pageable: Pageable): Promise<Page<Distributor>> {
+    public async findBySyncFlag(flag: MeilisearchFlag, pageable: Pageable): Promise<Page<Distributor>> {
         const result = await this.repository.createQueryBuilder("distributor")
             .leftJoin("distributor.artwork", "artwork").addSelect(["artwork.id"])
             .where("distributor.lastSyncFlag = :flag", { flag })
@@ -82,7 +82,7 @@ export class DistributorService {
         createDistributorDto.description = createDistributorDto.description?.trim();
 
         const existingDistributor = await this.findByName(createDistributorDto.name);
-        if(existingDistributor) return new CreateResult(existingDistributor, true); 
+        if (existingDistributor) return new CreateResult(existingDistributor, true);
 
         const distributor = this.repository.create();
         distributor.name = createDistributorDto.name;
@@ -94,7 +94,7 @@ export class DistributorService {
             .values(distributor)
             .orIgnore()
             .execute().then((result) => {
-                if(result.identifiers.length > 0) {
+                if (result.identifiers.length > 0) {
                     return new CreateResult(distributor, false);
                 }
                 return this.findByName(createDistributorDto.name).then((distributor) => new CreateResult(distributor, true));
@@ -115,7 +115,7 @@ export class DistributorService {
         updateDistributorDto.description = updateDistributorDto.description?.trim();
 
         const distributor = await this.findById(distributorId);
-        if(!distributor) throw new NotFoundException("Distributor not found.");
+        if (!distributor) throw new NotFoundException("Distributor not found.");
 
         distributor.name = updateDistributorDto.name;
         // distributor.geniusId = updateDistributorDto.geniusId;
@@ -147,7 +147,7 @@ export class DistributorService {
      */
     public async setArtwork(idOrObject: string | Distributor, artwork: Artwork): Promise<Distributor> {
         const distributor = await this.resolveDistributor(idOrObject);
-        if(!distributor) throw new NotFoundException("Distributor not found.");
+        if (!distributor) throw new NotFoundException("Distributor not found.");
 
         distributor.artwork = artwork;
         return this.repository.save(distributor);
@@ -159,7 +159,7 @@ export class DistributorService {
      * @returns Distributor
      */
     protected async resolveDistributor(idOrObject: string | Distributor): Promise<Distributor> {
-        if(typeof idOrObject == "string") {
+        if (typeof idOrObject == "string") {
             return this.findById(idOrObject);
         }
 

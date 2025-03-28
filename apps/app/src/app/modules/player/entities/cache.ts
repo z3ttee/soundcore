@@ -1,4 +1,4 @@
-import { Page, PageInfo, isNull } from "@soundcore/common";
+import { Page, PageInfo, isNull } from "@repo/utilities";
 
 export type CachedPage = Pick<Page, "length" | "nextOffset" | "prevOffset" | "totalSize">
 
@@ -19,7 +19,7 @@ export class Cache<T = any> {
     }
 
     public set(pageIndex: number, page: Page<T>) {
-        if(this.has(pageIndex)) return;
+        if (this.has(pageIndex)) return;
 
         this.infos.set(pageIndex, page.info);
         this.cache.push(...page.items);
@@ -35,7 +35,7 @@ export class Cache<T = any> {
 
     public get(pageIndex: number) {
         const infos = this.getPageInfo(pageIndex);
-        if(isNull(infos)) return null;
+        if (isNull(infos)) return null;
         return this.cache.slice(infos.offset, infos.limit);
     }
 
@@ -49,7 +49,7 @@ export class Cache<T = any> {
 
     public remove(pageIndex: number) {
         const infos = this.getPageInfo(pageIndex);
-        if(isNull(infos)) return null;
+        if (isNull(infos)) return null;
 
         this.pages.delete(pageIndex);
         this.infos.delete(pageIndex);

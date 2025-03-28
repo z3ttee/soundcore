@@ -3,7 +3,7 @@ import { Inject, Injectable } from "@angular/core";
 import { Observable, of } from "rxjs";
 import { SCSDKOptions } from "../../scdk.module";
 import { File } from "../entities/file.entity";
-import { Page, Pageable } from "@soundcore/common";
+import { Page, Pageable } from "@repo/utilities";
 import { SCSDK_OPTIONS } from "../../constants";
 
 @Injectable()
@@ -12,7 +12,7 @@ export class SCDKFileService {
     constructor(
         private readonly httpClient: HttpClient,
         @Inject(SCSDK_OPTIONS) private readonly options: SCSDKOptions
-    ) {}
+    ) { }
 
     /**
      * Find a file by its id.
@@ -20,7 +20,7 @@ export class SCDKFileService {
      * @returns File
      */
     public findById(fileId: string): Observable<File> {
-        if(!fileId) return of(null);
+        if (!fileId) return of(null);
         return this.httpClient.get<File>(`${this.options.api_base_uri}/v1/files/${fileId}`);
     }
 
@@ -31,7 +31,7 @@ export class SCDKFileService {
      * @returns Page<File>
      */
     public findByMountId(mountId: string, pageable: Pageable): Observable<Page<File>> {
-        if(!mountId) return of(Page.empty(pageable));
+        if (!mountId) return of(Page.empty(pageable));
         return this.httpClient.get<Page<File>>(`${this.findByMountIdBaseURL(mountId)}${pageable.toQuery()}`);
     }
 

@@ -5,14 +5,14 @@ import { SCSDKOptions } from "../../scdk.module";
 import { Notification } from "../entities/notification.entity";
 import { SCDKNotificationGateway } from "../gateway/notification.gateway";
 import { SCSDK_OPTIONS } from "../../constants";
-import { Page, Pageable } from "@soundcore/common";
+import { Page, Pageable } from "@repo/utilities";
 
 @Injectable()
 export class SCDKNotificationService {
 
     private _notificationSubject: BehaviorSubject<Set<Notification>> = new BehaviorSubject(new Set([]));
     public $notifications: Observable<Notification[]> = this._notificationSubject.asObservable().pipe(
-        map((set) => Array.from(set)), 
+        map((set) => Array.from(set)),
         map((list) => list.sort((a, b) => {
             return new Date(b?.sentAt).getTime() - new Date(a?.sentAt)?.getTime()
         }))
@@ -23,7 +23,7 @@ export class SCDKNotificationService {
         private readonly gateway: SCDKNotificationGateway,
         @Inject(SCSDK_OPTIONS) private readonly options: SCSDKOptions
     ) {
-        this.gateway.$onNotificationReceived.subscribe((notification) => this.addNotifications([ notification ]));
+        this.gateway.$onNotificationReceived.subscribe((notification) => this.addNotifications([notification]));
     }
 
     public findByCurrentUser(pageable: Pageable): Observable<Page<Notification>> {
@@ -34,7 +34,7 @@ export class SCDKNotificationService {
 
     private addNotifications(notifications: Notification[]) {
         const cached = this._notificationSubject.getValue();
-        for(const element of notifications) {
+        for (const element of notifications) {
             cached.add(element);
         }
         this._notificationSubject.next(cached)

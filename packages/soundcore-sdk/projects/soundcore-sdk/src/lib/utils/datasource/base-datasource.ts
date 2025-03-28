@@ -1,5 +1,5 @@
 import { CollectionViewer, DataSource } from "@angular/cdk/collections";
-import { isNull } from "@soundcore/common";
+import { isNull } from "@repo/utilities";
 import { BehaviorSubject, catchError, combineLatest, filter, map, Observable, of, startWith, Subject, Subscription, takeUntil } from "rxjs";
 
 export abstract class SCSDKBaseDatasource<T = any> extends DataSource<T> {
@@ -38,8 +38,8 @@ export abstract class SCSDKBaseDatasource<T = any> extends DataSource<T> {
     /**
      * Emits the empty state of the datasource
      */
-    public readonly $empty: Observable<boolean> = combineLatest([ 
-        this.$ready.pipe(filter((isReady) => isReady), startWith(false), takeUntil(this._destroy)),  
+    public readonly $empty: Observable<boolean> = combineLatest([
+        this.$ready.pipe(filter((isReady) => isReady), startWith(false), takeUntil(this._destroy)),
         this.$totalSize.pipe(takeUntil(this._destroy))
     ]).pipe(map(([_, totalSize]) => totalSize <= 0));
 
@@ -74,7 +74,7 @@ export abstract class SCSDKBaseDatasource<T = any> extends DataSource<T> {
         this.subscription.add(collectionViewer.viewChange.pipe(takeUntil(this._destroy)).subscribe((range) => {
             const startPage = this.getPageForIndex(range.start);
             const endPage = this.getPageForIndex(range.end);
-    
+
             for (let pageIndex = startPage; pageIndex <= endPage; pageIndex++) {
                 if (this.hasPage(pageIndex)) {
                     continue;
@@ -89,23 +89,23 @@ export abstract class SCSDKBaseDatasource<T = any> extends DataSource<T> {
                         return of(null);
                     })
                 ).subscribe((items) => {
-                    if(!this.ready) this.setReady(true);
-                    if(!isNull(items)) {
+                    if (!this.ready) this.setReady(true);
+                    if (!isNull(items)) {
                         // Add page index to fetched set
                         // to track fetched pages
                         this.fetchedPages.add(pageIndex);
-        
+
                         // if(items.length <= 0) return;
                         // Add fetched items to cachedData
-                        this.cachedData.splice(offset, this.pageSize, ...Array.from({length: items.length}).map((_, i) => items[i]));
+                        this.cachedData.splice(offset, this.pageSize, ...Array.from({ length: items.length }).map((_, i) => items[i]));
                         // Push updated cache to stream
                         this.dataStream.next(this.cachedData);
                     }
-    
+
                     subscription.unsubscribe();
                 });
 
-                this.cachedData.splice(offset, this.pageSize, ...Array.from({length: this.pageSize}).map(() => null));
+                this.cachedData.splice(offset, this.pageSize, ...Array.from({ length: this.pageSize }).map(() => null));
             }
         }));
 
@@ -153,7 +153,7 @@ export abstract class SCSDKBaseDatasource<T = any> extends DataSource<T> {
     }
 
     protected setTotalSize(size: number) {
-        if(this._totalSize <= 0) size = 0;
+        if (this._totalSize <= 0) size = 0;
         this._totalSize = size;
 
         this._totalSizeSubject.next(this._totalSize);
@@ -189,7 +189,7 @@ export abstract class SCSDKBaseDatasource<T = any> extends DataSource<T> {
      * @returns True, if the update was successful
      */
     private updateByIndex(index: number, updated: T): boolean {
-        if(index == -1) return false;
+        if (index == -1) return false;
 
         this.cachedData.splice(index, 1, updated);
         this.updateStream();
@@ -205,7 +205,7 @@ export abstract class SCSDKBaseDatasource<T = any> extends DataSource<T> {
      */
     public updateOrAppendById(id: any, updated: T): boolean {
         const index = this.getIndexByItemId(id);
-        if(index == -1) {
+        if (index == -1) {
             this.append(updated);
             return false;
         }
@@ -245,7 +245,7 @@ export abstract class SCSDKBaseDatasource<T = any> extends DataSource<T> {
      */
     public updateOrPrependById(id: any, updated: T): boolean {
         const index = this.getIndexByItemId(id);
-        if(index == -1) {
+        if (index == -1) {
             this.prepend(updated);
             return false;
         }
@@ -256,7 +256,7 @@ export abstract class SCSDKBaseDatasource<T = any> extends DataSource<T> {
 
     public appendMany(items: T[]) {
         // Add fetched items to cachedData
-        this.cachedData.splice(this._totalSize, items.length, ...Array.from({length: items.length}).map((_, i) => items[i]));
+        this.cachedData.splice(this._totalSize, items.length, ...Array.from({ length: items.length }).map((_, i) => items[i]));
         this.updateStream();
 
         this.setTotalSize(this._totalSize + items.length);
@@ -312,9 +312,9 @@ export abstract class SCSDKBaseDatasource<T = any> extends DataSource<T> {
 
     protected getPageOrFetch(pageIndex: number): Observable<T[]> {
         return new Observable((subscriber) => {
-            if(this.hasPage(pageIndex)) {
+            if (this.hasPage(pageIndex)) {
                 const pageStart = this.pageSize * pageIndex;
-                const pageEnd = pageStart + this.pageSize; 
+                const pageEnd = pageStart + this.pageSize;
 
                 // Note: Slice is exclusive the end param
                 const elements = this.cachedData.slice(pageIndex * this.pageSize, pageEnd + 1);
@@ -322,7 +322,7 @@ export abstract class SCSDKBaseDatasource<T = any> extends DataSource<T> {
                 subscriber.next(elements);
                 subscriber.complete();
                 return;
-            } 
+            }
 
             subscriber.add(this.fetchPage(pageIndex).pipe(catchError((err: Error) => {
                 console.error(err);

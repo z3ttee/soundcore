@@ -6,7 +6,7 @@ import { FilesFoundEvent } from "../../events/files-found.event";
 import { MountScanResultDTO } from "../dtos/scan-result.dto";
 import { MountService } from "./mount.service";
 import { AdminGateway } from "../../gateway/gateways/admin-gateway.gateway";
-import { Environment } from "@soundcore/common";
+import { Environment } from "@repo/utilities";
 import { MountScanFlag, MountScanProcessDTO } from "../dtos/scan-process.dto";
 import { MountProgressInfo, MountStatus } from "../entities/mount.entity";
 

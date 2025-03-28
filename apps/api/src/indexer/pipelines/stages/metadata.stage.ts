@@ -1,5 +1,5 @@
 import fs from "node:fs/promises";
-import { Batch } from "@soundcore/common";
+import { Batch } from "@repo/utilities";
 import { File, FileFlag } from "../../../file/entities/file.entity";
 import { Mount } from "../../../mount/entities/mount.entity";
 import { STAGE_METADATA_ID, STEP_CREATE_ALBUMS_ID, STEP_CREATE_ARTISTS_ID, STEP_READ_TAGS_ID } from "../../pipelines";

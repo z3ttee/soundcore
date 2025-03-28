@@ -10,7 +10,7 @@ import Database from "../../utils/database/database-worker-client";
 import { FileService } from "../services/file.service";
 import { FileProcessResultDTO } from "../dto/file-process-result.dto";
 import { FileDTO } from "../dto/file.dto";
-import { Batch } from "@soundcore/common";
+import { Batch } from "@repo/utilities";
 import { DataSource } from "typeorm";
 import { FileSystemService } from "../../filesystem/services/filesystem.service";
 import { Mount } from "../../mount/entities/mount.entity";

@@ -1,5 +1,5 @@
 import { BadRequestException, Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
-import { Environment, Page, Pageable, Pagination } from '@soundcore/common';
+import { Environment, Page, Pageable, Pagination } from '@repo/utilities';
 import { Roles } from '../../authentication/decorators/role.decorator';
 import { ROLE_ADMIN } from '../../constants';
 import { CreateResult } from '../../utils/results/creation.result';
@@ -10,7 +10,7 @@ import { MountService } from '../services/mount.service';
 
 @Controller('mounts')
 export class MountController {
-  constructor(private readonly mountService: MountService) {}
+  constructor(private readonly mountService: MountService) { }
 
   @Roles(ROLE_ADMIN)
   @Get("/bucket/:bucketId")
@@ -33,10 +33,10 @@ export class MountController {
   @Roles(ROLE_ADMIN)
   @Post()
   public async createMount(@Body() createMountDto: CreateMountDTO): Promise<CreateResult<Mount>> {
-    if(Environment.isDockerized) {
+    if (Environment.isDockerized) {
       throw new BadRequestException("Application is dockerized, please mount a docker volume into / instead.");
     }
-   
+
     return this.mountService.createIfNotExists(createMountDto)
   }
 

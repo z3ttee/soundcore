@@ -8,7 +8,7 @@ This monorepo contains all project files to build the Soundcore application.
 
 ## Packages
 - [@soundcore/bootstrap](/packages/bootstrap/README.md)
-- [@soundcore/common](/packages/common/README.md)
+- [@repo/utilities](/packages/common/README.md)
 - [@repo/queue](/packages/queue/README.md)
 - [@repo/pipelines](/packages/pipeline/README.md)
 - [@repo/meilisearch](/packages/meilisearch/README.md)

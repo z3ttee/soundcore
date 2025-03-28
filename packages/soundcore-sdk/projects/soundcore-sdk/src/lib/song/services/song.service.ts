@@ -9,7 +9,7 @@ import { ApiSearchResponse } from "../../meilisearch/entities/search-response.en
 import { MeiliSong } from "../../meilisearch/entities/meili-song.entity";
 import { Future, toFuture } from "../../utils/future";
 import { SCSDK_OPTIONS } from "../../constants";
-import { Page, Pageable } from "@soundcore/common";
+import { Page, Pageable } from "@repo/utilities";
 import { SCSDKDatasource } from "../../utils/datasource";
 
 @Injectable()
@@ -18,7 +18,7 @@ export class SCSDKSongService {
     constructor(
         private httpClient: HttpClient,
         @Inject(SCSDK_OPTIONS) private readonly options: SCSDKOptions
-    ) {}
+    ) { }
 
     /**
      * Find a song by its id.
@@ -26,9 +26,9 @@ export class SCSDKSongService {
      * @returns {Future<Song>}
      */
     public findById(songId: string): Observable<Future<Song>> {
-        if(!songId) return of(Future.notfound());
+        if (!songId) return of(Future.notfound());
         return this.httpClient.get<Song>(`${this.options.api_base_uri}/v1/songs/${songId}`).pipe(toFuture());
-    }    
+    }
 
     /**
      * Find a page of songs that belong to an album
@@ -37,7 +37,7 @@ export class SCSDKSongService {
      * @returns {Future<Page<Song>>}
      */
     public findByAlbum(albumId: string, pageable: Pageable): Observable<Future<Page<Song>>> {
-        if(!albumId) return of(Future.notfound());
+        if (!albumId) return of(Future.notfound());
         return this.httpClient.get<Page<Song>>(`${this.options.api_base_uri}/v1/songs/album/${albumId}${pageable.toQuery()}`).pipe(toFuture());
     }
 

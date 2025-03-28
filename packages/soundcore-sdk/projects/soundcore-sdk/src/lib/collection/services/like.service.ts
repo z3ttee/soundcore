@@ -1,6 +1,6 @@
 import { HttpClient } from "@angular/common/http";
 import { Inject, Injectable } from "@angular/core";
-import { Page, Pageable } from "@soundcore/common";
+import { Page, Pageable } from "@repo/utilities";
 import { Observable, Subject, tap } from "rxjs";
 import { SCSDK_OPTIONS } from "../../constants";
 import { SCSDKOptions } from "../../scdk.module";
@@ -20,12 +20,12 @@ export class SCSDKLikeService {
     constructor(
         private httpClient: HttpClient,
         @Inject(SCSDK_OPTIONS) private readonly options: SCSDKOptions
-    ) {}
+    ) { }
 
     public toggleLikeForSong(song: Song): Observable<Future<ToggleLikedSongDTO>> {
         return this.httpClient.get<ToggleLikedSongDTO>(`${this.options.api_base_uri}/v1/likes/songs/${song.id}`).pipe(toFuture(), tap((request) => {
             console.log(request);
-            if(request.loading || request.error) return;
+            if (request.loading || request.error) return;
             this._onSongLikeChangedSubject.next(request.data);
         }));
     }
@@ -43,7 +43,7 @@ export class SCSDKLikeService {
     }
 
     public getUrl(fnName: "findPageByLikedSongs"): string {
-        if(fnName == "findPageByLikedSongs") {
+        if (fnName == "findPageByLikedSongs") {
             return `${this.options.api_base_uri}/v1/likes/songs`;
         } else {
             return null;

@@ -1,4 +1,4 @@
-import { Batch, Page, Pageable } from "@soundcore/common";
+import { Batch, Page, Pageable } from "@repo/utilities";
 import { MeiliClient, MeiliIndex } from "@repo/meilisearch";
 import { progress, StepParams } from "@repo/pipelines";
 import { DataSource } from "typeorm";

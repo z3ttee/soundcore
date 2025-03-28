@@ -1,5 +1,5 @@
 import { CollectionViewer } from "@angular/cdk/collections";
-import { Page, Pageable } from "@soundcore/common";
+import { Page, Pageable } from "@repo/utilities";
 import { Future, LikedSong, PlaylistItem, SCSDKBaseDatasource, SCSDKTracklist, SCSDKTracklistService, Song, toFuture, toFutureCompat, TracklistType } from "@soundcore/sdk";
 import { catchError, filter, map, Observable, of, switchMap, takeUntil } from "rxjs";
 import { Queue } from "../../../utils/queue/queue.entity";
@@ -28,7 +28,7 @@ export class SCNGXTracklist<T = any, C = any> extends SCSDKBaseDatasource<SCNGXT
     ) {
         super(pageSize ?? 30, initialSize ?? pageSize);
 
-        if(TRACKLIST_REGISTRY.has(this.id)) {
+        if (TRACKLIST_REGISTRY.has(this.id)) {
             throw new Error(`It is preferred to reuse existing tracklists. Please use the tracklist builder for building tracklists.`);
         } else {
             TRACKLIST_REGISTRY.set(this.id, this);
@@ -62,19 +62,19 @@ export class SCNGXTracklist<T = any, C = any> extends SCSDKBaseDatasource<SCNGXT
 
         return this.initializeTracklist().pipe(
             switchMap(([tracklist]) => {
-                if(typeof tracklist === "undefined" || tracklist == null) return of([]);
+                if (typeof tracklist === "undefined" || tracklist == null) return of([]);
 
                 return this.service.getHttpClient().get<Page<T>>(`${tracklist.baseUrl}${pageable.toQuery()}`).pipe(
                     toFuture(),
                     filter((request) => !request.loading),
                     map((request) => {
-                        if(request.error) {
+                        if (request.error) {
                             throw request.error;
                         }
-        
+
                         // Get page data and return it
                         let page: Page<T> = Page.empty(pageable);
-                        if(request.data) {
+                        if (request.data) {
                             page = request.data;
                             this.setTotalSize(page.totalSize);
                         }
@@ -90,7 +90,7 @@ export class SCNGXTracklist<T = any, C = any> extends SCSDKBaseDatasource<SCNGXT
     private initializeTracklist(): Observable<[SCSDKTracklist, boolean]> {
         return new Observable((subscriber) => {
             // Check if tracklist was fetched before
-            if(typeof this.tracklist !== "undefined" && this.tracklist != null) {
+            if (typeof this.tracklist !== "undefined" && this.tracklist != null) {
                 // Push result to subscriber
                 subscriber.next([this.tracklist, false]);
                 // Complete source to prevent memory leaks
@@ -101,7 +101,7 @@ export class SCNGXTracklist<T = any, C = any> extends SCSDKBaseDatasource<SCNGXT
 
             // If the associated resource's id is invalid, throw error in subscriber
             // and complete the subscription
-            if(typeof this.assocResId === "undefined" || this.assocResId == null) {
+            if (typeof this.assocResId === "undefined" || this.assocResId == null) {
                 subscriber.error(new Error(`Please provide a valid assocResId. Received ${this.assocResId}`));
                 subscriber.complete();
                 return;
@@ -110,7 +110,7 @@ export class SCNGXTracklist<T = any, C = any> extends SCSDKBaseDatasource<SCNGXT
             // Fetch tracklist from api
             // First, build the request variable
             let request: Observable<Future<SCSDKTracklist>>;
-            switch(this.contextType) {
+            switch (this.contextType) {
                 case TracklistType.PLAYLIST:
                     request = this.service.findByPlaylist(this.assocResId).pipe(toFutureCompat());
                     break;
@@ -135,7 +135,7 @@ export class SCNGXTracklist<T = any, C = any> extends SCSDKBaseDatasource<SCNGXT
             }
 
             // Check if request could be built successfully
-            if(typeof request === "undefined" || request == null) {
+            if (typeof request === "undefined" || request == null) {
                 subscriber.error(new Error(`Failed building request for fetching tracklist.`));
                 subscriber.complete();
                 return;
@@ -144,9 +144,9 @@ export class SCNGXTracklist<T = any, C = any> extends SCSDKBaseDatasource<SCNGXT
             // Execute request and subscribe to result
             request.pipe(takeUntil(this.$destroyed)).subscribe((future) => {
                 // Do nothing if status is just loading
-                if(future.loading) return;
+                if (future.loading) return;
                 // Throw error if future has error attached
-                if(future.error) {
+                if (future.error) {
                     subscriber.error(future.error);
                     subscriber.complete();
                     return;
@@ -193,25 +193,25 @@ export class SCNGXTracklist<T = any, C = any> extends SCSDKBaseDatasource<SCNGXT
      */
     public destroyIfNotClaimed(onFree?: SCNGXDatasourceFreeHandler): Observable<boolean> {
         // Unregister claim
-        if(typeof onFree === "function") {
+        if (typeof onFree === "function") {
             this.unclaim(onFree);
         }
 
         return new Observable((subscriber) => {
             let allowDestroy: boolean = true;
 
-            if(this.claims.size > 0) {
+            if (this.claims.size > 0) {
                 console.warn(`Tracklist is claimed by ${this.claims.size} handlers. Asking to free resources...`);
                 allowDestroy = false;
 
-                for(const handler of this.claims) {
+                for (const handler of this.claims) {
                     const didHandlerAllow = handler();
                     allowDestroy = didHandlerAllow;
                 }
             }
 
             // Destroy tracklist if all handlers agreed.
-            if(allowDestroy) {
+            if (allowDestroy) {
                 // Remove tracklist from registry.
                 TRACKLIST_REGISTRY.delete(this.assocResId);
                 // Trigger destroy
@@ -254,19 +254,19 @@ export class SCNGXTracklist<T = any, C = any> extends SCSDKBaseDatasource<SCNGXT
      * @returns Item
      */
     public dequeueAt(index: number): Observable<Song> {
-        if(this.queue.isEmpty()) {
+        if (this.queue.isEmpty()) {
             return of(null);
         }
 
         const item = this.queue.dequeueAt(index);
-        if(typeof item === "undefined" || item == null) {
+        if (typeof item === "undefined" || item == null) {
             return of(null)
         };
 
         return this.getItemByIndex(item).pipe(map((datasourceitem) => {
             // Check if object is either LikedSong or PlaylistItem
             // If true, extract song payload and return it
-            if((datasourceitem as LikedSong)?.song || (datasourceitem as PlaylistItem)?.song) {
+            if ((datasourceitem as LikedSong)?.song || (datasourceitem as PlaylistItem)?.song) {
                 return (datasourceitem as PlaylistItem)?.song;
             }
 
@@ -295,7 +295,7 @@ export class SCNGXTracklist<T = any, C = any> extends SCSDKBaseDatasource<SCNGXT
     public resetQueue(): Observable<void> {
         return this.initializeTracklist().pipe(map(([tracklist, wasFreshlyInitialized]) => {
             // Was initialized with this request, so the queue was set.
-            if(wasFreshlyInitialized) return;
+            if (wasFreshlyInitialized) return;
 
             // Otherwise set queue if the tracklist was initialized before
             this.setQueue(tracklist);

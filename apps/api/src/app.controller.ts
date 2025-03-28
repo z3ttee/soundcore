@@ -1,11 +1,11 @@
 import { Controller, Get } from "@nestjs/common";
-import { Environment } from "@soundcore/common";
 import { ApplicationInfo, AppService } from "./app.service";
+import { Environment } from "@repo/bootstrap";
 
 @Controller("")
 export class AppController {
 
-    constructor(private readonly service: AppService) {}
+    constructor(private readonly service: AppService) { }
 
     @Get("")
     public async getBuildInfo(): Promise<ApplicationInfo> {

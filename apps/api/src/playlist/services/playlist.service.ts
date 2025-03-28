@@ -1,6 +1,6 @@
 import { BadRequestException, ForbiddenException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Page, Pageable, isNull } from '@soundcore/common';
+import { Page, Pageable, isNull } from '@repo/utilities';
 import { Not, ObjectLiteral, Repository, SelectQueryBuilder, UpdateResult } from 'typeorm';
 import { Playlist } from '../entities/playlist.entity';
 import { PlaylistItem } from '../entities/playlist-item.entity';

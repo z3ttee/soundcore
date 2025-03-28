@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Page, Pageable } from '@soundcore/common';
+import { Page, Pageable } from '@repo/utilities';
 import { ILike, In, Repository } from 'typeorm';
 import { KeycloakTokenPayload } from '../authentication/entities/oidc-token.entity';
 import { MeilisearchFlag } from '../utils/entities/meilisearch.entity';
@@ -13,7 +13,7 @@ export class UserService {
     constructor(
         // private readonly meiliClient: MeiliUserService,
         @InjectRepository(User) public readonly repository: Repository<User>
-    ) {}
+    ) { }
 
     public async findById(userId: string): Promise<User> {
         return this.repository.createQueryBuilder("user")
@@ -24,12 +24,12 @@ export class UserService {
 
     public async findOrCreateByTokenPayload(token: KeycloakTokenPayload): Promise<User> {
         // TODO: Support not only keycloak
-        if(!token) return null;
+        if (!token) return null;
 
         // Find in database and return if found
         const existingUser = await this.findById(token.sub);
-        if(existingUser) {
-            if(this.hasUpdated(token, existingUser)) {
+        if (existingUser) {
+            if (this.hasUpdated(token, existingUser)) {
                 // Update username (currently the only thing that can change which is important)
                 existingUser.name = token.preferred_username?.trim();
                 return this.save(existingUser).catch((error) => {
@@ -42,7 +42,7 @@ export class UserService {
             // if(this.meiliClient.isSyncRecommended(existingUser)) {
             //     this.sync([existingUser]);
             // }
-            
+
             return existingUser
         }
 
@@ -103,8 +103,8 @@ export class UserService {
      * @param idOrObject User id or object
      * @returns User
      */
-     protected async resolveUser(idOrObject: string | User): Promise<User> {
-        if(typeof idOrObject == "string") {
+    protected async resolveUser(idOrObject: string | User): Promise<User> {
+        if (typeof idOrObject == "string") {
             return this.findById(idOrObject);
         }
 
@@ -125,18 +125,18 @@ export class UserService {
     }
 
     public async findBySearchQuery(query: string, pageable: Pageable): Promise<Page<User>> {
-        if(!query || query == "") {
+        if (!query || query == "") {
             query = "%"
         } else {
             query = `%${query.replace(/\s/g, '%')}%`;
         }
 
-        const result = await this.repository.findAndCount({ where: { name: ILike(query) }, skip: pageable.offset, take: pageable.limit});
+        const result = await this.repository.findAndCount({ where: { name: ILike(query) }, skip: pageable.offset, take: pageable.limit });
         return Page.of(result[0], result[1], pageable);
     }
 
     private hasUpdated(token: KeycloakTokenPayload, existingUser: User): boolean {
-        if(token.sub != existingUser.id) return false;
+        if (token.sub != existingUser.id) return false;
         return token.preferred_username !== existingUser.name;
     }
 

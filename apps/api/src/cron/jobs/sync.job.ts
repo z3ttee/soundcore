@@ -13,7 +13,7 @@ import { PublisherService } from "../../publisher/services/publisher.service";
 import { Song } from "../../song/entities/song.entity";
 import { SongService } from "../../song/services/song.service";
 import { MeilisearchFlag } from "../../utils/entities/meilisearch.entity";
-import { Page, Pageable } from "@soundcore/common";
+import { Page, Pageable } from "@repo/utilities";
 
 const SYNC_ITEMS_LIMIT = 100;
 
@@ -40,7 +40,7 @@ export class MeiliSyncer {
     public async checkMeilisearchSyncFlags() {
         // Skip this iteration, if the application is still busy
         // with resolve the errors.
-        if(this._isResolvingSyncErrors) return;
+        if (this._isResolvingSyncErrors) return;
 
         // Get start time
         const startedAt: number = Date.now();
@@ -67,7 +67,7 @@ export class MeiliSyncer {
         const affectedLabels = affectedEntities[3];
         const affectedPublishers = affectedEntities[4];
         const affectedDistributors = affectedEntities[5];
-    
+
         // Resolve errors
         await Promise.all([
             this.resolveSyncErrorsForArtists(affectedArtists.elements).catch(() => null),
@@ -81,7 +81,7 @@ export class MeiliSyncer {
 
         // Build time stats
         const resolvedIssues: number = affectedArtists.size + affectedAlbums.size + affectedSongs.size + affectedPublishers.size + affectedLabels.size + affectedDistributors.size;
-        if(resolvedIssues > 0) {
+        if (resolvedIssues > 0) {
             const endedAt: number = Date.now();
             const timeTook: number = endedAt - startedAt;
 
@@ -100,35 +100,35 @@ export class MeiliSyncer {
     }
 
     private async resolveSyncErrorsForAlbums(resources: Album[]) {
-        if(resources?.length <= 0) return;
+        if (resources?.length <= 0) return;
         return this.albumService.syncWithMeilisearch(resources).catch((error) => {
             this.logger.error(`Failed resolving sync issues for ${resources.length} albums`, error.stack);
         });
     }
 
     private async resolveSyncErrorsForSongs(resources: Song[]) {
-        if(resources?.length <= 0) return;
+        if (resources?.length <= 0) return;
         return this.songService.syncWithMeilisearch(resources).catch((error) => {
             this.logger.error(`Failed resolving sync issues for ${resources.length} songs`, error.stack);
         });
     }
 
     private async resolveSyncErrorsForPublishers(resources: Publisher[]) {
-        if(resources?.length <= 0) return;
+        if (resources?.length <= 0) return;
         return this.publisherService.sync(resources).catch((error) => {
             this.logger.error(`Failed resolving sync issues for ${resources.length} publishers`, error.stack);
         });
     }
 
     private async resolveSyncErrorsForLabels(resources: Label[]) {
-        if(resources?.length <= 0) return;
+        if (resources?.length <= 0) return;
         return this.labelService.sync(resources).catch((error) => {
             this.logger.error(`Failed resolving sync issues for ${resources.length} labels`, error.stack);
         });
     }
 
     private async resolveSyncErrorsForDistributors(resources: Distributor[]) {
-        if(resources?.length <= 0) return;
+        if (resources?.length <= 0) return;
         return this.distributorService.sync(resources).catch((error) => {
             this.logger.error(`Failed resolving sync issues for ${resources.length} distributors`, error.stack);
         });

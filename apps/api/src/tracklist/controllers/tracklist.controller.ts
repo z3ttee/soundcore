@@ -7,7 +7,8 @@ import { Song } from '../../song/entities/song.entity';
 import { Tracklist } from '../entities/tracklist.entity';
 import { TracklistService } from '../services/tracklist.service';
 import { LikedSong } from '../../collection/entities/like.entity';
-import { Page, Pageable, Pagination } from '@soundcore/common';
+import { Page, Pageable } from '@repo/utilities';
+import { Pagination } from '@repo/nestjs';
 
 /**
  * Controller class that contains
@@ -15,7 +16,7 @@ import { Page, Pageable, Pagination } from '@soundcore/common';
  */
 @Controller('tracklists')
 export class TracklistController {
-    constructor(private readonly service: TracklistService) {}
+    constructor(private readonly service: TracklistService) { }
 
     // /**
     //  * Endpoint for building a list of tracks of an artist
@@ -28,7 +29,7 @@ export class TracklistController {
     // public async findListByArtistTop(@Param("artistId") artistId: string, @Authentication() authentication: User, @Hostname() hostname: string): Promise<Tracklist> {
     //     return this.service.findListByArtistTop(artistId, hostname, authentication);
     // }
- 
+
     //  /**
     //   * Metadata endpoint of /artist/top/:artistId
     //   * @param artistId Artist's id

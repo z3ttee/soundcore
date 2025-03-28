@@ -1,4 +1,4 @@
-import { isUndefined } from "@soundcore/common";
+import { isUndefined } from "@repo/utilities";
 import { AccessorDecorator } from "../definitions";
 import { IndexAttribute } from "../entities/index-attr.entity";
 import { addSchemaAttribute } from "../utils/reflectUtils";
@@ -15,8 +15,8 @@ export function MeilisearchPK(keyOrOptions?: string | PrimaryKeyOptions): Access
     let keyName;
     let options: PropertyOptions;
 
-    if(!isUndefined(keyOrOptions)) {
-        if(typeof keyOrOptions === "string") {
+    if (!isUndefined(keyOrOptions)) {
+        if (typeof keyOrOptions === "string") {
             keyName = keyOrOptions;
         } else {
             keyName = keyOrOptions.name;

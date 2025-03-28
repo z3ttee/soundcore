@@ -2,7 +2,7 @@ import { Future, PlayableEntity, Song } from "@soundcore/sdk";
 import { SCNGXBaseTracklist } from "./tracklist-base.entity";
 import { HttpClient } from "@angular/common/http";
 import { Observable, filter } from "rxjs";
-import { isNull } from "@soundcore/common";
+import { isNull } from "@repo/utilities";
 
 /**
  * Tracklist class to handle tracklists by providing an integrated queueing system
@@ -54,7 +54,7 @@ export class SCNGXTracklist extends SCNGXBaseTracklist<SCNGXTracklist, Song> {
     public static create(owner: PlayableEntity, apiBaseUrl: string, httpClient: HttpClient, startAtOrShuffle?: (number | string) | boolean, generateShuffled?: boolean): Observable<Future<SCNGXTracklist>> {
         return new Observable((subscriber) => {
             // Check if owner is null
-            if(isNull(owner)) {
+            if (isNull(owner)) {
                 // If true, return 404 Future
                 subscriber.next(Future.notfound());
                 subscriber.complete();
@@ -62,7 +62,7 @@ export class SCNGXTracklist extends SCNGXBaseTracklist<SCNGXTracklist, Song> {
             }
 
             const startAt = typeof startAtOrShuffle === "number" || typeof startAtOrShuffle === "string" ? startAtOrShuffle : undefined;
-            const shuffle = typeof startAtOrShuffle === "boolean" ? startAtOrShuffle : (generateShuffled ?? false) 
+            const shuffle = typeof startAtOrShuffle === "boolean" ? startAtOrShuffle : (generateShuffled ?? false)
 
             // Send loading state first
             subscriber.next(Future.loading());
@@ -81,7 +81,7 @@ export class SCNGXTracklist extends SCNGXBaseTracklist<SCNGXTracklist, Song> {
     protected override dequeue() {
         // Check if the pointer already is at the end of the tracklist
         // If true, return null
-        if(this.hasEnded) return null;
+        if (this.hasEnded) return null;
         return this._queue.dequeue();
     }
 

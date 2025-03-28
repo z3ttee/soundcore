@@ -10,7 +10,7 @@ import { AddSongDTO } from '../dtos/add-song.dto';
 import { CreatePlaylistDTO } from '../dtos/create-playlist.dto';
 import { PlaylistItemAddResult } from '../entities/playlist-item-added.entity';
 import { Playlist } from '../entities/playlist.entity';
-import { Page, Pageable, isNull } from "@soundcore/common";
+import { Page, Pageable, isNull } from "@repo/utilities";
 import { Logger } from '../../logging';
 import { Future } from '../../utils/future/future';
 import { toFuture } from '../../utils/future';
@@ -44,7 +44,7 @@ export class SCSDKPlaylistService {
    * @returns Playlist
    */
   public findById(playlistId: string): Observable<Future<Playlist>> {
-    if(!playlistId) return of(Future.notfound());
+    if (!playlistId) return of(Future.notfound());
     return this.httpClient.get<Playlist>(`${this.options.api_base_uri}/v1/playlists/${playlistId}`).pipe(toFuture());
   }
 
@@ -55,7 +55,7 @@ export class SCSDKPlaylistService {
    * @returns Future<Page<Playlist>>
    */
   public findByArtist(artistId: string, pageable: Pageable): Observable<Future<Page<Playlist>>> {
-    if(!artistId) return of(Future.notfound());
+    if (!artistId) return of(Future.notfound());
     return this.httpClient.get<Page<Playlist>>(`${this.options.api_base_uri}/v1/playlists/byArtist/${artistId}${pageable.toQuery()}`).pipe(toFuture());
   }
 
@@ -64,8 +64,8 @@ export class SCSDKPlaylistService {
    * @param authorId Playlist author's id
    * @returns Playlist
    */
-   public findByAuthor(authorId: string, pageable: Pageable): Observable<Future<Page<Playlist>>> {
-    if(!authorId) return of(Future.notfound());
+  public findByAuthor(authorId: string, pageable: Pageable): Observable<Future<Page<Playlist>>> {
+    if (!authorId) return of(Future.notfound());
     return this.httpClient.get<Page<Playlist>>(`${this.options.api_base_uri}/v1/playlists/byAuthor/${authorId}${pageable.toQuery()}`).pipe(toFuture());
   }
 
@@ -91,7 +91,7 @@ export class SCSDKPlaylistService {
     return this.httpClient.post<Playlist>(`${this.options.api_base_uri}/v1/playlists`, createPlaylistDto).pipe(
       toFuture(),
       tap((response) => {
-        if(response.loading) return;
+        if (response.loading) return;
         this.addToLocalLibrary(response.data);
       })
     );
@@ -115,7 +115,7 @@ export class SCSDKPlaylistService {
     this.logger.log(`Fetching playlist library of current user...`);
 
     this.httpClient.get<Page<Playlist>>(`${this.options.api_base_uri}/v1/playlists/@me`).pipe(apiResponse()).subscribe((response) => {
-      if(response.error) {
+      if (response.error) {
         this.logger.error(`Could not fetch playlist library of current user: ${response.message}`, response.error);
         return;
       }
@@ -134,7 +134,7 @@ export class SCSDKPlaylistService {
    * @param playlist Playlist to add
    */
   private addToLocalLibrary(playlist: Playlist) {
-    if(isNull(playlist)) return;
+    if (isNull(playlist)) return;
     const playlists = this.librarySubject.getValue();
     playlists.push(playlist)
     this.librarySubject.next(playlists);

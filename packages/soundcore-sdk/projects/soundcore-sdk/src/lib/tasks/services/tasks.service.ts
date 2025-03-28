@@ -2,7 +2,7 @@ import { HttpClient } from "@angular/common/http";
 import { Inject, Injectable } from "@angular/core";
 import { Observable } from "rxjs";
 import { SCSDK_OPTIONS } from "../../constants";
-import { Page, Pageable } from "@soundcore/common";
+import { Page, Pageable } from "@repo/utilities";
 import { SCSDKOptions } from "../../scdk.module";
 import { Future, toFuture } from "../../utils/future";
 import { Task, TaskDefinition } from "../entities/task.entity";
@@ -13,7 +13,7 @@ export class SCSDKTasksService {
     constructor(
         private readonly httpClient: HttpClient,
         @Inject(SCSDK_OPTIONS) private readonly options: SCSDKOptions
-    ) {}
+    ) { }
 
     /**
      * Find a list of tasks. The list is ordered by the last update date in the database to

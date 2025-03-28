@@ -1,5 +1,5 @@
 import { Logger, Provider } from "@nestjs/common";
-import { isUndefined, pascalToSnakeCase } from "@soundcore/common";
+import { isUndefined, pascalToSnakeCase } from "@repo/utilities";
 import { Config, IndexObject } from "meilisearch";
 import { IndexOptions } from "../decorators/meilisearch.decorator";
 import { IndexSchema } from "../definitions";

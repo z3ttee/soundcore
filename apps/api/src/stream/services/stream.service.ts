@@ -9,7 +9,7 @@ import { Stream } from '../entities/stream.entity';
 import { LessThanOrEqual, Repository } from 'typeorm';
 import { FileService } from '../../file/services/file.service';
 import { FileSystemService } from "../../filesystem/services/filesystem.service";
-import { Environment } from "@soundcore/common";
+import { Environment } from "@repo/bootstrap";
 import { CreateStreamDTO } from "../dtos/create-stream.dto";
 import { User } from "../../user/entities/user.entity";
 import { Song } from "../../song/entities/song.entity";
@@ -23,7 +23,7 @@ export class StreamService {
         private readonly fileService: FileService,
         private readonly fileSystem: FileSystemService,
         @InjectRepository(Stream) private readonly repository: Repository<Stream>,
-    ){}
+    ) { }
 
     public async createIfNotExists(createStreamDto: CreateStreamDTO) {
         const stream = new Stream();
@@ -36,8 +36,8 @@ export class StreamService {
             .orIgnore()
             .values(stream)
             .execute().then((insertResult) => {
-                if(insertResult.identifiers.length > 0) {
-                    if(Environment.isDebug) {
+                if (insertResult.identifiers.length > 0) {
+                    if (Environment.isDebug) {
                         this.logger.debug(`Successfully saved stream record for user ${createStreamDto.listenerId}`);
                     }
                 } else {
@@ -55,14 +55,14 @@ export class StreamService {
         });
 
         return this.fileService.findBySongId(token.songId).then(async (file) => {
-            if(!file) throw new NotFoundException("Song not found.");
+            if (!file) throw new NotFoundException("Song not found.");
 
             // Get file's path
             const filePath = this.fileSystem.resolveFilepath(file);
 
             // Get file stats
             let filesize = file.size;
-            if(filesize <= 0) {
+            if (filesize <= 0) {
                 // Try resolving the filesize by looking up file stats
                 const stat = await this.fileSystem.stats(filePath).catch(() => null);
                 filesize = stat?.size || 0;
@@ -70,8 +70,8 @@ export class StreamService {
 
             let readableStream: fs.ReadStream;
 
-            if(request.headers.range) {    
-                if(Environment.isDebug) {
+            if (request.headers.range) {
+                if (Environment.isDebug) {
                     this.logger.debug(`Received "Content-Range" header. Serving file in requested range.`);
                 }
 
@@ -79,12 +79,12 @@ export class StreamService {
                 const parts = range.replace(/bytes=/, "").split("-");
                 const partialstart = parts[0];
                 const partialend = parts[1];
-          
+
                 const start = parseInt(partialstart, 10);
-                const end = partialend ? parseInt(partialend, 10) : filesize-1;
-                const chunksize = (end-start)+1;
-                readableStream = fs.createReadStream(filePath, {start: start, end: end});
-                
+                const end = partialend ? parseInt(partialend, 10) : filesize - 1;
+                const chunksize = (end - start) + 1;
+                readableStream = fs.createReadStream(filePath, { start: start, end: end });
+
                 response.writeHead(206, {
                     'Content-Range': 'bytes ' + start + '-' + end + '/' + filesize,
                     'Accept-Ranges': 'bytes', 'Content-Length': chunksize,
@@ -94,7 +94,7 @@ export class StreamService {
                 readableStream = fs.createReadStream(filePath)
             }
 
-            if(!this.tokenService.isExpired(token)) {
+            if (!this.tokenService.isExpired(token)) {
                 // If the internal expiry is still valid, create new stream record 
                 // to track user's stream history
                 this.createIfNotExists({
@@ -113,7 +113,7 @@ export class StreamService {
 
     public async clearStreamRecords() {
         const startTime = Date.now();
-        const pivotDateMs = startTime - (1000*60*60*24*30);
+        const pivotDateMs = startTime - (1000 * 60 * 60 * 24 * 30);
 
         return this.repository.delete({
             listenedAt: LessThanOrEqual(pivotDateMs)

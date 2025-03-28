@@ -3,7 +3,8 @@ import { Authentication } from '../../authentication/decorators/authentication.d
 import { User } from '../../user/entities/user.entity';
 import { TracklistV2Service } from '../services/tracklist-v2.service';
 import { PlayableEntityType } from '../entities/playable.entity';
-import { Pageable, Pagination } from '@soundcore/common';
+import { Pageable } from '@repo/utilities';
+import { Pagination } from '@repo/nestjs';
 
 /**
  * Controller class that contains
@@ -17,7 +18,7 @@ export class TracklistV2Controller {
 
     constructor(
         private readonly service: TracklistV2Service
-    ) {}
+    ) { }
 
     /**
      * Find a tracklist by ownerId and ownerType. An owner usually is a resource

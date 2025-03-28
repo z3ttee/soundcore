@@ -1,14 +1,15 @@
 import { Controller, Get, Param } from "@nestjs/common";
-import { Pageable, Pagination } from "@soundcore/common";
+import { Pageable } from "@repo/utilities";
 import { Roles } from "../../authentication/decorators/role.decorator";
 import { TasksService } from "../services/tasks.service";
+import { Pagination } from '@repo/nestjs';
 
 @Controller("tasks")
 export class TasksController {
 
     constructor(
         private readonly service: TasksService
-    ) {}
+    ) { }
 
     @Roles("admin")
     @Get()

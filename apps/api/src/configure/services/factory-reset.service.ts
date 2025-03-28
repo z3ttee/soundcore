@@ -1,5 +1,5 @@
 import { Injectable, Logger } from "@nestjs/common";
-import { isUndefined } from "@soundcore/common";
+import { isUndefined } from "@repo/utilities";
 import Database from "../../utils/database/database-worker-client";
 import MeilisearchClient from "../../utils/database/meilisearch-worker-client";
 
@@ -19,7 +19,7 @@ export class FactoryResetService {
                 throw error;
             });
         }).finally(() => {
-            if(exitOnCompletion) this.shutdownApplication();
+            if (exitOnCompletion) this.shutdownApplication();
         });
     }
 
@@ -34,7 +34,7 @@ export class FactoryResetService {
         }).then(() => {
             return true;
         }).finally(() => {
-            if(exitOnCompletion) this.shutdownApplication();
+            if (exitOnCompletion) this.shutdownApplication();
         });
     }
 
@@ -44,8 +44,8 @@ export class FactoryResetService {
         await this.resetDatabase(false).catch((err) => error = err);
         await this.resetMeilisearch(false).catch((err) => error = err);
 
-        if(!isUndefined(error)) throw error;
-        if(exitOnCompletion) this.shutdownApplication();
+        if (!isUndefined(error)) throw error;
+        if (exitOnCompletion) this.shutdownApplication();
         return true;
     }
 

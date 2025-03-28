@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Pageable } from '@soundcore/common';
+import { Pageable } from '@repo/utilities';
 import { SCDKNotificationService } from '@soundcore/sdk';
 
 @Component({

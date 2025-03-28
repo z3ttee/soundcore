@@ -1,6 +1,6 @@
 import { HttpClient } from "@angular/common/http";
 import { Inject, Injectable } from "@angular/core";
-import { Page, Pageable } from "@soundcore/common";
+import { Page, Pageable } from "@repo/utilities";
 import { Observable } from "rxjs";
 import { SCSDK_OPTIONS } from "../../constants";
 import { Playlist } from "../../playlist/entities/playlist.entity";
@@ -14,7 +14,7 @@ export class SCSDKLibraryService {
     constructor(
         private httpClient: HttpClient,
         @Inject(SCSDK_OPTIONS) private readonly options: SCSDKOptions
-    ) {}
+    ) { }
 
     public buildDatasourceUrl(userId?: string): string {
         return `${this.options.api_base_uri}/v1/libraries/${userId}`;

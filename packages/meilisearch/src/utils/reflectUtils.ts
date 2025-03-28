@@ -1,5 +1,5 @@
 import { Logger } from "@nestjs/common";
-import { isUndefined } from "@soundcore/common";
+import { isUndefined } from "@repo/utilities";
 import { REFLECT_MEILIINDEX_ATTRIBUTES, REFLECT_MEILIINDEX_OPTIONS, REFLECT_MEILIINDEX_RELATIONS } from "../constants";
 import { IndexOptions } from "../decorators/meilisearch.decorator";
 import { IndexSchema } from "../definitions";
@@ -15,7 +15,7 @@ export function setSchemaRelations(schema: IndexSchema, attrs: Map<string, Index
 
 export function addSchemaRelation(schema: IndexSchema, relation: IndexAttributeRelation) {
     const attrs = getSchemaRelations(schema);
-    if(attrs.has(relation.attrName)) return;
+    if (attrs.has(relation.attrName)) return;
     attrs.set(relation.attrName, relation);
     setSchemaRelations(schema, attrs);
 }
@@ -30,7 +30,7 @@ export function setSchemaAttributes(schema: IndexSchema, attrs: Map<string, Inde
 
 export function addSchemaAttribute(schema: IndexSchema, attr: IndexAttribute) {
     const attrs = getSchemaAttributes(schema);
-    if(attrs.has(attr.attrName)) return;
+    if (attrs.has(attr.attrName)) return;
     attrs.set(attr.attrName, attr);
     setSchemaAttributes(schema, attrs);
 }
@@ -55,16 +55,16 @@ export function getIndexOptions(schema: IndexSchema): IndexOptions {
 
 export function getAllSchemaAttributes(schema: IndexSchema, logger?: Logger): Map<string, IndexAttribute> {
     const attrs = new Map(getSchemaAttributes(schema));
-    
-    for(const relation of getSchemaRelations(schema).values()) {
+
+    for (const relation of getSchemaRelations(schema).values()) {
         const relationSchema = relation.relationSchema;
-        if(isUndefined(relationSchema)) {
-          logger?.warn(`Cannot find schema for relation '${relation.attrName}' (${relation.type}). Did you forget to decorate the relation-class-type using @MeiliIndex()?`);
-          continue;
+        if (isUndefined(relationSchema)) {
+            logger?.warn(`Cannot find schema for relation '${relation.attrName}' (${relation.type}). Did you forget to decorate the relation-class-type using @MeiliIndex()?`);
+            continue;
         }
 
         const relationAttrs = getSchemaAttributes(relationSchema);
-        for(const attr of relationAttrs.values()) {
+        for (const attr of relationAttrs.values()) {
             const attrCopy: IndexAttribute = {
                 ...attr,
                 isPrimary: false,

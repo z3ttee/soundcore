@@ -1,14 +1,15 @@
 import { Controller, Get, Param, Query } from '@nestjs/common';
-import { isNull, Page, Pageable, Pagination } from '@soundcore/common';
+import { isNull, Page, Pageable } from '@repo/utilities';
 import { Authentication } from '../../authentication/decorators/authentication.decorator';
 import { Public } from '../../authentication/decorators/public.decorator';
 import { User } from '../../user/entities/user.entity';
 import { Song } from '../entities/song.entity';
 import { SongService } from '../services/song.service';
+import { Pagination } from '@repo/nestjs';
 
 @Controller('songs')
 export class SongController {
-  constructor(private readonly songService: SongService) {}
+  constructor(private readonly songService: SongService) { }
 
   @Get("latest")
   public async findLatest(@Authentication() user: User): Promise<Page<Song>> {

@@ -9,7 +9,7 @@ import { FileSystemService } from "../../../filesystem/services/filesystem.servi
 import { MountRegistryService } from "../../../mount/services/mount-registry.service";
 import { MountRegistry } from "../../../mount/entities/mount-registry.entity";
 import { FileDTO } from "../../../file/dto/file.dto";
-import { Batch, isNull } from "@soundcore/common";
+import { Batch, isNull } from "@repo/utilities";
 import { File, FileFlag } from "../../../file/entities/file.entity";
 import { FileService } from "../../../file/services/file.service";
 import { STAGE_SCAN_ID, STEP_LOOKUP_FILES_ID } from "../../pipelines";

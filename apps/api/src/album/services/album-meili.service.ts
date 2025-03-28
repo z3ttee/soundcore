@@ -1,6 +1,6 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Page, Pageable } from "@soundcore/common";
+import { Page, Pageable } from "@repo/utilities";
 import { InjectIndex, MeiliIndex } from "@repo/meilisearch";
 import { Repository } from "typeorm";
 import { MeilisearchBaseService } from "../../meilisearch/services/meili.service";

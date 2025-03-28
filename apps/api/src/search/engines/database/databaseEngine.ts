@@ -1,4 +1,4 @@
-import { Pageable, Page } from "@soundcore/common";
+import { Pageable, Page } from "@repo/utilities";
 import { SearchEngine } from "../engine";
 
 export class DatabaseSearchEngine extends SearchEngine {

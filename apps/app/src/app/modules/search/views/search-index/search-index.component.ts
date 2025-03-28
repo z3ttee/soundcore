@@ -6,7 +6,7 @@ import { combineLatest, debounceTime, Observable, of, Subject, switchMap, takeUn
 import { SCCDKScreenService } from '@soundcore/cdk';
 import { SCDKGenreService, MeiliAlbum, MeiliArtist, SCSDKSearchService, SCDKResource, MeiliPlaylist, MeiliUser, SCDKUserService, SCDKAlbumService, MeiliSong, SCSDKSongService, SCSDKPlaylistService, SCSDKArtistService } from '@soundcore/sdk';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { Pageable } from '@soundcore/common';
+import { Pageable } from '@repo/utilities';
 
 interface SearchIndexProps {
   query?: string;
@@ -76,7 +76,7 @@ export class SearchIndexComponent implements OnInit, OnDestroy {
             playlists: playlistSearchReq?.payload?.hits ?? [],
             users: userSearchReq?.payload?.hits ?? []
           }
-          
+
           subscriber.next({
             hits: hits,
             query: query,
@@ -112,7 +112,7 @@ export class SearchIndexComponent implements OnInit, OnDestroy {
 
   public removeFromSearch(song: MeiliSong) {
     this.searchService.removeFromHistory(song).pipe(takeUntil(this.$destroy)).subscribe((wasRemoved) => {
-      if(wasRemoved) {
+      if (wasRemoved) {
         this.snackbar.open(`Eintrag aus Suchverlauf gelöscht`, null, { duration: 5000 });
       } else {
         this.snackbar.open(`Es ist ein Fehler aufgetreten`, null, { duration: 5000 });

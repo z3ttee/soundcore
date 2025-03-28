@@ -1,6 +1,6 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Page, Pageable } from '@soundcore/common';
+import { Page, Pageable } from '@repo/utilities';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 import { CreateResult } from '../../utils/results/creation.result';
 import { CreateGenreDTO } from '../dtos/create-genre.dto';
@@ -13,7 +13,7 @@ export class GenreService {
 
     constructor(
         @InjectRepository(Genre) private readonly repository: Repository<Genre>
-    ) {}
+    ) { }
 
     /**
      * Find a page of genres
@@ -79,12 +79,12 @@ export class GenreService {
      * @param createGenreDto Genre data to create
      * @returns Genre
      */
-     public async createIfNotExists(createGenreDto: CreateGenreDTO): Promise<CreateResult<Genre>> {
+    public async createIfNotExists(createGenreDto: CreateGenreDTO): Promise<CreateResult<Genre>> {
         createGenreDto.name = createGenreDto.name.trim();
         createGenreDto.description = createGenreDto.description?.trim();
 
         const existingGenre = await this.findByName(createGenreDto.name);
-        if(existingGenre) return new CreateResult(existingGenre, true); 
+        if (existingGenre) return new CreateResult(existingGenre, true);
 
         const genre = this.repository.create();
         genre.name = createGenreDto.name;
@@ -96,7 +96,7 @@ export class GenreService {
             .values(genre)
             .orIgnore()
             .execute().then((result) => {
-                if(result.identifiers.length > 0) {
+                if (result.identifiers.length > 0) {
                     return new CreateResult(genre, false);
                 }
                 return this.findByName(createGenreDto.name).then((genre) => new CreateResult(genre, true));
@@ -117,7 +117,7 @@ export class GenreService {
         updateGenreDto.description = updateGenreDto.description?.trim();
 
         const genre = await this.findById(genreId);
-        if(!genre) throw new NotFoundException("Genre not found.");
+        if (!genre) throw new NotFoundException("Genre not found.");
 
         genre.name = updateGenreDto.name;
         // genre.geniusId = updateGenreDto.geniusId;

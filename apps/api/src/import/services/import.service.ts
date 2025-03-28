@@ -3,7 +3,7 @@ import { ImportTask, ImportTaskStatus, ImportTaskType } from '../entities/import
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '../../user/entities/user.entity';
-import { Page, Pageable } from '@soundcore/common';
+import { Page, Pageable } from '@repo/utilities';
 
 @Injectable()
 export class ImportService {
@@ -11,7 +11,7 @@ export class ImportService {
 
     constructor(
         @InjectRepository(ImportTask) private readonly repository: Repository<ImportTask>
-    ) {}
+    ) { }
 
     /**
      * Get repository.
@@ -79,7 +79,7 @@ export class ImportService {
      * @param stats Stats to set
      * @returns Updated import task
      */
-     public async setTaskStats(task: ImportTask, stats: any) {
+    public async setTaskStats(task: ImportTask, stats: any) {
         return this.repository.update(task.id, {
             stats: stats
         }).then(() => {
@@ -108,7 +108,7 @@ export class ImportService {
      * @returns True or False
      */
     public async deleteById(taskId: string, authentication: User): Promise<boolean> {
-        return this.repository.createQueryBuilder("task")  
+        return this.repository.createQueryBuilder("task")
             .leftJoin("task.user", "user")
             .delete()
             .where("id = :taskId AND user.id = :userId", { taskId, userId: authentication.id })
@@ -127,7 +127,7 @@ export class ImportService {
         return this.repository.createQueryBuilder()
             .update()
             .set({ status: ImportTaskStatus.SERVER_ABORT })
-            .where("status IN(:status)", { status: [ ImportTaskStatus.ENQUEUED, ImportTaskStatus.PROCESSING ] })
+            .where("status IN(:status)", { status: [ImportTaskStatus.ENQUEUED, ImportTaskStatus.PROCESSING] })
             .execute()
     }
 
@@ -136,10 +136,10 @@ export class ImportService {
      * than 7days
      */
     public async clearOldImports() {
-        const datePrior7daysMs = Date.now() - (1000*60*60*24*7);
+        const datePrior7daysMs = Date.now() - (1000 * 60 * 60 * 24 * 7);
         return this.repository.createQueryBuilder()
             .delete()
-            .where("createdAt <= :datePrior7daysMs AND status NOT IN (:status)", { datePrior7daysMs, status: [ ImportTaskStatus.PROCESSING, ImportTaskStatus.ENQUEUED ] })
+            .where("createdAt <= :datePrior7daysMs AND status NOT IN (:status)", { datePrior7daysMs, status: [ImportTaskStatus.PROCESSING, ImportTaskStatus.ENQUEUED] })
             .execute();
     }
 

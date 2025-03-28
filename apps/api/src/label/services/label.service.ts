@@ -1,6 +1,6 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Page, Pageable } from '@soundcore/common';
+import { Page, Pageable } from '@repo/utilities';
 import { In, Repository } from 'typeorm';
 import { Artwork } from '../../artwork/entities/artwork.entity';
 import { MeilisearchFlag } from '../../utils/entities/meilisearch.entity';
@@ -15,7 +15,7 @@ export class LabelService {
 
     constructor(
         @InjectRepository(Label) private readonly repository: Repository<Label>
-    ){ }
+    ) { }
 
     /**
      * Find a label by its id.
@@ -82,7 +82,7 @@ export class LabelService {
         createLabelDto.description = createLabelDto.description?.trim();
 
         const existingLabel = await this.findByName(createLabelDto.name);
-        if(existingLabel) return new CreateResult(existingLabel, true); 
+        if (existingLabel) return new CreateResult(existingLabel, true);
 
         const label = this.repository.create();
         label.name = createLabelDto.name;
@@ -94,7 +94,7 @@ export class LabelService {
             .values(label)
             .orIgnore()
             .execute().then((result) => {
-                if(result.identifiers.length > 0) {
+                if (result.identifiers.length > 0) {
                     return new CreateResult(label, false);
                 }
                 return this.findByName(createLabelDto.name).then((label) => new CreateResult(label, true));
@@ -115,7 +115,7 @@ export class LabelService {
         updateLabelDto.description = updateLabelDto.description?.trim();
 
         const label = await this.findById(labelId);
-        if(!label) throw new NotFoundException("Label not found.");
+        if (!label) throw new NotFoundException("Label not found.");
 
         label.name = updateLabelDto.name;
         // label.geniusId = updateLabelDto.geniusId;
@@ -147,7 +147,7 @@ export class LabelService {
      */
     public async setArtwork(idOrObject: string | Label, artwork: Artwork): Promise<Label> {
         const label = await this.resolveLabel(idOrObject);
-        if(!label) throw new NotFoundException("Label not found.");
+        if (!label) throw new NotFoundException("Label not found.");
 
         label.artwork = artwork;
         return this.repository.save(label);
@@ -159,7 +159,7 @@ export class LabelService {
      * @returns Label
      */
     protected async resolveLabel(idOrObject: string | Label): Promise<Label> {
-        if(typeof idOrObject == "string") {
+        if (typeof idOrObject == "string") {
             return this.findById(idOrObject);
         }
 

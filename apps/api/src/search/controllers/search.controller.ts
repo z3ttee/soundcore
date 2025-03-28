@@ -1,8 +1,9 @@
 import { Controller, Get, Query } from '@nestjs/common';
-import { Pageable, Pagination } from '@soundcore/common';
+import { Pageable } from '@repo/utilities';
 import { Authentication } from '../../authentication/decorators/authentication.decorator';
 import { User } from '../../user/entities/user.entity';
 import { SearchService } from '../services/search.service';
+import { Pagination } from '@repo/nestjs';
 
 @Controller('search')
 export class SearchController {

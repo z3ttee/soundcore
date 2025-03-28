@@ -1,4 +1,4 @@
-import { isNull } from "@soundcore/common";
+import { isNull } from "@repo/utilities";
 import { BehaviorSubject, combineLatest, debounceTime, distinctUntilChanged, map, skip } from "rxjs";
 import { DEFAULT_VOLUME, LOCALSTORAGE_KEY_VOLUME } from "src/app/constants";
 
@@ -16,10 +16,10 @@ export class VolumeManager {
         this._volume.asObservable(),
         this._mute.asObservable()
     ]).pipe(
-        map(([volume, isMuted]) => volume <= 0 || isMuted), 
+        map(([volume, isMuted]) => volume <= 0 || isMuted),
         distinctUntilChanged()
     )
-    
+
     constructor(
         private readonly audio: HTMLAudioElement,
         defaultVolume: number = DEFAULT_VOLUME
@@ -40,7 +40,7 @@ export class VolumeManager {
 
     public setVolume(volume: number) {
         let value = volume ?? DEFAULT_VOLUME;
-        if(value > 1) {
+        if (value > 1) {
             value = volume / 100;
         }
 
@@ -52,14 +52,14 @@ export class VolumeManager {
     public toggleMute() {
         const isMuted = this._mute.getValue();
 
-        if(isMuted) {
+        if (isMuted) {
             // Reset to previous volume and
             // push new muted state
             this.audio.volume = this._volume.getValue();
             this._mute.next(false);
             return;
         }
-        
+
         // Otherwise set volume to 0 and
         // push new muted state
         this.audio.volume = 0;
@@ -68,19 +68,19 @@ export class VolumeManager {
 
     private persist(volume: number) {
         // Check if localStorage API is supported by browser
-        if(isNull(localStorage)) {
+        if (isNull(localStorage)) {
             // If not supported, return and print message in console for debugging
             console.log("LocalStorage is not supported by browser. Cannot persist volume state.");
             return;
         }
 
         // Save to localStorage
-        localStorage.setItem(LOCALSTORAGE_KEY_VOLUME, `${volume/100}`);
+        localStorage.setItem(LOCALSTORAGE_KEY_VOLUME, `${volume / 100}`);
     }
 
     private read(): number {
         // Check if localStorage API is supported by browser
-        if(isNull(localStorage)) {
+        if (isNull(localStorage)) {
             // If not supported, return and print message in console for debugging
             console.log("LocalStorage is not supported by browser. Cannot read volume state.");
             return this.defaultVolume;
@@ -89,8 +89,8 @@ export class VolumeManager {
         // Read persisted volume
         const volume = localStorage.getItem(LOCALSTORAGE_KEY_VOLUME);
         // Check if value exists, if not, return default volume
-        if(isNull(volume)) return this.defaultVolume;
-        
+        if (isNull(volume)) return this.defaultVolume;
+
         // Return value read from localStorage
         return Math.max(0, Math.min(100, Number(volume)));
     }

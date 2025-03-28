@@ -1,13 +1,14 @@
 import { Controller, Get, Post } from "@nestjs/common";
-import { Pageable, Pagination } from "@soundcore/common";
+import { Pageable } from "@repo/utilities";
 import { Authentication } from "../../authentication/decorators/authentication.decorator";
 import { User } from "../../user/entities/user.entity";
 import { NotificationService } from "../services/notification.service";
+import { Pagination } from '@repo/nestjs';
 
 @Controller("notifications")
 export class NotificationController {
 
-    constructor(private readonly notificationService: NotificationService) {}
+    constructor(private readonly notificationService: NotificationService) { }
 
     @Get("@me")
     public async findByCurrentUser(@Authentication() authentication: User, @Pagination() pageable: Pageable) {

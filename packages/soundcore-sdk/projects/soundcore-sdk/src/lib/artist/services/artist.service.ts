@@ -8,7 +8,7 @@ import { ApiResponse } from "../../utils/responses/api-response";
 import { apiResponse } from "../../utils/rxjs/operators/api-response";
 import { Artist } from "../entities/artist.entity";
 import { SCSDK_OPTIONS } from "../../constants";
-import { Pageable } from "@soundcore/common";
+import { Pageable } from "@repo/utilities";
 import { Future } from "../../utils/future/future";
 import { toFuture } from "../../utils/future";
 
@@ -26,7 +26,7 @@ export class SCSDKArtistService {
    * @returns Observable<Artist>
    */
   public findById(artistId: string): Observable<Future<Artist>> {
-    if(!artistId) return of(Future.notfound());
+    if (!artistId) return of(Future.notfound());
     return this.httpClient.get<Artist>(`${this.options.api_base_uri}/v1/artists/${artistId}`).pipe(toFuture())
   }
 

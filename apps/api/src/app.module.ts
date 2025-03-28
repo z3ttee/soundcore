@@ -29,7 +29,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { HostnameModule } from './hostname/hostname.module';
 import { CronModule } from './cron/cron.module';
-import { Environment } from '@soundcore/common';
+import { Environment } from '@repo/bootstrap';
 import { WorkerQueueModule } from '@repo/queue';
 import { TracklistModule } from './tracklist/tracklist.module';
 import { PipelineModule } from '@repo/pipelines';
@@ -73,36 +73,39 @@ import { ConfigureModule } from './configure/configure.module';
       charset: "utf8mb4",
     }),
     MeilisearchModuleNEXT.forRootAsync({
-      useFactory: (configService: ConfigService) => ({
-        host: process.env.MEILISEARCH_HOST,
-        port: process.env.MEILISEARCH_PORT ? parseInt(process.env.MEILISEARCH_PORT) : null,
-        key: process.env.MEILISEARCH_KEY,
-        indexPrefix: "sc_"
-      })
-    }),
+      useFactory: ()
+    })
+    // MeilisearchModuleNEXT.forRootAsync({
+    //   useFactory: (configService: ConfigService) => ({
+    //     host: process.env.MEILISEARCH_HOST,
+    //     port: process.env.MEILISEARCH_PORT ? parseInt(process.env.MEILISEARCH_PORT) : null,
+    //     key: process.env.MEILISEARCH_KEY,
+    //     indexPrefix: "sc_"
+    //   })
+    // }),
     MeilisearchModule,
     CronModule,
-    WorkerQueueModule.forRootAsync({
-      useFactory: () => ({
-        defaultQueueOptions: {
-          concurrent: 1,
-          workerType: "thread",
-          debounceMs: 500
-        }
-      })
-    }),
-    PipelineModule.forRootAsync({
-      inject: [FileSystemService],
-      useFactory: async (fsService: FileSystemService) => {
-        return {
-          // Enable stdout on dev mode
-          enableStdout: !Environment.isProduction,
-          // Disable file logs on dev environment
-          disableFileLogs: !Environment.isProduction,
-          logsDirectory: fsService.getLogsDir()
-        }
-      }
-    }),
+    // WorkerQueueModule.forRootAsync({
+    //   useFactory: () => ({
+    //     defaultQueueOptions: {
+    //       concurrent: 1,
+    //       workerType: "thread",
+    //       debounceMs: 500
+    //     }
+    //   })
+    // }),
+    // PipelineModule.forRootAsync({
+    //   inject: [FileSystemService],
+    //   useFactory: async (fsService: FileSystemService) => {
+    //     return {
+    //       // Enable stdout on dev mode
+    //       enableStdout: !Environment.isProduction,
+    //       // Disable file logs on dev environment
+    //       disableFileLogs: !Environment.isProduction,
+    //       logsDirectory: fsService.getLogsDir()
+    //     }
+    //   }
+    // }),
     EventEmitterModule.forRoot({ global: true, ignoreErrors: true }),
     ArtistModule,
     ZoneModule,

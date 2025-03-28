@@ -6,7 +6,7 @@ import ffprobeStatic from "ffprobe-static";
 import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from "@nestjs/typeorm";
 import { In, Repository, SelectQueryBuilder } from "typeorm";
-import { Environment, fisherYatesArray, isNull, isString, Page, Pageable } from "@soundcore/common";
+import { fisherYatesArray, isNull, isString, Page, Pageable } from "@repo/utilities";
 import { SyncableService } from "../../utils/services/syncing.service";
 import { Song } from "../entities/song.entity";
 import { User } from "../../user/entities/user.entity";
@@ -18,6 +18,7 @@ import { FileFlag } from "../../file/entities/file.entity";
 import { GeniusFlag } from "../../utils/entities/genius.entity";
 import { MeilisearchFlag } from "../../utils/entities/meilisearch.entity";
 import { TRACKLIST_ARTIST_TOP_SIZE } from "../../constants";
+import { Environment } from "@repo/bootstrap";
 
 @Injectable()
 export class SongService implements SyncableService<Song> {
@@ -26,7 +27,7 @@ export class SongService implements SyncableService<Song> {
     constructor(
         @InjectRepository(Song) private readonly repository: Repository<Song>,
         // private readonly meilisearch: MeiliSongService
-    ){}
+    ) { }
 
     /**
      * Find page with the 20 latest indexed songs.
@@ -79,7 +80,7 @@ export class SongService implements SyncableService<Song> {
     }
 
     public async findByGeneric<T = Song>(idsQuery: SelectQueryBuilder<T>, findQuery: SelectQueryBuilder<T>, findIncludeQuery: SelectQueryBuilder<T>, pageable: Pageable, authentication?: User, seed?: number, startWithId?: string): Promise<Page<T>> {
-        if(!isNull(seed) && isNaN(seed)) throw new BadRequestException("Invalid seed found. Must be an integer")
+        if (!isNull(seed) && isNaN(seed)) throw new BadRequestException("Invalid seed found. Must be an integer")
 
         // If a offset should be included, lower the limit by one
         const shouldStartWithId = isString(startWithId);
@@ -89,24 +90,24 @@ export class SongService implements SyncableService<Song> {
         // Add page settings to query
         idsQuery = idsQuery.offset(offset).limit(limit);
         // Add seed, used to create shuffled tracklist
-        if(!isNaN(seed)) {
+        if (!isNaN(seed)) {
             idsQuery = idsQuery.orderBy(`RAND(${seed})`);
         }
 
         // Find ids and use these ids to fetch metadata
         return idsQuery.getManyAndCount().then(([ids, total]) => {
-            
+
             findQuery = findQuery.whereInIds(ids);
-            findIncludeQuery = shouldStartWithId ? findIncludeQuery.where(`${findIncludeQuery.alias}.id = :id`, { 
-                id: startWithId 
+            findIncludeQuery = shouldStartWithId ? findIncludeQuery.where(`${findIncludeQuery.alias}.id = :id`, {
+                id: startWithId
             }) : undefined;
 
             // Add seed, used to create shuffled tracklist
-            if(!isNaN(seed)) findQuery = findQuery.orderBy(`RAND(${seed})`);
+            if (!isNaN(seed)) findQuery = findQuery.orderBy(`RAND(${seed})`);
 
             // Fetch metadata
             return findQuery.getMany().then((tracks) => Page.of(tracks, total, pageable)).then((page) => {
-                if(isNull(findIncludeQuery)) return page;
+                if (isNull(findIncludeQuery)) return page;
                 // Find included item
                 return findIncludeQuery.getOne().then((song) => {
                     // Add to top of page
@@ -135,7 +136,7 @@ export class SongService implements SyncableService<Song> {
 
         const findQuery = this.buildGeneralQuery("song").orderBy("song.order", "ASC");
         const findIncludeQuery = this.buildGeneralQuery("song", authentication).orderBy("song.order", "ASC")
-        
+
         return this.findByGeneric(idsQuery, findQuery, findIncludeQuery, pageable, authentication, seed, startWithId);
     }
 
@@ -266,7 +267,7 @@ export class SongService implements SyncableService<Song> {
             // Create items variable
             let items = page.items;
             // Check if seed is provided
-            if(!isNull(seed)) {
+            if (!isNull(seed)) {
                 // Extract first item
                 const firstItem = page.items.splice(0, 1)[0];
                 // If a seed is provided, then return a shuffled result
@@ -367,15 +368,15 @@ export class SongService implements SyncableService<Song> {
             .leftJoin("song.artists", "artist")
 
             .addSelect(["index.id", "album.id", "album.title", "artist.id", "artist.name", "likedBy.likedAt"])
-            
+
             .where("likedBy.userId = :userId", { userId: user?.id })
 
             .skip(pageable.offset)
             .take(pageable.limit)
             .orderBy("likedBy.likedAt", "DESC")
-        
+
         // Take artistId into account if it exists
-        if(artistId) qb = qb.andWhere("artist.id = :artistId", { artistId });
+        if (artistId) qb = qb.andWhere("artist.id = :artistId", { artistId });
 
         // Count available elements
         let countQb = await this.repository.createQueryBuilder("song")
@@ -385,8 +386,8 @@ export class SongService implements SyncableService<Song> {
             .where("likedBy.userId = :userId", { userId: user?.id })
 
         // Take artistId into account if it exists
-        if(artistId) countQb = countQb.leftJoin("song.artists", "artist").andWhere("artist.id = :artistId", { artistId });
-            
+        if (artistId) countQb = countQb.leftJoin("song.artists", "artist").andWhere("artist.id = :artistId", { artistId });
+
         const totalElements = await countQb.getCount();
 
         // Execute fetch query
@@ -413,8 +414,8 @@ export class SongService implements SyncableService<Song> {
             .where("likedBy.userId = :userId", { userId: user?.id })
             .orderBy("likedBy.likedAt", "DESC")
             .select(["song.id"])
-            
-        if(artistId) qb = qb.leftJoin("song.artists", "artist").andWhere("artist.id = :artistId", { artistId })
+
+        if (artistId) qb = qb.leftJoin("song.artists", "artist").andWhere("artist.id = :artistId", { artistId })
         const result = await qb.getManyAndCount();
         return Page.of(result[0], result[1])
     }
@@ -449,10 +450,10 @@ export class SongService implements SyncableService<Song> {
             .leftJoin("song.album", "album").addSelect(["album.id", "album.slug", "album.name"])
             .leftJoin("song.primaryArtist", "primaryArtist").addSelect(["primaryArtist.id", "primaryArtist.slug", "primaryArtist.name"])
             .leftJoin("song.featuredArtists", "featuredArtists").addSelect(["featuredArtists.id", "featuredArtists.slug", "featuredArtists.name"])
-            .leftJoin("song.genres", "genre").addSelect(["genre.id","genre.slug","genre.name"])
+            .leftJoin("song.genres", "genre").addSelect(["genre.id", "genre.slug", "genre.name"])
 
             .where("song.lastSyncFlag = :flag", { flag })
-            
+
             .skip(pageable.offset)
             .take(pageable.limit)
             .getManyAndCount();
@@ -467,8 +468,8 @@ export class SongService implements SyncableService<Song> {
      * @param createSongDto Song data to be saved
      * @returns Song[]
      */
-    public async createIfNotExists(dtos: (CreateSongDTO | Song)[], qb?: (query: SelectQueryBuilder<Song>, alias: string) => SelectQueryBuilder<Song> ): Promise<Song[]> {
-        if(dtos.length <= 0) throw new BadRequestException("Cannot create resources for empty list.");
+    public async createIfNotExists(dtos: (CreateSongDTO | Song)[], qb?: (query: SelectQueryBuilder<Song>, alias: string) => SelectQueryBuilder<Song>): Promise<Song[]> {
+        if (dtos.length <= 0) throw new BadRequestException("Cannot create resources for empty list.");
 
         return await this.repository.createQueryBuilder()
             .insert()
@@ -483,10 +484,10 @@ export class SongService implements SyncableService<Song> {
                     .leftJoinAndSelect("song.file", "file")
                     .leftJoinAndSelect("song.artwork", "artwork")
 
-                if(typeof qb === "function") {
+                if (typeof qb === "function") {
                     query = qb(this.repository.createQueryBuilder(alias), alias);
                 }
-                    
+
                 return query.whereInIds(insertResult.raw).getMany();
             });
     }
@@ -503,7 +504,7 @@ export class SongService implements SyncableService<Song> {
      */
     public async setArtwork(idOrObject: string | Song, artwork: Artwork | SongArtwork): Promise<Song> {
         const song = await this.resolveSong(idOrObject);
-        if(!song) throw new NotFoundException("Could not find song.");
+        if (!song) throw new NotFoundException("Could not find song.");
 
         song.artwork = artwork as SongArtwork;
         return this.repository.save(song);
@@ -521,7 +522,7 @@ export class SongService implements SyncableService<Song> {
      */
     public async setGeniusFlag(idOrObject: string | Song, flag: GeniusFlag): Promise<Song> {
         const song = await this.resolveSong(idOrObject);
-        if(!song) throw new NotFoundException("Could not find song.");
+        if (!song) throw new NotFoundException("Could not find song.");
 
         song.genius.flag = flag;
         return this.repository.save(song);
@@ -570,7 +571,7 @@ export class SongService implements SyncableService<Song> {
      */
     public async setAlbumOrder(idOrObject: string | Song, order: number): Promise<Song> {
         const song = await this.resolveSong(idOrObject);
-        if(!song) throw new NotFoundException("Could not find song.");
+        if (!song) throw new NotFoundException("Could not find song.");
 
         song.order = order;
         return this.repository.save(song);
@@ -583,16 +584,16 @@ export class SongService implements SyncableService<Song> {
      */
     public async readID3TagsFromFile(absolutePath: string): Promise<ID3TagsDTO> {
         const filepath = path.resolve(absolutePath);
-        
+
         // Get duration in seconds
         const probe = await ffprobe(filepath, { path: ffprobeStatic.path });
         const durationInSeconds = Math.round(probe.streams[0].duration || 0);
-        
+
         const id3Tags = NodeID3.read(fs.readFileSync(filepath));
 
         // Media file not a mp3 file, so return
         // at this point with some data from the file details
-        if(!id3Tags) {
+        if (!id3Tags) {
             return {
                 album: undefined,
                 artists: [],
@@ -616,8 +617,8 @@ export class SongService implements SyncableService<Song> {
             }
         }
 
-        if(artists.length <= 0) {
-            if(Environment.isDebug) {
+        if (artists.length <= 0) {
+            if (Environment.isDebug) {
                 this.logger.debug(`No artists found on file ${filepath}`);
             }
         }
@@ -648,7 +649,7 @@ export class SongService implements SyncableService<Song> {
      * @returns Song
      */
     private async resolveSong(idOrObject: string | Song): Promise<Song> {
-        if(typeof idOrObject == "string") {
+        if (typeof idOrObject == "string") {
             return this.findById(idOrObject, false);
         }
 
@@ -663,22 +664,22 @@ export class SongService implements SyncableService<Song> {
      */
     private async findUniqueSong(uniqueSong: SongUniqueFindDTO): Promise<Song> {
         let query = this.repository.createQueryBuilder("song")
-                .leftJoinAndSelect("song.primaryArtist", "primaryArtist")
-                .leftJoinAndSelect("song.featuredArtists", "featuredArtist")
-                .leftJoinAndSelect("song.album", "album")
-                .where("song.name = :name AND album.name = :album AND song.duration = :duration AND primaryArtist.name = :artist", { 
-                    name: uniqueSong.name,
-                    duration: uniqueSong.duration,
-                    album: uniqueSong.album?.name,
-                    artist: uniqueSong.primaryArtist?.name
-                });
+            .leftJoinAndSelect("song.primaryArtist", "primaryArtist")
+            .leftJoinAndSelect("song.featuredArtists", "featuredArtist")
+            .leftJoinAndSelect("song.album", "album")
+            .where("song.name = :name AND album.name = :album AND song.duration = :duration AND primaryArtist.name = :artist", {
+                name: uniqueSong.name,
+                duration: uniqueSong.duration,
+                album: uniqueSong.album?.name,
+                artist: uniqueSong.primaryArtist?.name
+            });
 
-            // Build query to include all featuredArtists in where clause
-            const featuredArtists = uniqueSong.featuredArtists?.map((artist) => artist.name) || [];
-            query = query.andWhere(`featuredArtist.name = '${featuredArtists.join("' OR featuredArtist.name = '")}'`);
+        // Build query to include all featuredArtists in where clause
+        const featuredArtists = uniqueSong.featuredArtists?.map((artist) => artist.name) || [];
+        query = query.andWhere(`featuredArtist.name = '${featuredArtists.join("' OR featuredArtist.name = '")}'`);
 
-            // Execute query.
-            return query.getOne();
+        // Execute query.
+        return query.getOne();
     }
 
     /**
@@ -689,7 +690,7 @@ export class SongService implements SyncableService<Song> {
      * @returns Page<Song>
      */
     public async findBySearchQuery(query: string, pageable: Pageable, authentication?: User): Promise<Page<Song>> {
-        if(!query || query == "") {
+        if (!query || query == "") {
             query = "%"
         } else {
             query = `%${query.replace(/\s/g, '%')}%`;
@@ -723,9 +724,9 @@ export class SongService implements SyncableService<Song> {
      */
     public buildGeneralQuery(alias: string, authentication?: User) {
         let queryBuilder = this.repository.createQueryBuilder(alias).select([`${alias}.id`, `${alias}.slug`, `${alias}.name`, `${alias}.duration`, `${alias}.explicit`]);
-        
+
         // Fetch info if user has liked the song
-        if(authentication) queryBuilder.loadRelationCountAndMap(`${alias}.liked`, `${alias}.likes`, "likes", (qb) => qb.where("likes.userId = :userId", { userId: authentication?.id }))
+        if (authentication) queryBuilder.loadRelationCountAndMap(`${alias}.liked`, `${alias}.likes`, "likes", (qb) => qb.where("likes.userId = :userId", { userId: authentication?.id }))
 
         // Add basic relations used everywhere
         queryBuilder = queryBuilder.leftJoin(`${alias}.artwork`, "artwork").addSelect(["artwork.id"]);

@@ -1,5 +1,5 @@
 import { HttpClient } from "@angular/common/http";
-import { Page, Pageable } from "@soundcore/common";
+import { Page, Pageable } from "@repo/utilities";
 import { SCSDKBaseDatasource, toFuture } from "@soundcore/sdk";
 import { filter, map, Observable, of } from "rxjs";
 
@@ -23,12 +23,12 @@ export class SCNGXDatasource<T = any> extends SCSDKBaseDatasource<T> {
     protected fetchPage(pageIndex: number): Observable<T[]> {
         const pageable = new Pageable(pageIndex, this.pageSize);
 
-        if(typeof this.pageableUrl === "undefined" || this.pageableUrl == null) return of([]);
+        if (typeof this.pageableUrl === "undefined" || this.pageableUrl == null) return of([]);
         return this.httpClient.get<Page<T>>(`${this.pageableUrl}${pageable.toQuery()}`).pipe(
             toFuture(),
             filter((request) => !request.loading),
             map((request) => {
-                if(request.error) {
+                if (request.error) {
                     throw request.error;
                 }
 

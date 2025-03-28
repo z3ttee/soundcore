@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Page, Pageable } from '@soundcore/common';
+import { Page, Pageable } from '@repo/utilities';
 import { Repository } from 'typeorm';
 import { Album } from '../../album/entities/album.entity';
 import { Playlist } from '../../playlist/entities/playlist.entity';
@@ -19,7 +19,7 @@ export class LikeService {
         @InjectRepository(LikedResource) private repository: Repository<LikedResource>,
         @InjectRepository(LikedSong) private likedSongRepository: Repository<LikedSong>
 
-    ) {}
+    ) { }
 
     public getRepository() {
         return this.repository;
@@ -112,7 +112,7 @@ export class LikeService {
         const existing = await this.findByUserAndSong(authentication?.id, songId);
 
         // Remove like if exists.
-        if(existing) {
+        if (existing) {
             return this.likedSongRepository.delete({ id: existing.id }).then((): ToggleLikedSongDTO => ({
                 isLiked: false,
                 song: existing
@@ -146,13 +146,13 @@ export class LikeService {
      */
     public async toggleLikeForPlaylist(playlistId: string, authentication: User): Promise<boolean> {
         const playlist = await this.playlistService.findById(playlistId);
-        if(!playlist) throw new NotFoundException();
-        if(playlist.author?.id == authentication?.id) throw new BadRequestException("Author cannot like his own playlists.");
-        if(playlist.privacy == PlaylistPrivacy.PRIVATE) throw new BadRequestException("Cannot like this type of playlist.")
+        if (!playlist) throw new NotFoundException();
+        if (playlist.author?.id == authentication?.id) throw new BadRequestException("Author cannot like his own playlists.");
+        if (playlist.privacy == PlaylistPrivacy.PRIVATE) throw new BadRequestException("Cannot like this type of playlist.")
 
         const existing = await this.findByUserAndPlaylist(authentication?.id, playlistId);
         // Remove like if exists.
-        if(existing) {
+        if (existing) {
             return this.repository.delete({ id: existing.id }).then(() => false).catch(() => {
                 throw new BadRequestException("Could not remove like from playlist.")
             })
@@ -179,7 +179,7 @@ export class LikeService {
         const existing = await this.findByUserAndAlbum(authentication?.id, albumId);
 
         // Remove like if exists.
-        if(existing) {
+        if (existing) {
             return this.repository.delete({ id: existing.id }).then(() => false).catch(() => {
                 throw new BadRequestException("Could not remove like from album.")
             })

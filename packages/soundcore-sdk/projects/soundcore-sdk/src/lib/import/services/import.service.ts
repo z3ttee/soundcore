@@ -9,7 +9,7 @@ import { apiResponse } from '../../utils/rxjs/operators/api-response';
 import { BehaviorSubject, Observable, of } from 'rxjs';
 import { ImportReport } from '../entities/import-report.entity';
 import { SCSDK_OPTIONS } from '../../constants';
-import { Page, Pageable } from '@soundcore/common';
+import { Page, Pageable } from '@repo/utilities';
 
 @Injectable()
 export class SCSDKImportService {
@@ -20,7 +20,7 @@ export class SCSDKImportService {
     constructor(
         private readonly httpClient: HttpClient,
         @Inject(SCSDK_OPTIONS) private readonly options: SCSDKOptions
-    ) {}
+    ) { }
 
     /**
      * Create a new import task.
@@ -28,7 +28,7 @@ export class SCSDKImportService {
      * @returns ImportTask
      */
     public create(createImportDto: CreateImportDTO): Observable<ApiResponse<ImportTask>> {
-        if(typeof createImportDto === "undefined" || createImportDto == null) return of(null);
+        if (typeof createImportDto === "undefined" || createImportDto == null) return of(null);
         return this.httpClient.post<ImportTask>(`${this.options.api_base_uri}/v1/imports/spotify/playlist`, createImportDto).pipe(apiResponse());
     }
 
@@ -39,7 +39,7 @@ export class SCSDKImportService {
      * @returns Page<ImportTask>
      */
     public findPendingByUser(userId: string, pageable: Pageable): Observable<ApiResponse<Page<ImportTask>>> {
-        if(!userId) return of(null);
+        if (!userId) return of(null);
         return this.httpClient.get<Page<ImportTask>>(`${this.options.api_base_uri}/v1/imports/spotify${pageable.toQuery()}`).pipe(apiResponse());
     }
 
@@ -50,7 +50,7 @@ export class SCSDKImportService {
      * @returns Page<ImportTask>
      */
     public findCompletedByUser(userId: string, pageable: Pageable): Observable<ApiResponse<Page<ImportTask>>> {
-        if(!userId) return of(null);
+        if (!userId) return of(null);
         return this.httpClient.get<Page<ImportTask>>(`${this.options.api_base_uri}/v1/imports/spotify/completed${pageable.toQuery()}`).pipe(apiResponse());
     }
 
@@ -61,7 +61,7 @@ export class SCSDKImportService {
      * @returns Page<ImportTask>
      */
     public findFailedByUser(userId: string, pageable: Pageable): Observable<ApiResponse<Page<ImportTask>>> {
-        if(!userId) return of(null);
+        if (!userId) return of(null);
         return this.httpClient.get<Page<ImportTask>>(`${this.options.api_base_uri}/v1/imports/spotify/failed${pageable.toQuery()}`).pipe(apiResponse());
     }
 
@@ -72,7 +72,7 @@ export class SCSDKImportService {
      * @returns True or False
      */
     public deleteById(taskId: string): Observable<ApiResponse<boolean>> {
-        if(!taskId) return of(null);
+        if (!taskId) return of(null);
         return this.httpClient.delete<boolean>(`${this.options.api_base_uri}/v1/imports/${taskId}`).pipe(apiResponse());
     }
 
@@ -82,7 +82,7 @@ export class SCSDKImportService {
      * @returns ImportReport
      */
     public findReportByTaskid(taskId: string): Observable<ApiResponse<ImportReport>> {
-        if(!taskId) return of(null);
+        if (!taskId) return of(null);
         return this.httpClient.get<ImportReport>(`${this.options.api_base_uri}/v1/imports/${taskId}/report`).pipe(apiResponse());
     }
 

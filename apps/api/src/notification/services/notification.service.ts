@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Page, Pageable } from '@soundcore/common';
+import { Page, Pageable } from '@repo/utilities';
 import { Repository } from 'typeorm';
 import { User } from '../../user/entities/user.entity';
 import { CreateNotificationDTO } from '../dtos/notification.dto';
@@ -13,7 +13,7 @@ export class NotificationService {
     constructor(
         private readonly gateway: NotificationGateway,
         @InjectRepository(Notification) private readonly repository: Repository<Notification>
-    ) {}
+    ) { }
 
     public async findByCurrentUser(authentication: User, pageable: Pageable): Promise<Page<Notification>> {
         const result = await this.repository.createQueryBuilder("notification")
@@ -33,8 +33,8 @@ export class NotificationService {
         notification.title = createNotificationDto.title;
         notification.message = createNotificationDto.message;
 
-        if(!createNotificationDto.isBroadcast) {
-            if(notification.targets.length <= 0) throw new BadRequestException("You need to define at least one target user, as the notification is not handled as broadcast.")
+        if (!createNotificationDto.isBroadcast) {
+            if (notification.targets.length <= 0) throw new BadRequestException("You need to define at least one target user, as the notification is not handled as broadcast.")
             notification.targets = createNotificationDto.targets;
             notification.isBroadcast = false;
         } else {
@@ -46,7 +46,7 @@ export class NotificationService {
             this.gateway.sendNotification(notification);
             return result;
         })
-        
+
     }
 
 }

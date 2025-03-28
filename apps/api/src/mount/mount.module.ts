@@ -7,7 +7,7 @@ import { MountQueueService } from './services/mount-queue.service';
 import { MountRegistryService } from './services/mount-registry.service';
 import { GatewayModule } from '../gateway/gateway.module';
 import { IndexerModule } from '../indexer/indexer.module';
-import { Environment } from '@soundcore/common';
+import { Environment } from '@repo/utilities';
 
 @Module({
   controllers: [
@@ -19,7 +19,7 @@ import { Environment } from '@soundcore/common';
     MountRegistryService
   ],
   imports: [
-    TypeOrmModule.forFeature([ Mount ]),
+    TypeOrmModule.forFeature([Mount]),
     GatewayModule,
     IndexerModule
   ],
@@ -33,17 +33,17 @@ export class MountModule implements OnModuleInit {
 
   constructor(
     private readonly service: MountService,
-  ) {}
+  ) { }
 
   public async onModuleInit() {
     return this.service.checkForDefaultMount().then((result) => {
-      if(Environment.isDockerized) {
+      if (Environment.isDockerized) {
         return this.service.checkMountsDockerMode();
       } else {
         return this.service.checkMountsStandaloneMode();
       }
     }).catch((error: Error) => {
-      if(Environment.isDebug) {
+      if (Environment.isDebug) {
         this.logger.error(`Error occured while checking mounts: ${error.message}`, error.stack);
       } else {
         this.logger.error(`Error occured while checking mounts: ${error.message}`);

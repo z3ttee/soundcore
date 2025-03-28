@@ -8,7 +8,7 @@ import { SongService } from '../../song/services/song.service';
 import { User } from '../../user/entities/user.entity';
 import { LikedSong } from '../../collection/entities/like.entity';
 import { LikeService } from '../../collection/services/like.service';
-import { Page, Pageable } from '@soundcore/common';
+import { Page, Pageable } from '@repo/utilities';
 
 @Injectable()
 export class TracklistService {
@@ -16,8 +16,8 @@ export class TracklistService {
     constructor(
         private readonly songService: SongService,
         private readonly likeService: LikeService,
-        @InjectRepository(PlaylistItem)  private tracklistRepository: Repository<PlaylistItem>
-    ) {}
+        @InjectRepository(PlaylistItem) private tracklistRepository: Repository<PlaylistItem>
+    ) { }
 
     /**
      * Find a list of song ids by an artist.
@@ -41,13 +41,13 @@ export class TracklistService {
      */
     public async findMetaByArtist(artistId: string, pageable: Pageable, authentication?: User): Promise<Page<Song>> {
         const baseQuery = await this.buildFindByArtistQuery(artistId, pageable, authentication)
-        
+
         const result = await baseQuery.getRawAndEntities();
         const totalElements = await baseQuery.getCount();
         return Page.of(result.entities.map((song, index) => {
             song.streamCount = result.raw[index]?.streamCount || 0
             return song;
-        }), totalElements, pageable);   
+        }), totalElements, pageable);
     }
 
     /**
@@ -71,13 +71,13 @@ export class TracklistService {
      */
     public async findMetaByArtistTop(artistId: string, authentication?: User): Promise<Page<Song>> {
         const baseQuery = await this.buildFindByArtistTopQuery(artistId, authentication)
-        
+
         const result = await baseQuery.getRawAndEntities();
         const totalElements = result.entities.length;
         return Page.of(result.entities.map((song, index) => {
             song.streamCount = result.raw[index]?.streamCount || 0
             return song;
-        }), totalElements);   
+        }), totalElements);
     }
 
     /**
@@ -90,7 +90,7 @@ export class TracklistService {
     public async findListByAlbum(albumId: string, hostname: string, authentication?: User): Promise<Tracklist> {
         const result = await this.buildFindByAlbumQuery(albumId, null, authentication).select(["song.id"]).getMany();
         const metadataUrl = `/meta`;
-        return new Tracklist(result.length, TracklistType.ALBUM, result as unknown as TracklistItem[], metadataUrl);   
+        return new Tracklist(result.length, TracklistType.ALBUM, result as unknown as TracklistItem[], metadataUrl);
     }
 
     /**
@@ -101,13 +101,13 @@ export class TracklistService {
      * @returns Page<Song>
      */
     public async findMetaByAlbum(albumId: string, pageable: Pageable, authentication?: User): Promise<Page<Song>> {
-        const baseQuery = await this.buildFindByAlbumQuery(albumId, pageable, authentication)            
+        const baseQuery = await this.buildFindByAlbumQuery(albumId, pageable, authentication)
         const result = await baseQuery.getRawAndEntities();
         const totalElements = await baseQuery.getCount();
         return Page.of(result.entities.map((song, index) => {
             song.streamCount = result.raw[index]?.streamCount || 0
             return song;
-        }), totalElements, pageable);    
+        }), totalElements, pageable);
     }
 
     /**
@@ -129,7 +129,7 @@ export class TracklistService {
             .getMany();
 
         const metadataUrl = `/meta`;
-        return new Tracklist(result.length, TracklistType.PLAYLIST, result, metadataUrl);    
+        return new Tracklist(result.length, TracklistType.PLAYLIST, result, metadataUrl);
     }
 
     /**
@@ -179,7 +179,7 @@ export class TracklistService {
             .where("user.id = :userId AND like.type = :type", { userId: authentication.id, type: LikedSong.name })
             .getManyAndCount();
 
-        return new Tracklist(result[1], TracklistType.PLAYLIST, result[0], metadataUrl);    
+        return new Tracklist(result[1], TracklistType.PLAYLIST, result[0], metadataUrl);
     }
 
     /**
@@ -228,7 +228,7 @@ export class TracklistService {
             .where("primaryArtist.id = :artistId OR primaryArtist.slug = :artistId", { artistId })
 
         // Add optional page settings
-        if(!!pageable) {
+        if (!!pageable) {
             query.skip(pageable.offset).take(pageable.limit)
         }
 
@@ -288,7 +288,7 @@ export class TracklistService {
             .where("album.id = :albumId OR album.slug = :albumId", { albumId })
 
         // Add optional page settings
-        if(!!pageable) {
+        if (!!pageable) {
             query = query.skip(pageable.offset).take(pageable.limit)
         }
 
@@ -305,7 +305,7 @@ export class TracklistService {
      * @param authentication 
      * @returns SelectQueryBuilder<Song>
      */
-     protected buildFindByPlaylistQuery(playlistId: string, alias: string, pageable?: Pageable, authentication?: User): SelectQueryBuilder<Song> {
+    protected buildFindByPlaylistQuery(playlistId: string, alias: string, pageable?: Pageable, authentication?: User): SelectQueryBuilder<Song> {
         const query = this.songService.buildGeneralQuery(alias, authentication)
             // Get amount of streams
             // TODO: To be optimised using selectAndMap in next TypeORM release
@@ -325,7 +325,7 @@ export class TracklistService {
             .where("playlist.id = :playlistId OR playlist.slug = :playlistId", { playlistId })
 
         // Add optional page settings
-        if(!!pageable) {
+        if (!!pageable) {
             query.skip(pageable.offset).take(pageable.limit)
         }
 

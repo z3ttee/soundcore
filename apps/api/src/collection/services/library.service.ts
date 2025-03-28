@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Page, Pageable } from "@soundcore/common";
+import { Page, Pageable } from "@repo/utilities";
 import { Repository } from "typeorm";
 import { Playlist } from "../../playlist/entities/playlist.entity";
 import { User } from "../../user/entities/user.entity";
@@ -13,7 +13,7 @@ export class LibraryService {
     constructor(
         private readonly playlistService: PlaylistService,
         @InjectRepository(LikedResource) private readonly repository: Repository<LikedResource>
-    ) {}
+    ) { }
 
     public async findPageByUser(user: User, pageable: Pageable): Promise<Page<LikedResource | Playlist>> {
         return this.repository.createQueryBuilder("like")

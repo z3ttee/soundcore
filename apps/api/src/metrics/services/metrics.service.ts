@@ -1,7 +1,7 @@
 import os from "node:os";
 import { Injectable } from "@nestjs/common";
 import { ApplicationMode, DeviceInfo } from "../entities/device-info.entity";
-import { Environment } from "@soundcore/common";
+import { Environment } from "@repo/utilities";
 
 @Injectable()
 export class MetricsService {
@@ -15,7 +15,7 @@ export class MetricsService {
             })),
             memory: {
                 total: os.totalmem(),
-                used:  os.totalmem() - os.freemem()
+                used: os.totalmem() - os.freemem()
             }
         }
     }

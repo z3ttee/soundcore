@@ -1,4 +1,4 @@
-import { Page } from "@soundcore/common";
+import { Page } from "@repo/utilities";
 import { Song } from "../../song/entities/song.entity";
 import { PlayableEntityType } from "./playable.entity";
 
@@ -58,7 +58,7 @@ export class Tracklist {
          * Default: /meta
          */
         public readonly relativeMetaUrl: string
-    ) {}
+    ) { }
 
 }
 
@@ -70,6 +70,6 @@ export class TracklistV2<T = Song> {
         public readonly size: number,
         public readonly items: Page<T>,
         public readonly seed?: number
-    ) {}
+    ) { }
 
 }

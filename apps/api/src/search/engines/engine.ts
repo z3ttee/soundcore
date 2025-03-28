@@ -1,4 +1,4 @@
-import { Page, Pageable } from "@soundcore/common";
+import { Page, Pageable } from "@repo/utilities";
 import { TasksService } from "../../tasks/services/tasks.service";
 import { PipelineService } from "@repo/pipelines";
 import { EVENT_TRIGGER_SEARCH_ENGINE_SYNC, PIPELINE_ID_SEARCH_ENGINE_SYNC } from "../../constants";

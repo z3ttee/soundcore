@@ -1,12 +1,12 @@
 import { Pipe, PipeTransform } from "@angular/core";
-import { isNull } from "@soundcore/common";
+import { isNull } from "@repo/utilities";
 import { PlayableEntityType } from "@soundcore/sdk";
 
 @Pipe({
     name: 'playableEntityType'
 })
 export class PlayableEntityTypePipe implements PipeTransform {
-  
+
     transform(value: PlayableEntityType): string {
         switch (value) {
             case PlayableEntityType.PLAYLIST:
@@ -20,5 +20,5 @@ export class PlayableEntityTypePipe implements PipeTransform {
                 return "Titel";
         }
     }
-  
+
 }

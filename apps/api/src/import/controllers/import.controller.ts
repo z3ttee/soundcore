@@ -1,5 +1,5 @@
 import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
-import { Pageable, Pagination } from '@soundcore/common';
+import { Pageable, Pagination } from '@repo/utilities';
 import { Authentication } from '../../authentication/decorators/authentication.decorator';
 
 import { User } from '../../user/entities/user.entity';
@@ -15,21 +15,21 @@ export class ImportController {
     private readonly importService: ImportService,
     private readonly reportService: ImportReportService,
     private readonly spotifyService: SpotifyImportService
-  ) {}
+  ) { }
 
   @Get("spotify")
   public async findPendingSpotifyByUserId(@Authentication() authentication: User, @Pagination() pageable: Pageable) {
-    return this.importService.findByStatusOfUser(authentication.id, [ ImportTaskStatus.ENQUEUED, ImportTaskStatus.PROCESSING ], ImportTaskType.SPOTIFY_PLAYLIST, pageable);
+    return this.importService.findByStatusOfUser(authentication.id, [ImportTaskStatus.ENQUEUED, ImportTaskStatus.PROCESSING], ImportTaskType.SPOTIFY_PLAYLIST, pageable);
   }
 
   @Get("spotify/completed")
   public async findCompletedSpotifyByUserId(@Authentication() authentication: User, @Pagination() pageable: Pageable) {
-    return this.importService.findByStatusOfUser(authentication.id, [ ImportTaskStatus.OK ], ImportTaskType.SPOTIFY_PLAYLIST, pageable);
+    return this.importService.findByStatusOfUser(authentication.id, [ImportTaskStatus.OK], ImportTaskType.SPOTIFY_PLAYLIST, pageable);
   }
 
   @Get("spotify/failed")
   public async findFailedSpotifyByUserId(@Authentication() authentication: User, @Pagination() pageable: Pageable) {
-    return this.importService.findByStatusOfUser(authentication.id, [ ImportTaskStatus.ERRORED, ImportTaskStatus.SERVER_ABORT ], ImportTaskType.SPOTIFY_PLAYLIST, pageable);
+    return this.importService.findByStatusOfUser(authentication.id, [ImportTaskStatus.ERRORED, ImportTaskStatus.SERVER_ABORT], ImportTaskType.SPOTIFY_PLAYLIST, pageable);
   }
 
   @Post("spotify/playlist")

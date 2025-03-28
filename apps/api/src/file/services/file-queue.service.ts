@@ -5,7 +5,7 @@ import { EVENT_FILES_FOUND, EVENT_FILES_PROCESSED, EVENT_MOUNT_PROCESS_UPDATE, M
 import { FilesFoundEvent } from "../../events/files-found.event";
 import { FileDTO } from "../dto/file.dto";
 import { Mount, MountProgress, MountProgressInfo, MountStatus } from "../../mount/entities/mount.entity";
-import { Environment } from "@soundcore/common";
+import { Environment } from "@repo/utilities";
 import { FileProcessResultDTO } from "../dto/file-process-result.dto";
 import { FileProcessDTO, FileProcessFlag } from "../dto/file-process.dto";
 import { MountScanFlag } from "../../mount/dtos/scan-process.dto";

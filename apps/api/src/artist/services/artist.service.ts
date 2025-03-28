@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Page, Pageable } from '@soundcore/common';
+import { Page, Pageable } from '@repo/utilities';
 import { ObjectLiteral, Repository, SelectQueryBuilder, UpdateResult } from 'typeorm';
 import { GeniusFlag } from '../../utils/entities/genius.entity';
 import { MeilisearchFlag } from '../../utils/entities/meilisearch.entity';

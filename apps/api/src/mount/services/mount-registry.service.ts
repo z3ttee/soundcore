@@ -4,7 +4,7 @@ import { Injectable, Logger } from "@nestjs/common";
 import { FileSystemService } from "../../filesystem/services/filesystem.service";
 import { MountRegistry } from "../entities/mount-registry.entity";
 import { Mount } from "../entities/mount.entity";
-import { Environment } from "@soundcore/common";
+import { Environment } from "@repo/utilities";
 
 @Injectable()
 export class MountRegistryService {
@@ -12,7 +12,7 @@ export class MountRegistryService {
 
     constructor(
         private readonly filesystem: FileSystemService
-    ) {}
+    ) { }
 
     /**
      * Read the registry file of a mount and
@@ -22,8 +22,8 @@ export class MountRegistryService {
      */
     public async readRegistry(mount: Mount): Promise<MountRegistry> {
         const filepath: string = this.filesystem.resolveMountRegistryPath(mount);
-    
-        if(Environment.isDebug) {
+
+        if (Environment.isDebug) {
             this.logger.debug(`Reading registry file ${filepath}`);
         }
 
@@ -43,8 +43,8 @@ export class MountRegistryService {
      * @param registry Registry data
      * @returns Saved MountRegistry
      */
-    public async saveRegistry(registry: MountRegistry): Promise<MountRegistry> {        
-        if(Environment.isDebug) {
+    public async saveRegistry(registry: MountRegistry): Promise<MountRegistry> {
+        if (Environment.isDebug) {
             this.logger.debug(`Saving registry file ${registry.filepath}...`);
         }
 
@@ -57,7 +57,7 @@ export class MountRegistryService {
     }
 
     public async resetRegistry(registry: MountRegistry): Promise<MountRegistry> {
-        if(Environment.isDebug) {
+        if (Environment.isDebug) {
             this.logger.debug(`Resetting registry file ${registry.filepath}...`);
         }
 

@@ -1,5 +1,5 @@
 import { BehaviorSubject } from "rxjs";
-import { isNull } from "@soundcore/common";
+import { isNull } from "@repo/utilities";
 
 export class Queue<T = any> {
 
@@ -32,12 +32,12 @@ export class Queue<T = any> {
         const queue = this.queue.getValue();
         const item = queue.shift();
         this.queue.next(queue);
-        if(!isNull(item)) this._lastDequeuedItem = item;
+        if (!isNull(item)) this._lastDequeuedItem = item;
         return item;
     }
 
     public clearIfInitialized() {
-        if(!this._initialized) return;
+        if (!this._initialized) return;
         this.queue.next([]);
     }
 

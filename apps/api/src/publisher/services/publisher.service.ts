@@ -1,6 +1,6 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Page, Pageable } from '@soundcore/common';
+import { Page, Pageable } from '@repo/utilities';
 import { In, Repository } from 'typeorm';
 import { Artwork } from '../../artwork/entities/artwork.entity';
 import { MeilisearchFlag } from '../../utils/entities/meilisearch.entity';
@@ -16,14 +16,14 @@ export class PublisherService {
     constructor(
         @InjectRepository(Publisher) private readonly repository: Repository<Publisher>,
         // private readonly meiliClient: MeiliPublisherService
-    ){}
+    ) { }
 
     /**
      * Find a publisher by its id.
      * @param publisherId Publisher's id
      * @returns Publisher
      */
-     public async findById(publisherId: string): Promise<Publisher> {
+    public async findById(publisherId: string): Promise<Publisher> {
         return this.repository.createQueryBuilder("publisher")
             .leftJoin("publisher.artwork", "artwork")
             .addSelect(["artwork.id"])
@@ -83,7 +83,7 @@ export class PublisherService {
         createPublisherDto.description = createPublisherDto.description?.trim();
 
         const existingPublisher = await this.findByName(createPublisherDto.name);
-        if(existingPublisher) return new CreateResult(existingPublisher, true); 
+        if (existingPublisher) return new CreateResult(existingPublisher, true);
 
         const publisher = this.repository.create();
         publisher.name = createPublisherDto.name;
@@ -95,7 +95,7 @@ export class PublisherService {
             .values(publisher)
             .orIgnore()
             .execute().then((result) => {
-                if(result.identifiers.length > 0) {
+                if (result.identifiers.length > 0) {
                     return new CreateResult(publisher, false);
                 }
                 return this.findByName(createPublisherDto.name).then((publisher) => new CreateResult(publisher, true));
@@ -116,7 +116,7 @@ export class PublisherService {
         updatePublisherDto.description = updatePublisherDto.description?.trim();
 
         const publisher = await this.findById(publisherId);
-        if(!publisher) throw new NotFoundException("Publisher not found.");
+        if (!publisher) throw new NotFoundException("Publisher not found.");
 
         publisher.name = updatePublisherDto.name;
         // publisher.geniusId = updatePublisherDto.geniusId;
@@ -148,7 +148,7 @@ export class PublisherService {
      */
     public async setArtwork(idOrObject: string | Publisher, artwork: Artwork): Promise<Publisher> {
         const publisher = await this.resolvePublisher(idOrObject);
-        if(!publisher) throw new NotFoundException("Publisher not found.");
+        if (!publisher) throw new NotFoundException("Publisher not found.");
 
         publisher.artwork = artwork;
         return this.repository.save(publisher);
@@ -160,7 +160,7 @@ export class PublisherService {
      * @returns Publisher
      */
     protected async resolvePublisher(idOrObject: string | Publisher): Promise<Publisher> {
-        if(typeof idOrObject == "string") {
+        if (typeof idOrObject == "string") {
             return this.findById(idOrObject);
         }
 

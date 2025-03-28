@@ -1,4 +1,4 @@
-import { isUndefined, pascalToSnakeCase } from "@soundcore/common";
+import { isUndefined, pascalToSnakeCase } from "@repo/utilities";
 import { Faceting, TypoTolerance } from "meilisearch";
 import { setIndexOptions } from "../utils/reflectUtils";
 

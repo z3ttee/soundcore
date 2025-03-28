@@ -1,5 +1,5 @@
 import { Injectable } from "@angular/core";
-import { isNull } from "@soundcore/common";
+import { isNull } from "@repo/utilities";
 import { Future, PlayableEntityType } from "@soundcore/sdk";
 import { BehaviorSubject, Observable, combineLatest, distinctUntilChanged, map, of, switchMap } from "rxjs";
 import { PlayableItem } from "./player.service";
@@ -9,7 +9,7 @@ export class EnqueuedItem {
     constructor(
         public isList: boolean,
         public data: PlayableItem | SCNGXTracklist
-    ) {}
+    ) { }
 }
 
 @Injectable({
@@ -33,7 +33,7 @@ export class AudioQueue {
     public readonly $queue: Observable<Readonly<[PlayableItem[], SCNGXTracklist]>> = combineLatest([
         this.queueSubject.asObservable(),
         this.tracklistSubject.asObservable().pipe(switchMap((tracklist) => {
-            if(isNull(tracklist)) return of(null);
+            if (isNull(tracklist)) return of(null);
             return tracklist.$queue.pipe(map(() => tracklist));
         })),
     ]);
@@ -49,7 +49,7 @@ export class AudioQueue {
         const tracklist = this.getEnqueuedTracklist();
 
         // If the item should be enqueued as single
-        if(!this.isOfTypeList(resource)) {
+        if (!this.isOfTypeList(resource)) {
             // Enqueue entity
             queue.unshift(resource as PlayableItem);
             // Register id as enqueued
@@ -60,7 +60,7 @@ export class AudioQueue {
         }
 
         // Do not enqueue tracklists twice
-        if(tracklist?.id === resource.id) return -1;
+        if (tracklist?.id === resource.id) return -1;
         // Register id as enqueued
         this.enqueuedIds.set(resource.id, true);
         // Update tracklist subject
@@ -77,17 +77,17 @@ export class AudioQueue {
         // This was implemented because during development it happened
         // that tracklist were not successfully dequeued, when this got fixed
         // this maximum depth mechanism was introduced for the worst case scenario
-        if(currentDepth >= 1) return null;
+        if (currentDepth >= 1) return null;
 
         const tracklist = this.getEnqueuedTracklist();
         const queue = this.queueSubject.getValue();
         // If there is no tracklist enqueued 
         // or the queue is empty, return null
-        if(isNull(tracklist) && queue.length <= 0) return null;
-        
+        if (isNull(tracklist) && queue.length <= 0) return null;
+
         // Check if tracklist is null, or the queue has more than 0 items
         // If true, prioritize queue over tracklist
-        if(isNull(tracklist) || queue.length > 0) {
+        if (isNull(tracklist) || queue.length > 0) {
             // Is a single song, so splice it from queue
             const item = queue.splice(0, 1)?.[0];
             // Remove from registered ids
@@ -99,7 +99,7 @@ export class AudioQueue {
 
         // Check if tracklist has not ended, if true
         // return, otherwise remove from queue
-        if(tracklist.hasEnded) {
+        if (tracklist.hasEnded) {
             // Remove from registered ids
             this.enqueuedIds.delete(tracklist.id);
             // Release tracklist resources
@@ -113,7 +113,7 @@ export class AudioQueue {
 
         return { isList: true, data: tracklist };
 
-        
+
         // Return new dequeue attempt
         // return this.dequeue();
     }
@@ -150,8 +150,8 @@ export class AudioQueue {
     }
 
     public findById(id: string): EnqueuedItem {
-        if(!this.isEnqueued(id)) return null;
-        if(this.getEnqueuedTracklist()?.id === id) return { isList: true, data: this.getEnqueuedTracklist() }
+        if (!this.isEnqueued(id)) return null;
+        if (this.getEnqueuedTracklist()?.id === id) return { isList: true, data: this.getEnqueuedTracklist() }
         const queue = this.queueSubject.getValue();
         const item = queue.find((item) => item?.id === id);
         return !isNull(item) ? { isList: false, data: item } : null;
@@ -172,9 +172,9 @@ export class AudioQueue {
     public setShuffled(shuffled: boolean) {
         const tracklist = this.getEnqueuedTracklist();
         console.log("shuffling ", tracklist);
-        if(isNull(tracklist)) return;
-        
+        if (isNull(tracklist)) return;
+
         tracklist.restart(shuffled).subscribe();
     }
-    
+
 }

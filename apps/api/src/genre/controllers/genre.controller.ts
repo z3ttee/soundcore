@@ -1,10 +1,10 @@
 import { Controller, Get, Param } from '@nestjs/common';
-import { Pageable, Pagination } from '@soundcore/common';
+import { Pageable, Pagination } from '@repo/utilities';
 import { GenreService } from '../services/genre.service';
 
 @Controller('genres')
 export class GenreController {
-  constructor(private readonly service: GenreService) {}
+  constructor(private readonly service: GenreService) { }
 
   @Get("")
   public async findAll(@Pagination() pageable: Pageable) {
@@ -21,6 +21,6 @@ export class GenreController {
     return this.service.findById(genreId);
   }
 
-  
+
 
 }

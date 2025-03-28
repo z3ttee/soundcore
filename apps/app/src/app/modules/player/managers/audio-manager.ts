@@ -1,4 +1,4 @@
-import { isNull } from "@soundcore/common";
+import { isNull } from "@repo/utilities";
 import Hls, { ManifestParsedData } from "hls.js";
 import { BehaviorSubject, Observable, Subject, distinctUntilChanged, from, map, of, switchMap } from "rxjs";
 
@@ -20,13 +20,13 @@ export class AudioManager {
     private _hls: Hls;
 
     private readonly _readySubject: BehaviorSubject<boolean> = new BehaviorSubject(false);
-    
+
     /**
      * Emits current ready state. The manager will emit ready, when
      * the player was initialized and play-request can be issued
      */
     public readonly $ready = this._readySubject.asObservable().pipe(distinctUntilChanged());
-    
+
     private readonly onEnded: Subject<void> = new Subject();
     public readonly $onEnded = this.onEnded.asObservable();
 
@@ -78,13 +78,13 @@ export class AudioManager {
         return of(url).pipe(
             switchMap((url) => {
                 // Check if mode is not HLS
-                if(!this.isHLS || !this.isM3u8Url(url)) {
+                if (!this.isHLS || !this.isM3u8Url(url)) {
                     // If true, play audio normally 
                     // via HTML5 audio
                     this._audio.src = url;
                     return from(this._audio.play()).pipe(map(() => url));
                 }
-                
+
                 return this.playHLS(url);
             })
         );
@@ -100,7 +100,7 @@ export class AudioManager {
      */
     public togglePlaying(): Observable<boolean> {
         return new Observable((subscriber) => {
-            if(!this._audio.paused) {
+            if (!this._audio.paused) {
                 this._audio.pause();
 
                 subscriber.next(false);
@@ -121,7 +121,7 @@ export class AudioManager {
      */
     public resetCurrentlyPlaying(pause: boolean = false) {
         this._audio.currentTime = 0;
-        if(pause) {
+        if (pause) {
             this._audio.pause();
         }
     }
@@ -138,7 +138,7 @@ export class AudioManager {
     }
 
     private initialize(forceMode?: AudioManagerMode) {
-        if(!isNull(this._hls)) throw new Error("AudioManager already initialized");
+        if (!isNull(this._hls)) throw new Error("AudioManager already initialized");
 
         // Set ready state to false
         this._readySubject.next(false);
@@ -146,11 +146,11 @@ export class AudioManager {
         this._audio = new Audio();
 
         // Check if a mode is force
-        if(isNull(forceMode)) {
+        if (isNull(forceMode)) {
             // If true,
             // Set playback mode based on
             // if HLS streaming is supported
-            if(Hls.isSupported()) {
+            if (Hls.isSupported()) {
                 this._mode = AudioManagerMode.HLS;
             } else {
                 console.warn(`[${this.LABEL}] Browser does not support HLS for media streaming. Setting mode to '${this._mode.toUpperCase()}'`);
@@ -161,7 +161,7 @@ export class AudioManager {
             this._mode = forceMode;
         }
 
-        if(this.isHLS) {
+        if (this.isHLS) {
             // Create HLS instance
             this._hls = new Hls({});
             // Create event handler function
@@ -184,7 +184,7 @@ export class AudioManager {
         this._audio.onpause = () => this.isPaused.next(true);
         this._audio.ontimeupdate = () => this.currenTime.next(this._audio.currentTime);
 
-        if(this.isHLS) {
+        if (this.isHLS) {
             // Register manifest parsed event
             this._hls.on(Hls.Events.MANIFEST_PARSED, (_, data) => this.handleManifestParsedEvent(data));
             this._hls.on(Hls.Events.ERROR, function (event, data) {

@@ -2,7 +2,7 @@ import fs from "fs";
 import sharp from "sharp";
 import crypto from "node:crypto";
 import path from "path";
-import Vibrant from "node-vibrant";
+import { Vibrant } from "node-vibrant/node";
 import axios from "axios";
 import { Injectable, InternalServerErrorException, Logger, NotFoundException } from "@nestjs/common";
 import { CreateArtworkDTO, CreateDownloadableArtworkDTO } from "../dtos/create-artwork.dto";

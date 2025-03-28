@@ -1,7 +1,7 @@
 import { Logger, VersioningType } from '@nestjs/common';
 import { AppModule } from './app.module';
 import { Bootstrapper } from "@repo/bootstrap";
-import { Environment } from '@soundcore/common';
+import { Environment } from '@repo/utilities';
 
 // Always bind to 0.0.0.0 when inside docker
 const host = Environment.isDockerized ? "0.0.0.0" : (process.env.BIND_ADDRESS ?? "0.0.0.0");

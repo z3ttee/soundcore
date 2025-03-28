@@ -1,7 +1,7 @@
 import { WorkerJobRef } from "@repo/queue";
 
 import { GeniusProcessDTO } from "../dtos/genius-process.dto";
-import { Batch } from "@soundcore/common";
+import { Batch } from "@repo/utilities";
 
 export default async function (job: WorkerJobRef<GeniusProcessDTO>): Promise<any> {
     // return Batch.of(job.payload.payload).do((batch) => {
