@@ -11,7 +11,7 @@ import { MeiliBackgroundService } from './services/meili-background.service';
     imports: [
         ScheduleModule,
         EventEmitterModule,
-        PipelineModule.registerPipelines({
+        PipelineModule.forFeature({
             concurrent: 10,
             pipelines: [
                 path.join(__dirname, "pipelines", "meilisearch.pipeline.js")

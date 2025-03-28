@@ -1,8 +1,9 @@
 import { Controller, Get, Param } from '@nestjs/common';
-import { Pageable, Pagination } from '@repo/utilities';
+import { Pageable } from '@repo/utilities';
 import { Authentication } from '../../authentication/decorators/authentication.decorator';
 import { User } from '../../user/entities/user.entity';
 import { LikeService } from '../services/like.service';
+import { Pagination } from '@repo/nestjs';
 
 @Controller('likes')
 export class LikeController {

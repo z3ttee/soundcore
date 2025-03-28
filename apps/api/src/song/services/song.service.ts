@@ -587,7 +587,7 @@ export class SongService implements SyncableService<Song> {
 
         // Get duration in seconds
         const probe = await ffprobe(filepath, { path: ffprobeStatic.path });
-        const durationInSeconds = Math.round(probe.streams[0].duration || 0);
+        const durationInSeconds = Math.round(parseFloat(probe.streams[0].duration || "0"));
 
         const id3Tags = NodeID3.read(fs.readFileSync(filepath));
 

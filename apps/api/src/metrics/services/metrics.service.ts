@@ -1,7 +1,7 @@
 import os from "node:os";
 import { Injectable } from "@nestjs/common";
 import { ApplicationMode, DeviceInfo } from "../entities/device-info.entity";
-import { Environment } from "@repo/utilities";
+import { Environment } from "@repo/bootstrap";
 
 @Injectable()
 export class MetricsService {

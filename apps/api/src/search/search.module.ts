@@ -52,7 +52,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
   imports: [
     EventEmitterModule,
     ScheduleModule,
-    PipelineModule.registerPipelines({
+    PipelineModule.forFeature({
       concurrent: 10,
       pipelines: [
         path.join(__dirname, "pipelines", "synchronize.pipeline.js")

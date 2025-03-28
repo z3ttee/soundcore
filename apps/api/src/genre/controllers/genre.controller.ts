@@ -1,6 +1,7 @@
 import { Controller, Get, Param } from '@nestjs/common';
-import { Pageable, Pagination } from '@repo/utilities';
+import { Pageable } from '@repo/utilities';
 import { GenreService } from '../services/genre.service';
+import { Pagination } from '@repo/nestjs';
 
 @Controller('genres')
 export class GenreController {

@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
-import { Pageable, Pagination } from '@repo/utilities';
+import { Pageable } from '@repo/utilities';
 import { Authentication } from '../../authentication/decorators/authentication.decorator';
-
+import { Pagination } from '@repo/nestjs';
 import { User } from '../../user/entities/user.entity';
 import { CreateImportDTO } from '../dtos/create-import.dto';
 import { ImportTaskStatus, ImportTaskType } from '../entities/import.entity';

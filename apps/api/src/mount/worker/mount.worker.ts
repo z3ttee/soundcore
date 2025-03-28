@@ -84,43 +84,34 @@ async function scanMount(job: WorkerJobRef<MountScanProcessDTO>): Promise<MountS
         // Execute scan
         const files: FileDTO[] = [];
         const matches: string[] = [];
-        const globs = glob("**/*.mp3", { cwd: directory }, () => ({}));
 
-        // Listen for match event
-        // On every match, create a new object
-        // for future processing
-        globs.on("match", (match: any) => {
-            // Check if files already in registry, if not, add to files list
-            // for further processing. Otherwise it will be ignored
-            if (!registry.files.includes(match)) {
-                // On every match, create object.
-                const file = new FileDTO();
-                file.directory = path.dirname(match);
-                file.filename = path.basename(match);
-
-                files.push(file);
-            }
-
-            // Always add match to matches array
-            matches.push(match);
-        })
-
-        // Listen for END event.
-        // This will be triggered when matching process is done.
-        globs.on("end", () => {
+        glob("**/*.mp3", { cwd: directory }).then((matches) => {
             updateProgress(job, 0.9);
+
+            for (const match of matches) {
+                // Check if files already in registry, if not, add to files list
+                // for further processing. Otherwise it will be ignored
+                if (!registry.files.includes(match)) {
+                    // On every match, create object.
+                    const file = new FileDTO();
+                    file.directory = path.dirname(match);
+                    file.filename = path.basename(match);
+
+                    files.push(file);
+                }
+
+                // Always add match to matches array
+                matches.push(match);
+            }
 
             // Update registry file entries
             registry.files = matches;
-            registryService.saveRegistry(registry).finally(() => {
+            return registryService.saveRegistry(registry).finally(() => {
                 resolve(new MountScanResultDTO(mount, files, matches.length, Date.now() - startTime));
             });
-        })
-
-        // Listen for error event
-        globs.on("error", (err: Error) => {
+        }).catch((err) => {
             reject(err);
-        })
+        });
     })
 }
 

@@ -8,7 +8,7 @@ import { File } from "../../file/entities/file.entity";
 import { Mount } from "../../mount/entities/mount.entity";
 import { SC_ARTWORKDIR_NAME, SC_IDFILE_NAME } from "../filesystem.module";
 import { Artwork } from "../../artwork/entities/artwork.entity";
-import { Environment } from "@repo/utilities";
+import { Environment } from "@repo/bootstrap";
 import { randomString } from "@repo/utilities";
 
 @Injectable()

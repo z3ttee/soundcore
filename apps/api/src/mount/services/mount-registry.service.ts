@@ -4,7 +4,7 @@ import { Injectable, Logger } from "@nestjs/common";
 import { FileSystemService } from "../../filesystem/services/filesystem.service";
 import { MountRegistry } from "../entities/mount-registry.entity";
 import { Mount } from "../entities/mount.entity";
-import { Environment } from "@repo/utilities";
+import { Environment } from "@repo/bootstrap";
 
 @Injectable()
 export class MountRegistryService {

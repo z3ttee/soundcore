@@ -7,7 +7,7 @@ import { MountQueueService } from './services/mount-queue.service';
 import { MountRegistryService } from './services/mount-registry.service';
 import { GatewayModule } from '../gateway/gateway.module';
 import { IndexerModule } from '../indexer/indexer.module';
-import { Environment } from '@repo/utilities';
+import { Environment } from '@repo/bootstrap';
 
 @Module({
   controllers: [

@@ -8,7 +8,7 @@ import { PipelineModule } from '@repo/pipelines';
         IndexerService
     ],
     imports: [
-        PipelineModule.registerPipelines({
+        PipelineModule.forFeature({
             pipelines: [
                 path.join(__dirname, "pipelines", "indexer.pipeline.js")
             ]

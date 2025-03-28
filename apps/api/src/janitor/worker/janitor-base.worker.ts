@@ -1,5 +1,5 @@
 import { InternalServerErrorException, Logger } from "@nestjs/common";
-import { Environment } from "@repo/utilities";
+import { Environment } from "@repo/bootstrap";
 import { WorkerJobRef } from "@repo/queue";
 import { DataSource } from "typeorm";
 import { ImportTask } from "../../import/entities/import.entity";

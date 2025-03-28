@@ -11,12 +11,13 @@ import { FileSystemService } from '../../filesystem/services/filesystem.service'
 import { MountRegistryService } from './mount-registry.service';
 import { MountScanFlag } from '../dtos/scan-process.dto';
 import { FileFlag } from '../../file/entities/file.entity';
-import { Environment, Page, Pageable } from '@repo/utilities';
+import { Page, Pageable } from '@repo/utilities';
 import { EVENT_MOUNT_PROCESS_UPDATE, MOUNTNAME_MAX_LENGTH } from '../../constants';
 import { AdminGateway } from '../../gateway/gateways/admin-gateway.gateway';
 import { OnEvent } from '@nestjs/event-emitter';
 import { IndexerService } from '../../indexer/services/indexer.service';
 import { Task } from '../../tasks/entities/task.entity';
+import { Environment } from '@repo/bootstrap';
 
 @Injectable()
 export class MountService {

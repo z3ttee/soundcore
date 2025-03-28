@@ -72,7 +72,7 @@ import { PipelineModule } from '@repo/pipelines';
   // ...
   imports: [
     // ...
-    PipelineModule.registerPipelines({
+    PipelineModule.forFeature({
       pipelines: [
         // Note: You have to reference the path of the compiled javascript file
         path.join(__dirname, "my-pipeline.pipeline.js")

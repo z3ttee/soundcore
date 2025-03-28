@@ -1,6 +1,6 @@
 import { BadRequestException, Inject, Injectable, InternalServerErrorException, Logger, UnauthorizedException } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
-import { BaseClient, Client, Issuer } from "openid-client";
+import { Configuration, discovery } from "openid-client";
 import { OIDCConfig } from "../config/oidc.config";
 import { OIDC_OPTIONS } from "../oidc.constants";
 import { catchError, map, Observable, of, switchMap, tap } from "rxjs";
@@ -10,9 +10,6 @@ import { JWKSet, JWKStore } from "../entities/jwks.entity";
 @Injectable()
 export class OIDCService {
     private readonly logger: Logger = new Logger(OIDCService.name);
-
-    private _issuer: Issuer;
-    private _client: Client;
 
     // Updated by findRemoteJwks()
     private _keystore: JWKStore;
@@ -27,21 +24,12 @@ export class OIDCService {
         }
     }
 
-    public client(): Observable<Client> {
-        return new Observable((subscriber) => {
-            subscriber.add(this.issuer().subscribe(() => {
-                subscriber.next(this._client);
-                subscriber.complete();
-            }));
-        })
-    }
-
-    public jwksUri(): Observable<string> {
-        return this.client().pipe(map((client) => client?.issuer?.metadata?.jwks_uri));
+    public getJwksUri() {
+        return this.getOIDCConfiguration().pipe(map((conf) => conf.serverMetadata().jwks_uri));
     }
 
     public verifyAccessToken(tokenValue: string): Observable<JWTTokenPayload> {
-        return this.issuer().pipe(
+        return this.getOIDCConfiguration().pipe(
             switchMap(() => {
                 const token = this.jwtService.decode(tokenValue, { complete: true }) as KeycloakDecodedToken;
                 const kid = token?.header?.kid;
@@ -79,22 +67,18 @@ export class OIDCService {
         return `-----BEGIN CERTIFICATE-----\n${cert}\n-----END CERTIFICATE-----`;
     }
 
-    public issuer(): Observable<Issuer> {
+    public getOIDCConfiguration(): Observable<Configuration> {
         return new Observable((subscriber) => {
-            const discoverObservable: Observable<Issuer<BaseClient>> = new Observable((sub) => {
-                Issuer.discover(`${this.options.issuer}`).then((issuer) => {
-                    this._issuer = issuer
-                    this._client = new this._issuer.Client({
-                        client_id: this.options.client_id,
-                        client_secret: this.options.client_secret,
-                        redirect_uris: [this.options.redirect_uri],
-                        response_types: ["code"]
-                    })
-
-                    this._issuer = issuer;
-                    sub.next(issuer);
+            const discoverObservable: Observable<Configuration> = new Observable((sub) => {
+                discovery(new URL(`${this.options.issuer}`), this.options.client_id, {
+                    client_id: this.options.client_id,
+                    client_secret: this.options.client_secret,
+                    redirect_uris: [this.options.redirect_uri],
+                    response_types: ["code"]
+                }).then((oidcConfiguration) => {
+                    sub.next(oidcConfiguration);
                 }).catch((error: Error) => {
-                    sub.error(new Error(`Could not contact issuer: ${error.message}`));
+                    sub.error(new Error(`Could not load oidc configuration: ${error.message}`));
                 }).finally(() => {
                     sub.complete();
                 });
@@ -135,7 +119,7 @@ export class OIDCService {
 
     private fetchAndCacheJwks(): Observable<JWKStore> {
         return new Observable((subscriber) => {
-            subscriber.add(this.jwksUri().subscribe((jwksUri) => {
+            subscriber.add(this.getJwksUri().subscribe((jwksUri) => {
                 fetch(jwksUri).then((response) => {
                     return response.json();
                 }).catch(() => {

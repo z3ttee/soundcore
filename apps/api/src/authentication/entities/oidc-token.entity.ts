@@ -34,10 +34,9 @@ export class KeycloakTokenPayload extends JWTTokenPayload {
 
 export class JWTDecodedToken {
     header?: JWTTokenHeader;
-    payload?: JWTTokenPayload;
+    payload?: KeycloakTokenPayload;
     signature?: string;
 }
 
 export class KeycloakDecodedToken extends JWTDecodedToken {
-    override payload?: KeycloakTokenPayload;
 }

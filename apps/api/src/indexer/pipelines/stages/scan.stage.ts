@@ -1,8 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import crypto from "node:crypto";
-import glob from "glob";
-import iconv from "iconv-lite";
+import { glob } from "glob";
 import { DataSource } from "typeorm";
 import { Mount } from "../../../mount/entities/mount.entity";
 import { FileSystemService } from "../../../filesystem/services/filesystem.service";
@@ -76,52 +75,39 @@ export async function step_search_files(params: StepParams) {
         fs.mkdirSync(directory, { recursive: true });
     }
 
-    const files = await new Promise<FileDTO[]>(async (resolve, reject) => {
-        // Read registry
-        let registry: MountRegistry = await registryService.readRegistry(mount);
-
+    const files: FileDTO[] = await registryService.readRegistry(mount).then((registry) => {
         if (environment.force) {
-            registry = await registryService.resetRegistry(registry);
+            return registryService.resetRegistry(registry);
         }
-
+        return registry;
+    }).then(async (registry) => {
         // Execute scan
         const files: FileDTO[] = [];
-        const matches: string[] = [];
-        const globs = glob("**/*.mp3", { cwd: directory }, () => ({}));
 
-        // Listen for match event
-        // On every match, create a new object
-        // for future processing
-        globs.on("match", (match: any) => {
-            // Check if files already in registry, if not, add to files list
-            // for further processing. Otherwise it will be ignored
-            if (!registry.files.includes(match)) {
-                // On every match, create object.
-                const file = new FileDTO();
-                file.directory = path.dirname(match);
-                file.filename = path.basename(match);
+        await glob("**/*.mp3", { cwd: directory, ignore: registry.files }).then((matches) => {
+            console.log(registry.files);
+            console.log(" \n\n\n\n\n\n ");
+            console.log(matches);
 
-                files.push(file);
+            for (const match of matches) {
+                // Check if files already in registry, if not, add to files list
+                // for further processing. Otherwise it will be ignored
+                if (!registry.files.includes(match)) {
+                    // On every match, create object.
+                    const file = new FileDTO();
+                    file.directory = path.dirname(match);
+                    file.filename = path.basename(match);
+
+                    files.push(file);
+                }
             }
 
-            // Always add match to matches array
-            matches.push(match);
-        })
-
-        // Listen for END event.
-        // This will be triggered when matching process is done.
-        globs.on("end", () => {
             // Update registry file entries
             registry.files = matches;
-            registryService.saveRegistry(registry).finally(() => {
-                resolve(files);
-            });
-        });
+            return registryService.saveRegistry(registry);
+        })
 
-        // Listen for error event
-        globs.on("error", (err: Error) => {
-            reject(err);
-        });
+        return files;
     }).catch((error: Error) => {
         // Redirect error to step
         throw error;

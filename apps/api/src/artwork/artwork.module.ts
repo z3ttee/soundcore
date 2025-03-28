@@ -23,7 +23,7 @@ import { ArtworkBackgroundService } from './services/background.service';
       ArtistArtwork,
       DownloadableArtwork
     ]),
-    PipelineModule.registerPipelines({
+    PipelineModule.forFeature({
       pipelines: [
         path.join(__dirname, "pipelines", "artwork.pipeline.js")
       ]

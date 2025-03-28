@@ -1,8 +1,9 @@
 import { Controller, Get, Param, Query } from '@nestjs/common';
-import { Pageable, Pagination } from '@repo/utilities';
+import { Pageable } from '@repo/utilities';
 import { Authentication } from '../../authentication/decorators/authentication.decorator';
 import { User } from '../../user/entities/user.entity';
 import { AlbumService } from '../services/album.service';
+import { Pagination } from '@repo/nestjs';
 
 @Controller('albums')
 export class AlbumController {
