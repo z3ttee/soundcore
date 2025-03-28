@@ -1,6 +1,6 @@
 import { FactoryProvider, ModuleMetadata } from "@nestjs/common";
 
-export interface PipelineGlobalOptions {    
+export interface PipelineRootOptions {
     /**
      * Enable printing the logs of a pipeline run to the console.
      * @default false
@@ -16,11 +16,12 @@ export interface PipelineGlobalOptions {
     logsDirectory?: string;
 }
 
-export type AsyncPipelineGlobalOptions = {
-    useFactory: (...args: any[]) => Promise<PipelineGlobalOptions> | PipelineGlobalOptions;
-} & Pick<ModuleMetadata, 'imports'> & Pick<FactoryProvider, 'inject'>
+export interface AsyncPipelineRootOptions {
+    useFactory: (...args: any[]) => Promise<PipelineRootOptions> | PipelineRootOptions;
+    inject?: any[];
+}
 
-export interface PipelineLocalOptions {
+export interface PipelineFeatureOptions {
     /**
      * List of filepaths to pipeline script file
      * If no files are defined, the application recursively looks
@@ -51,4 +52,9 @@ export interface PipelineLocalOptions {
      * @default 100
      */
     debounceStatus?: number;
+}
+
+export interface AsyncPipelineFeatureOptions {
+    useFactory: (...args: any[]) => Promise<PipelineFeatureOptions> | PipelineFeatureOptions;
+    inject?: any[];
 }

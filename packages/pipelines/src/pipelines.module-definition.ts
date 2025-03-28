@@ -1,9 +1,9 @@
 import { ConfigurableModuleBuilder } from "@nestjs/common";
-import { PipelineGlobalOptions } from "./options";
+import { PipelineRootOptions } from "./options";
 
 
 
 export const {
     ConfigurableModuleClass: ConfigurablePipelineModule,
     MODULE_OPTIONS_TOKEN
-} = new ConfigurableModuleBuilder<PipelineGlobalOptions>().setClassMethodName("forRoot").build();
+} = new ConfigurableModuleBuilder<PipelineRootOptions>().setClassMethodName("forRoot").build();

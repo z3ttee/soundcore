@@ -94,18 +94,18 @@ import { ConfigureModule } from './configure/configure.module';
     //     }
     //   })
     // }),
-    // PipelineModule.forRootAsync({
-    //   inject: [FileSystemService],
-    //   useFactory: async (fsService: FileSystemService) => {
-    //     return {
-    //       // Enable stdout on dev mode
-    //       enableStdout: !Environment.isProduction,
-    //       // Disable file logs on dev environment
-    //       disableFileLogs: !Environment.isProduction,
-    //       logsDirectory: fsService.getLogsDir()
-    //     }
-    //   }
-    // }),
+    PipelineModule.forRootAsync({
+      inject: [FileSystemService],
+      useFactory: async (fsService: FileSystemService) => {
+        return {
+          // Enable stdout on dev mode
+          enableStdout: Environment.isDev,
+          // Disable file logs on dev environment
+          disableFileLogs: Environment.isDev,
+          logsDirectory: fsService.getLogsDir()
+        }
+      }
+    }),
     EventEmitterModule.forRoot({ global: true, ignoreErrors: true }),
     ArtistModule,
     ZoneModule,

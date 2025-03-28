@@ -9,10 +9,11 @@ import { PipelineRegistry } from "./pipeline-registry.service";
 import { Environment, RunStatus } from "../entities/common.entity";
 import { EventHandler, EventName, WorkerEmitEvent } from "../event/event";
 import { PipelineEventService } from "./pipeline-event.service";
-import { PipelineGlobalOptions, PipelineLocalOptions } from "../options";
+import { PipelineRootOptions, PipelineFeatureOptions } from "../options";
 import { Stage } from "../entities/stage.entity";
 import { Step } from "../entities/step.entity";
 import { MODULE_OPTIONS_TOKEN } from "../pipelines.module-definition";
+import { buildDefinitionsFromFiles } from "../utils/registerPipelines";
 
 @Injectable()
 export class PipelineService {
@@ -27,9 +28,13 @@ export class PipelineService {
         private readonly queue: PipelineQueue,
         private readonly registry: PipelineRegistry,
         private readonly events: PipelineEventService,
-        @Inject(MODULE_OPTIONS_TOKEN) private readonly globalOptions: PipelineGlobalOptions,
-        @Inject(LOCAL_OPTIONS_TOKEN) private readonly localOptions: PipelineLocalOptions,
+        @Inject(MODULE_OPTIONS_TOKEN) private readonly globalOptions: PipelineRootOptions,
+        @Inject(LOCAL_OPTIONS_TOKEN) private readonly localOptions: PipelineFeatureOptions,
     ) {
+        const pipelineFiles = localOptions.pipelines ?? [];
+        const definitions = buildDefinitionsFromFiles(pipelineFiles);
+        registry.registerAll(definitions);
+
         // Create worker pool
         this.pool = pool(path.resolve(__dirname, "..", "worker", "pipeline.worker.js"), {
             workerType: "auto",

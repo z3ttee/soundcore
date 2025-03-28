@@ -8,12 +8,12 @@ import { StepConditionEvaluator, StepExecutor, StepRef } from "../entities/step.
 import { PipelineAbortedException } from "../exceptions/abortedException";
 import { SkippedException } from "../exceptions/skippedException";
 import { createLogger } from "../logging/logger";
-import { PipelineGlobalOptions, PipelineLocalOptions } from "../options";
+import { PipelineRootOptions, PipelineFeatureOptions } from "../options";
 import { readConfiguratorFromFile } from "../utils/registerPipelines";
 import { emit, getOrDefault, globalThis, PipelineGlobal, resetGlobals } from "../utils/workerHelperFunctions";
 
 worker({
-    default: async (pipeline: PipelineRun, definition: IPipeline, globalOptions: PipelineGlobalOptions, localOptions: PipelineLocalOptions): Promise<PipelineWorkerResult> => {
+    default: async (pipeline: PipelineRun, definition: IPipeline, globalOptions: PipelineRootOptions, localOptions: PipelineFeatureOptions): Promise<PipelineWorkerResult> => {
         const startedAtMs: number = Date.now();
 
         // Instantiate logger
