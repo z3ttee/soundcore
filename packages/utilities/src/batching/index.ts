@@ -1,2 +1,3 @@
 
-export { Batch, BatchingHandler, ErrorHandler, MapBatchingHandler } from "./batching"
+export { Batch } from "./batching"
+export type { BatchingHandler, ErrorHandler, MapBatchingHandler } from "./batching"

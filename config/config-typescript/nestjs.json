@@ -16,9 +16,9 @@
     "incremental": true,
     "strict": false,
     "skipLibCheck": true,
-    "sourceMap": false,
-    "declaration": false,
-    "declarationMap": false
+    "sourceMap": true,
+    "declaration": true,
+    "declarationMap": true
   },
   "include": [
     "src"

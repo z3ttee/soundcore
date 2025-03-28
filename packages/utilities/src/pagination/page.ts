@@ -2,7 +2,7 @@ import { objectToSearchParams } from "../utils";
 import { isNull } from "../utils/utilities";
 import { PageFilter, PageSort } from "./filter";
 
-export class Page<T = unknown> {
+export class Page<T = any> {
   /**
    * Amount of items on the current page
    */
@@ -43,12 +43,12 @@ export class Page<T = unknown> {
     }
   }
 
-  public static of<T = unknown>(items: T[], totalSize: number, pageable?: Pageable): Page<T> {
+  public static of<T = any>(items: T[], totalSize: number, pageable?: Pageable): Page<T> {
     return new Page(items, totalSize, { limit: pageable?.limit, offset: pageable?.offset, index: pageable?.index });
   }
 
-  public static empty<T = unknown>(pageable?: Pageable): Page<T>;
-  public static empty<T = unknown>(limitOrPageable?: number | Pageable, offset?: number): Page<T> {
+  public static empty<T = any>(pageable?: Pageable): Page<T>;
+  public static empty<T = any>(limitOrPageable?: number | Pageable, offset?: number): Page<T> {
     if (typeof limitOrPageable === "number")
       return new Page([], 0, {
         limit: limitOrPageable,

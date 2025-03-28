@@ -43,6 +43,7 @@
     "@vercel/analytics": "^1.0.0"
   },
   "devDependencies": {
+    "@repo/config-typescript": "*",
     "@angular-devkit/build-angular": "^15.2.0",
     "@angular/cli": "~15.2.0",
     "@angular/compiler-cli": "^15.2.0",
