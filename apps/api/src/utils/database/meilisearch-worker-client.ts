@@ -1,6 +1,5 @@
 import { MeiliClient } from "@repo/meilisearch";
 import { IndexSchema } from "@repo/meilisearch/dist/definitions";
-import MeiliSearch from "meilisearch";
 
 class MeilisearchImpl {
     private static instance: MeilisearchImpl;

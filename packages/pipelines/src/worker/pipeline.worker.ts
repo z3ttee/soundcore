@@ -29,7 +29,7 @@ worker({
         const pipelineConfigurator = readConfiguratorFromFile(path.resolve(definition.scriptFile));
 
         // Resolve pipeline entity
-        if(typeof pipelineConfigurator["_resolver"] === "function") {
+        if (typeof pipelineConfigurator["_resolver"] === "function") {
             const resolver = async () => pipelineConfigurator["_resolver"](pipeline);
             pipeline = await resolver().catch((error: Error) => {
                 logger.error(`Could not resolve custom pipeline entity: ${error.message}`, error.stack);
@@ -47,12 +47,12 @@ worker({
 
         // Extract stage initializers pipeline script
         const stageConfigurators: Map<string, StageConfigurator> = new Map();
-        for(const stageConfigurator of pipelineConfigurator["_stages"]) {
+        for (const stageConfigurator of pipelineConfigurator["_stages"]) {
             stageConfigurators.set(stageConfigurator["_id"], stageConfigurator);
         }
 
         // Execute all stages
-        for(let stageIndex = 0; stageIndex < pipeline.stages.length; stageIndex++) {
+        for (let stageIndex = 0; stageIndex < pipeline.stages.length; stageIndex++) {
             const stage = pipeline.stages[stageIndex];
             const prevStage = stageIndex > 0 ? pipeline.stages[stageIndex - 1] : stage;
             logger.info(`Preparing stage '${stage.id}'...`);
@@ -64,9 +64,9 @@ worker({
             const stageConfigurator = stageConfigurators.get(stage.id)?.["_steps"];
             const stepCondEvaluators: Map<string, StepConditionEvaluator> = new Map();
             const stepExecutors: Map<string, StepExecutor> = new Map();
-            for(const stepConfigurator of stageConfigurator) {
-                if(typeof stepConfigurator["_conditionEvaluator"] === "function") stepCondEvaluators.set(stepConfigurator["_id"], stepConfigurator["_conditionEvaluator"]);
-                if(typeof stepConfigurator["_runner"] === "function") stepExecutors.set(stepConfigurator["_id"], stepConfigurator["_runner"])
+            for (const stepConfigurator of stageConfigurator) {
+                if (typeof stepConfigurator["_conditionEvaluator"] === "function") stepCondEvaluators.set(stepConfigurator["_id"], stepConfigurator["_conditionEvaluator"]);
+                if (typeof stepConfigurator["_runner"] === "function") stepExecutors.set(stepConfigurator["_id"], stepConfigurator["_runner"])
             }
 
             try {
@@ -76,26 +76,26 @@ worker({
                 emit("status", { pipeline });
 
                 // Check if there are any executors registered, otherwise skip stage
-                if(stepExecutors.size <= 0) {
+                if (stepExecutors.size <= 0) {
                     logger.warn(`Stage '${stage.id}' has no steps. Skipping...`);
                     continue;
                 }
 
                 // Evaluate if stage can run based on condition
-                if(typeof stageConfigurators.get(stage.id)?.["_conditionEvaluator"] === "function") {
+                if (typeof stageConfigurators.get(stage.id)?.["_conditionEvaluator"] === "function") {
                     const conditionEvaluator = async (prevOutput: Outputs, shared: Outputs) => await stageConfigurators.get(stage.id)?.["_conditionEvaluator"]({
-                        environment: {...pipeline.environment},
-                        prevOutput: prevOutput, 
+                        environment: { ...pipeline.environment },
+                        prevOutput: prevOutput,
                         shared: shared
                     });
                     const outputs = getOrDefault(`${prevStage.id}`, {});
 
                     // Execute evaluator
-                    await conditionEvaluator(outputs, {...globalThis.sharedOutputs}).catch((error: Error) => {
+                    await conditionEvaluator(outputs, { ...globalThis.sharedOutputs }).catch((error: Error) => {
                         logger.warn(`Could not evaluate condition for step '${stage.id}': ${error.message}`);
                         throw new SkippedException(`Could not evaluate condition: ${error.message}`);
                     }).then((canContinue) => {
-                        if(!canContinue) {
+                        if (!canContinue) {
                             stage.status = RunStatus.SKIPPED;
                             throw new SkippedException(`Skipped because condition was not met. Received 'false'`);
                         }
@@ -105,18 +105,18 @@ worker({
                 // Instantiate default resources and execute
                 // optional initializer to build resources object
                 let resources: Resources = {};
-                if(typeof stageConfigurators.get(stage.id)?.["_initializer"] === "function") {
+                if (typeof stageConfigurators.get(stage.id)?.["_initializer"] === "function") {
                     const initializer: StageInitializer = stageConfigurators.get(stage.id)?.["_initializer"];
 
                     // Execute initializer
-                    resources = await initializer().then((val) => val ?? {}).catch((error: Error) => {
+                    resources = await initializer(pipeline.environment).then((val) => val ?? {}).catch((error: Error) => {
                         logger.error(`Failed initializing stage: ${error.message}`, error.stack);
                         throw error;
                     });
                 }
 
                 // Execute steps
-                for(let index = 0; index < stage.steps.length; index++) {
+                for (let index = 0; index < stage.steps.length; index++) {
                     const step = stage.steps[index];
                     const prevStep = index > 0 ? stage.steps[index - 1] : undefined;
 
@@ -125,7 +125,7 @@ worker({
                     logger.info(`Preparing step '${step.id}'...`);
 
                     // Check if the step can be executed
-                    if(!stepExecutors.has(step.id) || typeof stepExecutors.get(step.id) !== "function") {
+                    if (!stepExecutors.has(step.id) || typeof stepExecutors.get(step.id) !== "function") {
                         throw new Error(`Step '${step.id}' has invalid executor function`);
                     }
 
@@ -136,18 +136,18 @@ worker({
                         emit("status", { pipeline });
 
                         // Evaluate condition, if not met, skip the step
-                        if(stepCondEvaluators.has(step.id)) {
+                        if (stepCondEvaluators.has(step.id)) {
                             const conditionEvaluator = async (prevOutput: Outputs) => await stepCondEvaluators.get(step.id)({
-                                environment: {...pipeline.environment},
-                                prevOutput: prevOutput, 
-                                shared: {...globalThis.sharedOutputs}
+                                environment: { ...pipeline.environment },
+                                prevOutput: prevOutput,
+                                shared: { ...globalThis.sharedOutputs }
                             });
                             const outputs = !!prevStep ? getOrDefault(`${stage.id}.${prevStep.id}`, {}) : {};
                             await conditionEvaluator(outputs).catch((error: Error) => {
                                 logger.warn(`Could not evaluate condition for step '${step.id}': ${error.message}`);
                                 throw new SkippedException(`Could not evaluate condition: ${error.message}`);
                             }).then((canContinue) => {
-                                if(!canContinue) {
+                                if (!canContinue) {
                                     step.status = RunStatus.SKIPPED;
                                     throw new SkippedException(`Skipped because condition was not met. Received 'false'`);
                                 }
@@ -185,7 +185,7 @@ worker({
                             emit("status", { pipeline });
                         })
                     } catch (error) {
-                        if(error instanceof SkippedException) {
+                        if (error instanceof SkippedException) {
                             logger.warn(`Skipped step '${step.id}': ${error.reason}`);
                             step.status = step.status != RunStatus.WORKING ? step.status : RunStatus.SKIPPED;
                             emit("status", { pipeline });
@@ -202,8 +202,8 @@ worker({
                 stage.status = RunStatus.COMPLETED;
                 stage.currentStepId = null;
                 emit("status", { pipeline });
-            } catch (error: any) {                
-                if(error instanceof PipelineAbortedException) {
+            } catch (error: any) {
+                if (error instanceof PipelineAbortedException) {
                     // Pipeline was aborted
                     pipeline.status = RunStatus.ABORTED;
                     stage.status = RunStatus.ABORTED;
@@ -211,7 +211,7 @@ worker({
                     emit("status", { pipeline });
                     logDurationMs(startedAtMs, logger);
                     throw new Error(`Pipeline aborted by step '${error.issuer.id}': ${error.message}`);
-                } else if(error instanceof SkippedException) {
+                } else if (error instanceof SkippedException) {
                     // Stage was skipped
                     logger.warn(`Skipped stage '${stage.id}': ${error.reason}`);
                     stage.status = stage.status != RunStatus.WORKING ? stage.status : RunStatus.SKIPPED;
@@ -239,9 +239,9 @@ worker({
 
         logDurationMs(startedAtMs, logger);
 
-        const pipelineResult = {...pipeline};
-        const outputsResult = {...globalThis.outputs};
-        const sharedResult = {...globalThis.sharedOutputs};
+        const pipelineResult = { ...pipeline };
+        const outputsResult = { ...globalThis.outputs };
+        const sharedResult = { ...globalThis.sharedOutputs };
 
         // Free resources by deleting globalThis and setting it to empty obj
         resetGlobals();

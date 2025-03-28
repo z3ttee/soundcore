@@ -1,9 +1,9 @@
-import { Resources } from "../entities/common.entity";
+import { Environment, Resources } from "../entities/common.entity";
 import { StageConditionEvaluator } from "../entities/stage.entity";
 import { PipelineConfigurator } from "./pipeline.builder";
 import { StepConfigurator } from "./step.builder";
 
-export type StageInitializer = () => Promise<Resources>;
+export type StageInitializer = (env: Environment) => Promise<Resources>;
 
 export class StageConfigurator {
     private readonly _steps: StepConfigurator[] = [];
@@ -16,7 +16,7 @@ export class StageConfigurator {
         private readonly _id: string,
         private readonly _name: string,
         private readonly _description?: string
-    ) {}
+    ) { }
 
     public condition(evaluator: StageConditionEvaluator): StageConfigurator {
         this._conditionEvaluator = evaluator;

@@ -1,6 +1,7 @@
 
 export const MEILISEARCH_PIPELINE_ID = "meilisearch-sync-pipeline"
 export const MEILISEARCH_PIPELINE_NAME = "Sync with Meilisearch"
+export const SEARCH_ENGINE_PIPELINE_NAME = "Sync with search engine"
 
 export const STAGE_SYNC_ID = "sync-resources"
 export const STAGE_SYNC_NAME = "Sync resources"
