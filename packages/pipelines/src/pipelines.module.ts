@@ -1,12 +1,9 @@
 import { DynamicModule, Module } from "@nestjs/common";
-import { LOCAL_OPTIONS_TOKEN } from "./constants";
 import { PipelineRootOptions, PipelineFeatureOptions, AsyncPipelineRootOptions, AsyncPipelineFeatureOptions } from "./options";
-import { ConfigurablePipelineModule } from "./pipelines.module-definition";
 import { PipelineEventService } from "./services/pipeline-event.service";
 import { PipelineQueue } from "./services/pipeline-queue.service";
 import { PipelineRegistry } from "./services/pipeline-registry.service";
 import { PipelineService } from "./services/pipelines.service";
-import { buildDefinitionsFromFiles } from "./utils/registerPipelines";
 import { createAsyncPipelineFeatureOptionsProvider, createAsyncPipelineRootOptionsProvider, createPipelineFeatureOptionsProvider, createPipelineRootOptionsProvider } from "./providers";
 
 export const rootRegistry = new PipelineRegistry();

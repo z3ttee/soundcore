@@ -12,8 +12,8 @@ import { PipelineEventService } from "./pipeline-event.service";
 import { PipelineRootOptions, PipelineFeatureOptions } from "../options";
 import { Stage } from "../entities/stage.entity";
 import { Step } from "../entities/step.entity";
-import { MODULE_OPTIONS_TOKEN } from "../pipelines.module-definition";
 import { buildDefinitionsFromFiles } from "../utils/registerPipelines";
+import { PROVIDER_TOKEN_FEATURE_OPTIONS, PROVIDER_TOKEN_ROOT_OPTIONS } from "../providers";
 
 @Injectable()
 export class PipelineService {
@@ -28,8 +28,8 @@ export class PipelineService {
         private readonly queue: PipelineQueue,
         private readonly registry: PipelineRegistry,
         private readonly events: PipelineEventService,
-        @Inject(MODULE_OPTIONS_TOKEN) private readonly globalOptions: PipelineRootOptions,
-        @Inject(LOCAL_OPTIONS_TOKEN) private readonly localOptions: PipelineFeatureOptions,
+        @Inject(PROVIDER_TOKEN_ROOT_OPTIONS) private readonly globalOptions: PipelineRootOptions,
+        @Inject(PROVIDER_TOKEN_FEATURE_OPTIONS) private readonly localOptions: PipelineFeatureOptions,
     ) {
         const pipelineFiles = localOptions.pipelines ?? [];
         const definitions = buildDefinitionsFromFiles(pipelineFiles);
