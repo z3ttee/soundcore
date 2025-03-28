@@ -38,10 +38,6 @@ export function readServiceInfoSync(): ServiceInfo {
     const jsonData: Record<keyof Omit<ServiceInfo, "client_secret">, string> = JSON.parse(fileData.toString());
     const client_secret: string | undefined = process.env[ENV_CLIENT_SECRET_KEY];
 
-    if (isNull(client_secret)) {
-      logger.warn(`Missing CLIENT_SECRET for service ${jsonData.client_name}`);
-    }
-
     return Object.assign(
       new ServiceInfo(
         jsonData.client_id,

@@ -34,6 +34,12 @@ export function createMeilisearchClient(): Provider {
         provide: MeiliClient,
         inject: [PROVIDER_TOKEN_ROOT_OPTIONS],
         useFactory: async (options: MeilisearchRootOptions): Promise<MeiliClient> => {
+            if (options.enabled == false) {
+                const logger = new Logger(LOGGER_LABEL);
+                logger.warn(`Meilisearch client is disabled. Skipping initialization.`);
+                return null;
+            }
+
             const client = new MeiliClient(options, []);
             return client.getVersion().catch((error: Error) => {
                 const logger = new Logger(LOGGER_LABEL);
@@ -50,7 +56,7 @@ export function createIndexProviders(schemas: IndexSchema[]): Provider[] {
     return schemas.map((schema) => ({
         provide: getSchemaToken(schema),
         inject: [PROVIDER_TOKEN_ROOT_OPTIONS, MeiliClient],
-        useFactory: async (options: MeilisearchRootOptions, client: MeiliClient) => {
+        useFactory: async (options: MeilisearchRootOptions, client: MeiliClient | null) => {
             return syncIndexSchema(schema, options, client)
         }
     }))

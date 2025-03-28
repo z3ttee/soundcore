@@ -1,10 +1,11 @@
 import { Config } from "meilisearch";
 
 export type MeilisearchRootOptions = Config & {
+    readonly enabled?: boolean;
     /**
      * Prefix string that is applied on all index uids
      */
-    indexPrefix?: string;
+    readonly indexPrefix?: string;
 }
 
 export type AsyncMeilisearchRootOptions = {

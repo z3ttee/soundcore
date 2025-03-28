@@ -1,4 +1,4 @@
-import MeiliSearch, { Config, Index, IndexesResults, IndexObject, Pagination } from "meilisearch";
+import { Config, Index, IndexesResults, IndexObject, Pagination, MeiliSearch } from "meilisearch";
 import { IndexSchema } from "../definitions";
 import { SchemaService } from "../services/schema.service";
 import { createMeiliIndex } from "../utils/indexInit";

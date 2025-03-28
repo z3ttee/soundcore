@@ -73,10 +73,11 @@ import { ConfigureModule } from './configure/configure.module';
       charset: "utf8mb4",
     }),
     MeilisearchModuleNEXT.forRootAsync({
-      useFactory: (configService: ConfigService) => ({
-        host: process.env.MEILISEARCH_HOST,
-        port: process.env.MEILISEARCH_PORT ? parseInt(process.env.MEILISEARCH_PORT) : null,
-        key: process.env.MEILISEARCH_KEY,
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => ({
+        enabled: config.get("SEARCH_ENGINE_MODULE") === "meilisearch",
+        host: `${config.get("SEARCH_ENGINE_HOST")}:${config.get("SEARCH_ENGINE_PORT")}`,
+        apiKey: config.get("SEARCH_ENGINE_KEY"),
         indexPrefix: "sc_"
       })
     }),

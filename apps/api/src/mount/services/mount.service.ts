@@ -206,15 +206,17 @@ export class MountService {
         const existingMount = await this.findByNameInBucket(createMountDto.zone.id, createMountDto.name) || await this.findByDirectoryInBucket(createMountDto.zone.id, createMountDto.directory);
         if (existingMount) return new CreateResult(existingMount, true);
 
-        const mount = this.repository.create();
-        mount.name = createMountDto.name;
-        mount.directory = directory;
-        mount.zone = createMountDto.zone as Zone;
+        const mount = this.repository.create({
+            name: createMountDto.name,
+            directory: directory,
+            zone: {
+                id: createMountDto.zone.id,
+            },
+        });
 
         return this.repository.createQueryBuilder()
             .insert()
             .values(mount)
-            .orIgnore()
             .execute().then((insertResult) => {
                 if (insertResult.identifiers.length < 0) {
                     return this.findByNameInBucket(createMountDto.zone.id, createMountDto.name).then((existingMount) => {

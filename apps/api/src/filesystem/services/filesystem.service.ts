@@ -10,6 +10,7 @@ import { SC_ARTWORKDIR_NAME, SC_IDFILE_NAME } from "../filesystem.module";
 import { Artwork } from "../../artwork/entities/artwork.entity";
 import { Environment } from "@repo/bootstrap";
 import { randomString } from "@repo/utilities";
+import { randomUUID } from "crypto";
 
 @Injectable()
 export class FileSystemService {
@@ -189,7 +190,7 @@ export class FileSystemService {
         // - Return instanceId and skip file read
         if (!fs.existsSync(filepath)) {
             this._logger.warn(`Could not find file ${SC_IDFILE_NAME}. Creating new instance id.`);
-            instanceId = randomString(36);
+            instanceId = randomUUID();
             fs.mkdirSync(path.dirname(filepath), { recursive: true });
             fs.writeFileSync(filepath, instanceId, { encoding: "utf-8" });
             return instanceId;

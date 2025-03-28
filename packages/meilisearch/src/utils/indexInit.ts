@@ -17,7 +17,9 @@ export function createMeiliIndex(config: Config, schema: IndexSchema, metadata?:
   return new MeiliIndex(config, uid, primaryKey, schema, metadata);
 }
 
-export function syncIndexSchema(schema: IndexSchema, rootOptions: MeilisearchRootOptions, client: MeiliClient) {
+export function syncIndexSchema(schema: IndexSchema, rootOptions: MeilisearchRootOptions, client: MeiliClient | null) {
+  if (!client || rootOptions.enabled === false) return null;
+
   const logger = new Logger(LOGGER_LABEL);
 
   // Extract index options from reflect-metadata
