@@ -25,6 +25,7 @@ export class PipelineModule {
                 }
             ],
             exports: [
+                OptionsProvider,
                 PipelineRegistry
             ]
         }
@@ -44,6 +45,7 @@ export class PipelineModule {
                 }
             ],
             exports: [
+                OptionsProvider,
                 PipelineRegistry
             ]
         }
