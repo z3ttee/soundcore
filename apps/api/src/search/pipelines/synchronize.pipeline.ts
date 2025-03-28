@@ -1,4 +1,4 @@
-import { pipeline } from "@soundcore/pipelines";
+import { pipeline } from "@repo/pipelines";
 import Database from "../../utils/database/database-worker-client";
 import { MeilisearchWorkerClient } from "../../utils/database/meilisearch-worker-client";
 import { PIPELINE_ID_SEARCH_ENGINE_SYNC } from "../../constants";
@@ -21,7 +21,7 @@ export default pipeline(PIPELINE_ID_SEARCH_ENGINE_SYNC, SEARCH_ENGINE_PIPELINE_N
      */
     .stage(STAGE_SYNC_ID, STAGE_SYNC_NAME)
     .useResources(async (env) => {
-        return await Promise.all([
+        return Promise.all([
             Database.connect(),
             MeilisearchWorkerClient.create(env.config)
         ]).then(([datasource, meilisearch]) => ({ datasource, meilisearch }));

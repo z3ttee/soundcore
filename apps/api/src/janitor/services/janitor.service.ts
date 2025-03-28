@@ -1,6 +1,6 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { Environment } from "@soundcore/common";
-import { WorkerJob, WorkerJobRef, WorkerQueue } from "@soundcore/queue";
+import { WorkerJob, WorkerJobRef, WorkerQueue } from "@repo/queue";
 import { Observable, Subject } from "rxjs";
 import { Janitor, JanitorProcessRef, JanitorTask } from "../entities/janitor.entity";
 

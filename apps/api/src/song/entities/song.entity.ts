@@ -8,15 +8,15 @@ import { Label } from "../../label/entities/label.entity";
 import { PlaylistItem } from "../../playlist/entities/playlist-item.entity";
 import { Publisher } from "../../publisher/entities/publisher.entity";
 import { Stream } from "../../stream/entities/stream.entity";
-import { Slug } from "@tsalliance/utilities";
 import { LikedSong } from "../../collection/entities/like.entity";
 import { File } from "../../file/entities/file.entity";
 import { SongArtwork } from "../../artwork/entities/artwork.entity";
 import { TracklistItem } from "../../tracklist/entities/tracklist.entity";
 import { GeniusInfo } from "../../utils/entities/genius.entity";
 import { MeilisearchInfo } from "../../utils/entities/meilisearch.entity";
-import { MeilisearchHasMany, MeilisearchHasOne, MeilisearchIndex, MeilisearchPK, MeilisearchProp } from "@soundcore/meilisearch";
+import { MeilisearchHasMany, MeilisearchHasOne, MeilisearchIndex, MeilisearchPK, MeilisearchProp } from "@repo/meilisearch";
 import { PlayableEntity, PlayableEntityType } from "../../tracklist/entities/playable.entity";
+import { createSlug } from "@repo/utilities";
 
 export interface SongID {
     id: string;
@@ -32,7 +32,7 @@ export class Song implements SongID, TracklistItem, PlayableEntity {
      * PLAYABLE ENTITY ATTRIBUTES
      */
     public readonly type: PlayableEntityType = PlayableEntityType.SONG;
-    
+
     /**
      * MEILISEARCH RELATED ATTRIBUTES
      */
@@ -155,12 +155,12 @@ export class Song implements SongID, TracklistItem, PlayableEntity {
 
     @BeforeInsert()
     public onBeforeInsert() {
-        this.slug = Slug.create(this.name);
+        this.slug = createSlug(this.name);
     }
 
-    @BeforeUpdate() 
+    @BeforeUpdate()
     public onBeforeUpdate() {
-        if(!this.slug) Slug.create(this.name);
+        if (!this.slug) createSlug(this.name);
     }
 
 }

@@ -1,5 +1,5 @@
 import { Injectable, Logger } from "@nestjs/common";
-import { WorkerJob, WorkerQueue } from "@soundcore/queue";
+import { WorkerJob, WorkerQueue } from "@repo/queue";
 import { GeniusProcessDTO } from "../dtos/genius-process.dto";
 
 @Injectable()

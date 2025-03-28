@@ -1,6 +1,6 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { EventEmitter2 } from "@nestjs/event-emitter";
-import { WorkerJob, WorkerJobRef, WorkerQueue } from "@soundcore/queue";
+import { WorkerJob, WorkerJobRef, WorkerQueue } from "@repo/queue";
 import { EVENT_FILES_FOUND, MOUNT_MAX_STEPS, MOUNT_STEP_WAITING } from "../../constants";
 import { FilesFoundEvent } from "../../events/files-found.event";
 import { MountScanResultDTO } from "../dtos/scan-result.dto";

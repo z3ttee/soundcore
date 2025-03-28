@@ -1,6 +1,6 @@
 import { InternalServerErrorException, Logger } from "@nestjs/common";
 import { EventEmitter2 } from "@nestjs/event-emitter";
-import { WorkerJobRef } from "@soundcore/queue";
+import { WorkerJobRef } from "@repo/queue";
 import { PlaylistItem } from "../../playlist/entities/playlist-item.entity";
 import { Playlist } from "../../playlist/entities/playlist.entity";
 // import { PlaylistService } from "../../playlist/playlist.service";

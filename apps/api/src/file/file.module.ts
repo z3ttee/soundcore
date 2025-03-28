@@ -1,6 +1,6 @@
 import { Module, OnModuleInit } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { WorkerQueueModule } from '@soundcore/queue';
+import { WorkerQueueModule } from '@repo/queue';
 import path from 'path';
 import { IndexerModule } from '../indexer/indexer.module';
 import { FileController } from './controllers/file.controller';

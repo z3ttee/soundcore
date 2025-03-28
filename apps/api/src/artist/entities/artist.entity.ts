@@ -2,7 +2,7 @@ import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, Pri
 import { Album } from "../../album/entities/album.entity";
 import { ArtistArtwork } from "../../artwork/entities/artwork.entity";
 import { Song } from "../../song/entities/song.entity";
-import { MeilisearchHasOne, MeilisearchIndex, MeilisearchPK, MeilisearchProp } from "@soundcore/meilisearch";
+import { MeilisearchHasOne, MeilisearchIndex, MeilisearchPK, MeilisearchProp } from "@repo/meilisearch";
 import { MeilisearchInfo } from "../../utils/entities/meilisearch.entity";
 import { GeniusInfo } from "../../utils/entities/genius.entity";
 import { PlayableEntity, PlayableEntityType } from "../../tracklist/entities/playable.entity";

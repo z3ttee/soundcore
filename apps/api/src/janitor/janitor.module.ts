@@ -1,7 +1,7 @@
 import path from "node:path";
 
 import { Module } from "@nestjs/common";
-import { WorkerQueueModule } from "@soundcore/queue";
+import { WorkerQueueModule } from "@repo/queue";
 import { JanitorService } from "./services/janitor.service";
 import { DeleteStreamsCronJob } from "./cron/delete-streams.cron";
 

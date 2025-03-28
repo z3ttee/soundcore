@@ -1,4 +1,4 @@
-import { WorkerJobRef } from "@soundcore/queue";
+import { WorkerJobRef } from "@repo/queue";
 
 import { GeniusProcessDTO } from "../dtos/genius-process.dto";
 import { Batch } from "@soundcore/common";

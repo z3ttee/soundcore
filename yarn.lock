@@ -3200,11 +3200,6 @@
   resolved "https://registry.yarnpkg.com/@tootallnate/once/-/once-2.0.0.tgz#f544a148d3ab35801c1f633a7441fd87c2e484bf"
   integrity sha512-XCuKFP5PS55gnMVu3dty8KPatLqUoy/ZYzDzAGCQ8JNFCkLXzmI7vNHCR+XpbZaMWQK/vQubr7PkYq8g470J/A==
 
-"@tsalliance/utilities@^1.19.0":
-  version "1.19.0"
-  resolved "https://registry.yarnpkg.com/@tsalliance/utilities/-/utilities-1.19.0.tgz#63ac64c8f6238edad04e15fa33390b73c8ae807f"
-  integrity sha512-AgykTwvKc3Bq2bhHYexX4DZxBNMzXIF2T4JIjaIq47hiuKpH7hQ4OxiM9IXFjv+JgtOvJTIf2u1AUuAUvNiStA==
-
 "@tsconfig/node10@^1.0.7":
   version "1.0.9"
   resolved "https://registry.yarnpkg.com/@tsconfig/node10/-/node10-1.0.9.tgz#df4907fc07a886922637b15e02d4cebc4c0021b2"

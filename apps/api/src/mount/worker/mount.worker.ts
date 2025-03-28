@@ -4,8 +4,7 @@ import fs from "fs";
 import path from "path";
 import { FileDTO } from "../../file/dto/file.dto";
 import { MountScanResultDTO } from "../dtos/scan-result.dto";
-import { WorkerJobRef, WorkerProgressEvent } from "@soundcore/queue";
-
+import { WorkerJobRef, WorkerProgressEvent } from "@repo/queue";
 import workerpool from "workerpool";
 import { FileSystemService } from "../../filesystem/services/filesystem.service";
 import { MountRegistryService } from "../services/mount-registry.service";
@@ -15,7 +14,7 @@ import { CreateMountDTO } from "../dtos/create-mount.dto";
 import Database from "../../utils/database/database-worker-client";
 import { Mount } from "../entities/mount.entity";
 import { MountService } from "../services/mount.service";
-import { Random } from "@tsalliance/utilities";
+import { randomString } from "@repo/utilities";
 
 const logger = new Logger("MountWorker");
 const filesystem = new FileSystemService();
@@ -169,7 +168,7 @@ async function lookupDockerMountedVolumes(job: WorkerJobRef<MountScanProcessDTO>
                     directory: path.join(rootDir, dirent.name),
                     isDefault: false,
                     doScan: false,
-                    discriminator: Random.randomString(4)
+                    discriminator: randomString(4)
                 }));
 
                 service.createMultipleIfNotExists(mountDtos).then((mounts) => {

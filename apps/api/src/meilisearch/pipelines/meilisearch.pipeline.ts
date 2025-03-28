@@ -1,4 +1,4 @@
-import { pipeline } from "@soundcore/pipelines";
+import { pipeline } from "@repo/pipelines";
 import { Album } from "../../album/entities/album.entity";
 import { Artist } from "../../artist/entities/artist.entity";
 import { Song } from "../../song/entities/song.entity";
@@ -25,8 +25,8 @@ export default pipeline(MEILISEARCH_PIPELINE_ID, MEILISEARCH_PIPELINE_NAME, "Syn
     .useResources(async () => {
         return await Promise.all([
             Database.connect(),
-            MeilisearchClient.connect([ Artist, Album, Song ])
-        ]).then(([ datasource, meilisearch ]) => ({ datasource, meilisearch }));
+            MeilisearchClient.connect([Artist, Album, Song])
+        ]).then(([datasource, meilisearch]) => ({ datasource, meilisearch }));
     })
     // Sync artists if flag is set or no flags exist
     .step(STEP_SYNC_ARTISTS_ID, STEP_SYNC_ARTISTS_NAME).condition((params) => {

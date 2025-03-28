@@ -1,38 +1,15 @@
 {
-  "$schema": "https://turborepo.org/schema.json",
+  "$schema": "https://turbo.build/schema.json",
   "tasks": {
-    "build:app": {
+    "ci:build": {
       "dependsOn": [
-        "^build:app"
+        "^ci:build"
       ],
       "outputs": [
-        "dist/**"
+        "dist/"
       ],
       "cache": true
     },
-    "build:api": {
-      "dependsOn": [
-        "^build:api"
-      ],
-      "outputs": [
-        "dist/**"
-      ],
-      "cache": true
-    },
-    "build:package": {
-      "dependsOn": [
-        "^build:package"
-      ],
-      "outputs": [
-        "dist/**"
-      ],
-      "cache": true
-    },
-    "lint": {
-      "outputs": []
-    },
-    "dev": {
-      "cache": false
-    }
+    "ci:lint": {}
   }
 }

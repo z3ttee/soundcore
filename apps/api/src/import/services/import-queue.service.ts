@@ -1,6 +1,6 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { Environment } from "@soundcore/common";
-import { WorkerJob, WorkerJobRef, WorkerQueue } from "@soundcore/queue";
+import { WorkerJob, WorkerJobRef, WorkerQueue } from "@repo/queue";
 import { ImportTaskUpdateEvent } from "../../gateway/events/importtask-update.event";
 import { GeneralGateway } from "../../gateway/gateways/general-gateway.gateway";
 import { ImportTask, ImportTaskStatus, ImportTaskType } from "../entities/import.entity";

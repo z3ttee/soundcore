@@ -4,7 +4,7 @@ import { ArtworkController } from './controllers/artwork.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ArtworkService } from './services/artwork.service';
 import { AlbumArtwork, ArtistArtwork, Artwork, DownloadableArtwork, SongArtwork } from './entities/artwork.entity';
-import { PipelineModule } from '@soundcore/pipelines';
+import { PipelineModule } from '@repo/pipelines';
 import { ScheduleModule } from '@nestjs/schedule';
 import { ArtworkBackgroundService } from './services/background.service';
 
@@ -16,12 +16,12 @@ import { ArtworkBackgroundService } from './services/background.service';
   ],
   imports: [
     ScheduleModule,
-    TypeOrmModule.forFeature([ 
-      Artwork, 
-      SongArtwork, 
-      AlbumArtwork, 
-      ArtistArtwork, 
-      DownloadableArtwork 
+    TypeOrmModule.forFeature([
+      Artwork,
+      SongArtwork,
+      AlbumArtwork,
+      ArtistArtwork,
+      DownloadableArtwork
     ]),
     PipelineModule.registerPipelines({
       pipelines: [
@@ -37,7 +37,7 @@ export class ArtworkModule implements OnModuleInit {
 
   constructor(
     private readonly backgroundService: ArtworkBackgroundService
-  ) {}
+  ) { }
 
   public async onModuleInit() {
     return this.backgroundService.markAwaitingAsAborted();

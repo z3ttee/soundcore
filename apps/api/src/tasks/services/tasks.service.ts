@@ -1,7 +1,7 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Page, Pageable } from "@soundcore/common";
-import { PipelineRegistry, PipelineRun, RunStatus, IPipeline } from "@soundcore/pipelines";
+import { PipelineRegistry, PipelineRun, RunStatus, IPipeline } from "@repo/pipelines";
 import { Repository } from "typeorm";
 import { Task } from "../entities/task.entity";
 import { TasksGateway } from "../gateway/tasks.gateway";
@@ -14,7 +14,7 @@ export class TasksService {
         private readonly gateway: TasksGateway,
         private readonly registry: PipelineRegistry,
         @InjectRepository(Task) private readonly repository: Repository<Task>
-    ) {}
+    ) { }
 
     /**
      * Find a page of tasks. The result is ordered by the updated date, so that
@@ -40,7 +40,7 @@ export class TasksService {
      */
     public async findDefinitions(pageable: Pageable): Promise<Page<IPipeline>> {
         return this.registry.listAll().then((definitions) => {
-            return Page.of( definitions.splice(pageable.offset, pageable.limit), definitions.length, pageable);
+            return Page.of(definitions.splice(pageable.offset, pageable.limit), definitions.length, pageable);
         });
     }
 
@@ -68,7 +68,7 @@ export class TasksService {
             .orIgnore()
             .returning(["runId"])
             .execute().then((insertResult) => {
-                if(insertResult.identifiers.length <= 0) return null;
+                if (insertResult.identifiers.length <= 0) return null;
                 return this.repository.createQueryBuilder("task")
                     .whereInIds(insertResult.raw)
                     .getOne();
@@ -86,8 +86,8 @@ export class TasksService {
             .set(updatedTask)
             .where("runId = :runId", { runId: task.runId })
             .execute().then((updateResult) => {
-                if(updateResult.affected <= 0) return null;
-                if(emit) return this.emitTasks([task]).then(() => task);
+                if (updateResult.affected <= 0) return null;
+                if (emit) return this.emitTasks([task]).then(() => task);
                 return task;
             });
     }
@@ -100,7 +100,7 @@ export class TasksService {
             })
             .where("status = :status", { status: RunStatus.ENQUEUED })
             .execute().then((updateResult) => {
-                if(updateResult.affected <= 0) return;
+                if (updateResult.affected <= 0) return;
                 this.logger.log(`Marked ${updateResult.affected} enqueued tasks as 'ABORTED'`);
             })
     }
@@ -108,9 +108,9 @@ export class TasksService {
     public async clearOldTasks(): Promise<void> {
         await this.repository.createQueryBuilder()
             .delete()
-            .where("createdAt <= :pivotDate", { pivotDate: new Date(Date.now() - 1000*60*60*24*7) })
+            .where("createdAt <= :pivotDate", { pivotDate: new Date(Date.now() - 1000 * 60 * 60 * 24 * 7) })
             .execute().then((updateResult) => {
-                if(updateResult.affected <= 0) return;
+                if (updateResult.affected <= 0) return;
                 this.logger.log(`Cleared ${updateResult.affected} tasks older than 7 days`);
             })
     }

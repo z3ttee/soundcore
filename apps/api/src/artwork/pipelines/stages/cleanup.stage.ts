@@ -1,5 +1,5 @@
 import { Batch } from "@soundcore/common";
-import { getOrDefault, progress, StepParams } from "@soundcore/pipelines";
+import { getOrDefault, progress, StepParams } from "@repo/pipelines";
 import { DataSource } from "typeorm";
 import { Artwork, ArtworkFlag, ArtworkWriteResult } from "../../entities/artwork.entity";
 import { ARTWORK_STAGE_PROCESS_ARTWORKS_ID, ARTWORK_STEP_WRITE_ARTWORKS_ID } from "../constants";
@@ -17,7 +17,7 @@ export async function step_update_succeeded_artworks(params: StepParams) {
         return artworkRepo.save(batch).then((results) => {
             return batch;
         }).finally(() => {
-            progress(current/total);
+            progress(current / total);
         })
     }).then((result) => {
         logger.info(`Successfully updated ${result.length} succeeded artworks`);
@@ -45,7 +45,7 @@ export async function step_update_errored_artworks(params: StepParams) {
                 logger.info(`Marked ${updateResult.affected} artworks as ERRORED`);
                 return batch;
             }).finally(() => {
-                progress(current/total);
+                progress(current / total);
             })
     }).then((result) => {
         logger.info(`Successfully updated ${result.length} errored artworks`);

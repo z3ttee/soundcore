@@ -1,6 +1,6 @@
 import { Batch, Page, Pageable } from "@soundcore/common";
-import { MeiliClient, MeiliIndex } from "@soundcore/meilisearch";
-import { progress, StepParams } from "@soundcore/pipelines";
+import { MeiliClient, MeiliIndex } from "@repo/meilisearch";
+import { progress, StepParams } from "@repo/pipelines";
 import { DataSource } from "typeorm";
 import { Album } from "../../../album/entities/album.entity";
 import { AlbumMeiliService } from "../../../album/services/album-meili.service";
@@ -9,8 +9,8 @@ import { ArtistMeiliService } from "../../../artist/services/artist-meili.servic
 import { Song } from "../../../song/entities/song.entity";
 import { SongMeiliService } from "../../../song/services/song-meili.service";
 
-export async function stage_checkout_resources(params: StepParams) {    
-    
+export async function stage_checkout_resources(params: StepParams) {
+
 }
 
 export async function step_sync_artists(params: StepParams) {
@@ -32,9 +32,9 @@ export async function step_sync_artists(params: StepParams) {
             return Page.empty();
         });
 
-        if(page.length <= 0) break;
+        if (page.length <= 0) break;
 
-        entities.push(...page.items);
+        entities.push(...(page.items as any));
         pageIndex++;
     } while (true);
 
@@ -44,7 +44,7 @@ export async function step_sync_artists(params: StepParams) {
         return service.syncAndUpdateEntities(batch).then((updateResult) => {
             return batch;
         }).finally(() => {
-            progress(current/total);
+            progress(current / total);
         })
     }).then((artists) => {
         logger.info(`Successfully synced ${artists.length} artists with meilisearch`);
@@ -73,7 +73,7 @@ export async function step_sync_albums(params: StepParams) {
             return Page.of([], 0);
         });
 
-        if(page.length <= 0) break;
+        if (page.length <= 0) break;
 
         entities.push(...page.items);
         pageIndex++;
@@ -85,7 +85,7 @@ export async function step_sync_albums(params: StepParams) {
         return service.syncAndUpdateEntities(batch).then((updateResult) => {
             return batch;
         }).finally(() => {
-            progress(current/total);
+            progress(current / total);
         })
     }).then((albums) => {
         logger.info(`Successfully synced ${albums.length} albums with meilisearch`);
@@ -114,7 +114,7 @@ export async function step_sync_songs(params: StepParams) {
             return Page.of([], 0);
         });
 
-        if(page.length <= 0) break;
+        if (page.length <= 0) break;
 
         entities.push(...page.items);
         pageIndex++;
@@ -126,7 +126,7 @@ export async function step_sync_songs(params: StepParams) {
         return service.syncAndUpdateEntities(batch).then((updateResult) => {
             return batch;
         }).finally(() => {
-            progress(current/total);
+            progress(current / total);
         })
     }).then((songs) => {
         logger.info(`Successfully synced ${songs.length} songs with meilisearch`);

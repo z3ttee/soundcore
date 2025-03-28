@@ -3,9 +3,9 @@ import { BeforeInsert, BeforeUpdate, Column, Entity, Index, JoinColumn, ManyToMa
 import { Artwork } from "../../artwork/entities/artwork.entity";
 import { Song } from "../../song/entities/song.entity";
 import { Resource, ResourceFlag, ResourceType } from "../../utils/entities/resource";
-import { Slug } from "@tsalliance/utilities";
 import { GeniusInfo } from "../../utils/entities/genius.entity";
 import { MeilisearchInfo } from "../../utils/entities/meilisearch.entity";
+import { createSlug } from "@repo/utilities";
 
 @Entity()
 export class Label implements Resource {
@@ -51,12 +51,12 @@ export class Label implements Resource {
 
     @BeforeInsert()
     public onBeforeInsert() {
-        this.slug = Slug.create(this.name);
+        this.slug = createSlug(this.name);
     }
 
-    @BeforeUpdate() 
+    @BeforeUpdate()
     public onBeforeUpdate() {
-        if(!this.slug) Slug.create(this.name);
+        if (!this.slug) createSlug(this.name);
     }
 
 }

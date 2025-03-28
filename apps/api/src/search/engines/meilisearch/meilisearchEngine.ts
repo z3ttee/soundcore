@@ -1,23 +1,18 @@
 import { Pageable, Page } from "@soundcore/common";
 import { SearchEngine, SearchEngineConfig, SearchEngineDataset, SearchEngineObjectType } from "../engine";
-import { IndexSchema } from "@soundcore/meilisearch/dist/definitions";
-import { MeiliClient } from "@soundcore/meilisearch";
+import { IndexSchema } from "@repo/meilisearch/dist/definitions";
+import { MeiliClient } from "@repo/meilisearch";
 import { Artist } from "../../../artist/entities/artist.entity";
 import { TaskStatus } from "meilisearch";
-import { MeilisearchFlag } from "../../../utils/entities/meilisearch.entity";
 
 export type MeilisearchEngineConfig = SearchEngineConfig & {
     readonly schemas?: IndexSchema[];
 }
 
 export class MeilisearchEngine extends SearchEngine {
-
-
     private _client = new MeiliClient({
         host: `${this.config.host}:${this.config.port}`,
-        headers: {
-            "Authorization": `Bearer ${this.config.key}`
-        }
+        apiKey: this.config.key
     }, this.config.schemas ?? []);
 
     constructor(protected readonly config: MeilisearchEngineConfig) {

@@ -4,12 +4,12 @@ import { LikedResource } from "../../collection/entities/like.entity";
 import { Playlist } from "../../playlist/entities/playlist.entity";
 import { Stream } from "../../stream/entities/stream.entity";
 import { Resource, ResourceFlag, ResourceType } from "../../utils/entities/resource";
-import { Slug } from "@tsalliance/utilities";
+import { createSlug } from "@repo/utilities";
 import { Artwork } from "../../artwork/entities/artwork.entity";
 import { PlaylistItem } from "../../playlist/entities/playlist-item.entity";
 import { ImportTask } from "../../import/entities/import.entity";
 import { MeilisearchInfo } from "../../utils/entities/meilisearch.entity";
-import { MeilisearchIndex, MeilisearchPK, MeilisearchProp } from "@soundcore/meilisearch";
+import { MeilisearchIndex, MeilisearchPK, MeilisearchProp } from "@repo/meilisearch";
 
 // TODO: Remove attributes from Syncable object when they get sent as response
 // TODO: Split profile and users logic
@@ -43,17 +43,17 @@ export class User implements Resource {
 
     @Column({ nullable: true })
     public accentColor?: string;
-    
+
     @OneToMany(() => Stream, stream => stream.listener)
     public streams?: Stream[];
 
     @ManyToOne(() => Artwork, { onDelete: "SET NULL", nullable: true })
     @JoinColumn()
     public artwork?: Artwork;
-    
+
     @OneToMany(() => Playlist, (p) => p.author)
     public playlists?: Playlist[];
-    
+
     @OneToMany(() => LikedResource, (l) => l.user, { onDelete: "CASCADE" })
     public likedResources?: LikedResource;
 
@@ -74,11 +74,11 @@ export class User implements Resource {
 
     @BeforeInsert()
     public onBeforeInsert() {
-        this.slug = Slug.create(this.name);
+        this.slug = createSlug(this.name);
     }
 
-    @BeforeUpdate() 
+    @BeforeUpdate()
     public onBeforeUpdate() {
-        if(!this.slug) Slug.create(this.name);
+        if (!this.slug) createSlug(this.name);
     }
 }

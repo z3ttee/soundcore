@@ -1,6 +1,6 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { OnEvent } from "@nestjs/event-emitter";
-import { PipelineEventParams, PipelineService } from "@soundcore/pipelines";
+import { PipelineEventParams, PipelineService } from "@repo/pipelines";
 import { EVENT_TRIGGER_MEILISEARCH_PROCESS_SONGS } from "../../constants";
 import { Task } from "../../tasks/entities/task.entity";
 import { TasksService } from "../../tasks/services/tasks.service";

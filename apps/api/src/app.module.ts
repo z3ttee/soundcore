@@ -27,16 +27,15 @@ import { FileSystemModule } from './filesystem/filesystem.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { PipesModule } from '@tsalliance/utilities';
 import { HostnameModule } from './hostname/hostname.module';
 import { CronModule } from './cron/cron.module';
 import { Environment } from '@soundcore/common';
-import { WorkerQueueModule } from '@soundcore/queue';
+import { WorkerQueueModule } from '@repo/queue';
 import { TracklistModule } from './tracklist/tracklist.module';
-import { PipelineModule } from '@soundcore/pipelines';
+import { PipelineModule } from '@repo/pipelines';
 import { TasksModule } from './tasks/tasks.module';
 import { FileSystemService } from './filesystem/services/filesystem.service';
-import { MeilisearchModule as MeilisearchModuleNEXT } from '@soundcore/meilisearch';
+import { MeilisearchModule as MeilisearchModuleNEXT } from '@repo/meilisearch';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MeilisearchModule } from './meilisearch/meilisearch.module';
 import { MetricsModule } from './metrics/metrics.module';
@@ -82,7 +81,6 @@ import { ConfigureModule } from './configure/configure.module';
       })
     }),
     MeilisearchModule,
-    PipesModule,
     CronModule,
     WorkerQueueModule.forRootAsync({
       useFactory: () => ({

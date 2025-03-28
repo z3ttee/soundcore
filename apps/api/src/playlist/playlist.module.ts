@@ -6,7 +6,7 @@ import { Playlist } from './entities/playlist.entity';
 import { PlaylistItem } from './entities/playlist-item.entity';
 import { PlaylistService } from './services/playlist.service';
 import { PlaylistController } from './controllers/playlist.controller';
-import { MeilisearchModule } from '@soundcore/meilisearch';
+import { MeilisearchModule } from '@repo/meilisearch';
 import { PlaylistMeiliService } from './services/playlist-meili.service';
 
 @Module({
@@ -20,12 +20,12 @@ import { PlaylistMeiliService } from './services/playlist-meili.service';
   imports: [
     SongModule,
     ArtworkModule,
-    TypeOrmModule.forFeature([ Playlist, PlaylistItem ]),
-    MeilisearchModule.forFeature([ Playlist ])
+    TypeOrmModule.forFeature([Playlist, PlaylistItem]),
+    MeilisearchModule.forFeature([Playlist])
   ],
   exports: [
     PlaylistService,
     PlaylistMeiliService
   ]
 })
-export class PlaylistModule {}
+export class PlaylistModule { }

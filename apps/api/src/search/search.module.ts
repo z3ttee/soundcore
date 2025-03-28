@@ -15,7 +15,7 @@ import { ConfigService } from '@nestjs/config';
 import { MeilisearchEngine } from './engines/meilisearch/meilisearchEngine';
 import { DatabaseSearchEngine } from './engines/database/databaseEngine';
 import { ScheduleModule } from '@nestjs/schedule';
-import { PipelineModule, PipelineService } from '@soundcore/pipelines';
+import { PipelineModule, PipelineService } from '@repo/pipelines';
 import path from 'node:path';
 import { TasksService } from '../tasks/services/tasks.service';
 import { EventEmitterModule } from '@nestjs/event-emitter';

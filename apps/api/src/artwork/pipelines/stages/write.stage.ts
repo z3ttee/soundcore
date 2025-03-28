@@ -1,5 +1,5 @@
 import { Batch } from "@soundcore/common";
-import { getSharedOrDefault, progress, set, StepParams } from "@soundcore/pipelines";
+import { getSharedOrDefault, progress, set, StepParams } from "@repo/pipelines";
 import { DataSource } from "typeorm";
 import { File } from "../../../file/entities/file.entity";
 import { FileService } from "../../../file/services/file.service";
@@ -20,7 +20,7 @@ export async function step_write_artworks(params: StepParams) {
     const groupedByTypes: Map<ArtworkType, ArtworkDTO[]> = new Map();
 
     // Group checked out artworks by their types
-    for(const artwork of artworkDtos) {
+    for (const artwork of artworkDtos) {
         const type = artwork.type;
 
         const list = groupedByTypes.get(type) ?? [];
@@ -32,7 +32,7 @@ export async function step_write_artworks(params: StepParams) {
     const succeededArtworks: ArtworkWithColorDTO[] = [];
     const erroredArtworks: ArtworkDTO[] = [];
 
-    if(groupedByTypes.has(ArtworkType.SONG)) {
+    if (groupedByTypes.has(ArtworkType.SONG)) {
         // Process artworks with type song
         await extract_from_mp3_file(groupedByTypes.get(ArtworkType.SONG), params).then((artworks) => {
             succeededArtworks.push(...artworks.succeeded);
@@ -70,8 +70,8 @@ async function extract_from_mp3_file(dtos: ArtworkDTO[], params: StepParams): Pr
     logger.info(`Collecting song infos and fetching file details...`);
 
     // Get songs from dtos to fetch file info
-    for(const dto of dtos) {
-        if(dto.songs?.length <= 0) continue;
+    for (const dto of dtos) {
+        if (dto.songs?.length <= 0) continue;
         // Add only first song, as they obviously have the same artwork, so only
         // one needs to be used for extraction
         const song = dto.songs?.[0];
@@ -86,7 +86,7 @@ async function extract_from_mp3_file(dtos: ArtworkDTO[], params: StepParams): Pr
         logger.error(`Failed processing batch #${batchNr}: ${err.message}`, err.stack);
     }).forEach((batch, current, total) => {
         return fileService.findBySongIdsForArtworkProcessing(batch).then(async (files) => {
-            for(const file of files) {
+            for (const file of files) {
                 const artwork = song2artwork.get(file.song.id) as ArtworkWithColorDTO;
                 const filepath = fsService.resolveFilepath(file);
 
@@ -111,7 +111,7 @@ async function extract_from_mp3_file(dtos: ArtworkDTO[], params: StepParams): Pr
         }).then(() => {
             return [];
         }).finally(() => {
-            progress(current/total);
+            progress(current / total);
         })
     }).then((_): ArtworkWriteResult => {
         return {

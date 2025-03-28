@@ -8,12 +8,12 @@ import { Song } from "../../../song/entities/song.entity";
 import { SongService } from "../../../song/services/song.service";
 import { Artist } from "../../../artist/entities/artist.entity";
 import { Album } from "../../../album/entities/album.entity";
-import { Slug } from "@tsalliance/utilities";
 import { DataSource } from "typeorm";
 import { ArtistService } from "../../../artist/services/artist.service";
 import { AlbumService } from "../../../album/services/album.service";
 import { FileSystemService } from "../../../filesystem/services/filesystem.service";
-import { getOrDefault, getSharedOrDefault, progress, set, StepParams } from "@soundcore/pipelines";
+import { getOrDefault, getSharedOrDefault, progress, set, StepParams } from "@repo/pipelines";
+import { createSlug } from "@repo/utilities";
 
 export async function step_read_mp3_tags(params: StepParams) {
     const { step, resources, logger } = params;
@@ -22,16 +22,16 @@ export async function step_read_mp3_tags(params: StepParams) {
     const repository = datasource.getRepository(Song);
     const fsService = new FileSystemService();
     const songService = new SongService(repository);
-    
+
     // Prepare step
     const files: Map<string, File> = getSharedOrDefault("targetFiles", new Map());
     const mount: Mount = getSharedOrDefault(`mount`);
 
-    if(!files || files.size <= 0) {
+    if (!files || files.size <= 0) {
         step.skip("No new files were created in database.");
     }
 
-    if(typeof mount === "undefined" || mount == null) {
+    if (typeof mount === "undefined" || mount == null) {
         step.skip("Invalid mount checked out.")
     }
 
@@ -43,8 +43,8 @@ export async function step_read_mp3_tags(params: StepParams) {
     const songs: Map<string, Song> = new Map();
 
     return Batch.useDataset<File, File>(Array.from(files.values())).onError((error: Error, batch, batchNr: number) => {
-        for(const file of batch) {
-            if(typeof file === "undefined" || file == null) continue;
+        for (const file of batch) {
+            if (typeof file === "undefined" || file == null) continue;
             file.flag = FileFlag.ERROR;
         }
 
@@ -54,13 +54,13 @@ export async function step_read_mp3_tags(params: StepParams) {
         const p = currentBatch / totalBatches;
         progress(p);
 
-        for(const file of batch) {
+        for (const file of batch) {
             // Set mount for file context
             file.mount = mount;
 
             // Build filepath
             const filepath = fsService.resolveFilepath(file);
-            
+
             // Remove mount from file, because it is not needed anymore
             delete file.mount;
 
@@ -70,7 +70,7 @@ export async function step_read_mp3_tags(params: StepParams) {
                 return false;
             });
             // Skip this file if not accessable
-            if(!canAccessFile) {
+            if (!canAccessFile) {
                 file.flag = FileFlag.ERROR;
                 continue;
             }
@@ -80,16 +80,16 @@ export async function step_read_mp3_tags(params: StepParams) {
                 logger.error(`Failed reading id3 tags from file ${filepath}: ${error?.message}`, error);
                 return null;
             });
-            if(typeof id3TagsDto === "undefined" || id3TagsDto == null) {
+            if (typeof id3TagsDto === "undefined" || id3TagsDto == null) {
                 file.flag = FileFlag.ERROR;
                 continue;
             }
 
             // Create primary artist
             let primaryArtist: Artist;
-            if(id3TagsDto?.artists?.length > 0) {
+            if (id3TagsDto?.artists?.length > 0) {
                 const artist = id3TagsDto.artists.splice(0, 1)?.[0];
-                if(typeof artist !== "undefined" && artist != null) {
+                if (typeof artist !== "undefined" && artist != null) {
                     primaryArtist = { name: artist?.name } as Artist;
                     artists.set(getArtistKey(primaryArtist), primaryArtist);
                 }
@@ -97,7 +97,7 @@ export async function step_read_mp3_tags(params: StepParams) {
 
             // Create featured artists
             const featuredArtists: Artist[] = [];
-            for(const artistDto of id3TagsDto.artists) {
+            for (const artistDto of id3TagsDto.artists) {
                 const featuredArtist = { name: artistDto.name } as Artist;
                 featuredArtists.push(featuredArtist);
                 artists.set(getArtistKey(featuredArtist), featuredArtist);
@@ -105,11 +105,11 @@ export async function step_read_mp3_tags(params: StepParams) {
 
             // Create album
             let album: Album;
-            if(id3TagsDto?.album) {
+            if (id3TagsDto?.album) {
                 const albumName = id3TagsDto.album;
-                if(typeof albumName !== "undefined" && albumName != null) {
-                    album = { 
-                        name: albumName, 
+                if (typeof albumName !== "undefined" && albumName != null) {
+                    album = {
+                        name: albumName,
                         primaryArtist: primaryArtist ?? undefined
                     } as Album;
 
@@ -119,7 +119,7 @@ export async function step_read_mp3_tags(params: StepParams) {
 
             const song: Song = {
                 name: id3TagsDto.title ?? file.name,
-                slug: Slug.create(id3TagsDto.title ?? file.name),
+                slug: createSlug(id3TagsDto.title ?? file.name),
                 duration: id3TagsDto.duration,
                 order: id3TagsDto.orderNr,
                 primaryArtist: primaryArtist,
@@ -129,7 +129,7 @@ export async function step_read_mp3_tags(params: StepParams) {
             } as Song;
 
             const songKey = getSongKey(song);
-            if(songs.has(songKey)) {
+            if (songs.has(songKey)) {
                 file.flag = FileFlag.POTENTIAL_DUPLICATE;
             } else {
                 songs.set(songKey, song);
@@ -165,7 +165,7 @@ export async function step_create_artists(params: StepParams) {
 
     // Check if there are any artists to create them,
     // if not, skip the step
-    if(!artists || artists.size <= 0) {
+    if (!artists || artists.size <= 0) {
         step.skip("No artists found.");
         return;
     }
@@ -178,7 +178,7 @@ export async function step_create_artists(params: StepParams) {
         // Execute insert query
         return service.createIfNotExists(batch.map((artist) => {
             // Map slug
-            artist.slug = Slug.create(artist.name);
+            artist.slug = createSlug(artist.name);
             return artist;
         }), (query, alias) => query.select([`${alias}.id`, `${alias}.name`])).then((createdArtists) => {
             progress(currentBatch / totalBatches);
@@ -217,7 +217,7 @@ export async function step_create_albums(params: StepParams) {
 
     // Check if there are any albums to create them,
     // if not, skip the step
-    if(!albums || albums.size <= 0) {
+    if (!albums || albums.size <= 0) {
         step.skip("No albums found.");
         return;
     }
@@ -229,7 +229,7 @@ export async function step_create_albums(params: StepParams) {
         // Create database entries
         return service.createIfNotExists(batch.map((album) => {
             // Map slug
-            album.slug = Slug.create(album.name);
+            album.slug = createSlug(album.name);
             // Map primaryArtist
             album.primaryArtist = artists.get(getArtistKey(album.primaryArtist)) ?? undefined;
             return album;
@@ -272,7 +272,7 @@ export async function step_create_songs(params: StepParams) {
 
     // Check if there are any albums to create them,
     // if not, skip the step
-    if(!songs || songs.size <= 0) {
+    if (!songs || songs.size <= 0) {
         step.skip("No songs found.");
         return;
     }
@@ -284,9 +284,9 @@ export async function step_create_songs(params: StepParams) {
         logger.error(`Failed processing songs in batch #${batchNr}: ${error.message}`, error.stack);
 
         // Set file flag to ERROR for songs
-        for(const song of batch) {
+        for (const song of batch) {
             const file = files.get(song.file?.id);
-            if(typeof file === "undefined" || file == null) continue;
+            if (typeof file === "undefined" || file == null) continue;
             file.flag = FileFlag.ERROR;
         }
     }).forEach((batch, currentBatch, totalBatches) => {
@@ -297,7 +297,7 @@ export async function step_create_songs(params: StepParams) {
         // now map their ids to the song dtos. This will create the songs in the database
         // using the correct relations.
         const mappedSongs: Song[] = batch.map((song) => {
-            const s = {...song} as Song;
+            const s = { ...song } as Song;
             s.primaryArtist = artists.get(getArtistKey(song.primaryArtist)) ?? undefined;
             s.album = albums.get(getAlbumKey(song.album)) ?? undefined;
 
@@ -319,7 +319,7 @@ export async function step_create_songs(params: StepParams) {
             const mappedCreatedSongs: Song[] = [];
             // Map the created songs in the database and apply featuredArtists as they
             // were not saved using the standard insert-query.
-            for(const s of createdSongs) {
+            for (const s of createdSongs) {
                 // We have to use the song dto from before the query, as the
                 // query result has no featuredArtists
                 const mappedSong = songMappedByFiles.get(s.file.id);
@@ -327,7 +327,7 @@ export async function step_create_songs(params: StepParams) {
                 // Check if there are any featured artists
                 // If not, continue with next as we do not have to add it to
                 // the save-query
-                if(mappedSong.featuredArtists?.length <= 0) {
+                if (mappedSong.featuredArtists?.length <= 0) {
                     continue;
                 }
 
@@ -336,7 +336,7 @@ export async function step_create_songs(params: StepParams) {
                 // Return the new mapped song
                 mappedCreatedSongs.push(s);
             }
-            
+
             // Perform a save-query using the mapped data
             return repository.save(mappedCreatedSongs).catch((error: Error) => {
                 logger.error(`Failed saving featured artists on songs: ${error.message}`, error.stack);
@@ -346,9 +346,9 @@ export async function step_create_songs(params: StepParams) {
                 progress(currentBatch / totalBatches);
 
                 // Set file status
-                for(const song of createdSongs) {
+                for (const song of createdSongs) {
                     const file = files.get(song.file?.id);
-                    if(typeof file === "undefined" || file == null) continue;
+                    if (typeof file === "undefined" || file == null) continue;
                     file.flag = FileFlag.OK;
                 }
 

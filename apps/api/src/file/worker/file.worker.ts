@@ -4,7 +4,7 @@ import crypto from "node:crypto";
 import { Logger } from "@nestjs/common";
 import { FileProcessDTO, FileProcessFlag } from "../dto/file-process.dto";
 import { File, FileFlag, FileID } from "../entities/file.entity";
-import { WorkerJobRef, WorkerProgressEvent } from "@soundcore/queue";
+import { WorkerJobRef, WorkerProgressEvent } from "@repo/queue";
 import workerpool from "workerpool";
 import Database from "../../utils/database/database-worker-client";
 import { FileService } from "../services/file.service";

@@ -1,5 +1,5 @@
-import { MeiliClient } from "@soundcore/meilisearch";
-import { IndexSchema } from "@soundcore/meilisearch/dist/definitions";
+import { MeiliClient } from "@repo/meilisearch";
+import { IndexSchema } from "@repo/meilisearch/dist/definitions";
 import MeiliSearch from "meilisearch";
 
 class MeilisearchImpl {
@@ -7,20 +7,18 @@ class MeilisearchImpl {
     private _client: MeiliClient;
 
     constructor() {
-        if(!MeilisearchImpl.instance) {
+        if (!MeilisearchImpl.instance) {
             MeilisearchImpl.instance = this;
         }
 
         return MeilisearchImpl.instance;
     }
 
-    public async connect(schemas?: IndexSchema[]): Promise<MeiliSearch> {
-        if(!this._client) {
+    public async connect(schemas?: IndexSchema[]): Promise<MeiliClient> {
+        if (!this._client) {
             this._client = new MeiliClient({
                 host: `${process.env.MEILISEARCH_HOST}:${process.env.MEILISEARCH_PORT}`,
-                headers: {
-                    "Authorization": `Bearer ${process.env.MEILISEARCH_KEY}`
-                }
+                apiKey: process.env.MEILISEARCH_KEY
             }, schemas ?? []);
         }
 

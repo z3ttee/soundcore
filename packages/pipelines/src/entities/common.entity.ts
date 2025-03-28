@@ -1,10 +1,10 @@
 import { Logger } from "winston";
 import { Stage } from "./stage.entity";
 
-export type Environment<T = { [key: string]: any }> = T;
-export type Outputs<T = { [key: string]: any }> = T;
+export type Environment<T = { [key: string | number | symbol]: any }> = T;
+export type Outputs<T = { [key: string | number | symbol]: any }> = T;
 export type PipelineLogger = Logger;
-export type Resources<T = { [key: string]: any }> = T;
+export type Resources<T = { [key: string | number | symbol]: any }> = T;
 export type PipelineFlow = Stage[][];
 
 export enum RunStatus {

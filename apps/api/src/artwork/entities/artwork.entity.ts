@@ -1,5 +1,5 @@
 
-import { MeilisearchIndex, MeilisearchPK } from "@soundcore/meilisearch";
+import { MeilisearchIndex, MeilisearchPK } from "@repo/meilisearch";
 import { ChildEntity, Column, CreateDateColumn, Entity, OneToMany, PrimaryColumn, TableInheritance } from "typeorm";
 import { Album } from "../../album/entities/album.entity";
 import { Artist } from "../../artist/entities/artist.entity";
@@ -85,7 +85,7 @@ export class DownloadableArtwork extends Artwork {
 
     @Column({ type: "enum", enum: ArtworkType, nullable: true })
     public dstType: ArtworkType;
-    
+
     @Column({ type: "varchar", nullable: true })
     public srcUrl: string;
 

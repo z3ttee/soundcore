@@ -1,6 +1,8 @@
 import path from "node:path"
 import { MountProgressInfo } from "./mount/entities/mount.entity";
 
+export const PIPELINE_ID_SEARCH_ENGINE_SYNC = "sc:pipeline:searchengine:sync"
+
 export const TRACKLIST_ARTIST_TOP_SIZE = 5;
 
 // Validation
@@ -29,6 +31,7 @@ export const TYPEORM_CONNECTION_INDEXER = "indexer-connection"
 export const TYPEORM_CONNECTION_GENERAL = "default"
 
 // Internal events
+export const EVENT_TRIGGER_SEARCH_ENGINE_SYNC = "sc:event:searchengine:sync:trigger"
 export const EVENT_TRIGGER_ARTWORK_PROCESS_SONGS = "trigger-artwork-process-for-songs";
 export const EVENT_TRIGGER_MEILISEARCH_PROCESS_SONGS = "trigger-artwork-meilisearch";
 

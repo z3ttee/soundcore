@@ -3,7 +3,7 @@ import { BeforeInsert, BeforeUpdate, Column, Entity, JoinColumn, JoinTable, Many
 import { Artwork } from "../../artwork/entities/artwork.entity";
 import { Song } from "../../song/entities/song.entity";
 import { ResourceType } from "../../utils/entities/resource";
-import { Slug } from "@tsalliance/utilities";
+import { createSlug } from "@repo/utilities";
 
 @Entity()
 export class Genre {
@@ -31,12 +31,12 @@ export class Genre {
 
     @BeforeInsert()
     public onBeforeInsert() {
-        this.slug = Slug.create(this.name);
+        this.slug = createSlug(this.name);
     }
 
-    @BeforeUpdate() 
+    @BeforeUpdate()
     public onBeforeUpdate() {
-        if(!this.slug) Slug.create(this.name);
+        if (!this.slug) createSlug(this.name);
     }
 
 }

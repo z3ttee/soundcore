@@ -6,7 +6,6 @@ import { OIDC_OPTIONS } from "../oidc.constants";
 import { catchError, map, Observable, of, switchMap, tap } from "rxjs";
 import { JWTDecodedToken, JWTTokenPayload, KeycloakDecodedToken } from "../entities/oidc-token.entity";
 import { JWKSet, JWKStore } from "../entities/jwks.entity";
-import { Bootstrapper } from "@soundcore/bootstrap";
 
 @Injectable()
 export class OIDCService {
@@ -22,9 +21,9 @@ export class OIDCService {
         private readonly jwtService: JwtService,
         @Inject(OIDC_OPTIONS) private readonly options: OIDCConfig
     ) {
-        if(!this.validateIssuerUrl(this.options.issuer)) {
+        if (!this.validateIssuerUrl(this.options.issuer)) {
             this.logger.error(`Found invalid issuer url. A valid value is needed for proper authentication.`);
-            Bootstrapper.shutdown();
+            process.exit(1)
         }
     }
 
@@ -51,14 +50,14 @@ export class OIDCService {
                 return this.jwks().pipe(tap(() => {
                     // Check if the kid on the jwt exists
                     // as signing key in the keystore
-                    if(!this._keystore.hasSigKey(kid)) {
+                    if (!this._keystore.hasSigKey(kid)) {
                         throw new BadRequestException("Invalid access token. Did you configure the oidc issuer correctly? If not, a malicious jwt was successfully blocked.");
                     }
                 }), map(() => token));
             }),
             map((token: JWTDecodedToken) => {
                 // Check if jwt has header with key id
-                if(!token.header || !this._keystore.hasSigKey(token.header.kid)) {
+                if (!token.header || !this._keystore.hasSigKey(token.header.kid)) {
                     throw new UnauthorizedException("Invalid access token");
                 }
 
@@ -84,14 +83,14 @@ export class OIDCService {
         return new Observable((subscriber) => {
             const discoverObservable: Observable<Issuer<BaseClient>> = new Observable((sub) => {
                 Issuer.discover(`${this.options.issuer}`).then((issuer) => {
-                    this._issuer = issuer 
+                    this._issuer = issuer
                     this._client = new this._issuer.Client({
                         client_id: this.options.client_id,
                         client_secret: this.options.client_secret,
                         redirect_uris: [this.options.redirect_uri],
                         response_types: ["code"]
                     })
-    
+
                     this._issuer = issuer;
                     sub.next(issuer);
                 }).catch((error: Error) => {
@@ -115,7 +114,7 @@ export class OIDCService {
     public jwks(): Observable<JWKStore> {
         return new Observable((subscriber) => {
             // Return existing jwks if exists
-            if(typeof this._keystore !== "undefined" && this._keystore != null) {
+            if (typeof this._keystore !== "undefined" && this._keystore != null) {
                 subscriber.next(this._keystore);
                 subscriber.complete();
                 return;
@@ -143,8 +142,8 @@ export class OIDCService {
                     return null;
                 }).then((jwks: JWKSet) => {
                     // Throw error if no jwks fetched
-                    if(typeof jwks === "undefined" || jwks == null) subscriber.error(new InternalServerErrorException("Failed fetching jwks"));
-        
+                    if (typeof jwks === "undefined" || jwks == null) subscriber.error(new InternalServerErrorException("Failed fetching jwks"));
+
                     this._keystore = new JWKStore(jwks);
                     subscriber.next(this._keystore);
                 }).catch((error: Error) => {
@@ -157,7 +156,7 @@ export class OIDCService {
     }
 
     private validateIssuerUrl(issuerUrl: string): boolean {
-        if(typeof issuerUrl !== "string") return false;        
+        if (typeof issuerUrl !== "string") return false;
         return true;
     }
 

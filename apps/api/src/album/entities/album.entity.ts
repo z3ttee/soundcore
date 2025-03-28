@@ -7,11 +7,11 @@ import { Distributor } from "../../distributor/entities/distributor.entity";
 import { Label } from "../../label/entities/label.entity";
 import { Publisher } from "../../publisher/entities/publisher.entity";
 import { Song } from "../../song/entities/song.entity";
-import { Slug } from "@tsalliance/utilities";
 import { GeniusInfo } from "../../utils/entities/genius.entity";
 import { MeilisearchInfo } from "../../utils/entities/meilisearch.entity";
-import { MeilisearchHasOne, MeilisearchIndex, MeilisearchPK, MeilisearchProp } from "@soundcore/meilisearch";
+import { MeilisearchHasOne, MeilisearchIndex, MeilisearchPK, MeilisearchProp } from "@repo/meilisearch";
 import { PlayableEntity, PlayableEntityType } from "../../tracklist/entities/playable.entity";
+import { createSlug } from "@repo/utilities";
 
 @Entity()
 @MeilisearchIndex()
@@ -94,11 +94,11 @@ export class Album implements PlayableEntity {
 
     @BeforeInsert()
     public onBeforeInsert() {
-        this.slug = Slug.create(this.name);
+        this.slug = createSlug(this.name);
     }
 
-    @BeforeUpdate() 
+    @BeforeUpdate()
     public onBeforeUpdate() {
-        if(!this.slug) Slug.create(this.name);
+        if (!this.slug) createSlug(this.name);
     }
 }

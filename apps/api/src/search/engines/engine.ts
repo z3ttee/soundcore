@@ -1,6 +1,6 @@
 import { Page, Pageable } from "@soundcore/common";
 import { TasksService } from "../../tasks/services/tasks.service";
-import { PipelineService } from "@soundcore/pipelines";
+import { PipelineService } from "@repo/pipelines";
 import { EVENT_TRIGGER_SEARCH_ENGINE_SYNC, PIPELINE_ID_SEARCH_ENGINE_SYNC } from "../../constants";
 import { Task } from "../../tasks/entities/task.entity";
 import { OnEvent } from "@nestjs/event-emitter";

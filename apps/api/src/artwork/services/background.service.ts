@@ -1,6 +1,6 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { OnEvent } from "@nestjs/event-emitter";
-import { PipelineService } from "@soundcore/pipelines";
+import { PipelineService } from "@repo/pipelines";
 import { EVENT_TRIGGER_ARTWORK_PROCESS_SONGS } from "../../constants";
 import { Task } from "../../tasks/entities/task.entity";
 import { TasksService } from "../../tasks/services/tasks.service";
@@ -23,7 +23,7 @@ export class ArtworkBackgroundService {
             const task: Task = params.pipeline as Task;
             this.taskService.updateTask(task, true);
         });
-        
+
         // Listen for failed events
         this.pipelines.on("failed", (error, params) => {
             this.logger.error(`Pipeline '${params.pipeline.id}' failed: ${error.message}`, error.stack);
@@ -38,12 +38,12 @@ export class ArtworkBackgroundService {
      */
     public async checkAbortedArtworks() {
         return this.service.hasAbortedArtworks().then((hasAborted) => {
-            if(!hasAborted) return;
+            if (!hasAborted) return;
 
             this.logger.warn(`Found artworks where processing was aborted by system. Enqueueing task...`);
-            
+
             return this.createPipelineRun({
-                withFlagsOnly: [ ArtworkFlag.ABORTED ]
+                withFlagsOnly: [ArtworkFlag.ABORTED]
             });
         }).catch((error: Error) => {
             this.logger.error(`Failed checking for aborted artworks: ${error.message}`, error.stack);
@@ -89,6 +89,6 @@ export class ArtworkBackgroundService {
      */
     @OnEvent(EVENT_TRIGGER_ARTWORK_PROCESS_SONGS)
     public triggerArtworkProcess() {
-        this.createPipelineRun({ withTypesOnly: [ ArtworkType.SONG ] });
+        this.createPipelineRun({ withTypesOnly: [ArtworkType.SONG] });
     }
 }

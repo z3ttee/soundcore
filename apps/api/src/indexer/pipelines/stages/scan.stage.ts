@@ -13,7 +13,7 @@ import { Batch, isNull } from "@soundcore/common";
 import { File, FileFlag } from "../../../file/entities/file.entity";
 import { FileService } from "../../../file/services/file.service";
 import { STAGE_SCAN_ID, STEP_LOOKUP_FILES_ID } from "../../pipelines";
-import { getOrDefault, getSharedOrDefault, progress, set, setShared, StepParams } from "@soundcore/pipelines";
+import { getOrDefault, getSharedOrDefault, progress, set, setShared, StepParams } from "@repo/pipelines";
 
 /**
  * Checkout mount using the id provided via env.
@@ -31,11 +31,11 @@ export async function step_checkout_mount(params: StepParams) {
     logger.info(`Checking out mount using id '${mountId}'`);
     const repository = datasource.getRepository(Mount);
 
-    if(typeof mountId === "undefined" || mountId == null) {
+    if (typeof mountId === "undefined" || mountId == null) {
         step.abort(`mountId is a required environment variable. Received: ${mountId}`);
         return;
     }
-            
+
     // Find mount in database
     const mount = await repository.findOneOrFail({
         where: { id: mountId },
@@ -71,7 +71,7 @@ export async function step_search_files(params: StepParams) {
     logger.info(`Using directory '${directory}'`);
 
     // Create directory if it does not exist.
-    if(!fs.existsSync(directory)) {
+    if (!fs.existsSync(directory)) {
         logger.warn(`Could not find directory '${directory}'. Creating it...`);
         fs.mkdirSync(directory, { recursive: true });
     }
@@ -80,7 +80,7 @@ export async function step_search_files(params: StepParams) {
         // Read registry
         let registry: MountRegistry = await registryService.readRegistry(mount);
 
-        if(environment.force) {
+        if (environment.force) {
             registry = await registryService.resetRegistry(registry);
         }
 
@@ -95,7 +95,7 @@ export async function step_search_files(params: StepParams) {
         globs.on("match", (match: any) => {
             // Check if files already in registry, if not, add to files list
             // for further processing. Otherwise it will be ignored
-            if(!registry.files.includes(match)) {
+            if (!registry.files.includes(match)) {
                 // On every match, create object.
                 const file = new FileDTO();
                 file.directory = path.dirname(match);
@@ -103,14 +103,14 @@ export async function step_search_files(params: StepParams) {
 
                 files.push(file);
             }
-            
+
             // Always add match to matches array
             matches.push(match);
         })
 
         // Listen for END event.
         // This will be triggered when matching process is done.
-        globs.on("end", () => { 
+        globs.on("end", () => {
             // Update registry file entries
             registry.files = matches;
             registryService.saveRegistry(registry).finally(() => {
@@ -140,7 +140,7 @@ export async function step_search_files(params: StepParams) {
  */
 export async function step_create_database_entries(params: StepParams) {
     const { environment, logger, step, resources } = params;
-    
+
     // Step preparation
     const datasource: DataSource = resources.datasource;
     const repository = datasource.getRepository(File);
@@ -150,7 +150,7 @@ export async function step_create_database_entries(params: StepParams) {
     const mount: Mount = getSharedOrDefault(`mount`);
     const files: FileDTO[] = getOrDefault(`${STAGE_SCAN_ID}.${STEP_LOOKUP_FILES_ID}.files`, []);
 
-    if(files.length <= 0) {
+    if (files.length <= 0) {
         step.skip("No files were found in previous steps");
     }
 
@@ -162,7 +162,7 @@ export async function step_create_database_entries(params: StepParams) {
         // Prepare batch
         const collectedFiles: File[] = [];
 
-        for(const fileDto of batch) {
+        for (const fileDto of batch) {
             const file = new File();
             file.name = fileDto.filename;
             file.directory = fileDto.directory;
@@ -179,11 +179,11 @@ export async function step_create_database_entries(params: StepParams) {
             try {
                 // Get file stats
                 stats = fs.statSync(filepath, { throwIfNoEntry: true });
-            } catch (error) {      
+            } catch (error) {
                 // Update flag to indicate something odd with the path encoding
                 // There must be errors with the encoding, when the file was found previously
                 // but cannot be found anymore
-                file.flag = FileFlag.INVALID_PATH_ENCODING;     
+                file.flag = FileFlag.INVALID_PATH_ENCODING;
 
                 logger.warn(`Could not get file stats for '${filepath}': ${error["message"] || error}`);
             }
@@ -204,14 +204,14 @@ export async function step_create_database_entries(params: StepParams) {
         // This will create files in database but only returns entities that were created
         // via this query and did not exist before
         return service.createIfNotExists(
-            collectedFiles, 
+            collectedFiles,
             (query, alias) => query.select([`${alias}.id`, `${alias}.name`, `${alias}.directory`, `${alias}.flag`])
         ).then((results) => {
             logger.info(`Successfully created files for batch ${currentBatch} in database`);
 
             // Create a map of all created files
-            for(const file of results) {
-                if(file.flag != FileFlag.OK && file.flag != FileFlag.PENDING_ANALYSIS) continue;
+            for (const file of results) {
+                if (file.flag != FileFlag.OK && file.flag != FileFlag.PENDING_ANALYSIS) continue;
                 mappedFiles.set(file.id, file);
             }
 
@@ -223,7 +223,7 @@ export async function step_create_database_entries(params: StepParams) {
             return [];
         }).finally(() => {
             // Update progress
-            progress(currentBatch/totalBatches);
+            progress(currentBatch / totalBatches);
         });
     }).then((files) => {
         // Batching completed

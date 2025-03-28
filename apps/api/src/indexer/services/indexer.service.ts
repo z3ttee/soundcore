@@ -1,6 +1,6 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { EventEmitter2 } from "@nestjs/event-emitter";
-import { PipelineService } from "@soundcore/pipelines";
+import { PipelineService } from "@repo/pipelines";
 import { EVENT_TRIGGER_ARTWORK_PROCESS_SONGS, EVENT_TRIGGER_MEILISEARCH_PROCESS_SONGS } from "../../constants";
 import { Task } from "../../tasks/entities/task.entity";
 import { TasksService } from "../../tasks/services/tasks.service";
@@ -18,7 +18,7 @@ export class IndexerService {
         this.pipelines.on("failed", (error, { pipeline }) => {
             console.error(error);
         })
-        this.pipelines.on("completed", ({ pipeline }) => {            
+        this.pipelines.on("completed", ({ pipeline }) => {
             this.emitter.emit(EVENT_TRIGGER_ARTWORK_PROCESS_SONGS);
             this.emitter.emit(EVENT_TRIGGER_MEILISEARCH_PROCESS_SONGS);
         })

@@ -2,13 +2,13 @@ import { BeforeInsert, BeforeUpdate, Column, CreateDateColumn, Entity, Index, Jo
 import { Artwork } from "../../artwork/entities/artwork.entity";
 import { LikedPlaylist } from "../../collection/entities/like.entity";
 import { User } from "../../user/entities/user.entity";
-import { Slug } from "@tsalliance/utilities";
 import { PlaylistPrivacy } from "../enums/playlist-privacy.enum";
 import { PlaylistItem } from "./playlist-item.entity";
 import { MeilisearchInfo } from "../../utils/entities/meilisearch.entity";
 import { GeniusInfo } from "../../utils/entities/genius.entity";
-import { MeilisearchHasOne, MeilisearchIndex, MeilisearchPK, MeilisearchProp } from "@soundcore/meilisearch";
+import { MeilisearchHasOne, MeilisearchIndex, MeilisearchPK, MeilisearchProp } from "@repo/meilisearch";
 import { PlayableEntity, PlayableEntityType } from "../../tracklist/entities/playable.entity";
+import { createSlug } from "@repo/utilities";
 
 @Entity()
 @MeilisearchIndex()
@@ -82,12 +82,12 @@ export class Playlist implements PlayableEntity {
 
     @BeforeInsert()
     public onBeforeInsert() {
-        this.slug = Slug.create(this.name);
+        this.slug = createSlug(this.name);
     }
 
-    @BeforeUpdate() 
+    @BeforeUpdate()
     public onBeforeUpdate() {
-        if(!this.slug) Slug.create(this.name);
+        if (!this.slug) createSlug(this.name);
     }
 
 }

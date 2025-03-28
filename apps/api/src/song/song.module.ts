@@ -10,7 +10,7 @@ import { ArtworkModule } from '../artwork/artwork.module';
 import { Song } from './entities/song.entity';
 import { PlaylistItem } from '../playlist/entities/playlist-item.entity';
 import { SongService } from './services/song.service';
-import { MeilisearchModule } from '@soundcore/meilisearch';
+import { MeilisearchModule } from '@repo/meilisearch';
 import { SongMeiliService } from './services/song-meili.service';
 
 @Module({
@@ -28,12 +28,12 @@ import { SongMeiliService } from './services/song-meili.service';
     LabelModule,
     AlbumModule,
     ArtworkModule,
-    TypeOrmModule.forFeature([ Song, PlaylistItem ]),
-    MeilisearchModule.forFeature([ Song ])
+    TypeOrmModule.forFeature([Song, PlaylistItem]),
+    MeilisearchModule.forFeature([Song])
   ],
   exports: [
     SongService,
     SongMeiliService
   ]
 })
-export class SongModule {}
+export class SongModule { }

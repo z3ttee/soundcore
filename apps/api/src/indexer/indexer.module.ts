@@ -1,7 +1,7 @@
 import path from 'path';
 import { Module } from '@nestjs/common';
 import { IndexerService } from './services/indexer.service';
-import { PipelineModule } from '@soundcore/pipelines';
+import { PipelineModule } from '@repo/pipelines';
 
 @Module({
     providers: [
@@ -18,4 +18,4 @@ import { PipelineModule } from '@soundcore/pipelines';
         IndexerService
     ]
 })
-export class IndexerModule {}
+export class IndexerModule { }

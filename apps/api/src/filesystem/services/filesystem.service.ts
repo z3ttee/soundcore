@@ -1,7 +1,6 @@
 import os from "os"
 import path from "path";
 import fs from "fs"
-import iconv from "iconv-lite";
 
 import { Injectable, Logger } from '@nestjs/common';
 import { v4 as uuidv4 } from "uuid"
@@ -9,8 +8,8 @@ import { File } from "../../file/entities/file.entity";
 import { Mount } from "../../mount/entities/mount.entity";
 import { SC_ARTWORKDIR_NAME, SC_IDFILE_NAME } from "../filesystem.module";
 import { Artwork } from "../../artwork/entities/artwork.entity";
-import { Random } from "@tsalliance/utilities";
 import { Environment } from "@soundcore/common";
+import { randomString } from "@repo/utilities";
 
 @Injectable()
 export class FileSystemService {
@@ -30,7 +29,7 @@ export class FileSystemService {
      * @returns {string} Root directory path
      */
     public getInstanceDir(): string {
-        if(Environment.isDockerized) {
+        if (Environment.isDockerized) {
             return path.resolve("/data/")
         }
         return path.join(os.homedir(), ".soundcore");
@@ -68,11 +67,11 @@ export class FileSystemService {
      * @returns {string} Absolute filepath to mount directory
      */
     public resolveMountPath(mount: Mount): string {
-        if(typeof mount === "undefined" || mount == null) {
+        if (typeof mount === "undefined" || mount == null) {
             throw new Error(`Valid mount object required on file object in order to resolve absolute path of the file. Found: ${typeof mount === "undefined"}`);
         }
 
-        if(typeof mount.directory !== "string") {
+        if (typeof mount.directory !== "string") {
             throw new Error(`Invalid directory value on mount. Expected type string but received: ${typeof mount.directory}`);
         }
 
@@ -87,8 +86,8 @@ export class FileSystemService {
      * @returns Absolute directory path
      */
     public resolveMountDirectory(directory?: string): string {
-        if(!directory || directory.startsWith(".") || directory.startsWith("..")) {
-            return path.resolve(this.resolveRootMountsDir(), Random.randomString(36));
+        if (!directory || directory.startsWith(".") || directory.startsWith("..")) {
+            return path.resolve(this.resolveRootMountsDir(), randomString(36));
         } else {
             return path.resolve(directory);
         }
@@ -145,11 +144,11 @@ export class FileSystemService {
      * @returns {string} Resolved absolute filepath
      */
     public resolveFilepath(filepathOrFile: string | File): string {
-        if(typeof filepathOrFile == "undefined" || filepathOrFile == null) {
+        if (typeof filepathOrFile == "undefined" || filepathOrFile == null) {
             throw new Error(`Parameter cannot be nullish in order to resolve the absolute filepath.`);
         }
 
-        if(typeof filepathOrFile === "string") {
+        if (typeof filepathOrFile === "string") {
             return path.resolve(filepathOrFile);
         }
 
@@ -166,7 +165,7 @@ export class FileSystemService {
         return new Promise((resolve, reject) => {
             try {
                 fs.stat(this.resolveFilepath(filepathOrFile), (err, stats) => {
-                    if(err) reject(err);
+                    if (err) reject(err);
                     else resolve(stats);
                 })
             } catch (err) {
@@ -188,9 +187,9 @@ export class FileSystemService {
         // - Generate random string as instance id
         // - Create new file and write id into it
         // - Return instanceId and skip file read
-        if(!fs.existsSync(filepath)) {
+        if (!fs.existsSync(filepath)) {
             this._logger.warn(`Could not find file ${SC_IDFILE_NAME}. Creating new instance id.`);
-            instanceId = Random.randomString(36);
+            instanceId = randomString(36);
             fs.mkdirSync(path.dirname(filepath), { recursive: true });
             fs.writeFileSync(filepath, instanceId, { encoding: "utf-8" });
             return instanceId;

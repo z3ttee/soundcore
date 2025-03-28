@@ -1,6 +1,6 @@
 import { InternalServerErrorException, Logger } from "@nestjs/common";
 import { Environment } from "@soundcore/common";
-import { WorkerJobRef } from "@soundcore/queue";
+import { WorkerJobRef } from "@repo/queue";
 import { DataSource } from "typeorm";
 import { ImportTask } from "../../import/entities/import.entity";
 import { ImportService } from "../../import/services/import.service";

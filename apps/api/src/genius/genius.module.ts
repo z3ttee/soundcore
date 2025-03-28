@@ -1,6 +1,6 @@
 import path from 'path';
 import { DynamicModule, Module } from '@nestjs/common';
-import { WorkerQueueModule } from '@soundcore/queue';
+import { WorkerQueueModule } from '@repo/queue';
 import { ArtworkModule } from '../artwork/artwork.module';
 import { DistributorModule } from '../distributor/distributor.module';
 import { GenreModule } from '../genre/genre.module';

@@ -2,7 +2,7 @@ import path from 'path';
 
 import { Module } from '@nestjs/common';
 import { ScheduleModule } from '@nestjs/schedule';
-import { PipelineModule } from '@soundcore/pipelines';
+import { PipelineModule } from '@repo/pipelines';
 import { MeilisearchService } from './services/meili.service';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { MeiliBackgroundService } from './services/meili-background.service';
@@ -26,4 +26,4 @@ import { MeiliBackgroundService } from './services/meili-background.service';
         MeilisearchService
     ]
 })
-export class MeilisearchModule {}
+export class MeilisearchModule { }

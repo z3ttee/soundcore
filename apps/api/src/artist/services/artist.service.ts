@@ -1,14 +1,13 @@
 import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Page, Pageable } from '@soundcore/common';
-import { Slug } from '@tsalliance/utilities';
 import { ObjectLiteral, Repository, SelectQueryBuilder, UpdateResult } from 'typeorm';
 import { GeniusFlag } from '../../utils/entities/genius.entity';
 import { MeilisearchFlag } from '../../utils/entities/meilisearch.entity';
-import { ResourceFlag } from '../../utils/entities/resource';
 import { CreateArtistDTO } from '../dtos/create-artist.dto';
 import { UpdateArtistDTO } from '../dtos/update-artist.dto';
 import { Artist } from '../entities/artist.entity';
+import { createSlug } from '@repo/utilities';
 
 @Injectable()
 export class ArtistService {
@@ -16,7 +15,7 @@ export class ArtistService {
 
     constructor(
         @InjectRepository(Artist) private readonly repository: Repository<Artist>,
-    ){ }
+    ) { }
 
     public getRepository() {
         return this.repository;
@@ -47,13 +46,13 @@ export class ArtistService {
             .loadRelationCountAndMap("artist.albumCount", "artist.albums", "albumCount")
             .loadRelationCountAndMap("artist.songCount", "artist.songs", "songCount")
             .addSelect("COUNT(stream.id)", "streamCount")
-            .where("artist.id = :artistId OR artist.slug = :artistId" , { artistId })
-            .getRawAndEntities();      
+            .where("artist.id = :artistId OR artist.slug = :artistId", { artistId })
+            .getRawAndEntities();
 
         const result = rawAndEntities.entities[0];
         const streamCount = Number(rawAndEntities.raw[0]?.streamCount ?? 0);
-              
-        if(!!result) result.streamCount = streamCount;
+
+        if (!!result) result.streamCount = streamCount;
         return result;
     }
 
@@ -63,7 +62,7 @@ export class ArtistService {
      * @returns Artist
      */
     public async findByName(name: string): Promise<Artist> {
-        return await this.repository.findOne({ where: { name }});
+        return await this.repository.findOne({ where: { name } });
     }
 
     /**
@@ -72,7 +71,7 @@ export class ArtistService {
      * @returns True or false
      */
     public async existsByName(name: string): Promise<boolean> {
-        return !!(await this.repository.findOne({ where: { name }}));
+        return !!(await this.repository.findOne({ where: { name } }));
     }
 
     /**
@@ -121,7 +120,7 @@ export class ArtistService {
      * @returns Artist[]
      */
     public async createIfNotExists(dtos: (CreateArtistDTO | Artist)[], qb?: (query: SelectQueryBuilder<Artist>, alias: string) => SelectQueryBuilder<Artist>): Promise<Artist[]> {
-        if(dtos.length <= 0) throw new BadRequestException("Cannot create resources for empty list.");
+        if (dtos.length <= 0) throw new BadRequestException("Cannot create resources for empty list.");
 
         return await this.repository.createQueryBuilder()
             .insert()
@@ -132,10 +131,10 @@ export class ArtistService {
                 const alias = "artist";
                 let query: SelectQueryBuilder<Artist> = this.repository.createQueryBuilder(alias).leftJoin(`${alias}.artwork`, "artwork").addSelect(["artwork.id"]);
 
-                if(typeof qb === "function") {
+                if (typeof qb === "function") {
                     query = qb(this.repository.createQueryBuilder(alias), alias);
                 }
-                    
+
                 return query.whereInIds(insertResult.raw).getMany();
             });
     }
@@ -151,12 +150,12 @@ export class ArtistService {
         updateArtistDto.description = updateArtistDto.description?.trim();
 
         const artist = await this.findById(artistId);
-        if(!artist) throw new NotFoundException("Artist not found.");
-        if(await this.findByName(updateArtistDto.name)) throw new BadRequestException("Artist with that name already exists.");
+        if (!artist) throw new NotFoundException("Artist not found.");
+        if (await this.findByName(updateArtistDto.name)) throw new BadRequestException("Artist with that name already exists.");
 
         artist.name = updateArtistDto.name;
         artist.description = updateArtistDto.description;
-        artist.slug = Slug.create(artist.name);
+        artist.slug = createSlug(artist.name);
 
         return this.save(artist);
     }
@@ -182,7 +181,7 @@ export class ArtistService {
      */
     public async setGeniusFlag(idOrObject: string | Artist, flag: GeniusFlag): Promise<Artist> {
         const artist = await this.resolveArtist(idOrObject);
-        if(!artist) return null;
+        if (!artist) return null;
 
         artist.genius.flag = flag;
         return this.repository.save(artist);
@@ -194,7 +193,7 @@ export class ArtistService {
      * @returns Artist
      */
     protected async resolveArtist(idOrObject: string | Artist): Promise<Artist> {
-        if(typeof idOrObject == "string") {
+        if (typeof idOrObject == "string") {
             return this.findById(idOrObject);
         }
 
@@ -213,7 +212,7 @@ export class ArtistService {
             .update()
             .set({
                 meilisearch: {
-                    syncedAt: new Date(), 
+                    syncedAt: new Date(),
                     flag: flag
                 }
             })

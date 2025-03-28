@@ -2,7 +2,7 @@ import { DataSource } from "typeorm";
 import { FileSystemService } from "../../../filesystem/services/filesystem.service";
 import { Batch } from "@soundcore/common";
 import { STAGE_METADATA_ID, STEP_CREATE_SONGS_ID } from "../../pipelines";
-import { getOrDefault, progress, StepParams } from "@soundcore/pipelines";
+import { getOrDefault, progress, StepParams } from "@repo/pipelines";
 import { Artwork, SongArtwork } from "../../../artwork/entities/artwork.entity";
 import { ArtworkService } from "../../../artwork/services/artwork.service";
 import { Song, SONG_ARTWORK_RELATION_FK } from "../../../song/entities/song.entity";
@@ -22,7 +22,7 @@ export async function step_create_artwork_entities(params: StepParams) {
     // Step preparation
     const songs: Map<string, Song> = getOrDefault(`${STAGE_METADATA_ID}.${STEP_CREATE_SONGS_ID}.songs`, new Map());
     const fsService = new FileSystemService();
-    
+
     // Create query runner to control transaction
     const queryRunner = datasource.createQueryRunner();
 
@@ -48,23 +48,23 @@ export async function step_create_artwork_entities(params: StepParams) {
 
         const artwork2song: Map<string, string[]> = new Map();
         const result: Map<string, Song> = new Map();
-        const dtos: SongArtwork[] = [];    
-        
+        const dtos: SongArtwork[] = [];
+
         // Loop through songs in batch to create artwork dtos
         // that are then saved in the database.
-        for(const song of batch) {
+        for (const song of batch) {
             // Create DTO using artwork service
             const dto = artworkService.createDTOForSong(song);
 
             // Map the artwork (key) to songs (value)
-            if(artwork2song.has(dto.id)) {
+            if (artwork2song.has(dto.id)) {
                 const ids = artwork2song.get(dto.id);
                 ids.push(song.id);
                 artwork2song.set(dto.id, ids);
             } else {
                 artwork2song.set(dto.id, [song.id]);
             }
-            
+
             // Push to dtos for database insertion
             dtos.push(dto);
         }
@@ -75,10 +75,10 @@ export async function step_create_artwork_entities(params: StepParams) {
             await artworkService.createForSongsIfNotExists(dtos, (query, alias) => query.select([`${alias}.id`])).then((artworks) => {
                 // Loop through created artworks and map
                 // artwork ids to song
-                for(const artwork of artworks) {
+                for (const artwork of artworks) {
                     const songIds = artwork2song.get(artwork.id);
-    
-                    for(const songId of songIds) {
+
+                    for (const songId of songIds) {
                         // Map artwork to songs
                         result.set(songId, {
                             id: songId,
@@ -96,15 +96,15 @@ export async function step_create_artwork_entities(params: StepParams) {
             });
 
             // Throw error if data is not valid for following steps
-            if(Array.from(result.keys()).length <= 0) throw new Error("Received invalid song and artwork mapping.");
+            if (Array.from(result.keys()).length <= 0) throw new Error("Received invalid song and artwork mapping.");
 
             // Save artwork<->song relation
             // This builds a raw query to update multiple entries at once.
             // A CASE-Statement is used to change columns based on the id of the row
             let sql = `UPDATE ${songRepo.metadata.tableName} SET ${SONG_ARTWORK_RELATION_FK} = CASE id `;
-            for(const data of Array.from(result.values())) {
+            for (const data of Array.from(result.values())) {
                 const artworkId = data.artwork?.id;
-                if(typeof artworkId === "undefined" || artworkId == null) continue;
+                if (typeof artworkId === "undefined" || artworkId == null) continue;
                 // Add a new condition inside CASE
                 sql += `WHEN '${data.id}' THEN '${data.artwork.id}'`;
             }
@@ -148,7 +148,7 @@ export async function step_create_artwork_entities(params: StepParams) {
         }
 
         // Post progress
-        progress(currentBatch/totalBatches);
+        progress(currentBatch / totalBatches);
 
         // Return result
         return result;

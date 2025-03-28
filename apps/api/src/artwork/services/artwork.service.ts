@@ -7,7 +7,6 @@ import axios from "axios";
 import { Injectable, InternalServerErrorException, Logger, NotFoundException } from "@nestjs/common";
 import { CreateArtworkDTO, CreateDownloadableArtworkDTO } from "../dtos/create-artwork.dto";
 import { Artwork, ArtworkFlag, ArtworkID, ArtworkType, SongArtwork } from "../entities/artwork.entity";
-import { Random } from "@tsalliance/utilities";
 import { DeleteResult, Repository, SelectQueryBuilder } from "typeorm";
 import { Artist } from "../../artist/entities/artist.entity";
 import { Album } from "../../album/entities/album.entity";
@@ -19,6 +18,7 @@ import { Response } from "express";
 import { InjectRepository } from "@nestjs/typeorm";
 import { FileSystemService } from "../../filesystem/services/filesystem.service";
 import { TasksService } from "../../tasks/services/tasks.service";
+import { randomString } from "@repo/utilities";
 
 @Injectable()
 export class ArtworkService {
@@ -30,7 +30,7 @@ export class ArtworkService {
 
         private readonly fileSystem: FileSystemService,
         private readonly taskService: TasksService,
-    ) {}
+    ) { }
 
     /**
      * Get the repository used by the service
@@ -66,7 +66,7 @@ export class ArtworkService {
      * @returns Artwork
      * @deprecated Use createIfNotExistsV2()
      */
-    public async createIfNotExists<T extends CreateArtworkDTO = CreateArtworkDTO>(createArtworkDtos: T[], qb?: (query: SelectQueryBuilder<Artwork>, alias: string) => SelectQueryBuilder<Artwork> ): Promise<Artwork[]> {
+    public async createIfNotExists<T extends CreateArtworkDTO = CreateArtworkDTO>(createArtworkDtos: T[], qb?: (query: SelectQueryBuilder<Artwork>, alias: string) => SelectQueryBuilder<Artwork>): Promise<Artwork[]> {
         return this.repository.createQueryBuilder()
             .insert()
             .values(createArtworkDtos)
@@ -75,16 +75,16 @@ export class ArtworkService {
             .execute().then((insertResult) => {
                 const alias = "artwork";
                 let query: SelectQueryBuilder<Artwork> = this.repository.createQueryBuilder(alias)
-                    
-                if(typeof qb === "function") {
+
+                if (typeof qb === "function") {
                     query = qb(this.repository.createQueryBuilder(alias), alias);
                 }
-                    
+
                 return query.whereInIds(insertResult.raw).getMany();
             })
     }
 
-    public async createIfNotExistsV2<T extends Artwork = Artwork>(repository: Repository<T>, values: T[], overwrite: (keyof T)[], qb?: (query: SelectQueryBuilder<T>, alias: string) => SelectQueryBuilder<T> ): Promise<T[]> {
+    public async createIfNotExistsV2<T extends Artwork = Artwork>(repository: Repository<T>, values: T[], overwrite: (keyof T)[], qb?: (query: SelectQueryBuilder<T>, alias: string) => SelectQueryBuilder<T>): Promise<T[]> {
         return repository.createQueryBuilder()
             .insert()
             .values(values as any)
@@ -93,11 +93,11 @@ export class ArtworkService {
             .execute().then((insertResult) => {
                 const alias = "artwork";
                 let query: SelectQueryBuilder<T> = repository.createQueryBuilder(alias)
-                    
-                if(typeof qb === "function") {
+
+                if (typeof qb === "function") {
                     query = qb(query, alias);
                 }
-                    
+
                 return query.whereInIds(insertResult.raw).getMany();
             })
     }
@@ -117,7 +117,7 @@ export class ArtworkService {
         const dto = new CreateDownloadableArtworkDTO(
             this.createHash(`${name}:${type}`),
             sourceUri,
-            type                
+            type
         );
 
         return this.createIfNotExists([dto])?.[0];
@@ -132,13 +132,13 @@ export class ArtworkService {
      * @returns Artwork
      */
     public async createForAlbumIfNotExists(album: Album, sourceUri: string): Promise<Artwork> {
-        const name = `${album.name} ${album.primaryArtist?.name || Random.randomString(8)}`;
+        const name = `${album.name} ${album.primaryArtist?.name || randomString(8)}`;
         const type = ArtworkType.ALBUM;
 
         const dto = new CreateDownloadableArtworkDTO(
             this.createHash(`${name}:${type}`),
             sourceUri,
-            type                
+            type
         );
 
         return this.createIfNotExists([dto])?.[0];
@@ -160,7 +160,7 @@ export class ArtworkService {
         const dto = new CreateDownloadableArtworkDTO(
             this.createHash(`${name}:${type}`),
             sourceUri,
-            type                
+            type
         );
 
         return this.createIfNotExists([dto])?.[0]
@@ -182,7 +182,7 @@ export class ArtworkService {
         const dto = new CreateDownloadableArtworkDTO(
             this.createHash(`${name}:${type}`),
             sourceUri,
-            type                
+            type
         );
 
         return this.createIfNotExists([dto])?.[0];
@@ -197,14 +197,14 @@ export class ArtworkService {
      * @returns Artwork
      * @deprecated 
      */
-     public async createForPublisherIfNotExists(publisher: Publisher, sourceUri: string): Promise<Artwork> {
+    public async createForPublisherIfNotExists(publisher: Publisher, sourceUri: string): Promise<Artwork> {
         const name = publisher.name;
         const type = ArtworkType.PUBLISHER;
 
         const dto = new CreateDownloadableArtworkDTO(
             this.createHash(`${name}:${type}`),
             sourceUri,
-            type                
+            type
         );
 
         return this.createIfNotExists([dto])?.[0]
@@ -215,7 +215,7 @@ export class ArtworkService {
      * @param artworks Set of artworks to create
      * @param qb Custom select query to customize returned entities after creation
      */
-    public async createForSongsIfNotExists(artworks: SongArtwork[], qb?: (query: SelectQueryBuilder<SongArtwork>, alias: string) => SelectQueryBuilder<SongArtwork> ): Promise<SongArtwork[]> {
+    public async createForSongsIfNotExists(artworks: SongArtwork[], qb?: (query: SelectQueryBuilder<SongArtwork>, alias: string) => SelectQueryBuilder<SongArtwork>): Promise<SongArtwork[]> {
         return this.createIfNotExistsV2(this.songArtworkRepo, artworks, ["flag"], qb);
     }
 
@@ -248,12 +248,12 @@ export class ArtworkService {
     }
 
     public static createSongCoverNameSchema(song: Song): string {
-        if(!song) return null;
+        if (!song) return null;
 
-        const primaryArtistName = song.primaryArtist?.id || Random.randomString(8);      
+        const primaryArtistName = song.primaryArtist?.id || randomString(8);
         const album = song.album;
 
-        if(typeof album != "undefined" && album != null) {
+        if (typeof album != "undefined" && album != null) {
             return `${album.id}`
         }
 
@@ -266,7 +266,7 @@ export class ArtworkService {
      * @returns Buffer
      */
     public async downloadToBuffer(url: string): Promise<Buffer> {
-        if(url.includes("default_avatar")) return null;
+        if (url.includes("default_avatar")) return null;
 
         return axios.get(url, { responseType: "arraybuffer" }).then((response) => {
             const buffer = Buffer.from(response.data, "binary");
@@ -287,7 +287,7 @@ export class ArtworkService {
 
             // Check if parameter is a buffer, if not
             // treat as file and read file into a buffer.
-            if(!Buffer.isBuffer(bufferOrFile)) {
+            if (!Buffer.isBuffer(bufferOrFile)) {
                 srcBuffer = fs.readFileSync(bufferOrFile as string);
             } else {
                 srcBuffer = bufferOrFile as Buffer;
@@ -295,7 +295,7 @@ export class ArtworkService {
 
             // Create destination directory
             fs.mkdir(path.dirname(dstFile), { recursive: true }, (err, directory) => {
-                if(err) {
+                if (err) {
                     this.logger.warn(`Could not write artwork to disk: Could not create directory '${directory}': ${err.message}`);
                     reject(err);
                     return;
@@ -304,7 +304,7 @@ export class ArtworkService {
                 // Read source file into buffer and convert to jpeg,
                 // compress and resize it. This will write the result into dstFile path
                 sharp(srcBuffer).jpeg({ force: true, quality: 80, chromaSubsampling: "4:4:4" }).resize(512, 512, { fit: "cover" }).toFile(dstFile, (err) => {
-                    if(err) {
+                    if (err) {
                         this.logger.warn(`Could not write artwork to disk: Failed while processing using sharp: ${err.message}`);
                         reject(err);
                         return;
@@ -321,13 +321,13 @@ export class ArtworkService {
      * @param idOrObject Artwork id or object to extract colors from
      * @returns ArtworkColors
      */
-     public async extractAccentColor(artwork: Pick<Artwork, "id">): Promise<string> {
-        if(!artwork) return null;
+    public async extractAccentColor(artwork: Pick<Artwork, "id">): Promise<string> {
+        if (!artwork) return null;
         const filepath = this.fileSystem.resolveArtworkDir(artwork);
 
         return new Promise((resolve, reject) => {
             fs.access(filepath, (err) => {
-                if(err) {
+                if (err) {
                     reject(err);
                     return;
                 }
@@ -343,7 +343,7 @@ export class ArtworkService {
 
     public async extractAndSetAccentColor(idOrObject: Artwork): Promise<string> {
         const artwork = await this.resolveArtwork(idOrObject);
-        if(!artwork) return null;
+        if (!artwork) return null;
 
         return this.extractAccentColor(artwork).then((color) => {
             return this.repository.update(artwork.id, { accentColor: color }).then(() => {
@@ -370,15 +370,15 @@ export class ArtworkService {
      * @param artworkId Requested artwork's id.
      * @param response Response to pipe stream to.
      */
-     public async streamArtwork(artworkId: string, response: Response): Promise<void> {
+    public async streamArtwork(artworkId: string, response: Response): Promise<void> {
         const artwork = await this.findById(artworkId);
-        if(!artwork) throw new NotFoundException("Could not find artwork.");
+        if (!artwork) throw new NotFoundException("Could not find artwork.");
 
         return new Promise((resolve, reject) => {
             const filepath = this.fileSystem.resolveArtworkDir(artwork);
 
             fs.access(filepath, (err) => {
-                if(err) {
+                if (err) {
                     reject(new NotFoundException("Could not find artwork file."));
                     return;
                 }
@@ -387,8 +387,8 @@ export class ArtworkService {
                 stream.on("finish", () => resolve());
                 stream.on("error", () => reject(new InternalServerErrorException("Failed reading artwork file.")));
             })
-             
-        }) 
+
+        })
     }
 
     /**
@@ -398,7 +398,7 @@ export class ArtworkService {
      * @returns Artwork
      */
     public async setFlags(artworkIds: string[], flag: ArtworkFlag): Promise<boolean> {
-        if(artworkIds.length <= 0) return false;
+        if (artworkIds.length <= 0) return false;
         return this.repository.createQueryBuilder()
             .update()
             .set({ flag })
@@ -416,7 +416,7 @@ export class ArtworkService {
      * @returns Artwork
      */
     private async resolveArtwork(idOrObject: string | Artwork): Promise<Artwork> {
-        if(typeof idOrObject == "string") {
+        if (typeof idOrObject == "string") {
             return this.findById(idOrObject);
         }
 
