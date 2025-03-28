@@ -73,27 +73,24 @@ import { ConfigureModule } from './configure/configure.module';
       charset: "utf8mb4",
     }),
     MeilisearchModuleNEXT.forRootAsync({
-      useFactory: ()
-    })
-    // MeilisearchModuleNEXT.forRootAsync({
-    //   useFactory: (configService: ConfigService) => ({
-    //     host: process.env.MEILISEARCH_HOST,
-    //     port: process.env.MEILISEARCH_PORT ? parseInt(process.env.MEILISEARCH_PORT) : null,
-    //     key: process.env.MEILISEARCH_KEY,
-    //     indexPrefix: "sc_"
-    //   })
-    // }),
+      useFactory: (configService: ConfigService) => ({
+        host: process.env.MEILISEARCH_HOST,
+        port: process.env.MEILISEARCH_PORT ? parseInt(process.env.MEILISEARCH_PORT) : null,
+        key: process.env.MEILISEARCH_KEY,
+        indexPrefix: "sc_"
+      })
+    }),
     MeilisearchModule,
     CronModule,
-    // WorkerQueueModule.forRootAsync({
-    //   useFactory: () => ({
-    //     defaultQueueOptions: {
-    //       concurrent: 1,
-    //       workerType: "thread",
-    //       debounceMs: 500
-    //     }
-    //   })
-    // }),
+    WorkerQueueModule.forRootAsync({
+      useFactory: () => ({
+        defaultQueueOptions: {
+          concurrent: 1,
+          workerType: "thread",
+          debounceMs: 500
+        }
+      })
+    }),
     PipelineModule.forRootAsync({
       inject: [FileSystemService],
       useFactory: async (fsService: FileSystemService) => {
