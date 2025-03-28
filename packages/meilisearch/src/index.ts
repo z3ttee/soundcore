@@ -1,5 +1,5 @@
 
-export { MeilisearchModule } from "./meilisearch.module";
+export { MeilisearchModule } from "./module";
 export { MeiliIndex } from "./entities/index.entity";
 export { MeiliClient } from "./entities/client.entity";
 

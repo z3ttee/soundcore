@@ -1,7 +1,7 @@
 import MeiliSearch, { Config, Index, IndexesResults, IndexObject, Pagination } from "meilisearch";
 import { IndexSchema } from "../definitions";
 import { SchemaService } from "../services/schema.service";
-import { createMeiliIndex } from "../utils/asyncProvider";
+import { createMeiliIndex } from "../utils/indexInit";
 import { MeiliIndex } from "./index.entity";
 
 export class MeiliClient extends MeiliSearch {

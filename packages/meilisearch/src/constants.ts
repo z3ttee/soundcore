@@ -1,6 +1,5 @@
-import MeiliSearch from "meilisearch";
 
-export const LOGGER_LABEL = MeiliSearch.name;
+export const LOGGER_LABEL = "MeilisearchClient";
 
 export const OPTIONS_TOKEN = "sc-meilisearch-options-token"
 export const INDEXES_TOKEN = "sc-meilisearch-indexes-token"

@@ -1,5 +1,5 @@
 
-export { PipelineModule } from "./pipelines.module";
+export { PipelineModule } from "./module";
 export { PipelineService } from "./services/pipelines.service";
 export { PipelineRegistry } from "./services/pipeline-registry.service";
 export { pipeline } from "./builder/pipeline.builder";

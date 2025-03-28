@@ -1,9 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { IndexSchema } from "../definitions";
-import { MeiliIndex } from "../entities/index.entity";
-import { getSchemaToken } from "../utils/asyncProvider";
-
-const indexes: Map<string, MeiliIndex> = new Map();
+import { getSchemaToken } from "../providers";
 
 @Injectable()
 export class SchemaService {

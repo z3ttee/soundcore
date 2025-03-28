@@ -1,5 +1,3 @@
-import { FactoryProvider, ModuleMetadata } from "@nestjs/common";
-
 export interface PipelineRootOptions {
     /**
      * Enable printing the logs of a pipeline run to the console.
