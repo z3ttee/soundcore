@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, inject, Inject, OnDestroy, OnInit } from '@angular/core';
 import { NavigationCancel, NavigationEnd, NavigationError, NavigationStart, Router } from '@angular/router';
 import { SSOService } from '@soundcore/sso';
 import { BehaviorSubject, combineLatest, filter, map, Observable, startWith, Subject, takeUntil, tap } from 'rxjs';
@@ -18,12 +18,10 @@ interface AppProps {
 })
 export class AppComponent implements OnInit, OnDestroy {
 
-  constructor(
-      public readonly screenService: SCCDKScreenService,
-      public readonly authService: SSOService,
-      private readonly router: Router,
-      private readonly appService: SCSDKAppService
-  ) {}
+  public readonly authService: SSOService = inject(SSOService);
+  private readonly appService: SCSDKAppService = inject(SCSDKAppService);
+  public readonly screenService: SCCDKScreenService = inject(SCCDKScreenService);
+  private readonly router: Router = inject(Router);
 
   private _destroySubject: Subject<void> = new Subject();
   private $destroy: Observable<void> = this._destroySubject.asObservable();
@@ -42,7 +40,7 @@ export class AppComponent implements OnInit, OnDestroy {
     map(([isRouteLoading, isReady, keycloakInitError]): AppProps => {
       // Toggle splash element
       const splashElement: HTMLElement = document.querySelector("#asc-splash-screen");
-      if(!isRouteLoading && isReady) {
+      if (!isRouteLoading && isReady) {
         splashElement.style.display = "none";
       } else {
         splashElement.style.display = "block";
@@ -57,18 +55,18 @@ export class AppComponent implements OnInit, OnDestroy {
   );
 
   public ngOnInit(): void {
-      this.router.events.pipe(filter((event) => event instanceof NavigationStart || event instanceof NavigationEnd || event instanceof NavigationCancel || event instanceof NavigationError)).subscribe((event: NavigationStart | NavigationEnd) => {
-          if(event instanceof NavigationStart) {
-            this._loadingSubject.next(true);
-          } else {
-            this._loadingSubject.next(false);
-          }
-      });
+    this.router.events.pipe(filter((event) => event instanceof NavigationStart || event instanceof NavigationEnd || event instanceof NavigationCancel || event instanceof NavigationError)).subscribe((event: NavigationStart | NavigationEnd) => {
+      if (event instanceof NavigationStart) {
+        this._loadingSubject.next(true);
+      } else {
+        this._loadingSubject.next(false);
+      }
+    });
   }
 
   public ngOnDestroy(): void {
-      this._destroySubject.next();
-      this._destroySubject.complete();
+    this._destroySubject.next();
+    this._destroySubject.complete();
   }
 
 }

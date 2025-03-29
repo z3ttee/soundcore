@@ -9,7 +9,7 @@ import { environment } from 'src/environments/environment';
 import { SCNGXModule, SCNGXDialogModule } from '@soundcore/ngx';
 import { SCCDKScreenModule } from '@soundcore/cdk';
 import { HttpClientModule } from '@angular/common/http';
-import { SSOModule } from "@soundcore/sso";
+import { OAuthModule } from 'angular-oauth2-oidc';
 
 @NgModule({
   declarations: [
@@ -20,20 +20,21 @@ import { SSOModule } from "@soundcore/sso";
     AppRoutingModule,
     BrowserAnimationsModule,
     HttpClientModule,
-    SSOModule.forRoot({
-      baseUrl: environment.keycloak_url,
-      realm: environment.keycloak_realm,
-      clientId: environment.keycloak_client_id,
-      initOptions: {
-        onLoad: 'check-sso',
-        silentCheckSsoRedirectUri: window.location.origin + '/assets/silent-check-sso.html'
-      },
-      loadUserProfileAtStartUp: true,
-      roleMapping: {
-        admin: environment.admin_role,
-        mod: environment.mod_role
-      }
-    }),
+    OAuthModule.forRoot(),
+    // SSOModule.forRoot({
+    //   baseUrl: environment.keycloak_url,
+    //   realm: environment.keycloak_realm,
+    //   clientId: environment.keycloak_client_id,
+    //   initOptions: {
+    //     onLoad: 'check-sso',
+    //     silentCheckSsoRedirectUri: window.location.origin + '/assets/silent-check-sso.html'
+    //   },
+    //   loadUserProfileAtStartUp: true,
+    //   roleMapping: {
+    //     admin: environment.admin_role,
+    //     mod: environment.mod_role
+    //   }
+    // }),
     SCSDKModule.forRoot({
       api_base_uri: environment.api_base_uri
     }),
@@ -57,4 +58,4 @@ import { SSOModule } from "@soundcore/sso";
   providers: [],
   bootstrap: [AppComponent]
 })
-export class AppModule {}
+export class AppModule { }

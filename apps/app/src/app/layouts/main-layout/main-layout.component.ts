@@ -1,6 +1,6 @@
 import { CdkDragDrop } from "@angular/cdk/drag-drop";
 import { Location } from "@angular/common";
-import { Component, OnDestroy, OnInit } from "@angular/core";
+import { Component, inject, OnDestroy, OnInit } from "@angular/core";
 import { UntypedFormControl } from "@angular/forms";
 import { NavigationCancel, NavigationEnd, NavigationError, NavigationStart, Router } from "@angular/router";
 import { SSOService, SSOUser } from "@soundcore/sso";
@@ -30,16 +30,17 @@ export class AscMainLayoutComponent implements OnInit, OnDestroy {
 
     public isNavigating: boolean = false;
 
+    public readonly playlistService: SCSDKPlaylistService = inject(SCSDKPlaylistService);
+    private readonly authService: SSOService = inject(SSOService);
+
     constructor(
         public readonly screenService: SCCDKScreenService,
-        private readonly authService: SSOService,
-        public readonly playlistService: SCSDKPlaylistService,
         private readonly dialogService: SCNGXDialogService,
         private readonly searchService: SCSDKSearchService,
         private readonly router: Router,
         private readonly _location: Location,
         public readonly gateway: SCSDKGeneralGateway
-    ) {}
+    ) { }
 
     public readonly $props: Observable<MainLayoutProps> = combineLatest([
         this.playlistService.$library.pipe(map((playlists) => ([...playlists]))),
@@ -63,7 +64,7 @@ export class AscMainLayoutComponent implements OnInit, OnDestroy {
         // This indicates the user that the page is loading parts of the app
         // that are needed for operation
         this.router.events.pipe(filter((event) => event instanceof NavigationStart || event instanceof NavigationEnd || event instanceof NavigationCancel || event instanceof NavigationError), takeUntil(this._destroy)).subscribe((event) => {
-            if(event instanceof NavigationStart) {
+            if (event instanceof NavigationStart) {
                 this.isNavigating = true;
             } else {
                 this.isNavigating = false;
@@ -88,7 +89,7 @@ export class AscMainLayoutComponent implements OnInit, OnDestroy {
     public navigateBack() {
         this._location.back();
     }
-    
+
     public navigateNext() {
         this._location.forward();
     }
@@ -96,11 +97,11 @@ export class AscMainLayoutComponent implements OnInit, OnDestroy {
     public navigateToSearch() {
         this.router.navigate(['/search']).then((value) => {
             // Only emit, if the prev route was not already /search
-            if(value) this.searchService.emitMainInput(this.searchInputControl.value);
+            if (value) this.searchService.emitMainInput(this.searchInputControl.value);
         })
     }
 
-    public openCreatePlaylistDialog() {       
+    public openCreatePlaylistDialog() {
         this.dialogService.open(AppPlaylistCreateDialog, {}).$afterClosed.pipe(takeUntil(this._destroy));
     }
 

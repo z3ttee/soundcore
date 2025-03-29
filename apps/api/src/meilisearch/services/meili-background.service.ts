@@ -16,36 +16,36 @@ export class MeiliBackgroundService {
         private readonly pipelines: PipelineService,
         private readonly tasks: TasksService
     ) {
-        this.pipelines.on("status", (params) => this.handleOnPipelineStatus(params));
-        this.pipelines.on("failed", (error, params) => this.handleOnPipelineFailed(error, params));
+        // this.pipelines.on("status", (params) => this.handleOnPipelineStatus(params));
+        // this.pipelines.on("failed", (error, params) => this.handleOnPipelineFailed(error, params));
     }
 
-    @OnEvent(EVENT_TRIGGER_MEILISEARCH_PROCESS_SONGS)
-    public triggerMeilisearchSync() {
-        this.createNewRun();
-    }
+    // @OnEvent(EVENT_TRIGGER_MEILISEARCH_PROCESS_SONGS)
+    // public triggerMeilisearchSync() {
+    //     this.createNewRun();
+    // }
 
     /**
      * Create new pipeline run to sync resources with meilisearch
      * @param env Environment used for the pipeline run
      */
-    public async createNewRun(env?: MeilisearchPipelineEnv) {
-        return this.pipelines.createRun(MEILISEARCH_PIPELINE_ID, env).then((run) => {
-            return this.tasks.createTaskFromPipelineRun(run).then((task) => {
-                return this.pipelines.enqueueRun(task).then(() => task);
-            });
-        });
-    }
+    // public async createNewRun(env?: MeilisearchPipelineEnv) {
+    //     return this.pipelines.createRun(MEILISEARCH_PIPELINE_ID, env).then((run) => {
+    //         return this.tasks.createTaskFromPipelineRun(run).then((task) => {
+    //             return this.pipelines.enqueueRun(task).then(() => task);
+    //         });
+    //     });
+    // }
 
 
 
-    private handleOnPipelineFailed(error: Error, params: PipelineEventParams) {
-        this.logger.error(`Meilisearch background task failed: ${error.message}`, error.stack);
-    }
+    // private handleOnPipelineFailed(error: Error, params: PipelineEventParams) {
+    //     this.logger.error(`Meilisearch background task failed: ${error.message}`, error.stack);
+    // }
 
-    private handleOnPipelineStatus(params: PipelineEventParams) {
-        this.tasks.updateTask(params.pipeline as Task, true);
-    }
+    // private handleOnPipelineStatus(params: PipelineEventParams) {
+    //     this.tasks.updateTask(params.pipeline as Task, true);
+    // }
 
 
 }

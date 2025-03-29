@@ -45,6 +45,8 @@ export abstract class SearchEngine {
     /** Start syncing database with the search engine */
     @OnEvent(EVENT_TRIGGER_SEARCH_ENGINE_SYNC)
     public async triggerSync(): Promise<Task | null> {
+        this.logger.log("Triggering sync with search engine");
+
         if (this.config.module === "database") {
             this.logger.log(`Skipped syncing with search engine because the configured engine was set to ${this.config.module}`);
             return;

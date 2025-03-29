@@ -10,7 +10,7 @@ import { DistributorModule } from '../distributor/distributor.module';
 import { AlbumModule } from '../album/album.module';
 import { UserModule } from '../user/user.module';
 import { PlaylistModule } from '../playlist/playlist.module';
-import { SearchEngine, SearchEngineConfig, SearchEngineModuleType } from './engines/engine';
+import { SearchEngine } from './engines/engine';
 import { ConfigService } from '@nestjs/config';
 import { MeilisearchEngine } from './engines/meilisearch/meilisearchEngine';
 import { DatabaseSearchEngine } from './engines/database/databaseEngine';
