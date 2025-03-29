@@ -4,10 +4,10 @@
     "outDir": "./dist",
     "removeComments": true,
     "sourceMap": true,
-    "declaration": false,
+    "declaration": true,
   },
   "include": [
-    "src/**/*.ts"
+    "src/**/*"
   ],
   "exclude": [
     "dist",

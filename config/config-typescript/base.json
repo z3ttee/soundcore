@@ -4,7 +4,6 @@
     "sourceMap": true,
     "composite": false,
     "declaration": true,
-    "declarationMap": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "noEmit": true,
@@ -21,5 +20,7 @@
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true
   },
-  "exclude": ["node_modules"]
+  "exclude": [
+    "node_modules"
+  ]
 }
