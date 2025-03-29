@@ -6,12 +6,8 @@
   "types": "./dist/index.d.ts",
   "private": true,
   "scripts": {
-    "ng": "ng",
     "start": "ng serve",
-    "build:app": "ng build",
-    "build:package": "ng build",
-    "watch": "ng build --watch",
-    "test": "ng test"
+    "ci:build": "ng build"
   },
   "dependencies": {
     "@angular/animations": "^15.2.0",

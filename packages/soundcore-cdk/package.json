@@ -21,12 +21,8 @@
     }
   },
   "scripts": {
-    "ng": "ng",
     "start": "ng serve",
-    "build:app": "ng build",
-    "build:package": "ng build",
-    "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "ci:build": "ng build"
   },
   "private": true,
   "dependencies": {

@@ -4,6 +4,7 @@
   "scripts": {
     "start": "ng serve",
     "build:app": "ng build",
+    "ci:build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },
