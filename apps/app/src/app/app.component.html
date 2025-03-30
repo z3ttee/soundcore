@@ -1,5 +1,6 @@
-<ng-container *ngIf="($props | async) as props">
+<!-- <ng-container *ngIf="($props | async) as props"> -->
+<ng-container *ngIf="(authService.$session | async)">
     <scngx-dialog-section></scngx-dialog-section>
-
-    <router-outlet *ngIf="props.ready"></router-outlet>
+    <router-outlet></router-outlet>
 </ng-container>
+<!-- </ng-container> -->

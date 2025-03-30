@@ -9,7 +9,7 @@ import { environment } from 'src/environments/environment';
 import { SCNGXModule, SCNGXDialogModule } from '@soundcore/ngx';
 import { SCCDKScreenModule } from '@soundcore/cdk';
 import { HttpClientModule } from '@angular/common/http';
-import { OAuthModule } from 'angular-oauth2-oidc';
+import { provideAuthentication } from './auth/module';
 
 @NgModule({
   declarations: [
@@ -20,7 +20,7 @@ import { OAuthModule } from 'angular-oauth2-oidc';
     AppRoutingModule,
     BrowserAnimationsModule,
     HttpClientModule,
-    OAuthModule.forRoot(),
+    // OAuthModule.forRoot(),
     // SSOModule.forRoot({
     //   baseUrl: environment.keycloak_url,
     //   realm: environment.keycloak_realm,
@@ -55,7 +55,13 @@ import { OAuthModule } from 'angular-oauth2-oidc';
     SCNGXDialogModule,
     SCSDKMountModule,
   ],
-  providers: [],
+  providers: [
+    provideAuthentication({
+      issuer: environment.oidc_issuer,
+      clientId: environment.oidc_client_id,
+      scope: environment.oidc_scope,
+    }),
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
