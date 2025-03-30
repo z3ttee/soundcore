@@ -11,6 +11,7 @@
     "noImplicitReturns": false,
     "noUnusedLocals": false,
     "noUnusedParameters": false,
+    "moduleResolution": "node",
   },
   "include": [
     "src/**/*"

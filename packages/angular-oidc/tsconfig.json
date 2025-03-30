@@ -1,21 +1,23 @@
+/* To learn more about Typescript configuration file: https://www.typescriptlang.org/docs/handbook/tsconfig-json.html. */
+/* To learn more about Angular compiler options: https://angular.dev/reference/configs/angular-compiler-options. */
 {
   "extends": "@repo/config-typescript/angular.json",
   "compilerOptions": {
-    "outDir": "./dist",
-    "declaration": true,
-    "declarationDir": "./dist/types",
-    "sourceMap": true,
-    "removeComments": false,
-    "noUnusedParameters": false,
-    "noUnusedLocals": false
+    "outDir": "./dist/out-tsc",
+    "moduleResolution": "bundler",
+    "isolatedModules": true,
+    "importHelpers": true,
+    "paths": {
+      "angular-oidc": [
+        "./dist/angular-oidc"
+      ]
+    },
   },
   "include": [
-    "src/**/*"
+    "projects/**/*"
   ],
   "exclude": [
     "node_modules",
-    "test",
-    "dist",
-    "**/*spec.ts"
-  ]
+    "dist"
+  ],
 }

@@ -1,29 +1,29 @@
 {
   "name": "@repo/angular-oidc",
   "version": "1.0.0",
-  "private": true,
-  "license": "UNLICENSED",
-  "main": "./dist/esm/index.js",
-  "module": "./dist/esm/index.js",
-  "types": "./dist/types/index.d.ts",
   "scripts": {
-    "ci:lint": "eslint",
-    "ci:build": "rimraf dist && node esbuild.mjs && tsc --emitDeclarationOnly"
+    "ci:build": "ng build"
   },
-  "files": [
-    "dist/**/*",
-    "README.md"
-  ],
+  "private": true,
+  "module": "./dist/angular-oidc/fesm2022/angular-oidc.mjs",
+  "typings": "./dist/angular-oidc/public-api.d.ts",
   "dependencies": {
-    "@angular/common": "^15.2.0",
-    "@angular/core": "^15.2.0",
-    "@repo/utilities": "*",
-    "rxjs": "^7.8.2"
+    "@angular/common": "^19.2.0",
+    "@angular/compiler": "^19.2.0",
+    "@angular/core": "^19.2.0",
+    "@angular/platform-browser": "^19.2.0",
+    "@angular/platform-browser-dynamic": "^19.2.0",
+    "@angular/router": "^19.2.0",
+    "rxjs": "~7.8.0",
+    "tslib": "^2.3.0",
+    "zone.js": "~0.15.0"
   },
   "devDependencies": {
+    "@angular-devkit/build-angular": "^19.2.5",
+    "@angular/cli": "^19.2.5",
+    "@angular/compiler-cli": "^19.2.0",
     "@repo/config-typescript": "*",
-    "esbuild": "^0.25.1",
-    "rimraf": "^6.0.1",
-    "typescript": "^5.8.2"
+    "ng-packagr": "^19.2.0",
+    "typescript": "~5.7.2"
   }
 }

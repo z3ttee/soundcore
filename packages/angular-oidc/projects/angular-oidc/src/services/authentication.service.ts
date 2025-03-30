@@ -1,11 +1,11 @@
 import { inject, Injectable } from "@angular/core";
-import { Profile, Session } from "../types";
-import { authorizationCodeGrant, buildAuthorizationUrl, buildEndSessionUrl, Configuration, discovery, fetchUserInfo, skipSubjectCheck, } from "openid-client";
-import { DI_AUTH_OPTIONS, KEY_COOKIE_ACCESSTOKEN, KEY_COOKIE_IDTOKEN, KEY_COOKIE_REFRESHTOKEN } from "../constants";
-import { isNull } from "@repo/utilities";
-import { CookieService } from "./cookie.service";
-import { BehaviorSubject, map } from "rxjs";
 import { ActivatedRoute, Router } from "@angular/router";
+import { isNull } from "@repo/utilities";
+import { authorizationCodeGrant, buildAuthorizationUrl, buildEndSessionUrl, Configuration, discovery, fetchUserInfo, skipSubjectCheck, } from "openid-client";
+import { BehaviorSubject, map } from "rxjs";
+import { DI_AUTH_OPTIONS, KEY_COOKIE_ACCESSTOKEN, KEY_COOKIE_IDTOKEN, KEY_COOKIE_REFRESHTOKEN } from "../constants";
+import { Profile, Session } from "../types";
+import { CookieService } from "./cookie.service";
 
 @Injectable()
 export class AuthenticationService {
@@ -40,7 +40,7 @@ export class AuthenticationService {
         const params = new URLSearchParams(window.location.search);
 
         // Check if grant code exists and do token exchange
-        return this._checkCodeGrantedAndExchange(params.get("state"), params.get("code")).then((authenticated) => {
+        return this._checkCodeGrantedAndExchange(params.get("code")).then((authenticated) => {
             // On success, return and authenticate
             if (authenticated) return true;
             // Otherwise read session info
@@ -104,7 +104,7 @@ export class AuthenticationService {
     public async refresh(): Promise<boolean> {
         console.info("[Authentication] Refreshing session");
 
-        const session = this.getSession();
+        // const session = this.getSession();
         // TODO: Implement refresh
         return false;
     }
@@ -187,7 +187,7 @@ export class AuthenticationService {
         }
     }
 
-    private async _checkCodeGrantedAndExchange(state?: string | null, code?: string | null): Promise<boolean> {
+    private async _checkCodeGrantedAndExchange(code?: string | null): Promise<boolean> {
         if (!this._config) throw new Error("No metadata loaded. Please call loadMetadata() in APP_INITIALIZER.");
 
         // Check if code exists, when not dont continue with exchange
