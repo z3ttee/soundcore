@@ -1,0 +1,29 @@
+{
+  "name": "@repo/angular-oidc",
+  "version": "1.0.0",
+  "private": true,
+  "license": "UNLICENSED",
+  "main": "./dist/esm/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/types/index.d.ts",
+  "scripts": {
+    "ci:lint": "eslint",
+    "ci:build": "rimraf dist && node esbuild.mjs && tsc --emitDeclarationOnly"
+  },
+  "files": [
+    "dist/**/*",
+    "README.md"
+  ],
+  "dependencies": {
+    "@angular/common": "^15.2.0",
+    "@angular/core": "^15.2.0",
+    "@repo/utilities": "*",
+    "rxjs": "^7.8.2"
+  },
+  "devDependencies": {
+    "@repo/config-typescript": "*",
+    "esbuild": "^0.25.1",
+    "rimraf": "^6.0.1",
+    "typescript": "^5.8.2"
+  }
+}

@@ -9,7 +9,7 @@ import { environment } from 'src/environments/environment';
 import { SCNGXModule, SCNGXDialogModule } from '@soundcore/ngx';
 import { SCCDKScreenModule } from '@soundcore/cdk';
 import { HttpClientModule } from '@angular/common/http';
-import { provideAuthentication } from './auth/module';
+import { provideAuthentication } from '@repo/angular-oidc';
 
 @NgModule({
   declarations: [

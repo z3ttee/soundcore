@@ -29,6 +29,7 @@
     "@ng-icons/heroicons": "^23.1.0",
     "@ng-icons/simple-icons": "^23.1.0",
     "@ng-icons/feather-icons": "^23.1.0",
+    "@repo/angular-oidc": "*",
     "openid-client": "^6.3.4",
     "hls.js": "^1.4.0",
     "lottie-web": "^5.9.2",

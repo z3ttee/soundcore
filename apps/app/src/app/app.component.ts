@@ -1,10 +1,8 @@
-import { AfterViewInit, Component, inject, Inject, OnDestroy, OnInit } from '@angular/core';
-import { NavigationCancel, NavigationEnd, NavigationError, NavigationStart, Router } from '@angular/router';
-import { SSOService } from '@soundcore/sso';
-import { BehaviorSubject, combineLatest, filter, map, Observable, startWith, Subject, takeUntil, tap } from 'rxjs';
+import { AfterViewInit, Component, inject, OnDestroy, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+import { BehaviorSubject, filter, Observable, Subject } from 'rxjs';
 import { SCCDKScreenService } from '@soundcore/cdk';
-import { environment } from 'src/environments/environment';
-import { AuthenticationService } from './auth/services/authentication.service';
+import { AuthenticationService } from '@repo/angular-oidc';
 
 interface AppProps {
   ready?: boolean;
@@ -21,7 +19,6 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
   // public readonly authService: SSOService = inject(SSOService);
   public readonly authService = inject(AuthenticationService);
   public readonly screenService: SCCDKScreenService = inject(SCCDKScreenService);
-  private readonly router: Router = inject(Router);
 
   private _destroySubject: Subject<void> = new Subject();
   private $destroy: Observable<void> = this._destroySubject.asObservable();
