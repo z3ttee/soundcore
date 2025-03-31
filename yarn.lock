@@ -296,7 +296,7 @@
   dependencies:
     tslib "^2.3.0"
 
-"@angular/animations@^18.0.0 || ^19.0.0", "@angular/animations@^19.2.4":
+"@angular/animations@^19.2.4":
   version "19.2.4"
   resolved "https://registry.npmjs.org/@angular/animations/-/animations-19.2.4.tgz"
   integrity sha512-aoVgPGaB/M9OLGt9rMMYd8V9VNzVEFQHKpyuEl4FDBoeuIaFJcXFTfwY3+L5Ew6wcIErKH67rRYJsKv8r5Ou8w==
@@ -346,14 +346,13 @@
   optionalDependencies:
     parse5 "^7.1.2"
 
-"@angular/cdk@^18.2.14", "@angular/cdk@18.2.14":
-  version "18.2.14"
-  resolved "https://registry.npmjs.org/@angular/cdk/-/cdk-18.2.14.tgz"
-  integrity sha512-vDyOh1lwjfVk9OqoroZAP8pf3xxKUvyl+TVR8nJxL4c5fOfUFkD7l94HaanqKSRwJcI2xiztuu92IVoHn8T33Q==
+"@angular/cdk@^19.2.7", "@angular/cdk@19.2.7":
+  version "19.2.7"
+  resolved "https://registry.npmjs.org/@angular/cdk/-/cdk-19.2.7.tgz"
+  integrity sha512-+Dx1WGEWMO3OYDKr2w/Z5xOCsdjkRuG7Z18ve8eeBOHayRaC0KbYoXkvPxUiJo233CJWEzKQ/qF13C54GGWnng==
   dependencies:
-    tslib "^2.3.0"
-  optionalDependencies:
     parse5 "^7.1.2"
+    tslib "^2.3.0"
 
 "@angular/cli@^19.2.5":
   version "19.2.5"
@@ -409,7 +408,7 @@
   dependencies:
     tslib "^2.3.0"
 
-"@angular/common@^18.0.0 || ^19.0.0", "@angular/common@^19.2.0", "@angular/common@^19.2.4", "@angular/common@19.2.4":
+"@angular/common@^19.0.0 || ^20.0.0", "@angular/common@^19.2.0", "@angular/common@^19.2.4", "@angular/common@19.2.4":
   version "19.2.4"
   resolved "https://registry.npmjs.org/@angular/common/-/common-19.2.4.tgz"
   integrity sha512-5iBerI1hkY8rAt0gZQgOlfzR69jj5j25JyfkDOhdZhezE0pqhDc69OnbkUM20LTau4bFRYOj015eiKWzE2DOzQ==
@@ -467,7 +466,7 @@
   dependencies:
     tslib "^2.3.0"
 
-"@angular/core@^18.0.0", "@angular/core@^18.0.0 || ^19.0.0", "@angular/core@^19.2.0", "@angular/core@^19.2.4", "@angular/core@>=15", "@angular/core@19.2.4":
+"@angular/core@^18.0.0", "@angular/core@^19.0.0 || ^20.0.0", "@angular/core@^19.2.0", "@angular/core@^19.2.4", "@angular/core@>=15", "@angular/core@19.2.4":
   version "19.2.4"
   resolved "https://registry.npmjs.org/@angular/core/-/core-19.2.4.tgz"
   integrity sha512-ZuSMg+LWG0ADLEvMzSqU+D6M5KcQtxBssEFq4UskGIYuvNGqC91hAl4sbnXDQ5C7GgFcLY6ouaemS6dBOIfc/g==
@@ -481,7 +480,7 @@
   dependencies:
     tslib "^2.3.0"
 
-"@angular/forms@^18.0.0 || ^19.0.0", "@angular/forms@^19.2.4":
+"@angular/forms@^19.0.0 || ^20.0.0", "@angular/forms@^19.2.4":
   version "19.2.4"
   resolved "https://registry.npmjs.org/@angular/forms/-/forms-19.2.4.tgz"
   integrity sha512-XzFVmy2BduohtV6E304VCiCvayqV6hiYfPDvkzQnPiFfnQqRCGOTKSDOqxBDsSoDoZW7vZNHe3HmNMdyPg3Rog==
@@ -542,10 +541,10 @@
     "@material/typography" "15.0.0-canary.684e33d25.0"
     tslib "^2.3.0"
 
-"@angular/material@^18.2.14":
-  version "18.2.14"
-  resolved "https://registry.npmjs.org/@angular/material/-/material-18.2.14.tgz"
-  integrity sha512-28pxzJP49Mymt664WnCtPkKeg7kXUsQKTKGf/Kl95rNTEdTJLbnlcc8wV0rT0yQNR7kXgpfBnG7h0ETLv/iu5Q==
+"@angular/material@^19.2.7":
+  version "19.2.7"
+  resolved "https://registry.npmjs.org/@angular/material/-/material-19.2.7.tgz"
+  integrity sha512-6aFj4Rk3oa0XykCMjQ28KGVCMo7umd8M37bT9/FALMue6JEi2fPIDrbUDWb2GYL5rdHkgsr+dbEqlwAyHW/5cw==
   dependencies:
     tslib "^2.3.0"
 
@@ -577,7 +576,7 @@
   dependencies:
     tslib "^2.3.0"
 
-"@angular/platform-browser@^18.0.0 || ^19.0.0", "@angular/platform-browser@^19.2.0", "@angular/platform-browser@^19.2.4", "@angular/platform-browser@19.2.4":
+"@angular/platform-browser@^19.0.0 || ^20.0.0", "@angular/platform-browser@^19.2.0", "@angular/platform-browser@^19.2.4", "@angular/platform-browser@19.2.4":
   version "19.2.4"
   resolved "https://registry.npmjs.org/@angular/platform-browser/-/platform-browser-19.2.4.tgz"
   integrity sha512-skP+Oq9hxh0hkLcs2bXgnt7Z+KKP5xZYzaHPEToLtPat6l6kSPjT0CJ+DE/8ce443hItAcCbn+JrKGC29nd2pw==
@@ -3992,12 +3991,12 @@
   resolved "file:packages/angular-components"
   dependencies:
     "@angular/animations" "^19.2.4"
-    "@angular/cdk" "^18.2.14"
+    "@angular/cdk" "^19.2.7"
     "@angular/common" "^19.2.4"
     "@angular/compiler" "^19.2.4"
     "@angular/core" "^19.2.4"
     "@angular/forms" "^19.2.4"
-    "@angular/material" "^18.2.14"
+    "@angular/material" "^19.2.7"
     "@angular/platform-browser" "^19.2.4"
     "@angular/platform-browser-dynamic" "^19.2.4"
     "@angular/router" "^19.2.4"
@@ -8937,7 +8936,7 @@ hosted-git-info@^6.0.0:
   dependencies:
     lru-cache "^7.5.1"
 
-hosted-git-info@^8.0.0:
+hosted-git-info@^7.0.0, hosted-git-info@^8.0.0:
   version "8.0.2"
   resolved "https://registry.npmjs.org/hosted-git-info/-/hosted-git-info-8.0.2.tgz"
   integrity sha512-sYKnA7eGln5ov8T8gnYlkSOxFJvywzEx9BueN6xo/GKO8PGiI6uK6xx+DIGe45T3bdVjLAQDQW1aicT8z8JwQg==
