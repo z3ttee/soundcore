@@ -17,7 +17,7 @@
     "@angular/platform-browser-dynamic": "^17.3.12",
     "@angular/router": "^17.3.12",
     "@fortawesome/fontawesome-svg-core": "^6.2.0",
-    "@fortawesome/angular-fontawesome": "^0.13.0",
+    "@fortawesome/angular-fontawesome": "^0.15.0",
     "lottie-web": "^5.9.2",
     "ngx-lottie": "^10.0.0",
     "rxjs": "^7.8.0",
