@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { SCNGXArtworkModule, SCNGXResourceTypePipeModule } from '@repo/angular-components';
+import { SCNGXArtworkModule, SCNGXResourceTypePipeModule } from '@repo/angular-ui';
 import { GenericResourceListItemComponent } from './generic-resource-list-item.component';
 
 @NgModule({

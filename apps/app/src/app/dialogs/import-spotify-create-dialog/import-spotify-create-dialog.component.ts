@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, OnDestroy } from "@angular/core";
 import { FormControl, FormGroup, Validators } from "@angular/forms";
-import { DialogRef } from "@repo/angular-components";
+import { DialogRef } from "@repo/angular-ui";
 import { ImportTask, PlaylistPrivacy, SCSDKImportService } from "@repo/angular-sdk";
 import { Subject } from "rxjs";
 

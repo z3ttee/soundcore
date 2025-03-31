@@ -7,7 +7,7 @@ import { heroArrowPathRoundedSquare, heroBackward, heroChevronDown, heroForward,
 import { heroHeartSolid, heroPauseSolid, heroPlaySolid, heroXMarkSolid } from "@ng-icons/heroicons/solid";
 
 import { MatSnackBarModule } from "@angular/material/snack-bar";
-import { SCNGXArtworkModule, SCNGXExplicitBadgeModule, SCNGXIconBtnModule } from "@repo/angular-components";
+import { SCNGXArtworkModule, SCNGXExplicitBadgeModule, SCNGXIconBtnModule } from "@repo/angular-ui";
 import { SCNGXRangeModule } from "src/app/components/inputs/range/range.module";
 import { SCNGXSeekerModule } from "src/app/components/inputs/seeker";
 import { AppDurationPipeModule } from "src/app/pipes/duration/duration-pipe.module";

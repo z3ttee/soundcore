@@ -4,7 +4,7 @@ import { MatInputModule } from "@angular/material/input";
 import { RouterModule, Routes } from "@angular/router";
 import { NgIconsModule } from "@ng-icons/core";
 import { simpleSpotify } from "@ng-icons/simple-icons";
-import { SCNGXArtworkModule, SCNGXButtonModule, SCNGXDialogModule, SCNGXLabelModule, SCNGXScrollingModule, SCNGXSkeletonModule, SCNGXUiRowModule, SCNGXUiTitleModule } from "@repo/angular-components";
+import { SCNGXArtworkModule, SCNGXButtonModule, SCNGXDialogModule, SCNGXLabelModule, SCNGXScrollingModule, SCNGXSkeletonModule, SCNGXUiRowModule, SCNGXUiTitleModule } from "@repo/angular-ui";
 import { SCSDKImportModule } from "@repo/angular-sdk";
 import { SCNGXTabsModule } from "src/app/components/navigation-tabs";
 import { AppImportSpotifyCreateDialogModule } from "src/app/dialogs/import-spotify-create-dialog/import-spotify-create-dialog.module";

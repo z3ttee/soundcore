@@ -4,7 +4,7 @@ import { ReactiveFormsModule } from "@angular/forms";
 import { MatRippleModule } from "@angular/material/core";
 import { MatSnackBarModule } from "@angular/material/snack-bar";
 import { RouterModule, Routes } from "@angular/router";
-import { SCNGXArtworkModule, SCNGXExplicitBadgeModule, SCNGXIconBtnModule, SCNGXScrollingModule, SCNGXUiRowModule, SCNGXUiTitleModule } from "@repo/angular-components";
+import { SCNGXArtworkModule, SCNGXExplicitBadgeModule, SCNGXIconBtnModule, SCNGXScrollingModule, SCNGXUiRowModule, SCNGXUiTitleModule } from "@repo/angular-ui";
 import { SCSDKCollectionModule, SCSDKStreamModule } from "@repo/angular-sdk";
 import { SCNGXRangeModule } from "src/app/components/inputs/range/range.module";
 import { SCNGXSeekerModule } from "src/app/components/inputs/seeker";

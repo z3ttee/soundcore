@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, OnDestroy } from "@angular/core";
-import { SCNGXDialogService } from "@repo/angular-components";
+import { SCNGXDialogService } from "@repo/angular-ui";
 import { SCSDKFactoryResetService } from "@repo/angular-sdk";
 import { Observable, Subject, takeUntil } from "rxjs";
 

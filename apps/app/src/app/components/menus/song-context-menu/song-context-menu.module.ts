@@ -5,7 +5,7 @@ import { RouterModule } from '@angular/router';
 import { NgIconsModule } from '@ng-icons/core';
 import { heroHeart, heroRectangleStack, heroSquaresPlus } from '@ng-icons/heroicons/outline';
 import { heroMinusSolid, heroPlaySolid } from '@ng-icons/heroicons/solid';
-import { SCNGXDialogModule, SCNGXDividerModule } from '@repo/angular-components';
+import { SCNGXDialogModule, SCNGXDividerModule } from '@repo/angular-ui';
 import { SCSDKCollectionModule } from '@repo/angular-sdk';
 import { SCCDKContextMenuModule } from '@soundcore/cdk';
 import { AppPlaylistChooseDialogModule } from 'src/app/dialogs/playlist-choose-dialog/playlist-choose-dialog.module';

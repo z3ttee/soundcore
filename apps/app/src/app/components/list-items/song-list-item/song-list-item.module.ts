@@ -5,7 +5,7 @@ import { RouterModule } from '@angular/router';
 import { NgIconsModule } from '@ng-icons/core';
 import { heroHeart } from '@ng-icons/heroicons/outline';
 import { heroEllipsisVerticalSolid, heroHeartSolid, heroPauseSolid, heroPlaySolid } from '@ng-icons/heroicons/solid';
-import { SCNGXAddedToPlaylistPipeModule, SCNGXArtworkModule, SCNGXExplicitBadgeModule, SCNGXIconBtnModule, SCNGXSkeletonModule, SCNGXSongDurationPipeModule, SCNGXTooltipModule } from '@repo/angular-components';
+import { SCNGXAddedToPlaylistPipeModule, SCNGXArtworkModule, SCNGXExplicitBadgeModule, SCNGXIconBtnModule, SCNGXSkeletonModule, SCNGXSongDurationPipeModule, SCNGXTooltipModule } from '@repo/angular-ui';
 import { LottieModule } from 'ngx-lottie';
 import { SCNGXSongListItemComponent } from './song-list-item.component';
 @NgModule({

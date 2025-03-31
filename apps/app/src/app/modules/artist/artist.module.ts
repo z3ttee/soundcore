@@ -17,7 +17,7 @@ import {
   SCNGXUiRowModule,
   SCNGXUiSectionTitleModule,
   SCNGXUiTitleModule
-} from '@repo/angular-components';
+} from '@repo/angular-ui';
 import { SCDKAlbumModule, SCSDKArtistModule, SCSDKSongModule } from '@repo/angular-sdk';
 import { LottieModule } from 'ngx-lottie';
 import { SCNGXChipsModule } from 'src/app/components/chips/chips.module';

@@ -1,6 +1,6 @@
 import { Component, OnDestroy } from "@angular/core";
 import { FormControl, FormGroup, Validators } from "@angular/forms";
-import { DialogRef } from "@repo/angular-components";
+import { DialogRef } from "@repo/angular-ui";
 import { Mount, SCSDKMountService } from "@repo/angular-sdk";
 import { Subject, takeUntil } from "rxjs";
 

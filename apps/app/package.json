@@ -22,7 +22,7 @@
     "@angular/router": "^15.2.0",
     "@floating-ui/dom": "^0.4.5",
     "@soundcore/cdk": "*",
-    "@repo/angular-components": "*",
+    "@repo/angular-ui": "*",
     "@soundcore/tailwind": "*",
     "@ng-icons/core": "^23.1.0",
     "@ng-icons/heroicons": "^23.1.0",

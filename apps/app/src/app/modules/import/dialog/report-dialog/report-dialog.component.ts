@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, OnDestroy } from "@angular/core";
-import { DialogRef } from "@repo/angular-components";
+import { DialogRef } from "@repo/angular-ui";
 import { ApiError, ImportReport, ImportSpotifyReport, SCSDKImportService, SpotifyImport, toFutureCompat } from "@repo/angular-sdk";
 import { combineLatest, map, Observable, Subject, takeUntil } from "rxjs";
 

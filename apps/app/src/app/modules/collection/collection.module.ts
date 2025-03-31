@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { RouterModule, Routes } from '@angular/router';
-import { SCNGXIconBtnModule, SCNGXScrollingModule } from '@repo/angular-components';
+import { SCNGXIconBtnModule, SCNGXScrollingModule } from '@repo/angular-ui';
 import { SCSDKCollectionModule } from '@repo/angular-sdk';
 import { SCNGXSongListItemModule } from 'src/app/components/list-items/song-list-item/song-list-item.module';
 import { SCNGXCollectionViewModule } from 'src/app/components/resource-views/collection-view/collection-view.module';

@@ -1,7 +1,7 @@
 import { CommonModule } from "@angular/common";
 import { NgModule } from "@angular/core";
 import { RouterModule, Routes } from "@angular/router";
-import { SCNGXBytesPipeModule, SCNGXUiRowModule, SCNGXUiTitleModule } from "@repo/angular-components";
+import { SCNGXBytesPipeModule, SCNGXUiRowModule, SCNGXUiTitleModule } from "@repo/angular-ui";
 import { SCSDKMetricsModule } from "@repo/angular-sdk";
 import { DashboardIndexView } from "./views/dashboard-index/dashboard-index.component";
 

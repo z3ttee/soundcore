@@ -4,7 +4,7 @@ import { MatRippleModule } from "@angular/material/core";
 import { RouterModule, Routes } from "@angular/router";
 import { NgIconsModule } from '@ng-icons/core';
 import { heroBell } from '@ng-icons/heroicons/outline';
-import { SCNGXLabelModule, SCNGXToolbarModule, SCNGXTooltipModule } from "@repo/angular-components";
+import { SCNGXLabelModule, SCNGXToolbarModule, SCNGXTooltipModule } from "@repo/angular-ui";
 import { HomeComponent } from './views/home/home.component';
 
 const routes: Routes = [

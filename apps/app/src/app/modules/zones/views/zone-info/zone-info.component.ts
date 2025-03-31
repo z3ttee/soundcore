@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { SCNGXDatasource, SCNGXDialogService } from '@repo/angular-components';
+import { SCNGXDatasource, SCNGXDialogService } from '@repo/angular-ui';
 import { ApiError, ApplicationInfo, Future, Mount, SCSDKAdminGateway, SCSDKAppService, SCSDKZoneService, toFuture, Zone } from '@repo/angular-sdk';
 import { BehaviorSubject, combineLatest, filter, map, Observable, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { AppMountCreateDialog, MountCreateDialogOptions } from 'src/app/dialogs/mount-create-dialog/mount-create-dialog.component';

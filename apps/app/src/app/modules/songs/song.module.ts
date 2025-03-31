@@ -3,7 +3,7 @@ import { NgModule } from "@angular/core";
 import { RouterModule, Routes } from "@angular/router";
 import { NgIconsModule } from '@ng-icons/core';
 import { heroHeart } from '@ng-icons/heroicons/outline';
-import { SCNGXIconBtnModule } from "@repo/angular-components";
+import { SCNGXIconBtnModule } from "@repo/angular-ui";
 import { SCSDKSongModule } from "@repo/angular-sdk";
 import { SCNGXSongListItemModule } from "src/app/components/list-items/song-list-item/song-list-item.module";
 import { ListViewModule } from "src/app/components/resource-views/list-view/list-view.module";

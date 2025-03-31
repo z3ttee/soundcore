@@ -1,6 +1,6 @@
 import { HttpClient } from "@angular/common/http";
 import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from "@angular/core";
-import { SCNGXDatasource, SCNGXDialogService } from "@repo/angular-components";
+import { SCNGXDatasource, SCNGXDialogService } from "@repo/angular-ui";
 import { ImportTask, ImportTaskStatus, ImportTaskType, SCSDKGeneralGateway, SCSDKImportService, SpotifyImport } from "@repo/angular-sdk";
 import { filter, Subject, takeUntil } from "rxjs";
 import { AppImportSpotifyCreateDialog } from "src/app/dialogs/import-spotify-create-dialog/import-spotify-create-dialog.component";

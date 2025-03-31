@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { MatRippleModule } from '@angular/material/core';
 import { RouterModule } from '@angular/router';
-import { SCNGXArtworkModule, SCNGXSkeletonModule } from '@repo/angular-components';
+import { SCNGXArtworkModule, SCNGXSkeletonModule } from '@repo/angular-ui';
 import { LottieModule } from 'ngx-lottie';
 import { SCNGXArtistListItemComponent } from './artist-list-item.component';
 

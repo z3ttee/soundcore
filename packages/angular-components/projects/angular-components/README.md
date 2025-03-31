@@ -4,20 +4,20 @@ This library was generated with [Angular CLI](https://github.com/angular/angular
 
 ## Code scaffolding
 
-Run `ng generate component component-name --project angular-components` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module --project angular-components`.
-> Note: Don't forget to add `--project angular-components` or else it will be added to the default project in your `angular.json` file. 
+Run `ng generate component component-name --project angular-ui` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module --project angular-ui`.
+> Note: Don't forget to add `--project angular-ui` or else it will be added to the default project in your `angular.json` file. 
 
 ## Build
 
-Run `ng build angular-components` to build the project. The build artifacts will be stored in the `dist/` directory.
+Run `ng build angular-ui` to build the project. The build artifacts will be stored in the `dist/` directory.
 
 ## Publishing
 
-After building your library with `ng build angular-components`, go to the dist folder `cd dist/angular-components` and run `npm publish`.
+After building your library with `ng build angular-ui`, go to the dist folder `cd dist/angular-ui` and run `npm publish`.
 
 ## Running unit tests
 
-Run `ng test angular-components` to execute the unit tests via [Karma](https://karma-runner.github.io).
+Run `ng test angular-ui` to execute the unit tests via [Karma](https://karma-runner.github.io).
 
 ## Further help
 

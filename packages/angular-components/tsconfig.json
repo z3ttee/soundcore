@@ -4,8 +4,8 @@
   "extends": "@repo/config-typescript/angular.json",
   "compilerOptions": {
     "paths": {
-      "angular-components": [
-        "./dist/angular-components"
+      "angular-ui": [
+        "./dist/angular-ui"
       ]
     },
     "outDir": "./dist/out-tsc",

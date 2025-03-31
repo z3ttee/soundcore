@@ -2,7 +2,7 @@ import { CommonModule } from "@angular/common";
 import { NgModule } from "@angular/core";
 import { RouterModule } from "@angular/router";
 import { NgIconsModule } from "@ng-icons/core";
-import { SCNGXArtworkModule } from "@repo/angular-components";
+import { SCNGXArtworkModule } from "@repo/angular-ui";
 import { NavListItemComponent } from "./nav-list-item.component";
 
 @NgModule({

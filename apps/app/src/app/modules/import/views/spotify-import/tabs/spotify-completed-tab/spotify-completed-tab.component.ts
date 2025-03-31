@@ -1,6 +1,6 @@
 import { HttpClient } from "@angular/common/http";
 import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from "@angular/core";
-import { SCNGXDatasource, SCNGXDialogService } from "@repo/angular-components";
+import { SCNGXDatasource, SCNGXDialogService } from "@repo/angular-ui";
 import { ImportTaskStatus, ImportTaskType, SCSDKGeneralGateway, SpotifyImport } from "@repo/angular-sdk";
 import { filter, Subject, takeUntil } from "rxjs";
 import { ReportDialogComponent, ReportDialogOptions } from "src/app/modules/import/dialog/report-dialog/report-dialog.component";

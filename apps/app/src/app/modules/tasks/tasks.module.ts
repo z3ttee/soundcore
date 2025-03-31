@@ -4,7 +4,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { RouterModule, Routes } from "@angular/router";
 import { NgIconsModule } from "@ng-icons/core";
 import { heroArrowTopRightOnSquare } from '@ng-icons/heroicons/outline';
-import { SCNGXHorizontalListModule, SCNGXIconBtnModule, SCNGXScrollingModule, SCNGXUiRowModule, SCNGXUiSectionTitleModule, SCNGXUiTitleModule } from "@repo/angular-components";
+import { SCNGXHorizontalListModule, SCNGXIconBtnModule, SCNGXScrollingModule, SCNGXUiRowModule, SCNGXUiSectionTitleModule, SCNGXUiTitleModule } from "@repo/angular-ui";
 import { SCSDKTasksModule } from "@repo/angular-sdk";
 import { SCNGXTaskStatusIconModule } from "src/app/components/icons/task-status-icon/task-status-icon.module";
 import { SCNGXTaskListItemModule } from "src/app/components/list-items/task-list-item/task-list-item.module";

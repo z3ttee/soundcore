@@ -4,7 +4,7 @@ import { RouterModule, Routes } from "@angular/router";
 import { NgIconsModule } from "@ng-icons/core";
 import { heroArrowUturnLeft } from "@ng-icons/heroicons/outline";
 
-import { SCNGXButtonModule, SCNGXDialogModule, SCNGXListTileModule, SCNGXUiRowModule, SCNGXUiTitleModule } from "@repo/angular-components";
+import { SCNGXButtonModule, SCNGXDialogModule, SCNGXListTileModule, SCNGXUiRowModule, SCNGXUiTitleModule } from "@repo/angular-ui";
 import { SCSDKConfigureModule } from "@repo/angular-sdk";
 import { SCNGXTabsModule } from "src/app/components/navigation-tabs";
 import { ConfigurateGeneralView } from "./views/configurate-general/configurate-general.component";

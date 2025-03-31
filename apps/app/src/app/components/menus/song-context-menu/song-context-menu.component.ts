@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { SCNGXDialogService } from '@repo/angular-components';
+import { SCNGXDialogService } from '@repo/angular-ui';
 import { PlayableEntity, PlayableEntityType, Playlist, PlaylistAddSongFailReason, SCSDKLikeService, SCSDKPlaylistService, Song } from '@repo/angular-sdk';
 import { isNull } from '@repo/utilities';
 import { SSOService } from '@soundcore/sso';

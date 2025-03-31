@@ -5,7 +5,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { NgIconsModule } from '@ng-icons/core';
 import { heroHeart } from '@ng-icons/heroicons/outline';
 import { heroEllipsisVerticalSolid, heroPauseSolid, heroPlaySolid } from '@ng-icons/heroicons/solid';
-import { SCNGXAlbumGridItemModule, SCNGXArtworkModule, SCNGXButtonModule, SCNGXHorizontalListModule, SCNGXIconBtnModule, SCNGXScrollingModule, SCNGXSongDurationPipeModule, SCNGXTableModule, SCNGXUiRowModule } from '@repo/angular-components';
+import { SCNGXAlbumGridItemModule, SCNGXArtworkModule, SCNGXButtonModule, SCNGXHorizontalListModule, SCNGXIconBtnModule, SCNGXScrollingModule, SCNGXSongDurationPipeModule, SCNGXTableModule, SCNGXUiRowModule } from '@repo/angular-ui';
 import { SCDKAlbumModule, SCSDKSongModule, SCSDKTracklistModule } from '@repo/angular-sdk';
 import { SCNGXSongListItemModule } from 'src/app/components/list-items/song-list-item/song-list-item.module';
 import { SongContextMenuModule } from 'src/app/components/menus/song-context-menu/song-context-menu.module';

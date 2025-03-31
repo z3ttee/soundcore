@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { SCNGXAlbumGridItemModule, SCNGXArtistGridItemModule, SCNGXHorizontalListModule, SCNGXPlaylistGridItemModule, SCNGXProfileGridItemModule, SCNGXToolbarModule, SCNGXUiRowModule } from '@repo/angular-components';
+import { SCNGXAlbumGridItemModule, SCNGXArtistGridItemModule, SCNGXHorizontalListModule, SCNGXPlaylistGridItemModule, SCNGXProfileGridItemModule, SCNGXToolbarModule, SCNGXUiRowModule } from '@repo/angular-ui';
 import { SearchIndexComponent } from './views/search-index/search-index.component';
 
 import { ReactiveFormsModule } from '@angular/forms';

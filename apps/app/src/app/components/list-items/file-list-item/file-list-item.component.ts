@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
-import { StatusIndicatorAppearance } from "@repo/angular-components";
+import { StatusIndicatorAppearance } from "@repo/angular-ui";
 import { File, FileFlag } from '@repo/angular-sdk';
 
 @Component({

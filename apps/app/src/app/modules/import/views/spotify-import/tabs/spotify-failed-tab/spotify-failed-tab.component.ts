@@ -1,6 +1,6 @@
 import { HttpClient } from "@angular/common/http";
 import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from "@angular/core";
-import { SCNGXDatasource } from "@repo/angular-components";
+import { SCNGXDatasource } from "@repo/angular-ui";
 import { ImportTaskStatus, ImportTaskType, SCSDKGeneralGateway, SpotifyImport } from "@repo/angular-sdk";
 import { filter, Subject, takeUntil } from "rxjs";
 import { environment } from "src/environments/environment";

@@ -3,7 +3,7 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { NgIconsModule } from '@ng-icons/core';
 import { heroArrowRightOnRectangle, heroCog6Tooth } from '@ng-icons/heroicons/outline';
-import { SCNGXButtonModule, SCNGXUiTitleModule } from '@repo/angular-components';
+import { SCNGXButtonModule, SCNGXUiTitleModule } from '@repo/angular-ui';
 import { AdminMoreComponent } from './views/admin-more/admin-more.component';
 
 const routes: Routes = [

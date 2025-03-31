@@ -1,5 +1,5 @@
 {
-  "name": "angular-components",
+  "name": "angular-ui",
   "version": "1.0.0",
   "peerDependencies": {
     "@angular/common": "^19.2.0",

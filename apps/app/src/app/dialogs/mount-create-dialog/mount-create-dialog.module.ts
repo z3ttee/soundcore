@@ -5,7 +5,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
-import { SCNGXButtonModule, SCNGXDialogModule, SCNGXLoadingBtnModule } from '@repo/angular-components';
+import { SCNGXButtonModule, SCNGXDialogModule, SCNGXLoadingBtnModule } from '@repo/angular-ui';
 import { SCSDKMountModule } from '@repo/angular-sdk';
 import { AppMountCreateDialog } from './mount-create-dialog.component';
 

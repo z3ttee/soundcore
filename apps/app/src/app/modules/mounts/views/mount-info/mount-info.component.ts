@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
-import { SCNGXDatasource, SCNGXDialogService } from '@repo/angular-components';
+import { SCNGXDatasource, SCNGXDialogService } from '@repo/angular-ui';
 import { ApplicationInfo, File, Future, Mount, MountProgress, MountStatus, MountStatusUpdateEvent, SCDKFileService, SCSDKAdminGateway, SCSDKAppService, SCSDKMountService } from '@repo/angular-sdk';
 import { BehaviorSubject, combineLatest, filter, map, Observable, startWith, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { AppMountCreateDialog, MountCreateDialogOptions } from 'src/app/dialogs/mount-create-dialog/mount-create-dialog.component';

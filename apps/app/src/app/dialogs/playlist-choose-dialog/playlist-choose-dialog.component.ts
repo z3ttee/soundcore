@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, OnDestroy } from "@angular/core";
-import { DialogRef, SCNGXDialogService } from "@repo/angular-components";
+import { DialogRef, SCNGXDialogService } from "@repo/angular-ui";
 import { Playlist, SCSDKPlaylistService } from "@repo/angular-sdk";
 import { Subject, takeUntil } from "rxjs";
 import { AppPlaylistCreateDialog } from "../playlist-create-dialog/playlist-create-dialog.component";

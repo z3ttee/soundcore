@@ -3,7 +3,7 @@ import { BrowserModule } from '@angular/platform-browser';
 
 import { HttpClientModule } from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { SCNGXDialogModule, SCNGXModule } from '@repo/angular-components';
+import { SCNGXDialogModule, SCNGXModule } from '@repo/angular-ui';
 import { provideAuthentication } from '@repo/angular-oidc';
 import { SCSDKModule, SCSDKMountModule } from '@repo/angular-sdk';
 import { SCCDKScreenModule } from '@soundcore/cdk';

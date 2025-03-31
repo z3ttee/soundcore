@@ -5,7 +5,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { NgIconsModule } from '@ng-icons/core';
 import { heroArrowPath, heroChartPie, heroPencil, heroRectangleStack, heroStar, heroTrash } from '@ng-icons/heroicons/outline';
 import { heroPlusSolid, heroStarSolid } from '@ng-icons/heroicons/solid';
-import { SCNGXButtonModule, SCNGXBytesPipeModule, SCNGXIconBtnModule, SCNGXLoadingBtnModule, SCNGXMountStatusPipeModule, SCNGXProgressbarModule, SCNGXScrollingModule, SCNGXSkeletonModule, SCNGXStatusIndicatorModule, SCNGXUiTitleModule } from '@repo/angular-components';
+import { SCNGXButtonModule, SCNGXBytesPipeModule, SCNGXIconBtnModule, SCNGXLoadingBtnModule, SCNGXMountStatusPipeModule, SCNGXProgressbarModule, SCNGXScrollingModule, SCNGXSkeletonModule, SCNGXStatusIndicatorModule, SCNGXUiTitleModule } from '@repo/angular-ui';
 import { SCDKFileModule, SCSDKMountModule } from '@repo/angular-sdk';
 import { SCNGXFileListItemModule } from 'src/app/components/list-items/file-list-item/file-list-item.module';
 import { SCNGXTabsModule } from 'src/app/components/navigation-tabs';

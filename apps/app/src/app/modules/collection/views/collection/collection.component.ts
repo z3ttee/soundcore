@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute } from '@angular/router';
-import { SCNGXTracklist, SCNGXTracklistBuilder } from '@repo/angular-components';
+import { SCNGXTracklist, SCNGXTracklistBuilder } from '@repo/angular-ui';
 import { LikedSong, SCSDKLikeService, ToggleLikedSongDTO } from '@repo/angular-sdk';
 import { SSOService, SSOUser } from '@soundcore/sso';
 import { combineLatest, filter, map, Observable, Subject, take, takeUntil } from 'rxjs';

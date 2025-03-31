@@ -3,7 +3,7 @@ import { Location } from "@angular/common";
 import { Component, inject, OnDestroy, OnInit } from "@angular/core";
 import { UntypedFormControl } from "@angular/forms";
 import { NavigationCancel, NavigationEnd, NavigationError, NavigationStart, Router } from "@angular/router";
-import { SCNGXDialogService } from "@repo/angular-components";
+import { SCNGXDialogService } from "@repo/angular-ui";
 import { Playlist, SCSDKGeneralGateway, SCSDKPlaylistService, SCSDKSearchService } from "@repo/angular-sdk";
 import { SCCDKScreenService } from "@soundcore/cdk";
 import { SSOService, SSOUser } from "@soundcore/sso";
