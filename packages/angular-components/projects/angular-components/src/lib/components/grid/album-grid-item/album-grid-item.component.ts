@@ -2,9 +2,10 @@ import { Component, Input, OnInit } from '@angular/core';
 import { Album, MeiliAlbum } from '@repo/angular-sdk';
 
 @Component({
-  selector: 'scngx-album-grid-item',
-  templateUrl: './album-grid-item.component.html',
-  styleUrls: ['./album-grid-item.component.scss']
+    selector: 'scngx-album-grid-item',
+    templateUrl: './album-grid-item.component.html',
+    styleUrls: ['./album-grid-item.component.scss'],
+    standalone: false
 })
 export class SCNGXAlbumGridItemComponent implements OnInit {
 

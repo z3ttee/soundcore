@@ -2,7 +2,8 @@ import { Pipe, PipeTransform } from '@angular/core';
 import { FileFlag } from '@repo/angular-sdk';
 
 @Pipe({
-  name: 'scngxFileFlagPipe'
+    name: 'scngxFileFlagPipe',
+    standalone: false
 })
 export class SCNGXFileFlagPipe implements PipeTransform {
 

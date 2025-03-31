@@ -2,7 +2,8 @@ import { Pipe, PipeTransform } from '@angular/core';
 import { MountStatus } from '@repo/angular-sdk';
 
 @Pipe({
-  name: 'scngxMountStatusPipe'
+    name: 'scngxMountStatusPipe',
+    standalone: false
 })
 export class SCNGXMountStatusPipe implements PipeTransform {
 

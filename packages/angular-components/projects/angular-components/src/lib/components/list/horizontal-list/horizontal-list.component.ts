@@ -3,10 +3,11 @@ import { debounceTime, fromEvent, Subject, takeUntil } from 'rxjs';
 import { SCCDKScreenService } from '@soundcore/cdk';
 
 @Component({
-  selector: 'scngx-horizontal-list',
-  templateUrl: './horizontal-list.component.html',
-  styleUrls: ['./horizontal-list.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'scngx-horizontal-list',
+    templateUrl: './horizontal-list.component.html',
+    styleUrls: ['./horizontal-list.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class SCNGXHorizontalListComponent implements OnInit, OnDestroy, AfterViewInit {
   private readonly _destroy: Subject<void> = new Subject();

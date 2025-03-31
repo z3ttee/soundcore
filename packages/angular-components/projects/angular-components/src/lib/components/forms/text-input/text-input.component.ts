@@ -11,23 +11,22 @@ export const CUSTOM_TEXT_INPUT_CONTROL_VALUE_ACCESSOR: any = {
 };
 
 @Component({
-  selector: 'scngx-text-input',
-  templateUrl: './text-input.component.html',
-  styleUrls: ['./text-input.component.scss'],
-  encapsulation: ViewEncapsulation.None,
-  providers: [ CUSTOM_TEXT_INPUT_CONTROL_VALUE_ACCESSOR ],
-  host: {
-    '(blur)': 'onTouched()'
-  },
-  animations:[
-    trigger(
-      'visibilityChanged',[
-            state('true',style({'height':'*','padding-top':'4px'})),
-            state('false',style({height:'0px','padding-top':'0px'})),
-            transition('*=>*',animate('200ms'))
-      ]
-    )
-  ]
+    selector: 'scngx-text-input',
+    templateUrl: './text-input.component.html',
+    styleUrls: ['./text-input.component.scss'],
+    encapsulation: ViewEncapsulation.None,
+    providers: [CUSTOM_TEXT_INPUT_CONTROL_VALUE_ACCESSOR],
+    host: {
+        '(blur)': 'onTouched()'
+    },
+    animations: [
+        trigger('visibilityChanged', [
+            state('true', style({ 'height': '*', 'padding-top': '4px' })),
+            state('false', style({ height: '0px', 'padding-top': '0px' })),
+            transition('*=>*', animate('200ms'))
+        ])
+    ],
+    standalone: false
 })
 export class SCNGXTextInputComponent implements OnInit, OnDestroy, ControlValueAccessor, OnChanges {
 

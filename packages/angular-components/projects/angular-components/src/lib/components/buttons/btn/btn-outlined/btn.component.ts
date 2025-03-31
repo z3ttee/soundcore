@@ -1,9 +1,10 @@
 import { Component, Input, OnInit } from '@angular/core';
 
 @Component({
-  selector: 'scngx-btn-outlined',
-  templateUrl: './btn.component.html',
-  styleUrls: ['./btn.component.scss']
+    selector: 'scngx-btn-outlined',
+    templateUrl: './btn.component.html',
+    styleUrls: ['./btn.component.scss'],
+    standalone: false
 })
 export class SCNGXBtnOutlinedComponent implements OnInit {
 

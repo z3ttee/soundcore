@@ -1,10 +1,11 @@
 import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
 
 @Component({
-  selector: 'scngx-nav-item',
-  templateUrl: './item-component.component.html',
-  styleUrls: ['./item-component.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'scngx-nav-item',
+    templateUrl: './item-component.component.html',
+    styleUrls: ['./item-component.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class SCNGXNavItemComponent implements OnInit {
 

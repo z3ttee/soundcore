@@ -7,9 +7,10 @@ export interface SCNGXTabItemRoute {
 }
 
 @Component({
-  selector: 'scngx-tab-item',
-  templateUrl: './tab-item.component.html',
-  styleUrls: ['./tab-item.component.scss']
+    selector: 'scngx-tab-item',
+    templateUrl: './tab-item.component.html',
+    styleUrls: ['./tab-item.component.scss'],
+    standalone: false
 })
 export class SCNGXTabItemComponent implements OnInit {
 

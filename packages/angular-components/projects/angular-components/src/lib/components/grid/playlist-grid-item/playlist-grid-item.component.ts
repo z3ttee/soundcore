@@ -2,9 +2,10 @@ import { Component, Input, OnInit } from '@angular/core';
 import { MeiliPlaylist, Playlist } from '@repo/angular-sdk';
 
 @Component({
-  selector: 'scngx-playlist-grid-item',
-  templateUrl: './playlist-grid-item.component.html',
-  styleUrls: ['./playlist-grid-item.component.scss']
+    selector: 'scngx-playlist-grid-item',
+    templateUrl: './playlist-grid-item.component.html',
+    styleUrls: ['./playlist-grid-item.component.scss'],
+    standalone: false
 })
 export class SCDKPlaylistGridItemComponent implements OnInit {
 

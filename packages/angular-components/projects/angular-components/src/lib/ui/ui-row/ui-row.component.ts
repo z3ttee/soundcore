@@ -1,8 +1,9 @@
 import { Component, Input, OnInit } from '@angular/core';
 
 @Component({
-  selector: 'scngx-ui-row',
-  templateUrl: './ui-row.component.html'
+    selector: 'scngx-ui-row',
+    templateUrl: './ui-row.component.html',
+    standalone: false
 })
 export class SCNGXUiRowComponent implements OnInit {
 

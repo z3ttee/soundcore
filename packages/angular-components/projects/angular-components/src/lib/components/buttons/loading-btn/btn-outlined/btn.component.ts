@@ -2,9 +2,10 @@ import { Component, Input, OnInit } from '@angular/core';
 import { AnimationOptions } from 'ngx-lottie';
 
 @Component({
-  selector: 'scngx-lbtn-outlined',
-  templateUrl: './btn.component.html',
-  styleUrls: ['./btn.component.scss']
+    selector: 'scngx-lbtn-outlined',
+    templateUrl: './btn.component.html',
+    styleUrls: ['./btn.component.scss'],
+    standalone: false
 })
 export class SCNGXLoadingBtnOutlinedComponent implements OnInit {
 

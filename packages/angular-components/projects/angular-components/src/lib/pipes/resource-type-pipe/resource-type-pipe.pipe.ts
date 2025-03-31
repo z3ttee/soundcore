@@ -2,7 +2,8 @@ import { Pipe, PipeTransform } from '@angular/core';
 import { SCDKResourceType } from '@repo/angular-sdk';
 
 @Pipe({
-  name: 'scngxResourceTypePipe'
+    name: 'scngxResourceTypePipe',
+    standalone: false
 })
 export class SCNGXResourceTypePipe implements PipeTransform {
 

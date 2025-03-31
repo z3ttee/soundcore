@@ -1,7 +1,8 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
-  name: 'scngxSongDurationPipe'
+    name: 'scngxSongDurationPipe',
+    standalone: false
 })
 export class SCNGXSongDurationPipe implements PipeTransform {
 

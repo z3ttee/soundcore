@@ -2,10 +2,11 @@ import { ChangeDetectionStrategy, Component, Input, OnDestroy, OnInit } from '@a
 import { BehaviorSubject } from 'rxjs';
 
 @Component({
-  selector: 'scngx-ui-title',
-  templateUrl: './ui-title.component.html',
-  styleUrls: ['./ui-title.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'scngx-ui-title',
+    templateUrl: './ui-title.component.html',
+    styleUrls: ['./ui-title.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class SCNGXUiTitleComponent {
 

@@ -4,20 +4,21 @@ import { Subject, takeUntil } from 'rxjs';
 import { SCNGXDialogService } from '../../services/dialog.service';
 
 @Component({
-  selector: 'scngx-dialog-section',
-  templateUrl: './dialog-section.component.html',
-  styleUrls: ['./dialog-section.component.scss'],
-  animations: [
-    trigger('fadeIn', [
-      transition(':enter', [
-        style({ opacity: 0, transform: 'scale(0.9) translate(-50%,-50%)' }),
-        animate('140ms', style({ opacity: 1, transform: 'scale(1.0) translate(-50%,-50%)' })),
-      ]),
-      transition(':leave', [
-        animate('80ms', style({ opacity: 0, transform: 'scale(0.9) translate(-50%,-50%)' })),
-      ]),
-    ])
-  ]
+    selector: 'scngx-dialog-section',
+    templateUrl: './dialog-section.component.html',
+    styleUrls: ['./dialog-section.component.scss'],
+    animations: [
+        trigger('fadeIn', [
+            transition(':enter', [
+                style({ opacity: 0, transform: 'scale(0.9) translate(-50%,-50%)' }),
+                animate('140ms', style({ opacity: 1, transform: 'scale(1.0) translate(-50%,-50%)' })),
+            ]),
+            transition(':leave', [
+                animate('80ms', style({ opacity: 0, transform: 'scale(0.9) translate(-50%,-50%)' })),
+            ]),
+        ])
+    ],
+    standalone: false
 })
 export class SCNGXDialogSectionComponent implements OnInit, OnDestroy {
 

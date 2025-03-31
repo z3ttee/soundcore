@@ -1,9 +1,10 @@
 import { Component, Input, OnInit } from '@angular/core';
 
 @Component({
-  selector: 'scngx-vertical-grid',
-  templateUrl: './vertical-grid.component.html',
-  styleUrls: ['./vertical-grid.component.scss']
+    selector: 'scngx-vertical-grid',
+    templateUrl: './vertical-grid.component.html',
+    styleUrls: ['./vertical-grid.component.scss'],
+    standalone: false
 })
 export class SCNGXVerticalGridComponent implements OnInit {
 

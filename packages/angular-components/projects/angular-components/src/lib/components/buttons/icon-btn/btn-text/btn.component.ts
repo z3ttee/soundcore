@@ -2,10 +2,11 @@ import { ChangeDetectionStrategy, Component, Input, OnInit, TemplateRef } from '
 import { AnimationOptions } from 'ngx-lottie';
 
 @Component({
-  selector: 'scngx-ibtn-text',
-  templateUrl: './btn.component.html',
-  styleUrls: ['./btn.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'scngx-ibtn-text',
+    templateUrl: './btn.component.html',
+    styleUrls: ['./btn.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class SCNGXIconBtnTextComponent implements OnInit {
 

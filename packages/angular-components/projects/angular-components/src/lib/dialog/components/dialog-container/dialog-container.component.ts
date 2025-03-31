@@ -3,9 +3,10 @@ import { DialogRef } from '../../entities/dialog-ref.entity';
 import { Dialog } from '../../entities/dialog.entity';
 
 @Component({
-  selector: 'scngx-dialog-container',
-  templateUrl: './dialog-container.component.html',
-  styleUrls: ['./dialog-container.component.scss']
+    selector: 'scngx-dialog-container',
+    templateUrl: './dialog-container.component.html',
+    styleUrls: ['./dialog-container.component.scss'],
+    standalone: false
 })
 export class DialogContainerComponent implements OnInit, AfterViewInit {
 

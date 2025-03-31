@@ -2,8 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { DialogRef } from '../../entities/dialog-ref.entity';
 
 @Component({
-  templateUrl: './dialog-confirm.component.html',
-  styleUrls: ['./dialog-confirm.component.scss']
+    templateUrl: './dialog-confirm.component.html',
+    styleUrls: ['./dialog-confirm.component.scss'],
+    standalone: false
 })
 export class DialogConfirmComponent implements OnInit {
 

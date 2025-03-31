@@ -9,7 +9,8 @@ const OPACITY_END_CLASS = "opacity-100";
 const OPACITY_BEGIN_CLASS = "opacity-0";
 
 @Directive({
-  selector: '[scngxTooltip]'
+    selector: '[scngxTooltip]',
+    standalone: false
 })
 export class SCNGXTooltipDirective implements OnDestroy, OnInit {
 

@@ -1,9 +1,10 @@
 import { Component, Input, OnInit } from '@angular/core';
 
 @Component({
-  selector: 'scngx-btn',
-  templateUrl: './btn.component.html',
-  styleUrls: ['./btn.component.scss']
+    selector: 'scngx-btn',
+    templateUrl: './btn.component.html',
+    styleUrls: ['./btn.component.scss'],
+    standalone: false
 })
 export class SCNGXBtnBaseComponent implements OnInit {
 

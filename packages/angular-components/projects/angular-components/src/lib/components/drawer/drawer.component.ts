@@ -6,9 +6,10 @@ import { SCCDKScreenService } from '@soundcore/cdk';
 export type SCNGXDrawerMode = "push" | "over";
 
 @Component({
-  selector: 'scngx-drawer',
-  templateUrl: './drawer.component.html',
-  styleUrls: ['./drawer.component.scss']
+    selector: 'scngx-drawer',
+    templateUrl: './drawer.component.html',
+    styleUrls: ['./drawer.component.scss'],
+    standalone: false
 })
 export class SCNGXDrawerComponent implements OnInit, AfterViewInit {
 

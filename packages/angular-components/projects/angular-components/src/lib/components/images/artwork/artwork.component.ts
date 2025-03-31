@@ -3,9 +3,10 @@ import { Artwork, SCDKArtworkService } from '@repo/angular-sdk';
 import { BehaviorSubject, firstValueFrom, Observable } from 'rxjs';
 
 @Component({
-  selector: 'scngx-artwork',
-  templateUrl: './artwork.component.html',
-  styleUrls: ['./artwork.component.scss']
+    selector: 'scngx-artwork',
+    templateUrl: './artwork.component.html',
+    styleUrls: ['./artwork.component.scss'],
+    standalone: false
 })
 export class SCNGXArtworkComponent implements OnInit, AfterViewInit, OnChanges {
 

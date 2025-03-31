@@ -2,7 +2,8 @@ import { Pipe, PipeTransform } from '@angular/core';
 import { ZoneStatus } from '@repo/angular-sdk';
 
 @Pipe({
-  name: 'scngxZoneStatus'
+    name: 'scngxZoneStatus',
+    standalone: false
 })
 export class SCNGXZoneStatusPipe implements PipeTransform {
 

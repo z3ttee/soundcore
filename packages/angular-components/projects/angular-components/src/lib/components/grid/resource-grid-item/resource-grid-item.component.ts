@@ -1,10 +1,11 @@
 import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
 
 @Component({
-  selector: 'scngx-resource-grid-item',
-  templateUrl: './resource-grid-item.component.html',
-  styleUrls: ['./resource-grid-item.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'scngx-resource-grid-item',
+    templateUrl: './resource-grid-item.component.html',
+    styleUrls: ['./resource-grid-item.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class SCNGXResourceGridItemComponent implements OnInit {
 

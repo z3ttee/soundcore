@@ -1,9 +1,10 @@
 import { Component, Input, OnInit } from '@angular/core';
 
 @Component({
-  selector: 'scngx-explicit-badge',
-  templateUrl: './explicit-badge.component.html',
-  styleUrls: ['./explicit-badge.component.scss']
+    selector: 'scngx-explicit-badge',
+    templateUrl: './explicit-badge.component.html',
+    styleUrls: ['./explicit-badge.component.scss'],
+    standalone: false
 })
 export class SCNGXExplicitBadgeComponent implements OnInit {
 

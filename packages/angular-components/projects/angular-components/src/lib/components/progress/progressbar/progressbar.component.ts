@@ -1,9 +1,10 @@
 import { Component, Input, OnInit } from '@angular/core';
 
 @Component({
-  selector: 'scngx-progressbar',
-  templateUrl: './progressbar.component.html',
-  styleUrls: ['./progressbar.component.scss']
+    selector: 'scngx-progressbar',
+    templateUrl: './progressbar.component.html',
+    styleUrls: ['./progressbar.component.scss'],
+    standalone: false
 })
 export class SCNGXProgressbarComponent implements OnInit {
 

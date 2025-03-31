@@ -1,9 +1,10 @@
 import { Component, Input, OnInit } from '@angular/core';
 
 @Component({
-  selector: 'scngx-collection-grid-item',
-  templateUrl: './collection-grid-item.component.html',
-  styleUrls: ['./collection-grid-item.component.scss']
+    selector: 'scngx-collection-grid-item',
+    templateUrl: './collection-grid-item.component.html',
+    styleUrls: ['./collection-grid-item.component.scss'],
+    standalone: false
 })
 export class SCNGXCollectionGridItemComponent implements OnInit {
 

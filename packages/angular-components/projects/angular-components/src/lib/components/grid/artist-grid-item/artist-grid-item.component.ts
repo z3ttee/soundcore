@@ -2,9 +2,10 @@ import { Component, Input, OnInit } from '@angular/core';
 import { Artist, MeiliArtist } from '@repo/angular-sdk';
 
 @Component({
-  selector: 'scngx-artist-grid-item',
-  templateUrl: './artist-grid-item.component.html',
-  styleUrls: ['./artist-grid-item.component.scss']
+    selector: 'scngx-artist-grid-item',
+    templateUrl: './artist-grid-item.component.html',
+    styleUrls: ['./artist-grid-item.component.scss'],
+    standalone: false
 })
 export class SCNGXArtistGridItemComponent implements OnInit {
 

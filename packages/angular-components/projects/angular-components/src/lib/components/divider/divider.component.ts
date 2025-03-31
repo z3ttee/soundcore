@@ -5,7 +5,8 @@ export type SCNGXDividerVariant = "default" | "gradient";
 @Component({
     selector: "scngx-divider",
     templateUrl: "./divider.component.html",
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class SCNGXDividerComponent {
 

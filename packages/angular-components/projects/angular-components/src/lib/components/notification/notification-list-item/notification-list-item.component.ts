@@ -2,10 +2,11 @@ import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core
 import { Notification } from '@repo/angular-sdk';
 
 @Component({
-  selector: 'scngx-notification-list-item',
-  templateUrl: './notification-list-item.component.html',
-  styleUrls: ['./notification-list-item.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'scngx-notification-list-item',
+    templateUrl: './notification-list-item.component.html',
+    styleUrls: ['./notification-list-item.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class SCNGXNotificationListItemComponent implements OnInit {
 

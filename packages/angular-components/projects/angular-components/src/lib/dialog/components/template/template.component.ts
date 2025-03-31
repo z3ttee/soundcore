@@ -2,9 +2,10 @@ import { Component, Input, OnInit } from '@angular/core';
 import { DialogRef } from '../../entities/dialog-ref.entity';
 
 @Component({
-  selector: 'scngx-dialog',
-  templateUrl: './template.component.html',
-  styleUrls: ['./template.component.scss']
+    selector: 'scngx-dialog',
+    templateUrl: './template.component.html',
+    styleUrls: ['./template.component.scss'],
+    standalone: false
 })
 export class SCNGXDialogComponent implements OnInit {
 

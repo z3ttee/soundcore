@@ -3,7 +3,8 @@ import { Pipe, PipeTransform } from '@angular/core';
 import { Observable, of } from 'rxjs';
 
 @Pipe({
-  name: 'scngxAddedToPlaylistPipe'
+    name: 'scngxAddedToPlaylistPipe',
+    standalone: false
 })
 export class SCNGXAddedToPlaylistPipe implements PipeTransform {
 

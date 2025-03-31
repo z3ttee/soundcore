@@ -1,7 +1,8 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
-  name: 'scngxBytesPipe'
+    name: 'scngxBytesPipe',
+    standalone: false
 })
 export class SCNGXBytesPipe implements PipeTransform {
 

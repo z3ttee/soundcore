@@ -1,9 +1,10 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 
 @Component({
-  selector: 'scngx-ui-section-title',
-  templateUrl: './ui-section-title.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'scngx-ui-section-title',
+    templateUrl: './ui-section-title.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class SCNGXUiSectionTitleComponent {
 
