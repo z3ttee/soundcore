@@ -1,0 +1,31 @@
+{
+  "name": "@repo/angular-sdk",
+  "version": "1.0.0",
+  "scripts": {
+    "ci:build": "ng build"
+  },
+  "private": true,
+  "module": "./dist/angular-sdk/fesm2022/angular-sdk.mjs",
+  "typings": "./dist/angular-sdk/public-api.d.ts",
+  "dependencies": {
+    "@angular/common": "^19.2.0",
+    "@angular/compiler": "^19.2.0",
+    "@angular/core": "^19.2.0",
+    "@angular/platform-browser": "^19.2.0",
+    "@angular/platform-browser-dynamic": "^19.2.0",
+    "@angular/router": "^19.2.0",
+    "@repo/angular-oidc": "*",
+    "@repo/utilities": "*",
+    "rxjs": "~7.8.0",
+    "tslib": "^2.3.0",
+    "zone.js": "~0.15.0"
+  },
+  "devDependencies": {
+    "@angular-devkit/build-angular": "^19.2.5",
+    "@angular/cli": "^19.2.5",
+    "@angular/compiler-cli": "^19.2.0",
+    "@repo/config-typescript": "*",
+    "ng-packagr": "^19.2.0",
+    "typescript": "~5.7.2"
+  }
+}

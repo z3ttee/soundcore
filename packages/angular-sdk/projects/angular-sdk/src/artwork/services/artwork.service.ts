@@ -1,0 +1,24 @@
+import { Inject, Injectable } from "@angular/core";
+import { Observable, of } from "rxjs";
+import { SCSDK_OPTIONS } from "../../constants";
+import type { SCSDKOptions } from "../../scdk.module";
+import { Artwork } from "../entities/artwork.entity";
+
+@Injectable()
+export class SCDKArtworkService {
+
+    constructor(
+        @Inject(SCSDK_OPTIONS) private readonly options: SCSDKOptions
+    ) { }
+
+    /**
+     * Build the url of a given artwork.
+     * @param artwork Artwork to build url for.
+     * @returns Observable<string>
+     */
+    public buildArtworkURL(artwork: Artwork): Observable<string | null> {
+        if (!artwork || !artwork.id) return of(null);
+        return of(`${this.options.api_base_uri}/v1/artworks/${artwork.id}`);
+    }
+
+}
