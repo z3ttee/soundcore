@@ -1,10 +1,10 @@
-import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { NgModule } from '@angular/core';
+import { LottieComponent } from 'ngx-lottie';
 import { SCNGXButtonModule } from '../btn/btn.module';
 import { SCNGXIconBtnBaseComponent } from './btn-base/btn.component';
 import { SCNGXIconBtnOutlinedComponent } from './btn-outlined/btn.component';
 import { SCNGXIconBtnTextComponent } from './btn-text/btn.component';
-import { LottieModule } from 'ngx-lottie';
 
 @NgModule({
   declarations: [
@@ -15,7 +15,7 @@ import { LottieModule } from 'ngx-lottie';
   imports: [
     CommonModule,
     SCNGXButtonModule,
-    LottieModule
+    LottieComponent
   ],
   exports: [
     SCNGXIconBtnBaseComponent,

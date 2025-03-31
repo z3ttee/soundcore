@@ -1,6 +1,6 @@
 import { ModuleWithProviders, NgModule } from "@angular/core";
 import { SCCDKModule, SCCDKOptions, SCCDK_OPTIONS } from "@soundcore/cdk";
-import { LottieCacheModule, LottieModule } from 'ngx-lottie';
+import { provideCacheableAnimationLoader, provideLottieOptions } from 'ngx-lottie';
 import { SCNGXScrollModule } from "./services/scroll/scroll.module";
 
 export const SCNGX_OPTIONS = "scngx-options";
@@ -8,22 +8,18 @@ export interface SCNGXOptions {
     cdk: SCCDKOptions
 }
 
-// Note we need a separate function as it's required
-// by the AOT compiler.
-export function playerFactory() {
-    return import(/* webpackChunkName: 'lottie-web' */ 'lottie-web/build/player/lottie_svg');
-}
-
 @NgModule({
     imports: [
         SCCDKModule,
-        LottieModule.forRoot({ player: playerFactory }),
-        LottieCacheModule.forRoot(),
         SCNGXScrollModule,
     ],
+    providers: [
+        provideLottieOptions({
+            player: () => import('lottie-web'),
+        }),
+        provideCacheableAnimationLoader(),
+    ],
     exports: [
-        LottieModule,
-        LottieCacheModule,
         SCCDKModule
     ],
     declarations: []

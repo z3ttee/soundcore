@@ -1,16 +1,18 @@
 /* To learn more about Typescript configuration file: https://www.typescriptlang.org/docs/handbook/tsconfig-json.html. */
 /* To learn more about Angular compiler options: https://angular.dev/reference/configs/angular-compiler-options. */
 {
+  "extends": "@repo/config-typescript/angular.json",
   "compilerOptions": {
     "paths": {
       "angular-components": [
         "./dist/angular-components"
       ]
     },
-    "esModuleInterop": true,
     "outDir": "./dist/out-tsc",
-    "declaration": true,
-    "sourceMap": true
+    "noImplicitAny": false,
+    "strictNullChecks": false,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
   },
   "include": [
     "projects/**/*"

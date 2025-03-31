@@ -1,6 +1,6 @@
 import { HttpClient } from "@angular/common/http";
-import { SCSDKBaseDatasource, toFuture } from "@repo/angular-sdk";
-import { Page, Pageable } from "@repo/utilities";
+import { SCSDKBaseDatasource } from "@repo/angular-sdk";
+import { Page, Pageable, toFuture } from "@repo/utilities";
 import { filter, map, Observable, of } from "rxjs";
 
 export type SCNGXDatasourceFreeHandler = () => boolean;

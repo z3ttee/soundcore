@@ -1,7 +1,8 @@
 import { CollectionViewer } from "@angular/cdk/collections";
-import { Future, LikedSong, PlaylistItem, SCSDKBaseDatasource, SCSDKTracklist, SCSDKTracklistService, Song, toFuture, toFutureCompat, TracklistType } from "@repo/angular-sdk";
-import { Page, Pageable } from "@repo/utilities";
+import { LikedSong, PlaylistItem, SCSDKBaseDatasource, SCSDKTracklist, SCSDKTracklistService, Song, TracklistType } from "@repo/angular-sdk";
+import { Future, Page, Pageable, toFuture } from "@repo/utilities";
 import { catchError, filter, map, Observable, of, switchMap, takeUntil } from "rxjs";
+import { toFutureCompat } from "../../../utils/future";
 import { Queue } from "../../../utils/queue/queue.entity";
 import { TRACKLIST_REGISTRY } from "../utils/tracklist-builder";
 import { SCNGXDatasourceFreeHandler } from "./datasource.entity";

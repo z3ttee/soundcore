@@ -3,13 +3,13 @@ import { Pipe, PipeTransform } from '@angular/core';
 import { Observable, of } from 'rxjs';
 
 @Pipe({
-    name: 'scngxAddedToPlaylistPipe',
-    standalone: false
+  name: 'scngxAddedToPlaylistPipe',
+  standalone: false
 })
 export class SCNGXAddedToPlaylistPipe implements PipeTransform {
 
-  public transform(value: Date): Observable<string> {
-    if(!value) return of("No Date available");
+  public transform(value: Date): Observable<string | null> {
+    if (!value) return of("No Date available");
 
     /*return timer(5000).pipe(map(() => {
       return new DatePipe("en-US").transform(value, 'dd/MM/yyyy');
