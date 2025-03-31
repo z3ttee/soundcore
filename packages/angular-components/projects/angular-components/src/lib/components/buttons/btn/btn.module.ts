@@ -1,7 +1,6 @@
-import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { NgModule } from '@angular/core';
 import { SCNGXBtnBaseComponent } from './btn-base/btn.component';
-import { HeroIconModule } from 'ng-heroicon';
 import { SCNGXBtnOutlinedComponent } from './btn-outlined/btn.component';
 import { SCNGXBtnTextComponent } from './btn-text/btn.component';
 
@@ -13,7 +12,6 @@ import { SCNGXBtnTextComponent } from './btn-text/btn.component';
   ],
   imports: [
     CommonModule,
-    HeroIconModule
   ],
   exports: [
     SCNGXBtnBaseComponent,

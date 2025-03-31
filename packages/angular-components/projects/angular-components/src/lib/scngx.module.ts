@@ -1,8 +1,7 @@
 import { ModuleWithProviders, NgModule } from "@angular/core";
-import { LottieModule, LottieCacheModule  } from 'ngx-lottie';
-import { SCNGXScrollModule } from "./services/scroll/scroll.module";
-import { HeroIconModule } from "ng-heroicon";
 import { SCCDKModule, SCCDKOptions, SCCDK_OPTIONS } from "@soundcore/cdk";
+import { LottieCacheModule, LottieModule } from 'ngx-lottie';
+import { SCNGXScrollModule } from "./services/scroll/scroll.module";
 
 export const SCNGX_OPTIONS = "scngx-options";
 export interface SCNGXOptions {
@@ -18,13 +17,8 @@ export function playerFactory() {
 @NgModule({
     imports: [
         SCCDKModule,
-        LottieModule.forRoot({ player: playerFactory }), 
+        LottieModule.forRoot({ player: playerFactory }),
         LottieCacheModule.forRoot(),
-        HeroIconModule.forRoot({}, {
-            defaultHostDisplay: 'inlineBlock', // default 'none'
-            attachDefaultDimensionsIfNoneFound: true // default 'false'
-        }),
-
         SCNGXScrollModule,
     ],
     exports: [

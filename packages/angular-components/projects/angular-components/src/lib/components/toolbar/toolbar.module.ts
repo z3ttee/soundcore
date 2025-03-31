@@ -1,8 +1,7 @@
-import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { SCNGXToolbarComponent } from './toolbar.component';
-import { HeroIconModule, chevronDown } from 'ng-heroicon';
+import { NgModule } from '@angular/core';
 import { MatRippleModule } from '@angular/material/core';
+import { SCNGXToolbarComponent } from './toolbar.component';
 
 @NgModule({
   declarations: [
@@ -10,7 +9,6 @@ import { MatRippleModule } from '@angular/material/core';
   ],
   imports: [
     CommonModule,
-    HeroIconModule.withIcons({ chevronDown }),
     MatRippleModule
   ],
   exports: [
