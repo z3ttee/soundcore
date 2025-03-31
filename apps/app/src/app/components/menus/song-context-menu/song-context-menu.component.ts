@@ -1,12 +1,12 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { SCNGXDialogService } from '@repo/angular-components';
+import { PlayableEntity, PlayableEntityType, Playlist, PlaylistAddSongFailReason, SCSDKLikeService, SCSDKPlaylistService, Song } from '@repo/angular-sdk';
+import { isNull } from '@repo/utilities';
 import { SSOService } from '@soundcore/sso';
 import { Observable, Subject, takeUntil } from 'rxjs';
-import { SCNGXDialogService } from '@soundcore/ngx';
-import { PlayableEntity, PlayableEntityType, Playlist, PlaylistAddSongFailReason, SCSDKLikeService, SCSDKPlaylistService, Song } from '@soundcore/sdk';
 import { AppPlaylistChooseDialog } from 'src/app/dialogs/playlist-choose-dialog/playlist-choose-dialog.component';
 import { PlayerService } from 'src/app/modules/player/services/player.service';
-import { isNull } from '@repo/utilities';
 
 @Component({
   selector: 'app-song-context-menu',

@@ -1,11 +1,11 @@
 import { CommonModule } from "@angular/common";
 import { NgModule } from "@angular/core";
 import { RouterModule, Routes } from "@angular/router";
-import { SCSDKSettingsModule } from "@soundcore/sdk";
+import { SCSDKSettingsModule } from "@repo/angular-sdk";
 
-import { SettingsComponent } from './views/settings/settings.component';
-import {MatCheckboxModule} from '@angular/material/checkbox';
 import { ReactiveFormsModule } from "@angular/forms";
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { SettingsComponent } from './views/settings/settings.component';
 
 const routes: Routes = [
     { path: "", component: SettingsComponent }
@@ -16,13 +16,13 @@ const routes: Routes = [
         CommonModule,
         ReactiveFormsModule,
         RouterModule.forChild(routes),
-        
+
         SCSDKSettingsModule,
 
         MatCheckboxModule
     ],
     declarations: [
-      SettingsComponent
+        SettingsComponent
     ]
 })
-export class SettingsModule {}
+export class SettingsModule { }

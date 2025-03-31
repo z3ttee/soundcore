@@ -2,8 +2,8 @@ import { Location } from "@angular/common";
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, HostListener, OnDestroy, ViewChild } from "@angular/core";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { ActivatedRoute, Router } from "@angular/router";
+import { PlayableEntity, SCSDKLikeService, Song } from "@repo/angular-sdk";
 import { SCCDKScreenService } from "@soundcore/cdk";
-import { PlayableEntity, SCSDKLikeService, Song } from "@soundcore/sdk";
 import { combineLatest, filter, map, Observable, Subject, takeUntil } from "rxjs";
 import { PlayerService, Streamable } from "src/app/modules/player/services/player.service";
 
@@ -23,7 +23,7 @@ interface BigPictureProps {
 @Component({
     selector: "app-big-picture",
     templateUrl: "./bigpicture.component.html",
-    styleUrls: [ "./bigpicture.component.scss" ],
+    styleUrls: ["./bigpicture.component.scss"],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class BigPictureComponent implements OnDestroy {
@@ -39,7 +39,7 @@ export class BigPictureComponent implements OnDestroy {
         private readonly router: Router,
         private readonly activatedRoute: ActivatedRoute,
         private readonly cdr: ChangeDetectorRef
-    ) {}
+    ) { }
 
     private readonly $destroy: Subject<void> = new Subject();
 
@@ -87,7 +87,7 @@ export class BigPictureComponent implements OnDestroy {
     }
 
     public toggleQueue() {
-        if(this.router.url.startsWith("/player/queue")) {
+        if (this.router.url.startsWith("/player/queue")) {
             this.location.back();
         } else {
             this.router.navigate(['/player/queue']);
@@ -105,7 +105,7 @@ export class BigPictureComponent implements OnDestroy {
     public closeBigPicture() {
         const path = this.location.path();
 
-        if(path.startsWith('/bigpicture')) {
+        if (path.startsWith('/bigpicture')) {
             this.router.navigate(['/'], { skipLocationChange: false })
             return;
         }
@@ -117,9 +117,9 @@ export class BigPictureComponent implements OnDestroy {
         event.stopPropagation();
         event.preventDefault();
 
-        if(typeof song === "undefined" || song == null) return;
+        if (typeof song === "undefined" || song == null) return;
         this.likeService.toggleLikeForSong(song).pipe(takeUntil(this.$destroy), filter((request) => !request.loading)).subscribe((request) => {
-            if(request.error) {
+            if (request.error) {
                 this.snackbar.open(`Ein Fehler ist aufgetreten`, null, { duration: 3000 });
                 return;
             }
@@ -130,7 +130,7 @@ export class BigPictureComponent implements OnDestroy {
             this.cdr.markForCheck();
             this.cdr.detectChanges();
 
-            if(isLiked) {
+            if (isLiked) {
                 this.snackbar.open(`Song zu Lieblingssongs hinzugefügt`, null, { duration: 3000 });
             } else {
                 this.snackbar.open(`Song aus Lieblingssongs entfernt`, null, { duration: 3000 });
@@ -143,7 +143,7 @@ export class BigPictureComponent implements OnDestroy {
     @HostListener('mozfullscreenchange', ['$event'])
     public onFullscreenChange(event: Event) {
         const fullscreenElement = document.fullscreenElement;
-        if(typeof fullscreenElement === "undefined" || fullscreenElement == null) {
+        if (typeof fullscreenElement === "undefined" || fullscreenElement == null) {
             this.closeBigPicture();
         } else {
             console.log(event)

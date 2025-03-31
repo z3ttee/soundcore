@@ -1,10 +1,10 @@
-import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { NotificationsComponent } from './views/notifications/notifications.component';
+import { SCNGXNotificationListItemModule, SCNGXToolbarModule } from '@repo/angular-components';
+import { SCDKNotificationModule } from '@repo/angular-sdk';
 import { Error404Module } from 'src/app/shared/error404/error404.module';
-import { SCNGXNotificationListItemModule, SCNGXToolbarModule } from '@soundcore/ngx';
-import { SCDKNotificationModule } from '@soundcore/sdk';
+import { NotificationsComponent } from './views/notifications/notifications.component';
 
 const routes: Routes = [
   { path: "", component: NotificationsComponent }

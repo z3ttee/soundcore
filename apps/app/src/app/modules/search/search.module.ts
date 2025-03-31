@@ -1,15 +1,15 @@
-import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { SCNGXAlbumGridItemModule, SCNGXArtistGridItemModule, SCNGXHorizontalListModule, SCNGXPlaylistGridItemModule, SCNGXProfileGridItemModule, SCNGXToolbarModule, SCNGXUiRowModule } from '@repo/angular-components';
 import { SearchIndexComponent } from './views/search-index/search-index.component';
-import { SCNGXArtistGridItemModule, SCNGXToolbarModule, SCNGXUiRowModule, SCNGXAlbumGridItemModule, SCNGXPlaylistGridItemModule, SCNGXProfileGridItemModule, SCNGXHorizontalListModule } from '@soundcore/ngx';
 
-import { Error404Module } from 'src/app/shared/error404/error404.module';
 import { ReactiveFormsModule } from '@angular/forms';
-import { SCDKAlbumModule, SCDKUserModule, SCSDKArtistModule, SCSDKPlaylistModule, SCSDKSearchModule, SCSDKSongModule } from '@soundcore/sdk';
-import { SongContextMenuModule } from 'src/app/components/menus/song-context-menu/song-context-menu.module';
-import { SongGridItemModule } from 'src/app/components/grid-items/song-grid-item/song-grid-item.module';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { SCDKAlbumModule, SCDKUserModule, SCSDKArtistModule, SCSDKPlaylistModule, SCSDKSearchModule, SCSDKSongModule } from '@repo/angular-sdk';
+import { SongGridItemModule } from 'src/app/components/grid-items/song-grid-item/song-grid-item.module';
+import { SongContextMenuModule } from 'src/app/components/menus/song-context-menu/song-context-menu.module';
+import { Error404Module } from 'src/app/shared/error404/error404.module';
 
 const routes: Routes = [
   { path: "", component: SearchIndexComponent }

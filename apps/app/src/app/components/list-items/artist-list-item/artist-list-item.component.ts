@@ -1,7 +1,7 @@
-import { ChangeDetectionStrategy, Component, ElementRef, EventEmitter, Input, NgZone, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
-import { BehaviorSubject, fromEvent, Observable, Subject, takeUntil } from 'rxjs';
+import { ChangeDetectionStrategy, Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
+import { Artist } from '@repo/angular-sdk';
 import { SCCDKScreenService } from '@soundcore/cdk';
-import { Artist } from '@soundcore/sdk';
+import { BehaviorSubject, fromEvent, Observable, Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'scngx-artist-list-item',
@@ -40,14 +40,14 @@ export class SCNGXArtistListItemComponent implements OnInit, OnDestroy {
   }
 
   public ngOnDestroy(): void {
-      this.$destroy.next();
-      this.$destroy.complete();
+    this.$destroy.next();
+    this.$destroy.complete();
 
-      this.onContext.complete();
+    this.onContext.complete();
   }
 
   public emitOnContext(event: MouseEvent) {
-    if(this.onContext.observed) {
+    if (this.onContext.observed) {
       this.cancelEvent(event);
     }
 

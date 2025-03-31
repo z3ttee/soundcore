@@ -3,7 +3,7 @@ import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from "@angular/
 import { FormControl } from "@angular/forms";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { Router } from "@angular/router";
-import { SCSDKLikeService, Song } from "@soundcore/sdk";
+import { SCSDKLikeService, Song } from "@repo/angular-sdk";
 import { combineLatest, filter, map, Observable, Subject, take, takeUntil, tap } from "rxjs";
 import { PlayerService } from "../../services/player.service";
 
@@ -39,7 +39,7 @@ export class AppPlayerBarComponent implements OnInit, OnDestroy {
         private readonly router: Router,
         private readonly playerService: PlayerService,
         private readonly location: Location,
-    ) {}
+    ) { }
 
     public $currentTime: Observable<number> = this.playerService.$currentTime.pipe(takeUntil(this.$destroy));
 
@@ -88,9 +88,9 @@ export class AppPlayerBarComponent implements OnInit, OnDestroy {
         event.stopPropagation();
         event.preventDefault();
 
-        if(typeof song === "undefined" || song == null) return;
+        if (typeof song === "undefined" || song == null) return;
         this.likeService.toggleLikeForSong(song).pipe(takeUntil(this.$destroy), filter((request) => !request.loading)).subscribe((request) => {
-            if(request.error) {
+            if (request.error) {
                 this.snackbar.open(`Ein Fehler ist aufgetreten`, null, { duration: 3000 });
                 return;
             }
@@ -98,7 +98,7 @@ export class AppPlayerBarComponent implements OnInit, OnDestroy {
             const isLiked = request.data.isLiked;
             song.liked = isLiked ?? song.liked;
 
-            if(isLiked) {
+            if (isLiked) {
                 this.snackbar.open(`Song zu Lieblingssongs hinzugefügt`, null, { duration: 3000 });
             } else {
                 this.snackbar.open(`Song aus Lieblingssongs entfernt`, null, { duration: 3000 });
@@ -119,7 +119,7 @@ export class AppPlayerBarComponent implements OnInit, OnDestroy {
     }
 
     public toggleQueue() {
-        if(this.router.url.startsWith("/player/queue")) {
+        if (this.router.url.startsWith("/player/queue")) {
             this.location.back();
         } else {
             this.router.navigate(['/player/queue']);

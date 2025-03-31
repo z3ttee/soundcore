@@ -1,7 +1,7 @@
 import { HttpClient } from "@angular/common/http";
 import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from "@angular/core";
-import { SCNGXDatasource, SCNGXDialogService } from "@soundcore/ngx";
-import { ImportTask, ImportTaskStatus, ImportTaskType, SCSDKGeneralGateway, SCSDKImportService, SpotifyImport } from "@soundcore/sdk";
+import { SCNGXDatasource, SCNGXDialogService } from "@repo/angular-components";
+import { ImportTask, ImportTaskStatus, ImportTaskType, SCSDKGeneralGateway, SCSDKImportService, SpotifyImport } from "@repo/angular-sdk";
 import { filter, Subject, takeUntil } from "rxjs";
 import { AppImportSpotifyCreateDialog } from "src/app/dialogs/import-spotify-create-dialog/import-spotify-create-dialog.component";
 import { environment } from "src/environments/environment";
@@ -28,13 +28,13 @@ export class SpotifyPendingTabComponent implements OnInit, OnDestroy {
         private readonly httpClient: HttpClient,
         private readonly importService: SCSDKImportService,
         private readonly gateway: SCSDKGeneralGateway
-    ) {}
+    ) { }
 
     public readonly datasource: SCNGXDatasource<SpotifyImport> = new SCNGXDatasource(this.httpClient, `${environment.api_base_uri}/v1/imports/spotify`, 8);
 
     public ngOnInit(): void {
         this.gateway.$onImportTaskUpdate.pipe(takeUntil(this._destroy), filter((task) => task.type == ImportTaskType.SPOTIFY_PLAYLIST)).subscribe((task: SpotifyImport) => {
-            if(task.status == ImportTaskStatus.ENQUEUED || task.status == ImportTaskStatus.PROCESSING) {
+            if (task.status == ImportTaskStatus.ENQUEUED || task.status == ImportTaskStatus.PROCESSING) {
                 this.datasource.updateOrAppendById(task.id, task);
             } else {
                 this.datasource.removeById(task.id);
@@ -49,7 +49,7 @@ export class SpotifyPendingTabComponent implements OnInit, OnDestroy {
 
     public openCreateImportDialog(datasource: SCNGXDatasource<ImportTask>) {
         this.dialog.open(AppImportSpotifyCreateDialog).$afterClosed.pipe(takeUntil(this._destroy)).subscribe(async (data: ImportTask) => {
-            if(!data) return;
+            if (!data) return;
             datasource.append(data);
         });
     }

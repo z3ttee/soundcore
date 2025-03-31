@@ -4,19 +4,21 @@ import { RouterModule, Routes } from "@angular/router";
 import { NgIconsModule } from "@ng-icons/core";
 import { heroArrowUturnLeft } from "@ng-icons/heroicons/outline";
 
-import { SCNGXButtonModule, SCNGXDialogModule, SCNGXListTileModule, SCNGXUiRowModule, SCNGXUiTitleModule } from "@soundcore/ngx";
-import { SCSDKConfigureModule } from "@soundcore/sdk";
+import { SCNGXButtonModule, SCNGXDialogModule, SCNGXListTileModule, SCNGXUiRowModule, SCNGXUiTitleModule } from "@repo/angular-components";
+import { SCSDKConfigureModule } from "@repo/angular-sdk";
 import { SCNGXTabsModule } from "src/app/components/navigation-tabs";
 import { ConfigurateGeneralView } from "./views/configurate-general/configurate-general.component";
 import { ConfigurateIndexView } from "./views/configurate-index/configurate-index.component";
 import { ConfigurateResetView } from "./views/configurate-reset/configurate-reset.component";
 
 const routes: Routes = [
-    { path: "", component: ConfigurateIndexView, children: [
-        { path: "", component: ConfigurateGeneralView },
-        { path: "reset", component: ConfigurateResetView }
+    {
+        path: "", component: ConfigurateIndexView, children: [
+            { path: "", component: ConfigurateGeneralView },
+            { path: "reset", component: ConfigurateResetView }
 
-    ] },
+        ]
+    },
 ]
 
 @NgModule({
@@ -40,4 +42,4 @@ const routes: Routes = [
         SCSDKConfigureModule
     ]
 })
-export class ConfigurateModule {}
+export class ConfigurateModule { }

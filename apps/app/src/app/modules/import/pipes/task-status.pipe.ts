@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from "@angular/core";
-import { ImportTaskStatus } from "@soundcore/sdk";
+import { ImportTaskStatus } from "@repo/angular-sdk";
 
 @Pipe({
     name: "taskStatusPipe"
@@ -7,17 +7,17 @@ import { ImportTaskStatus } from "@soundcore/sdk";
 export class TaskStatusPipe implements PipeTransform {
 
     transform(value: ImportTaskStatus): string {
-        if(value == ImportTaskStatus.ENQUEUED) {
+        if (value == ImportTaskStatus.ENQUEUED) {
             return "Eingereiht"
-        } else if(value == ImportTaskStatus.PROCESSING) {
+        } else if (value == ImportTaskStatus.PROCESSING) {
             return "Wird verarbeitet"
-        } else if(value == ImportTaskStatus.OK) {
+        } else if (value == ImportTaskStatus.OK) {
             return "Abgeschlossen"
-        } else if(value == ImportTaskStatus.SERVER_ABORT) {
+        } else if (value == ImportTaskStatus.SERVER_ABORT) {
             return "Vom System abgebrochen"
         } else {
             return "Fehlgeschlagen"
         }
     }
-    
+
 }

@@ -1,7 +1,7 @@
-import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { NgModule } from '@angular/core';
+import { SCNGXArtworkModule, SCNGXResourceTypePipeModule } from '@repo/angular-components';
 import { GenericResourceListItemComponent } from './generic-resource-list-item.component';
-import { SCNGXArtworkModule, SCNGXResourceTypePipeModule } from '@soundcore/ngx';
 
 @NgModule({
   declarations: [

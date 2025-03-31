@@ -1,5 +1,5 @@
-import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, TemplateRef } from '@angular/core';
-import { Song, User } from '@soundcore/sdk';
+import { AfterViewInit, ChangeDetectionStrategy, Component, EventEmitter, Input, OnDestroy, OnInit, Output, TemplateRef } from '@angular/core';
+import { Song, User } from '@repo/angular-sdk';
 
 @Component({
   selector: 'scngx-song-list-item',
@@ -11,10 +11,10 @@ export class SCNGXSongListItemComponent implements OnInit, OnDestroy, AfterViewI
 
   constructor() { }
 
-  @Input() 
+  @Input()
   public song: Song;
 
-  @Input() 
+  @Input()
   public index: number;
 
   @Input()
@@ -23,10 +23,10 @@ export class SCNGXSongListItemComponent implements OnInit, OnDestroy, AfterViewI
   @Input()
   public addedBy: User;
 
-  @Input() 
+  @Input()
   public active: boolean = false;
 
-  @Input() 
+  @Input()
   public playing: boolean = false;
 
   @Input()
@@ -53,16 +53,16 @@ export class SCNGXSongListItemComponent implements OnInit, OnDestroy, AfterViewI
   }
 
   public ngAfterViewInit(): void {
-    
+
   }
 
   public ngOnDestroy(): void {
-      this.onPlay.complete();
-      this.onPlay.complete();
+    this.onPlay.complete();
+    this.onPlay.complete();
   }
 
   public emitOnPlay(event: MouseEvent) {
-    if(this.onPlay.observed) {
+    if (this.onPlay.observed) {
       this.cancelEvent(event);
     }
 
@@ -70,9 +70,9 @@ export class SCNGXSongListItemComponent implements OnInit, OnDestroy, AfterViewI
   }
 
   public emitOnPlayMobile(event: MouseEvent) {
-    if(!this.song) return;
-    
-    if(this.onPlay.observed) {
+    if (!this.song) return;
+
+    if (this.onPlay.observed) {
       this.cancelEvent(event);
     }
 
@@ -80,10 +80,10 @@ export class SCNGXSongListItemComponent implements OnInit, OnDestroy, AfterViewI
   }
 
   public emitOnLike(event: MouseEvent) {
-    if(this.onLike.observed) {
+    if (this.onLike.observed) {
       this.cancelEvent(event);
     }
-    
+
     this.onLike.emit(this.song);
   }
 

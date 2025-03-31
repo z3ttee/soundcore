@@ -1,8 +1,8 @@
 import { ChangeDetectionStrategy, Component, OnDestroy } from "@angular/core";
 import { FormControl, FormGroup, Validators } from "@angular/forms";
-import { Subject, takeUntil } from "rxjs";
-import { DialogRef } from "@soundcore/ngx";
-import { Playlist, ApiResponse, PlaylistPrivacy, SCSDKPlaylistService, SCSDKImportService, ImportTask } from "@soundcore/sdk";
+import { DialogRef } from "@repo/angular-components";
+import { ImportTask, PlaylistPrivacy, SCSDKImportService } from "@repo/angular-sdk";
+import { Subject } from "rxjs";
 
 @Component({
     templateUrl: "./import-spotify-create-dialog.component.html",
@@ -33,12 +33,12 @@ export class AppImportSpotifyCreateDialog implements OnDestroy {
     constructor(
         public readonly dialogRef: DialogRef<any, ImportTask>,
         private readonly importService: SCSDKImportService
-    ) {}
+    ) { }
 
     public async submit() {
-        if(this.loading) return;
+        if (this.loading) return;
         this.form.markAllAsTouched();
-        if(this.form.invalid) return;
+        if (this.form.invalid) return;
 
         this.loading = true;
 
@@ -49,7 +49,7 @@ export class AppImportSpotifyCreateDialog implements OnDestroy {
             this.loading = false;
 
             // Check for error
-            if(response.error) {
+            if (response.error) {
                 this.errorMessage = response.message;
                 return;
             }

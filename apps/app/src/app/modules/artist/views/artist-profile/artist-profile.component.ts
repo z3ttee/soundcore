@@ -1,9 +1,8 @@
-import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { combineLatest, map, Observable, startWith, Subject, switchMap, takeUntil, tap } from 'rxjs';
-import { Album, Artist, Future, PlayableEntityType, Playlist, SCDKAlbumService, SCSDKArtistService, SCSDKDatasource, SCSDKPlaylistService, SCSDKSongService, Song, toFutureCompat } from '@soundcore/sdk';
-import { AUDIOWAVE_LOTTIE_OPTIONS } from 'src/app/constants';
+import { Album, Artist, Future, PlayableEntityType, Playlist, SCDKAlbumService, SCSDKArtistService, SCSDKDatasource, SCSDKPlaylistService, SCSDKSongService, Song, toFutureCompat } from '@repo/angular-sdk';
 import { Page, Pageable } from '@repo/utilities';
+import { combineLatest, map, Observable, startWith, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { PlayerService } from 'src/app/modules/player/services/player.service';
 
 interface ArtistInfoProps {

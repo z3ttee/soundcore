@@ -1,6 +1,6 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from "@angular/core";
+import { ChangeDetectionStrategy, Component, Input } from "@angular/core";
 import { IsActiveMatchOptions } from "@angular/router";
-import { Artwork } from "@soundcore/sdk";
+import { Artwork } from "@repo/angular-sdk";
 
 @Component({
     selector: "scngx-nav-list-item",

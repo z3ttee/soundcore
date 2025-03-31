@@ -1,10 +1,10 @@
-import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MountListItemComponent } from './mount-list-item.component';
-import { SCNGXMountStatusPipeModule, SCNGXBytesPipeModule, SCNGXSkeletonModule } from '@soundcore/ngx';
+import { NgModule } from '@angular/core';
 import { NgIconsModule } from '@ng-icons/core';
-import { heroRectangleStack, heroChartPie, heroStar } from '@ng-icons/heroicons/outline';
+import { heroChartPie, heroRectangleStack, heroStar } from '@ng-icons/heroicons/outline';
 import { heroStarSolid } from '@ng-icons/heroicons/solid';
+import { SCNGXBytesPipeModule, SCNGXMountStatusPipeModule, SCNGXSkeletonModule } from '@repo/angular-components';
+import { MountListItemComponent } from './mount-list-item.component';
 
 @NgModule({
   declarations: [

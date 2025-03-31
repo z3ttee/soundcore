@@ -1,13 +1,13 @@
-import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { SCNGXSongListItemComponent } from './song-list-item.component';
-import { LottieModule } from 'ngx-lottie';
+import { NgModule } from '@angular/core';
 import { MatRippleModule } from '@angular/material/core';
 import { RouterModule } from '@angular/router';
-import { SCNGXAddedToPlaylistPipeModule, SCNGXArtworkModule, SCNGXExplicitBadgeModule, SCNGXIconBtnModule, SCNGXSkeletonModule, SCNGXSongDurationPipeModule, SCNGXTooltipModule } from '@soundcore/ngx';
 import { NgIconsModule } from '@ng-icons/core';
-import { heroPlaySolid, heroPauseSolid, heroEllipsisVerticalSolid, heroHeartSolid } from '@ng-icons/heroicons/solid';
 import { heroHeart } from '@ng-icons/heroicons/outline';
+import { heroEllipsisVerticalSolid, heroHeartSolid, heroPauseSolid, heroPlaySolid } from '@ng-icons/heroicons/solid';
+import { SCNGXAddedToPlaylistPipeModule, SCNGXArtworkModule, SCNGXExplicitBadgeModule, SCNGXIconBtnModule, SCNGXSkeletonModule, SCNGXSongDurationPipeModule, SCNGXTooltipModule } from '@repo/angular-components';
+import { LottieModule } from 'ngx-lottie';
+import { SCNGXSongListItemComponent } from './song-list-item.component';
 @NgModule({
   declarations: [
     SCNGXSongListItemComponent
@@ -33,4 +33,4 @@ import { heroHeart } from '@ng-icons/heroicons/outline';
     LottieModule
   ]
 })
-export class SCNGXSongListItemModule {}
+export class SCNGXSongListItemModule { }

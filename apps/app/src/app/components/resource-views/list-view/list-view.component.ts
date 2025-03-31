@@ -1,7 +1,7 @@
 import { Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
-import { Observable, Subject, takeUntil } from 'rxjs';
+import { Artwork, SCDKResource } from "@repo/angular-sdk";
 import { SCCDKScreenService } from '@soundcore/cdk';
-import { Artwork, SCDKResource } from "@soundcore/sdk";
+import { Observable, Subject, takeUntil } from 'rxjs';
 
 const DEFAULT_ACCENT_COLOR = "#cccccc";
 
@@ -26,14 +26,14 @@ export class ListViewComponent implements OnInit, OnDestroy, OnChanges {
   private $destroy: Subject<void> = new Subject();
   public $isTouch: Observable<boolean> = this.screenService.$isTouch.pipe(takeUntil(this.$destroy));
 
-  public ngOnInit(): void {}
+  public ngOnInit(): void { }
   public ngOnChanges(changes: SimpleChanges): void {
-      const current: SCDKResource = changes["resource"]?.currentValue;
-      this.accentColor = current?.artwork?.colors?.vibrant || DEFAULT_ACCENT_COLOR;
+    const current: SCDKResource = changes["resource"]?.currentValue;
+    this.accentColor = current?.artwork?.colors?.vibrant || DEFAULT_ACCENT_COLOR;
   }
   public ngOnDestroy(): void {
-      this.$destroy.complete();
-      this.$destroy.next();
+    this.$destroy.complete();
+    this.$destroy.next();
   }
 
 }

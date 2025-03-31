@@ -1,15 +1,15 @@
 import { CommonModule } from "@angular/common";
 import { NgModule } from "@angular/core";
+import { MatIconModule } from '@angular/material/icon';
 import { RouterModule, Routes } from "@angular/router";
-import { SCNGXHorizontalListModule, SCNGXIconBtnModule, SCNGXScrollingModule, SCNGXUiRowModule, SCNGXUiSectionTitleModule, SCNGXUiTitleModule } from "@soundcore/ngx";
-import { SCSDKTasksModule } from "@soundcore/sdk";
-import { TasksIndexView } from "./views/tasks-index/tasks-index.component";
-import { SCNGXTaskListItemModule } from "src/app/components/list-items/task-list-item/task-list-item.module";
 import { NgIconsModule } from "@ng-icons/core";
 import { heroArrowTopRightOnSquare } from '@ng-icons/heroicons/outline';
-import { TaskInfoView } from "./views/task-info/task-info.component";
+import { SCNGXHorizontalListModule, SCNGXIconBtnModule, SCNGXScrollingModule, SCNGXUiRowModule, SCNGXUiSectionTitleModule, SCNGXUiTitleModule } from "@repo/angular-components";
+import { SCSDKTasksModule } from "@repo/angular-sdk";
 import { SCNGXTaskStatusIconModule } from "src/app/components/icons/task-status-icon/task-status-icon.module";
-import { MatIconModule } from '@angular/material/icon';
+import { SCNGXTaskListItemModule } from "src/app/components/list-items/task-list-item/task-list-item.module";
+import { TaskInfoView } from "./views/task-info/task-info.component";
+import { TasksIndexView } from "./views/tasks-index/tasks-index.component";
 
 const routes: Routes = [
     { path: "", component: TasksIndexView },
@@ -41,4 +41,4 @@ const routes: Routes = [
         SCSDKTasksModule
     ]
 })
-export class TasksModule {}
+export class TasksModule { }

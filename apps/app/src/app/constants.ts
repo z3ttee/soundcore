@@ -1,4 +1,4 @@
-import { scngxLottieAudioWave } from "@soundcore/ngx";
+import { scngxLottieAudioWave } from "@repo/angular-components";
 import { AnimationOptions } from "ngx-lottie";
 
 export const LOCALSTORAGE_KEY_VOLUME = "__soundcore.player.volume__";

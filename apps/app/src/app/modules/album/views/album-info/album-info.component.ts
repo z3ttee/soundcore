@@ -1,11 +1,11 @@
 import { ChangeDetectionStrategy, Component, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { combineLatest, map, Observable, of, startWith, Subject, switchMap, takeUntil } from 'rxjs';
-import { Album, Future, SCDKAlbumService, SCSDKDatasource, SCSDKSongService, Song, toFutureCompat } from '@soundcore/sdk';
-import { AUDIOWAVE_LOTTIE_OPTIONS } from 'src/app/constants';
-import { PlayerService } from 'src/app/modules/player/services/player.service';
+import { Album, Future, SCDKAlbumService, SCSDKDatasource, SCSDKSongService, Song, toFutureCompat } from '@repo/angular-sdk';
 import { Page } from '@repo/utilities';
+import { combineLatest, map, Observable, of, startWith, Subject, switchMap, takeUntil } from 'rxjs';
+import { AUDIOWAVE_LOTTIE_OPTIONS } from 'src/app/constants';
 import { SCNGXTracklist } from 'src/app/modules/player/entities/tracklist.entity';
+import { PlayerService } from 'src/app/modules/player/services/player.service';
 
 interface AlbumInfoProps {
   album?: Future<Album>;

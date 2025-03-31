@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, OnDestroy } from "@angular/core";
-import { SCNGXDialogService } from "@soundcore/ngx";
-import { SCSDKFactoryResetService } from "@soundcore/sdk";
+import { SCNGXDialogService } from "@repo/angular-components";
+import { SCSDKFactoryResetService } from "@repo/angular-sdk";
 import { Observable, Subject, takeUntil } from "rxjs";
 
 @Component({
@@ -14,13 +14,13 @@ export class ConfigurateResetView implements OnDestroy {
     constructor(
         private readonly resetService: SCSDKFactoryResetService,
         private readonly dialog: SCNGXDialogService
-    ) {}
+    ) { }
 
     public confirmAllReset() {
         this.confirmReset("Beim Zurücksetzen der Datenbank werden alle gespeicherten Daten gelöscht. Zusätzlich werden Einträge aus der Suchmaschine entfernt. Registrierte Mounts sind davon nicht betroffen. Bitte beachte, dass nach dem Ausführen die Anwendung heruntergefahren wird. Je nach Konfiguration der Umgebung, erfolgt ein automatischer Neustart. Andernfalls muss der Service manuell gestartet werden.").subscribe((confirmed) => {
-            if(confirmed) {
+            if (confirmed) {
                 this.resetService.resetAll().pipe(takeUntil(this.$destroy)).subscribe((request) => {
-                    if(request.error) {
+                    if (request.error) {
                         console.error(request.error);
                         // TODO: Show snackbar
                     }
@@ -31,9 +31,9 @@ export class ConfigurateResetView implements OnDestroy {
 
     public confirmSearchEngineReset() {
         this.confirmReset("Beim Zurücksetzen der Suchmaschine werden alle registrierten Dokumente gelöscht. Das bedeutet, dass alle möglichen Sucheinträge nicht mehr auffindbar sind. Im Anschluss wird eine erneute Indexierung der Musikbibliothek empfohlen, um die Suche wiederherzustellen. Bitte beachte, dass nach dem Ausführen die Anwendung heruntergefahren wird. Je nach Konfiguration der Umgebung, erfolgt ein automatischer Neustart. Andernfalls muss der Service manuell gestartet werden.").subscribe((confirmed) => {
-            if(confirmed) {
+            if (confirmed) {
                 this.resetService.resetSearchEngine().pipe(takeUntil(this.$destroy)).subscribe((request) => {
-                    if(request.error) {
+                    if (request.error) {
                         console.error(request.error);
                         // TODO: Show snackbar
                     }

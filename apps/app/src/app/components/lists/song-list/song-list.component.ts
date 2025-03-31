@@ -1,6 +1,6 @@
 import { CdkVirtualScrollViewport } from "@angular/cdk/scrolling";
 import { AfterViewInit, ChangeDetectionStrategy, Component, EventEmitter, Input, Output, ViewChild } from "@angular/core";
-import { PlayableEntity, SCSDKBaseDatasource, Song } from "@soundcore/sdk";
+import { PlayableEntity, SCSDKBaseDatasource, Song } from "@repo/angular-sdk";
 import { BehaviorSubject, Observable, Subject, combineLatest, map, startWith, takeUntil } from "rxjs";
 import { AUDIOWAVE_LOTTIE_OPTIONS } from "src/app/constants";
 import { PlayerService } from "src/app/modules/player/services/player.service";
@@ -20,7 +20,7 @@ export class SongListComponent implements AfterViewInit {
 
     constructor(
         private readonly player: PlayerService
-    ) {}
+    ) { }
 
     private readonly $destroy: Subject<void> = new Subject();
 
@@ -32,8 +32,8 @@ export class SongListComponent implements AfterViewInit {
 
     public readonly $playerInfo: Observable<PlayerInfo> = combineLatest([
         // Get paused state
-        this.player.$isPaused.pipe(startWith(true)), 
-    // Get current tracklist id
+        this.player.$isPaused.pipe(startWith(true)),
+        // Get current tracklist id
         this.player.$currentItem.pipe(startWith(null)),
     ]).pipe(map(([isPaused, currentItem]): PlayerInfo => {
         return {

@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from "@angular/core";
-import { PlayableEntityType } from "@soundcore/sdk";
+import { PlayableEntityType } from "@repo/angular-sdk";
 
 @Pipe({
     name: 'playableEntityType'

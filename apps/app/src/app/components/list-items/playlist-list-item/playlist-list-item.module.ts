@@ -1,7 +1,7 @@
-import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { NgModule } from '@angular/core';
+import { SCNGXArtworkModule } from '@repo/angular-components';
 import { SCNGXPlaylistListItemComponent } from './playlist-list-item.component';
-import { SCNGXArtworkModule } from '@soundcore/ngx';
 
 @NgModule({
   declarations: [

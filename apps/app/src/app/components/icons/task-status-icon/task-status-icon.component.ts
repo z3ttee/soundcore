@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, Input } from "@angular/core";
-import { RunStatus } from "@soundcore/sdk";
+import { RunStatus } from "@repo/angular-sdk";
 
 @Component({
     selector: "scngx-task-status-icon",

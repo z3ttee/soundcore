@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { Zone } from "@soundcore/sdk";
+import { Zone } from "@repo/angular-sdk";
 
 @Component({
   selector: 'app-bucket-list-item',
@@ -8,7 +8,7 @@ import { Zone } from "@soundcore/sdk";
 })
 export class BucketListItemComponent {
 
-  @Input() 
+  @Input()
   public bucket: Zone;
 
   @Input()

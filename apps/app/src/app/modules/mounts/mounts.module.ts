@@ -1,17 +1,17 @@
-import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule, Routes } from '@angular/router';
-import { MountInfoComponent } from './views/mount-info/mount-info.component';
-import { SCDKFileModule, SCSDKMountModule } from '@soundcore/sdk';
-import { SCNGXButtonModule, SCNGXBytesPipeModule, SCNGXIconBtnModule, SCNGXLoadingBtnModule, SCNGXMountStatusPipeModule, SCNGXProgressbarModule, SCNGXScrollingModule, SCNGXSkeletonModule, SCNGXStatusIndicatorModule, SCNGXUiTitleModule } from '@soundcore/ngx';
-import { Error404Module } from 'src/app/shared/error404/error404.module';
-import { SCNGXFileListItemModule } from 'src/app/components/list-items/file-list-item/file-list-item.module';
-import { AppMountCreateDialogModule } from 'src/app/dialogs/mount-create-dialog/mount-create-dialog.module';
+import { NgModule } from '@angular/core';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
-import { SCNGXTabsModule } from 'src/app/components/navigation-tabs';
+import { RouterModule, Routes } from '@angular/router';
 import { NgIconsModule } from '@ng-icons/core';
+import { heroArrowPath, heroChartPie, heroPencil, heroRectangleStack, heroStar, heroTrash } from '@ng-icons/heroicons/outline';
 import { heroPlusSolid, heroStarSolid } from '@ng-icons/heroicons/solid';
-import { heroRectangleStack, heroChartPie, heroPencil, heroTrash, heroArrowPath, heroStar } from '@ng-icons/heroicons/outline';
+import { SCNGXButtonModule, SCNGXBytesPipeModule, SCNGXIconBtnModule, SCNGXLoadingBtnModule, SCNGXMountStatusPipeModule, SCNGXProgressbarModule, SCNGXScrollingModule, SCNGXSkeletonModule, SCNGXStatusIndicatorModule, SCNGXUiTitleModule } from '@repo/angular-components';
+import { SCDKFileModule, SCSDKMountModule } from '@repo/angular-sdk';
+import { SCNGXFileListItemModule } from 'src/app/components/list-items/file-list-item/file-list-item.module';
+import { SCNGXTabsModule } from 'src/app/components/navigation-tabs';
+import { AppMountCreateDialogModule } from 'src/app/dialogs/mount-create-dialog/mount-create-dialog.module';
+import { Error404Module } from 'src/app/shared/error404/error404.module';
+import { MountInfoComponent } from './views/mount-info/mount-info.component';
 
 const routes: Routes = [
   { path: "", component: MountInfoComponent },

@@ -2,10 +2,10 @@ import { HttpClient } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
-import { BehaviorSubject, combineLatest, debounceTime, filter, map, Observable, startWith, Subject, switchMap, takeUntil, tap } from 'rxjs';
-import { ApplicationInfo, File, Future, Mount, MountProgress, MountStatus, MountStatusUpdateEvent, SCDKFileService, SCSDKAdminGateway, SCSDKAppService, SCSDKMountService } from '@soundcore/sdk';
+import { SCNGXDatasource, SCNGXDialogService } from '@repo/angular-components';
+import { ApplicationInfo, File, Future, Mount, MountProgress, MountStatus, MountStatusUpdateEvent, SCDKFileService, SCSDKAdminGateway, SCSDKAppService, SCSDKMountService } from '@repo/angular-sdk';
+import { BehaviorSubject, combineLatest, filter, map, Observable, startWith, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { AppMountCreateDialog, MountCreateDialogOptions } from 'src/app/dialogs/mount-create-dialog/mount-create-dialog.component';
-import { SCNGXDatasource, SCNGXDialogService } from '@soundcore/ngx';
 
 interface MountInfoProps {
   mount?: Mount;
@@ -37,7 +37,7 @@ export class MountInfoComponent implements OnInit, OnDestroy {
   ) { }
 
   @ViewChild("container") public containerRef: ElementRef<HTMLDivElement>;
-  
+
   private readonly $destroy: Subject<void> = new Subject();
   private readonly $reload: Subject<void> = new Subject();
 
@@ -67,7 +67,7 @@ export class MountInfoComponent implements OnInit, OnDestroy {
   public $mount: Observable<Future<Mount>> = this.$mountId.pipe(
     switchMap((mountId) => this.mountService.findById(mountId)),
     switchMap((request) => this.$onMountUpdated.pipe(
-      startWith(null), 
+      startWith(null),
       map((updated) => Future.merge(request, updated)),
       takeUntil(this.$destroy)
     ))
@@ -110,26 +110,26 @@ export class MountInfoComponent implements OnInit, OnDestroy {
 
   public ngOnInit(): void {
     this.adminGateway.$mountStatusUpdate.pipe(takeUntil(this.$destroy)).subscribe((event) => {
-      if(this.currentMountId !== event.mountId) return;
+      if (this.currentMountId !== event.mountId) return;
       this.$onMountStatusUpdate.next(event);
     });
   }
   public ngOnDestroy(): void {
-      this.$destroy.next();
-      this.$destroy.complete();
+    this.$destroy.next();
+    this.$destroy.complete();
   }
 
   public deleteMount(mount: Mount) {
     this.setDeleting(true);
 
     this.dialog.confirm("Möchtest du den Mountpunkt wirklich löschen?", "Mount löschen").$afterClosed.pipe(takeUntil(this.$destroy)).subscribe((confirmed) => {
-      if(confirmed) {
+      if (confirmed) {
         this.mountService.deleteById(mount.id).pipe(takeUntil(this.$destroy)).subscribe((request) => {
           this.setDeleting(request.loading);
 
-          if(request.loading) return;
+          if (request.loading) return;
 
-          if(request.error) {
+          if (request.error) {
             this.snackbar.open(`${request.error.message}`, null, { duration: 5000 });
             return;
           }
@@ -145,7 +145,7 @@ export class MountInfoComponent implements OnInit, OnDestroy {
   }
 
   public openMountEditorDialog(mount?: Mount) {
-    if(!mount) return;
+    if (!mount) return;
 
     this.dialog.open<any, MountCreateDialogOptions, Mount>(AppMountCreateDialog, {
       data: {
@@ -153,7 +153,7 @@ export class MountInfoComponent implements OnInit, OnDestroy {
         mode: "edit"
       }
     }).$afterClosed.pipe(takeUntil(this.$destroy)).subscribe((result) => {
-      if(!!result) {
+      if (!!result) {
         this.$onMountUpdated.next({
           ...mount,
           ...result
@@ -164,20 +164,20 @@ export class MountInfoComponent implements OnInit, OnDestroy {
   }
 
   public triggerReindex(mount: Mount) {
-    if(!mount) return;
+    if (!mount) return;
 
     this.mountService.rescanMount(mount.id).pipe(takeUntil(this.$destroy)).subscribe((request) => {
       this.setRefreshing(request.loading);
-      if(!request.loading) console.log("triggered mount re-index: ", request?.data);
+      if (!request.loading) console.log("triggered mount re-index: ", request?.data);
     });
   }
 
   public setAsDefault(mount: Mount) {
-    if(!mount) return;
+    if (!mount) return;
 
     this.mountService.setDefault(mount.id).pipe(takeUntil(this.$destroy)).subscribe((request) => {
       this.setSettingAsDefault(request.loading);
-      if(!request.loading) console.log("set default: ", request?.data);
+      if (!request.loading) console.log("set default: ", request?.data);
     });
   }
 

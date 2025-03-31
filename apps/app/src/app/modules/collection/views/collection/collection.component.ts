@@ -1,8 +1,8 @@
 import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute } from '@angular/router';
-import { SCNGXTracklist, SCNGXTracklistBuilder } from '@soundcore/ngx';
-import { LikedSong, SCSDKLikeService, ToggleLikedSongDTO } from '@soundcore/sdk';
+import { SCNGXTracklist, SCNGXTracklistBuilder } from '@repo/angular-components';
+import { LikedSong, SCSDKLikeService, ToggleLikedSongDTO } from '@repo/angular-sdk';
 import { SSOService, SSOUser } from '@soundcore/sso';
 import { combineLatest, filter, map, Observable, Subject, take, takeUntil } from 'rxjs';
 import { AUDIOWAVE_LOTTIE_OPTIONS } from 'src/app/constants';
@@ -26,7 +26,7 @@ export class CollectionComponent implements OnInit, OnDestroy {
   private readonly _destroy: Subject<void> = new Subject();
   private readonly _destroySize: Subject<void> = new Subject();
 
-   // Lottie animations options
+  // Lottie animations options
   public animOptions = AUDIOWAVE_LOTTIE_OPTIONS;
 
   constructor(
@@ -62,7 +62,7 @@ export class CollectionComponent implements OnInit, OnDestroy {
       const isLiked = toggleResult.isLiked;
 
       this.$props.pipe(take(1), takeUntil(this._destroy)).subscribe(({ tracklist }) => {
-        if(isLiked) {
+        if (isLiked) {
           this.addToCollection(likedSong, tracklist);
         } else {
           this.removeFromCollection(likedSong, tracklist);
@@ -85,8 +85,8 @@ export class CollectionComponent implements OnInit, OnDestroy {
 
   public toggleAndRemoveFromCollection(likedSong: LikedSong, tracklist: SCNGXTracklist<LikedSong>) {
     this.likeService.toggleLikeForSong(likedSong.song).pipe(takeUntil(this._destroy)).subscribe((request) => {
-      if(request.loading) return;
-      if(request.error) {
+      if (request.loading) return;
+      if (request.error) {
         this.snackbar.open(`Ein Fehler ist aufgetreten.`, null, { duration: 3000 });
         return;
       }

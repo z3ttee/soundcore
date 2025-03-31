@@ -2,17 +2,17 @@ import { CommonModule } from "@angular/common";
 import { NgModule } from "@angular/core";
 import { RouterModule, Routes } from "@angular/router";
 import { NgIconsModule } from "@ng-icons/core";
-import { heroXMarkSolid, heroHeartSolid, heroPlaySolid, heroPauseSolid } from "@ng-icons/heroicons/solid";
-import { heroForward, heroBackward, heroRectangleStack, heroHeart, heroChevronDown, heroArrowPathRoundedSquare } from "@ng-icons/heroicons/outline";
 import { featherShuffle } from "@ng-icons/feather-icons";
+import { heroArrowPathRoundedSquare, heroBackward, heroChevronDown, heroForward, heroHeart, heroRectangleStack } from "@ng-icons/heroicons/outline";
+import { heroHeartSolid, heroPauseSolid, heroPlaySolid, heroXMarkSolid } from "@ng-icons/heroicons/solid";
 
-import { SCNGXArtworkModule, SCNGXExplicitBadgeModule, SCNGXIconBtnModule } from "@soundcore/ngx";
+import { MatSnackBarModule } from "@angular/material/snack-bar";
+import { SCNGXArtworkModule, SCNGXExplicitBadgeModule, SCNGXIconBtnModule } from "@repo/angular-components";
 import { SCNGXRangeModule } from "src/app/components/inputs/range/range.module";
 import { SCNGXSeekerModule } from "src/app/components/inputs/seeker";
 import { AppDurationPipeModule } from "src/app/pipes/duration/duration-pipe.module";
-import { BigPictureComponent } from "./views/bigpicture/bigpicture.component";
-import { MatSnackBarModule } from "@angular/material/snack-bar";
 import { PlayableEntityTypePipeModule } from "src/app/pipes/playableEntity/playableEntityType.module";
+import { BigPictureComponent } from "./views/bigpicture/bigpicture.component";
 
 const routes: Routes = [
     { path: "", component: BigPictureComponent },
@@ -42,4 +42,4 @@ const routes: Routes = [
         BigPictureComponent
     ]
 })
-export class BigPictureModule {}
+export class BigPictureModule { }

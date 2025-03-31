@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
-import { Playlist } from '@soundcore/sdk';
+import { Playlist } from '@repo/angular-sdk';
 
 @Component({
   selector: 'scngx-playlist-list-item',

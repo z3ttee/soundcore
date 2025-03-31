@@ -1,8 +1,8 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { UntypedFormControl, UntypedFormGroup } from '@angular/forms';
-import { SCSDKSettingsService } from '@soundcore/sdk';
-import { Subject, takeUntil } from 'rxjs';
+import { SCSDKSettingsService } from '@repo/angular-sdk';
 import { SSOService } from '@soundcore/sso';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-settings',
@@ -28,8 +28,8 @@ export class SettingsComponent implements OnInit, OnDestroy {
   }
 
   public ngOnDestroy(): void {
-      this._destroy.next();
-      this._destroy.complete();
+    this._destroy.next();
+    this._destroy.complete();
   }
 
 }

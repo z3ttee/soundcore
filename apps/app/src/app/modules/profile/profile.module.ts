@@ -1,12 +1,12 @@
-import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ProfileInfoComponent } from './views/profile-info/profile-info.component';
+import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { SCDKUserModule, SCSDKProfileModule } from '@soundcore/sdk';
-import { Error404Module } from 'src/app/shared/error404/error404.module';
-import { ListViewModule } from 'src/app/components/resource-views/list-view/list-view.module';
-import { SCNGXPlaylistGridItemModule, SCNGXScrollingModule, SCNGXTooltipModule, SCNGXUiRowModule } from '@soundcore/ngx';
+import { SCNGXPlaylistGridItemModule, SCNGXScrollingModule, SCNGXTooltipModule, SCNGXUiRowModule } from '@repo/angular-components';
+import { SCDKUserModule, SCSDKProfileModule } from '@repo/angular-sdk';
 import { SCNGXArtistListItemModule } from 'src/app/components/list-items/artist-list-item/artist-list-item.module';
+import { ListViewModule } from 'src/app/components/resource-views/list-view/list-view.module';
+import { Error404Module } from 'src/app/shared/error404/error404.module';
+import { ProfileInfoComponent } from './views/profile-info/profile-info.component';
 
 const routes: Routes = [
   { path: "", redirectTo: "@me", pathMatch: "full" },

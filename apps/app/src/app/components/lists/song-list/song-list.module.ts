@@ -1,9 +1,9 @@
 import { CommonModule } from "@angular/common";
 import { NgModule } from "@angular/core";
-import { SCNGXScrollingModule } from "@soundcore/ngx";
-import { SongListComponent } from "./song-list.component";
+import { SCNGXScrollingModule } from "@repo/angular-components";
 import { SCNGXSongListItemModule } from "../../list-items/song-list-item/song-list-item.module";
 import { SongContextMenuModule } from "../../menus/song-context-menu/song-context-menu.module";
+import { SongListComponent } from "./song-list.component";
 
 @NgModule({
     declarations: [
@@ -19,4 +19,4 @@ import { SongContextMenuModule } from "../../menus/song-context-menu/song-contex
         SongListComponent
     ]
 })
-export class SongListModule {}
+export class SongListModule { }

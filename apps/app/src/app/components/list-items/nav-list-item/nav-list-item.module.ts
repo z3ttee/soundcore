@@ -2,7 +2,7 @@ import { CommonModule } from "@angular/common";
 import { NgModule } from "@angular/core";
 import { RouterModule } from "@angular/router";
 import { NgIconsModule } from "@ng-icons/core";
-import { SCNGXArtworkModule } from "@soundcore/ngx";
+import { SCNGXArtworkModule } from "@repo/angular-components";
 import { NavListItemComponent } from "./nav-list-item.component";
 
 @NgModule({
@@ -19,4 +19,4 @@ import { NavListItemComponent } from "./nav-list-item.component";
         NavListItemComponent
     ]
 })
-export class NavListItemModule {}
+export class NavListItemModule { }

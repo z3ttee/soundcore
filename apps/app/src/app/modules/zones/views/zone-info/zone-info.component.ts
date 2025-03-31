@@ -1,9 +1,9 @@
 import { HttpClient } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { SCNGXDatasource, SCNGXDialogService } from '@repo/angular-components';
+import { ApiError, ApplicationInfo, Future, Mount, SCSDKAdminGateway, SCSDKAppService, SCSDKZoneService, toFuture, Zone } from '@repo/angular-sdk';
 import { BehaviorSubject, combineLatest, filter, map, Observable, Subject, switchMap, takeUntil, tap } from 'rxjs';
-import { SCNGXDatasource, SCNGXDialogService } from '@soundcore/ngx';
-import { ApiError, ApplicationInfo, Zone, Future, Mount, SCSDKAdminGateway, SCSDKAppService, SCSDKZoneService, toFuture } from '@soundcore/sdk';
 import { AppMountCreateDialog, MountCreateDialogOptions } from 'src/app/dialogs/mount-create-dialog/mount-create-dialog.component';
 import { environment } from 'src/environments/environment';
 
@@ -46,7 +46,7 @@ export class ZoneInfoComponent implements OnDestroy {
         return this.zoneService.findById(zoneId).pipe(
           toFuture(),
           map((request): [Future<Zone>, SCNGXDatasource<Mount>] => {
-            if(request.data) return [request, new SCNGXDatasource(this.httpClient, `${environment.api_base_uri}/v1/mounts/bucket/${zoneId}`, 8)]
+            if (request.data) return [request, new SCNGXDatasource(this.httpClient, `${environment.api_base_uri}/v1/mounts/bucket/${zoneId}`, 8)]
             return [request, null]
           })
         );
@@ -68,8 +68,8 @@ export class ZoneInfoComponent implements OnDestroy {
   );
 
   public ngOnDestroy(): void {
-      this._destroy.next();
-      this._destroy.complete();
+    this._destroy.next();
+    this._destroy.complete();
   }
 
   public openMountCreateDialog(zone: Zone, datasource: SCNGXDatasource<Mount>) {
@@ -78,7 +78,7 @@ export class ZoneInfoComponent implements OnDestroy {
         bucketId: zone.id
       }
     }).$afterClosed.pipe(takeUntil(this._destroy)).subscribe((result) => {
-      if(result != null) datasource.append(result);
+      if (result != null) datasource.append(result);
     });
   }
 }

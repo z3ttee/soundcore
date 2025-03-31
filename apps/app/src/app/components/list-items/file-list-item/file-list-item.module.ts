@@ -1,8 +1,8 @@
-import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { SCNGXArtworkModule, SCNGXBytesPipeModule, SCNGXExplicitBadgeModule, SCNGXFileFlagPipeModule, SCNGXSkeletonModule, SCNGXStatusIndicatorModule } from '@soundcore/ngx';
-import { SCNGXFileListItemComponent } from './file-list-item.component';
+import { NgModule } from '@angular/core';
 import { RouterModule } from '@angular/router';
+import { SCNGXArtworkModule, SCNGXBytesPipeModule, SCNGXExplicitBadgeModule, SCNGXFileFlagPipeModule, SCNGXSkeletonModule, SCNGXStatusIndicatorModule } from '@repo/angular-components';
+import { SCNGXFileListItemComponent } from './file-list-item.component';
 
 @NgModule({
   declarations: [

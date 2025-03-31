@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { Task } from '@soundcore/sdk';
+import { Task } from '@repo/angular-sdk';
 
 @Component({
   selector: 'scngx-task-list-item',
@@ -8,7 +8,7 @@ import { Task } from '@soundcore/sdk';
 })
 export class SCNGXTaskListItemComponent {
 
-  @Input() 
+  @Input()
   public task?: Task;
 
   @Input()
@@ -19,23 +19,23 @@ export class SCNGXTaskListItemComponent {
   // }
 
   public getDuration(): string {
-    if(!this.task?.createdAt || !this.task?.updatedAt) return "---";
+    if (!this.task?.createdAt || !this.task?.updatedAt) return "---";
     const startedAt = new Date(this.task?.createdAt);
     const endedAt = new Date(this.task?.updatedAt);
     const diffMs = endedAt.getTime() - startedAt.getTime();
 
-    if(diffMs < 0) return "---";
+    if (diffMs < 0) return "---";
 
     const seconds = Math.floor((diffMs / 1000) % 60);
     const minutes = Math.floor((diffMs / (1000 * 60)) % 60);
     const hours = Math.floor((diffMs / (1000 * 60 * 60)) % 24);
 
     let outputs = "";
-    if(hours > 0) outputs += `${hours}h `;
-    if(minutes > 0) outputs += `${minutes}m `;
-    if(seconds >= 0) outputs += `${seconds}s`;
+    if (hours > 0) outputs += `${hours}h `;
+    if (minutes > 0) outputs += `${minutes}m `;
+    if (seconds >= 0) outputs += `${seconds}s`;
 
     return outputs;
   }
-  
+
 }

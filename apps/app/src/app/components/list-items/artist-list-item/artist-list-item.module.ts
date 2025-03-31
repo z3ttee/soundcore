@@ -1,10 +1,10 @@
-import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { SCNGXArtistListItemComponent } from './artist-list-item.component';
-import { LottieModule } from 'ngx-lottie';
+import { NgModule } from '@angular/core';
 import { MatRippleModule } from '@angular/material/core';
 import { RouterModule } from '@angular/router';
-import { SCNGXArtworkModule, SCNGXSkeletonModule } from '@soundcore/ngx';
+import { SCNGXArtworkModule, SCNGXSkeletonModule } from '@repo/angular-components';
+import { LottieModule } from 'ngx-lottie';
+import { SCNGXArtistListItemComponent } from './artist-list-item.component';
 
 @NgModule({
   declarations: [

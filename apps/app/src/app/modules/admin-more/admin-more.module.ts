@@ -1,10 +1,10 @@
-import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { AdminMoreComponent } from './views/admin-more/admin-more.component';
-import { SCNGXButtonModule, SCNGXUiTitleModule } from '@soundcore/ngx';
 import { NgIconsModule } from '@ng-icons/core';
-import { heroCog6Tooth, heroArrowRightOnRectangle } from '@ng-icons/heroicons/outline';
+import { heroArrowRightOnRectangle, heroCog6Tooth } from '@ng-icons/heroicons/outline';
+import { SCNGXButtonModule, SCNGXUiTitleModule } from '@repo/angular-components';
+import { AdminMoreComponent } from './views/admin-more/admin-more.component';
 
 const routes: Routes = [
   { path: "", component: AdminMoreComponent }

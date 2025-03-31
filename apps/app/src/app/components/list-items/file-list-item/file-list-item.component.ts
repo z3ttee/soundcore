@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
-import { File, FileFlag } from '@soundcore/sdk';
-import { StatusIndicatorAppearance } from "@soundcore/ngx";
+import { StatusIndicatorAppearance } from "@repo/angular-components";
+import { File, FileFlag } from '@repo/angular-sdk';
 
 @Component({
   selector: 'app-file-list-item',
@@ -9,7 +9,7 @@ import { StatusIndicatorAppearance } from "@soundcore/ngx";
 })
 export class SCNGXFileListItemComponent implements OnInit, OnChanges {
 
-  @Input() 
+  @Input()
   public file: File;
 
   @Input()
@@ -27,15 +27,15 @@ export class SCNGXFileListItemComponent implements OnInit, OnChanges {
   }
 
   private init() {
-    if(this.file.flag == FileFlag.OK) {
+    if (this.file.flag == FileFlag.OK) {
       this.indicatorAppearance = "success";
       return;
     }
-    if(this.file.flag == FileFlag.POTENTIAL_DUPLICATE || this.file.flag == FileFlag.PENDING_ANALYSIS) {
+    if (this.file.flag == FileFlag.POTENTIAL_DUPLICATE || this.file.flag == FileFlag.PENDING_ANALYSIS) {
       this.indicatorAppearance = "warn";
       return;
     }
-    if(this.file.flag == FileFlag.ERROR) {
+    if (this.file.flag == FileFlag.ERROR) {
       this.indicatorAppearance = "error";
       return;
     }

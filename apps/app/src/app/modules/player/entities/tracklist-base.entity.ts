@@ -1,9 +1,9 @@
 import { HttpClient } from "@angular/common/http";
-import { ApiError, Future, LikedSong, PlayableEntity, PlaylistItem, Song, toFuture, TracklistV2 } from "@soundcore/sdk";
+import { ApiError, Future, LikedSong, PlayableEntity, PlaylistItem, Song, toFuture, TracklistV2 } from "@repo/angular-sdk";
 import { isNull, isString, Page, Pageable } from "@repo/utilities";
 import { BehaviorSubject, filter, map, Observable, of, Subject, switchMap, take, takeUntil, tap } from "rxjs";
-import { Queue } from "./queue";
 import { Cache } from "./cache";
+import { Queue } from "./queue";
 
 export const PAGE_SIZE = 30;
 export type TracklistWithoutItems<T extends TracklistEntityTypes = Song> = Omit<TracklistV2<T>, "items">;

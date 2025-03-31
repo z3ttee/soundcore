@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, OnDestroy } from "@angular/core";
-import { DeviceInfo, Future, SCSDKMetricsService } from "@soundcore/sdk";
+import { DeviceInfo, Future, SCSDKMetricsService } from "@repo/angular-sdk";
 import { SSOService, SSOUser } from "@soundcore/sso";
 import { combineLatest, map, Observable, Subject } from "rxjs";
 
@@ -17,7 +17,7 @@ export class DashboardIndexView implements OnDestroy {
     constructor(
         private readonly authService: SSOService,
         private readonly metricsService: SCSDKMetricsService
-    ) {}
+    ) { }
 
     private readonly $destroy: Subject<void> = new Subject();
 

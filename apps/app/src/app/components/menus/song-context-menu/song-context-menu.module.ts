@@ -1,16 +1,15 @@
-import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { SongContextMenuComponent } from './song-context-menu.component';
-import { SCCDKContextMenuModule } from '@soundcore/cdk';
-import { AppPlaylistChooseDialogModule } from 'src/app/dialogs/playlist-choose-dialog/playlist-choose-dialog.module';
+import { NgModule } from '@angular/core';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
-import { SCNGXDialogModule } from '@soundcore/ngx';
-import { SCSDKCollectionModule } from '@soundcore/sdk';
-import { SCNGXDividerModule } from '@soundcore/ngx';
 import { RouterModule } from '@angular/router';
 import { NgIconsModule } from '@ng-icons/core';
-import { heroSquaresPlus, heroRectangleStack, heroHeart } from '@ng-icons/heroicons/outline';
-import { heroPlaySolid, heroMinusSolid } from '@ng-icons/heroicons/solid';
+import { heroHeart, heroRectangleStack, heroSquaresPlus } from '@ng-icons/heroicons/outline';
+import { heroMinusSolid, heroPlaySolid } from '@ng-icons/heroicons/solid';
+import { SCNGXDialogModule, SCNGXDividerModule } from '@repo/angular-components';
+import { SCSDKCollectionModule } from '@repo/angular-sdk';
+import { SCCDKContextMenuModule } from '@soundcore/cdk';
+import { AppPlaylistChooseDialogModule } from 'src/app/dialogs/playlist-choose-dialog/playlist-choose-dialog.module';
+import { SongContextMenuComponent } from './song-context-menu.component';
 
 @NgModule({
   declarations: [

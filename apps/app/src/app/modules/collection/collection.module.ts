@@ -1,14 +1,14 @@
-import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { CollectionComponent } from './views/collection/collection.component';
-import { RouterModule, Routes } from '@angular/router';
-import { SCSDKCollectionModule } from '@soundcore/sdk';
-import { Error404Module } from 'src/app/shared/error404/error404.module';
-import { SCNGXSongListItemModule } from 'src/app/components/list-items/song-list-item/song-list-item.module';
-import { ListViewModule } from 'src/app/components/resource-views/list-view/list-view.module';
-import { SCNGXIconBtnModule, SCNGXScrollingModule } from '@soundcore/ngx';
-import { SCNGXCollectionViewModule } from 'src/app/components/resource-views/collection-view/collection-view.module';
+import { NgModule } from '@angular/core';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { RouterModule, Routes } from '@angular/router';
+import { SCNGXIconBtnModule, SCNGXScrollingModule } from '@repo/angular-components';
+import { SCSDKCollectionModule } from '@repo/angular-sdk';
+import { SCNGXSongListItemModule } from 'src/app/components/list-items/song-list-item/song-list-item.module';
+import { SCNGXCollectionViewModule } from 'src/app/components/resource-views/collection-view/collection-view.module';
+import { ListViewModule } from 'src/app/components/resource-views/list-view/list-view.module';
+import { Error404Module } from 'src/app/shared/error404/error404.module';
+import { CollectionComponent } from './views/collection/collection.component';
 
 const routes: Routes = [
   { path: "", component: CollectionComponent }

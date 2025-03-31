@@ -1,7 +1,7 @@
-import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { NgModule } from '@angular/core';
+import { SCNGXArtworkModule, SCNGXResourceGridItemModule } from '@repo/angular-components';
 import { SongGridItemComponent } from './song-grid-item.component';
-import { SCNGXArtworkModule, SCNGXResourceGridItemModule } from '@soundcore/ngx';
 
 @NgModule({
   declarations: [

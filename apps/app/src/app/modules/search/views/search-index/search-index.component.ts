@@ -1,12 +1,12 @@
 import { HttpClient } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
 import { UntypedFormControl } from '@angular/forms';
-import { Router } from '@angular/router';
-import { combineLatest, debounceTime, Observable, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
-import { SCCDKScreenService } from '@soundcore/cdk';
-import { SCDKGenreService, MeiliAlbum, MeiliArtist, SCSDKSearchService, SCDKResource, MeiliPlaylist, MeiliUser, SCDKUserService, SCDKAlbumService, MeiliSong, SCSDKSongService, SCSDKPlaylistService, SCSDKArtistService } from '@soundcore/sdk';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { Router } from '@angular/router';
+import { MeiliAlbum, MeiliArtist, MeiliPlaylist, MeiliSong, MeiliUser, SCDKAlbumService, SCDKGenreService, SCDKResource, SCDKUserService, SCSDKArtistService, SCSDKPlaylistService, SCSDKSearchService, SCSDKSongService } from '@repo/angular-sdk';
 import { Pageable } from '@repo/utilities';
+import { SCCDKScreenService } from '@soundcore/cdk';
+import { combineLatest, debounceTime, Observable, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
 
 interface SearchIndexProps {
   query?: string;

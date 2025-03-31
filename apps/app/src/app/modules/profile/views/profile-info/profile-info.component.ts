@@ -1,8 +1,8 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Subject, takeUntil } from 'rxjs';
-import { Playlist, SCSDKPlaylistService, SCDKUserService, User, SCSDKProfileService, Artist } from '@soundcore/sdk';
+import { Artist, Playlist, SCDKUserService, SCSDKPlaylistService, SCSDKProfileService, User } from '@repo/angular-sdk';
 import { Pageable } from '@repo/utilities';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-profile-info',

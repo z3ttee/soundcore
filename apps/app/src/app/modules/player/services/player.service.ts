@@ -1,14 +1,14 @@
-import { Injectable } from "@angular/core";
-import { isNull, toVoid } from "@repo/utilities";
-import { LikedSong, PlayableEntity, PlayableEntityType, PlaylistItem, SCSDKStreamService, Song } from "@soundcore/sdk";
-import { BehaviorSubject, distinctUntilChanged, filter, map, Observable, of, switchMap, take, tap } from "rxjs";
-import { SCNGXTracklist } from "../entities/tracklist.entity";
-import { AudioQueue } from "./queue.service";
-import { environment } from "src/environments/environment";
 import { HttpClient } from "@angular/common/http";
+import { Injectable } from "@angular/core";
+import { LikedSong, PlayableEntity, PlayableEntityType, PlaylistItem, SCSDKStreamService, Song } from "@repo/angular-sdk";
+import { isNull, toVoid } from "@repo/utilities";
+import { BehaviorSubject, distinctUntilChanged, filter, map, Observable, of, switchMap, take, tap } from "rxjs";
+import { environment } from "src/environments/environment";
+import { SCNGXTracklist } from "../entities/tracklist.entity";
 import { AudioManager } from "../managers/audio-manager";
-import { VolumeManager } from "../managers/volume-manager";
 import { ShuffleManager } from "../managers/shuffle-manager";
+import { VolumeManager } from "../managers/volume-manager";
+import { AudioQueue } from "./queue.service";
 
 export type PlayableItem = Song & PlaylistItem & LikedSong
 

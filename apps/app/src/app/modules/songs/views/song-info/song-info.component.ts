@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, OnDestroy } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
-import { SCSDKSongService, Song } from "@soundcore/sdk";
+import { SCSDKSongService, Song } from "@repo/angular-sdk";
 import { combineLatest, map, Observable, Subject, switchMap, takeUntil } from "rxjs";
 import { AUDIOWAVE_LOTTIE_OPTIONS } from "src/app/constants";
 
@@ -26,7 +26,7 @@ export class SongInfoViewComponent implements OnDestroy {
     constructor(
         private readonly activatedRoute: ActivatedRoute,
         private readonly songService: SCSDKSongService,
-    ) {}
+    ) { }
 
     public readonly $props: Observable<SongInfoViewProps> = combineLatest([
         this.activatedRoute.paramMap.pipe(

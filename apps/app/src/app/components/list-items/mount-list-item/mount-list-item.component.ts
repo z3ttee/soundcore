@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { Mount } from "@soundcore/sdk";
+import { Mount } from "@repo/angular-sdk";
 
 @Component({
   selector: 'app-mount-list-item',
@@ -8,7 +8,7 @@ import { Mount } from "@soundcore/sdk";
 })
 export class MountListItemComponent {
 
-  @Input() 
+  @Input()
   public mount: Mount;
 
   @Input()

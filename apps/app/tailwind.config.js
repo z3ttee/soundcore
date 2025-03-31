@@ -6,7 +6,7 @@ module.exports = {
   content: [
     "./src/**/*.{html,ts}",
     "./projects/**/*.{html,ts,scss,css}",
-    "../../node_modules/@soundcore/ngx/dist/**/*.{html,ts,scss,css,mjs,js}",
+    "../../node_modules/@repo/angular-components/dist/**/*.{html,ts,scss,css,mjs,js}",
     "../../node_modules/@soundcore/cdk/dist/**/*.{html,ts,scss,css,mjs,js}"
   ]
 }

@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, OnDestroy } from "@angular/core";
-import { Song } from "@soundcore/sdk";
+import { Song } from "@repo/angular-sdk";
 import { Observable, Subject, combineLatest, map, takeUntil } from "rxjs";
 import { AUDIOWAVE_LOTTIE_OPTIONS } from "src/app/constants";
 import { SCNGXTracklist } from "src/app/modules/player/entities/tracklist.entity";
@@ -29,7 +29,7 @@ export class QueueViewComponent implements OnDestroy {
     constructor(
         private readonly queue: AudioQueue,
         private readonly player: PlayerService
-    ) {}
+    ) { }
 
     public $props: Observable<QueueViewProps> = combineLatest([
         this.queue.$queue,

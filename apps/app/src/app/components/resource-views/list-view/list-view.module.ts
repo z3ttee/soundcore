@@ -1,8 +1,8 @@
-import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ListViewComponent } from './list-view.component';
-import { SCNGXSkeletonModule, SCNGXSongDurationPipeModule, SCNGXArtworkModule } from '@soundcore/ngx';
+import { NgModule } from '@angular/core';
 import { MatRippleModule } from '@angular/material/core';
+import { SCNGXArtworkModule, SCNGXSkeletonModule, SCNGXSongDurationPipeModule } from '@repo/angular-components';
+import { ListViewComponent } from './list-view.component';
 
 @NgModule({
   declarations: [

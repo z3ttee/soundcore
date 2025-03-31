@@ -1,6 +1,6 @@
-import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from "@angular/core";
-import { DialogRef } from "@soundcore/ngx";
-import { ApiError, FailedSpotifyImport, ImportReport, ImportSpotifyReport, SCSDKImportService, SpotifyImport, toFutureCompat } from "@soundcore/sdk";
+import { ChangeDetectionStrategy, Component, OnDestroy } from "@angular/core";
+import { DialogRef } from "@repo/angular-components";
+import { ApiError, ImportReport, ImportSpotifyReport, SCSDKImportService, SpotifyImport, toFutureCompat } from "@repo/angular-sdk";
 import { combineLatest, map, Observable, Subject, takeUntil } from "rxjs";
 
 export interface ReportDialogOptions {
@@ -25,7 +25,7 @@ export class ReportDialogComponent implements OnDestroy {
     constructor(
         public readonly dialogRef: DialogRef<ReportDialogOptions, SpotifyImport>,
         private readonly reportService: SCSDKImportService,
-    ) {}
+    ) { }
 
     public readonly $props: Observable<ReportDialogProps> = combineLatest([
         this.reportService.findReportByTaskid(this.dialogRef.config?.data?.data?.id).pipe(toFutureCompat(), takeUntil(this._destroy))

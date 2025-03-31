@@ -1,11 +1,11 @@
-import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { SCNGXSkeletonModule, SCNGXStatusIndicatorModule } from '@soundcore/ngx';
-import { SCNGXTaskListItemComponent } from './task-list-item.component';
+import { NgModule } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { NgIconsModule } from '@ng-icons/core';
-import { heroChevronRight, heroCalendarDays, heroClock } from '@ng-icons/heroicons/outline';
+import { heroCalendarDays, heroChevronRight, heroClock } from '@ng-icons/heroicons/outline';
+import { SCNGXSkeletonModule, SCNGXStatusIndicatorModule } from '@repo/angular-components';
 import { SCNGXTaskStatusIconModule } from '../../icons/task-status-icon/task-status-icon.module';
+import { SCNGXTaskListItemComponent } from './task-list-item.component';
 
 @NgModule({
   declarations: [

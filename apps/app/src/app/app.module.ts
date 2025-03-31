@@ -1,15 +1,15 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
+import { HttpClientModule } from '@angular/common/http';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { SCNGXDialogModule, SCNGXModule } from '@repo/angular-components';
+import { provideAuthentication } from '@repo/angular-oidc';
+import { SCSDKModule, SCSDKMountModule } from '@repo/angular-sdk';
+import { SCCDKScreenModule } from '@soundcore/cdk';
+import { environment } from 'src/environments/environment';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { SCSDKModule, SCSDKMountModule } from '@soundcore/sdk';
-import { environment } from 'src/environments/environment';
-import { SCNGXModule, SCNGXDialogModule } from '@soundcore/ngx';
-import { SCCDKScreenModule } from '@soundcore/cdk';
-import { HttpClientModule } from '@angular/common/http';
-import { provideAuthentication } from '@repo/angular-oidc';
 
 @NgModule({
   declarations: [

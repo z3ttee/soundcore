@@ -1,8 +1,8 @@
-import { Future, PlayableEntity, Song } from "@soundcore/sdk";
-import { SCNGXBaseTracklist } from "./tracklist-base.entity";
 import { HttpClient } from "@angular/common/http";
-import { Observable, filter } from "rxjs";
+import { Future, PlayableEntity, Song } from "@repo/angular-sdk";
 import { isNull } from "@repo/utilities";
+import { Observable, filter } from "rxjs";
+import { SCNGXBaseTracklist } from "./tracklist-base.entity";
 
 /**
  * Tracklist class to handle tracklists by providing an integrated queueing system

@@ -1,9 +1,9 @@
 import { Injectable } from "@angular/core";
+import { Future, PlayableEntityType } from "@repo/angular-sdk";
 import { isNull } from "@repo/utilities";
-import { Future, PlayableEntityType } from "@soundcore/sdk";
-import { BehaviorSubject, Observable, combineLatest, distinctUntilChanged, map, of, switchMap } from "rxjs";
-import { PlayableItem } from "./player.service";
+import { BehaviorSubject, Observable, combineLatest, map, of, switchMap } from "rxjs";
 import { SCNGXTracklist } from "../entities/tracklist.entity";
+import { PlayableItem } from "./player.service";
 
 export class EnqueuedItem {
     constructor(

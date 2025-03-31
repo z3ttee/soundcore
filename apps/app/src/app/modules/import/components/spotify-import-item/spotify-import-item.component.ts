@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from "@angular/core";
-import { ImportTask, Playlist } from "@soundcore/sdk";
+import { ImportTask, Playlist } from "@repo/angular-sdk";
 
 @Component({
     selector: "app-spotify-import",

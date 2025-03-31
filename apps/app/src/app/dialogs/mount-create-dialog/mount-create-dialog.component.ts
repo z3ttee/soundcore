@@ -1,8 +1,8 @@
 import { Component, OnDestroy } from "@angular/core";
 import { FormControl, FormGroup, Validators } from "@angular/forms";
+import { DialogRef } from "@repo/angular-components";
+import { Mount, SCSDKMountService } from "@repo/angular-sdk";
 import { Subject, takeUntil } from "rxjs";
-import { DialogRef } from "@soundcore/ngx";
-import { Mount, SCSDKMountService } from "@soundcore/sdk";
 
 export interface MountCreateDialogOptions {
     bucketId?: string;
@@ -18,7 +18,7 @@ export class AppMountCreateDialog implements OnDestroy {
     constructor(
         public readonly dialogRef: DialogRef<MountCreateDialogOptions, Mount>,
         private readonly mountService: SCSDKMountService,
-    ) {}
+    ) { }
 
     private readonly _destroy: Subject<void> = new Subject();
 
@@ -44,24 +44,24 @@ export class AppMountCreateDialog implements OnDestroy {
     public errorMessage: string;
 
     public async submit() {
-        if(this.loading) return;
+        if (this.loading) return;
         this.form.markAllAsTouched();
-        if(this.form.invalid) return;
+        if (this.form.invalid) return;
 
         this.loading = true;
 
 
         // Handle editor mode == "edit"
-        if(this.dialogRef.config.data.mode == "edit") {
+        if (this.dialogRef.config.data.mode == "edit") {
             this.mountService.update(this.dialogRef.config.data.data?.id, {
                 name: this.form.get("name").value,
                 isDefault: this.form.get("setAsDefault").value,
                 doScan: this.form.get("doScan").value
             }).pipe((takeUntil(this._destroy))).subscribe((request) => {
                 this.loading = request.loading;
-                if(request.loading) return;
+                if (request.loading) return;
 
-                if(request.error) {
+                if (request.error) {
                     this.errorMessage = request.error?.message;
                     return;
                 }
@@ -80,14 +80,14 @@ export class AppMountCreateDialog implements OnDestroy {
             doScan: this.form.get("doScan").value
         }).pipe(takeUntil(this._destroy)).subscribe((request) => {
             this.loading = request.loading;
-            if(request.loading) return;
+            if (request.loading) return;
 
-            if(request.error) {
+            if (request.error) {
                 this.errorMessage = request.error?.message;
                 return;
             }
 
-            if(!request.data?.existed) {
+            if (!request.data?.existed) {
                 this.dialogRef.close(request.data.data);
             } else {
                 this.dialogRef.close(null);

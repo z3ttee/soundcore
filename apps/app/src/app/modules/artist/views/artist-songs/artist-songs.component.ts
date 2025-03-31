@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { Artist, Future, SCSDKArtistService, SCSDKDatasource, SCSDKSongService, Song } from '@repo/angular-sdk';
 import { combineLatest, map, Observable, startWith, Subject, switchMap } from 'rxjs';
-import { Artist, Future, SCSDKArtistService, SCSDKDatasource, SCSDKSongService, Song, toFutureCompat } from '@soundcore/sdk';
 import { AUDIOWAVE_LOTTIE_OPTIONS } from 'src/app/constants';
 import { PlayerService } from 'src/app/modules/player/services/player.service';
 
@@ -41,7 +41,7 @@ export class ArtistSongsComponent implements OnDestroy {
    * artist data in future format
    */
   public $artist: Observable<Future<Artist>> = this.$artistId.pipe(switchMap((artistId) => this.artistService.findById(artistId)));
-  
+
   /**
    * Observable that emits current datasource
    * of tracks
@@ -52,7 +52,7 @@ export class ArtistSongsComponent implements OnDestroy {
     // Get changes to artist
     this.$artist,
     // Get paused state
-    this.playerService.$isPaused.pipe(startWith(true)), 
+    this.playerService.$isPaused.pipe(startWith(true)),
     // Get current tracklist id
     this.playerService.$currentItem.pipe(startWith(null)),
   ]).pipe(
@@ -71,8 +71,8 @@ export class ArtistSongsComponent implements OnDestroy {
   );
 
   public ngOnDestroy(): void {
-      this._destroy.next();
-      this._destroy.complete();
+    this._destroy.next();
+    this._destroy.complete();
   }
 
   public forcePlay(artist: Artist) {

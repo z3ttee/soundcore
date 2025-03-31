@@ -1,14 +1,14 @@
-import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { NgModule } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { AdminLayoutComponent } from './admin-layout.component';
-import { ProfileBarModule } from 'src/app/components/profile-bar/profile-bar.module';
-import { SCNGXBottomNavModule, SCNGXDrawerModule, SCNGXProgressbarModule, SCNGXToolbarModule } from '@soundcore/ngx';
-import { SCSDKImportModule } from '@soundcore/sdk';
 import { NgIconsModule } from '@ng-icons/core';
-import { heroPlusSolid, heroEllipsisVerticalSolid } from '@ng-icons/heroicons/solid';
-import { heroHome, heroShieldExclamation, heroCubeTransparent, heroArrowRightOnRectangle, heroCog6Tooth, heroDocumentPlus, heroChartPie, heroBell, heroMagnifyingGlass, heroUser, heroBookmarkSquare, heroChevronDown } from '@ng-icons/heroicons/outline';
+import { heroArrowRightOnRectangle, heroBell, heroBookmarkSquare, heroChartPie, heroChevronDown, heroCog6Tooth, heroCubeTransparent, heroDocumentPlus, heroHome, heroMagnifyingGlass, heroShieldExclamation, heroUser } from '@ng-icons/heroicons/outline';
+import { heroEllipsisVerticalSolid, heroPlusSolid } from '@ng-icons/heroicons/solid';
+import { SCNGXBottomNavModule, SCNGXDrawerModule, SCNGXProgressbarModule, SCNGXToolbarModule } from '@repo/angular-components';
+import { SCSDKImportModule } from '@repo/angular-sdk';
 import { NavListItemModule } from 'src/app/components/list-items/nav-list-item/nav-list-item.module';
+import { ProfileBarModule } from 'src/app/components/profile-bar/profile-bar.module';
+import { AdminLayoutComponent } from './admin-layout.component';
 
 @NgModule({
   declarations: [
@@ -19,7 +19,7 @@ import { NavListItemModule } from 'src/app/components/list-items/nav-list-item/n
     RouterModule,
     ProfileBarModule,
     NavListItemModule,
-        
+
     SCNGXDrawerModule,
     SCNGXBottomNavModule,
     SCNGXProgressbarModule,
@@ -27,13 +27,13 @@ import { NavListItemModule } from 'src/app/components/list-items/nav-list-item/n
 
     SCSDKImportModule,
 
-    NgIconsModule.withIcons({ 
-      heroHome, 
-      heroMagnifyingGlass, 
-      heroUser, 
-      heroBookmarkSquare, 
-      heroChevronDown, 
-      heroPlusSolid, 
+    NgIconsModule.withIcons({
+      heroHome,
+      heroMagnifyingGlass,
+      heroUser,
+      heroBookmarkSquare,
+      heroChevronDown,
+      heroPlusSolid,
       heroBell,
       heroEllipsisVerticalSolid,
       heroCog6Tooth,

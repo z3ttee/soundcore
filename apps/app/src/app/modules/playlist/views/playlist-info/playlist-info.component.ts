@@ -1,11 +1,11 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { combineLatest, map, Observable, startWith, Subject, switchMap, takeUntil } from 'rxjs';
-import { Future, Playlist, SCSDKDatasource, SCSDKPlaylistService, SCSDKSongService, Song } from '@soundcore/sdk';
-import { AUDIOWAVE_LOTTIE_OPTIONS } from 'src/app/constants';
-import { PlayerService } from 'src/app/modules/player/services/player.service';
-import { SCNGXTracklist } from 'src/app/modules/player/entities/tracklist.entity';
+import { Future, Playlist, SCSDKDatasource, SCSDKPlaylistService, SCSDKSongService, Song } from '@repo/angular-sdk';
 import { SSOService, SSOUser } from '@soundcore/sso';
+import { combineLatest, map, Observable, startWith, Subject, switchMap, takeUntil } from 'rxjs';
+import { AUDIOWAVE_LOTTIE_OPTIONS } from 'src/app/constants';
+import { SCNGXTracklist } from 'src/app/modules/player/entities/tracklist.entity';
+import { PlayerService } from 'src/app/modules/player/services/player.service';
 
 interface PlaylistInfoProps {
   playlist?: Future<Playlist>;
@@ -30,7 +30,7 @@ export class PlaylistInfoComponent implements OnInit, OnDestroy {
     private readonly playerService: PlayerService,
     private readonly songService: SCSDKSongService,
     private readonly ssoService: SSOService
-  ) {}
+  ) { }
 
   // Lottie animations options
   public animOptions = AUDIOWAVE_LOTTIE_OPTIONS;
@@ -52,12 +52,12 @@ export class PlaylistInfoComponent implements OnInit, OnDestroy {
    * of tracks
    */
   public $datasource: Observable<SCSDKDatasource<Song>> = this.$playlistId.pipe(switchMap((playlistId) => this.songService.findByPlaylistDatasource(playlistId)));
-  
+
   public readonly $props: Observable<PlaylistInfoProps> = combineLatest([
     // Get changes to playlist
     this.$playlist,
     // Get paused state
-    this.playerService.$isPaused.pipe(startWith(true)), 
+    this.playerService.$isPaused.pipe(startWith(true)),
     // Get current tracklist id
     this.playerService.$currentItem.pipe(startWith(null)),
     // Get user data
@@ -79,11 +79,11 @@ export class PlaylistInfoComponent implements OnInit, OnDestroy {
     takeUntil(this.$destroy)
   );
 
-  public ngOnInit(): void {}
+  public ngOnInit(): void { }
 
   public ngOnDestroy(): void {
-      this.$destroy.next();
-      this.$destroy.complete();
+    this.$destroy.next();
+    this.$destroy.complete();
   }
 
   public forcePlay(playlist: Playlist) {

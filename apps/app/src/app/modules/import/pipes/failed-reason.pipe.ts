@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from "@angular/core";
-import { FailedReason } from "@soundcore/sdk";
+import { FailedReason } from "@repo/angular-sdk";
 
 @Pipe({
     name: "failedReasonPipe"
@@ -7,11 +7,11 @@ import { FailedReason } from "@soundcore/sdk";
 export class FailedReasonPipe implements PipeTransform {
 
     transform(value: FailedReason): string {
-        if(value == FailedReason.NOT_FOUND) {
+        if (value == FailedReason.NOT_FOUND) {
             return "Nicht gefunden"
         } else {
             return "Fehlgeschlagen"
         }
     }
-    
+
 }

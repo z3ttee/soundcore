@@ -1,13 +1,13 @@
-import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { SCNGXButtonModule, SCNGXDialogModule, SCNGXLoadingBtnModule } from '@soundcore/ngx';
-import { AppMountCreateDialog } from './mount-create-dialog.component'
-import { SCSDKMountModule } from '@soundcore/sdk';
-import {MatFormFieldModule} from '@angular/material/form-field';
+import { NgModule } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import {MatSelectModule} from '@angular/material/select';
-import {MatCheckboxModule} from '@angular/material/checkbox';
+import { MatSelectModule } from '@angular/material/select';
+import { SCNGXButtonModule, SCNGXDialogModule, SCNGXLoadingBtnModule } from '@repo/angular-components';
+import { SCSDKMountModule } from '@repo/angular-sdk';
+import { AppMountCreateDialog } from './mount-create-dialog.component';
 
 @NgModule({
   declarations: [

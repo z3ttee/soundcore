@@ -3,13 +3,13 @@ import { Location } from "@angular/common";
 import { Component, inject, OnDestroy, OnInit } from "@angular/core";
 import { UntypedFormControl } from "@angular/forms";
 import { NavigationCancel, NavigationEnd, NavigationError, NavigationStart, Router } from "@angular/router";
-import { SSOService, SSOUser } from "@soundcore/sso";
-import { combineLatest, filter, map, Observable, startWith, Subject, takeUntil, tap } from "rxjs";
+import { SCNGXDialogService } from "@repo/angular-components";
+import { Playlist, SCSDKGeneralGateway, SCSDKPlaylistService, SCSDKSearchService } from "@repo/angular-sdk";
 import { SCCDKScreenService } from "@soundcore/cdk";
-import { SCNGXDialogService } from "@soundcore/ngx";
-import { Playlist, SCSDKGeneralGateway, SCSDKPlaylistService, SCSDKSearchService } from "@soundcore/sdk";
-import { AppPlaylistCreateDialog } from "src/app/dialogs/playlist-create-dialog/playlist-create-dialog.component";
+import { SSOService, SSOUser } from "@soundcore/sso";
+import { combineLatest, filter, map, Observable, startWith, Subject, takeUntil } from "rxjs";
 import { SCNGXPlaylistListItemComponent } from "src/app/components/list-items/playlist-list-item/playlist-list-item.component";
+import { AppPlaylistCreateDialog } from "src/app/dialogs/playlist-create-dialog/playlist-create-dialog.component";
 
 interface MainLayoutProps {
     playlists?: Playlist[];

@@ -1,19 +1,19 @@
-import { NgModule } from "@angular/core";
-import { AscMainLayoutComponent } from "./main-layout.component";
-import { SCNGXBottomNavModule, SCNGXDrawerModule, SCNGXProgressbarModule, SCNGXScrollingModule } from "@soundcore/ngx"
-import { RouterModule } from "@angular/router";
+import { DragDropModule } from '@angular/cdk/drag-drop';
 import { CommonModule } from "@angular/common";
-import { SCSDKPlaylistModule, SCSDKSearchModule } from "@soundcore/sdk";
-import {DragDropModule} from '@angular/cdk/drag-drop';
-import { ProfileBarModule } from "src/app/components/profile-bar/profile-bar.module";
+import { NgModule } from "@angular/core";
 import { ReactiveFormsModule } from "@angular/forms";
-import { AppPlaylistCreateDialogModule } from "src/app/dialogs/playlist-create-dialog/playlist-create-dialog.module";
-import { SCNGXPlaylistListItemModule } from "src/app/components/list-items/playlist-list-item/playlist-list-item.module";
+import { RouterModule } from "@angular/router";
 import { NgIconsModule } from '@ng-icons/core';
+import { heroArrowLeft, heroArrowRightOnRectangle, heroBell, heroBolt, heroBookmarkSquare, heroChevronDown, heroCog6Tooth, heroHome, heroMagnifyingGlass, heroUser } from '@ng-icons/heroicons/outline';
 import { heroPlusSolid } from '@ng-icons/heroicons/solid';
-import { heroHome, heroArrowRightOnRectangle, heroCog6Tooth, heroBell, heroMagnifyingGlass, heroUser, heroBookmarkSquare, heroChevronDown, heroBolt, heroCubeTransparent, heroArrowLeft } from '@ng-icons/heroicons/outline';
+import { SCNGXBottomNavModule, SCNGXDrawerModule, SCNGXProgressbarModule, SCNGXScrollingModule } from "@repo/angular-components";
+import { SCSDKPlaylistModule, SCSDKSearchModule } from "@repo/angular-sdk";
 import { NavListItemModule } from "src/app/components/list-items/nav-list-item/nav-list-item.module";
+import { SCNGXPlaylistListItemModule } from "src/app/components/list-items/playlist-list-item/playlist-list-item.module";
+import { ProfileBarModule } from "src/app/components/profile-bar/profile-bar.module";
+import { AppPlaylistCreateDialogModule } from "src/app/dialogs/playlist-create-dialog/playlist-create-dialog.module";
 import { AppPlayerModule } from "src/app/modules/player/player.module";
+import { AscMainLayoutComponent } from "./main-layout.component";
 
 @NgModule({
     declarations: [
@@ -39,15 +39,15 @@ import { AppPlayerModule } from "src/app/modules/player/player.module";
         AppPlaylistCreateDialogModule,
         AppPlayerModule,
 
-        NgIconsModule.withIcons({ 
-            heroHome, 
-            heroMagnifyingGlass, 
-            heroUser, 
-            heroBookmarkSquare, 
-            heroChevronDown, 
-            heroPlusSolid, 
-            heroArrowLeft, 
-            heroBolt, 
+        NgIconsModule.withIcons({
+            heroHome,
+            heroMagnifyingGlass,
+            heroUser,
+            heroBookmarkSquare,
+            heroChevronDown,
+            heroPlusSolid,
+            heroArrowLeft,
+            heroBolt,
             heroBell,
             heroCog6Tooth,
             heroArrowRightOnRectangle
@@ -57,4 +57,4 @@ import { AppPlayerModule } from "src/app/modules/player/player.module";
         AscMainLayoutComponent
     ]
 })
-export class AscMainLayoutModule {}
+export class AscMainLayoutModule { }
