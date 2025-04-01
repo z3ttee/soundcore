@@ -77,10 +77,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "soundcore:build:production"
+              "buildTarget": "soundcore:build:production"
             },
             "development": {
-              "browserTarget": "soundcore:build:development"
+              "buildTarget": "soundcore:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -88,7 +88,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "soundcore:build"
+            "buildTarget": "soundcore:build"
           }
         },
         "test": {
