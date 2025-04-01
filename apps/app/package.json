@@ -1,12 +1,9 @@
 {
   "name": "@soundcore/app",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "scripts": {
-    "start": "ng serve",
-    "build:app": "ng build",
-    "ci:build": "ng build",
-    "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "dev": "ng serve",
+    "ci:build": "ng build"
   },
   "private": true,
   "dependencies": {
@@ -21,13 +18,13 @@
     "@angular/platform-browser-dynamic": "^15.2.0",
     "@angular/router": "^15.2.0",
     "@floating-ui/dom": "^0.4.5",
-    "@repo/angular-cdk": "*",
-    "@repo/angular-ui": "*",
     "@soundcore/tailwind": "*",
     "@ng-icons/core": "^23.1.0",
     "@ng-icons/heroicons": "^23.1.0",
     "@ng-icons/simple-icons": "^23.1.0",
     "@ng-icons/feather-icons": "^23.1.0",
+    "@repo/angular-cdk": "*",
+    "@repo/angular-ui": "*",
     "@repo/angular-oidc": "*",
     "@repo/angular-sdk": "*",
     "openid-client": "^6.3.4",
