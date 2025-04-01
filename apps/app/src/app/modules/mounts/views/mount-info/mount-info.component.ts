@@ -19,8 +19,9 @@ interface MountInfoProps {
 }
 
 @Component({
-  templateUrl: './mount-info.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+    templateUrl: './mount-info.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class MountInfoComponent implements OnInit, OnDestroy {
 

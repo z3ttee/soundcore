@@ -5,9 +5,10 @@ import { Pageable } from '@repo/utilities';
 import { Subject, takeUntil } from 'rxjs';
 
 @Component({
-  selector: 'app-profile-info',
-  templateUrl: './profile-info.component.html',
-  styleUrls: ['./profile-info.component.scss']
+    selector: 'app-profile-info',
+    templateUrl: './profile-info.component.html',
+    styleUrls: ['./profile-info.component.scss'],
+    standalone: false
 })
 export class ProfileInfoComponent implements OnInit, OnDestroy {
 

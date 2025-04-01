@@ -2,9 +2,10 @@ import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core
 import { Playlist } from '@repo/angular-sdk';
 
 @Component({
-  selector: 'scngx-playlist-list-item',
-  templateUrl: './playlist-list-item.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'scngx-playlist-list-item',
+    templateUrl: './playlist-list-item.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class SCNGXPlaylistListItemComponent implements OnInit {
 

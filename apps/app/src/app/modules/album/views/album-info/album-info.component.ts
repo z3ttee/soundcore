@@ -17,8 +17,9 @@ interface AlbumInfoProps {
 }
 
 @Component({
-  templateUrl: './album-info.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+    templateUrl: './album-info.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class AlbumInfoComponent implements OnDestroy {
 

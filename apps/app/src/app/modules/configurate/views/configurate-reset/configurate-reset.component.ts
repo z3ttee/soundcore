@@ -5,7 +5,8 @@ import { Observable, Subject, takeUntil } from "rxjs";
 
 @Component({
     templateUrl: "./configurate-reset.component.html",
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class ConfigurateResetView implements OnDestroy {
 

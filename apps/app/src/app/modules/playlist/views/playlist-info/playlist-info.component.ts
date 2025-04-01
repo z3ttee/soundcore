@@ -17,8 +17,9 @@ interface PlaylistInfoProps {
 }
 
 @Component({
-  templateUrl: './playlist-info.component.html',
-  styleUrls: ['./playlist-info.component.scss']
+    templateUrl: './playlist-info.component.html',
+    styleUrls: ['./playlist-info.component.scss'],
+    standalone: false
 })
 export class PlaylistInfoComponent implements OnInit, OnDestroy {
 

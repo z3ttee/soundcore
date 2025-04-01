@@ -4,7 +4,8 @@ import { ImportTask, Playlist } from "@repo/angular-sdk";
 @Component({
     selector: "app-spotify-import",
     templateUrl: "./spotify-import-item.component.html",
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class SpotifyImportItemComponent {
 

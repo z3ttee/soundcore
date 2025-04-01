@@ -3,7 +3,8 @@ import { Subject } from "rxjs";
 
 @Component({
     templateUrl: "./spotify-import.component.html",
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class SpotifyImportView implements OnDestroy {
 

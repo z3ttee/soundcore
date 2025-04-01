@@ -3,9 +3,10 @@ import { StatusIndicatorAppearance } from "@repo/angular-ui";
 import { File, FileFlag } from '@repo/angular-sdk';
 
 @Component({
-  selector: 'app-file-list-item',
-  templateUrl: './file-list-item.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'app-file-list-item',
+    templateUrl: './file-list-item.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class SCNGXFileListItemComponent implements OnInit, OnChanges {
 

@@ -2,7 +2,8 @@ import { Component, Input } from "@angular/core";
 
 @Component({
     selector: "scngx-tab-item",
-    templateUrl: "./tab-item.component.html"
+    templateUrl: "./tab-item.component.html",
+    standalone: false
 })
 export class SCNGXTabItemComponent {
 

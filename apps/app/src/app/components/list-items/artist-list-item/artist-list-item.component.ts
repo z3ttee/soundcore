@@ -4,10 +4,11 @@ import { Artist } from '@repo/angular-sdk';
 import { BehaviorSubject, fromEvent, Observable, Subject, takeUntil } from 'rxjs';
 
 @Component({
-  selector: 'scngx-artist-list-item',
-  templateUrl: './artist-list-item.component.html',
-  styleUrls: ['./artist-list-item.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'scngx-artist-list-item',
+    templateUrl: './artist-list-item.component.html',
+    styleUrls: ['./artist-list-item.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class SCNGXArtistListItemComponent implements OnInit, OnDestroy {
 

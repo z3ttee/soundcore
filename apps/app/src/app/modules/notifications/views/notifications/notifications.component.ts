@@ -3,8 +3,9 @@ import { SCDKNotificationService } from '@repo/angular-sdk';
 import { Pageable } from '@repo/utilities';
 
 @Component({
-  templateUrl: './notifications.component.html',
-  styleUrls: ['./notifications.component.scss']
+    templateUrl: './notifications.component.html',
+    styleUrls: ['./notifications.component.scss'],
+    standalone: false
 })
 export class NotificationsComponent implements OnInit {
 

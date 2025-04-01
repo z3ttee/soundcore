@@ -2,9 +2,10 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { Task } from '@repo/angular-sdk';
 
 @Component({
-  selector: 'scngx-task-list-item',
-  templateUrl: './task-list-item.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'scngx-task-list-item',
+    templateUrl: './task-list-item.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class SCNGXTaskListItemComponent {
 

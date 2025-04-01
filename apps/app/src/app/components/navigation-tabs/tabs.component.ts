@@ -3,7 +3,8 @@ import { ChangeDetectionStrategy, Component, Input } from "@angular/core";
 @Component({
     selector: "scngx-tabs",
     templateUrl: "./tabs.component.html",
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class SCNGXTabsComponent {
 

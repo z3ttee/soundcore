@@ -11,7 +11,8 @@ export interface MountCreateDialogOptions {
 }
 
 @Component({
-    templateUrl: "./mount-create-dialog.component.html"
+    templateUrl: "./mount-create-dialog.component.html",
+    standalone: false
 })
 export class AppMountCreateDialog implements OnDestroy {
 

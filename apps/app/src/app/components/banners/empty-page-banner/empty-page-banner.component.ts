@@ -3,7 +3,8 @@ import { ChangeDetectionStrategy, Component, Input } from "@angular/core";
 @Component({
     selector: "scngx-empty-page-banner",
     templateUrl: "./empty-page-banner.component.html",
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class EmptyPageBannerComponent {
 

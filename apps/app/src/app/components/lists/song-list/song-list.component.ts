@@ -14,7 +14,8 @@ interface PlayerInfo {
 @Component({
     selector: "scngx-song-list",
     templateUrl: "./song-list.component.html",
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class SongListComponent implements AfterViewInit {
 

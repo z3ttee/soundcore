@@ -16,7 +16,8 @@ interface ReportDialogProps {
 
 @Component({
     templateUrl: "./report-dialog.component.html",
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class ReportDialogComponent implements OnDestroy {
 

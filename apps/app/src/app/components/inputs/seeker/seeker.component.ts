@@ -3,7 +3,8 @@ import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild }
 @Component({
     selector: 'scngx-seeker',
     templateUrl: './seeker.component.html',
-    styleUrls: ['./seeker.component.scss']
+    styleUrls: ['./seeker.component.scss'],
+    standalone: false
 })
 export class SCNGXSeekerComponent implements OnInit {
   

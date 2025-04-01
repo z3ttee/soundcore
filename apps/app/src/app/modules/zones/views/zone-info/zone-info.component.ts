@@ -16,8 +16,9 @@ interface ZoneInfoProps {
 }
 
 @Component({
-  templateUrl: './zone-info.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+    templateUrl: './zone-info.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class ZoneInfoComponent implements OnDestroy {
 

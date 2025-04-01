@@ -23,6 +23,7 @@ interface PlayerbarProps {
     selector: "scngx-player-bar",
     templateUrl: "./player-bar.component.html",
     changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class AppPlayerBarComponent implements OnInit, OnDestroy {
 

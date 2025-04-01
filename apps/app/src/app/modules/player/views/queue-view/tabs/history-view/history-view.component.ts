@@ -9,7 +9,8 @@ interface QueueHistoryProps {
 
 @Component({
     templateUrl: "./history-view.component.html",
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class QueueHistoryViewComponent {
 

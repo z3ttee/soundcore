@@ -5,7 +5,8 @@ import { BehaviorSubject } from "rxjs";
     selector: 'scngx-range',
     templateUrl: './range.component.html',
     styleUrls: ['./range.component.scss'],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class SCNGXRangeComponent implements AfterViewInit {
   

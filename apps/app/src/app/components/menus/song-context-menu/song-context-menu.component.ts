@@ -9,10 +9,11 @@ import { AppPlaylistChooseDialog } from 'src/app/dialogs/playlist-choose-dialog/
 import { PlayerService } from 'src/app/modules/player/services/player.service';
 
 @Component({
-  selector: 'app-song-context-menu',
-  templateUrl: './song-context-menu.component.html',
-  styleUrls: ['./song-context-menu.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'app-song-context-menu',
+    templateUrl: './song-context-menu.component.html',
+    styleUrls: ['./song-context-menu.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class SongContextMenuComponent implements OnInit, OnDestroy {
 

@@ -17,9 +17,10 @@ interface CollectionViewProps {
 }
 
 @Component({
-  templateUrl: './collection.component.html',
-  styleUrls: ['./collection.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+    templateUrl: './collection.component.html',
+    styleUrls: ['./collection.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class CollectionComponent implements OnInit, OnDestroy {
 

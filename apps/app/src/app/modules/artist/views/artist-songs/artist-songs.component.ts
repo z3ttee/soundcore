@@ -13,8 +13,9 @@ interface ArtistSongsProps {
 }
 
 @Component({
-  templateUrl: './artist-songs.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+    templateUrl: './artist-songs.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class ArtistSongsComponent implements OnDestroy {
 

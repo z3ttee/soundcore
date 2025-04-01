@@ -6,9 +6,10 @@ import { Observable, Subject, takeUntil } from 'rxjs';
 const DEFAULT_ACCENT_COLOR = "#cccccc";
 
 @Component({
-  selector: 'app-list-view',
-  templateUrl: './list-view.component.html',
-  styleUrls: ['./list-view.component.scss']
+    selector: 'app-list-view',
+    templateUrl: './list-view.component.html',
+    styleUrls: ['./list-view.component.scss'],
+    standalone: false
 })
 export class ListViewComponent implements OnInit, OnDestroy, OnChanges {
 

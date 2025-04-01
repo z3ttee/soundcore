@@ -2,10 +2,11 @@ import { AfterViewInit, ChangeDetectionStrategy, Component, EventEmitter, Input,
 import { Song, User } from '@repo/angular-sdk';
 
 @Component({
-  selector: 'scngx-song-list-item',
-  templateUrl: './song-list-item.component.html',
-  styleUrls: ['./song-list-item.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'scngx-song-list-item',
+    templateUrl: './song-list-item.component.html',
+    styleUrls: ['./song-list-item.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class SCNGXSongListItemComponent implements OnInit, OnDestroy, AfterViewInit {
 

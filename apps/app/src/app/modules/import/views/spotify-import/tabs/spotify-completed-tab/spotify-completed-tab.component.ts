@@ -8,7 +8,8 @@ import { environment } from "src/environments/environment";
 
 @Component({
     templateUrl: "./spotify-completed-tab.component.html",
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class SpotifyCompletedTabComponent implements OnInit, OnDestroy {
 

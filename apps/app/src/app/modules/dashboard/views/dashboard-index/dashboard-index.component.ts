@@ -10,7 +10,8 @@ interface DashboardIndexProps {
 
 @Component({
     templateUrl: "./dashboard-index.component.html",
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class DashboardIndexView implements OnDestroy {
 

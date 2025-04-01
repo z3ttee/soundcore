@@ -5,7 +5,8 @@ import { Artwork } from "@repo/angular-sdk";
 @Component({
     selector: "scngx-nav-list-item",
     templateUrl: "./nav-list-item.component.html",
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class NavListItemComponent {
 

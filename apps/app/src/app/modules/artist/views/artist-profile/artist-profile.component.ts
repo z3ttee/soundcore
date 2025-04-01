@@ -17,9 +17,10 @@ interface ArtistInfoProps {
 }
 
 @Component({
-  selector: 'app-artist-profile',
-  templateUrl: './artist-profile.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'app-artist-profile',
+    templateUrl: './artist-profile.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class ArtistProfileComponent implements OnDestroy {
 

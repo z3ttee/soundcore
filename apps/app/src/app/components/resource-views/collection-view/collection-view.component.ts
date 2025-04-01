@@ -9,7 +9,8 @@ interface CollectionViewProps {
 @Component({
     selector: "scngx-collection-view",
     templateUrl: "./collection-view.component.html",
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class SCNGXCollectionViewComponent implements OnDestroy {
 

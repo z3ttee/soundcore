@@ -6,7 +6,8 @@ import { Subject } from "rxjs";
 
 @Component({
     templateUrl: "./import-spotify-create-dialog.component.html",
-    changeDetection: ChangeDetectionStrategy.Default
+    changeDetection: ChangeDetectionStrategy.Default,
+    standalone: false
 })
 export class AppImportSpotifyCreateDialog implements OnDestroy {
 

@@ -7,7 +7,8 @@ import { environment } from "src/environments/environment";
 
 @Component({
     templateUrl: "./spotify-failed-tab.component.html",
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class SpotifyFailedTabComponent implements OnInit, OnDestroy {
 

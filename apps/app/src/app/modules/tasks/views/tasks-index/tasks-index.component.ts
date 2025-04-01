@@ -11,7 +11,8 @@ interface TasksIndexViewProps {
 }
 
 @Component({
-    templateUrl: "./tasks-index.component.html"
+    templateUrl: "./tasks-index.component.html",
+    standalone: false
 })
 export class TasksIndexView implements OnInit, OnDestroy {
 

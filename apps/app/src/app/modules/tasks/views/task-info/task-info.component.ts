@@ -10,6 +10,7 @@ interface TaskInfoViewProps {
 
 @Component({
     templateUrl: "./task-info.component.html",
+    standalone: false
 })
 export class TaskInfoView implements OnInit, OnDestroy {
 

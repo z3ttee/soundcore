@@ -6,7 +6,8 @@ import { BehaviorSubject, Subject, takeUntil } from "rxjs";
 
 @Component({
     templateUrl: "./playlist-create-dialog.component.html",
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class AppPlaylistCreateDialog implements OnDestroy {
 

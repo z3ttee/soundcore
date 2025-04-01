@@ -17,7 +17,8 @@ interface QueueViewProps {
 
 @Component({
     templateUrl: "./queue-view.component.html",
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class QueueViewComponent implements OnDestroy {
 

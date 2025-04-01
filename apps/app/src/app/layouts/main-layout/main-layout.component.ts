@@ -21,6 +21,7 @@ interface MainLayoutProps {
 
 @Component({
     templateUrl: "./main-layout.component.html",
+    standalone: false
 })
 export class AscMainLayoutComponent implements OnInit, OnDestroy {
 

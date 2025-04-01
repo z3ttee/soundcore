@@ -6,8 +6,9 @@ import { Subject } from 'rxjs';
 import { environment } from 'src/environments/environment';
 
 @Component({
-  templateUrl: './zones-index.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+    templateUrl: './zones-index.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class ZonesIndexComponent implements OnInit, OnDestroy {
 

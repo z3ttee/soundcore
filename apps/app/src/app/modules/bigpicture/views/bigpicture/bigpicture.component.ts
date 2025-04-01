@@ -24,7 +24,8 @@ interface BigPictureProps {
     selector: "app-big-picture",
     templateUrl: "./bigpicture.component.html",
     styleUrls: ["./bigpicture.component.scss"],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class BigPictureComponent implements OnDestroy {
 

@@ -2,9 +2,10 @@ import { Component, Input, OnInit } from '@angular/core';
 import { MeiliSong, Song } from '@repo/angular-sdk';
 
 @Component({
-  selector: 'song-grid-item',
-  templateUrl: './song-grid-item.component.html',
-  styleUrls: ['./song-grid-item.component.scss']
+    selector: 'song-grid-item',
+    templateUrl: './song-grid-item.component.html',
+    styleUrls: ['./song-grid-item.component.scss'],
+    standalone: false
 })
 export class SongGridItemComponent implements OnInit {
 

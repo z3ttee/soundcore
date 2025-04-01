@@ -26,10 +26,11 @@ interface SearchHits {
 }
 
 @Component({
-  selector: 'app-search-index',
-  templateUrl: './search-index.component.html',
-  styleUrls: ['./search-index.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'app-search-index',
+    templateUrl: './search-index.component.html',
+    styleUrls: ['./search-index.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class SearchIndexComponent implements OnInit, OnDestroy {
 

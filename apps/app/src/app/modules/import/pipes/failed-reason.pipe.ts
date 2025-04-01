@@ -2,7 +2,8 @@ import { Pipe, PipeTransform } from "@angular/core";
 import { FailedReason } from "@repo/angular-sdk";
 
 @Pipe({
-    name: "failedReasonPipe"
+    name: "failedReasonPipe",
+    standalone: false
 })
 export class FailedReasonPipe implements PipeTransform {
 

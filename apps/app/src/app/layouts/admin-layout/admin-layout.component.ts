@@ -7,7 +7,8 @@ import { SSOService } from "@soundcore/sso";
 import { Subject } from "rxjs";
 
 @Component({
-    templateUrl: "./admin-layout.component.html"
+    templateUrl: "./admin-layout.component.html",
+    standalone: false
 })
 export class AdminLayoutComponent implements OnInit, OnDestroy {
 

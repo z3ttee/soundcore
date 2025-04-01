@@ -2,7 +2,8 @@ import { Pipe, PipeTransform } from "@angular/core";
 import { PlayableEntityType } from "@repo/angular-sdk";
 
 @Pipe({
-    name: 'playableEntityType'
+    name: 'playableEntityType',
+    standalone: false
 })
 export class PlayableEntityTypePipe implements PipeTransform {
 

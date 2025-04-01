@@ -14,7 +14,8 @@ interface SongInfoViewProps {
 
 @Component({
     templateUrl: "./song-info.component.html",
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class SongInfoViewComponent implements OnDestroy {
 

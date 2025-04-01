@@ -4,7 +4,8 @@ import { RunStatus } from "@repo/angular-sdk";
 @Component({
     selector: "scngx-task-status-icon",
     templateUrl: "./task-status-icon.component.html",
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class SCNGXTaskStatusIconComponent {
 

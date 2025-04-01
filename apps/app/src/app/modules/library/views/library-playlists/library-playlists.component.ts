@@ -1,9 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 
 @Component({
-  selector: 'app-library-playlists',
-  templateUrl: './library-playlists.component.html',
-  styleUrls: ['./library-playlists.component.scss']
+    selector: 'app-library-playlists',
+    templateUrl: './library-playlists.component.html',
+    styleUrls: ['./library-playlists.component.scss'],
+    standalone: false
 })
 export class LibraryPlaylistsComponent implements OnInit {
 

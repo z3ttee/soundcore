@@ -6,7 +6,8 @@ import { AppPlaylistCreateDialog } from "../playlist-create-dialog/playlist-crea
 
 @Component({
     templateUrl: "./playlist-choose-dialog.component.html",
-    changeDetection: ChangeDetectionStrategy.Default
+    changeDetection: ChangeDetectionStrategy.Default,
+    standalone: false
 })
 export class AppPlaylistChooseDialog implements OnDestroy {
 

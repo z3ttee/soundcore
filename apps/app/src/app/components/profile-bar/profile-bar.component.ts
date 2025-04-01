@@ -3,9 +3,10 @@ import { SCCDKScreenService } from '@repo/angular-cdk';
 import { SSOService, SSOUser } from '@soundcore/sso';
 
 @Component({
-  selector: 'app-profile-bar',
-  templateUrl: './profile-bar.component.html',
-  styleUrls: ['./profile-bar.component.scss']
+    selector: 'app-profile-bar',
+    templateUrl: './profile-bar.component.html',
+    styleUrls: ['./profile-bar.component.scss'],
+    standalone: false
 })
 export class ProfileBarComponent implements OnInit {
 

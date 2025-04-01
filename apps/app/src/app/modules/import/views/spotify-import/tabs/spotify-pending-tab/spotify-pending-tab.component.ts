@@ -13,7 +13,8 @@ interface SpotifyPendingTabProps {
 
 @Component({
     templateUrl: "./spotify-pending-tab.component.html",
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class SpotifyPendingTabComponent implements OnInit, OnDestroy {
 
