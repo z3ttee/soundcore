@@ -1,5 +1,5 @@
 import { Inject, Injectable } from "@angular/core";
-import { SSOService } from "@soundcore/sso";
+import { AuthenticationService } from "@repo/angular-oidc";
 import { Observable, Subject } from "rxjs";
 import { GATEWAY_EVENT_TASK_EMIT, SCSDK_OPTIONS } from "../../constants";
 import { SCSDKAuthenticatedGateway } from "../../gateway/gateways/gateway";
@@ -15,7 +15,7 @@ export class SCSDKTaskGateway extends SCSDKAuthenticatedGateway {
     public readonly $onTasksUpdated: Observable<Task[]> = this._tasksUpdateSubj.asObservable();
 
     constructor(
-        ssoService: SSOService,
+        ssoService: AuthenticationService,
         @Inject(SCSDK_OPTIONS) options: SCSDKOptions
     ) {
         super(new URL(`${options.api_base_uri}/tasks`), ssoService);

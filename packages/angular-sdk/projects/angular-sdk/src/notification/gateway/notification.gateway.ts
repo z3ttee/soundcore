@@ -1,5 +1,5 @@
 import { Inject, Injectable } from "@angular/core";
-import { SSOService } from "@soundcore/sso";
+import { AuthenticationService } from "@repo/angular-oidc";
 import { Observable, Subject, takeUntil } from "rxjs";
 import { SCSDK_OPTIONS } from "../../constants";
 import { SCSDKAuthenticatedGateway } from "../../gateway/gateways/gateway";
@@ -17,10 +17,10 @@ export class SCDKNotificationGateway extends SCSDKAuthenticatedGateway {
     public $onNotificationReceived: Observable<Notification> = this._notificationReceivedSubject.asObservable().pipe(takeUntil(this._destroy));
 
     constructor(
-        ssoService: SSOService,
+        authService: AuthenticationService,
         @Inject(SCSDK_OPTIONS) options: SCSDKOptions
     ) {
-        super(new URL(`${options.api_base_uri}/notifications`), ssoService);
+        super(new URL(`${options.api_base_uri}/notifications`), authService);
     }
 
     protected registerEvents(): void {

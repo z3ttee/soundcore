@@ -1,6 +1,6 @@
 
 import { Inject, Injectable } from "@angular/core";
-import { SSOService } from "@soundcore/sso";
+import { AuthenticationService } from "@repo/angular-oidc";
 import { Observable, Subject } from "rxjs";
 import { SCSDK_OPTIONS } from "../../constants";
 import type { SCSDKOptions } from "../../scdk.module";
@@ -18,7 +18,7 @@ export class SCSDKAdminGateway extends SCSDKAuthenticatedGateway {
   public readonly $mountStatusUpdate: Observable<MountStatusUpdateEvent> = this._mountStatusUpdateSubj.asObservable();
 
   constructor(
-    ssoService: SSOService,
+    ssoService: AuthenticationService,
     @Inject(SCSDK_OPTIONS) options: SCSDKOptions
   ) {
     super(new URL(`${options.api_base_uri}/admin`), ssoService);

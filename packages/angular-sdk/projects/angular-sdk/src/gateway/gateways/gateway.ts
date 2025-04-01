@@ -1,4 +1,4 @@
-import { SSOService } from "@soundcore/sso";
+import { AuthenticationService } from "@repo/angular-oidc";
 import { BehaviorSubject, Observable } from "rxjs";
 import { io, Socket } from "socket.io-client";
 
@@ -52,7 +52,7 @@ export abstract class SCSDKAuthenticatedGateway {
 
     constructor(
         private readonly _url: URL,
-        private readonly ssoService: SSOService
+        private readonly ssoService: AuthenticationService
     ) {
         this.connect();
     }
@@ -62,13 +62,11 @@ export abstract class SCSDKAuthenticatedGateway {
         const port = this._url.port;
         const pathname = this._url.pathname;
 
-        this.ssoService.$token
-
         this.socket = io(`${hostname}:${port}`, {
             path: pathname,
             transports: ["websocket"],
             auth: async (cb) => {
-                cb({ token: (await this.ssoService.getAccessToken()) })
+                cb({ token: (await this.ssoService.getSession().access_token) })
             }
         });
 

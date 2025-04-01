@@ -2,6 +2,8 @@
   "name": "@repo/angular-ui",
   "version": "1.0.0",
   "private": true,
+  "module": "./dist/angular-ui/fesm2020/angular-ui.mjs",
+  "typings": "./dist/angular-ui/public-api.d.ts",
   "scripts": {
     "ci:build": "ng build"
   },

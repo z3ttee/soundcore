@@ -52,14 +52,14 @@ export class SCSDKSearchService {
   }
 
   public removeFromHistory(resource: SCDKResource) {
-    return this.dbService.deleteByKey(SC_SEARCHHISTORY_STORE, resource.id).pipe(tap((wasDeleted) => {
-      if (wasDeleted) {
-        // Update observable
-        this._recentlySearchedSubject.next(this._recentlySearchedSubject.getValue().filter((res) => res.id !== resource.id));
-      } else {
-        // Print warning to console
-        console.warn(`Failed deleting history entry from database using key 'id: ${resource?.id}'`);
-      }
+    return this.dbService.deleteByKey(SC_SEARCHHISTORY_STORE, resource.id).pipe(tap(() => {
+      // if (wasDeleted) {
+      // Update observable
+      this._recentlySearchedSubject.next(this._recentlySearchedSubject.getValue().filter((res) => res.id !== resource.id));
+      // } else {
+      //   // Print warning to console
+      //   console.warn(`Failed deleting history entry from database using key 'id: ${resource?.id}'`);
+      // }
     }));
   }
 

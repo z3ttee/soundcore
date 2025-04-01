@@ -4,9 +4,8 @@ import { RouterModule, Routes } from '@angular/router';
 import { NgIconsModule } from '@ng-icons/core';
 import { heroChartPie, heroRectangleStack } from '@ng-icons/heroicons/outline';
 import { heroPlusSolid } from '@ng-icons/heroicons/solid';
-import { SCNGXButtonModule, SCNGXBytesPipeModule, SCNGXScrollingModule, SCNGXSkeletonModule, SCNGXUiSectionTitleModule, SCNGXUiTitleModule, SCNGXZoneStatusPipeModule } from '@repo/angular-ui';
 import { SCSDKMountModule, SCSDKZoneModule } from '@repo/angular-sdk';
-import { SSOGuard } from '@soundcore/sso';
+import { SCNGXButtonModule, SCNGXBytesPipeModule, SCNGXScrollingModule, SCNGXSkeletonModule, SCNGXUiSectionTitleModule, SCNGXUiTitleModule, SCNGXZoneStatusPipeModule } from '@repo/angular-ui';
 import { BucketListItemModule } from 'src/app/components/list-items/bucket-list-item/bucket-list-item.module';
 import { MountListItemModule } from 'src/app/components/list-items/mount-list-item/mount-list-item.module';
 import { AppMountCreateDialogModule } from 'src/app/dialogs/mount-create-dialog/mount-create-dialog.module';
@@ -17,7 +16,7 @@ import { ZonesIndexComponent } from './views/zones-index/zones-index.component';
 const routes: Routes = [
   { path: "", component: ZonesIndexComponent },
   { path: ":zoneId", component: ZoneInfoComponent },
-  { path: ":zoneId/:mountId", canActivate: [SSOGuard], loadChildren: () => import("../mounts/mounts.module").then((m) => m.MountsModule) },
+  { path: ":zoneId/:mountId", canActivate: [], loadChildren: () => import("../mounts/mounts.module").then((m) => m.MountsModule) },
 ]
 
 @NgModule({
