@@ -1,0 +1,17 @@
+/* To learn more about Typescript configuration file: https://www.typescriptlang.org/docs/handbook/tsconfig-json.html. */
+/* To learn more about Angular compiler options: https://angular.dev/reference/configs/angular-compiler-options. */
+{
+  "extends": "@repo/config-typescript/angular.json",
+  "compilerOptions": {
+    "sourceMap": true,
+    "paths": {
+      "angular-cdk": [
+        "./dist/angular-cdk"
+      ]
+    },
+    "outDir": "./dist/out-tsc"
+  },
+  "include": [
+    "projects/**/*"
+  ]
+}

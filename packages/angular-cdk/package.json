@@ -1,0 +1,31 @@
+{
+  "name": "@repo/angular-cdk",
+  "version": "1.0.0",
+  "private": true,
+  "module": "./dist/fesm2022/angular-cdk.mjs",
+  "typings": "./dist/index.d.ts",
+  "scripts": {
+    "ci:build": "ng build"
+  },
+  "dependencies": {
+    "@angular/common": "^19.2.0",
+    "@angular/compiler": "^19.2.0",
+    "@angular/core": "^19.2.0",
+    "@repo/angular-cdk": "^15.2.0",
+    "@angular/forms": "^19.2.0",
+    "@angular/platform-browser": "^19.2.0",
+    "@angular/platform-browser-dynamic": "^19.2.0",
+    "@angular/router": "^19.2.0",
+    "rxjs": "~7.8.0",
+    "tslib": "^2.3.0",
+    "zone.js": "~0.15.0"
+  },
+  "devDependencies": {
+    "@angular-devkit/build-angular": "^19.2.5",
+    "@angular/cli": "^19.2.5",
+    "@angular/compiler-cli": "^19.2.0",
+    "@repo/config-typescript": "*",
+    "ng-packagr": "^19.2.0",
+    "typescript": "~5.8.0"
+  }
+}
