@@ -5,7 +5,7 @@
     </div>
     <div class="w-full">
         <p class="text-sm text-font-secondary -mb-0.5">Angemeldet als</p>
-        <p class="font-semi">{{ user?.name || user?.sub }}</p>
+        <p class="font-semi">{{ user?.preferred_username || user?.sub }}</p>
     </div>
     <div class="flex items-center justify-center min-w-10 max-w-10 h-10 rounded-full">
         <span class="transition-all will-change-transform inline-flex justify-center items-center"

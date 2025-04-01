@@ -44,8 +44,11 @@ export class VolumeManager {
             value = volume / 100;
         }
 
-        console.log("setting volume:", volume)
-        this.audio.volume = Math.max(0, Math.min(1, volume));
+        console.log("setting volume:", value)
+
+
+
+        this.audio.volume = Math.max(0, Math.min(1, value));
         this._volume.next(this.audio.volume)
     }
 

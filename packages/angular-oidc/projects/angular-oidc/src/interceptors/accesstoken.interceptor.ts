@@ -4,9 +4,9 @@ import { catchError, mergeMap, Observable, of, throwError } from "rxjs";
 import { AuthenticationService } from "../services/authentication.service";
 
 export function accessTokenInterceptor(): HttpInterceptorFn {
-    const service = inject(AuthenticationService);
-
     return (request: HttpRequest<unknown>, next: HttpHandlerFn): Observable<HttpEvent<unknown>> => {
+        const service = inject(AuthenticationService);
+
         return service.$session.pipe(
             mergeMap((session) => {
                 if (session && session.access_token) {

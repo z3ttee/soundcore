@@ -1,7 +1,6 @@
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { SCCDKScreenModule } from '@repo/angular-cdk';
 import { provideAuthentication } from '@repo/angular-oidc';
@@ -11,27 +10,14 @@ import { environment } from 'src/environments/environment';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 
-@NgModule({ declarations: [
+@NgModule({
+    declarations: [
         AppComponent
     ],
-    bootstrap: [AppComponent], imports: [BrowserModule,
+    bootstrap: [AppComponent], imports: [
+        BrowserModule,
         AppRoutingModule,
         BrowserAnimationsModule,
-        // OAuthModule.forRoot(),
-        // SSOModule.forRoot({
-        //   baseUrl: environment.keycloak_url,
-        //   realm: environment.keycloak_realm,
-        //   clientId: environment.keycloak_client_id,
-        //   initOptions: {
-        //     onLoad: 'check-sso',
-        //     silentCheckSsoRedirectUri: window.location.origin + '/assets/silent-check-sso.html'
-        //   },
-        //   loadUserProfileAtStartUp: true,
-        //   roleMapping: {
-        //     admin: environment.admin_role,
-        //     mod: environment.mod_role
-        //   }
-        // }),
         SCSDKModule.forRoot({
             api_base_uri: environment.api_base_uri
         }),
@@ -50,12 +36,15 @@ import { AppComponent } from './app.component';
         }),
         SCCDKScreenModule,
         SCNGXDialogModule,
-        SCSDKMountModule], providers: [
+        SCSDKMountModule
+    ],
+    providers: [
         provideAuthentication({
             issuer: environment.oidc_issuer,
             clientId: environment.oidc_client_id,
             scope: environment.oidc_scope,
         }),
         provideHttpClient(withInterceptorsFromDi()),
-    ] })
+    ]
+})
 export class AppModule { }

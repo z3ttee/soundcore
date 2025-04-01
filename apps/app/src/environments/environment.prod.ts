@@ -3,6 +3,7 @@ export const environment = {
 
   oidc_issuer: "https://sso.zitzmann.dev/realms/tsalliance",
   oidc_client_id: "alliance-soundcore-app",
+  oidc_scope: "profile email offline_access",
 
   api_base_uri: "https://api.tsalliance.eu/soundcore@next",
 
