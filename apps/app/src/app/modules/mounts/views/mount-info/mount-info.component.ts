@@ -2,8 +2,9 @@ import { HttpClient } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
+import { ApplicationInfo, File, Mount, MountProgress, MountStatus, MountStatusUpdateEvent, SCDKFileService, SCSDKAdminGateway, SCSDKAppService, SCSDKMountService } from '@repo/angular-sdk';
 import { SCNGXDatasource, SCNGXDialogService } from '@repo/angular-ui';
-import { ApplicationInfo, File, Future, Mount, MountProgress, MountStatus, MountStatusUpdateEvent, SCDKFileService, SCSDKAdminGateway, SCSDKAppService, SCSDKMountService } from '@repo/angular-sdk';
+import { Future } from '@repo/utilities';
 import { BehaviorSubject, combineLatest, filter, map, Observable, startWith, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { AppMountCreateDialog, MountCreateDialogOptions } from 'src/app/dialogs/mount-create-dialog/mount-create-dialog.component';
 
@@ -19,9 +20,9 @@ interface MountInfoProps {
 }
 
 @Component({
-    templateUrl: './mount-info.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: false
+  templateUrl: './mount-info.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false
 })
 export class MountInfoComponent implements OnInit, OnDestroy {
 
@@ -69,7 +70,7 @@ export class MountInfoComponent implements OnInit, OnDestroy {
     switchMap((mountId) => this.mountService.findById(mountId)),
     switchMap((request) => this.$onMountUpdated.pipe(
       startWith(null),
-      map((updated) => Future.merge(request, updated)),
+      map((updated) => Future.assign(request, updated)),
       takeUntil(this.$destroy)
     ))
   );

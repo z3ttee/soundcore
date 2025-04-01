@@ -1,30 +1,38 @@
 <ng-container *ngIf="($props | async) as props">
     <div class="w-full h-full overflow-y-auto" cdkVirtualScrollingElement>
-        <app-error404 *ngIf="!props.playlist.loading && !props.playlist.data" [title]="'Playlist nicht gefunden'"></app-error404>
+        <app-error404 *ngIf="!props.playlist.loading && !props.playlist.data"
+            [title]="'Playlist nicht gefunden'"></app-error404>
 
-        <app-list-view [resource]="$any(props.playlist)" [title]="props.playlist.data?.name" [isLoading]="props.playlist.loading" [artwork]="props.playlist.data?.artwork">
+        <app-list-view [resource]="$any(props.playlist)" [title]="props.playlist.data?.name"
+            [isLoading]="props.playlist.loading" [artwork]="props.playlist.data?.artwork">
             <ng-container scngx-stats>
                 <li class="text-font-secondary">
-                    <span *ngIf="props.playlist.data?.author">by <span class="hover:underline cursor-pointer" [routerLink]="['/profile', props.playlist.data?.author?.slug || props.playlist.data?.author?.id]">{{ props.playlist.data?.author?.name }}</span></span>
+                    <span *ngIf="props.playlist.data?.author">by <span class="hover:underline cursor-pointer"
+                            [routerLink]="['/profile', props.playlist.data?.author?.slug || props.playlist.data?.author?.id]">{{
+                            props.playlist.data?.author?.name }}</span></span>
                 </li>
                 <li class="text-font-secondary">
-                    <span>{{ props.playlist.data?.songsCount }} {{ props.playlist.data?.songsCount != 1 ? 'Songs' : 'Song' }}</span>
+                    <span>{{ props.playlist.data?.songsCount }} {{ props.playlist.data?.songsCount != 1 ? 'Songs' :
+                        'Song' }}</span>
                 </li>
                 <li class="text-font-secondary">
                     <span>{{ props.playlist.data?.totalDuration | scngxSongDurationPipe }} min</span>
                 </li>
             </ng-container>
-        
+
             <ng-container scngx-controls>
                 <scngx-ibtn (click)="forcePlay(props.playlist.data)" size="md">
-                    <img *ngIf="!props.isPlaying; else paused" class="w-7 h-7 text-body ml-0.5" src="assets/icons/play.svg">
-                    <ng-template #paused><img *ngIf="props.isPlaying" class="w-7 h-7 text-body ml-0.5" src="assets/icons/pause.svg"></ng-template>
+                    <img *ngIf="!props.isPlaying; else paused" class="w-7 h-7 text-body ml-0.5"
+                        src="assets/icons/play.svg">
+                    <ng-template #paused><img *ngIf="props.isPlaying" class="w-7 h-7 text-body ml-0.5"
+                            src="assets/icons/pause.svg"></ng-template>
                 </scngx-ibtn>
-        
-                <button class="flex items-center p-2 rounded-full" matRipple [matRippleCentered]="true" *ngIf="props.playlist.data?.author?.id != props.user?.id">
+
+                <button class="flex items-center p-2 rounded-full" matRipple [matRippleCentered]="true"
+                    *ngIf="props.playlist.data?.author?.id != props.user?.sub">
                     <ng-icon name="heroHeart" class="'h-7 aspect-square'"></ng-icon>
                 </button>
-        
+
                 <button class="flex items-center p-2 rounded-full" matRipple [matRippleCentered]="true">
                     <ng-icon name="heroEllipsisVerticalSolid" class="'h-7 aspect-square'"></ng-icon>
                 </button>
@@ -36,12 +44,9 @@
         </div> -->
 
         <!-- Songs list -->
-        <scngx-song-list 
-            [datasource]="($datasource | async)" 
-            [owner]="props.playlist.data"
-            [useParentScroll]="true">
+        <scngx-song-list [datasource]="($datasource | async)" [owner]="props.playlist.data" [useParentScroll]="true">
         </scngx-song-list>
-        
+
         <!-- <ng-container *ngIf="($datasource | async) as datasource">
             <cdk-virtual-scroll-viewport [itemSize]="56">
                 <div *cdkVirtualFor="let item of datasource; index as i" class="px-window">

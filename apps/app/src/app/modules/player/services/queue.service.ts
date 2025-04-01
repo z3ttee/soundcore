@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
-import { Future, PlayableEntityType } from "@repo/angular-sdk";
-import { isNull } from "@repo/utilities";
+import { PlayableEntityType } from "@repo/angular-sdk";
+import { Future, isNull } from "@repo/utilities";
 import { BehaviorSubject, Observable, combineLatest, map, of, switchMap } from "rxjs";
 import { SCNGXTracklist } from "../entities/tracklist.entity";
 import { PlayableItem } from "./player.service";

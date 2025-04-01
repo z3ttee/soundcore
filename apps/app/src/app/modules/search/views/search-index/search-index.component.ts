@@ -26,11 +26,11 @@ interface SearchHits {
 }
 
 @Component({
-    selector: 'app-search-index',
-    templateUrl: './search-index.component.html',
-    styleUrls: ['./search-index.component.scss'],
-    changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: false
+  selector: 'app-search-index',
+  templateUrl: './search-index.component.html',
+  styleUrls: ['./search-index.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false
 })
 export class SearchIndexComponent implements OnInit, OnDestroy {
 
@@ -112,12 +112,11 @@ export class SearchIndexComponent implements OnInit, OnDestroy {
   }
 
   public removeFromSearch(song: MeiliSong) {
-    this.searchService.removeFromHistory(song).pipe(takeUntil(this.$destroy)).subscribe((wasRemoved) => {
-      if (wasRemoved) {
-        this.snackbar.open(`Eintrag aus Suchverlauf gelöscht`, null, { duration: 5000 });
-      } else {
-        this.snackbar.open(`Es ist ein Fehler aufgetreten`, null, { duration: 5000 });
-      }
+    this.searchService.removeFromHistory(song).pipe(takeUntil(this.$destroy)).subscribe(() => {
+      this.snackbar.open(`Eintrag aus Suchverlauf gelöscht`, null, { duration: 5000 });
+      // } else {
+      //   this.snackbar.open(`Es ist ein Fehler aufgetreten`, null, { duration: 5000 });
+      // }
     });
   }
 

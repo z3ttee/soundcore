@@ -9,8 +9,9 @@ export enum ZoneEnv {
     STANDALONE = "standalone"
 }
 
-export class Zone  {
+export class Zone {
     public id: string;
+    public slug?: string;
     public status: ZoneStatus;
     public environment: ZoneEnv;
     public name: string;

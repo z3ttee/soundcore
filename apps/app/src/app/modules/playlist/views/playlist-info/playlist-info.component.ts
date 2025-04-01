@@ -1,7 +1,8 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Future, Playlist, SCSDKDatasource, SCSDKPlaylistService, SCSDKSongService, Song } from '@repo/angular-sdk';
-import { SSOService, SSOUser } from '@soundcore/sso';
+import { AuthenticationService, Profile } from '@repo/angular-oidc';
+import { Playlist, SCSDKDatasource, SCSDKPlaylistService, SCSDKSongService, Song } from '@repo/angular-sdk';
+import { Future } from '@repo/utilities';
 import { combineLatest, map, Observable, startWith, Subject, switchMap, takeUntil } from 'rxjs';
 import { AUDIOWAVE_LOTTIE_OPTIONS } from 'src/app/constants';
 import { SCNGXTracklist } from 'src/app/modules/player/entities/tracklist.entity';
@@ -13,13 +14,13 @@ interface PlaylistInfoProps {
   isPlaying?: boolean;
   isTracklistActive?: boolean;
   currentItemId?: string;
-  user?: SSOUser;
+  user?: Profile;
 }
 
 @Component({
-    templateUrl: './playlist-info.component.html',
-    styleUrls: ['./playlist-info.component.scss'],
-    standalone: false
+  templateUrl: './playlist-info.component.html',
+  styleUrls: ['./playlist-info.component.scss'],
+  standalone: false
 })
 export class PlaylistInfoComponent implements OnInit, OnDestroy {
 
@@ -30,7 +31,7 @@ export class PlaylistInfoComponent implements OnInit, OnDestroy {
     private readonly activatedRoute: ActivatedRoute,
     private readonly playerService: PlayerService,
     private readonly songService: SCSDKSongService,
-    private readonly ssoService: SSOService
+    private readonly ssoService: AuthenticationService
   ) { }
 
   // Lottie animations options
@@ -62,7 +63,7 @@ export class PlaylistInfoComponent implements OnInit, OnDestroy {
     // Get current tracklist id
     this.playerService.$currentItem.pipe(startWith(null)),
     // Get user data
-    this.ssoService.$user
+    this.ssoService.$profile
   ]).pipe(
     // Build props object
     map(([playlist, isPaused, currentItem, user]): PlaylistInfoProps => {

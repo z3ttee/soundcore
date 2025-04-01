@@ -4,16 +4,16 @@ import { Component, inject, OnDestroy, OnInit } from "@angular/core";
 import { UntypedFormControl } from "@angular/forms";
 import { NavigationCancel, NavigationEnd, NavigationError, NavigationStart, Router } from "@angular/router";
 import { SCCDKScreenService } from "@repo/angular-cdk";
+import { AuthenticationService, Profile } from "@repo/angular-oidc";
 import { Playlist, SCSDKGeneralGateway, SCSDKPlaylistService, SCSDKSearchService } from "@repo/angular-sdk";
 import { SCNGXDialogService } from "@repo/angular-ui";
-import { SSOService, SSOUser } from "@soundcore/sso";
-import { combineLatest, filter, map, Observable, startWith, Subject, takeUntil } from "rxjs";
+import { combineLatest, filter, map, Observable, of, startWith, Subject, takeUntil } from "rxjs";
 import { SCNGXPlaylistListItemComponent } from "src/app/components/list-items/playlist-list-item/playlist-list-item.component";
 import { AppPlaylistCreateDialog } from "src/app/dialogs/playlist-create-dialog/playlist-create-dialog.component";
 
 interface MainLayoutProps {
     playlists?: Playlist[];
-    account?: SSOUser;
+    account?: Profile;
 
     isAdminAccount?: boolean;
     isModAccount?: boolean;
@@ -32,7 +32,7 @@ export class AscMainLayoutComponent implements OnInit, OnDestroy {
     public isNavigating: boolean = false;
 
     public readonly playlistService: SCSDKPlaylistService = inject(SCSDKPlaylistService);
-    private readonly authService: SSOService = inject(SSOService);
+    private readonly authService = inject(AuthenticationService);
 
     constructor(
         public readonly screenService: SCCDKScreenService,
@@ -45,10 +45,10 @@ export class AscMainLayoutComponent implements OnInit, OnDestroy {
 
     public readonly $props: Observable<MainLayoutProps> = combineLatest([
         this.playlistService.$library.pipe(map((playlists) => ([...playlists]))),
-        this.authService.$user.pipe(startWith(null)),
+        this.authService.$profile.pipe(startWith(null)),
         combineLatest([
-            this.authService.$isAdmin,
-            this.authService.$isMod
+            of(true),
+            of(true)
         ])
     ]).pipe(
         map(([playlists, account, [isAdminAccount, isModAccount]]): MainLayoutProps => ({

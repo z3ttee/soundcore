@@ -1,8 +1,8 @@
 import { HttpClient } from "@angular/common/http";
 import { Component, OnDestroy, OnInit } from "@angular/core";
+import { SCSDKTaskGateway, SCSDKTasksService, Task, TaskDefinition } from "@repo/angular-sdk";
 import { SCNGXDatasource } from "@repo/angular-ui";
-import { Future, SCSDKTaskGateway, SCSDKTasksService, Task, TaskDefinition } from "@repo/angular-sdk";
-import { Page, Pageable } from "@repo/utilities";
+import { Future, Page, Pageable } from "@repo/utilities";
 import { combineLatest, map, Observable, Subject, takeUntil } from "rxjs";
 
 interface TasksIndexViewProps {

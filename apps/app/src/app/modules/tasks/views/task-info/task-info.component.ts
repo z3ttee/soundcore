@@ -1,7 +1,8 @@
 import { HttpClient } from "@angular/common/http";
 import { Component, OnDestroy, OnInit } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
-import { Future, RunStatus, SCSDKTaskGateway, SCSDKTasksService, Stage, Step, Task } from "@repo/angular-sdk";
+import { RunStatus, SCSDKTaskGateway, SCSDKTasksService, Stage, Step, Task } from "@repo/angular-sdk";
+import { Future } from "@repo/utilities";
 import { combineLatest, filter, map, Observable, startWith, Subject, switchMap, takeUntil, tap } from "rxjs";
 
 interface TaskInfoViewProps {
@@ -35,7 +36,7 @@ export class TaskInfoView implements OnInit, OnDestroy {
         this.$taskUpdate.pipe(startWith(null))
     ]).pipe(
         map(([task, taskUpdate]): TaskInfoViewProps => ({
-            task: Future.merge(task, taskUpdate),
+            task: Future.assign(task, taskUpdate),
         })),
         takeUntil(this.$destroy)
     );

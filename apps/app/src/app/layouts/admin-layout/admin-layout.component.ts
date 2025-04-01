@@ -2,8 +2,8 @@ import { Location } from "@angular/common";
 import { Component, OnDestroy, OnInit } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
 import { SCCDKScreenService } from "@repo/angular-cdk";
+import { AuthenticationService } from "@repo/angular-oidc";
 import { SCSDKGeneralGateway } from "@repo/angular-sdk";
-import { SSOService } from "@soundcore/sso";
 import { Subject } from "rxjs";
 
 @Component({
@@ -18,7 +18,7 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
 
     constructor(
         public readonly screenService: SCCDKScreenService,
-        public readonly authService: SSOService,
+        public readonly authService: AuthenticationService,
         public readonly activatedRoute: ActivatedRoute,
         private readonly router: Router,
         private readonly _location: Location,

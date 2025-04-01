@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Album, Artist, Future, PlayableEntityType, Playlist, SCDKAlbumService, SCSDKArtistService, SCSDKDatasource, SCSDKPlaylistService, SCSDKSongService, Song, toFutureCompat } from '@repo/angular-sdk';
-import { Page, Pageable } from '@repo/utilities';
+import { Album, Artist, PlayableEntityType, Playlist, SCDKAlbumService, SCSDKArtistService, SCSDKDatasource, SCSDKPlaylistService, SCSDKSongService, Song } from '@repo/angular-sdk';
+import { Future, Page, Pageable } from '@repo/utilities';
 import { combineLatest, map, Observable, startWith, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { PlayerService } from 'src/app/modules/player/services/player.service';
 
@@ -17,10 +17,10 @@ interface ArtistInfoProps {
 }
 
 @Component({
-    selector: 'app-artist-profile',
-    templateUrl: './artist-profile.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: false
+  selector: 'app-artist-profile',
+  templateUrl: './artist-profile.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false
 })
 export class ArtistProfileComponent implements OnDestroy {
 
@@ -78,8 +78,8 @@ export class ArtistProfileComponent implements OnDestroy {
 
       return {
         artist: artist,
-        albums: albums,
-        featAlbums: featAlbums,
+        albums: albums as any,
+        featAlbums: featAlbums as any,
         featPlaylists: featPlaylists,
         isPlaying: !isPaused && currentTracklistId === artist.data?.id,
         isTracklistActive: currentTracklistId === artist.data?.id,
@@ -104,3 +104,7 @@ export class ArtistProfileComponent implements OnDestroy {
   }
 
 }
+function toFutureCompat(): import("rxjs").OperatorFunction<import("@repo/angular-sdk").ApiResponse<Page<Album>>, unknown> {
+  throw new Error('Function not implemented.');
+}
+

@@ -1,21 +1,21 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { SCCDKScreenService } from '@repo/angular-cdk';
-import { SSOService, SSOUser } from '@soundcore/sso';
+import { AuthenticationService, Profile } from '@repo/angular-oidc';
 
 @Component({
-    selector: 'app-profile-bar',
-    templateUrl: './profile-bar.component.html',
-    styleUrls: ['./profile-bar.component.scss'],
-    standalone: false
+  selector: 'app-profile-bar',
+  templateUrl: './profile-bar.component.html',
+  styleUrls: ['./profile-bar.component.scss'],
+  standalone: false
 })
 export class ProfileBarComponent implements OnInit {
 
-  @Input() public user: SSOUser;
+  @Input() public user: Profile;
 
   public showOverlay: boolean = false;
 
   constructor(
-    public readonly authService: SSOService,
+    public readonly authService: AuthenticationService,
     public readonly screenService: SCCDKScreenService
   ) { }
 

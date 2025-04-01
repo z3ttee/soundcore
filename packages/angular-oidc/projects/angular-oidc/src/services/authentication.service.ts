@@ -15,6 +15,7 @@ export class AuthenticationService {
     private readonly _router = inject(Router);
     private readonly _activatedRoute = inject(ActivatedRoute);
 
+    /** Configuration document returned by oidc discovery */
     private _config?: Configuration | null;
 
     private readonly _session = new BehaviorSubject<Session | null>(this.getSession());
@@ -22,6 +23,8 @@ export class AuthenticationService {
     public readonly $session = this._session.asObservable();
 
     private readonly _profile = new BehaviorSubject<Profile | null>(null);
+    /** Subscribe to profile changes */
+    public readonly $profile = this._profile.asObservable();
 
     public readonly $authenticated = this.$session.pipe(map((session) => !!session && !!session.access_token));
 

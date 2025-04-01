@@ -1,8 +1,9 @@
 import { HttpClient } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { ApiError, ApplicationInfo, Mount, SCSDKAdminGateway, SCSDKAppService, SCSDKZoneService, Zone } from '@repo/angular-sdk';
 import { SCNGXDatasource, SCNGXDialogService } from '@repo/angular-ui';
-import { ApiError, ApplicationInfo, Future, Mount, SCSDKAdminGateway, SCSDKAppService, SCSDKZoneService, toFuture, Zone } from '@repo/angular-sdk';
+import { Future, toFuture } from '@repo/utilities';
 import { BehaviorSubject, combineLatest, filter, map, Observable, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { AppMountCreateDialog, MountCreateDialogOptions } from 'src/app/dialogs/mount-create-dialog/mount-create-dialog.component';
 import { environment } from 'src/environments/environment';
@@ -16,9 +17,9 @@ interface ZoneInfoProps {
 }
 
 @Component({
-    templateUrl: './zone-info.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: false
+  templateUrl: './zone-info.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false
 })
 export class ZoneInfoComponent implements OnDestroy {
 
@@ -57,7 +58,7 @@ export class ZoneInfoComponent implements OnDestroy {
   ]).pipe(
     map(([[request, datasource], appInfo]): ZoneInfoProps => ({
       loading: request.loading,
-      error: request.error,
+      error: request.error as any,
       datasource: datasource,
       zone: request.data,
       appInfo: appInfo

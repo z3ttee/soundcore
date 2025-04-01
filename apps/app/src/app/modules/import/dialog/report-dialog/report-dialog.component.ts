@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, OnDestroy } from "@angular/core";
-import { DialogRef } from "@repo/angular-ui";
-import { ApiError, ImportReport, ImportSpotifyReport, SCSDKImportService, SpotifyImport, toFutureCompat } from "@repo/angular-sdk";
+import { ApiError, ImportReport, ImportSpotifyReport, SCSDKImportService, SpotifyImport } from "@repo/angular-sdk";
+import { DialogRef, toFutureCompat, } from "@repo/angular-ui";
 import { combineLatest, map, Observable, Subject, takeUntil } from "rxjs";
 
 export interface ReportDialogOptions {
@@ -35,7 +35,7 @@ export class ReportDialogComponent implements OnDestroy {
             loading: request.loading,
             task: this.dialogRef.config?.data?.data,
             report: (request.data as ImportReport<ImportSpotifyReport>),
-            error: request.error
+            error: request.error as any
         })),
         takeUntil(this._destroy)
     );

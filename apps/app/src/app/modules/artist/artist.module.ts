@@ -5,6 +5,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { NgIconsModule } from '@ng-icons/core';
 import { heroHeart, heroMusicalNote } from '@ng-icons/heroicons/outline';
 import { heroEllipsisVerticalSolid } from '@ng-icons/heroicons/solid';
+import { SCDKAlbumModule, SCSDKArtistModule, SCSDKSongModule } from '@repo/angular-sdk';
 import {
   SCNGXAlbumGridItemModule,
   SCNGXArtworkModule,
@@ -18,8 +19,7 @@ import {
   SCNGXUiSectionTitleModule,
   SCNGXUiTitleModule
 } from '@repo/angular-ui';
-import { SCDKAlbumModule, SCSDKArtistModule, SCSDKSongModule } from '@repo/angular-sdk';
-import { LottieModule } from 'ngx-lottie';
+import { LottieComponent } from 'ngx-lottie';
 import { SCNGXChipsModule } from 'src/app/components/chips/chips.module';
 import { SCNGXSongListItemModule } from 'src/app/components/list-items/song-list-item/song-list-item.module';
 import { SongListModule } from 'src/app/components/lists/song-list/song-list.module';
@@ -45,7 +45,7 @@ const routes: Routes = [
     RouterModule.forChild(routes),
     Error404Module,
     NgIconsModule.withIcons({ heroEllipsisVerticalSolid, heroHeart, heroMusicalNote }),
-    LottieModule,
+    LottieComponent,
 
     MatRippleModule,
 

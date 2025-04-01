@@ -6,10 +6,11 @@
                 <div scngxSubtitle>Verwalte hier die einzelnen Speicherzonen.</div>
             </scngx-ui-title>
         </div>
-    
-        <div *cdkVirtualFor="let bucket of datasource">
-            <app-bucket-list-item [routerLink]="bucket ? [bucket?.slug ?? bucket?.id] : null" [bucket]="bucket"></app-bucket-list-item>
+
+        <div *cdkVirtualFor="let zone of datasource">
+            <app-bucket-list-item [routerLink]="zone ? [zone?.slug ?? zone?.id] : null"
+                [zone]="zone"></app-bucket-list-item>
         </div>
-    
+
     </cdk-virtual-scroll-viewport>
 </div>

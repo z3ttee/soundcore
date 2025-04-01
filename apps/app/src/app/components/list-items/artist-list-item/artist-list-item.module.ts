@@ -3,7 +3,7 @@ import { NgModule } from '@angular/core';
 import { MatRippleModule } from '@angular/material/core';
 import { RouterModule } from '@angular/router';
 import { SCNGXArtworkModule, SCNGXSkeletonModule } from '@repo/angular-ui';
-import { LottieModule } from 'ngx-lottie';
+import { LottieComponent } from 'ngx-lottie';
 import { SCNGXArtistListItemComponent } from './artist-list-item.component';
 
 @NgModule({
@@ -13,7 +13,7 @@ import { SCNGXArtistListItemComponent } from './artist-list-item.component';
   imports: [
     CommonModule,
     RouterModule,
-    LottieModule,
+    LottieComponent,
 
     MatRippleModule,
 

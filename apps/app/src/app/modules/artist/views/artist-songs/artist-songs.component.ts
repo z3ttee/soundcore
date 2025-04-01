@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Artist, Future, SCSDKArtistService, SCSDKDatasource, SCSDKSongService, Song } from '@repo/angular-sdk';
+import { Artist, SCSDKArtistService, SCSDKDatasource, SCSDKSongService, Song } from '@repo/angular-sdk';
+import { Future } from '@repo/utilities';
 import { combineLatest, map, Observable, startWith, Subject, switchMap } from 'rxjs';
 import { AUDIOWAVE_LOTTIE_OPTIONS } from 'src/app/constants';
 import { PlayerService } from 'src/app/modules/player/services/player.service';
@@ -13,9 +14,9 @@ interface ArtistSongsProps {
 }
 
 @Component({
-    templateUrl: './artist-songs.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: false
+  templateUrl: './artist-songs.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false
 })
 export class ArtistSongsComponent implements OnDestroy {
 

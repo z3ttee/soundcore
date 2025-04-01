@@ -1,9 +1,9 @@
 import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute } from '@angular/router';
-import { SCNGXTracklist, SCNGXTracklistBuilder } from '@repo/angular-ui';
+import { AuthenticationService, Profile } from '@repo/angular-oidc';
 import { LikedSong, SCSDKLikeService, ToggleLikedSongDTO } from '@repo/angular-sdk';
-import { SSOService, SSOUser } from '@soundcore/sso';
+import { SCNGXTracklist, SCNGXTracklistBuilder } from '@repo/angular-ui';
 import { combineLatest, filter, map, Observable, Subject, take, takeUntil } from 'rxjs';
 import { AUDIOWAVE_LOTTIE_OPTIONS } from 'src/app/constants';
 
@@ -12,15 +12,15 @@ interface CollectionViewProps {
   currentItem?: any;
 
   tracklist?: SCNGXTracklist<LikedSong>;
-  user?: SSOUser;
+  user?: Profile;
   latestLikeChange?: ToggleLikedSongDTO;
 }
 
 @Component({
-    templateUrl: './collection.component.html',
-    styleUrls: ['./collection.component.scss'],
-    changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: false
+  templateUrl: './collection.component.html',
+  styleUrls: ['./collection.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false
 })
 export class CollectionComponent implements OnInit, OnDestroy {
 
@@ -35,16 +35,16 @@ export class CollectionComponent implements OnInit, OnDestroy {
     private readonly likeService: SCSDKLikeService,
     // private readonly player: AppPlayerService,
     private readonly tracklistBuilder: SCNGXTracklistBuilder,
-    private readonly ssoService: SSOService,
+    private readonly ssoService: AuthenticationService,
     private readonly snackbar: MatSnackBar
   ) { }
 
   public readonly $props: Observable<CollectionViewProps> = combineLatest([
     // this.player.$current.pipe(takeUntil(this._destroy)),
     // this.player.$isPaused.pipe(takeUntil(this._destroy)),
-    this.ssoService.$user.pipe(
-      map((ssoUser): [SSOUser, SCNGXTracklist<LikedSong>] => {
-        return [ssoUser, this.tracklistBuilder.forLikedSongs(ssoUser.id) as SCNGXTracklist<LikedSong>];
+    this.ssoService.$profile.pipe(
+      map((ssoUser): [Profile, SCNGXTracklist<LikedSong>] => {
+        return [ssoUser, this.tracklistBuilder.forLikedSongs(ssoUser.sub) as SCNGXTracklist<LikedSong>];
       }),
       takeUntil(this._destroy)
     )

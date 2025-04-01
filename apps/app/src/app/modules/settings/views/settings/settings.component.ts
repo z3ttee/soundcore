@@ -1,14 +1,14 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { UntypedFormControl, UntypedFormGroup } from '@angular/forms';
+import { AuthenticationService } from '@repo/angular-oidc';
 import { SCSDKSettingsService } from '@repo/angular-sdk';
-import { SSOService } from '@soundcore/sso';
 import { Subject, takeUntil } from 'rxjs';
 
 @Component({
-    selector: 'app-settings',
-    templateUrl: './settings.component.html',
-    styleUrls: ['./settings.component.scss'],
-    standalone: false
+  selector: 'app-settings',
+  templateUrl: './settings.component.html',
+  styleUrls: ['./settings.component.scss'],
+  standalone: false
 })
 export class SettingsComponent implements OnInit, OnDestroy {
   private readonly _destroy: Subject<void> = new Subject();
@@ -19,7 +19,7 @@ export class SettingsComponent implements OnInit, OnDestroy {
 
   constructor(
     private readonly settingsService: SCSDKSettingsService,
-    public readonly authService: SSOService
+    public readonly authService: AuthenticationService
   ) { }
 
   public ngOnInit(): void {

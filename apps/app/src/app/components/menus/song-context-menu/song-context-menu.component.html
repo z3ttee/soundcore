@@ -1,6 +1,7 @@
 <sccdk-context-menu>
     <sccdk-context-menu-category>
-        <sccdk-context-menu-item [routerLink]="['/artist', song.primaryArtist.id ?? song.primaryArtist.slug]" *ngIf="song.primaryArtist">
+        <sccdk-context-menu-item [routerLink]="['/artist', song.primaryArtist.id ?? song.primaryArtist.slug]"
+            *ngIf="song.primaryArtist">
             <span>Künstler ansehen</span>
         </sccdk-context-menu-item>
         <sccdk-context-menu-item [routerLink]="['/album', song.album.id ?? song.album.slug]" *ngIf="song.album">
@@ -30,7 +31,7 @@
         </sccdk-context-menu-item> -->
     </sccdk-context-menu-category>
     <scngx-divider></scngx-divider>
-    <sccdk-context-menu-category *ngIf="$isAdmin | async">
+    <sccdk-context-menu-category>
         <sccdk-context-menu-item>
             <!-- <hero-icon name="minus" [class]="'h-5 w-5'"></hero-icon> -->
             <span>Verwalten</span>

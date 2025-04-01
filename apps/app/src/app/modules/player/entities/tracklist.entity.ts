@@ -1,6 +1,6 @@
 import { HttpClient } from "@angular/common/http";
-import { Future, PlayableEntity, Song } from "@repo/angular-sdk";
-import { isNull } from "@repo/utilities";
+import { PlayableEntity, Song } from "@repo/angular-sdk";
+import { Future, isNull } from "@repo/utilities";
 import { Observable, filter } from "rxjs";
 import { SCNGXBaseTracklist } from "./tracklist-base.entity";
 

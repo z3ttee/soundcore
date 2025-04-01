@@ -30,6 +30,7 @@
     "noImplicitOverride": true,
     "emitDecoratorMetadata": true,
     "noFallthroughCasesInSwitch": true,
+    "useDefineForClassFields": false
   },
   "include": [
     "src/**/*.ts"

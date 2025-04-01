@@ -1,19 +1,19 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { SCNGXDialogService } from '@repo/angular-ui';
+import { AuthenticationService } from '@repo/angular-oidc';
 import { PlayableEntity, PlayableEntityType, Playlist, PlaylistAddSongFailReason, SCSDKLikeService, SCSDKPlaylistService, Song } from '@repo/angular-sdk';
+import { SCNGXDialogService } from '@repo/angular-ui';
 import { isNull } from '@repo/utilities';
-import { SSOService } from '@soundcore/sso';
-import { Observable, Subject, takeUntil } from 'rxjs';
+import { Subject } from 'rxjs';
 import { AppPlaylistChooseDialog } from 'src/app/dialogs/playlist-choose-dialog/playlist-choose-dialog.component';
 import { PlayerService } from 'src/app/modules/player/services/player.service';
 
 @Component({
-    selector: 'app-song-context-menu',
-    templateUrl: './song-context-menu.component.html',
-    styleUrls: ['./song-context-menu.component.scss'],
-    changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: false
+  selector: 'app-song-context-menu',
+  templateUrl: './song-context-menu.component.html',
+  styleUrls: ['./song-context-menu.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false
 })
 export class SongContextMenuComponent implements OnInit, OnDestroy {
 
@@ -22,7 +22,7 @@ export class SongContextMenuComponent implements OnInit, OnDestroy {
   @Input() public index: number;
 
   constructor(
-    private readonly authService: SSOService,
+    private readonly authService: AuthenticationService,
     private readonly playlistService: SCSDKPlaylistService,
     private readonly dialog: SCNGXDialogService,
     private readonly snackbar: MatSnackBar,
@@ -32,7 +32,7 @@ export class SongContextMenuComponent implements OnInit, OnDestroy {
   ) { }
 
   private readonly _destroy: Subject<void> = new Subject();
-  public readonly $isAdmin: Observable<boolean> = this.authService.$isAdmin.pipe(takeUntil(this._destroy));
+  // public readonly $isAdmin: Observable<boolean> = this.authService.$isAdmin.pipe(takeUntil(this._destroy));
 
   public ngOnInit(): void { }
   public ngOnDestroy(): void {

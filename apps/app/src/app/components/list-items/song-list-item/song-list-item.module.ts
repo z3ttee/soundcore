@@ -6,7 +6,7 @@ import { NgIconsModule } from '@ng-icons/core';
 import { heroHeart } from '@ng-icons/heroicons/outline';
 import { heroEllipsisVerticalSolid, heroHeartSolid, heroPauseSolid, heroPlaySolid } from '@ng-icons/heroicons/solid';
 import { SCNGXAddedToPlaylistPipeModule, SCNGXArtworkModule, SCNGXExplicitBadgeModule, SCNGXIconBtnModule, SCNGXSkeletonModule, SCNGXSongDurationPipeModule, SCNGXTooltipModule } from '@repo/angular-ui';
-import { LottieModule } from 'ngx-lottie';
+import { LottieComponent } from 'ngx-lottie';
 import { SCNGXSongListItemComponent } from './song-list-item.component';
 @NgModule({
   declarations: [
@@ -15,7 +15,7 @@ import { SCNGXSongListItemComponent } from './song-list-item.component';
   imports: [
     CommonModule,
     RouterModule,
-    LottieModule,
+    LottieComponent,
     NgIconsModule.withIcons({ heroHeart, heroHeartSolid, heroPlaySolid, heroPauseSolid, heroEllipsisVerticalSolid }),
 
     MatRippleModule,
@@ -30,7 +30,7 @@ import { SCNGXSongListItemComponent } from './song-list-item.component';
   ],
   exports: [
     SCNGXSongListItemComponent,
-    LottieModule
+    LottieComponent
   ]
 })
 export class SCNGXSongListItemModule { }

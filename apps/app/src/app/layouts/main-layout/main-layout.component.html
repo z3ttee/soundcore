@@ -12,45 +12,57 @@
             <div class="block p-window pb-0">
                 <div class="flex items-center w-full">
                     <div class="w-1/2">
-                        <img src="assets/branding/soundcore_logo_full.svg" class="min-w-10 max-w-10 h-10 block cursor-pointer" [routerLink]="['/']">
+                        <img src="assets/branding/soundcore_logo_full.svg"
+                            class="min-w-10 max-w-10 h-10 block cursor-pointer" [routerLink]="['/']">
                     </div>
 
                     <div class="w-1/2 text-right">
-                        <button (click)="navigateBack()" class="inline-flex items-center justify-center bg-body-light rounded-full w-9 h-9 mr-1.5 transform-gpu transition-all will-change-transform active:scale-95"><ng-icon size="20" name="heroChevronDown" class="transform-gpu rotate-90"></ng-icon></button>
-                        <button (click)="navigateNext()" class="inline-flex items-center justify-center bg-body-light rounded-full w-9 h-9 transform-gpu transition-all will-change-transform active:scale-95"><ng-icon size="20" name="heroChevronDown" class="transform-gpu -rotate-90"></ng-icon></button>
+                        <button (click)="navigateBack()"
+                            class="inline-flex items-center justify-center bg-body-light rounded-full w-9 h-9 mr-1.5 transform-gpu transition-all will-change-transform active:scale-95"><ng-icon
+                                size="20" name="heroChevronDown" class="transform-gpu rotate-90"></ng-icon></button>
+                        <button (click)="navigateNext()"
+                            class="inline-flex items-center justify-center bg-body-light rounded-full w-9 h-9 transform-gpu transition-all will-change-transform active:scale-95"><ng-icon
+                                size="20" name="heroChevronDown" class="transform-gpu -rotate-90"></ng-icon></button>
                     </div>
                 </div>
 
                 <div class="w-full mt-row">
-                    <input type="text" [formControl]="searchInputControl" placeholder="Suchen" class="outline-none appearance-none w-full bg-body-light border border-transparent focus:border-font focus:border-opacity-30 transition-colors rounded-full text-sm py-3 px-4 placeholder:font-semi placeholder:text-font-secondary" (click)="navigateToSearch()">
+                    <input type="text" [formControl]="searchInputControl" placeholder="Suchen"
+                        class="outline-none appearance-none w-full bg-body-light border border-transparent focus:border-font focus:border-opacity-30 transition-colors rounded-full text-sm py-3 px-4 placeholder:font-semi placeholder:text-font-secondary"
+                        (click)="navigateToSearch()">
                 </div>
             </div>
 
-            <hr class="my-row bg-divider min-h-[3px] max-h-[3px] rounded-full appearance-none border-none w-[90%] mx-auto">
+            <hr
+                class="my-row bg-divider min-h-[3px] max-h-[3px] rounded-full appearance-none border-none w-[90%] mx-auto">
 
             <!-- Main menu -->
             <div class="block px-window">
                 <div class="flex flex-col select-none gap-1">
-                    <scngx-nav-list-item [routerLink]="['/']" [routerLinkActiveOptions]="{exact: true}" iconName="heroHome">Startseite</scngx-nav-list-item>
-                    <scngx-nav-list-item [routerLink]="['/library']" iconName="heroBookmarkSquare">Bibliothek</scngx-nav-list-item>
-                    <scngx-nav-list-item [routerLink]="['/profile/@me']" iconName="heroUser">Dein Profil</scngx-nav-list-item>
+                    <scngx-nav-list-item [routerLink]="['/']" [routerLinkActiveOptions]="{exact: true}"
+                        iconName="heroHome">Startseite</scngx-nav-list-item>
+                    <scngx-nav-list-item [routerLink]="['/library']"
+                        iconName="heroBookmarkSquare">Bibliothek</scngx-nav-list-item>
+                    <scngx-nav-list-item [routerLink]="['/profile/@me']" iconName="heroUser">Dein
+                        Profil</scngx-nav-list-item>
                 </div>
             </div>
 
-            <hr class="mt-row bg-divider min-h-[3px] max-h-[3px] rounded-full appearance-none border-none w-[90%] mx-auto">
+            <hr
+                class="mt-row bg-divider min-h-[3px] max-h-[3px] rounded-full appearance-none border-none w-[90%] mx-auto">
 
             <div class="block px-window flex-grow" cdkVirtualScrollingElement>
                 <cdk-virtual-scroll-viewport [itemSize]="26">
                     <div class="flex flex-col gap-1 select-none py-row">
                         <!-- Create playlist button -->
-                        <scngx-nav-list-item (click)="openCreatePlaylistDialog()" iconName="heroPlusSolid">Playlist erstellen</scngx-nav-list-item>
-                        <scngx-nav-list-item [routerLink]="['/collection']" iconSrc="assets/img/collection_cover.png">Lieblingssongs</scngx-nav-list-item>
+                        <scngx-nav-list-item (click)="openCreatePlaylistDialog()" iconName="heroPlusSolid">Playlist
+                            erstellen</scngx-nav-list-item>
+                        <scngx-nav-list-item [routerLink]="['/collection']"
+                            iconSrc="assets/img/collection_cover.png">Lieblingssongs</scngx-nav-list-item>
 
                         <!-- Playlist items -->
-                        <scngx-nav-list-item 
-                            *cdkVirtualFor="let playlist of props.playlists"
-                            [routerLink]="['/playlist', playlist?.slug || playlist?.id]"
-                            [artwork]="playlist.artwork ?? {}">
+                        <scngx-nav-list-item *cdkVirtualFor="let playlist of props.playlists"
+                            [routerLink]="['/playlist', playlist?.slug || playlist?.id]" [artwork]="playlist.artwork">
                             {{ playlist.name }}
                         </scngx-nav-list-item>
                     </div>
@@ -60,27 +72,35 @@
             <hr class="bg-divider min-h-[3px] max-h-[3px] rounded-full appearance-none border-none w-[90%] mx-auto">
             <app-profile-bar [user]="props.account">
                 <ul>
-                    
-                    <li *ngIf="props.isAdminAccount" class="flex items-center cursor-pointer gap-4 p-2.5 transition-all bg-body-light bg-opacity-0 active:bg-opacity-80 rounded-sm" [ngClass]="{'hover:bg-opacity-50': !(screenService.$isTouch | async)}" [routerLink]="['/admin']">
-                        <ng-icon name="heroShieldExclamation" class="h-5 w-5"></ng-icon> 
+
+                    <li *ngIf="props.isAdminAccount"
+                        class="flex items-center cursor-pointer gap-4 p-2.5 transition-all bg-body-light bg-opacity-0 active:bg-opacity-80 rounded-sm"
+                        [ngClass]="{'hover:bg-opacity-50': !(screenService.$isTouch | async)}"
+                        [routerLink]="['/admin']">
+                        <ng-icon name="heroShieldExclamation" class="h-5 w-5"></ng-icon>
                         <span>Administration</span>
                     </li>
 
                     <hr *ngIf="props.isAdminAccount" class="appearance-none border-none bg-divider h-[2px] my-2">
 
-                    <li class="flex items-center cursor-pointer gap-4 p-2.5 transition-all bg-body-light bg-opacity-0 active:bg-opacity-80 rounded-sm" [ngClass]="{'hover:bg-opacity-50': !(screenService.$isTouch | async)}" [routerLink]="['/notifications']">
-                        <ng-icon name="heroBell" class="h-5 w-5"></ng-icon> 
+                    <li class="flex items-center cursor-pointer gap-4 p-2.5 transition-all bg-body-light bg-opacity-0 active:bg-opacity-80 rounded-sm"
+                        [ngClass]="{'hover:bg-opacity-50': !(screenService.$isTouch | async)}"
+                        [routerLink]="['/notifications']">
+                        <ng-icon name="heroBell" class="h-5 w-5"></ng-icon>
                         <span>Benachrichtungen</span>
                     </li>
-                    <li class="flex items-center cursor-pointer gap-4 p-2.5 transition-all bg-body-light bg-opacity-0 active:bg-opacity-80 rounded-sm" [ngClass]="{'hover:bg-opacity-50': !(screenService.$isTouch | async)}" [routerLink]="['/settings']">
-                        <ng-icon name="heroCog6Tooth" class="h-5 w-5"></ng-icon> 
+                    <li class="flex items-center cursor-pointer gap-4 p-2.5 transition-all bg-body-light bg-opacity-0 active:bg-opacity-80 rounded-sm"
+                        [ngClass]="{'hover:bg-opacity-50': !(screenService.$isTouch | async)}"
+                        [routerLink]="['/settings']">
+                        <ng-icon name="heroCog6Tooth" class="h-5 w-5"></ng-icon>
                         <span>Einstellungen</span>
                     </li>
 
                     <hr class="appearance-none border-none bg-divider h-[2px] my-2">
 
-                    <li class="flex items-center cursor-pointer gap-4 p-2.5 transition-all bg-error-light bg-opacity-0 active:bg-opacity-20 rounded-sm text-error-light" [ngClass]="{'hover:bg-opacity-10': !(screenService.$isTouch | async)}" (click)="logout()">
-                        <ng-icon name="heroArrowRightOnRectangle" class="h-5 w-5"></ng-icon> 
+                    <li class="flex items-center cursor-pointer gap-4 p-2.5 transition-all bg-error-light bg-opacity-0 active:bg-opacity-20 rounded-sm text-error-light"
+                        [ngClass]="{'hover:bg-opacity-10': !(screenService.$isTouch | async)}" (click)="logout()">
+                        <ng-icon name="heroArrowRightOnRectangle" class="h-5 w-5"></ng-icon>
                         <span>Abmelden</span>
                     </li>
                 </ul>
@@ -99,13 +119,16 @@
     <!-- Layout - Mobile -->
     <scngx-bottom-nav *ngIf="(screenService.$isTouch | async)">
         <!-- Bottom navigation items -->
-        <scngx-nav-item [label]="'Home'" [routerLink]="['/']" [routerLinkActiveOptions]="{exact: true}" routerLinkActive #rla="routerLinkActive" [active]="rla.isActive">
+        <scngx-nav-item [label]="'Home'" [routerLink]="['/']" [routerLinkActiveOptions]="{exact: true}" routerLinkActive
+            #rla="routerLinkActive" [active]="rla.isActive">
             <ng-icon name="heroHome" class="h-5 w-5 transition-all"></ng-icon>
         </scngx-nav-item>
-        <scngx-nav-item [label]="'Suchen'" [routerLink]="['/search']" routerLinkActive #rla1="routerLinkActive" [active]="rla1.isActive">
+        <scngx-nav-item [label]="'Suchen'" [routerLink]="['/search']" routerLinkActive #rla1="routerLinkActive"
+            [active]="rla1.isActive">
             <ng-icon name="heroMagnifyingGlass" class="h-5 w-5 transition-all"></ng-icon>
         </scngx-nav-item>
-        <scngx-nav-item [label]="'Bibliothek'" [routerLink]="['/library']" routerLinkActive #rla2="routerLinkActive" [active]="rla2.isActive">
+        <scngx-nav-item [label]="'Bibliothek'" [routerLink]="['/library']" routerLinkActive #rla2="routerLinkActive"
+            [active]="rla2.isActive">
             <ng-icon name="heroBookmarkSquare" class="h-5 w-5 transition-all"></ng-icon>
         </scngx-nav-item>
         <!-- Page contents -->
@@ -121,14 +144,16 @@
         <ng-container *ngIf="$any(connection | async) as con">
             <ng-container *ngIf="con.status == 'disconnected'">
                 <div class="w-full pt-window px-window">
-                    <div class="flex flex-1 items-center justify-start w-full bg-warn p-3 rounded-sm border border-warn-light">
+                    <div
+                        class="flex flex-1 items-center justify-start w-full bg-warn p-3 rounded-sm border border-warn-light">
                         <div>
-                            
+
                         </div>
                         <div>
                             <p class="text-sm">Störung erkannt.</p>
-                            <p class="text-xs">Derzeit kann keine zuverlässige Verbindung zum Soundcore-Service aufgebaut werden.</p>
-                
+                            <p class="text-xs">Derzeit kann keine zuverlässige Verbindung zum Soundcore-Service
+                                aufgebaut werden.</p>
+
                             <button *ngIf="con.$retry" (click)="con.$retry.subscribe()">Erneut versuchen</button>
                         </div>
                     </div>
@@ -137,14 +162,17 @@
 
             <ng-container *ngIf="con.status != 'disconnected' && con.reconnectAttempts > 0">
                 <div class="w-full pt-window px-window">
-                    <div class="flex flex-1 items-center justify-start w-full bg-warn p-3 rounded-sm border border-warn-light">
+                    <div
+                        class="flex flex-1 items-center justify-start w-full bg-warn p-3 rounded-sm border border-warn-light">
                         <div>
-                            
+
                         </div>
                         <div>
                             <p class="text-sm pb-2">Störung erkannt.</p>
-                            <p class="text-sm">Derzeit kann keine zuverlässige Verbindung zum Soundcore-Service aufgebaut werden. 
-                                Du wirst automatisch verbunden sobald der Service wieder erreichbar ist. ({{ con.reconnectAttempts ?? 0 }})
+                            <p class="text-sm">Derzeit kann keine zuverlässige Verbindung zum Soundcore-Service
+                                aufgebaut werden.
+                                Du wirst automatisch verbunden sobald der Service wieder erreichbar ist. ({{
+                                con.reconnectAttempts ?? 0 }})
                             </p>
                         </div>
                     </div>

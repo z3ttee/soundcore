@@ -1,6 +1,6 @@
 import { HttpClient } from "@angular/common/http";
-import { ApiError, Future, LikedSong, PlayableEntity, PlaylistItem, Song, toFuture, TracklistV2 } from "@repo/angular-sdk";
-import { isNull, isString, Page, Pageable } from "@repo/utilities";
+import { ApiError, LikedSong, PlayableEntity, PlaylistItem, Song, TracklistV2 } from "@repo/angular-sdk";
+import { Future, isNull, isString, Page, Pageable, toFuture } from "@repo/utilities";
 import { BehaviorSubject, filter, map, Observable, of, Subject, switchMap, take, takeUntil, tap } from "rxjs";
 import { Cache } from "./cache";
 import { Queue } from "./queue";
@@ -303,7 +303,7 @@ export abstract class SCNGXBaseTracklist<T, U extends TracklistEntityTypes> {
             map((request) => {
                 // Publish error if exists
                 if (request.error) {
-                    this.error(request.error);
+                    this.error(request.error as any);
                     return null;
                 }
 
@@ -416,7 +416,7 @@ export abstract class SCNGXBaseTracklist<T, U extends TracklistEntityTypes> {
             // Handle errors
             tap((request) => {
                 // Push error to tracklist if exists
-                if (!isNull(request.error)) this.error(request.error);
+                if (!isNull(request.error)) this.error(request.error as any);
             }),
             // Return page content
             map((request) => request.data),

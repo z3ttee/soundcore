@@ -1,7 +1,7 @@
 import { CommonModule } from "@angular/common";
 import { NgModule } from "@angular/core";
+import { LottieComponent, LottieDirective } from "ngx-lottie";
 import { EmptyPageBannerComponent } from "./empty-page-banner.component";
-import { LottieModule } from "ngx-lottie";
 
 @NgModule({
     declarations: [
@@ -9,10 +9,11 @@ import { LottieModule } from "ngx-lottie";
     ],
     imports: [
         CommonModule,
-        LottieModule,
+        LottieComponent,
+        LottieDirective
     ],
     exports: [
         EmptyPageBannerComponent
     ]
 })
-export class EmptyPageBannerModule {}
+export class EmptyPageBannerModule { }

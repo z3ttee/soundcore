@@ -11,17 +11,24 @@
         <div class="block p-window pb-0">
             <div class="flex items-center w-full">
                 <div class="w-1/2">
-                    <img src="assets/branding/soundcore_logo_full.svg" class="min-w-10 max-w-10 h-10 block cursor-pointer" [routerLink]="['/']">
+                    <img src="assets/branding/soundcore_logo_full.svg"
+                        class="min-w-10 max-w-10 h-10 block cursor-pointer" [routerLink]="['/']">
                 </div>
 
                 <div class="w-1/2 text-right">
-                    <button (click)="navigateBack()" class="inline-flex items-center justify-center bg-body-light rounded-full w-9 h-9 mr-1.5 transform-gpu transition-all will-change-transform active:scale-95"><ng-icon name="heroChevronDown" size="20" class="h-5 w-5 transform-gpu rotate-90"></ng-icon></button>
-                    <button (click)="navigateNext()" class="inline-flex items-center justify-center bg-body-light rounded-full w-9 h-9 transform-gpu transition-all will-change-transform active:scale-95"><ng-icon name="heroChevronDown" size="20" class="h-5 w-5 transform-gpu -rotate-90"></ng-icon></button>
+                    <button (click)="navigateBack()"
+                        class="inline-flex items-center justify-center bg-body-light rounded-full w-9 h-9 mr-1.5 transform-gpu transition-all will-change-transform active:scale-95"><ng-icon
+                            name="heroChevronDown" size="20" class="h-5 w-5 transform-gpu rotate-90"></ng-icon></button>
+                    <button (click)="navigateNext()"
+                        class="inline-flex items-center justify-center bg-body-light rounded-full w-9 h-9 transform-gpu transition-all will-change-transform active:scale-95"><ng-icon
+                            name="heroChevronDown" size="20"
+                            class="h-5 w-5 transform-gpu -rotate-90"></ng-icon></button>
                 </div>
             </div>
 
             <div class="mt-4">
-                <scngx-nav-list-item [routerLink]="['/']" [routerLinkActiveOptions]="{exact: true}" iconName="heroArrowLeft">Zurück zur App</scngx-nav-list-item>
+                <scngx-nav-list-item [routerLink]="['/']" [routerLinkActiveOptions]="{exact: true}"
+                    iconName="heroArrowLeft">Zurück zur App</scngx-nav-list-item>
             </div>
         </div>
 
@@ -29,30 +36,39 @@
 
         <div class="block h-full px-window">
             <div class="flex flex-col gap-1 select-none">
-                <scngx-nav-list-item [routerLink]="['./']" [routerLinkActiveOptions]="{ exact: true }" iconName="heroChartPie">Dashboard</scngx-nav-list-item>
-                <scngx-nav-list-item [routerLink]="['./zones']" iconName="heroCubeTransparent">Speicherzonen</scngx-nav-list-item>
-                <scngx-nav-list-item [routerLink]="['./import']" iconName="heroDocumentPlus">Importieren</scngx-nav-list-item>
+                <scngx-nav-list-item [routerLink]="['./']" [routerLinkActiveOptions]="{ exact: true }"
+                    iconName="heroChartPie">Dashboard</scngx-nav-list-item>
+                <scngx-nav-list-item [routerLink]="['./zones']"
+                    iconName="heroCubeTransparent">Speicherzonen</scngx-nav-list-item>
+                <scngx-nav-list-item [routerLink]="['./import']"
+                    iconName="heroDocumentPlus">Importieren</scngx-nav-list-item>
                 <scngx-nav-list-item [routerLink]="['./tasks']" iconName="heroBolt">Prozesse</scngx-nav-list-item>
-                <scngx-nav-list-item [routerLink]="['./configurate']" iconName="heroCog6Tooth">Einstellungen</scngx-nav-list-item>
+                <scngx-nav-list-item [routerLink]="['./configurate']"
+                    iconName="heroCog6Tooth">Einstellungen</scngx-nav-list-item>
             </div>
         </div>
 
         <hr class="bg-divider min-h-[3px] max-h-[3px] rounded-full appearance-none border-none w-[90%] mx-auto">
-        <app-profile-bar [user]="(authService.$user | async)">
+        <app-profile-bar [user]="(authService.$profile | async)">
             <ul>
-                <li class="flex items-center cursor-pointer gap-4 p-2.5 transition-all bg-body-light bg-opacity-0 active:bg-opacity-80 rounded-sm" [ngClass]="{'hover:bg-opacity-50': !(screenService.$isTouch | async)}" [routerLink]="['/notifications']">
-                    <ng-icon name="heroBell" class="h-5 w-5"></ng-icon> 
+                <li class="flex items-center cursor-pointer gap-4 p-2.5 transition-all bg-body-light bg-opacity-0 active:bg-opacity-80 rounded-sm"
+                    [ngClass]="{'hover:bg-opacity-50': !(screenService.$isTouch | async)}"
+                    [routerLink]="['/notifications']">
+                    <ng-icon name="heroBell" class="h-5 w-5"></ng-icon>
                     <span>Benachrichtungen</span>
                 </li>
-                <li class="flex items-center cursor-pointer gap-4 p-2.5 transition-all bg-body-light bg-opacity-0 active:bg-opacity-80 rounded-sm" [ngClass]="{'hover:bg-opacity-50': !(screenService.$isTouch | async)}" [routerLink]="['/settings']">
-                    <ng-icon name="heroCog6Tooth" class="h-5 w-5"></ng-icon> 
+                <li class="flex items-center cursor-pointer gap-4 p-2.5 transition-all bg-body-light bg-opacity-0 active:bg-opacity-80 rounded-sm"
+                    [ngClass]="{'hover:bg-opacity-50': !(screenService.$isTouch | async)}" [routerLink]="['/settings']">
+                    <ng-icon name="heroCog6Tooth" class="h-5 w-5"></ng-icon>
                     <span>Einstellungen</span>
                 </li>
 
                 <hr class="appearance-none border-none bg-divider h-[2px] my-2">
 
-                <li class="flex items-center cursor-pointer gap-4 p-2.5 transition-all bg-error-light bg-opacity-0 active:bg-opacity-20 rounded-sm text-error-light" [ngClass]="{'hover:bg-opacity-10': !(screenService.$isTouch | async)}" (click)="authService.logout()">
-                    <ng-icon name="heroArrowRightOnRectangle" class="h-5 w-5"></ng-icon> 
+                <li class="flex items-center cursor-pointer gap-4 p-2.5 transition-all bg-error-light bg-opacity-0 active:bg-opacity-20 rounded-sm text-error-light"
+                    [ngClass]="{'hover:bg-opacity-10': !(screenService.$isTouch | async)}"
+                    (click)="authService.logout()">
+                    <ng-icon name="heroArrowRightOnRectangle" class="h-5 w-5"></ng-icon>
                     <span>Abmelden</span>
                 </li>
             </ul>
@@ -69,16 +85,20 @@
 <!-- Layout - Mobile -->
 <scngx-bottom-nav *ngIf="(screenService.$isTouch | async)">
     <!-- Bottom navigation items -->
-    <scngx-nav-item [label]="'Speicherzonen'" [routerLink]="['./zones']" routerLinkActive #rla="routerLinkActive" [active]="rla.isActive">
+    <scngx-nav-item [label]="'Speicherzonen'" [routerLink]="['./zones']" routerLinkActive #rla="routerLinkActive"
+        [active]="rla.isActive">
         <ng-icon name="heroCubeTransparent" class="h-5 w-5 transition-all"></ng-icon>
     </scngx-nav-item>
-    <scngx-nav-item [label]="'Importieren'" [routerLink]="['./import']" routerLinkActive #rla1="routerLinkActive" [active]="rla1.isActive">
+    <scngx-nav-item [label]="'Importieren'" [routerLink]="['./import']" routerLinkActive #rla1="routerLinkActive"
+        [active]="rla1.isActive">
         <ng-icon name="heroDocumentPlus" class="h-5 w-5 transition-all"></ng-icon>
     </scngx-nav-item>
-    <scngx-nav-item [label]="'Tasks'" [routerLink]="['./tasks']" routerLinkActive #rla2="routerLinkActive" [active]="rla2.isActive">
+    <scngx-nav-item [label]="'Tasks'" [routerLink]="['./tasks']" routerLinkActive #rla2="routerLinkActive"
+        [active]="rla2.isActive">
         <ng-icon name="heroBolt" class="h-5 w-5 transition-all"></ng-icon>
     </scngx-nav-item>
-    <scngx-nav-item [label]="'Mehr'" [routerLink]="['./more']" routerLinkActive #rla3="routerLinkActive" [active]="rla3.isActive">
+    <scngx-nav-item [label]="'Mehr'" [routerLink]="['./more']" routerLinkActive #rla3="routerLinkActive"
+        [active]="rla3.isActive">
         <ng-icon name="heroEllipsisVerticalSolid" class="h-5 w-5 transition-all"></ng-icon>
     </scngx-nav-item>
 
@@ -94,14 +114,16 @@
     <ng-container *ngIf="$any(connection | async) as con">
         <ng-container *ngIf="con.status == 'disconnected'">
             <div class="w-full pt-window px-window">
-                <div class="flex flex-1 items-center justify-start w-full bg-warn p-3 rounded-sm border border-warn-light">
+                <div
+                    class="flex flex-1 items-center justify-start w-full bg-warn p-3 rounded-sm border border-warn-light">
                     <div>
-                        
+
                     </div>
                     <div>
                         <p class="text-sm">Störung erkannt.</p>
-                        <p class="text-xs">Derzeit kann keine zuverlässige Verbindung zum Soundcore-Service aufgebaut werden.</p>
-            
+                        <p class="text-xs">Derzeit kann keine zuverlässige Verbindung zum Soundcore-Service aufgebaut
+                            werden.</p>
+
                         <button *ngIf="con.$retry" (click)="con.$retry.subscribe()">Erneut versuchen</button>
                     </div>
                 </div>
@@ -110,14 +132,17 @@
 
         <ng-container *ngIf="con.status != 'disconnected' && con.reconnectAttempts > 0">
             <div class="w-full pt-window px-window">
-                <div class="flex flex-1 items-center justify-start w-full bg-warn p-3 rounded-sm border border-warn-light">
+                <div
+                    class="flex flex-1 items-center justify-start w-full bg-warn p-3 rounded-sm border border-warn-light">
                     <div>
-                        
+
                     </div>
                     <div>
                         <p class="text-sm pb-2">Störung erkannt.</p>
-                        <p class="text-sm">Derzeit kann keine zuverlässige Verbindung zum Soundcore-Service aufgebaut werden. 
-                            Du wirst automatisch verbunden sobald der Service wieder erreichbar ist. ({{ con.reconnectAttempts ?? 0 }})
+                        <p class="text-sm">Derzeit kann keine zuverlässige Verbindung zum Soundcore-Service aufgebaut
+                            werden.
+                            Du wirst automatisch verbunden sobald der Service wieder erreichbar ist. ({{
+                            con.reconnectAttempts ?? 0 }})
                         </p>
                     </div>
                 </div>

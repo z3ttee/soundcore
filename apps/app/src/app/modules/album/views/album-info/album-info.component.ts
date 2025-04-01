@@ -1,7 +1,8 @@
 import { ChangeDetectionStrategy, Component, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Album, Future, SCDKAlbumService, SCSDKDatasource, SCSDKSongService, Song, toFutureCompat } from '@repo/angular-sdk';
-import { Page } from '@repo/utilities';
+import { Album, SCDKAlbumService, SCSDKDatasource, SCSDKSongService, Song } from '@repo/angular-sdk';
+import { toFutureCompat } from '@repo/angular-ui';
+import { Future, Page } from '@repo/utilities';
 import { combineLatest, map, Observable, of, startWith, Subject, switchMap, takeUntil } from 'rxjs';
 import { AUDIOWAVE_LOTTIE_OPTIONS } from 'src/app/constants';
 import { SCNGXTracklist } from 'src/app/modules/player/entities/tracklist.entity';
@@ -17,9 +18,9 @@ interface AlbumInfoProps {
 }
 
 @Component({
-    templateUrl: './album-info.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: false
+  templateUrl: './album-info.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false
 })
 export class AlbumInfoComponent implements OnDestroy {
 
