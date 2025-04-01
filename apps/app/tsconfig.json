@@ -1,6 +1,5 @@
 /* To learn more about this file see: https://angular.io/config/tsconfig. */
 {
-  "extends": "@repo/config-typescript/angular.json",
   "compileOnSave": false,
   "compilerOptions": {
     "baseUrl": "./",
