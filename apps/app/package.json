@@ -31,7 +31,7 @@
     "uuid": "^8.3.2",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
-    "zone.js": "^0.14.0",
+    "zone.js": "^0.15.0",
     "@vercel/analytics": "^1.0.0"
   },
   "devDependencies": {
@@ -43,6 +43,6 @@
     "autoprefixer": "^10.4.4",
     "postcss": "^8.4.12",
     "tailwindcss": "^3.0.23",
-    "typescript": "~5.4.5"
+    "typescript": "^5.8.0"
   }
 }
