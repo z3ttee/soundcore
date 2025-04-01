@@ -1,5 +1,5 @@
 import { ModuleWithProviders, NgModule } from "@angular/core";
-import { SCCDKModule, SCCDKOptions, SCCDK_OPTIONS } from "@soundcore/cdk";
+import { SCCDKModule, SCCDKOptions, SCCDK_OPTIONS } from "@repo/angular-cdk";
 import { provideCacheableAnimationLoader, provideLottieOptions } from 'ngx-lottie';
 import { SCNGXScrollModule } from "./services/scroll/scroll.module";
 

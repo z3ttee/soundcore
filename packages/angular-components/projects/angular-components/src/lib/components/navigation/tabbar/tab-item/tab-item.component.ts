@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { SCCDKScreenService } from '@soundcore/cdk';
+import { SCCDKScreenService } from '@repo/angular-cdk';
 
 export interface SCNGXTabItemRoute {
   commands: any[];
@@ -7,10 +7,10 @@ export interface SCNGXTabItemRoute {
 }
 
 @Component({
-    selector: 'scngx-tab-item',
-    templateUrl: './tab-item.component.html',
-    styleUrls: ['./tab-item.component.scss'],
-    standalone: false
+  selector: 'scngx-tab-item',
+  templateUrl: './tab-item.component.html',
+  styleUrls: ['./tab-item.component.scss'],
+  standalone: false
 })
 export class SCNGXTabItemComponent implements OnInit {
 
@@ -21,7 +21,7 @@ export class SCNGXTabItemComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    
+
   }
 
 }

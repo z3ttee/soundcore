@@ -1,8 +1,7 @@
 import { AfterViewInit, Component, inject, OnDestroy, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
-import { BehaviorSubject, filter, Observable, Subject } from 'rxjs';
-import { SCCDKScreenService } from '@soundcore/cdk';
+import { SCCDKScreenService } from '@repo/angular-cdk';
 import { AuthenticationService } from '@repo/angular-oidc';
+import { BehaviorSubject, filter, Observable, Subject } from 'rxjs';
 
 interface AppProps {
   ready?: boolean;

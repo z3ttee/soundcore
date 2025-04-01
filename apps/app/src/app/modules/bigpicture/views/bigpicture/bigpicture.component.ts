@@ -2,8 +2,8 @@ import { Location } from "@angular/common";
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, HostListener, OnDestroy, ViewChild } from "@angular/core";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { ActivatedRoute, Router } from "@angular/router";
+import { SCCDKScreenService } from "@repo/angular-cdk";
 import { PlayableEntity, SCSDKLikeService, Song } from "@repo/angular-sdk";
-import { SCCDKScreenService } from "@soundcore/cdk";
 import { combineLatest, filter, map, Observable, Subject, takeUntil } from "rxjs";
 import { PlayerService, Streamable } from "src/app/modules/player/services/player.service";
 

@@ -1,5 +1,5 @@
 {
-  "name": "@soundcore/cdk",
+  "name": "@repo/angular-cdk",
   "version": "0.0.0",
   "module": "./dist/fesm2015/soundcore-cdk.mjs",
   "es2020": "./dist/fesm2020/soundcore-cdk.mjs",

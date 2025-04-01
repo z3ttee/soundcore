@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { SCCDKScreenService } from '@soundcore/cdk';
 
 @Component({
   templateUrl: './home.component.html',
@@ -18,11 +17,11 @@ export class HomeComponent implements OnInit {
 
     console.log("hours: ", currentHours)
 
-    if(currentHours >= 5 && currentHours < 11) {
+    if (currentHours >= 5 && currentHours < 11) {
       this.greeting = "Guten Morgen";
-    } else if(currentDate.getHours() >= 11 && currentHours < 14) {
+    } else if (currentDate.getHours() >= 11 && currentHours < 14) {
       this.greeting = "Guten Tag"
-    } else if(currentDate.getHours() >= 14 && currentHours < 18) {
+    } else if (currentDate.getHours() >= 14 && currentHours < 18) {
       this.greeting = "Schönen Nachmittag"
     } else {
       this.greeting = "Guten Abend"

@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
+import { SCCDKScreenService } from '@repo/angular-cdk';
 import { SSOService, SSOUser } from '@soundcore/sso';
-import { SCCDKScreenService } from '@soundcore/cdk';
 
 @Component({
   selector: 'app-profile-bar',
@@ -18,7 +18,7 @@ export class ProfileBarComponent implements OnInit {
     public readonly screenService: SCCDKScreenService
   ) { }
 
-  public ngOnInit(): void {}
+  public ngOnInit(): void { }
 
   public onMouseEnter(event: MouseEvent) {
     this.showOverlay = true;

@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, OnDestroy } from "@angular/core";
-import { SCCDKScreenService } from "@soundcore/cdk";
+import { SCCDKScreenService } from "@repo/angular-cdk";
 import { combineLatest, map, Observable, Subject, takeUntil } from "rxjs";
 
 interface CollectionViewProps {
@@ -15,7 +15,7 @@ export class SCNGXCollectionViewComponent implements OnDestroy {
 
     constructor(
         private readonly screen: SCCDKScreenService
-    ) {}
+    ) { }
 
     private readonly _destroy: Subject<void> = new Subject();
 

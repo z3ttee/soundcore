@@ -3,9 +3,9 @@ import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/
 import { UntypedFormControl } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
+import { SCCDKScreenService } from '@repo/angular-cdk';
 import { MeiliAlbum, MeiliArtist, MeiliPlaylist, MeiliSong, MeiliUser, SCDKAlbumService, SCDKGenreService, SCDKResource, SCDKUserService, SCSDKArtistService, SCSDKPlaylistService, SCSDKSearchService, SCSDKSongService } from '@repo/angular-sdk';
 import { Pageable } from '@repo/utilities';
-import { SCCDKScreenService } from '@soundcore/cdk';
 import { combineLatest, debounceTime, Observable, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
 
 interface SearchIndexProps {

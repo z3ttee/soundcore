@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
+import { SCCDKScreenService } from '@repo/angular-cdk';
 import { Artist } from '@repo/angular-sdk';
-import { SCCDKScreenService } from '@soundcore/cdk';
 import { BehaviorSubject, fromEvent, Observable, Subject, takeUntil } from 'rxjs';
 
 @Component({

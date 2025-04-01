@@ -1,6 +1,6 @@
 import { AfterViewInit, Component, Input, OnInit } from '@angular/core';
 import { NavigationStart, Router } from '@angular/router';
-import { SCCDKScreen, SCCDKScreenService } from '@soundcore/cdk';
+import { SCCDKScreen, SCCDKScreenService } from '@repo/angular-cdk';
 import { Observable, Subject, takeUntil } from 'rxjs';
 
 export type SCNGXDrawerMode = "push" | "over";

@@ -1,8 +1,8 @@
 import { Location } from "@angular/common";
 import { Component, OnDestroy, OnInit } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
+import { SCCDKScreenService } from "@repo/angular-cdk";
 import { SCSDKGeneralGateway } from "@repo/angular-sdk";
-import { SCCDKScreenService } from "@soundcore/cdk";
 import { SSOService } from "@soundcore/sso";
 import { Subject } from "rxjs";
 

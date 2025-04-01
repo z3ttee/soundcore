@@ -3,10 +3,10 @@ import { BrowserModule } from '@angular/platform-browser';
 
 import { HttpClientModule } from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { SCNGXDialogModule, SCNGXModule } from '@repo/angular-ui';
+import { SCCDKScreenModule } from '@repo/angular-cdk';
 import { provideAuthentication } from '@repo/angular-oidc';
 import { SCSDKModule, SCSDKMountModule } from '@repo/angular-sdk';
-import { SCCDKScreenModule } from '@soundcore/cdk';
+import { SCNGXDialogModule, SCNGXModule } from '@repo/angular-ui';
 import { environment } from 'src/environments/environment';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';

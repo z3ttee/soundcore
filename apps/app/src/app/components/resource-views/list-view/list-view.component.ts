@@ -1,6 +1,6 @@
 import { Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
+import { SCCDKScreenService } from '@repo/angular-cdk';
 import { Artwork, SCDKResource } from "@repo/angular-sdk";
-import { SCCDKScreenService } from '@soundcore/cdk';
 import { Observable, Subject, takeUntil } from 'rxjs';
 
 const DEFAULT_ACCENT_COLOR = "#cccccc";

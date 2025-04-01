@@ -1,5 +1,5 @@
 {
-  "name": "@soundcore/cdk",
+  "name": "@repo/angular-cdk",
   "version": "0.0.0",
   "peerDependencies": {
     "@angular/common": "^15.2.0",
