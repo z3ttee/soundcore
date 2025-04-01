@@ -1,7 +1,7 @@
+import { Overlay, OverlayRef } from "@angular/cdk/overlay";
+import { TemplatePortal } from "@angular/cdk/portal";
 import { Injectable, TemplateRef, ViewContainerRef } from "@angular/core";
 import { MatBottomSheet, MatBottomSheetRef } from "@angular/material/bottom-sheet";
-import { Overlay, OverlayRef } from "@repo/angular-cdk/overlay";
-import { TemplatePortal } from "@repo/angular-cdk/portal";
 import { combineLatest, filter, fromEvent, map, Observable, Subject, take } from "rxjs";
 import { SCCDKScreenService } from "../../screen/screen.service";
 import { SCNGXContextRef } from "../entities/context-menu.entity";

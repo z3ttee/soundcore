@@ -1,5 +1,5 @@
+import { Platform } from "@angular/cdk/platform";
 import { Inject, Injectable, OnDestroy } from "@angular/core";
-import { Platform } from "@repo/angular-cdk/platform";
 import { BehaviorSubject, fromEvent, Observable, Subject, takeUntil } from "rxjs";
 import { SCCDK_OPTIONS, SCCDKOptions } from "../module";
 
