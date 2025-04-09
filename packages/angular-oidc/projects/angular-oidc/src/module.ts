@@ -4,6 +4,7 @@ import { DI_AUTH_OPTIONS } from "./constants";
 import { accessTokenInterceptor } from "./interceptors/accesstoken.interceptor";
 import { AuthenticationService } from "./services/authentication.service";
 import { CookieService } from "./services/cookie.service";
+import { RefreshSessionService } from "./services/refresh.service";
 import { AuthenticationModuleOptions } from "./types";
 
 /** Register authentication module in an angular app */
@@ -15,6 +16,7 @@ export function provideAuthentication(options: AuthenticationModuleOptions) {
         },
         CookieService,
         AuthenticationService,
+        RefreshSessionService,
         provideHttpClient(
             withInterceptors([accessTokenInterceptor()])
         ),

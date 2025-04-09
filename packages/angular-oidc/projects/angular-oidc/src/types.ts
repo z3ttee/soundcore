@@ -1,6 +1,11 @@
-import { TokenEndpointResponse, UserInfoResponse } from "openid-client";
+import { UserInfoResponse } from "openid-client";
 
-export type Session = Partial<TokenEndpointResponse>;
+export type Session = {
+    readonly access_token?: string;
+    readonly expires_at?: Date;
+    readonly id_token?: string;
+    readonly refresh_token?: string;
+}
 
 export type Profile = UserInfoResponse
 
@@ -16,6 +21,8 @@ export type AuthenticationModuleOptions = {
      * successful session end on the authentication server 
      */
     readonly postLogoutRedirectUri?: string;
+    /** Enable silently refreshing the session */
+    readonly withSilentRefresh?: boolean;
     /** Cookie name settings */
     readonly cookies?: {
         /** Name of the access token cookie */
@@ -24,5 +31,7 @@ export type AuthenticationModuleOptions = {
         readonly id_token?: string;
         /** Name of the id token cookie */
         readonly refresh_token?: string;
+        /** Name of the cookie for storing the access token expiry */
+        readonly expires_at?: string;
     }
 }

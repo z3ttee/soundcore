@@ -1,16 +1,18 @@
 import { inject, Injectable } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
 import { isNull } from "@repo/utilities";
-import { authorizationCodeGrant, buildAuthorizationUrl, buildEndSessionUrl, Configuration, discovery, fetchUserInfo, skipSubjectCheck, } from "openid-client";
+import { authorizationCodeGrant, buildAuthorizationUrl, buildEndSessionUrl, Configuration, discovery, fetchUserInfo, refreshTokenGrant, skipSubjectCheck, TokenEndpointResponse } from "openid-client";
 import { BehaviorSubject, map } from "rxjs";
-import { DI_AUTH_OPTIONS, KEY_COOKIE_ACCESSTOKEN, KEY_COOKIE_IDTOKEN, KEY_COOKIE_REFRESHTOKEN } from "../constants";
+import { DI_AUTH_OPTIONS, KEY_COOKIE_ACCESSTOKEN, KEY_COOKIE_EXPIRESAT, KEY_COOKIE_IDTOKEN, KEY_COOKIE_REFRESHTOKEN } from "../constants";
 import { Profile, Session } from "../types";
 import { CookieService } from "./cookie.service";
+import { RefreshSessionService } from "./refresh.service";
 
 @Injectable()
 export class AuthenticationService {
     private readonly _options = inject(DI_AUTH_OPTIONS);
     private readonly _cookies = inject(CookieService);
+    private readonly _refresh = inject(RefreshSessionService);
 
     private readonly _router = inject(Router);
     private readonly _activatedRoute = inject(ActivatedRoute);
@@ -31,6 +33,21 @@ export class AuthenticationService {
     public readonly $profile = this._profile.asObservable();
 
     public readonly $authenticated = this.$session.pipe(map((session) => !!session && !!session.access_token));
+
+    constructor() {
+        // Subscribe to session expired event
+        this._refresh.$onSessionExpired.subscribe(() => {
+            if (!this._options.withSilentRefresh) return;
+
+            console.error("[Authentication] Received session expired event");
+
+            this.refresh().then((authenticated) => {
+                if (!authenticated) this.authenticate(window.location.href);
+            }).catch((error) => {
+                console.error("[Authentication] Failed to refresh session", error);
+            });
+        });
+    }
 
     /**
      * Try authenticating the current user.
@@ -79,13 +96,15 @@ export class AuthenticationService {
      * @param redirect_uri URL to which the user gets send after authentication
      */
     public async authenticate(redirect_uri: string): Promise<void> {
+        console.info("[Authentication] Sending user to authentication page");
+
         const config = this._config;
         if (isNull(config)) throw new Error("No metadata loaded. Please call loadMetadata() in APP_INITIALIZER.");
 
         const params = new URLSearchParams({
             redirect_uri: redirect_uri,
             // Always include openid scope
-            scope: `openid ${this._options.scope ?? ""}`,
+            scope: this._getScope(),
             // state: this._config?.serverMetadata()?.supportsPKCE() ? randomState() : undefined,
             response_type: "code",
         })
@@ -112,9 +131,20 @@ export class AuthenticationService {
     public async refresh(): Promise<boolean> {
         console.info("[Authentication] Refreshing session");
 
+        const config = this._config;
+        if (isNull(config)) throw new Error("No metadata loaded. Please call loadMetadata() in APP_INITIALIZER.");
+
+        const session = this.getSession();
+        if (!session?.refresh_token) return false;
+
         // const session = this.getSession();
         // TODO: Implement refresh
-        return false;
+        return refreshTokenGrant(config, session.refresh_token, new URLSearchParams({
+            scope: this._getScope(),
+        })).then((tokenSet) => {
+            this.setSession(tokenSet);
+            return true;
+        });
     }
 
     /** Get session tokens from cookies */
@@ -123,6 +153,7 @@ export class AuthenticationService {
             access_token: this._cookies.getOrDefault("access_token", undefined),
             id_token: this._cookies.getOrDefault("id_token", undefined),
             refresh_token: this._cookies.getOrDefault("refresh_token", undefined),
+            expires_at: new Date(this._cookies.getOrDefault(this._getAccessTokenExpiresAtCookieKey(), "")),
         }
     }
 
@@ -151,15 +182,19 @@ export class AuthenticationService {
         })
     }
 
-    public setSession(session: Session): void {
+    public setSession(session: TokenEndpointResponse): void {
+        const expires_at = new Date(Date.now() + ((session.expires_in ?? 0) * 1000));
+
         this._cookies.set(this._getAccessTokenCookieKey(), session.access_token, session.expires_in);
         this._cookies.set(this._getRefreshTokenCookieKey(), session.access_token, 60 * 60 * 24 * 30);
         this._cookies.set(this._getIdTokenCookieKey(), session.id_token, session.expires_in);
+        this._cookies.set(this._getAccessTokenExpiresAtCookieKey(), expires_at.toISOString(), session.expires_in);
 
         this._session.next(session);
 
         console.info("[Authentication] Session updated");
 
+        this._refresh.setupSessionTimeout(expires_at);
     }
 
     /** 
@@ -226,6 +261,10 @@ export class AuthenticationService {
         return this._options.cookies?.id_token ?? KEY_COOKIE_IDTOKEN;
     }
 
+    private _getAccessTokenExpiresAtCookieKey(): string {
+        return this._options.cookies?.expires_at ?? KEY_COOKIE_EXPIRESAT;
+    }
+
     private _clearQueryParams(): void {
         this._router.navigate([], {
             relativeTo: this._activatedRoute,
@@ -239,6 +278,10 @@ export class AuthenticationService {
 
     private _setInitialized(): void {
         this._initialized.next(true);
+    }
+
+    private _getScope(): string {
+        return `openid ${this._options.scope ?? ""}`
     }
 
 }
