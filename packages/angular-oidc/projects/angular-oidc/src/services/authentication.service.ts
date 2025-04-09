@@ -18,6 +18,10 @@ export class AuthenticationService {
     /** Configuration document returned by oidc discovery */
     private _config?: Configuration | null;
 
+    private readonly _initialized = new BehaviorSubject<boolean>(false);
+    /** Check if the auth service already was initialized */
+    public readonly $initialized = this._initialized.asObservable();
+
     private readonly _session = new BehaviorSubject<Session | null>(this.getSession());
     /** Subscribe to the current set of tokens for this session */
     public readonly $session = this._session.asObservable();
@@ -52,8 +56,7 @@ export class AuthenticationService {
             // When access token exists, the session is active
             if (session.access_token) {
                 console.info("[Authentication] Found local session");
-                this.loadProfile();
-                return true;
+                return this.loadProfile().then(() => true);
             }
 
             // Try refreshing the session
@@ -66,6 +69,8 @@ export class AuthenticationService {
                 this.logout(false);
                 return this.authenticate(redirect_uri).then(() => false)
             });
+        }).finally(() => {
+            this._setInitialized();
         });
     }
 
@@ -230,6 +235,10 @@ export class AuthenticationService {
         })
 
         console.info("[Authentication] Cleared query parameters");
+    }
+
+    private _setInitialized(): void {
+        this._initialized.next(true);
     }
 
 }
