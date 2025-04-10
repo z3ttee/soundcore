@@ -1,0 +1,39 @@
+/* You can add global styles to this file, and also import other style files */
+@import "tailwindcss";
+
+@font-face {
+    font-family: "Inter";
+    src: url("/assets/fonts/inter/inter_variablefont_opsz-wght.ttf") format("truetype-variations");
+    font-weight: 1 999;
+}
+
+@theme {
+    --color-primary: hsl(38, 100%, 62%);
+
+    --color-surface-dim: hsl(0, 0%, 3%);
+    --color-surface: hsl(0, 0%, 9%);
+    --color-surface-on: hsl(0, 0%, 91%);
+    --color-surface-on-variant: hsl(0, 0%, 80%);
+    --color-surface-on-variant2: hsl(0, 0%, 70%);
+    --color-surface-container-lowest: hsl(0, 0%, 13%);
+    --color-surface-container-low: hsl(0, 0%, 16%);
+    --color-surface-container: hsl(0, 0%, 19%);
+    --color-surface-container-high: hsl(0, 0%, 22%);
+    --color-surface-container-highest: hsl(0, 0%, 25%);
+
+    --color-outline: hsl(0, 0%, 30%);
+}
+
+* {
+    box-sizing: border-box;
+    font-family: "Inter", sans-serif;
+    font-weight: 500;
+}
+
+html,
+body {
+    height: 100%;
+    width: 100%;
+    color: var(--color-surface-on);
+    background-color: var(--color-surface-dim);
+}

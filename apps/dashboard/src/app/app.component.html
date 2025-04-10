@@ -1,0 +1,31 @@
+<sc-drawer>
+    <sc-drawer-sidebar>
+        <div class="flex flex-col gap-2">
+            <app-drawer-nav-item [route]="['/']" [exact]="true" icon="phosphorDesktopDuotone">
+                Dashboard
+            </app-drawer-nav-item>
+
+            <app-drawer-nav-item [route]="['/zones']" icon="phosphorComputerTowerDuotone">
+                Speicherzonen
+            </app-drawer-nav-item>
+
+            <app-drawer-nav-item [route]="['/processes']" icon="phosphorCpuDuotone">
+                Hintergrundprozesse
+            </app-drawer-nav-item>
+        </div>
+    </sc-drawer-sidebar>
+
+    <sc-drawer-footer>
+        <div class="flex items-center justify-start gap-4">
+            <sc-avatar useInitials="CZ"></sc-avatar>
+            <div>
+                <p class="text-xs text-surface-on-variant2">Angemeldet als</p>
+                <p>zettee</p>
+            </div>
+        </div>
+    </sc-drawer-footer>
+
+    <sc-drawer-content>
+        <router-outlet></router-outlet>
+    </sc-drawer-content>
+</sc-drawer>

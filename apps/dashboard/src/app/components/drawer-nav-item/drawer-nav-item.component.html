@@ -1,0 +1,8 @@
+<a class="flex items-center justify-start gap-4 border border-transparent hover:border-outline py-3 px-4 select-none cursor-pointer hover:bg-surface-container-low active:bg-surface-container focus-visible:bg-surface-container focus-visible:border-outline rounded transition-all"
+    [routerLink]="route()" routerLinkActive="bg-surface-container hover:bg-surface-container! border-outline!"
+    [routerLinkActiveOptions]="{ exact: exact() }">
+    @if (icon()) {
+    <ng-icon [name]="icon()"></ng-icon>
+    }
+    <span class="text-sm"><ng-content></ng-content></span>
+</a>
