@@ -86,6 +86,15 @@ export class AuthenticationService {
                 this.logout(false);
                 return this.authenticate(redirect_uri).then(() => false)
             });
+        }).then((authenticated) => {
+            const session = this.getSession();
+            this._session.next(session);
+
+            if (session?.expires_at && this._options.withSilentRefresh) {
+                this._refresh.setupSessionTimeout(session.expires_at);
+            }
+
+            return authenticated;
         }).finally(() => {
             this._setInitialized();
         });
@@ -135,13 +144,18 @@ export class AuthenticationService {
         if (isNull(config)) throw new Error("No metadata loaded. Please call loadMetadata() in APP_INITIALIZER.");
 
         const session = this.getSession();
-        if (!session?.refresh_token) return false;
+        if (!session?.refresh_token) {
+            console.warn("[Authentication] No refresh token found. Cannot refresh session.");
+            return false;
+        };
 
         // const session = this.getSession();
         // TODO: Implement refresh
         return refreshTokenGrant(config, session.refresh_token, new URLSearchParams({
             scope: this._getScope(),
         })).then((tokenSet) => {
+            console.info("[Authentication] Session refreshed");
+
             this.setSession(tokenSet);
             return true;
         });
@@ -150,9 +164,9 @@ export class AuthenticationService {
     /** Get session tokens from cookies */
     public getSession(): Session {
         return {
-            access_token: this._cookies.getOrDefault("access_token", undefined),
-            id_token: this._cookies.getOrDefault("id_token", undefined),
-            refresh_token: this._cookies.getOrDefault("refresh_token", undefined),
+            access_token: this._cookies.getOrDefault(this._getAccessTokenCookieKey(), undefined),
+            id_token: this._cookies.getOrDefault(this._getIdTokenCookieKey(), undefined),
+            refresh_token: this._cookies.getOrDefault(this._getRefreshTokenCookieKey(), undefined),
             expires_at: new Date(this._cookies.getOrDefault(this._getAccessTokenExpiresAtCookieKey(), "")),
         }
     }
@@ -186,7 +200,7 @@ export class AuthenticationService {
         const expires_at = new Date(Date.now() + ((session.expires_in ?? 0) * 1000));
 
         this._cookies.set(this._getAccessTokenCookieKey(), session.access_token, session.expires_in);
-        this._cookies.set(this._getRefreshTokenCookieKey(), session.access_token, 60 * 60 * 24 * 30);
+        this._cookies.set(this._getRefreshTokenCookieKey(), session.refresh_token, 60 * 60 * 24 * 30);
         this._cookies.set(this._getIdTokenCookieKey(), session.id_token, session.expires_in);
         this._cookies.set(this._getAccessTokenExpiresAtCookieKey(), expires_at.toISOString(), session.expires_in);
 
