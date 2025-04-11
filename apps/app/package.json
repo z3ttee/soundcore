@@ -22,6 +22,7 @@
     "@ng-icons/heroicons": "^31.2.0",
     "@ng-icons/simple-icons": "^31.2.0",
     "@ng-icons/feather-icons": "^31.2.0",
+    "@ng-icons/phosphor-icons": "^31.2.0",
     "@repo/utilities": "*",
     "@repo/angular-ui": "*",
     "@repo/angular-oidc": "*",

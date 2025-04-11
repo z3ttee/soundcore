@@ -1,15 +1,25 @@
-/* You can add global styles to this file, and also import other style files */
+@use '@angular/material' as mat;
 
 /* Import Tailwindcss */
 @import 'tailwindcss/base';
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
 
-/* Import Readex Pro Font from Google Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Readex+Pro:wght@400;500;600;700&display=swap');
+@font-face {
+    font-family: "Inter";
+    src: url("/assets/fonts/inter/inter_variablefont_opsz-wght.ttf") format("truetype-variations");
+    font-weight: 1 999;
+}
 
-/* Import Font Awesome */
-@import "@angular/material/prebuilt-themes/pink-bluegrey.css";
+:root {
+    @include mat.paginator-overrides((container-background-color: transparent,
+        ));
+
+    @include mat.table-overrides((background-color: transparent,
+            header-headline-color: white,
+        ));
+}
+
 
 /* General styling */
 * {
@@ -18,32 +28,44 @@
     font-weight: 500;
 
     font-size: 14px;
-    line-height: 1.5rem/* 24px */;
+    line-height: 1.5rem
+        /* 24px */
+    ;
 }
 
-html, body { 
-    height: 100%; 
+html,
+body {
+    height: 100%;
     width: 100%;
     overflow: hidden;
     @apply text-font;
 }
-body { 
+
+body {
     margin: 0;
     @apply bg-body;
 }
 
-.cdk-global-overlay-wrapper, .cdk-overlay-container {
+.cdk-global-overlay-wrapper,
+.cdk-overlay-container {
     z-index: 9999999999999 !important;
 }
 
-.mdc-notched-outline__notch { border-right: none; }
+.mdc-notched-outline__notch {
+    border-right: none;
+}
 
 /**
 []=============================[]
           Headlines
 []=============================[]
 */
-h1,h2,h3,h4,h5,h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
     font-family: 'Readex Pro', sans-serif;
     @apply font-bold;
 }
@@ -51,18 +73,23 @@ h1,h2,h3,h4,h5,h6 {
 h1 {
     @apply text-4xl tracking-tight;
 }
+
 h2 {
     @apply text-3xl;
 }
+
 h3 {
     @apply text-2xl;
 }
+
 h4 {
     @apply text-xl;
 }
+
 h5 {
     @apply text-lg;
 }
+
 h6 {
     @apply text-md font-normal;
 }
@@ -74,9 +101,11 @@ h6 {
 */
 /* width */
 ::-webkit-scrollbar {
-    width: 0.75rem/* 12px */;
+    width: 0.75rem
+        /* 12px */
+    ;
 }
-  
+
 /* Handle */
 ::-webkit-scrollbar-thumb {
     @apply bg-body-light rounded;
@@ -93,7 +122,7 @@ h6 {
     viewport
 []=============================[]
 */
-cdk-virtual-scroll-viewport {  
+cdk-virtual-scroll-viewport {
     .cdk-virtual-scroll-content-wrapper {
         max-width: 100% !important;
     }

@@ -1,0 +1,9 @@
+<button
+  class="inline-flex items-center transition-all justify-center appearance-none outline-none rounded-full min-w-[35px] w-[35px] h-[35px] text-body-sm"
+  [ngClass]="{
+    'bg-primary-container-lowest text-primary-container-on': active(),
+    'text-surface-on-variant hover:bg-surface-container active:bg-surface-container-high': !active()
+  }"
+  (click)="click.emit($event)">
+  <ng-content></ng-content>
+</button>

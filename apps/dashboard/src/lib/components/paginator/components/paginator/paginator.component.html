@@ -1,0 +1,54 @@
+<div class="@container flex flex-col gap-xs w-full">
+  <div class="grid grid-cols-1 @3xl:grid-cols-[1fr,max-content,1fr] items-center justify-start w-full">
+    <div class="@3xl:block hidden">
+      <ng-container [ngTemplateOutlet]="itemsCount"></ng-container>
+    </div>
+
+    <div class="flex items-center justify-center gap-xs">
+      <!-- Previous page button -->
+      <sc-icon-button variant="text" size="sm" (click)="previousPage()" [disabled]="activePageIndex() <= 0">
+        <ng-icon name="phosphorCaretLeft" size="16"></ng-icon>
+      </sc-icon-button>
+
+      @if (pages() > 1) {
+      <!-- Page buttons -->
+      <div class="flex items-center justify-start gap-xss" #test>
+        @for (pageIndex of _displayablePageIndexes(); track $index) {
+        <sc-page-button [active]="pageIndex === activePageIndex()" (click)="selectPage(pageIndex)">
+          {{ pageIndex + 1 }}
+        </sc-page-button>
+        }
+      </div>
+      }
+
+      <!-- Next page button -->
+      <sc-icon-button variant="text" size="sm" (click)="nextPage()" [disabled]="activePageIndex() >= maxPageIndex()">
+        <ng-icon name="phosphorCaretRight" size="16"></ng-icon>
+      </sc-icon-button>
+    </div>
+
+    <div class="@3xl:block hidden">
+      <ng-container [ngTemplateOutlet]="currentInfo"></ng-container>
+    </div>
+  </div>
+
+  <div class="@3xl:hidden flex items-center justify-between">
+    <ng-container [ngTemplateOutlet]="itemsCount"></ng-container>
+    <ng-container [ngTemplateOutlet]="currentInfo"></ng-container>
+  </div>
+</div>
+
+<ng-template #itemsCount>
+  <p class="text-label-lg text-surface-on-variant">
+    {{ start() }} - {{ end() }} von
+    {{ length() }}
+  </p>
+</ng-template>
+
+<ng-template #currentInfo>
+  <div class="flex items-center justify-end">
+    <p class="text-right text-label-lg text-surface-on-variant">
+      Seite {{ activePageIndex() + 1 }} von {{ maxPageIndex() + 1 }}
+    </p>
+  </div>
+</ng-template>

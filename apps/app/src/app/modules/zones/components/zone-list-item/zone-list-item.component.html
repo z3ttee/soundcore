@@ -1,0 +1,33 @@
+<div class="flex items-center justify-start py-1 w-full overflow-hidden h-16">
+    <div class="flex flex-1 items-center justify-start gap-4 rounded-sm w-full h-full px-3 pointer-events-none select-none transition-all cursor-pointer"
+        [ngClass]="{'hover:border-opacity-100 active:border-opacity-100 border border-body-lighter border-opacity-0 bg-opacity-0 hover:bg-opacity-30 bg-body-light cursor-pointer pointer-events-auto active:bg-opacity-50': !!zone}">
+        <!-- Bucket artwork -->
+        <div class="h-10 min-w-10 w-10 rounded-sm">
+            <img class="w-full aspect-square" src="/assets/img/icon_bucket.png" [scSkeleton]="!zone()" />
+        </div>
+
+        <!-- Bucket description -->
+        <div class="flex-grow overflow-hidden">
+            <div class="flex flex-col">
+                <p [scSkeleton]="!zone()" class="break-words">{{ zone()?.name }}</p>
+                <p [scSkeleton]="!zone()" class="break-words text-xs opacity-60 font-light">ID: {{ zone()?.id }}</p>
+            </div>
+        </div>
+
+        <div class="min-w-36 w-36 hidden md:block">
+            <div [scSkeleton]="!zone()" class="flex items-center gap-2">
+                <ng-icon class="h-5 w-5" name="heroChartPie"></ng-icon>
+                <span class="text-sm">{{ zone()?.usedSpace | bytesToUnit:"gb" }}</span>
+            </div>
+        </div>
+
+        <div class="min-w-36 w-36">
+            <div [scSkeleton]="!zone()" class="flex items-center justify-end gap-2">
+                <ng-icon class="h-5 w-5" name="heroRectangleStack"></ng-icon>
+                <span class="text-sm">
+                    {{ zone()?.mountsCount ?? 0 }} Mount{{ zone()?.mountsCount != 1 ? 's' : ''}}
+                </span>
+            </div>
+        </div>
+    </div>
+</div>

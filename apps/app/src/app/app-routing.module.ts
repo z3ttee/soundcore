@@ -11,7 +11,7 @@ const routes: Routes = [
   {
     path: "admin", component: AdminLayoutComponent, canActivate: [], data: { roles: ["admin"] }, children: [
       { path: "", canActivate: [], loadChildren: () => import("./modules/dashboard/dashboard.module").then((m) => m.DashboardModule) },
-      { path: "zones", canActivate: [], loadChildren: () => import("./modules/zones/zones.module").then((m) => m.ZonesModule) },
+      { path: "zones", loadChildren: () => import("./modules/zones/routes").then((m) => m.routes) },
       { path: "import", canActivate: [], loadChildren: () => import("./modules/import/import.module").then((m) => m.ImportModule) },
       { path: "tasks", canActivate: [], loadChildren: () => import("./modules/tasks/tasks.module").then((m) => m.TasksModule) },
       { path: "configurate", canActivate: [], loadChildren: () => import("./modules/configurate/configurate.module").then((m) => m.ConfigurateModule) },

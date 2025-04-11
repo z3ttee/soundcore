@@ -1,0 +1,35 @@
+<div class="px-window pt-window w-full h-full">
+    <cdk-virtual-scroll-viewport [itemSize]="64" class="w-full h-full overflow-x-hidden">
+        <div class="mb-row">
+            <scngx-ui-title>
+                Speicherzonen
+                <div scngxSubtitle>Verwalte hier die einzelnen Speicherzonen.</div>
+            </scngx-ui-title>
+        </div>
+
+        <mat-table [dataSource]="dataSource" [fixedLayout]="true">
+            <!-- ID Definition -->
+            <ng-container matColumnDef="id">
+                <mat-header-cell *matHeaderCellDef>ID</mat-header-cell>
+                <mat-cell *matCellDef="let row">
+                    @let item = asItem(row);
+                    {{ item.data?.id }}
+                </mat-cell>
+            </ng-container>
+
+            <!-- Name Definition -->
+            <ng-container matColumnDef="name">
+                <mat-header-cell *matHeaderCellDef>Name</mat-header-cell>
+                <mat-cell *matCellDef="let item">{{ item.name }}</mat-cell>
+            </ng-container>
+
+            <!-- Header and Row Declarations -->
+            <mat-header-row *matHeaderRowDef="['id', 'name']"></mat-header-row>
+            <mat-row *matRowDef="let item; columns: ['id', 'name']"
+                [routerLink]="item ? [item?.slug ?? item?.id] : null"></mat-row>
+        </mat-table>
+
+        <sc-paginator></sc-paginator>
+
+    </cdk-virtual-scroll-viewport>
+</div>

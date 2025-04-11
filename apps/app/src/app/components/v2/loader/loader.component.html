@@ -1,0 +1,8 @@
+<div
+  #spinner
+  class="loader transform-gpu will-change-transform"
+  [ngClass]="{ active: active() }"
+  [style.width]="_calculatedSize() + 'px'"
+  [style.height]="_calculatedSize() + 'px'"
+  [style.borderWidth]="_calculateStrokeWidth() + 'px'"
+  [style.animationDuration]="_calculatedSpeed() + 's'"></div>

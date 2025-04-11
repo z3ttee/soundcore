@@ -17,11 +17,11 @@ interface ZoneInfoProps {
 }
 
 @Component({
+  selector: "app-view-zone-info",
   templateUrl: './zone-info.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  standalone: false
 })
-export class ZoneInfoComponent implements OnDestroy {
+export class ZoneInfoViewComponent implements OnDestroy {
 
   constructor(
     private readonly zoneService: SCSDKZoneService,

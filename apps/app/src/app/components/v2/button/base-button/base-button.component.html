@@ -1,0 +1,37 @@
+<button
+  class="inline-flex relative h-full w-full items-center border-2 rounded-sm transition-colors outline-2 outline-offset-4 outline-transparent appearance-none overflow-hidden"
+  role="button" type="button" #nativeElement (click)="_handleClickEvent($event)" [ngClass]="{
+    'justify-start': alignment() === 'left',
+    'justify-center': alignment() === 'center',
+    'justify-end': alignment() === 'right',
+    'bg-surface-inverse text-surface-inverse-on border-surface-inverse focus-visible:outline-surface-on':
+      color() === 'default',
+    'bg-primary text-primary-on border-primary focus-visible:outline-primary': color() === 'primary',
+    'bg-secondary text-secondary-on border-secondary focus-visible:outline-secondary': color() === 'secondary',
+    'bg-info text-info-on border-info focus-visible:outline-info': color() === 'info',
+    'bg-warn text-warn-on border-warn focus-visible:outline-warn': color() === 'warn',
+    'bg-success text-success-on border-success focus-visible:outline-success': color() === 'success',
+    'bg-error text-error-on border-error focus-visible:outline-error': color() === 'error',
+    '!text-surface-on': color() === 'default' && (variant() === 'outlined' || variant() === 'text'),
+    '!text-primary': color() === 'primary' && (variant() === 'outlined' || variant() === 'text'),
+    '!text-secondary': color() === 'secondary' && (variant() === 'outlined' || variant() === 'text'),
+    '!text-info': color() === 'info' && (variant() === 'outlined' || variant() === 'text'),
+    '!text-success': color() === 'success' && (variant() === 'outlined' || variant() === 'text'),
+    '!text-warn': color() === 'warn' && (variant() === 'outlined' || variant() === 'text'),
+    '!text-error': color() === 'error' && (variant() === 'outlined' || variant() === 'text'),
+    'border-opacity-80 !outline-none': variant() === 'outlined',
+    'hover:bg-opacity-10 hover:border-opacity-100 focus-visible:border-opacity-100 focus-visible:bg-opacity-30':
+      variant() === 'outlined' && !disabled(),
+    '!border-transparent': variant() === 'text' || variant() === 'contained',
+    'border-opacity-0 bg-opacity-0': variant() === 'text' || variant() === 'outlined',
+    'hover:bg-opacity-15 focus-visible:bg-opacity-15 active:bg-opacity-30':
+      (variant() === 'text' || variant() === 'outlined') && !disabled() && color(),
+    'hover:bg-opacity-10 focus-visible:bg-opacity-15 active:bg-opacity-15':
+      (variant() === 'text' || variant() === 'outlined') && !disabled() && !color(),
+    'hover:bg-opacity-85 focus-visible:bg-opacity-80 active:bg-opacity-75': variant() === 'contained' && !disabled(),
+    'cursor-not-allowed': disabled(),
+    'opacity-30': disabled() && variant() !== 'contained',
+    'opacity-20': disabled() && variant() === 'contained'
+  }">
+  <ng-content></ng-content>
+</button>

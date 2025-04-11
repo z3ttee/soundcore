@@ -1,3 +1,6 @@
+export * from "./skeleton";
+
+
 // Lottie animations
 import lottieAudioWave from "./assets/lottie/audio_wave.json";
 export const scngxLottieAudioWave = lottieAudioWave;
@@ -135,3 +138,4 @@ export * from "./lib/pipes";
 // Notifications
 export * from "./lib/components/notification/notification-list-item/notification-list-item.component";
 export * from "./lib/components/notification/notification-list-item/notification-list-item.module";
+

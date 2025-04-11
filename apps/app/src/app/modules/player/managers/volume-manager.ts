@@ -40,14 +40,13 @@ export class VolumeManager {
 
     public setVolume(volume: number) {
         let value = volume ?? DEFAULT_VOLUME;
+
         if (value > 1) {
             value = volume / 100;
         }
 
+        if (isNaN(value)) value = DEFAULT_VOLUME;
         console.log("setting volume:", value)
-
-
-
         this.audio.volume = Math.max(0, Math.min(1, value));
         this._volume.next(this.audio.volume)
     }

@@ -1,5 +1,5 @@
 <ng-container *ngIf="($props | async) as props">
-    <cdk-virtual-scroll-viewport [itemSize]="64" class="w-full h-full overflow-x-hidden">
+    <!-- <cdk-virtual-scroll-viewport [itemSize]="64" class="w-full h-full overflow-x-hidden">
         <app-error404 *ngIf="!props.loading && !props.zone"></app-error404>
 
         <div class="w-full p-window pb-0" #page *ngIf="props.loading || props.zone">
@@ -63,5 +63,5 @@
             </div>
         </div>
         
-    </cdk-virtual-scroll-viewport>
+    </cdk-virtual-scroll-viewport> -->
 </ng-container>

@@ -1,6 +1,6 @@
 import { Controller, Get, Param } from '@nestjs/common';
-import { Pageable } from '@repo/utilities';
 import { Pagination } from '@repo/nestjs';
+import { Pageable } from '@repo/utilities';
 import { Roles } from '../../authentication/decorators/role.decorator';
 import { Zone } from '../entities/zone.entity';
 import { ZoneService } from '../services/zone.service';
@@ -10,9 +10,9 @@ export class ZoneController {
   constructor(private readonly service: ZoneService) { }
 
   @Roles("admin")
-  @Get(":bucketId")
-  public async findById(@Param("bucketId") bucketId: string): Promise<Zone> {
-    return this.service.findById(bucketId);
+  @Get(":zoneId")
+  public async findById(@Param("zoneId") zoneId: string): Promise<Zone> {
+    return this.service.findById(zoneId);
   }
 
   @Roles("admin")

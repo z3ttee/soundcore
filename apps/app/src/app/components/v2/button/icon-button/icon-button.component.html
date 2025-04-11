@@ -1,0 +1,27 @@
+<sc-base-button alignment="center" [variant]="variant()" [color]="color()" [disabled]="disabled()" [ngClass]="{
+    'h-btn-xs w-btn-xs': size() === 'xs',
+    'h-btn-sm w-btn-sm': size() === 'sm',
+    'text-label': size() === 'sm' || size() === 'xs',
+    'h-btn-md w-btn-md text-label-lg': size() === 'md',
+    'h-btn-lg w-btn-lg text-body-sm': size() === 'lg',
+    'h-btn-xl w-btn-xl text-body tracking-tight': size() === 'xl',
+    'opacity-45 pointer-events-none': _isLoading()
+  }" (click)="_handleClickEvent($event)">
+  <div class="relative h-full w-full">
+    @if (_isLoading()) {
+    <sc-loader @loaderToggle
+      class="absolute top-1/2 left-1/2 transform-gpu -translate-x-1/2 -translate-y-1/2"></sc-loader>
+    }
+
+    <span [@btnTextSlide]="!_isLoading() ? 'visible' : 'hidden'"
+      class="h-full inline-flex items-center justify-center align-middle gap-xs transition-colors font-medium"
+      [ngClass]="{
+        'text-label': size() === 'sm' || size() === 'xs',
+        'text-label-lg': size() === 'md',
+        'text-body-sm': size() === 'lg',
+        'text-body': size() === 'xl'
+      }">
+      <ng-content></ng-content>
+    </span>
+  </div>
+</sc-base-button>
