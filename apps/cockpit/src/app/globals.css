@@ -1,0 +1,74 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@theme {
+  --color-primary: hsl(38, 100%, 62%);
+
+  --color-surface-dim: hsl(0, 0%, 3%);
+  --color-surface: hsl(0, 0%, 9%);
+  --color-surface-on: hsl(0, 0%, 90%);
+  --color-surface-on-variant: hsl(0, 0%, 75%);
+  --color-surface-on-variant2: hsl(0, 0%, 60%);
+  --color-surface-container-lowest: hsl(0, 0%, 13%);
+  --color-surface-container-low: hsl(0, 0%, 16%);
+  --color-surface-container: hsl(0, 0%, 19%);
+  --color-surface-container-high: hsl(0, 0%, 22%);
+  --color-surface-container-highest: hsl(0, 0%, 25%);
+
+  --color-outline: hsl(0, 0%, 25%);
+  --color-outline-variant: hsl(0, 0%, 15%);
+
+  --text-h1: 3.05rem;
+  --text-h2: 3.05rem;
+  --text-h3: 2.44rem;
+  --text-h4: 1.95rem;
+  --text-h5: 1.56rem;
+  --text-h6: 1.25rem;
+
+  --text-body: 1rem;
+  --text-body--font-weight: 500;
+
+  --text-body-2: 0.85rem;
+  --text-body-2--font-weight: 400;
+
+  --text-label: 0.69rem;
+  --text-label--font-weight: 600;
+  --text-label--letter-spacing: 0.05rem;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  width: 100%;
+  color: var(--color-surface-on);
+  background-color: var(--color-surface-dim);
+}
+
+@layer base {
+  h1 {
+    font-size: var(--text-h1);
+  }
+  h2 {
+    font-size: var(--text-h2);
+  }
+  h3 {
+    font-size: var(--text-h3);
+  }
+  h4 {
+    font-size: var(--text-h4);
+  }
+  h5 {
+    font-size: var(--text-h5);
+  }
+  h6 {
+    font-size: var(--text-h6);
+  }
+  p {
+    font-size: var(--text-body);
+    font-weight: var(--text-body--font-weight);
+  }
+}
