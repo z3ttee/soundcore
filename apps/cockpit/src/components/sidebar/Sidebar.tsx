@@ -47,11 +47,11 @@ export function ScSidebar(props: PropsWithChildren<SidebarProps>) {
     <SidebarContext.Provider value={contextValue}>
       <div className="flex items-start justify-start w-full">
         <aside
-          className={`absolute z-50 xl:sticky top-0 left-0 h-[100vh] p-4 transition-transform w-[350px] max-w-full overflow-hidden ${!isOpen ? "absolute! -translate-x-full" : "translate-x-0"}`}>
+          className={`absolute z-50 xl:sticky top-0 left-0 h-[100vh] p-4 transition-transform w-[380px] max-w-full overflow-hidden ${!isOpen ? "absolute! -translate-x-full" : "translate-x-0"}`}>
           <div className={`flex flex-col w-full h-full bg-surface rounded-lg overflow-y-auto`}>
-            {header && <div className="w-full p-4">{header}</div>}
-            {navigation && <div className="w-full p-4">{navigation}</div>}
-            {footer && <div className="w-full p-4">{footer}</div>}
+            {header && <div className="w-full p-6 pt-7">{header}</div>}
+            {navigation && <div className="w-full p-6">{navigation}</div>}
+            {footer && <div className="w-full p-6 pb-7">{footer}</div>}
           </div>
         </aside>
         <main className="py-4 px-4">{children}</main>

@@ -25,7 +25,15 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${readexFont.className} antialiased`}>
         <ScSidebar
-          header={<ScLogo />}
+          header={
+            <div className="flex items-center justify-start gap-6">
+              <ScLogo />
+              <div>
+                <p>Cockpit</p>
+                <p className="text-label text-surface-on-variant2">Management Konsole</p>
+              </div>
+            </div>
+          }
           navigation={
             <SidebarCategory label="Allgemein">
               <SidebarItem label="Dashboard" href="/" icon={<Gauge size={22} weight="duotone" />} />
