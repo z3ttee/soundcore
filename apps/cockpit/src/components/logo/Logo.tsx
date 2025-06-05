@@ -1,6 +1,6 @@
 import { twMerge } from "tailwind-merge";
 
-export async function ScLogo(props: { className?: string }) {
+export function ScLogo(props: { className?: string }) {
   return (
     <div className={twMerge("w-10", props.className, "h-auto aspect-square")}>
       <svg

@@ -1,61 +1,64 @@
-import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { Module } from "@nestjs/common";
+import { TypeOrmModule } from "@nestjs/typeorm";
 
-import { ArtistModule } from './artist/artist.module';
-import { ZoneModule } from './zone/zone.module';
-import { AlbumModule } from './album/album.module';
-import { SongModule } from './song/song.module';
-import { GeniusModule } from './genius/genius.module';
-import { LabelModule } from './label/label.module';
-import { PublisherModule } from './publisher/publisher.module';
-import { UploadModule } from './upload/upload.module';
-import { SearchModule } from './search/search.module';
-import { StreamModule } from './stream/stream.module';
-import { DistributorModule } from './distributor/distributor.module';
-import { GenreModule } from './genre/genre.module';
-import { PlaylistModule } from './playlist/playlist.module';
-import { UserModule } from './user/user.module';
-import { ImportModule } from './import/import.module';
-import { CollectionModule } from './collection/collection.module';
-import { NotificationModule } from './notification/notification.module';
-import { OIDCModule } from './authentication/oidc.module';
-import { ProfileModule } from './profile/profile.module';
-import { MountModule } from './mount/mount.module';
-import { FileModule } from './file/file.module';
-import { IndexerModule } from './indexer/indexer.module';
-import { FileSystemModule } from './filesystem/filesystem.module';
-import { EventEmitterModule } from '@nestjs/event-emitter';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { HostnameModule } from './hostname/hostname.module';
-import { CronModule } from './cron/cron.module';
-import { Environment } from '@repo/bootstrap';
-import { WorkerQueueModule } from '@repo/queue';
-import { TracklistModule } from './tracklist/tracklist.module';
-import { PipelineModule } from '@repo/pipelines';
-import { TasksModule } from './tasks/tasks.module';
-import { FileSystemService } from './filesystem/services/filesystem.service';
-import { MeilisearchModule as MeilisearchModuleNEXT } from '@repo/meilisearch';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { MeilisearchModule } from './meilisearch/meilisearch.module';
-import { MetricsModule } from './metrics/metrics.module';
-import { ConfigureModule } from './configure/configure.module';
+import { ConfigModule, ConfigService } from "@nestjs/config";
+import { EventEmitterModule } from "@nestjs/event-emitter";
+import { Environment } from "@repo/bootstrap";
+import { MeilisearchModule as MeilisearchModuleNEXT } from "@repo/meilisearch";
+import { PipelineModule } from "@repo/pipelines";
+import { WorkerQueueModule } from "@repo/queue";
+import { AlbumModule } from "./album/album.module";
+import { AppController } from "./app.controller";
+import { AppService } from "./app.service";
+import { ArtistModule } from "./artist/artist.module";
+import { AuthenticationModule } from "./authentication/module";
+import { CollectionModule } from "./collection/collection.module";
+import { ConfigureModule } from "./configure/configure.module";
+import { CronModule } from "./cron/cron.module";
+import { DistributorModule } from "./distributor/distributor.module";
+import { FileModule } from "./file/file.module";
+import { FileSystemModule } from "./filesystem/filesystem.module";
+import { FileSystemService } from "./filesystem/services/filesystem.service";
+import { GeniusModule } from "./genius/genius.module";
+import { GenreModule } from "./genre/genre.module";
+import { HostnameModule } from "./hostname/hostname.module";
+import { ImportModule } from "./import/import.module";
+import { IndexerModule } from "./indexer/indexer.module";
+import { LabelModule } from "./label/label.module";
+import { MeilisearchModule } from "./meilisearch/meilisearch.module";
+import { MetricsModule } from "./metrics/metrics.module";
+import { MountModule } from "./mount/mount.module";
+import { NotificationModule } from "./notification/notification.module";
+import { PlaylistModule } from "./playlist/playlist.module";
+import { ProfileModule } from "./profile/profile.module";
+import { PublisherModule } from "./publisher/publisher.module";
+import { SearchModule } from "./search/search.module";
+import { SongModule } from "./song/song.module";
+import { StreamModule } from "./stream/stream.module";
+import { TasksModule } from "./tasks/tasks.module";
+import { TracklistModule } from "./tracklist/tracklist.module";
+import { UploadModule } from "./upload/upload.module";
+import { UserModule } from "./user/user.module";
+import { LibrariesModule } from "./v2/libraries/module";
+import { ZoneModule } from "./zone/zone.module";
 
 @Module({
-  controllers: [
-    AppController
-  ],
+  controllers: [AppController],
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: [
-        ".env.dev",
-        ".env"
-      ],
-      expandVariables: true
+      envFilePath: [".env.dev", ".env"],
+      expandVariables: true,
+    }),
+    AuthenticationModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => ({
+        publishableKey: config.getOrThrow("CLERK_PUBLISHABLE_KEY"),
+        secretKey: config.getOrThrow("CLERK_SECRET_KEY"),
+      }),
     }),
     EventEmitterModule.forRoot({
-      global: true
+      global: true,
     }),
     FileSystemModule.forRoot(),
     TypeOrmModule.forRoot({
@@ -78,8 +81,8 @@ import { ConfigureModule } from './configure/configure.module';
         enabled: config.get("SEARCH_ENGINE_MODULE") === "meilisearch",
         host: `${config.get("SEARCH_ENGINE_HOST")}:${config.get("SEARCH_ENGINE_PORT")}`,
         apiKey: config.get("SEARCH_ENGINE_KEY"),
-        indexPrefix: "sc_"
-      })
+        indexPrefix: "sc_",
+      }),
     }),
     MeilisearchModule,
     CronModule,
@@ -88,9 +91,9 @@ import { ConfigureModule } from './configure/configure.module';
         defaultQueueOptions: {
           concurrent: 1,
           workerType: "thread",
-          debounceMs: 500
-        }
-      })
+          debounceMs: 500,
+        },
+      }),
     }),
     PipelineModule.forRootAsync({
       inject: [FileSystemService],
@@ -100,11 +103,13 @@ import { ConfigureModule } from './configure/configure.module';
           enableStdout: Environment.isDev,
           // Disable file logs on dev environment
           disableFileLogs: Environment.isDev,
-          logsDirectory: fsService.getLogsDir()
-        }
-      }
+          logsDirectory: fsService.getLogsDir(),
+        };
+      },
     }),
     EventEmitterModule.forRoot({ global: true, ignoreErrors: true }),
+    LibrariesModule,
+
     ArtistModule,
     ZoneModule,
     AlbumModule,
@@ -121,11 +126,7 @@ import { ConfigureModule } from './configure/configure.module';
     ImportModule,
     CollectionModule,
     NotificationModule,
-    OIDCModule.forRoot({
-      issuer: process.env.OIDC_ISSUER,
-      client_id: process.env.OIDC_CLIENT_ID,
-      client_secret: process.env.OIDC_CLIENT_SECRET
-    }),
+
     ProfileModule,
     MountModule,
     FileModule,
@@ -133,16 +134,14 @@ import { ConfigureModule } from './configure/configure.module';
     HostnameModule,
     GeniusModule.forRootAsync({
       useFactory: () => ({
-        clientToken: process.env.GENIUS_TOKEN
+        clientToken: process.env.GENIUS_TOKEN,
       }),
     }),
     TracklistModule,
     MetricsModule,
     ConfigureModule,
-    TasksModule.forRoot()
+    TasksModule.forRoot(),
   ],
-  providers: [
-    AppService
-  ]
+  providers: [AppService],
 })
-export class AppModule { }
+export class AppModule {}

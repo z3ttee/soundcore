@@ -1,63 +1,53 @@
-import { BadRequestException, Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
-import { Pageable } from '@repo/utilities';
-import { Roles } from '../../authentication/decorators/role.decorator';
-import { ROLE_ADMIN } from '../../constants';
-import { CreateResult } from '../../utils/results/creation.result';
-import { CreateMountDTO } from '../dtos/create-mount.dto';
-import { UpdateMountDTO } from '../dtos/update-mount.dto';
-import { Mount } from '../entities/mount.entity';
-import { MountService } from '../services/mount.service';
-import { Pagination } from '@repo/nestjs';
-import { Environment } from '@repo/bootstrap';
+import { BadRequestException, Body, Controller, Delete, Get, Param, Post, Put } from "@nestjs/common";
+import { Environment } from "@repo/bootstrap";
+import { Pagination } from "@repo/nestjs";
+import { Pageable } from "@repo/utilities";
+import { CreateResult } from "../../utils/results/creation.result";
+import { CreateMountDTO } from "../dtos/create-mount.dto";
+import { UpdateMountDTO } from "../dtos/update-mount.dto";
+import { Mount } from "../entities/mount.entity";
+import { MountService } from "../services/mount.service";
 
-@Controller('mounts')
+@Controller("mounts")
 export class MountController {
-  constructor(private readonly mountService: MountService) { }
+  constructor(private readonly mountService: MountService) {}
 
-  @Roles(ROLE_ADMIN)
   @Get("/bucket/:bucketId")
   public async findAllByBucket(@Param("bucketId") bucketId: string, @Pagination() pageable: Pageable) {
     return this.mountService.findByBucketId(bucketId, pageable);
   }
 
-  @Roles(ROLE_ADMIN)
   @Get(":mountId")
   public async findById(@Param("mountId") mountId: string): Promise<Mount> {
     return this.mountService.findById(mountId);
   }
 
-  @Roles(ROLE_ADMIN)
   @Put(":mountId")
   public async updateMount(@Param("mountId") mountId: string, @Body() updateMountDto: UpdateMountDTO): Promise<Mount> {
-    return this.mountService.update(mountId, updateMountDto)
+    return this.mountService.update(mountId, updateMountDto);
   }
 
-  @Roles(ROLE_ADMIN)
   @Post()
   public async createMount(@Body() createMountDto: CreateMountDTO): Promise<CreateResult<Mount>> {
     if (Environment.isDockerized) {
       throw new BadRequestException("Application is dockerized, please mount a docker volume into / instead.");
     }
 
-    return this.mountService.createIfNotExists(createMountDto)
+    return this.mountService.createIfNotExists(createMountDto);
   }
 
-  @Roles(ROLE_ADMIN)
   @Delete(":mountId")
   public async deleteMount(@Param("mountId") mountId: string): Promise<boolean> {
-    return this.mountService.delete(mountId)
+    return this.mountService.delete(mountId);
   }
 
-  @Roles(ROLE_ADMIN)
   @Put(":mountId/default")
   public async setDefaultInBucket(@Param("mountId") mountId: string): Promise<Mount> {
-    return this.mountService.setDefaultMount(mountId)
+    return this.mountService.setDefaultMount(mountId);
   }
 
-  @Roles(ROLE_ADMIN)
   @Get(":mountId/rescan")
   public async reindexMount(@Param("mountId") mountId: string) {
-    return this.mountService.rescanMount(mountId)
+    return this.mountService.rescanMount(mountId);
   }
-
 }

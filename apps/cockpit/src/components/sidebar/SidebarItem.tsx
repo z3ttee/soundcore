@@ -16,9 +16,6 @@ const sidebarItem = cva("flex items-center gap-4 border p-2 rounded outline-none
 
 export default function SidebarItem(props: PropsWithChildren<{ label: string; href: string; icon?: ReactElement }>) {
   const pathname = usePathname();
-
-  console.log("SidebarItem", pathname, props.href);
-
   return (
     <Link href={props.href} key={props.href} className={sidebarItem({ active: pathname === props.href })}>
       {props.icon}
